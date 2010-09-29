@@ -554,7 +554,7 @@ public  class BetaDoubleRef
         }
         throw new TodoException();
     }
-    
+
     @Override
     public final double atomicGetAndIncrement(final double amount){
         double result = atomicIncrementAndGet(amount);
@@ -1051,11 +1051,18 @@ public  class BetaDoubleRef
 
     @Override
     public final double atomicGet(){
-        DoubleRefTranlocal read = ___load(___stm.spinCount, null, LOCKMODE_NONE);
+        //DoubleRefTranlocal read = ___active;
 
+        //if = ___arriveAndLockOrBackoff();
+        //if(
+          
+
+
+        DoubleRefTranlocal read = ___load(___stm.spinCount, null, LOCKMODE_NONE);
         if(read == null){
-            throw new AtomicOperationException();
+           throw new AtomicOperationException();
         }
+
 
         if(read.isLocked){
             throw new LockedException("Can't read locked reference");

@@ -1087,18 +1087,18 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     @Override
     public final ${transactionalObject.type} atomicGet(){
-        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} read = ___active;
+        //${transactionalObject.tranlocal}${transactionalObject.typeParameter} read = ___active;
 
+        //if = ___arriveAndLockOrBackoff();
+        //if(
+          
+
+
+        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} read = ___load(___stm.spinCount, null, LOCKMODE_NONE);
         if(read == null){
            throw new AtomicOperationException();
         }
 
-        if = ___arriveAndLockOrBackoff();
-        if(
-
-
-
-        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} read = ___load(___stm.spinCount, null, LOCKMODE_NONE);
 
         if(read.isLocked){
             throw new LockedException("Can't read locked reference");

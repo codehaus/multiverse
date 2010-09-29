@@ -554,7 +554,7 @@ public final class BetaLongRef
         }
         throw new TodoException();
     }
-    
+
     @Override
     public final long atomicGetAndIncrement(final long amount){
         long result = atomicIncrementAndGet(amount);
@@ -1051,11 +1051,18 @@ public final class BetaLongRef
 
     @Override
     public final long atomicGet(){
-        LongRefTranlocal read = ___load(___stm.spinCount, null, LOCKMODE_NONE);
+        //LongRefTranlocal read = ___active;
 
+        //if = ___arriveAndLockOrBackoff();
+        //if(
+          
+
+
+        LongRefTranlocal read = ___load(___stm.spinCount, null, LOCKMODE_NONE);
         if(read == null){
-            throw new AtomicOperationException();
+           throw new AtomicOperationException();
         }
+
 
         if(read.isLocked){
             throw new LockedException("Can't read locked reference");

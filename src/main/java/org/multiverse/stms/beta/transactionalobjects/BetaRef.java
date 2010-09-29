@@ -554,7 +554,7 @@ public final class BetaRef<E>
         }
         throw new TodoException();
     }
-    
+
     @Override
     public final boolean isNull(){
         final Transaction tx = getThreadLocalTransaction();
@@ -970,11 +970,18 @@ public final class BetaRef<E>
 
     @Override
     public final E atomicGet(){
-        RefTranlocal<E> read = ___load(___stm.spinCount, null, LOCKMODE_NONE);
+        //RefTranlocal<E> read = ___active;
 
+        //if = ___arriveAndLockOrBackoff();
+        //if(
+          
+
+
+        RefTranlocal<E> read = ___load(___stm.spinCount, null, LOCKMODE_NONE);
         if(read == null){
-            throw new AtomicOperationException();
+           throw new AtomicOperationException();
         }
+
 
         if(read.isLocked){
             throw new LockedException("Can't read locked reference");

@@ -554,7 +554,7 @@ public final class BetaIntRef
         }
         throw new TodoException();
     }
-    
+
     @Override
     public final int atomicGetAndIncrement(final int amount){
         int result = atomicIncrementAndGet(amount);
@@ -1051,11 +1051,18 @@ public final class BetaIntRef
 
     @Override
     public final int atomicGet(){
-        IntRefTranlocal read = ___load(___stm.spinCount, null, LOCKMODE_NONE);
+        //IntRefTranlocal read = ___active;
 
+        //if = ___arriveAndLockOrBackoff();
+        //if(
+          
+
+
+        IntRefTranlocal read = ___load(___stm.spinCount, null, LOCKMODE_NONE);
         if(read == null){
-            throw new AtomicOperationException();
+           throw new AtomicOperationException();
         }
+
 
         if(read.isLocked){
             throw new LockedException("Can't read locked reference");
