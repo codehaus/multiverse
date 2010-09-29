@@ -12,7 +12,6 @@ import static java.lang.String.format;
  */
 public class BetaStmConfiguration {
 
-    public StmCallback stmCallback;
     public PropagationLevel propagationLevel = PropagationLevel.Requires;
     public IsolationLevel isolationLevel = IsolationLevel.Snapshot;
     public PessimisticLockLevel pessimisticLockLevel = PessimisticLockLevel.LockNone;

@@ -38,7 +38,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     public PessimisticLockLevel pessimisticLockLevel;
     public int readLockMode;
     public int writeLockMode;
-    public StmCallback stmCallback;
     public final String familyName;
     public final boolean isAnonymous;
     public boolean interruptible = false;
@@ -84,7 +83,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         }
 
         this.stm = stm;
-        this.stmCallback = configuration.stmCallback;
         this.interruptible = configuration.interruptible;
         this.readonly = configuration.readonly;
         this.spinCount = configuration.spinCount;
@@ -314,7 +312,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -344,7 +341,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -375,7 +371,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -402,7 +397,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -429,7 +423,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -456,7 +449,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -483,7 +475,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -510,7 +501,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -537,7 +527,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -568,7 +557,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -599,7 +587,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.propagationLevel = propagationLevel;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.permanentListeners = permanentListeners;
-        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -630,7 +617,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -661,7 +647,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -692,7 +677,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.stmCallback = stmCallback;
         return config;
     }
 
@@ -721,7 +705,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.traceLevel = traceLevel;
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.stmCallback = stmCallback;
         config.isolationLevel = isolationLevel;
         config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
@@ -762,7 +745,6 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = newPermanentListeners;
-        config.stmCallback = stmCallback;
         return config;
     }
 
