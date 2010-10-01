@@ -103,6 +103,15 @@ performance.
 
 - transactional array
 
+- mono transaction and undefined state
+    - state not used for now
+
+- array transaction and undefined state
+    - state not used for now
+
+- map transaction and undefined state
+    - state not used for now
+
 todo
 
 - can it be that there is an isolation problem on the load in combination with pooling? because a tranlocal
@@ -114,12 +123,6 @@ value even though it is locked.
 - array transaction:  support for orelse
 
 - array tree transaction: support for orelse
-
-- mono transaction and undefined state
-
-- array transaction and undefined state
-
-- map transaction and undefined state
 
 - unshared atomicget, with periodic atomicset.
 
@@ -214,15 +217,13 @@ and not allowed. So not throw the retry error immediately..
 
 - ensureOptimistic
 
-- every transaction should have a random unit.
-
 - read uncommitted isolation level
 
 - improved testing in the transaction for the ensure functionality
 
 - improved testing in the transaction for read committed isolation level
 
-- the skipreadconflict logic can be made cheaper by mering the config.readlocklevel and config.inconsistentread.
+- the skipreadconflict logic can be made cheaper by merging the config.readlocklevel and config.inconsistentread.
 
 - use a retry policy for re-acquiring lock. atm only spinning is used. 
 

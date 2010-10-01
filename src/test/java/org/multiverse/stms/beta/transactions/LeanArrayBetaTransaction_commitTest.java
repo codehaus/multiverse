@@ -1,33 +1,32 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConfiguration;
 
-import static org.junit.Assert.fail;
-import static org.multiverse.TestUtils.assertIsAborted;
+public class LeanArrayBetaTransaction_commitTest
+        extends BetaTransaction_commitTest{
 
-public class LeanArrayBetaTransaction_commitTest {
-
-    private BetaStm stm;
-
-    @Before
-    public void setUp() {
-        stm = new BetaStm();
+    @Override
+    public boolean isSupportingListeners() {
+        return false;
     }
 
-    @Test
-    public void whenAbortOnly() {
-        LeanArrayBetaTransaction tx = new LeanArrayBetaTransaction(stm);
-        tx.setAbortOnly();
+    @Override
+    public BetaTransaction newTransaction() {
+        return new LeanArrayBetaTransaction(stm);
+    }
 
-        try {
-            tx.commit();
-            fail();
-        } catch (ReadWriteConflict conflict) {
-        }
+    @Override
+    public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
+        return new LeanArrayBetaTransaction(config);
+    }
 
-        assertIsAborted(tx);
+    @Override
+    public boolean isTransactionSupportingCommute() {
+        return false;
+    }
+
+     @Override
+    public int getTransactionMaxCapacity() {
+        return new BetaStmConfiguration().maxArrayTransactionSize;
     }
 }

@@ -59,7 +59,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
         BetaLongRef ref = newLongRef(stm);
 
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
-        tranlocal.addCommutingFunction(Functions.newIncLongFunction(1), pool);
+        tranlocal.addCommutingFunction(Functions.newLongIncFunction(1), pool);
 
         tranlocal.prepareForPooling(pool);
 

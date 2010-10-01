@@ -1,6 +1,9 @@
 package org.multiverse.api;
 
 /**
+ * With the IsolationLevel you have a way to provide declarative control to guarantee isolation between transactions.
+ * The transaction is free to provide a higher isolation than the one specified. 
+ *
  * @author Peter Veentjer.
  */
 public enum IsolationLevel {

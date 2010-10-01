@@ -33,7 +33,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
     public void whenSuccess() {
         BetaLongRef ref = newLongRef(stm, 2);
 
-        LongFunction function = Functions.newIncLongFunction(1);
+        LongFunction function = Functions.newLongIncFunction(1);
         long result = ref.atomicGetAndAlter(function);
 
         assertEquals(2, result);
@@ -71,7 +71,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
         setThreadLocalTransaction(tx);
         ref.set(10);
 
-        LongFunction function = Functions.newIncLongFunction(1);
+        LongFunction function = Functions.newLongIncFunction(1);
         long result = ref.atomicGetAndAlter(function);
 
         tx.abort();

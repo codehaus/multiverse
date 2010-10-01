@@ -1,24 +1,42 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.createReadBiasedLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
-public class LeanMonoBetaTransaction_openForReadTest implements BetaStmConstants {
-    private BetaStm stm;
+public class LeanMonoBetaTransaction_openForReadTest
+        extends BetaTransaction_openForReadTest {
 
-    @Before
-    public void setUp() {
-        stm = new BetaStm();
+    @Override
+    public BetaTransaction newTransaction() {
+        return new LeanMonoBetaTransaction(stm);
+    }
+
+    @Override
+    public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
+        return new LeanMonoBetaTransaction(config);
+    }
+
+    @Override
+    public boolean doesTransactionSupportCommute() {
+        return false;
+    }
+
+    @Override
+    protected void assumeIsAbleToNotTrackReads() {
+        assumeTrue(false);
+    }
+
+    @Override
+    public int getTransactionMaxCapacity() {
+        return 1;
     }
 
     @Test

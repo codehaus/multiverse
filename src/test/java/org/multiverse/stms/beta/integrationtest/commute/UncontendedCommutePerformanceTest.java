@@ -99,7 +99,7 @@ public class UncontendedCommutePerformanceTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    btx.commute(ref, Functions.newIncLongFunction(1));
+                    btx.commute(ref, Functions.newLongIncFunction(1));
                 }
             };
 

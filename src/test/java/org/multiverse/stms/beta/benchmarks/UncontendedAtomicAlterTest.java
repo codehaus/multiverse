@@ -94,7 +94,7 @@ public class UncontendedAtomicAlterTest {
             BetaLongRef ref = newLongRef(stm, -1);
 
             long startMs = System.currentTimeMillis();
-            LongFunction function = Functions.newIncLongFunction(0);
+            LongFunction function = Functions.newLongIncFunction(0);
             for (long k = 0; k < transactionCount; k++) {
                 ref.atomicAlterAndGet(function);
             }

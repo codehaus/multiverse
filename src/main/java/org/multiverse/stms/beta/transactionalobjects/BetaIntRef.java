@@ -388,10 +388,7 @@ public final class BetaIntRef
         long remainingSurplus = ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
         if (remainingSurplus == 0 && oldActive != null) {
             //nobody is using the tranlocal anymore, so pool it.
-
-            //todo: permanent tranlocals also are pooled, but could this cause problems with less
-            //strict reads
-            pool.put(oldActive);
+             pool.put(oldActive);
         }
 
         return listenersAfterWrite;

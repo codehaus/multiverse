@@ -186,7 +186,7 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
         ref.ensure(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongFunction function = Functions.newIncLongFunction(1);
+        LongFunction function = Functions.newLongIncFunction(1);
         ref.alterAndGet(tx, function);
 
         try {

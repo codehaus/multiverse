@@ -46,7 +46,7 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
-        tranlocal.addCommutingFunction(Functions.newIncLongFunction(1), pool);
+        tranlocal.addCommutingFunction(Functions.newLongIncFunction(1), pool);
         tranlocal.read = committed;
         tranlocal.evaluateCommutingFunctions(pool);
 
@@ -64,9 +64,9 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
         LongRefTranlocal committed = ref.___unsafeLoad();
 
         LongRefTranlocal tranlocal = ref.___openForCommute(pool);
-        tranlocal.addCommutingFunction(Functions.newIncLongFunction(1), pool);
-        tranlocal.addCommutingFunction(Functions.newIncLongFunction(1), pool);
-        tranlocal.addCommutingFunction(Functions.newIncLongFunction(1), pool);
+        tranlocal.addCommutingFunction(Functions.newLongIncFunction(1), pool);
+        tranlocal.addCommutingFunction(Functions.newLongIncFunction(1), pool);
+        tranlocal.addCommutingFunction(Functions.newLongIncFunction(1), pool);
         tranlocal.read = committed;
         tranlocal.evaluateCommutingFunctions(pool);
 

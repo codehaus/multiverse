@@ -61,7 +61,7 @@ public class Functions {
      * @param amount the value to increment with. A negative value does a decrement.
      * @return the create identity IntFunction.
      */
-    public static LongFunction newIncLongFunction(long amount) {
+    public static LongFunction newLongIncFunction(long amount) {
         if (amount == 0) {
             return identityLongFunction;
         }
