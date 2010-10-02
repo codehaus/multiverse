@@ -3,6 +3,9 @@ package org.multiverse.stms.beta.integrationtest.classic;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.PessimisticLockLevel;
+import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.IntRef;
@@ -12,7 +15,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.StmUtils.*;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.StmUtils.newIntRef;
+import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class ReadersWritersProblemStressTest {
@@ -24,15 +29,42 @@ public class ReadersWritersProblemStressTest {
 
     private AtomicLong currentReaderCount = new AtomicLong();
     private AtomicLong currentWriterCount = new AtomicLong();
+    private Stm stm;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        readWriteLock = new ReadersWritersLock();
+        stm = getGlobalStmInstance();
     }
 
     @Test
-    public void test() {
+    public void whenNoLocks() {
+        test(PessimisticLockLevel.LockNone);
+    }
+
+    @Test
+    public void whenEnsureReads() {
+        test(PessimisticLockLevel.EnsureReads);
+    }
+
+    @Test
+    public void whenEnsureWrites() {
+        test(PessimisticLockLevel.EnsureWrites);
+    }
+
+    @Test
+    public void whenPrivatizeReads() {
+        test(PessimisticLockLevel.PrivatizeReads);
+    }
+
+    @Test
+    public void whenPrivatizedWrites() {
+        test(PessimisticLockLevel.PrivatizeWrites);
+    }
+
+    public void test(PessimisticLockLevel pessimisticLockLevel) {
+        readWriteLock = new ReadersWritersLock(pessimisticLockLevel);
+
         ReaderThread[] readers = createReaderThreads();
         WriterThread[] writers = createWriterThreads();
 
@@ -135,13 +167,27 @@ public class ReadersWritersProblemStressTest {
         }
     }
 
-    static class ReadersWritersLock {
+    class ReadersWritersLock {
 
         //-1  is write lock, 0 = free, positive number is readLock count.
         private final IntRef readerCount = newIntRef();
+        private AtomicBlock acquireReadLockBlock;
+        private AtomicBlock acquireWriteLockBlock;
+
+        public ReadersWritersLock(PessimisticLockLevel pessimisticLockLevel) {
+            acquireReadLockBlock = stm.createTransactionFactoryBuilder()
+                    .setPessimisticLockLevel(pessimisticLockLevel)
+                    .setMaxRetries(10000)
+                    .buildAtomicBlock();
+
+            acquireWriteLockBlock = stm.createTransactionFactoryBuilder()
+                    .setPessimisticLockLevel(pessimisticLockLevel)
+                    .setMaxRetries(10000)
+                    .buildAtomicBlock();
+        }
 
         public void acquireReadLock() {
-            execute(new AtomicVoidClosure() {
+            acquireReadLockBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     if (readerCount.get() == -1) {
@@ -154,7 +200,7 @@ public class ReadersWritersProblemStressTest {
         }
 
         public void acquireWriteLock() {
-            execute(new AtomicVoidClosure() {
+            acquireWriteLockBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     if (readerCount.get() != 0) {
