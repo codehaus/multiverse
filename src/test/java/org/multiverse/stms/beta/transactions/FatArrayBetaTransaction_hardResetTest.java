@@ -1,7 +1,6 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
@@ -100,12 +99,7 @@ public class FatArrayBetaTransaction_hardResetTest {
         assertEquals(100, tx.getRemainingTimeoutNs());
     }
 
-    @Test
-    @Ignore
-    public void whenUndefined() {
-    }
-
-    @Test
+     @Test
     public void whenPrepared() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.prepare();

@@ -1,7 +1,6 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
@@ -78,12 +77,6 @@ public abstract class BetaTransaction_registerTest implements BetaStmConstants {
         assertIsPrepared(tx);
         verifyZeroInteractions(listener);
         assertHasNormalListeners(tx, listener);
-    }
-
-    @Test
-    @Ignore
-    public void whenUndefined() {
-
     }
 
     @Test

@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.exampletransactionalobjects.LinkedList;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
 import static org.junit.Assert.*;
@@ -94,5 +95,11 @@ public abstract class BetaTransaction_typesTest {
     @Test
     @Ignore
     public void whenCustomTransactionalObjectUsed() {
+        BetaTransaction tx = stm.startDefaultTransaction();
+        LinkedList list = new LinkedList(tx);
+        tx.commit();
+
+
+
     }
 }

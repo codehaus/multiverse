@@ -1,7 +1,6 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.DeadTransactionException;
@@ -819,7 +818,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref1 = newLongRef(stm, 10);
         BetaLongRef ref2 = newLongRef(stm, 10);
 
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         tx.openForRead(ref1, LOCKMODE_NONE);
         LongFunction function = mock(LongFunction.class);
         tx.commute(ref2, function);
@@ -875,17 +874,11 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     }
 
     @Test
-    @Ignore
-    public void whenUndefined() {
-    }
-
-    //todo:
-    @Test
     public void whenNotCommittedBefore_thenReadConflict() {
         BetaTransaction otherTx = stm.startDefaultTransaction();
         BetaLongRef ref = new BetaLongRef(otherTx);
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
 
         try {
             tx.openForWrite(ref, LOCKMODE_NONE);
@@ -903,7 +896,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         LongRefTranlocal committed = ref.___unsafeLoad();
         int oldReadonlyCount = ref.___getReadonlyCount();
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         assertIsActive(tx);
@@ -930,7 +923,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         LongRefTranlocal committed = ref.___unsafeLoad();
         int oldReadonlyCount = ref.___getReadonlyCount();
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         assertIsActive(tx);
@@ -955,7 +948,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     public void whenOpenForWriteAndLock() {
         BetaLongRef ref = newLongRef(stm, 100);
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         LongRefTranlocal write1 = tx.openForWrite(ref, LOCKMODE_NONE);
         LongRefTranlocal write2 = tx.openForWrite(ref, LOCKMODE_NONE);
 
@@ -979,7 +972,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     public void whenAlreadyOpenedForReadAndLocked() {
         BetaLongRef ref = newLongRef(stm, 100);
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_COMMIT);
         LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
@@ -1002,7 +995,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     public void whenAlreadyOpenedForWriteAndLocked() {
         BetaLongRef ref = newLongRef(stm, 100);
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         LongRefTranlocal write1 = tx.openForWrite(ref, LOCKMODE_COMMIT);
         LongRefTranlocal write2 = tx.openForWrite(ref, LOCKMODE_NONE);
 
@@ -1026,7 +1019,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     public void whenAlreadyOpenedForReadAndLock() {
         BetaLongRef ref = newLongRef(stm, 100);
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
         LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
@@ -1051,7 +1044,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     public void whenAlreadyOpenedForWriteAndLock() {
         BetaLongRef ref = newLongRef(stm, 100);
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         LongRefTranlocal write1 = tx.openForWrite(ref, LOCKMODE_NONE);
         LongRefTranlocal write2 = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
@@ -1075,7 +1068,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     public void whenRepeatedLockThenNoProblem() {
         BetaLongRef ref = newLongRef(stm, 100);
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         LongRefTranlocal write1 = tx.openForWrite(ref, LOCKMODE_COMMIT);
         LongRefTranlocal write2 = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
@@ -1099,10 +1092,10 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     public void whenLockedByOtherAfterOpenedAndLockRequired() {
         BetaLongRef ref = newLongRef(stm, 100);
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         tx.openForWrite(ref, LOCKMODE_NONE);
 
-        FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
+        BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForWrite(ref, LOCKMODE_COMMIT);
 
         try {
@@ -1136,10 +1129,10 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     public void whenLockedByOther_thenReadConflict(boolean lockNeeded) {
         BetaLongRef ref = newLongRef(stm, 100);
 
-        FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
+        BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.privatize(otherTx);
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         try {
             tx.openForWrite(ref, lockNeeded?LOCKMODE_COMMIT:LOCKMODE_NONE);
             fail();
@@ -1157,7 +1150,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     //todo:
     @Test
     public void whenNullRef_thenNullPointerException() {
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
 
         try {
             tx.openForWrite((BetaLongRef) null, LOCKMODE_NONE);
@@ -1171,10 +1164,12 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     //todo:
     @Test
     public void whenHasCommutingFunctions() {
+        assumeTrue(isSupportingCommute());
+
         BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         LongFunction function = Functions.newLongIncFunction(1);
         tx.commute(ref, function);
 
@@ -1200,13 +1195,15 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     //todo:
     @Test
     public void whenHasCommutingFunctionAndLocked_thenReadConflict() {
+        assumeTrue(isSupportingCommute());
+
         BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
-        FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
+        BetaTransaction otherTx = newTransaction();
         ref.privatize(otherTx);
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         LongFunction function = Functions.newLongIncFunction(1);
         tx.commute(ref, function);
 
@@ -1228,6 +1225,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     //todo:
     @Test
     public void whenCommuteAvailableThatCausesProblems_thenAbort() {
+        assumeTrue(isSupportingCommute());
+
         BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
@@ -1235,7 +1234,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         RuntimeException exception = new RuntimeException();
         when(function.call(10)).thenThrow(exception);
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         tx.commute(ref, function);
 
         try {
@@ -1256,6 +1255,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     //todo:
     @Test
     public void whenCommuteAvailableThatCausesProblemsAndLock_thenAbort() {
+        assumeTrue(isSupportingCommute());
+
         BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
@@ -1263,7 +1264,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         RuntimeException exception = new RuntimeException();
         when(function.call(10)).thenThrow(exception);
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         tx.commute(ref, function);
 
         try {
@@ -1280,8 +1281,6 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertNull(ref.___getLockOwner());
         assertSame(committed, ref.___unsafeLoad());
     }
-
-
 
     @Test
     public void whenPrepared_thenPreparedTransactionException() {

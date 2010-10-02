@@ -1,7 +1,6 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.DeadTransactionException;
@@ -36,12 +35,6 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
     }
 
     @Test
-    @Ignore
-    public void whenUndefined() {
-
-    }
-
-   @Test
     public void whenSuccess() {
         BetaTransaction tx = newTransaction();
         BetaLongRef ref = new BetaLongRef(tx);

@@ -508,13 +508,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         assertUpdateBiased(ref);
         assertFalse(write.isCommitted);
     }
-
-    @Test
-    @Ignore
-    public void whenUndefined() {
-
-    }
-
+    
     @Test
     public void whenCommitted_thenDeadTransactionException() {
         BetaTransaction tx = newTransaction();

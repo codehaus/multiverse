@@ -1,7 +1,6 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
@@ -27,13 +26,7 @@ public class FatArrayBetaTransaction_softResetTest {
     public void setUp() {
         stm = new BetaStm();
     }
-
-    @Test
-    @Ignore
-    public void whenUndefined() {
-
-    }
-
+ 
     @Test
     public void whenMaximumNumberOfRetriesReached() {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)

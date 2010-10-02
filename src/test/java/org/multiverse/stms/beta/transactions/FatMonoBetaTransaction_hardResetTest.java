@@ -102,12 +102,6 @@ public class FatMonoBetaTransaction_hardResetTest {
         assertEquals(100, tx.getRemainingTimeoutNs());
     }
 
-
-    @Test
-    @Ignore
-    public void whenUndefined() {
-    }
-
     @Test
     public void whenPrepared() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);

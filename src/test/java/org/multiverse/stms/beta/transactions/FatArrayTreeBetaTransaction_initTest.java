@@ -1,7 +1,6 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
@@ -77,13 +76,7 @@ public class FatArrayTreeBetaTransaction_initTest {
 
         assertHasNoCommitLock(ref);
     }
-
-    @Test
-    @Ignore
-    public void whenUndefined() {
-
-    }
-
+ 
     @Test
     public void whenAborted() {
         BetaLongRef ref = newLongRef(stm);
