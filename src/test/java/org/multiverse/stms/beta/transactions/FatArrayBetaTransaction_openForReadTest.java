@@ -42,7 +42,12 @@ public class FatArrayBetaTransaction_openForReadTest
         assumeTrue(true);
     }
 
-  @Test
+    @Override
+    protected boolean hasLocalConflictCounter() {
+        return true;
+    }
+
+    @Test
     public void whenOverflowing() {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);

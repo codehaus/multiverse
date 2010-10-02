@@ -44,14 +44,17 @@ public abstract class BetaTransaction_registerChangeListenerAndAbortTest impleme
 
     public abstract boolean isSupportingListeners();
 
+    public abstract int getTransactionMaxCapacity();
+
     @Test
-    @Ignore
     public void whenMultipleReads_thenMultipleRegisters() {
+        assumeTrue(getTransactionMaxCapacity()>=3);
+
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
         BetaLongRef ref3 = newLongRef(stm);
 
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         tx.openForRead(ref1, LOCKMODE_NONE);
         tx.openForRead(ref2, LOCKMODE_NONE);
         tx.openForRead(ref3, LOCKMODE_NONE);
@@ -221,8 +224,9 @@ public abstract class BetaTransaction_registerChangeListenerAndAbortTest impleme
     }
 
     @Test
-    @Ignore
     public void whenOneOfThemItemsIsConstructed() {
+        assumeTrue(getTransactionMaxCapacity()>=2);
+
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 

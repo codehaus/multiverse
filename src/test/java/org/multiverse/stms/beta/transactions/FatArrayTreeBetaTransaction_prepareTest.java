@@ -12,6 +12,11 @@ public class FatArrayTreeBetaTransaction_prepareTest
     }
 
     @Override
+    public boolean isSupportingWriteSkewDetection() {
+        return true;
+    }
+
+    @Override
     public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
         return new FatArrayBetaTransaction(config);
     }

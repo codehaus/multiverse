@@ -8,6 +8,7 @@ import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.*;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.Listeners;
+import org.multiverse.stms.beta.conflictcounters.LocalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
 import static java.lang.String.format;
@@ -33,6 +34,9 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         this.remainingTimeoutNs = config.timeoutNs;
     }
 
+    public final LocalConflictCounter getLocalConflictCounter(){
+        return null;
+    }
 
     public final boolean tryLock(BetaTransactionalObject ref, int lockMode){
         throw new TodoException();

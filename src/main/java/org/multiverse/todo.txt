@@ -112,6 +112,8 @@ performance.
 - map transaction and undefined state
     - state not used for now
 
+- use a retry policy for re-acquiring lock. atm only spinning is used.
+
 todo
 
 - can it be that there is an isolation problem on the load in combination with pooling? because a tranlocal
@@ -225,7 +227,6 @@ and not allowed. So not throw the retry error immediately..
 
 - the skipreadconflict logic can be made cheaper by merging the config.readlocklevel and config.inconsistentread.
 
-- use a retry policy for re-acquiring lock. atm only spinning is used. 
 
 done
 

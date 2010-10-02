@@ -34,5 +34,8 @@ public class FatArrayTreeBetaTransaction_openForReadTest
         assumeTrue(true);
     }
 
-
+    @Override
+    protected boolean hasLocalConflictCounter() {
+        return true;
+    }
 }

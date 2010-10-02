@@ -7,6 +7,11 @@ public class FatMonoBetaTransaction_commuteTest extends BetaTransaction_commuteT
     }
 
     @Override
+    public boolean hasLocalConflictCounter() {
+        return true;
+    }
+
+    @Override
     public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
         return new FatMonoBetaTransaction(config);
     }

@@ -29,8 +29,9 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
 
     public abstract boolean doesTransactionSupportCommute();
 
-     public abstract int getTransactionMaxCapacity();
+    public abstract int getTransactionMaxCapacity();
 
+    public abstract boolean isSupportingWriteSkewDetection();
 
     @Before
     public void setUp() {
@@ -219,13 +220,14 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
     }
 
     @Test
-    @Ignore
     public void whenMultipleItems() {
+        assumeTrue(getTransactionMaxCapacity() >= 3);
+
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
         BetaLongRef ref3 = newLongRef(stm);
 
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         LongRefTranlocal write1 = tx.openForWrite(ref1, LOCKMODE_NONE);
         write1.value++;
         LongRefTranlocal write2 = tx.openForWrite(ref2, LOCKMODE_NONE);
@@ -299,7 +301,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
     @Test
     public void whenMultipleReferencesHaveCommute() {
         assumeTrue(doesTransactionSupportCommute());
-        assumeTrue(getTransactionMaxCapacity()>=3);
+        assumeTrue(getTransactionMaxCapacity() >= 3);
 
         BetaLongRef ref1 = newLongRef(stm, 10);
         BetaLongRef ref2 = newLongRef(stm, 20);
@@ -439,16 +441,17 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
     }
 
     @Test
-    @Ignore
     public void whenWriteSkewStillPossibleWithWriteSkewEnabled() {
+        assumeTrue(getTransactionMaxCapacity() >= 2);
+
         BetaLongRef ref1 = newLongRef(stm, 0);
         BetaLongRef ref2 = newLongRef(stm, 0);
 
-        BetaTransaction tx1 = new FatArrayBetaTransaction(stm);
+        BetaTransaction tx1 = newTransaction();
         tx1.openForWrite(ref1, LOCKMODE_NONE).value++;
         tx1.openForRead(ref2, LOCKMODE_NONE);
 
-        BetaTransaction tx2 = new FatArrayBetaTransaction(stm);
+        BetaTransaction tx2 = newTransaction();
         tx2.openForRead(ref1, LOCKMODE_NONE);
         tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
 
@@ -457,18 +460,20 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
     }
 
     @Test
-    @Ignore
-    public void whenWriteSkewNotPossibleWithoutWriteSkewDisabled() {
+    public void whenSerializedIsolationLevel_thenWriteSkewDetectedAndReadWriteConflictThrown() {
+        assumeTrue(getTransactionMaxCapacity() >= 2);
+        assumeTrue(isSupportingWriteSkewDetection());
+
         BetaLongRef ref1 = newLongRef(stm, 0);
         BetaLongRef ref2 = newLongRef(stm, 0);
 
-        BetaTransaction tx1 = new FatArrayBetaTransaction(stm);
+        BetaTransaction tx1 = newTransaction();
         tx1.openForWrite(ref1, LOCKMODE_NONE).value++;
         tx1.openForRead(ref2, LOCKMODE_NONE);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setIsolationLevel(IsolationLevel.Serializable);
-        BetaTransaction tx2 = new FatArrayBetaTransaction(config);
+        BetaTransaction tx2 = newTransaction(config);
         tx2.openForRead(ref1, LOCKMODE_NONE);
         tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
 

@@ -4,6 +4,11 @@ public class LeanArrayTreeBetaTransaction_registerChangeListenerAndAbortTest
         extends BetaTransaction_registerChangeListenerAndAbortTest {
 
     @Override
+    public int getTransactionMaxCapacity() {
+        return Integer.MAX_VALUE;
+    }
+
+    @Override
     public boolean isSupportingListeners() {
         return false;
     }

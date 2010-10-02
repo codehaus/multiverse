@@ -5,7 +5,9 @@ import org.multiverse.api.blocking.*;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.*;
 import org.multiverse.api.lifecycle.*;
+
 import org.multiverse.stms.beta.*;
+import org.multiverse.stms.beta.conflictcounters.*;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
 import java.util.*;
@@ -40,6 +42,8 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
         this.poolTransactionType = poolTransactionType;
         this.config = config;
     }
+
+    public abstract LocalConflictCounter getLocalConflictCounter();
 
     public final boolean isAlive(){
         return status == ACTIVE || status == PREPARED;

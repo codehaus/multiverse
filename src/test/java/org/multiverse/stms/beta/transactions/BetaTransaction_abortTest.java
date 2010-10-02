@@ -1,7 +1,6 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
@@ -205,12 +204,6 @@ public abstract class BetaTransaction_abortTest {
         assertNull(ref.___unsafeLoad());
         assertFalse(write.isPermanent);
         assertFalse(write.isCommitted);
-    }
-
-    @Test
-    @Ignore
-    public void whenHasReads() {
-
     }
 
     @Test

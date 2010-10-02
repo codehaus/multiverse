@@ -9,12 +9,17 @@ public class LeanMonoBetaTransaction_openForWriteTest
     }
 
     @Override
+    public boolean hasLocalConflictCounter() {
+        return false;
+    }
+
+    @Override
     public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
         return new LeanMonoBetaTransaction(config);
     }
 
     @Override
-    public boolean doesTransactionSupportCommute() {
+    public boolean isSupportingCommute() {
         return false;
     }
 

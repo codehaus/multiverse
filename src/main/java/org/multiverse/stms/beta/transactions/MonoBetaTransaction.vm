@@ -45,6 +45,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     public final LocalConflictCounter getLocalConflictCounter(){
         return localConflictCounter;
     }
+#else
+    public final LocalConflictCounter getLocalConflictCounter(){
+        return null;
+    }
 #end
 
     public final boolean tryLock(BetaTransactionalObject ref, int lockMode){

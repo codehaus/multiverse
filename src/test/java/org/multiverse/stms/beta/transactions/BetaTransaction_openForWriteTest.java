@@ -34,10 +34,11 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
     public abstract BetaTransaction newTransaction(BetaTransactionConfiguration config);
 
-    public abstract boolean doesTransactionSupportCommute();
+    public abstract boolean isSupportingCommute();
 
     public abstract int getTransactionMaxCapacity();
 
+    public abstract boolean hasLocalConflictCounter();
 
     @Before
     public void setUp() {
@@ -156,12 +157,14 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     }
    
     @Test
-    @Ignore
     public void conflictCounterIsOnlySetOnFirstRead() {
+        assumeTrue(getTransactionMaxCapacity()>=2);
+        assumeTrue(hasLocalConflictCounter());
+
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         stm.getGlobalConflictCounter().signalConflict(ref1);
 
         tx.openForWrite(ref1, LOCKMODE_NONE);
@@ -509,13 +512,14 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     }
 
     @Test
-    @Ignore
     public void multipleOpenForWrites() {
+        assumeTrue(getTransactionMaxCapacity()>=3);
+
         BetaTransactionalObject ref1 = newLongRef(stm);
         BetaTransactionalObject ref2 = newLongRef(stm);
         BetaTransactionalObject ref3 = newLongRef(stm);
 
-        BetaTransaction tx = new FatArrayBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         Tranlocal write1 = tx.openForWrite(ref1, LOCKMODE_NONE);
         Tranlocal write2 = tx.openForWrite(ref2, LOCKMODE_NONE);
         Tranlocal write3 = tx.openForWrite(ref3, LOCKMODE_NONE);
@@ -594,11 +598,12 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     }
 
     @Test
-    @Ignore
     public void conflictCounterIsSetAtFirstWrite() {
+        assumeTrue(hasLocalConflictCounter());
+
         BetaLongRef ref = newLongRef(stm, 10);
 
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
 
         stm.getGlobalConflictCounter().signalConflict(ref);
         tx.openForWrite(ref, LOCKMODE_NONE);
@@ -608,11 +613,12 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     }
 
     @Test
-    @Ignore
     public void conflictCounterIsNotSetWhenAlreadyOpenedForWrite() {
+        assumeTrue(hasLocalConflictCounter());
+
         BetaLongRef ref = newLongRef(stm, 10);
 
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
 
         stm.getGlobalConflictCounter().signalConflict(newLongRef(stm));
 
@@ -627,13 +633,15 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     }
 
     @Test
-    @Ignore
     public void whenUnrealConflictThenConflictCounterUpdated() {
+        assumeTrue(getTransactionMaxCapacity()>=3);
+        assumeTrue(hasLocalConflictCounter());
+
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
         BetaLongRef ref3 = newLongRef(stm);
 
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
 
         stm.getGlobalConflictCounter().signalConflict(newLongRef(stm));
 
@@ -687,7 +695,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
     @Test
     public void commute_whenHasCommutingFunctions() {
-        assumeTrue(doesTransactionSupportCommute());
+        assumeTrue(isSupportingCommute());
 
         BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
@@ -718,7 +726,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
     @Test
     public void commute_whenHasCommutingFunctionAndLocked_thenReadConflict() {
-        assumeTrue(doesTransactionSupportCommute());
+        assumeTrue(isSupportingCommute());
 
         BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
@@ -747,15 +755,18 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
 
     @Test
-    @Ignore
     public void commute_whenPessimisticThenNoConflictDetectionNeeded() {
+        assumeTrue(isSupportingCommute());
+        assumeTrue(hasLocalConflictCounter());
+        assumeTrue(getTransactionMaxCapacity()>=2);
+
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
 
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
+        BetaTransaction tx = newTransaction(config);
         LongRefTranlocal write1 = tx.openForWrite(ref1, LOCKMODE_NONE);
 
         long oldLocalConflictCount = tx.getLocalConflictCounter().get();
@@ -773,7 +784,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
     @Test
     public void commute_whenCommuteAvailableThatCausesProblems_thenAbort() {
-        assumeTrue(doesTransactionSupportCommute());
+        assumeTrue(isSupportingCommute());
 
         BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
@@ -803,7 +814,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     @Test
     public void commute_whenCommuteConflicts_thenAborted() {
         assumeTrue(getTransactionMaxCapacity() >= 2);
-        assumeTrue(doesTransactionSupportCommute());
+        assumeTrue(isSupportingCommute());
 
         BetaLongRef ref1 = newLongRef(stm, 10);
         BetaLongRef ref2 = newLongRef(stm, 10);
@@ -836,7 +847,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
     @Test
     public void commute_whenCommuteAvailableThatCausesProblemsAndLock_thenAbort() {
-        assumeTrue(doesTransactionSupportCommute());
+        assumeTrue(isSupportingCommute());
 
         BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();

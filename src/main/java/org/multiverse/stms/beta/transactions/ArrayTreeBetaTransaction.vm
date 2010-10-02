@@ -43,6 +43,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         this.remainingTimeoutNs = config.timeoutNs;
     }
 
+    @Override
     public final LocalConflictCounter getLocalConflictCounter() {
         return localConflictCounter;
     }

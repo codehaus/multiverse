@@ -11,6 +11,11 @@ public class FatMonoBetaTransaction_prepareTest extends BetaTransaction_prepareT
     }
 
     @Override
+    public boolean isSupportingWriteSkewDetection() {
+        return true;
+    }
+
+    @Override
     public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
         return new FatMonoBetaTransaction(config);
     }

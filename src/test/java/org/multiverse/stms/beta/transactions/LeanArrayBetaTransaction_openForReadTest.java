@@ -13,6 +13,11 @@ public class LeanArrayBetaTransaction_openForReadTest
     }
 
     @Override
+    protected boolean hasLocalConflictCounter() {
+        return true;
+    }
+
+    @Override
     public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
         return new LeanArrayBetaTransaction(config);
     }

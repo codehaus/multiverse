@@ -12,6 +12,11 @@ public class FatMonoBetaTransaction_openForConstructionTest
         extends BetaTransaction_openForConstructionTest {
 
     @Override
+    protected boolean hasLocalConflictCounter() {
+        return true;
+    }
+
+    @Override
     public BetaTransaction newTransaction() {
         return new FatMonoBetaTransaction(stm);
     }
@@ -19,6 +24,11 @@ public class FatMonoBetaTransaction_openForConstructionTest
     @Override
     public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
         return new FatMonoBetaTransaction(config);
+    }
+
+    @Override
+    protected int getMaxTransactionCapacity() {
+        return 1;
     }
 
     @Test

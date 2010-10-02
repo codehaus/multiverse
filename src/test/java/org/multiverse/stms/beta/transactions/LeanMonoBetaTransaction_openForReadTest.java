@@ -39,6 +39,11 @@ public class LeanMonoBetaTransaction_openForReadTest
         return 1;
     }
 
+    @Override
+    protected boolean hasLocalConflictCounter() {
+        return false;
+    }
+
     @Test
     public void whenUntrackedRead_thenSpeculativeConfigError() {
         BetaLongRef ref = createReadBiasedLongRef(stm, 100);

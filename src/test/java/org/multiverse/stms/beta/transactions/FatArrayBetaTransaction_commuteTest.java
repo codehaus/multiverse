@@ -10,6 +10,11 @@ public class FatArrayBetaTransaction_commuteTest extends BetaTransaction_commute
     }
 
     @Override
+    public boolean hasLocalConflictCounter() {
+        return true;
+    }
+
+    @Override
     public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
         return new FatArrayBetaTransaction(config);
     }

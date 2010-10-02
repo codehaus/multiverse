@@ -14,12 +14,17 @@ public class FatArrayBetaTransaction_openForWriteTest
     }
 
     @Override
+    public boolean hasLocalConflictCounter() {
+        return true;
+    }
+
+    @Override
     public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
         return new FatArrayBetaTransaction(config);
     }
 
     @Override
-    public boolean doesTransactionSupportCommute() {
+    public boolean isSupportingCommute() {
         return  true;
     }
 

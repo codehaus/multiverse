@@ -32,6 +32,8 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
 
     public abstract boolean isTransactionSupportingCommute();
 
+    public abstract boolean hasLocalConflictCounter();
+
     public abstract int getTransactionMaxCapacity();
 
     @Before
@@ -88,13 +90,13 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
     }
 
     @Test
-    @Ignore
     public void whenCommuteThenConflictCounterNotSet() {
+        assumeTrue(hasLocalConflictCounter());
         assumeTrue(isTransactionSupportingCommute());
-
+                
         BetaLongRef ref = newLongRef(stm);
 
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         long localConflictCount = tx.getLocalConflictCounter().get();
 
         LongFunction function = mock(LongFunction.class);

@@ -9,6 +9,11 @@ public class FatArrayTreeBetaTransaction_commuteTest
     }
 
     @Override
+    public boolean hasLocalConflictCounter() {
+        return true;
+    }
+
+    @Override
     public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
         return new FatArrayTreeBetaTransaction(config);
     }

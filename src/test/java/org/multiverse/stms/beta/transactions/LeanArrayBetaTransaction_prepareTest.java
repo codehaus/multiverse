@@ -10,6 +10,11 @@ public class LeanArrayBetaTransaction_prepareTest extends BetaTransaction_prepar
     }
 
     @Override
+    public boolean isSupportingWriteSkewDetection() {
+        return false;
+    }
+
+    @Override
     public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
         return new LeanArrayBetaTransaction(config);
     }

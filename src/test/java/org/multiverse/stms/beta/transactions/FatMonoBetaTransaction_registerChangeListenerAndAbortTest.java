@@ -7,6 +7,11 @@ public class FatMonoBetaTransaction_registerChangeListenerAndAbortTest
         extends BetaTransaction_registerChangeListenerAndAbortTest {
 
     @Override
+    public int getTransactionMaxCapacity() {
+        return 1;
+    }
+
+    @Override
     public boolean isSupportingListeners() {
         return true;
     }

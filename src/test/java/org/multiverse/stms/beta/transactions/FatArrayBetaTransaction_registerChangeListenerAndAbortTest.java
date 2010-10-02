@@ -1,10 +1,17 @@
 package org.multiverse.stms.beta.transactions;
 
+import org.multiverse.stms.beta.BetaStmConfiguration;
+
 /**
  * @author Peter Veentjer
  */
 public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest
         extends BetaTransaction_registerChangeListenerAndAbortTest {
+
+    @Override
+    public int getTransactionMaxCapacity() {
+        return new BetaStmConfiguration().maxArrayTransactionSize;
+    }
 
     @Override
     public boolean isSupportingListeners() {

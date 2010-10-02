@@ -37,6 +37,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         this.remainingTimeoutNs = config.timeoutNs;
     }
 
+    @Override
     public final LocalConflictCounter getLocalConflictCounter() {
         return localConflictCounter;
     }

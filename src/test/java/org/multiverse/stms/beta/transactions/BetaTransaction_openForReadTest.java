@@ -38,6 +38,8 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
 
     protected abstract void assumeIsAbleToNotTrackReads();
 
+    protected abstract boolean hasLocalConflictCounter();
+
     @Before
     public void setUp() {
         stm = new BetaStm();
@@ -57,7 +59,6 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         assertNull(read);
         assertIsActive(tx);
     }
-
 
 
 //    @Test
@@ -518,11 +519,12 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
     }
 
     @Test
-    @Ignore
     public void conflictCounterIsSetAtFirstRead() {
+        assumeTrue(hasLocalConflictCounter());
+
         BetaLongRef ref = newLongRef(stm, 10);
 
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
 
         stm.getGlobalConflictCounter().signalConflict(ref);
         tx.openForRead(ref, LOCKMODE_NONE);
@@ -532,11 +534,12 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
     }
 
     @Test
-    @Ignore
     public void conflictCounterIsNotSetWhenAlreadyRead() {
+        assumeTrue(hasLocalConflictCounter());
+
         BetaLongRef ref = newLongRef(stm, 10);
 
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
 
         stm.getGlobalConflictCounter().signalConflict(newLongRef(stm));
 
@@ -551,15 +554,17 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
     }
 
     @Test
-    @Ignore
     public void whenContainsUntrackedRead_thenCantRecoverFromUnrealReadConflict() {
+        assumeTrue(getTransactionMaxCapacity()>=2);
+        assumeTrue(hasLocalConflictCounter());
+
         BetaLongRef ref1 = createReadBiasedLongRef(stm, 100);
         BetaLongRef ref2 = newLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setReadTrackingEnabled(false);
 
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
+        BetaTransaction tx = newTransaction(config);
         tx.openForRead(ref1, LOCKMODE_NONE);
 
         //an unreal readconflict
@@ -581,13 +586,15 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
     }
 
     @Test
-    @Ignore
     public void whenUnrealConflictThenConflictCounterUpdated() {
+        assumeTrue(getTransactionMaxCapacity()>=3);
+        assumeTrue(hasLocalConflictCounter());
+
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
         BetaLongRef ref3 = newLongRef(stm);
 
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
 
         stm.getGlobalConflictCounter().signalConflict(newLongRef(stm));
 

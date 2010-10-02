@@ -42,6 +42,11 @@ public class FatMonoBetaTransaction_openForReadTest
         assumeTrue(true);
     }
 
+    @Override
+    protected boolean hasLocalConflictCounter() {
+        return true;
+    }
+
     @Test
     public void whenOverflowing() {
         BetaLongRef ref1 = newLongRef(stm);

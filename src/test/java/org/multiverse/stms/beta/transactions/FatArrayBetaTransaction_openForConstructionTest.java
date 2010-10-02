@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.transactions;
 
 import org.junit.Test;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
+import org.multiverse.stms.beta.BetaStmConfiguration;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static org.junit.Assert.assertEquals;
@@ -12,6 +13,11 @@ public class FatArrayBetaTransaction_openForConstructionTest
         extends BetaTransaction_openForConstructionTest {
 
     @Override
+    protected int getMaxTransactionCapacity() {
+        return new BetaStmConfiguration().maxArrayTransactionSize;
+    }
+
+    @Override
     public BetaTransaction newTransaction() {
         return new FatArrayBetaTransaction(stm);
     }
@@ -19,6 +25,11 @@ public class FatArrayBetaTransaction_openForConstructionTest
     @Override
     public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
         return new FatArrayBetaTransaction(config);
+    }
+
+    @Override
+    protected boolean hasLocalConflictCounter() {
+        return true;
     }
 
     @Test

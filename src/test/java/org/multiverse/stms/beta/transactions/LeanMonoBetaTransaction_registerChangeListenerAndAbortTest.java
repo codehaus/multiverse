@@ -9,6 +9,11 @@ public class LeanMonoBetaTransaction_registerChangeListenerAndAbortTest
     }
 
     @Override
+    public int getTransactionMaxCapacity() {
+        return 1;
+    }
+
+    @Override
     public boolean isSupportingCommute() {
         return false;
     }

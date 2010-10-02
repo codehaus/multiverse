@@ -38,6 +38,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         this.remainingTimeoutNs = config.timeoutNs;
     }
 
+    @Override
     public final LocalConflictCounter getLocalConflictCounter() {
         return localConflictCounter;
     }

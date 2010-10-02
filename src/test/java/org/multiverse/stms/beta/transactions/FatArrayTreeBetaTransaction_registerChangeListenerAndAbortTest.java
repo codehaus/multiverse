@@ -12,6 +12,11 @@ public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest
     }
 
     @Override
+    public int getTransactionMaxCapacity() {
+        return Integer.MAX_VALUE;
+    }
+
+    @Override
     public boolean isSupportingCommute() {
         return true;
     }

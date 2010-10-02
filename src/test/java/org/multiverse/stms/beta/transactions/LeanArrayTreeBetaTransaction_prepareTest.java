@@ -9,6 +9,11 @@ public class LeanArrayTreeBetaTransaction_prepareTest
     }
 
     @Override
+    public boolean isSupportingWriteSkewDetection() {
+        return false;
+    }
+
+    @Override
     public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
         return new LeanArrayTreeBetaTransaction(config);
     }

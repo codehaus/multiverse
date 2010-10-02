@@ -16,6 +16,11 @@ public class FatMonoBetaTransaction_openForWriteTest
         extends BetaTransaction_openForWriteTest {
 
     @Override
+    public boolean hasLocalConflictCounter() {
+        return true;
+    }
+
+    @Override
     public BetaTransaction newTransaction() {
         return new FatMonoBetaTransaction(stm);
     }
@@ -26,7 +31,7 @@ public class FatMonoBetaTransaction_openForWriteTest
     }
 
     @Override
-    public boolean doesTransactionSupportCommute() {
+    public boolean isSupportingCommute() {
         return true;
     }
 

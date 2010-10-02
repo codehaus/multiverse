@@ -4,6 +4,11 @@ public class LeanArrayTreeBetaTransaction_openForWriteTest
         extends BetaTransaction_openForWriteTest{
 
     @Override
+    public boolean hasLocalConflictCounter() {
+        return true;
+    }
+
+    @Override
     public BetaTransaction newTransaction() {
         return new LeanArrayBetaTransaction(stm);
     }
@@ -14,7 +19,7 @@ public class LeanArrayTreeBetaTransaction_openForWriteTest
     }
 
     @Override
-    public boolean doesTransactionSupportCommute() {
+    public boolean isSupportingCommute() {
         return false;
     }
 

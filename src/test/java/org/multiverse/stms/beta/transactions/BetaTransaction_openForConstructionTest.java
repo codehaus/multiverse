@@ -13,6 +13,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
@@ -24,6 +25,10 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
     public abstract BetaTransaction newTransaction();
 
     public abstract BetaTransaction newTransaction(BetaTransactionConfiguration config);
+
+    protected abstract boolean hasLocalConflictCounter();
+
+    protected abstract int getMaxTransactionCapacity();
 
     @Before
     public void setUp() {
@@ -185,14 +190,17 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
     }
 
     @Test
-    @Ignore
     public void whenPessimisticThenNoConflictDetectionNeeded() {
+        assumeTrue(getMaxTransactionCapacity()>2);
+        assumeTrue(hasLocalConflictCounter());
+
         BetaLongRef ref1 = newLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
+                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
+                .init();
 
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
+        BetaTransaction tx = newTransaction(config);
         tx.openForRead(ref1, LOCKMODE_NONE);
 
         long oldLocalConflictCount = tx.getLocalConflictCounter().get();
@@ -205,9 +213,10 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
     }
 
     @Test
-    @Ignore
     public void conflictCounterIsNotReset() {
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        assumeTrue(hasLocalConflictCounter());
+
+        BetaTransaction tx = newTransaction();
         long oldConflictCount = tx.getLocalConflictCounter().get();
         BetaLongRef ref = new BetaLongRef(tx);
 
@@ -217,7 +226,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
         assertEquals(oldConflictCount, tx.getLocalConflictCounter().get());
         assertIsActive(tx);
     }
-
+   
     @Test
     public void whenPrepared_thenPreparedTransactionException() {
         BetaLongRef ref = newLongRef(stm);

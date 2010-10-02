@@ -31,7 +31,7 @@ public class FatMonoBetaTransaction_softResetTest implements BetaStmConstants {
 
     @Test
     @Ignore
-    public void whenNew() {
+    public void whenUndefined() {
 
     }
 
