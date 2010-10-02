@@ -8,6 +8,7 @@ import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -21,14 +22,14 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 /**
  * todo: improvement: print how many times each philosopher eat.
  */
-public class DiningPhilosophersStressTest {
+public class DiningPhilosophersStressTest implements BetaStmConstants {
 
     private int philosopherCount = 10;
     private volatile boolean stop;
 
     private BetaIntRef[] forks;
     private BetaStm stm;
-    private boolean pessimistic;
+    private PessimisticLockLevel pessimisticLockLevel;
 
     @Before
     public void setUp() {
@@ -38,17 +39,32 @@ public class DiningPhilosophersStressTest {
     }
 
     @Test
-    public void testPessimistic() {
-        test(true);
+    public void whenLockNone(){
+        test(PessimisticLockLevel.LockNone);
     }
 
     @Test
-    public void testOptimistic() {
-        test(false);
+    public void testPrivatizeReads() {
+        test(PessimisticLockLevel.PrivatizeReads);
     }
 
-    public void test(boolean pessimistic) {
-        this.pessimistic = pessimistic;
+    @Test
+    public void testPrivatizeWrite() {
+        test(PessimisticLockLevel.PrivatizeWrites);
+    }
+
+    @Test
+    public void testEnsureReads() {
+        test(PessimisticLockLevel.EnsureReads);
+    }
+
+    @Test
+    public void testEnsureWrite() {
+        test(PessimisticLockLevel.EnsureWrites);
+    }
+
+    public void test(PessimisticLockLevel pessimisticLockLevel) {
+        this.pessimisticLockLevel = pessimisticLockLevel;
         createForks();
 
         PhilosopherThread[] philosopherThreads = createPhilosopherThreads();
@@ -89,10 +105,10 @@ public class DiningPhilosophersStressTest {
         private final BetaIntRef leftFork;
         private final BetaIntRef rightFork;
         private final AtomicBlock releaseForksBlock = stm.createTransactionFactoryBuilder()
-                .setPessimisticLockLevel(pessimistic ? PessimisticLockLevel.PrivatizeReads : PessimisticLockLevel.LockNone)
+                .setPessimisticLockLevel(pessimisticLockLevel)
                 .buildAtomicBlock();
         private final AtomicBlock takeForksBlock = stm.createTransactionFactoryBuilder()
-                .setPessimisticLockLevel(pessimistic ? PessimisticLockLevel.PrivatizeReads : PessimisticLockLevel.LockNone)
+                .setPessimisticLockLevel(pessimisticLockLevel)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
 
