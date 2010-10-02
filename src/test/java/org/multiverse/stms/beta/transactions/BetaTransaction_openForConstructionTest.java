@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.DeadTransactionException;
@@ -35,6 +36,19 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
     }
 
     @Test
+    public void whenNullRef_thenNullPointerException() {
+        BetaTransaction tx = newTransaction();
+
+        try {
+            tx.openForConstruction((BetaLongRef) null);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        assertIsAborted(tx);
+    }
+
+    @Test
     public void whenSuccess() {
         BetaTransaction tx = newTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
@@ -55,7 +69,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
     }
 
     @Test
-    public void whenAlreadyOpenedForConstruction() {
+    public void whenAlreadyOpenedForConstruction_thenNoProblem() {
         BetaTransaction tx = newTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
         LongRefTranlocal construction1 = tx.openForConstruction(ref);
@@ -76,18 +90,6 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
         assertEquals(DIRTY_TRUE, construction1.isDirty);
     }
 
-    @Test
-    public void whenNullRef_thenNullPointerException() {
-        BetaTransaction tx = newTransaction();
-
-        try {
-            tx.openForConstruction((BetaLongRef) null);
-            fail();
-        } catch (NullPointerException expected) {
-        }
-
-        assertIsAborted(tx);
-    }
 
     @Test
     public void whenAlreadyCommitted_thenIllegalArgumentException() {
@@ -157,6 +159,8 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
         assertReadonlyCount(0, ref);
     }
 
+    // ================= readonly =========================
+
     @Test
     public void whenReadonly_thenReadonlyException() {
         BetaLongRef ref = newLongRef(stm);
@@ -182,9 +186,11 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
         assertReadonlyCount(0, ref);
     }
 
+    // ================ isolation level ============================
+
     @Test
-    public void whenPessimisticThenNoConflictDetectionNeeded() {
-        assumeTrue(getMaxTransactionCapacity()>2);
+    public void pessimisticLockLevel_whenPessimisticThenNoConflictDetectionNeeded() {
+        assumeTrue(getMaxTransactionCapacity() > 2);
         assumeTrue(hasLocalConflictCounter());
 
         BetaLongRef ref1 = newLongRef(stm);
@@ -205,8 +211,10 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
         assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());
     }
 
+    // ============ consistency ============================
+
     @Test
-    public void conflictCounterIsNotReset() {
+    public void consistency_conflictCounterIsNotReset() {
         assumeTrue(hasLocalConflictCounter());
 
         BetaTransaction tx = newTransaction();
@@ -219,9 +227,17 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
         assertEquals(oldConflictCount, tx.getLocalConflictCounter().get());
         assertIsActive(tx);
     }
-   
+
     @Test
-    public void whenPrepared_thenPreparedTransactionException() {
+    @Ignore
+    public void consistency_whenThereIsConflict_thenItIsNotTriggered() {
+
+    }
+
+    // ============================ state ====================
+
+    @Test
+    public void state_whenPrepared_thenPreparedTransactionException() {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = newTransaction();
@@ -237,7 +253,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
     }
 
     @Test
-    public void whenAborted_thenDeadTransactionException() {
+    public void state_whenAborted_thenDeadTransactionException() {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = newTransaction();
@@ -253,7 +269,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
     }
 
     @Test
-    public void whenCommitted_thenDeadTransactionException() {
+    public void state_whenCommitted_thenDeadTransactionException() {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = newTransaction();

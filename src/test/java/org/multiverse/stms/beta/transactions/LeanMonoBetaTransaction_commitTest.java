@@ -9,6 +9,11 @@ public class LeanMonoBetaTransaction_commitTest
     }
 
     @Override
+    public boolean isSupportingWriteSkewDetection() {
+        return false;
+    }
+
+    @Override
     public BetaTransaction newTransaction() {
         return new LeanMonoBetaTransaction(stm);
     }

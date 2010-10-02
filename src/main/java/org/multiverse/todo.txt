@@ -227,8 +227,16 @@ and not allowed. So not throw the retry error immediately..
 
 - the skipreadconflict logic can be made cheaper by merging the config.readlocklevel and config.inconsistentread.
 
+- when an inconsistent read is done, instead of going through the arrive and depart, do it faster.
+ The arrive/depart is needed for consistency, but when an inconsistent read is done, it isn't needed.
 
 done
+
+- improved isolation stress test
+
+- very big cleanup of the transaction tests.
+
+- removed read uncomitted.
 
 - Predicates modelled in same way as Function
 

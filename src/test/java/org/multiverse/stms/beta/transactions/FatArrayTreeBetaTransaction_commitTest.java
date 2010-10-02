@@ -9,6 +9,11 @@ public class FatArrayTreeBetaTransaction_commitTest
         extends BetaTransaction_commitTest {
 
     @Override
+    public boolean isSupportingWriteSkewDetection() {
+        return true;
+    }
+
+    @Override
     public boolean isSupportingListeners() {
         return true;
     }

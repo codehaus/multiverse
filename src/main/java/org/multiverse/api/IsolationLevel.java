@@ -9,12 +9,6 @@ package org.multiverse.api;
 public enum IsolationLevel {
 
     /**
-     * The lowest isolation level where one can see uncommitted data and inconsistent data. Use it carefully
-     * since the data read could be something that never entered the system or is inconsistent.
-     */
-    ReadUncommitted(true, true, true),
-
-    /**
      * This isolation level doesn't allow for uncommitted data to be read, but you don't get any consistency
      * guarantees. It could be that the value read changes over time (although when readtracking is used this
      * problem won't happen that often). And no guarantees are made that the data you read is consistent.

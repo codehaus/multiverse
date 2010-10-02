@@ -36,6 +36,7 @@ public class FatArrayBetaTransaction_openForConstructionTest
     public void whenOverflowing() {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, 3);
         config.init();
+
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
 
         BetaLongRef ref1 = new BetaLongRef(tx);

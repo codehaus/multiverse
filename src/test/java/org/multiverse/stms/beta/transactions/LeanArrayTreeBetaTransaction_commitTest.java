@@ -4,6 +4,11 @@ public class LeanArrayTreeBetaTransaction_commitTest
         extends BetaTransaction_commitTest {
 
     @Override
+    public boolean isSupportingWriteSkewDetection() {
+        return false;
+    }
+
+    @Override
     public boolean isSupportingListeners() {
         return false;
     }

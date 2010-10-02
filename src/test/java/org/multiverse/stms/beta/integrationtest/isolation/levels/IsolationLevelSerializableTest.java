@@ -1,7 +1,6 @@
-package org.multiverse.stms.beta.integrationtest.isolation;
+package org.multiverse.stms.beta.integrationtest.isolation.levels;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.Transaction;
@@ -16,6 +15,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newReadBiasedLongRef;
 
 public class IsolationLevelSerializableTest {
 
@@ -33,13 +33,50 @@ public class IsolationLevelSerializableTest {
     }
 
     @Test
-    @Ignore
-    public void unrepeatableRead() {
+    public void repeatableRead_whenTracked_thenNoInconsistentRead() {
+        final BetaLongRef ref = newLongRef(stm);
 
+        transactionFactory = stm.createTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .setReadTrackingEnabled(true)
+                .setIsolationLevel(IsolationLevel.Serializable)
+                .build();
+
+        BetaTransaction tx = transactionFactory.newTransaction();
+        ref.get(tx);
+
+        ref.atomicIncrementAndGet(1);
+
+        long read2 = ref.get(tx);
+        assertEquals(0, read2);
     }
 
     @Test
-    public void causalConsistencyViolationNotPossible() {
+    public void repeatableRead_whenNotTrackedAndConflictingUpdate_thenReadConflict() {
+        final BetaLongRef ref = newReadBiasedLongRef(stm);
+
+        transactionFactory = stm.createTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .setReadTrackingEnabled(false)
+                .setBlockingAllowed(false)
+                .setIsolationLevel(IsolationLevel.Serializable)
+                .build();
+
+        BetaTransaction tx = transactionFactory.newTransaction();
+        ref.get(tx);
+
+        ref.atomicIncrementAndGet(1);
+
+        try {
+            ref.get(tx);
+            fail();
+        } catch (ReadWriteConflict expected) {
+
+        }
+    }
+
+    @Test
+    public void causalConsistency_whenConflictingWrite_thenReadWriteConflict() {
         final BetaLongRef ref1 = newLongRef(stm);
         final BetaLongRef ref2 = newLongRef(stm);
 

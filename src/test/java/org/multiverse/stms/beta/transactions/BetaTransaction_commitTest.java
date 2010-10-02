@@ -47,6 +47,8 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
 
     public abstract boolean isSupportingListeners();
 
+    public abstract boolean isSupportingWriteSkewDetection();
+
     @Before
     public void setUp() {
         stm = new BetaStm();
@@ -57,7 +59,26 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
 
     }
 
-     //todo: move
+    @Test
+    public void whenConstructed() {
+        BetaTransaction tx = newTransaction();
+        BetaLongRef ref = new BetaLongRef(tx);
+        LongRefTranlocal tranlocal = tx.openForConstruction(ref);
+        tranlocal.value++;
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertSame(tranlocal, ref.___unsafeLoad());
+        assertTrue(tranlocal.isCommitted);
+        assertNull(tranlocal.read);
+        assertSame(ref, tranlocal.owner);
+        assertEquals(1, tranlocal.value);
+        assertHasNoCommitLock(ref);
+        assertUpdateBiased(ref);
+        assertSurplus(0, ref);
+        assertReadonlyCount(0, ref);
+    }
+
     @Test
     public void whenContainsOnlyNormalRead() {
         BetaLongRef ref = newLongRef(stm);
@@ -65,7 +86,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
 
         int oldReadonlyCount = ref.___getReadonlyCount();
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         tx.openForRead(ref, LOCKMODE_NONE);
         tx.commit();
 
@@ -78,13 +99,12 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         assertReadonlyCount(oldReadonlyCount + 1, ref);
     }
 
-    //todo: move
     @Test
     public void whenContainsReadBiasedRead() {
         BetaLongRef ref = createReadBiasedLongRef(stm, 100);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         tx.openForRead(ref, LOCKMODE_NONE);
         tx.commit();
 
@@ -97,74 +117,13 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         assertIsCommitted(tx);
     }
 
-    //todo: move
-    @Test
-    public void whenContainsLockedNormalRead() {
-        BetaLongRef ref = newLongRef(stm, 100);
-        LongRefTranlocal committed = ref.___unsafeLoad();
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForRead(ref, LOCKMODE_COMMIT);
-        tx.commit();
-
-        assertSame(committed, ref.___unsafeLoad());
-        assertNull(ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
-        assertSurplus(0, ref);
-        assertUpdateBiased(ref);
-        assertReadonlyCount(1, ref);
-        assertIsCommitted(tx);
-    }
-
-    //todo: move
-    @Test
-    public void whenContainsLockedReadBiasedRead() {
-        BetaLongRef ref = createReadBiasedLongRef(stm, 100);
-        LongRefTranlocal committed = ref.___unsafeLoad();
-
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForRead(ref, LOCKMODE_COMMIT);
-        tx.commit();
-
-        assertSame(committed, ref.___unsafeLoad());
-        assertNull(ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
-        assertSurplus(1, ref);
-        assertReadBiased(ref);
-        assertReadonlyCount(0, ref);
-        assertIsCommitted(tx);
-    }
-
-    //todo: move
-    @Test
-    public void whenContainsLockedUpdate() {
-        BetaLongRef ref = createReadBiasedLongRef(stm, 100);
-
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
-        write.value++;
-        tx.commit();
-
-        assertSame(write, ref.___unsafeLoad());
-        assertTrue(write.isCommitted);
-        assertFalse(write.isPermanent);
-        assertSame(ref, write.owner);
-        assertNull(write.read);
-        assertNull(ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
-        assertSurplus(0, ref);
-        assertUpdateBiased(ref);
-        assertReadonlyCount(0, ref);
-        assertIsCommitted(tx);
-    }
-
-    //todo: move
     @Test
     public void whenNormalUpdate() {
         BetaLongRef ref = newLongRef(stm);
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = (LongRefTranlocal) tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaTransaction tx = newTransaction();
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
         tx.commit();
 
@@ -180,36 +139,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         assertReadonlyCount(0, ref);
     }
 
-    //todo: move
-    @Test
-    public void whenWriteConflictCausedByLock() {
-        BetaLongRef ref = newLongRef(stm, 0);
-        LongRefTranlocal committed = ref.___unsafeLoad();
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
-        write.value++;
-
-        FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        otherTx.openForRead(ref, LOCKMODE_COMMIT);
-
-        try {
-            tx.commit();
-            fail();
-        } catch (ReadWriteConflict expected) {
-        }
-
-        assertHasCommitLock(ref);
-        assertSurplus(1, ref);
-        assertUpdateBiased(ref);
-        assertReadonlyCount(0, ref);
-        assertSame(otherTx, ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
-        assertFalse(write.isPermanent);
-        assertFalse(write.isCommitted);
-    }
-
-    //todo: move
     @Test
     public void whenAlmostReadBiased() {
         BetaLongRef ref = newLongRef(stm, 10);
@@ -222,7 +152,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
             tx.commit();
         }
 
-        BetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         tx.openForRead(ref, LOCKMODE_NONE);
         tx.commit();
 
@@ -240,12 +170,11 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         assertReadonlyCount(0, ref);
     }
 
-    //todo: move
     @Test
     public void whenUpdateReadBiasedRead() {
         BetaLongRef ref = createReadBiasedLongRef(stm, 10);
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
         tx.commit();
@@ -262,13 +191,12 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         assertReadonlyCount(0, ref);
     }
 
-    //todo: move
     @Test
     public void whenNotDirtyAndNotLocked() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
+        BetaTransaction tx = newTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         tx.commit();
 
@@ -282,33 +210,13 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         assertFalse(write.isCommitted);
     }
 
-    //todo: move
-    @Test
-    public void whenNotDirtyAndLocked() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
-
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
-        tx.commit();
-
-        assertIsCommitted(tx);
-        assertSame(committed, ref.___unsafeLoad());
-        assertNull(ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
-        assertSurplus(0, ref);
-        assertUpdateBiased(ref);
-        assertReadonlyCount(1, ref);
-        assertFalse(write.isCommitted);
-    }
-
-    //todo: move
     @Test
     public void whenNotDirtyAndNoDirtyCheck() {
         BetaLongRef ref = newLongRef(stm);
 
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(new BetaTransactionConfiguration(stm).setDirtyCheckEnabled(false));
-        LongRefTranlocal write = (LongRefTranlocal) tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).setDirtyCheckEnabled(false);
+        BetaTransaction tx = newTransaction(config);
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         tx.commit();
 
         assertIsCommitted(tx);
@@ -361,7 +269,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
 
     @Test
     public void whenOnlyConstructedObjects() {
-        assumeTrue(getTransactionMaxCapacity()>1);
+        assumeTrue(getTransactionMaxCapacity() > 1);
 
         BetaTransaction tx = newTransaction();
         BetaLongRef ref1 = new BetaLongRef(tx);
@@ -388,223 +296,6 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         assertHasNoCommitLock(ref2);
         assertSurplus(0, ref2);
         assertUpdateBiased(ref2);
-    }
-
-    @Test
-    public void whenHasPrivatizedWrite() {
-        BetaLongRef ref = newLongRef(stm);
-        int oldReadonlyCount = ref.___getReadonlyCount();
-
-        BetaTransaction tx = newTransaction();
-        ref.privatize(tx);
-        ref.incrementAndGet(tx, 1);
-        LongRefTranlocal committed = (LongRefTranlocal) tx.get(ref);
-        tx.commit();
-
-        assertIsCommitted(tx);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
-        assertSurplus(0, ref);
-        assertReadonlyCount(oldReadonlyCount, ref);
-        assertUpdateBiased(ref);
-    }
-
-    @Test
-    public void whenHasEnsuredWrite() {
-        BetaLongRef ref = newLongRef(stm);
-        int oldReadonlyCount = ref.___getReadonlyCount();
-
-        BetaTransaction tx = newTransaction();
-        ref.ensure(tx);
-        ref.incrementAndGet(tx, 1);
-        LongRefTranlocal committed = (LongRefTranlocal) tx.get(ref);
-        tx.commit();
-
-        assertIsCommitted(tx);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
-        assertSurplus(0, ref);
-        assertReadonlyCount(oldReadonlyCount, ref);
-        assertUpdateBiased(ref);
-    }
-
-    @Test
-    public void whenHasPrivatizedRead() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
-        int oldReadonlyCount = ref.___getReadonlyCount();
-
-        BetaTransaction tx = newTransaction();
-        ref.privatize(tx);
-
-        tx.commit();
-
-        assertIsCommitted(tx);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
-        assertSurplus(0, ref);
-        assertReadonlyCount(oldReadonlyCount + 1, ref);
-        assertUpdateBiased(ref);
-    }
-
-    @Test
-    public void whenHasEnsuredRead() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
-        int oldReadonlyCount = ref.___getReadonlyCount();
-
-        BetaTransaction tx = newTransaction();
-        ref.ensure(tx);
-
-        tx.commit();
-
-        assertIsCommitted(tx);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
-        assertSurplus(0, ref);
-        assertReadonlyCount(oldReadonlyCount + 1, ref);
-        assertUpdateBiased(ref);
-    }
-
-    @Test
-    public void whenPermanentLifecycleListenerAvailable_thenNotified() {
-        assumeTrue(isSupportingListeners());
-
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .addPermanentListener(listener);
-        BetaTransaction tx = newTransaction(config);
-        tx.commit();
-
-        assertIsCommitted(tx);
-        verify(listener).notify(tx, TransactionLifecycleEvent.PostCommit);
-    }
-
-    @Test
-    public void whenLifecycleListenerAvailable_thenNotified() {
-        assumeTrue(isSupportingListeners());
-
-        assumeTrue(isSupportingListeners());
-
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-        BetaTransaction tx = newTransaction();
-        tx.register(listener);
-        tx.commit();
-
-        assertIsCommitted(tx);
-        verify(listener).notify(tx, TransactionLifecycleEvent.PostCommit);
-    }
-
-    @Test
-    public void whenNormalAndPermanentLifecycleListenersAvailable_permanentGetsCalledFirst() {
-        assumeTrue(isSupportingListeners());
-
-        TransactionLifecycleListener normalListener = mock(TransactionLifecycleListener.class);
-        TransactionLifecycleListener permanentListener = mock(TransactionLifecycleListener.class);
-
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .addPermanentListener(permanentListener);
-        BetaTransaction tx = newTransaction(config);
-        tx.register(normalListener);
-        tx.commit();
-
-        assertIsCommitted(tx);
-
-        InOrder inOrder = inOrder(permanentListener, normalListener);
-
-        inOrder.verify(permanentListener).notify(tx, TransactionLifecycleEvent.PostCommit);
-        inOrder.verify(normalListener).notify(tx, TransactionLifecycleEvent.PostCommit);
-    }
-
-    @Test
-    public void whenOnlyRead() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
-
-        int readonlyCount = ref.___getReadonlyCount();
-
-        BetaTransaction tx = newTransaction();
-        tx.openForRead(ref, LOCKMODE_NONE);
-        tx.commit();
-
-        assertIsCommitted(tx);
-        assertSame(committed, ref.___unsafeLoad());
-        assertSurplus(0, ref);
-        assertEquals(0, committed.value);
-        assertUpdateBiased(ref);
-        assertHasNoCommitLock(ref);
-        assertReadonlyCount(readonlyCount + 1, ref);
-    }
-
-    @Test
-    public void whenChangeListenerAvailable_thenListenerNotified() {
-        BetaLongRef ref = newLongRef(stm);
-
-        BetaTransaction tx = newTransaction();
-        tx.openForRead(ref, LOCKMODE_NONE);
-        Latch latch = new CheapLatch();
-        tx.registerChangeListenerAndAbort(latch);
-
-        ref.atomicIncrementAndGet(1);
-
-        assertTrue(latch.isOpen());
-        assertHasNoListeners(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
-        assertSurplus(0, ref);
-        assertUpdateBiased(ref);
-    }
-
-    @Test
-    public void whenChangeListenerAvailableAndNoWrite_thenListenerRemains() {
-        BetaLongRef ref = newLongRef(stm);
-
-        BetaTransaction listeningTx = newTransaction();
-        LongRefTranlocal read = listeningTx.openForRead(ref, LOCKMODE_NONE);
-        Latch latch = new CheapLatch();
-        listeningTx.registerChangeListenerAndAbort(latch);
-
-        BetaTransaction tx = newTransaction();
-        tx.openForWrite(ref, LOCKMODE_NONE);
-        tx.commit();
-
-        assertFalse(latch.isOpen());
-        assertHasListeners(ref, latch);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
-        assertSurplus(0, ref);
-        assertUpdateBiased(ref);
-    }
-
-    @Test
-    public void whenMultipleChangeListeners_thenAllNotified() {
-        BetaLongRef ref = newLongRef(stm);
-
-        List<Latch> listeners = new LinkedList<Latch>();
-        for (int k = 0; k < 10; k++) {
-            BetaTransaction tx = newTransaction();
-            tx.openForRead(ref, LOCKMODE_NONE);
-            Latch listener = new CheapLatch();
-            listeners.add(listener);
-            tx.registerChangeListenerAndAbort(listener);
-        }
-
-        BetaTransaction tx = newTransaction();
-        tx.openForWrite(ref, LOCKMODE_NONE).value++;
-        tx.commit();
-
-        for (Latch listener : listeners) {
-            assertTrue(listener.isOpen());
-        }
     }
 
     @Test
@@ -648,24 +339,25 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenConstructed() {
+    public void whenOnlyRead() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        int readonlyCount = ref.___getReadonlyCount();
+
         BetaTransaction tx = newTransaction();
-        BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal tranlocal = tx.openForConstruction(ref);
-        tranlocal.value++;
+        tx.openForRead(ref, LOCKMODE_NONE);
         tx.commit();
 
         assertIsCommitted(tx);
-        assertSame(tranlocal, ref.___unsafeLoad());
-        assertTrue(tranlocal.isCommitted);
-        assertNull(tranlocal.read);
-        assertSame(ref, tranlocal.owner);
-        assertEquals(1, tranlocal.value);
-        assertHasNoCommitLock(ref);
-        assertUpdateBiased(ref);
+        assertSame(committed, ref.___unsafeLoad());
         assertSurplus(0, ref);
-        assertReadonlyCount(0, ref);
+        assertEquals(0, committed.value);
+        assertUpdateBiased(ref);
+        assertHasNoCommitLock(ref);
+        assertReadonlyCount(readonlyCount + 1, ref);
     }
+
 
     @Test
     public void whenMultipleItems() {
@@ -688,27 +380,6 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         for (BetaLongRef ref : refs) {
             assertEquals(1, tx.openForRead(ref, LOCKMODE_NONE).value);
         }
-    }
-
-    @Test    
-    public void repeatedCommits() {
-        assumeTrue(getTransactionMaxCapacity()>=2);
-
-        BetaLongRef ref1 = newLongRef(stm);
-        BetaLongRef ref2 = newLongRef(stm);
-
-        BetaTransaction tx = newTransaction();
-        for (int k = 0; k < 100; k++) {
-            LongRefTranlocal tranlocal1 = tx.openForWrite(ref1, LOCKMODE_NONE);
-            tranlocal1.value++;
-            LongRefTranlocal tranlocal2 = tx.openForWrite(ref2, LOCKMODE_NONE);
-            tranlocal2.value++;
-            tx.commit();
-            tx.hardReset();
-        }
-
-        assertEquals(100L, ref1.___unsafeLoad().value);
-        assertEquals(100L, ref2.___unsafeLoad().value);
     }
 
     @Test
@@ -743,8 +414,126 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         assertIsCommitted(tx);
     }
 
+
+    // =========================== listeners =======================
+
     @Test
-    public void whenNormalListenerAvailable() {
+    public void listeners_whenPermanentLifecycleListenerAvailable_thenNotified() {
+        assumeTrue(isSupportingListeners());
+
+        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .addPermanentListener(listener);
+        BetaTransaction tx = newTransaction(config);
+        tx.commit();
+
+        assertIsCommitted(tx);
+        verify(listener).notify(tx, TransactionLifecycleEvent.PostCommit);
+    }
+
+    @Test
+    public void listeners_whenLifecycleListenerAvailable_thenNotified() {
+        assumeTrue(isSupportingListeners());
+
+        assumeTrue(isSupportingListeners());
+
+        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        BetaTransaction tx = newTransaction();
+        tx.register(listener);
+        tx.commit();
+
+        assertIsCommitted(tx);
+        verify(listener).notify(tx, TransactionLifecycleEvent.PostCommit);
+    }
+
+    @Test
+    public void listeners_whenNormalAndPermanentLifecycleListenersAvailable_permanentGetsCalledFirst() {
+        assumeTrue(isSupportingListeners());
+
+        TransactionLifecycleListener normalListener = mock(TransactionLifecycleListener.class);
+        TransactionLifecycleListener permanentListener = mock(TransactionLifecycleListener.class);
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .addPermanentListener(permanentListener);
+        BetaTransaction tx = newTransaction(config);
+        tx.register(normalListener);
+        tx.commit();
+
+        assertIsCommitted(tx);
+
+        InOrder inOrder = inOrder(permanentListener, normalListener);
+
+        inOrder.verify(permanentListener).notify(tx, TransactionLifecycleEvent.PostCommit);
+        inOrder.verify(normalListener).notify(tx, TransactionLifecycleEvent.PostCommit);
+    }
+
+
+    @Test
+    public void listeners_whenChangeListenerAvailable_thenListenerNotified() {
+        BetaLongRef ref = newLongRef(stm);
+
+        BetaTransaction tx = newTransaction();
+        tx.openForRead(ref, LOCKMODE_NONE);
+        Latch latch = new CheapLatch();
+        tx.registerChangeListenerAndAbort(latch);
+
+        ref.atomicIncrementAndGet(1);
+
+        assertTrue(latch.isOpen());
+        assertHasNoListeners(ref);
+        assertHasNoCommitLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSurplus(0, ref);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void listeners_whenChangeListenerAvailableAndNoWrite_thenListenerRemains() {
+        BetaLongRef ref = newLongRef(stm);
+
+        BetaTransaction listeningTx = newTransaction();
+        LongRefTranlocal read = listeningTx.openForRead(ref, LOCKMODE_NONE);
+        Latch latch = new CheapLatch();
+        listeningTx.registerChangeListenerAndAbort(latch);
+
+        BetaTransaction tx = newTransaction();
+        tx.openForWrite(ref, LOCKMODE_NONE);
+        tx.commit();
+
+        assertFalse(latch.isOpen());
+        assertHasListeners(ref, latch);
+        assertHasNoCommitLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSurplus(0, ref);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void listeners_whenMultipleChangeListeners_thenAllNotified() {
+        BetaLongRef ref = newLongRef(stm);
+
+        List<Latch> listeners = new LinkedList<Latch>();
+        for (int k = 0; k < 10; k++) {
+            BetaTransaction tx = newTransaction();
+            tx.openForRead(ref, LOCKMODE_NONE);
+            Latch listener = new CheapLatch();
+            listeners.add(listener);
+            tx.registerChangeListenerAndAbort(listener);
+        }
+
+        BetaTransaction tx = newTransaction();
+        tx.openForWrite(ref, LOCKMODE_NONE).value++;
+        tx.commit();
+
+        for (Latch listener : listeners) {
+            assertTrue(listener.isOpen());
+        }
+    }
+
+
+    @Test
+    public void listeners_whenNormalListenerAvailable() {
         assumeTrue(isSupportingListeners());
 
         BetaLongRef ref = newLongRef(stm, 0);
@@ -761,7 +550,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenPermanentListenerAvailable() {
+    public void listeners_whenPermanentListenerAvailable() {
         assumeTrue(isSupportingListeners());
 
         BetaLongRef ref = newLongRef(stm, 0);
@@ -789,8 +578,90 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         }
     }
 
+
+    // =================== isolation ====================
+
     @Test
-    public void whenNoDirtyCheckAndCommute() {
+    public void isolation_whenWriteSkewStillPossibleWithWriteSkewEnabled() {
+        assumeTrue(getTransactionMaxCapacity() > 1);
+
+        BetaLongRef ref1 = newLongRef(stm, 0);
+        BetaLongRef ref2 = newLongRef(stm, 0);
+
+        BetaTransaction tx1 = newTransaction();
+        tx1.openForWrite(ref1, LOCKMODE_NONE).value++;
+        tx1.openForRead(ref2, LOCKMODE_NONE);
+
+        BetaTransaction tx2 = new FatArrayBetaTransaction(stm);
+        tx2.openForRead(ref1, LOCKMODE_NONE);
+        tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
+
+        tx1.commit();
+        tx2.commit();
+    }
+
+    @Test
+    public void isolation_whenWriteSkewNotPossibleWithoutWriteSkewDisabled() {
+        assumeTrue(isSupportingWriteSkewDetection());
+        assumeTrue(getTransactionMaxCapacity() > 1);
+
+        BetaLongRef ref1 = newLongRef(stm, 0);
+        BetaLongRef ref2 = newLongRef(stm, 0);
+
+        BetaTransaction tx1 = newTransaction();
+        tx1.openForWrite(ref1, LOCKMODE_NONE).value++;
+        tx1.openForRead(ref2, LOCKMODE_NONE);
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setIsolationLevel(IsolationLevel.Serializable);
+        BetaTransaction tx2 = newTransaction(config);
+        tx2.openForRead(ref1, LOCKMODE_NONE);
+        tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
+
+        tx1.commit();
+
+        try {
+            tx2.commit();
+            fail();
+        } catch (ReadWriteConflict expected) {
+        }
+
+        assertIsAborted(tx2);
+    }
+
+    // ======================= pessimistic lock level =================
+
+    @Test
+    public void pessimisticLockLevel_whenPrivatizeWritesAndDirtyCheck() {
+        BetaLongRef ref = newLongRef(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites)
+                .setDirtyCheckEnabled(true);
+        BetaTransaction tx = newTransaction(config);
+        tx.openForWrite(ref, LOCKMODE_NONE).value++;
+        tx.commit();
+
+        assertEquals(1, ref.___unsafeLoad().value);
+    }
+
+    @Test
+    public void pessimisticLockLevel_whenPrivatizeReadsReadAndDirtyCheck() {
+        BetaLongRef ref = newLongRef(stm);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
+                .setDirtyCheckEnabled(true);
+        BetaTransaction tx = newTransaction(config);
+        tx.openForWrite(ref, LOCKMODE_NONE).value++;
+        tx.commit();
+
+        assertEquals(1, ref.___unsafeLoad().value);
+    }
+
+
+    // ====================== commute =========================
+
+    @Test
+    public void commute_whenNoDirtyCheckAndCommute() {
         assumeTrue(isTransactionSupportingCommute());
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
@@ -809,7 +680,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenDirtyCheckAndCommute() {
+    public void commute_whenDirtyCheckAndCommute() {
         assumeTrue(isTransactionSupportingCommute());
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
@@ -828,9 +699,9 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenMultipleReferencesWithCommute() {
+    public void commute_whenMultipleReferencesWithCommute() {
         assumeTrue(isTransactionSupportingCommute());
-        assumeTrue(getTransactionMaxCapacity()>1);
+        assumeTrue(getTransactionMaxCapacity() > 1);
 
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
@@ -851,9 +722,9 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenInterleavingPossibleWithCommute() {
+    public void commute_whenInterleavingPossibleWithCommute() {
         assumeTrue(isTransactionSupportingCommute());
-        assumeTrue(getTransactionMaxCapacity()>1);
+        assumeTrue(getTransactionMaxCapacity() > 1);
 
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
@@ -877,7 +748,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenMultipleCommutes() {
+    public void commute_whenMultipleCommutes() {
         assumeTrue(isTransactionSupportingCommute());
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
@@ -897,8 +768,49 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         assertEquals(3, ref.___unsafeLoad().value);
     }
 
+    // ======================== misc ==========================
+
+
     @Test
-    public void whenCommuteAndLockedByOtherTransaction_thenWriteConflict() {
+    public void whenAbortOnly() {
+        BetaTransaction tx = newTransaction();
+        tx.setAbortOnly();
+
+        try {
+            tx.commit();
+            fail();
+        } catch (ReadWriteConflict conflict) {
+        }
+
+        assertIsAborted(tx);
+    }
+
+
+    @Test
+    public void repeatedCommits() {
+        assumeTrue(getTransactionMaxCapacity() >= 2);
+
+        BetaLongRef ref1 = newLongRef(stm);
+        BetaLongRef ref2 = newLongRef(stm);
+
+        BetaTransaction tx = newTransaction();
+        for (int k = 0; k < 100; k++) {
+            LongRefTranlocal tranlocal1 = tx.openForWrite(ref1, LOCKMODE_NONE);
+            tranlocal1.value++;
+            LongRefTranlocal tranlocal2 = tx.openForWrite(ref2, LOCKMODE_NONE);
+            tranlocal2.value++;
+            tx.commit();
+            tx.hardReset();
+        }
+
+        assertEquals(100L, ref1.___unsafeLoad().value);
+        assertEquals(100L, ref2.___unsafeLoad().value);
+    }
+
+    // ========================== locking ========================
+
+    @Test
+    public void locking_whenCommuteAndLockedByOtherTransaction_thenWriteConflict() {
         assumeTrue(isTransactionSupportingCommute());
 
         BetaLongRef ref = newLongRef(stm);
@@ -922,94 +834,159 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenPrivatizeWritesAndDirtyCheck() {
+    public void locking_whenHasPrivatizedRead() {
         BetaLongRef ref = newLongRef(stm);
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites)
-                .setDirtyCheckEnabled(true);
-        BetaTransaction tx = newTransaction(config);
-        tx.openForWrite(ref, LOCKMODE_NONE).value++;
-        tx.commit();
+        LongRefTranlocal committed = ref.___unsafeLoad();
+        int oldReadonlyCount = ref.___getReadonlyCount();
 
-        assertEquals(1, ref.___unsafeLoad().value);
-    }
-
-    @Test
-    public void whenPrivatizeReadsReadAndDirtyCheck() {
-        BetaLongRef ref = newLongRef(stm);
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
-                .setDirtyCheckEnabled(true);
-        BetaTransaction tx = newTransaction(config);
-        tx.openForWrite(ref, LOCKMODE_NONE).value++;
-        tx.commit();
-
-        assertEquals(1, ref.___unsafeLoad().value);
-    }
-
-    @Test
-    public void whenWriteSkewStillPossibleWithWriteSkewEnabled() {
-        assumeTrue(getTransactionMaxCapacity()>1);
-
-        BetaLongRef ref1 = newLongRef(stm, 0);
-        BetaLongRef ref2 = newLongRef(stm, 0);
-
-        BetaTransaction tx1 = new FatArrayBetaTransaction(stm);
-        tx1.openForWrite(ref1, LOCKMODE_NONE).value++;
-        tx1.openForRead(ref2, LOCKMODE_NONE);
-
-        BetaTransaction tx2 = new FatArrayBetaTransaction(stm);
-        tx2.openForRead(ref1, LOCKMODE_NONE);
-        tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
-
-        tx1.commit();
-        tx2.commit();
-    }
-
-    @Test
-    public void whenWriteSkewNotPossibleWithoutWriteSkewDisabled() {
-        assumeTrue(getTransactionMaxCapacity()>1);
-
-        BetaLongRef ref1 = newLongRef(stm, 0);
-        BetaLongRef ref2 = newLongRef(stm, 0);
-
-        BetaTransaction tx1 = new FatArrayBetaTransaction(stm);
-        tx1.openForWrite(ref1, LOCKMODE_NONE).value++;
-        tx1.openForRead(ref2, LOCKMODE_NONE);
-
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setIsolationLevel(IsolationLevel.Serializable);
-        BetaTransaction tx2 = new FatArrayBetaTransaction(config);
-        tx2.openForRead(ref1, LOCKMODE_NONE);
-        tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
-
-        tx1.commit();
-
-        try {
-            tx2.commit();
-            fail();
-        } catch (ReadWriteConflict expected) {
-        }
-
-        assertIsAborted(tx2);
-    }
-
-    @Test
-    public void whenAbortOnly() {
         BetaTransaction tx = newTransaction();
-        tx.setAbortOnly();
+        ref.privatize(tx);
+
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertHasNoCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(0, ref);
+        assertReadonlyCount(oldReadonlyCount + 1, ref);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void locking_whenHasEnsuredRead() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+        int oldReadonlyCount = ref.___getReadonlyCount();
+
+        BetaTransaction tx = newTransaction();
+        ref.ensure(tx);
+
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertHasNoCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(0, ref);
+        assertReadonlyCount(oldReadonlyCount + 1, ref);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void locking_whenContainsPrivatizedNormalRead() {
+        BetaLongRef ref = newLongRef(stm, 100);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction tx = newTransaction();
+        tx.openForRead(ref, LOCKMODE_COMMIT);
+        tx.commit();
+
+        assertSame(committed, ref.___unsafeLoad());
+        assertNull(ref.___getLockOwner());
+        assertHasNoCommitLock(ref);
+        assertSurplus(0, ref);
+        assertUpdateBiased(ref);
+        assertReadonlyCount(1, ref);
+        assertIsCommitted(tx);
+    }
+
+    @Test
+    public void locking_whenHasPrivatizedWrite() {
+        BetaLongRef ref = newLongRef(stm);
+        int oldReadonlyCount = ref.___getReadonlyCount();
+
+        BetaTransaction tx = newTransaction();
+        ref.privatize(tx);
+        ref.incrementAndGet(tx, 1);
+        LongRefTranlocal committed = (LongRefTranlocal) tx.get(ref);
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertHasNoCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(0, ref);
+        assertReadonlyCount(oldReadonlyCount, ref);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void locking_whenHasEnsuredWrite() {
+        BetaLongRef ref = newLongRef(stm);
+        int oldReadonlyCount = ref.___getReadonlyCount();
+
+        BetaTransaction tx = newTransaction();
+        ref.ensure(tx);
+        ref.incrementAndGet(tx, 1);
+        LongRefTranlocal committed = (LongRefTranlocal) tx.get(ref);
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertHasNoCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertSurplus(0, ref);
+        assertReadonlyCount(oldReadonlyCount, ref);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void locking_whenNotDirtyAndLocked() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction tx = newTransaction();
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertSame(committed, ref.___unsafeLoad());
+        assertNull(ref.___getLockOwner());
+        assertHasNoCommitLock(ref);
+        assertSurplus(0, ref);
+        assertUpdateBiased(ref);
+        assertReadonlyCount(1, ref);
+        assertFalse(write.isCommitted);
+    }
+
+    @Test
+    public void locking_whenWriteConflictCausedByLock_thenReadWriteConflict() {
+        BetaLongRef ref = newLongRef(stm, 0);
+        LongRefTranlocal committed = ref.___unsafeLoad();
+
+        BetaTransaction tx = newTransaction();
+        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        write.value++;
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        otherTx.openForRead(ref, LOCKMODE_COMMIT);
 
         try {
             tx.commit();
             fail();
-        } catch (ReadWriteConflict conflict) {
+        } catch (ReadWriteConflict expected) {
         }
 
-        assertIsAborted(tx);
+        assertHasCommitLock(ref);
+        assertSurplus(1, ref);
+        assertUpdateBiased(ref);
+        assertReadonlyCount(0, ref);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertSame(committed, ref.___unsafeLoad());
+        assertFalse(write.isPermanent);
+        assertFalse(write.isCommitted);
     }
 
+
+    // =========================== state =========================
+
     @Test
-    public void whenPreparedUnused() {
+    public void state_whenAlreadyPreparedButUnused() {
         BetaTransaction tx = newTransaction();
         tx.prepare();
 
@@ -1019,7 +996,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenPreparedAndContainsRead() {
+    public void state_whenAlreadyPreparedAndContainsRead() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
@@ -1038,7 +1015,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenPreparedAndContainsUpdate() {
+    public void state_whenAlreadyPreparedAndContainsUpdate() {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = newTransaction();
@@ -1061,7 +1038,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenAlreadyCommitted_thenIgnore() {
+    public void state_whenAlreadyCommitted_thenIgnore() {
         BetaTransaction tx = newTransaction();
         tx.commit();
 
@@ -1070,7 +1047,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenAlreadyAborted_thenDeadTransactionException() {
+    public void state_whenAlreadyAborted_thenDeadTransactionException() {
         BetaTransaction tx = newTransaction();
         tx.abort();
 

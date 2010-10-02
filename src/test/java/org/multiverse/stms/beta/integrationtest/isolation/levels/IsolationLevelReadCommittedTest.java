@@ -1,7 +1,6 @@
-package org.multiverse.stms.beta.integrationtest.isolation;
+package org.multiverse.stms.beta.integrationtest.isolation.levels;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.Transaction;
@@ -14,6 +13,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.newReadBiasedLongRef;
 
 public class IsolationLevelReadCommittedTest {
     private BetaStm stm;
@@ -30,13 +30,46 @@ public class IsolationLevelReadCommittedTest {
     }
 
     @Test
-    @Ignore
-    public void unrepeatableRead() {
+    public void repeatableRead_whenTracked_thenNoInconsistentRead() {
+        final BetaLongRef ref = newLongRef(stm);
 
+        transactionFactory = stm.createTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .setReadTrackingEnabled(true)
+                .setIsolationLevel(IsolationLevel.ReadCommitted)
+                .build();
+
+        BetaTransaction tx = transactionFactory.newTransaction();
+        ref.get(tx);
+
+        ref.atomicIncrementAndGet(1);
+
+        long read2 = ref.get(tx);
+        assertEquals(0, read2);
     }
 
     @Test
-    public void causalConsistencyViolationPossible() {
+    public void repeatableRead_whenNotTracked_thenInconsistentReadPossible() {
+        final BetaLongRef ref = newReadBiasedLongRef(stm);
+
+        transactionFactory = stm.createTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .setReadTrackingEnabled(false)
+                .setBlockingAllowed(false)
+                .setIsolationLevel(IsolationLevel.ReadCommitted)
+                .build();
+
+        BetaTransaction tx = transactionFactory.newTransaction();
+        ref.get(tx);
+
+        ref.atomicIncrementAndGet(1);
+
+        long read2 = ref.get(tx);
+        assertEquals(1, read2);
+    }
+
+    @Test
+    public void causalConsistency_whenConflictingUpdate_thenNotDetected() {
         final BetaLongRef ref1 = newLongRef(stm);
         final BetaLongRef ref2 = newLongRef(stm);
 
@@ -67,7 +100,7 @@ public class IsolationLevelReadCommittedTest {
         ref2.incrementAndGet(tx, 1);
 
         ref1.atomicIncrementAndGet(1);
-        
+
         tx.commit();
 
         assertEquals(1, ref1.atomicGet());

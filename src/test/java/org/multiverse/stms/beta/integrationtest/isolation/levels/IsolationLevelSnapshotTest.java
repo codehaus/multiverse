@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta.integrationtest.isolation;
+package org.multiverse.stms.beta.integrationtest.isolation.levels;
 
 import org.junit.Before;
 import org.junit.Ignore;

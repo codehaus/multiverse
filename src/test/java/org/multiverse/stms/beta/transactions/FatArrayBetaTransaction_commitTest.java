@@ -11,6 +11,11 @@ public class FatArrayBetaTransaction_commitTest extends BetaTransaction_commitTe
     }
 
     @Override
+    public boolean isSupportingWriteSkewDetection() {
+        return true;
+    }
+
+    @Override
     public BetaTransaction newTransaction() {
         return new FatArrayBetaTransaction(stm);
     }

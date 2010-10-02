@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta.integrationtest.isolation;
+package org.multiverse.stms.beta.integrationtest.isolation.writeskew;
 
 import org.junit.After;
 import org.junit.Before;
