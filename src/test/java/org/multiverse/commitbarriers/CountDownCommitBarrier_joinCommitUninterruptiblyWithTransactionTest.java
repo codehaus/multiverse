@@ -165,7 +165,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
         t.join();
         t.assertNothingThrown();
         assertTrue(barrier.isCommitted());
-        assertEquals(1, ref.___unsafeLoad().value);
+        assertEquals(1, ref.atomicGet());
         assertEquals(0, barrier.getNumberWaiting());
     }
 
@@ -198,7 +198,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
         t.join();
         t.assertFailedWithException(IllegalStateException.class);
         assertTrue(barrier.isAborted());
-        assertEquals(0, ref.___unsafeLoad().value);
+        assertEquals(0, ref.atomicGet());
         assertEquals(0, barrier.getNumberWaiting());
     }
 

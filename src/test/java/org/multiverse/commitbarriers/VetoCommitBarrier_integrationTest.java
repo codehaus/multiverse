@@ -48,8 +48,8 @@ public class VetoCommitBarrier_integrationTest {
 
         joinAll(t1, t2);
 
-        assertEquals(1, ref1.___unsafeLoad().value);
-        assertEquals(1, ref2.___unsafeLoad().value);
+        assertEquals(1, ref1.atomicGet());
+        assertEquals(1, ref2.atomicGet());
     }
 
     @Test
@@ -72,8 +72,8 @@ public class VetoCommitBarrier_integrationTest {
         t1.join();
         t2.join();
 
-        assertEquals(0, ref1.___unsafeLoad().value);
-        assertEquals(0, ref2.___unsafeLoad().value);
+        assertEquals(0, ref1.atomicGet());
+        assertEquals(0, ref2.atomicGet());
     }
 
     public class CommitThread extends TestThread {

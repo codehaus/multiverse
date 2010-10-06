@@ -4,6 +4,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.Function;
 import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.transactionalobjects.AbstractBetaTransactionalObject;
 import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
 import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
@@ -13,6 +14,21 @@ public class LinkedList<E> extends AbstractBetaTransactionalObject {
 
     public LinkedList(BetaTransaction tx) {
         super(tx);
+    }
+
+    @Override
+    public Listeners ___commitAll(Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool) {
+        throw new TodoException();
+    }
+
+    @Override
+    public Tranlocal ___newTranlocal() {
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, Tranlocal tranlocal) {
+        throw new TodoException();
     }
 
     @Override
@@ -65,6 +81,10 @@ public class LinkedList<E> extends AbstractBetaTransactionalObject {
         throw new TodoException();
     }
 
+    @Override
+    public Listeners ___commitDirty(Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool) {
+        throw new TodoException();
+    }
 
     public E removeFromFront(BetaTransaction tx) {
         LinkedListTranlocal<E> tranlocal = (LinkedListTranlocal) tx.openForWrite(
@@ -156,17 +176,6 @@ public class LinkedList<E> extends AbstractBetaTransactionalObject {
         }
     }
 
-    @Override
-    public LinkedListTranlocal ___openForConstruction(BetaObjectPool pool) {
-        return new LinkedListTranlocal<E>(this);
-    }
-
-    @Override
-    public LinkedListTranlocal ___openForCommute(BetaObjectPool pool) {
-        LinkedListTranlocal tranlocal = new LinkedListTranlocal<E>(this);
-        tranlocal.isCommuting = true;
-        return tranlocal;
-    }
 }
 
 class LinkedListTranlocal<E> extends Tranlocal {
@@ -174,7 +183,7 @@ class LinkedListTranlocal<E> extends Tranlocal {
     public LinkedListNode<E> tail;
 
     public LinkedListTranlocal(LinkedList<E> owner) {
-        super(owner, false);
+        super(owner);
     }
 
     @Override
@@ -183,19 +192,19 @@ class LinkedListTranlocal<E> extends Tranlocal {
         tail = null;
     }
 
-    @Override
-    public LinkedListTranlocal<E> openForWrite(BetaObjectPool pool) {
-        LinkedListTranlocal<E> tranlocal = new LinkedListTranlocal<E>((LinkedList<E>) owner);
-        tranlocal.read = this;
-        tranlocal.head = head;
-        tranlocal.tail = tail;
-        return tranlocal;
-    }
+//    @Override
+//    public LinkedListTranlocal<E> openForWrite(BetaObjectPool pool) {
+//        LinkedListTranlocal<E> tranlocal = new LinkedListTranlocal<E>((LinkedList<E>) owner);
+//        //tranlocal.read = this;
+//        tranlocal.head = head;
+//        tranlocal.tail = tail;
+//        return tranlocal;
+//    }
 
-    @Override
-    public LinkedListTranlocal<E> openForCommute(BetaObjectPool pool) {
-        throw new TodoException();
-    }
+    //@Override
+    //public LinkedListTranlocal<E> openForCommute(BetaObjectPool pool) {
+//        throw new TodoException();
+  //  }
 
     @Override
     public boolean calculateIsDirty() {
@@ -203,6 +212,7 @@ class LinkedListTranlocal<E> extends Tranlocal {
             return false;
         }
 
+        /*
         if (read == null) {
             isDirty = DIRTY_TRUE;
             return true;
@@ -220,8 +230,11 @@ class LinkedListTranlocal<E> extends Tranlocal {
         }
 
         isDirty = DIRTY_FALSE;
-        return false;
+        return false;  */
+        throw new TodoException();
     }
+
+
 
     @Override
     public void evaluateCommutingFunctions(BetaObjectPool pool) {
@@ -241,15 +254,23 @@ class LinkedListNode<E> extends AbstractBetaTransactionalObject {
     }
 
     @Override
-    public LinkedListNodeTranlocal<E> ___openForConstruction(BetaObjectPool pool) {
-        return new LinkedListNodeTranlocal<E>(this);
+    public Listeners ___commitAll(Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool) {
+        throw new TodoException();
     }
 
     @Override
-    public LinkedListNodeTranlocal<E> ___openForCommute(BetaObjectPool pool) {
-        LinkedListNodeTranlocal<E> tranlocal = new LinkedListNodeTranlocal<E>(this);
-        tranlocal.isCommuting = true;
-        return tranlocal;
+    public Tranlocal ___newTranlocal() {
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, Tranlocal tranlocal) {
+        throw new TodoException();
+    }
+
+   @Override
+    public Listeners ___commitDirty(Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool) {
+        throw new TodoException();
     }
 
     @Override
@@ -310,7 +331,7 @@ class LinkedListNodeTranlocal<E> extends Tranlocal {
     E value;
 
     LinkedListNodeTranlocal(BetaTransactionalObject owner) {
-        super(owner, false);
+        super(owner);
     }
 
     @Override
@@ -320,23 +341,24 @@ class LinkedListNodeTranlocal<E> extends Tranlocal {
         value = null;
     }
 
-    @Override
-    public LinkedListNodeTranlocal<E> openForWrite(BetaObjectPool pool) {
-        LinkedListNodeTranlocal<E> tranlocal = new LinkedListNodeTranlocal<E>(owner);
-        tranlocal.read = this;
-        tranlocal.next = next;
-        tranlocal.prev = prev;
-        tranlocal.value = value;
-        return tranlocal;
-    }
+//    @Override
+//    public LinkedListNodeTranlocal<E> openForWrite(BetaObjectPool pool) {
+//        LinkedListNodeTranlocal<E> tranlocal = new LinkedListNodeTranlocal<E>(owner);
+//        //tranlocal.read = this;
+//        tranlocal.next = next;
+//        tranlocal.prev = prev;
+//        tranlocal.value = value;
+//        return tranlocal;
+//    }
 
-    @Override
-    public LinkedListNodeTranlocal<E> openForCommute(BetaObjectPool pool) {
-        throw new TodoException();
-    }
+//    @Override
+//    public LinkedListNodeTranlocal<E> openForCommute(BetaObjectPool pool) {
+//        throw new TodoException();
+//    }
 
     @Override
     public boolean calculateIsDirty() {
+        /*
         if (isCommitted) {
             return false;
         }
@@ -364,6 +386,8 @@ class LinkedListNodeTranlocal<E> extends Tranlocal {
 
         isDirty = DIRTY_FALSE;
         return false;
+        .*/
+          throw new TodoException();
     }
 
     @Override

@@ -15,6 +15,7 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
@@ -33,7 +34,7 @@ public class BetaLongRef_getAndIncrement1Test implements BetaStmConstants {
     @Test
     public void whenPreparedTransactionAvailable_thenPreparedTransactionException() {
         BetaLongRef ref = newLongRef(stm, 10);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.prepare();
@@ -47,8 +48,7 @@ public class BetaLongRef_getAndIncrement1Test implements BetaStmConstants {
         }
 
         assertIsAborted(tx);
-        assertEquals(10, ref.atomicGet());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
@@ -69,7 +69,7 @@ public class BetaLongRef_getAndIncrement1Test implements BetaStmConstants {
     @Test
     public void whenNoChange() {
         BetaLongRef ref = newLongRef(stm, 10);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -80,7 +80,7 @@ public class BetaLongRef_getAndIncrement1Test implements BetaStmConstants {
         assertIsCommitted(tx);
         assertEquals(10, ref.atomicGet());
         assertSame(tx, getThreadLocalTransaction());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class BetaLongRef_getAndIncrement1Test implements BetaStmConstants {
     @Test
     public void whenLocked_thenLockedException() {
         BetaLongRef ref = newLongRef(stm, 10);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.openForRead(ref, LOCKMODE_COMMIT);
 
@@ -103,7 +103,7 @@ public class BetaLongRef_getAndIncrement1Test implements BetaStmConstants {
         }
 
         assertSame(tx, ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version,10);
         assertSurplus(1, ref);
         assertHasCommitLock(ref);
     }

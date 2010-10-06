@@ -90,7 +90,7 @@ public class CountDownCommitBarrier_joinCommitTest {
         t.join();
         t.assertFailedWithException(IllegalStateException.class);
         assertTrue(barrier.isAborted());
-        assertEquals(0, ref.___unsafeLoad().value);
+        assertEquals(0, ref.atomicGet());
     }
 
     @Test
@@ -136,7 +136,7 @@ public class CountDownCommitBarrier_joinCommitTest {
 
         t.join();
         t.assertFailedWithException(InterruptedException.class);
-        assertEquals(0, ref.___unsafeLoad().value);
+        assertEquals(0, ref.atomicGet());
         assertTrue(barrier.isAborted());
     }
 

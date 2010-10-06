@@ -128,7 +128,7 @@ public final class BetaObjectPool {
      * @param tranlocal the RefTranlocal to pool.
      */
     public void put(final RefTranlocal tranlocal) {
-        if (tranlocal.isPermanent || !tranlocalPoolingEnabled) {
+        if (!tranlocalPoolingEnabled) {
             return;
         }
 
@@ -176,7 +176,7 @@ public final class BetaObjectPool {
      * @param tranlocal the IntRefTranlocal to pool.
      */
     public void put(final IntRefTranlocal tranlocal) {
-        if (tranlocal.isPermanent || !tranlocalPoolingEnabled) {
+        if (!tranlocalPoolingEnabled) {
             return;
         }
 
@@ -224,7 +224,7 @@ public final class BetaObjectPool {
      * @param tranlocal the BooleanRefTranlocal to pool.
      */
     public void put(final BooleanRefTranlocal tranlocal) {
-        if (tranlocal.isPermanent || !tranlocalPoolingEnabled) {
+        if (!tranlocalPoolingEnabled) {
             return;
         }
 
@@ -272,7 +272,7 @@ public final class BetaObjectPool {
      * @param tranlocal the DoubleRefTranlocal to pool.
      */
     public void put(final DoubleRefTranlocal tranlocal) {
-        if (tranlocal.isPermanent || !tranlocalPoolingEnabled) {
+        if (!tranlocalPoolingEnabled) {
             return;
         }
 
@@ -320,7 +320,7 @@ public final class BetaObjectPool {
      * @param tranlocal the LongRefTranlocal to pool.
      */
     public void put(final LongRefTranlocal tranlocal) {
-        if (tranlocal.isPermanent || !tranlocalPoolingEnabled) {
+        if (!tranlocalPoolingEnabled) {
             return;
         }
 
@@ -382,7 +382,7 @@ public final class BetaObjectPool {
      *
      */
     public void put(final Tranlocal tranlocal) {
-        if (!tranlocalPoolingEnabled || tranlocal == null || tranlocal.isPermanent) {
+        if (!tranlocalPoolingEnabled || tranlocal == null) {
             return;
         }
 

@@ -85,6 +85,10 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     }
 
 
+    public final <E> E read(BetaRef<E> ref){
+        throw new TodoException();
+    }
+        
     @Override
     public <E> RefTranlocal<E> openForRead(
         final BetaRef<E> ref, int lockMode) {
@@ -93,6 +97,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOpenForRead(ref);
         }
 
+        //todo: needs to go.
         if (ref == null) {
             return null;
         }
@@ -101,20 +106,21 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         final int index = indexOf(ref);
         if(index > -1){
             //we are lucky, at already is attached to the session
-            RefTranlocal<E> found = (RefTranlocal<E>)array[index];
-
-            if (lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, lockMode == LOCKMODE_COMMIT)){
-                throw abortOnReadConflict();
-            }
+            RefTranlocal<E> tranlocal = (RefTranlocal<E>)array[index];
 
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
             if (index > 0) {
                 array[index] = array[0];
-                array[index] = found;
+                array[0] = tranlocal;
             }
 
-            return found;
+            if (!tranlocal.isConstructing
+                && lockMode != LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+                throw abortOnReadConflict();
+            }
+
+            return tranlocal;
         }
 
         //check if the size is not exceeded.
@@ -127,25 +133,32 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             hasReads = true;
         }
 
-        RefTranlocal<E> read = ref.___load(config.spinCount, this, lockMode);
+        RefTranlocal<E> tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new RefTranlocal<E>(ref);
+        }
 
-        if (read.isLocked) {
+        if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
+            pool.put(tranlocal);
             throw abortOnReadConflict();
         }
+
+        tranlocal.isCommitted = true;
 
         if (hasReadConflict()) {
-            ref.___abort(this, read, pool);
+            ref.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        if( lockMode != LOCKMODE_NONE || config.trackReads || !read.isPermanent){
-            array[firstFreeIndex] = read;
+        if( lockMode != LOCKMODE_NONE || config.trackReads || tranlocal.hasDepartObligation){
+            array[firstFreeIndex] = tranlocal;
             firstFreeIndex++;
         }else{
+            //todo: pooling of tranlocal
             hasUntrackedReads = true;
         }
 
-        return read;
+        return tranlocal;
     }
 
 
@@ -168,23 +181,26 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         lockMode = lockMode>=config.writeLockMode?lockMode:config.writeLockMode;
         final int index = indexOf(ref);
         if(index != -1){
-            RefTranlocal<E> result = (RefTranlocal<E>)array[index];
-            if(lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result,lockMode == LOCKMODE_COMMIT)){
-                throw abortOnReadConflict();
-            }else if(!result.isCommitted){
-                return result;
+            RefTranlocal<E> tranlocal = (RefTranlocal<E>)array[index];
+
+            //an optimization that shifts the read index to the front, so it can be access faster the next time.
+            if (index > 0) {
+                array[index] = array[0];
+                array[0] = tranlocal;
             }
 
-            result = result.openForWrite(pool);
-            //an optimization that shifts the read index to the front, so it can be access faster the next time.
-            //if (index > 0) {
-            //    array[index] = array[0];
-            //    array[index] = result;
-            //}
-            hasUpdates = true;
-            array[index]=result;
-            return result;
+            if(!tranlocal.isConstructing
+                 && lockMode != LOCKMODE_NONE
+                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal,lockMode == LOCKMODE_COMMIT)){
+                throw abortOnReadConflict();
+            }
+
+            if(tranlocal.isCommitted){
+                hasUpdates = true;
+                tranlocal.isCommitted = false;
+            }
+            
+            return tranlocal;
         }
 
         //it was not previously attached to this transaction
@@ -199,29 +215,28 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             hasReads = true;
         }
 
-        final RefTranlocal<E> read = ref.___load(config.spinCount, this, lockMode);
+        RefTranlocal<E> tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new RefTranlocal<E>(ref);
+        }
 
-        if(read.isLocked){
+        if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
+           pool.put(tranlocal);
            throw abortOnReadConflict();
         }
 
+        tranlocal.isCommitted = false;
+
         if (hasReadConflict()) {
-            read.owner.___abort(this, read, pool);
+            tranlocal.owner.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        //open the tranlocal for writing.
-        RefTranlocal<E>  result =  pool.take(ref);
-        if(result == null){
-            result = new RefTranlocal<E>(ref);
-        }
-
-        result.read = read;
-        result.value = read.value;
+        tranlocal.isCommitted = false;            
         hasUpdates = true;
-        array[firstFreeIndex] = result;
+        array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
-        return result;
+        return tranlocal;
     }
 
     @Override
@@ -244,7 +259,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(index >= 0){
             RefTranlocal<E> result = (RefTranlocal<E>)array[index];
 
-            if(result.isCommitted || result.read!= null){
+            if(!result.isConstructing){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -258,7 +273,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //it was not previously attached to this transaction
 
-        if(ref.___unsafeLoad() != null){
+        if(ref.___getLockOwner()!=this){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -268,14 +283,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         //open the tranlocal for writing.
-        RefTranlocal<E> result =  pool.take(ref);
-        if(result == null){
-            result = new RefTranlocal<E>(ref);
+        RefTranlocal<E> tranlocal =  pool.take(ref);
+        if(tranlocal == null){
+                tranlocal = new RefTranlocal<E>(ref);
         }
-        result.isDirty = DIRTY_TRUE;
-        array[firstFreeIndex] = result;
+        tranlocal.isLockOwner = true;
+        tranlocal.isConstructing = true;
+        tranlocal.isDirty = true;
+        array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
-        return result;
+        return tranlocal;
     }
 
     public <E> void commute(
@@ -288,13 +305,17 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(function == null){
             throw abortCommuteOnNullFunction(ref);
         }
-
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
-      }
+  
+    }
 
 
+    public final  int read(BetaIntRef ref){
+        throw new TodoException();
+    }
+        
     @Override
     public  IntRefTranlocal openForRead(
         final BetaIntRef ref, int lockMode) {
@@ -303,6 +324,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOpenForRead(ref);
         }
 
+        //todo: needs to go.
         if (ref == null) {
             return null;
         }
@@ -311,20 +333,21 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         final int index = indexOf(ref);
         if(index > -1){
             //we are lucky, at already is attached to the session
-            IntRefTranlocal found = (IntRefTranlocal)array[index];
-
-            if (lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, lockMode == LOCKMODE_COMMIT)){
-                throw abortOnReadConflict();
-            }
+            IntRefTranlocal tranlocal = (IntRefTranlocal)array[index];
 
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
             if (index > 0) {
                 array[index] = array[0];
-                array[index] = found;
+                array[0] = tranlocal;
             }
 
-            return found;
+            if (!tranlocal.isConstructing
+                && lockMode != LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+                throw abortOnReadConflict();
+            }
+
+            return tranlocal;
         }
 
         //check if the size is not exceeded.
@@ -337,25 +360,32 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             hasReads = true;
         }
 
-        IntRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
+        IntRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new IntRefTranlocal(ref);
+        }
 
-        if (read.isLocked) {
+        if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
+            pool.put(tranlocal);
             throw abortOnReadConflict();
         }
+
+        tranlocal.isCommitted = true;
 
         if (hasReadConflict()) {
-            ref.___abort(this, read, pool);
+            ref.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        if( lockMode != LOCKMODE_NONE || config.trackReads || !read.isPermanent){
-            array[firstFreeIndex] = read;
+        if( lockMode != LOCKMODE_NONE || config.trackReads || tranlocal.hasDepartObligation){
+            array[firstFreeIndex] = tranlocal;
             firstFreeIndex++;
         }else{
+            //todo: pooling of tranlocal
             hasUntrackedReads = true;
         }
 
-        return read;
+        return tranlocal;
     }
 
 
@@ -378,23 +408,26 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         lockMode = lockMode>=config.writeLockMode?lockMode:config.writeLockMode;
         final int index = indexOf(ref);
         if(index != -1){
-            IntRefTranlocal result = (IntRefTranlocal)array[index];
-            if(lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result,lockMode == LOCKMODE_COMMIT)){
-                throw abortOnReadConflict();
-            }else if(!result.isCommitted){
-                return result;
+            IntRefTranlocal tranlocal = (IntRefTranlocal)array[index];
+
+            //an optimization that shifts the read index to the front, so it can be access faster the next time.
+            if (index > 0) {
+                array[index] = array[0];
+                array[0] = tranlocal;
             }
 
-            result = result.openForWrite(pool);
-            //an optimization that shifts the read index to the front, so it can be access faster the next time.
-            //if (index > 0) {
-            //    array[index] = array[0];
-            //    array[index] = result;
-            //}
-            hasUpdates = true;
-            array[index]=result;
-            return result;
+            if(!tranlocal.isConstructing
+                 && lockMode != LOCKMODE_NONE
+                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal,lockMode == LOCKMODE_COMMIT)){
+                throw abortOnReadConflict();
+            }
+
+            if(tranlocal.isCommitted){
+                hasUpdates = true;
+                tranlocal.isCommitted = false;
+            }
+            
+            return tranlocal;
         }
 
         //it was not previously attached to this transaction
@@ -409,29 +442,28 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             hasReads = true;
         }
 
-        final IntRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
+        IntRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new IntRefTranlocal(ref);
+        }
 
-        if(read.isLocked){
+        if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
+           pool.put(tranlocal);
            throw abortOnReadConflict();
         }
 
+        tranlocal.isCommitted = false;
+
         if (hasReadConflict()) {
-            read.owner.___abort(this, read, pool);
+            tranlocal.owner.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        //open the tranlocal for writing.
-        IntRefTranlocal  result =  pool.take(ref);
-        if(result == null){
-            result = new IntRefTranlocal(ref);
-        }
-
-        result.read = read;
-        result.value = read.value;
+        tranlocal.isCommitted = false;            
         hasUpdates = true;
-        array[firstFreeIndex] = result;
+        array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
-        return result;
+        return tranlocal;
     }
 
     @Override
@@ -454,7 +486,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(index >= 0){
             IntRefTranlocal result = (IntRefTranlocal)array[index];
 
-            if(result.isCommitted || result.read!= null){
+            if(!result.isConstructing){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -468,7 +500,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //it was not previously attached to this transaction
 
-        if(ref.___unsafeLoad() != null){
+        if(ref.___getLockOwner()!=this){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -478,14 +510,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         //open the tranlocal for writing.
-        IntRefTranlocal result =  pool.take(ref);
-        if(result == null){
-            result = new IntRefTranlocal(ref);
+        IntRefTranlocal tranlocal =  pool.take(ref);
+        if(tranlocal == null){
+                tranlocal = new IntRefTranlocal(ref);
         }
-        result.isDirty = DIRTY_TRUE;
-        array[firstFreeIndex] = result;
+        tranlocal.isLockOwner = true;
+        tranlocal.isConstructing = true;
+        tranlocal.isDirty = true;
+        array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
-        return result;
+        return tranlocal;
     }
 
     public  void commute(
@@ -498,13 +532,17 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(function == null){
             throw abortCommuteOnNullFunction(ref);
         }
-
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
-      }
+  
+    }
 
 
+    public final  boolean read(BetaBooleanRef ref){
+        throw new TodoException();
+    }
+        
     @Override
     public  BooleanRefTranlocal openForRead(
         final BetaBooleanRef ref, int lockMode) {
@@ -513,6 +551,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOpenForRead(ref);
         }
 
+        //todo: needs to go.
         if (ref == null) {
             return null;
         }
@@ -521,20 +560,21 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         final int index = indexOf(ref);
         if(index > -1){
             //we are lucky, at already is attached to the session
-            BooleanRefTranlocal found = (BooleanRefTranlocal)array[index];
-
-            if (lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, lockMode == LOCKMODE_COMMIT)){
-                throw abortOnReadConflict();
-            }
+            BooleanRefTranlocal tranlocal = (BooleanRefTranlocal)array[index];
 
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
             if (index > 0) {
                 array[index] = array[0];
-                array[index] = found;
+                array[0] = tranlocal;
             }
 
-            return found;
+            if (!tranlocal.isConstructing
+                && lockMode != LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+                throw abortOnReadConflict();
+            }
+
+            return tranlocal;
         }
 
         //check if the size is not exceeded.
@@ -547,25 +587,32 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             hasReads = true;
         }
 
-        BooleanRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
+        BooleanRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new BooleanRefTranlocal(ref);
+        }
 
-        if (read.isLocked) {
+        if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
+            pool.put(tranlocal);
             throw abortOnReadConflict();
         }
+
+        tranlocal.isCommitted = true;
 
         if (hasReadConflict()) {
-            ref.___abort(this, read, pool);
+            ref.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        if( lockMode != LOCKMODE_NONE || config.trackReads || !read.isPermanent){
-            array[firstFreeIndex] = read;
+        if( lockMode != LOCKMODE_NONE || config.trackReads || tranlocal.hasDepartObligation){
+            array[firstFreeIndex] = tranlocal;
             firstFreeIndex++;
         }else{
+            //todo: pooling of tranlocal
             hasUntrackedReads = true;
         }
 
-        return read;
+        return tranlocal;
     }
 
 
@@ -588,23 +635,26 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         lockMode = lockMode>=config.writeLockMode?lockMode:config.writeLockMode;
         final int index = indexOf(ref);
         if(index != -1){
-            BooleanRefTranlocal result = (BooleanRefTranlocal)array[index];
-            if(lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result,lockMode == LOCKMODE_COMMIT)){
-                throw abortOnReadConflict();
-            }else if(!result.isCommitted){
-                return result;
+            BooleanRefTranlocal tranlocal = (BooleanRefTranlocal)array[index];
+
+            //an optimization that shifts the read index to the front, so it can be access faster the next time.
+            if (index > 0) {
+                array[index] = array[0];
+                array[0] = tranlocal;
             }
 
-            result = result.openForWrite(pool);
-            //an optimization that shifts the read index to the front, so it can be access faster the next time.
-            //if (index > 0) {
-            //    array[index] = array[0];
-            //    array[index] = result;
-            //}
-            hasUpdates = true;
-            array[index]=result;
-            return result;
+            if(!tranlocal.isConstructing
+                 && lockMode != LOCKMODE_NONE
+                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal,lockMode == LOCKMODE_COMMIT)){
+                throw abortOnReadConflict();
+            }
+
+            if(tranlocal.isCommitted){
+                hasUpdates = true;
+                tranlocal.isCommitted = false;
+            }
+            
+            return tranlocal;
         }
 
         //it was not previously attached to this transaction
@@ -619,29 +669,28 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             hasReads = true;
         }
 
-        final BooleanRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
+        BooleanRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new BooleanRefTranlocal(ref);
+        }
 
-        if(read.isLocked){
+        if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
+           pool.put(tranlocal);
            throw abortOnReadConflict();
         }
 
+        tranlocal.isCommitted = false;
+
         if (hasReadConflict()) {
-            read.owner.___abort(this, read, pool);
+            tranlocal.owner.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        //open the tranlocal for writing.
-        BooleanRefTranlocal  result =  pool.take(ref);
-        if(result == null){
-            result = new BooleanRefTranlocal(ref);
-        }
-
-        result.read = read;
-        result.value = read.value;
+        tranlocal.isCommitted = false;            
         hasUpdates = true;
-        array[firstFreeIndex] = result;
+        array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
-        return result;
+        return tranlocal;
     }
 
     @Override
@@ -664,7 +713,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(index >= 0){
             BooleanRefTranlocal result = (BooleanRefTranlocal)array[index];
 
-            if(result.isCommitted || result.read!= null){
+            if(!result.isConstructing){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -678,7 +727,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //it was not previously attached to this transaction
 
-        if(ref.___unsafeLoad() != null){
+        if(ref.___getLockOwner()!=this){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -688,14 +737,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         //open the tranlocal for writing.
-        BooleanRefTranlocal result =  pool.take(ref);
-        if(result == null){
-            result = new BooleanRefTranlocal(ref);
+        BooleanRefTranlocal tranlocal =  pool.take(ref);
+        if(tranlocal == null){
+                tranlocal = new BooleanRefTranlocal(ref);
         }
-        result.isDirty = DIRTY_TRUE;
-        array[firstFreeIndex] = result;
+        tranlocal.isLockOwner = true;
+        tranlocal.isConstructing = true;
+        tranlocal.isDirty = true;
+        array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
-        return result;
+        return tranlocal;
     }
 
     public  void commute(
@@ -708,13 +759,17 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(function == null){
             throw abortCommuteOnNullFunction(ref);
         }
-
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
-      }
+  
+    }
 
 
+    public final  double read(BetaDoubleRef ref){
+        throw new TodoException();
+    }
+        
     @Override
     public  DoubleRefTranlocal openForRead(
         final BetaDoubleRef ref, int lockMode) {
@@ -723,6 +778,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOpenForRead(ref);
         }
 
+        //todo: needs to go.
         if (ref == null) {
             return null;
         }
@@ -731,20 +787,21 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         final int index = indexOf(ref);
         if(index > -1){
             //we are lucky, at already is attached to the session
-            DoubleRefTranlocal found = (DoubleRefTranlocal)array[index];
-
-            if (lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, lockMode == LOCKMODE_COMMIT)){
-                throw abortOnReadConflict();
-            }
+            DoubleRefTranlocal tranlocal = (DoubleRefTranlocal)array[index];
 
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
             if (index > 0) {
                 array[index] = array[0];
-                array[index] = found;
+                array[0] = tranlocal;
             }
 
-            return found;
+            if (!tranlocal.isConstructing
+                && lockMode != LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+                throw abortOnReadConflict();
+            }
+
+            return tranlocal;
         }
 
         //check if the size is not exceeded.
@@ -757,25 +814,32 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             hasReads = true;
         }
 
-        DoubleRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
+        DoubleRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new DoubleRefTranlocal(ref);
+        }
 
-        if (read.isLocked) {
+        if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
+            pool.put(tranlocal);
             throw abortOnReadConflict();
         }
+
+        tranlocal.isCommitted = true;
 
         if (hasReadConflict()) {
-            ref.___abort(this, read, pool);
+            ref.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        if( lockMode != LOCKMODE_NONE || config.trackReads || !read.isPermanent){
-            array[firstFreeIndex] = read;
+        if( lockMode != LOCKMODE_NONE || config.trackReads || tranlocal.hasDepartObligation){
+            array[firstFreeIndex] = tranlocal;
             firstFreeIndex++;
         }else{
+            //todo: pooling of tranlocal
             hasUntrackedReads = true;
         }
 
-        return read;
+        return tranlocal;
     }
 
 
@@ -798,23 +862,26 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         lockMode = lockMode>=config.writeLockMode?lockMode:config.writeLockMode;
         final int index = indexOf(ref);
         if(index != -1){
-            DoubleRefTranlocal result = (DoubleRefTranlocal)array[index];
-            if(lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result,lockMode == LOCKMODE_COMMIT)){
-                throw abortOnReadConflict();
-            }else if(!result.isCommitted){
-                return result;
+            DoubleRefTranlocal tranlocal = (DoubleRefTranlocal)array[index];
+
+            //an optimization that shifts the read index to the front, so it can be access faster the next time.
+            if (index > 0) {
+                array[index] = array[0];
+                array[0] = tranlocal;
             }
 
-            result = result.openForWrite(pool);
-            //an optimization that shifts the read index to the front, so it can be access faster the next time.
-            //if (index > 0) {
-            //    array[index] = array[0];
-            //    array[index] = result;
-            //}
-            hasUpdates = true;
-            array[index]=result;
-            return result;
+            if(!tranlocal.isConstructing
+                 && lockMode != LOCKMODE_NONE
+                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal,lockMode == LOCKMODE_COMMIT)){
+                throw abortOnReadConflict();
+            }
+
+            if(tranlocal.isCommitted){
+                hasUpdates = true;
+                tranlocal.isCommitted = false;
+            }
+            
+            return tranlocal;
         }
 
         //it was not previously attached to this transaction
@@ -829,29 +896,28 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             hasReads = true;
         }
 
-        final DoubleRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
+        DoubleRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new DoubleRefTranlocal(ref);
+        }
 
-        if(read.isLocked){
+        if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
+           pool.put(tranlocal);
            throw abortOnReadConflict();
         }
 
+        tranlocal.isCommitted = false;
+
         if (hasReadConflict()) {
-            read.owner.___abort(this, read, pool);
+            tranlocal.owner.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        //open the tranlocal for writing.
-        DoubleRefTranlocal  result =  pool.take(ref);
-        if(result == null){
-            result = new DoubleRefTranlocal(ref);
-        }
-
-        result.read = read;
-        result.value = read.value;
+        tranlocal.isCommitted = false;            
         hasUpdates = true;
-        array[firstFreeIndex] = result;
+        array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
-        return result;
+        return tranlocal;
     }
 
     @Override
@@ -874,7 +940,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(index >= 0){
             DoubleRefTranlocal result = (DoubleRefTranlocal)array[index];
 
-            if(result.isCommitted || result.read!= null){
+            if(!result.isConstructing){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -888,7 +954,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //it was not previously attached to this transaction
 
-        if(ref.___unsafeLoad() != null){
+        if(ref.___getLockOwner()!=this){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -898,14 +964,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         //open the tranlocal for writing.
-        DoubleRefTranlocal result =  pool.take(ref);
-        if(result == null){
-            result = new DoubleRefTranlocal(ref);
+        DoubleRefTranlocal tranlocal =  pool.take(ref);
+        if(tranlocal == null){
+                tranlocal = new DoubleRefTranlocal(ref);
         }
-        result.isDirty = DIRTY_TRUE;
-        array[firstFreeIndex] = result;
+        tranlocal.isLockOwner = true;
+        tranlocal.isConstructing = true;
+        tranlocal.isDirty = true;
+        array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
-        return result;
+        return tranlocal;
     }
 
     public  void commute(
@@ -918,13 +986,17 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(function == null){
             throw abortCommuteOnNullFunction(ref);
         }
-
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
-      }
+  
+    }
 
 
+    public final  long read(BetaLongRef ref){
+        throw new TodoException();
+    }
+        
     @Override
     public  LongRefTranlocal openForRead(
         final BetaLongRef ref, int lockMode) {
@@ -933,6 +1005,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOpenForRead(ref);
         }
 
+        //todo: needs to go.
         if (ref == null) {
             return null;
         }
@@ -941,20 +1014,21 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         final int index = indexOf(ref);
         if(index > -1){
             //we are lucky, at already is attached to the session
-            LongRefTranlocal found = (LongRefTranlocal)array[index];
-
-            if (lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, lockMode == LOCKMODE_COMMIT)){
-                throw abortOnReadConflict();
-            }
+            LongRefTranlocal tranlocal = (LongRefTranlocal)array[index];
 
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
             if (index > 0) {
                 array[index] = array[0];
-                array[index] = found;
+                array[0] = tranlocal;
             }
 
-            return found;
+            if (!tranlocal.isConstructing
+                && lockMode != LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+                throw abortOnReadConflict();
+            }
+
+            return tranlocal;
         }
 
         //check if the size is not exceeded.
@@ -967,25 +1041,32 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             hasReads = true;
         }
 
-        LongRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
+        LongRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new LongRefTranlocal(ref);
+        }
 
-        if (read.isLocked) {
+        if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
+            pool.put(tranlocal);
             throw abortOnReadConflict();
         }
+
+        tranlocal.isCommitted = true;
 
         if (hasReadConflict()) {
-            ref.___abort(this, read, pool);
+            ref.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        if( lockMode != LOCKMODE_NONE || config.trackReads || !read.isPermanent){
-            array[firstFreeIndex] = read;
+        if( lockMode != LOCKMODE_NONE || config.trackReads || tranlocal.hasDepartObligation){
+            array[firstFreeIndex] = tranlocal;
             firstFreeIndex++;
         }else{
+            //todo: pooling of tranlocal
             hasUntrackedReads = true;
         }
 
-        return read;
+        return tranlocal;
     }
 
 
@@ -1008,23 +1089,26 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         lockMode = lockMode>=config.writeLockMode?lockMode:config.writeLockMode;
         final int index = indexOf(ref);
         if(index != -1){
-            LongRefTranlocal result = (LongRefTranlocal)array[index];
-            if(lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result,lockMode == LOCKMODE_COMMIT)){
-                throw abortOnReadConflict();
-            }else if(!result.isCommitted){
-                return result;
+            LongRefTranlocal tranlocal = (LongRefTranlocal)array[index];
+
+            //an optimization that shifts the read index to the front, so it can be access faster the next time.
+            if (index > 0) {
+                array[index] = array[0];
+                array[0] = tranlocal;
             }
 
-            result = result.openForWrite(pool);
-            //an optimization that shifts the read index to the front, so it can be access faster the next time.
-            //if (index > 0) {
-            //    array[index] = array[0];
-            //    array[index] = result;
-            //}
-            hasUpdates = true;
-            array[index]=result;
-            return result;
+            if(!tranlocal.isConstructing
+                 && lockMode != LOCKMODE_NONE
+                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal,lockMode == LOCKMODE_COMMIT)){
+                throw abortOnReadConflict();
+            }
+
+            if(tranlocal.isCommitted){
+                hasUpdates = true;
+                tranlocal.isCommitted = false;
+            }
+            
+            return tranlocal;
         }
 
         //it was not previously attached to this transaction
@@ -1039,29 +1123,28 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             hasReads = true;
         }
 
-        final LongRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
+        LongRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new LongRefTranlocal(ref);
+        }
 
-        if(read.isLocked){
+        if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
+           pool.put(tranlocal);
            throw abortOnReadConflict();
         }
 
+        tranlocal.isCommitted = false;
+
         if (hasReadConflict()) {
-            read.owner.___abort(this, read, pool);
+            tranlocal.owner.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        //open the tranlocal for writing.
-        LongRefTranlocal  result =  pool.take(ref);
-        if(result == null){
-            result = new LongRefTranlocal(ref);
-        }
-
-        result.read = read;
-        result.value = read.value;
+        tranlocal.isCommitted = false;            
         hasUpdates = true;
-        array[firstFreeIndex] = result;
+        array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
-        return result;
+        return tranlocal;
     }
 
     @Override
@@ -1084,7 +1167,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(index >= 0){
             LongRefTranlocal result = (LongRefTranlocal)array[index];
 
-            if(result.isCommitted || result.read!= null){
+            if(!result.isConstructing){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -1098,7 +1181,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //it was not previously attached to this transaction
 
-        if(ref.___unsafeLoad() != null){
+        if(ref.___getLockOwner()!=this){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1108,14 +1191,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         //open the tranlocal for writing.
-        LongRefTranlocal result =  pool.take(ref);
-        if(result == null){
-            result = new LongRefTranlocal(ref);
+        LongRefTranlocal tranlocal =  pool.take(ref);
+        if(tranlocal == null){
+                tranlocal = new LongRefTranlocal(ref);
         }
-        result.isDirty = DIRTY_TRUE;
-        array[firstFreeIndex] = result;
+        tranlocal.isLockOwner = true;
+        tranlocal.isConstructing = true;
+        tranlocal.isDirty = true;
+        array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
-        return result;
+        return tranlocal;
     }
 
     public  void commute(
@@ -1128,13 +1213,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(function == null){
             throw abortCommuteOnNullFunction(ref);
         }
-
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
-      }
+  
+    }
 
 
+        
     @Override
     public  Tranlocal openForRead(
         final BetaTransactionalObject ref, int lockMode) {
@@ -1143,6 +1229,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOpenForRead(ref);
         }
 
+        //todo: needs to go.
         if (ref == null) {
             return null;
         }
@@ -1151,20 +1238,21 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         final int index = indexOf(ref);
         if(index > -1){
             //we are lucky, at already is attached to the session
-            Tranlocal found = (Tranlocal)array[index];
-
-            if (lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, found, lockMode == LOCKMODE_COMMIT)){
-                throw abortOnReadConflict();
-            }
+            Tranlocal tranlocal = (Tranlocal)array[index];
 
             //an optimization that shifts the read index to the front, so it can be access faster the next time.
             if (index > 0) {
                 array[index] = array[0];
-                array[index] = found;
+                array[0] = tranlocal;
             }
 
-            return found;
+            if (!tranlocal.isConstructing
+                && lockMode != LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+                throw abortOnReadConflict();
+            }
+
+            return tranlocal;
         }
 
         //check if the size is not exceeded.
@@ -1177,25 +1265,32 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             hasReads = true;
         }
 
-        Tranlocal read = ref.___load(config.spinCount, this, lockMode);
+        Tranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = ref.___newTranlocal();
+        }
 
-        if (read.isLocked) {
+        if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
+            pool.put(tranlocal);
             throw abortOnReadConflict();
         }
+
+        tranlocal.isCommitted = true;
 
         if (hasReadConflict()) {
-            ref.___abort(this, read, pool);
+            ref.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        if( lockMode != LOCKMODE_NONE || config.trackReads || !read.isPermanent){
-            array[firstFreeIndex] = read;
+        if( lockMode != LOCKMODE_NONE || config.trackReads || tranlocal.hasDepartObligation){
+            array[firstFreeIndex] = tranlocal;
             firstFreeIndex++;
         }else{
+            //todo: pooling of tranlocal
             hasUntrackedReads = true;
         }
 
-        return read;
+        return tranlocal;
     }
 
 
@@ -1218,23 +1313,26 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         lockMode = lockMode>=config.writeLockMode?lockMode:config.writeLockMode;
         final int index = indexOf(ref);
         if(index != -1){
-            Tranlocal result = (Tranlocal)array[index];
-            if(lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result,lockMode == LOCKMODE_COMMIT)){
-                throw abortOnReadConflict();
-            }else if(!result.isCommitted){
-                return result;
+            Tranlocal tranlocal = (Tranlocal)array[index];
+
+            //an optimization that shifts the read index to the front, so it can be access faster the next time.
+            if (index > 0) {
+                array[index] = array[0];
+                array[0] = tranlocal;
             }
 
-            result = result.openForWrite(pool);
-            //an optimization that shifts the read index to the front, so it can be access faster the next time.
-            //if (index > 0) {
-            //    array[index] = array[0];
-            //    array[index] = result;
-            //}
-            hasUpdates = true;
-            array[index]=result;
-            return result;
+            if(!tranlocal.isConstructing
+                 && lockMode != LOCKMODE_NONE
+                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal,lockMode == LOCKMODE_COMMIT)){
+                throw abortOnReadConflict();
+            }
+
+            if(tranlocal.isCommitted){
+                hasUpdates = true;
+                tranlocal.isCommitted = false;
+            }
+            
+            return tranlocal;
         }
 
         //it was not previously attached to this transaction
@@ -1249,23 +1347,28 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             hasReads = true;
         }
 
-        final Tranlocal read = ref.___load(config.spinCount, this, lockMode);
+        Tranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = ref.___newTranlocal();
+        }
 
-        if(read.isLocked){
+        if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
+           pool.put(tranlocal);
            throw abortOnReadConflict();
         }
 
+        tranlocal.isCommitted = false;
+
         if (hasReadConflict()) {
-            read.owner.___abort(this, read, pool);
+            tranlocal.owner.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        //open the tranlocal for writing.
-        Tranlocal  result = read.openForWrite(pool);
+        tranlocal.isCommitted = false;            
         hasUpdates = true;
-        array[firstFreeIndex] = result;
+        array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
-        return result;
+        return tranlocal;
     }
 
     @Override
@@ -1288,7 +1391,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(index >= 0){
             Tranlocal result = (Tranlocal)array[index];
 
-            if(result.isCommitted || result.read!= null){
+            if(!result.isConstructing){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -1302,7 +1405,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //it was not previously attached to this transaction
 
-        if(ref.___unsafeLoad() != null){
+        if(ref.___getLockOwner()!=this){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1312,11 +1415,16 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         //open the tranlocal for writing.
-        Tranlocal result = ref.___openForConstruction(pool);
-        result.isDirty = DIRTY_TRUE;
-        array[firstFreeIndex] = result;
+        Tranlocal tranlocal =  pool.take(ref);
+        if(tranlocal == null){
+                tranlocal = ref.___newTranlocal();
+        }
+        tranlocal.isLockOwner = true;
+        tranlocal.isConstructing = true;
+        tranlocal.isDirty = true;
+        array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
-        return result;
+        return tranlocal;
     }
 
     public  void commute(
@@ -1329,11 +1437,11 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(function == null){
             throw abortCommuteOnNullFunction(ref);
         }
-
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
-      }
+  
+    }
 
  
     @Override
@@ -1443,7 +1551,10 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         Listeners[] listeners = null;
 
         if (firstFreeIndex > 0) {
-            final boolean needsPrepare = status == ACTIVE && hasUpdates;
+            final boolean needsPrepare = status == ACTIVE
+                    && hasUpdates
+                    && config.writeLockMode != LOCKMODE_COMMIT;
+
             if(config.dirtyCheck){
                 if(needsPrepare && !doPrepareDirty()){
                     throw abortOnWriteConflict();
@@ -1469,12 +1580,17 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     private Listeners[] commitAll() {
         Listeners[] listenersArray = null;
 
-        int storeIndex = 0;
+        int listenersArrayIndex = 0;
         for (int k = 0; k < firstFreeIndex; k++) {
             final Tranlocal tranlocal = array[k];
-            array[k]=null;
+            array[k] = null;
+
+            if(!tranlocal.isCommitted){
+                tranlocal.isDirty = true;
+            }
 
             final Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool);
+
             if(listeners != null){
                 if(listenersArray == null){
                     final int length = firstFreeIndex - k;
@@ -1483,8 +1599,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                         listenersArray = new Listeners[length];
                     }
                 }
-                listenersArray[storeIndex]=listeners;
-                storeIndex++;
+                listenersArray[listenersArrayIndex]=listeners;
+                listenersArrayIndex++;
             }
         }
 
@@ -1494,15 +1610,17 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     private Listeners[] commitDirty() {
         Listeners[] listenersArray = null;
 
-        int storeIndex = 0;
+        int listenersArrayIndex = 0;
         for (int k = 0; k < firstFreeIndex; k++) {
             final Tranlocal tranlocal = array[k];
-            array[k]=null;
+            array[k] = null;
 
-            if(tranlocal.isDirty == DIRTY_UNKNOWN){
+            //we need to make sure that the dirty flag is set since it could happen that the
+            //prepare completes before setting the dirty flags 
+            if(!tranlocal.isCommitted && !tranlocal.isDirty){
                 tranlocal.calculateIsDirty();
             }
-
+                     
             final Listeners listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool);
 
             if(listeners != null){
@@ -1513,8 +1631,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                         listenersArray = new Listeners[length];
                     }
                 }
-                listenersArray[storeIndex]=listeners;
-                storeIndex++;
+                listenersArray[listenersArrayIndex]=listeners;
+                listenersArrayIndex++;
             }
         }
 
@@ -1546,15 +1664,10 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnWriteConflict();
         }
 
-        if(hasUpdates){
-            if(config.dirtyCheck){
-                if(!doPrepareDirty()){
-                    throw abortOnWriteConflict();
-                }
-            }else{
-                if(!doPrepareAll()){
-                    throw abortOnWriteConflict();
-                }
+        if(hasUpdates && config.writeLockMode != LOCKMODE_COMMIT){
+            final boolean prepareSuccess = config.dirtyCheck ? doPrepareDirty() : doPrepareAll();
+            if(!prepareSuccess){
+                throw abortOnWriteConflict();
             }
         }
 
@@ -1575,7 +1688,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 continue;
             }
 
-            if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal, true)){
+            if(!tranlocal.doPrepareAllUpdates(pool, this, spinCount)) {
                 return false;
             }
         }
@@ -1584,7 +1697,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     }
 
     private boolean doPrepareDirty() {
-        if(config.writeLockMode==LOCKMODE_COMMIT){
+        if(config.writeLockMode == LOCKMODE_COMMIT){
             return true;
         }
 
@@ -1597,11 +1710,9 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 continue;
             }
 
-            if (tranlocal.calculateIsDirty()) {
-                if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal, true)){
-                    return false;
-                }
-            }
+            if(!tranlocal.doPrepareDirtyUpdates(pool, this, spinCount)) {
+                return false;
+            } 
         }
 
         return true;

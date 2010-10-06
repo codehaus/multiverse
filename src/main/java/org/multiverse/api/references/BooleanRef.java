@@ -162,6 +162,8 @@ public interface BooleanRef extends TransactionalObject {
      */
     boolean atomicGetAndSet(boolean value);
 
+    boolean atomicWeakGet();
+
     /**
      * Atomically sets the value and returns the new value. This method doesn't care about any
      * running transactions.

@@ -47,7 +47,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortEnsureWrites();
         }
 
-        if(config.writeLockMode!=LOCKMODE_NONE){
+        if(config.writeLockMode != LOCKMODE_NONE){
             return;
         }
 
@@ -60,11 +60,12 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
     }
 
-
+    public final <E> E read(BetaRef<E> ref){
+        throw new TodoException();
+    }
+    
     @Override
-    public final <E> RefTranlocal<E> openForRead(
-        final BetaRef<E> ref,
-        int lockMode) {
+    public final <E> RefTranlocal<E> openForRead(final BetaRef<E> ref,int lockMode) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(ref);
@@ -74,50 +75,63 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             return null;
         }
 
-        lockMode = lockMode>=config.readLockMode?lockMode:config.readLockMode;
+        lockMode = lockMode>=config.readLockMode ? lockMode : config.readLockMode;
 
         if(attached == null){
             //the transaction has no previous attached references.
 
-            RefTranlocal<E> read = ref.___load(config.spinCount, this, lockMode);
+            RefTranlocal<E> tranlocal = pool.take(ref);
+            if(tranlocal == null){
+                tranlocal = new RefTranlocal<E>(ref);
+            }
 
-            if (read.isLocked) {
+            if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
+                pool.put(tranlocal);
                 throw abortOnReadConflict();
             }
 
-            if(lockMode!=LOCKMODE_NONE || !read.isPermanent || config.trackReads){
-                attached = read;
-            }else{
+            tranlocal.isCommitted = true;
+
+            if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation || config.trackReads){
+                attached = tranlocal;
+            }else{                
                 throw abortOnTooSmallSize(2);
             }
 
-            return read;
+            return tranlocal;
         }
 
         //the transaction has a previous attached reference
         if(attached.owner == ref){
             //the reference is the one we are looking for.
-            RefTranlocal<E> result = (RefTranlocal<E>)attached;
 
-            if(lockMode!=LOCKMODE_NONE &&
-                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
+            final RefTranlocal<E> tranlocal = (RefTranlocal<E>)attached;
+
+            if(lockMode != LOCKMODE_NONE
+                && !tranlocal.isConstructing
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            return result;
+            return tranlocal;
         }
 
-        if(lockMode!=LOCKMODE_NONE || config.trackReads){
+        if(lockMode != LOCKMODE_NONE || config.trackReads){
             throw abortOnTooSmallSize(2);
         }
 
-        RefTranlocal<E> read = ref.___load(config.spinCount, this, lockMode);
+        RefTranlocal<E> tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new RefTranlocal<E>(ref);
+        }
 
-        //if it was locked, lets abort.
-        if (read.isLocked) {
+        tranlocal.isCommitted = true;
+
+        if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
             throw abortOnReadConflict();
         }
 
+        pool.put(tranlocal);
         throw abortOnTooSmallSize(2);
     }
 
@@ -137,28 +151,26 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOpenForWriteWhenReadonly(ref);
         }
 
-        lockMode = lockMode>=config.writeLockMode?lockMode:config.writeLockMode;
+        lockMode = lockMode>=config.writeLockMode? lockMode: config.writeLockMode;
 
         if(attached == null){
             //the transaction has no previous attached references.
 
-            RefTranlocal<E> read = ref.___load(config.spinCount, this, lockMode);
 
-            //if it was locked, lets abort.
-            if (read.isLocked) {
+            RefTranlocal<E> tranlocal = pool.take(ref);
+            if(tranlocal == null){
+                tranlocal = new RefTranlocal<E>(ref);
+            }
+
+            if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
+                pool.put(tranlocal);
                 throw abortOnReadConflict();
             }
 
-            RefTranlocal<E> result = pool.take(ref);
-            if (result == null) {
-                result = new RefTranlocal<E>(ref);
-            }
-            result.value = read.value;
-            result.read = read;
-
+            tranlocal.isCommitted = false;
             hasUpdates = true;
-            attached = result;
-            return result;
+            attached = tranlocal;
+            return tranlocal;
         }
 
         //the transaction has a previous attached reference
@@ -168,27 +180,19 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         //the reference is the one we are looking for.
-        RefTranlocal<E> result = (RefTranlocal<E>)attached;
+        RefTranlocal<E> tranlocal = (RefTranlocal<E>)attached;
 
-        if(lockMode!=LOCKMODE_NONE
-            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
+        if(lockMode != LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 
-        if(!result.isCommitted){
-            return result;
+        if(tranlocal.isCommitted){
+            tranlocal.isCommitted = false;
+            hasUpdates = true;
         }
 
-        final RefTranlocal<E> read = result;
-        result = pool.take(ref);
-        if (result == null) {
-            result = new RefTranlocal<E>(ref);
-        }
-        result.value = read.value;
-        result.read = read;
-        hasUpdates = true;    
-        attached = result;
-        return result;
+        return tranlocal;
     }
 
     @Override
@@ -207,14 +211,16 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOpenForConstructionWhenReadonly(ref);
         }
 
-        RefTranlocal<E> result = (attached == null || attached.owner != ref) ? null : (RefTranlocal<E>)attached;
+        RefTranlocal<E> tranlocal = (attached == null || attached.owner != ref)
+            ? null
+            : (RefTranlocal<E>)attached;
 
-        if(result != null){
-            if(result.isCommitted || result.read != null){
+        if(tranlocal != null){
+            if(!tranlocal.isConstructing){
                throw abortOpenForConstructionWithBadReference(ref);
             }
 
-            return result;
+            return tranlocal;
         }
 
         //check if there is room
@@ -222,17 +228,19 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___unsafeLoad()!=null){
+        if(ref.___getLockOwner()!=this){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
-        result =  pool.take(ref);
-        if(result == null){
-            result = new RefTranlocal<E>(ref);
+        tranlocal =  pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new RefTranlocal<E>(ref);
         }
-        result.isDirty = DIRTY_TRUE;
-        attached = result;
-        return result;
+        tranlocal.isDirty = true;
+        tranlocal.isLockOwner = true;
+        tranlocal.isConstructing = true;
+        attached = tranlocal;
+        return tranlocal;
     }
 
     public <E> void commute(
@@ -245,17 +253,17 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(function == null){
             throw abortCommuteOnNullFunction(ref);
         }
-    
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
-
+    public final  int read(BetaIntRef ref){
+        throw new TodoException();
+    }
+    
     @Override
-    public final  IntRefTranlocal openForRead(
-        final BetaIntRef ref,
-        int lockMode) {
+    public final  IntRefTranlocal openForRead(final BetaIntRef ref,int lockMode) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(ref);
@@ -265,50 +273,63 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             return null;
         }
 
-        lockMode = lockMode>=config.readLockMode?lockMode:config.readLockMode;
+        lockMode = lockMode>=config.readLockMode ? lockMode : config.readLockMode;
 
         if(attached == null){
             //the transaction has no previous attached references.
 
-            IntRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
+            IntRefTranlocal tranlocal = pool.take(ref);
+            if(tranlocal == null){
+                tranlocal = new IntRefTranlocal(ref);
+            }
 
-            if (read.isLocked) {
+            if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
+                pool.put(tranlocal);
                 throw abortOnReadConflict();
             }
 
-            if(lockMode!=LOCKMODE_NONE || !read.isPermanent || config.trackReads){
-                attached = read;
-            }else{
+            tranlocal.isCommitted = true;
+
+            if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation || config.trackReads){
+                attached = tranlocal;
+            }else{                
                 throw abortOnTooSmallSize(2);
             }
 
-            return read;
+            return tranlocal;
         }
 
         //the transaction has a previous attached reference
         if(attached.owner == ref){
             //the reference is the one we are looking for.
-            IntRefTranlocal result = (IntRefTranlocal)attached;
 
-            if(lockMode!=LOCKMODE_NONE &&
-                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
+            final IntRefTranlocal tranlocal = (IntRefTranlocal)attached;
+
+            if(lockMode != LOCKMODE_NONE
+                && !tranlocal.isConstructing
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            return result;
+            return tranlocal;
         }
 
-        if(lockMode!=LOCKMODE_NONE || config.trackReads){
+        if(lockMode != LOCKMODE_NONE || config.trackReads){
             throw abortOnTooSmallSize(2);
         }
 
-        IntRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
+        IntRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new IntRefTranlocal(ref);
+        }
 
-        //if it was locked, lets abort.
-        if (read.isLocked) {
+        tranlocal.isCommitted = true;
+
+        if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
             throw abortOnReadConflict();
         }
 
+        pool.put(tranlocal);
         throw abortOnTooSmallSize(2);
     }
 
@@ -328,28 +349,26 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOpenForWriteWhenReadonly(ref);
         }
 
-        lockMode = lockMode>=config.writeLockMode?lockMode:config.writeLockMode;
+        lockMode = lockMode>=config.writeLockMode? lockMode: config.writeLockMode;
 
         if(attached == null){
             //the transaction has no previous attached references.
 
-            IntRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
 
-            //if it was locked, lets abort.
-            if (read.isLocked) {
+            IntRefTranlocal tranlocal = pool.take(ref);
+            if(tranlocal == null){
+                tranlocal = new IntRefTranlocal(ref);
+            }
+
+            if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
+                pool.put(tranlocal);
                 throw abortOnReadConflict();
             }
 
-            IntRefTranlocal result = pool.take(ref);
-            if (result == null) {
-                result = new IntRefTranlocal(ref);
-            }
-            result.value = read.value;
-            result.read = read;
-
+            tranlocal.isCommitted = false;
             hasUpdates = true;
-            attached = result;
-            return result;
+            attached = tranlocal;
+            return tranlocal;
         }
 
         //the transaction has a previous attached reference
@@ -359,27 +378,19 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         //the reference is the one we are looking for.
-        IntRefTranlocal result = (IntRefTranlocal)attached;
+        IntRefTranlocal tranlocal = (IntRefTranlocal)attached;
 
-        if(lockMode!=LOCKMODE_NONE
-            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
+        if(lockMode != LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 
-        if(!result.isCommitted){
-            return result;
+        if(tranlocal.isCommitted){
+            tranlocal.isCommitted = false;
+            hasUpdates = true;
         }
 
-        final IntRefTranlocal read = result;
-        result = pool.take(ref);
-        if (result == null) {
-            result = new IntRefTranlocal(ref);
-        }
-        result.value = read.value;
-        result.read = read;
-        hasUpdates = true;    
-        attached = result;
-        return result;
+        return tranlocal;
     }
 
     @Override
@@ -398,14 +409,16 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOpenForConstructionWhenReadonly(ref);
         }
 
-        IntRefTranlocal result = (attached == null || attached.owner != ref) ? null : (IntRefTranlocal)attached;
+        IntRefTranlocal tranlocal = (attached == null || attached.owner != ref)
+            ? null
+            : (IntRefTranlocal)attached;
 
-        if(result != null){
-            if(result.isCommitted || result.read != null){
+        if(tranlocal != null){
+            if(!tranlocal.isConstructing){
                throw abortOpenForConstructionWithBadReference(ref);
             }
 
-            return result;
+            return tranlocal;
         }
 
         //check if there is room
@@ -413,17 +426,19 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___unsafeLoad()!=null){
+        if(ref.___getLockOwner()!=this){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
-        result =  pool.take(ref);
-        if(result == null){
-            result = new IntRefTranlocal(ref);
+        tranlocal =  pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new IntRefTranlocal(ref);
         }
-        result.isDirty = DIRTY_TRUE;
-        attached = result;
-        return result;
+        tranlocal.isDirty = true;
+        tranlocal.isLockOwner = true;
+        tranlocal.isConstructing = true;
+        attached = tranlocal;
+        return tranlocal;
     }
 
     public  void commute(
@@ -436,17 +451,17 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(function == null){
             throw abortCommuteOnNullFunction(ref);
         }
-    
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
-
+    public final  boolean read(BetaBooleanRef ref){
+        throw new TodoException();
+    }
+    
     @Override
-    public final  BooleanRefTranlocal openForRead(
-        final BetaBooleanRef ref,
-        int lockMode) {
+    public final  BooleanRefTranlocal openForRead(final BetaBooleanRef ref,int lockMode) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(ref);
@@ -456,50 +471,63 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             return null;
         }
 
-        lockMode = lockMode>=config.readLockMode?lockMode:config.readLockMode;
+        lockMode = lockMode>=config.readLockMode ? lockMode : config.readLockMode;
 
         if(attached == null){
             //the transaction has no previous attached references.
 
-            BooleanRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
+            BooleanRefTranlocal tranlocal = pool.take(ref);
+            if(tranlocal == null){
+                tranlocal = new BooleanRefTranlocal(ref);
+            }
 
-            if (read.isLocked) {
+            if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
+                pool.put(tranlocal);
                 throw abortOnReadConflict();
             }
 
-            if(lockMode!=LOCKMODE_NONE || !read.isPermanent || config.trackReads){
-                attached = read;
-            }else{
+            tranlocal.isCommitted = true;
+
+            if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation || config.trackReads){
+                attached = tranlocal;
+            }else{                
                 throw abortOnTooSmallSize(2);
             }
 
-            return read;
+            return tranlocal;
         }
 
         //the transaction has a previous attached reference
         if(attached.owner == ref){
             //the reference is the one we are looking for.
-            BooleanRefTranlocal result = (BooleanRefTranlocal)attached;
 
-            if(lockMode!=LOCKMODE_NONE &&
-                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
+            final BooleanRefTranlocal tranlocal = (BooleanRefTranlocal)attached;
+
+            if(lockMode != LOCKMODE_NONE
+                && !tranlocal.isConstructing
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            return result;
+            return tranlocal;
         }
 
-        if(lockMode!=LOCKMODE_NONE || config.trackReads){
+        if(lockMode != LOCKMODE_NONE || config.trackReads){
             throw abortOnTooSmallSize(2);
         }
 
-        BooleanRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
+        BooleanRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new BooleanRefTranlocal(ref);
+        }
 
-        //if it was locked, lets abort.
-        if (read.isLocked) {
+        tranlocal.isCommitted = true;
+
+        if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
             throw abortOnReadConflict();
         }
 
+        pool.put(tranlocal);
         throw abortOnTooSmallSize(2);
     }
 
@@ -519,28 +547,26 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOpenForWriteWhenReadonly(ref);
         }
 
-        lockMode = lockMode>=config.writeLockMode?lockMode:config.writeLockMode;
+        lockMode = lockMode>=config.writeLockMode? lockMode: config.writeLockMode;
 
         if(attached == null){
             //the transaction has no previous attached references.
 
-            BooleanRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
 
-            //if it was locked, lets abort.
-            if (read.isLocked) {
+            BooleanRefTranlocal tranlocal = pool.take(ref);
+            if(tranlocal == null){
+                tranlocal = new BooleanRefTranlocal(ref);
+            }
+
+            if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
+                pool.put(tranlocal);
                 throw abortOnReadConflict();
             }
 
-            BooleanRefTranlocal result = pool.take(ref);
-            if (result == null) {
-                result = new BooleanRefTranlocal(ref);
-            }
-            result.value = read.value;
-            result.read = read;
-
+            tranlocal.isCommitted = false;
             hasUpdates = true;
-            attached = result;
-            return result;
+            attached = tranlocal;
+            return tranlocal;
         }
 
         //the transaction has a previous attached reference
@@ -550,27 +576,19 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         //the reference is the one we are looking for.
-        BooleanRefTranlocal result = (BooleanRefTranlocal)attached;
+        BooleanRefTranlocal tranlocal = (BooleanRefTranlocal)attached;
 
-        if(lockMode!=LOCKMODE_NONE
-            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
+        if(lockMode != LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 
-        if(!result.isCommitted){
-            return result;
+        if(tranlocal.isCommitted){
+            tranlocal.isCommitted = false;
+            hasUpdates = true;
         }
 
-        final BooleanRefTranlocal read = result;
-        result = pool.take(ref);
-        if (result == null) {
-            result = new BooleanRefTranlocal(ref);
-        }
-        result.value = read.value;
-        result.read = read;
-        hasUpdates = true;    
-        attached = result;
-        return result;
+        return tranlocal;
     }
 
     @Override
@@ -589,14 +607,16 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOpenForConstructionWhenReadonly(ref);
         }
 
-        BooleanRefTranlocal result = (attached == null || attached.owner != ref) ? null : (BooleanRefTranlocal)attached;
+        BooleanRefTranlocal tranlocal = (attached == null || attached.owner != ref)
+            ? null
+            : (BooleanRefTranlocal)attached;
 
-        if(result != null){
-            if(result.isCommitted || result.read != null){
+        if(tranlocal != null){
+            if(!tranlocal.isConstructing){
                throw abortOpenForConstructionWithBadReference(ref);
             }
 
-            return result;
+            return tranlocal;
         }
 
         //check if there is room
@@ -604,17 +624,19 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___unsafeLoad()!=null){
+        if(ref.___getLockOwner()!=this){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
-        result =  pool.take(ref);
-        if(result == null){
-            result = new BooleanRefTranlocal(ref);
+        tranlocal =  pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new BooleanRefTranlocal(ref);
         }
-        result.isDirty = DIRTY_TRUE;
-        attached = result;
-        return result;
+        tranlocal.isDirty = true;
+        tranlocal.isLockOwner = true;
+        tranlocal.isConstructing = true;
+        attached = tranlocal;
+        return tranlocal;
     }
 
     public  void commute(
@@ -627,17 +649,17 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(function == null){
             throw abortCommuteOnNullFunction(ref);
         }
-    
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
-
+    public final  double read(BetaDoubleRef ref){
+        throw new TodoException();
+    }
+    
     @Override
-    public final  DoubleRefTranlocal openForRead(
-        final BetaDoubleRef ref,
-        int lockMode) {
+    public final  DoubleRefTranlocal openForRead(final BetaDoubleRef ref,int lockMode) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(ref);
@@ -647,50 +669,63 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             return null;
         }
 
-        lockMode = lockMode>=config.readLockMode?lockMode:config.readLockMode;
+        lockMode = lockMode>=config.readLockMode ? lockMode : config.readLockMode;
 
         if(attached == null){
             //the transaction has no previous attached references.
 
-            DoubleRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
+            DoubleRefTranlocal tranlocal = pool.take(ref);
+            if(tranlocal == null){
+                tranlocal = new DoubleRefTranlocal(ref);
+            }
 
-            if (read.isLocked) {
+            if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
+                pool.put(tranlocal);
                 throw abortOnReadConflict();
             }
 
-            if(lockMode!=LOCKMODE_NONE || !read.isPermanent || config.trackReads){
-                attached = read;
-            }else{
+            tranlocal.isCommitted = true;
+
+            if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation || config.trackReads){
+                attached = tranlocal;
+            }else{                
                 throw abortOnTooSmallSize(2);
             }
 
-            return read;
+            return tranlocal;
         }
 
         //the transaction has a previous attached reference
         if(attached.owner == ref){
             //the reference is the one we are looking for.
-            DoubleRefTranlocal result = (DoubleRefTranlocal)attached;
 
-            if(lockMode!=LOCKMODE_NONE &&
-                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
+            final DoubleRefTranlocal tranlocal = (DoubleRefTranlocal)attached;
+
+            if(lockMode != LOCKMODE_NONE
+                && !tranlocal.isConstructing
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            return result;
+            return tranlocal;
         }
 
-        if(lockMode!=LOCKMODE_NONE || config.trackReads){
+        if(lockMode != LOCKMODE_NONE || config.trackReads){
             throw abortOnTooSmallSize(2);
         }
 
-        DoubleRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
+        DoubleRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new DoubleRefTranlocal(ref);
+        }
 
-        //if it was locked, lets abort.
-        if (read.isLocked) {
+        tranlocal.isCommitted = true;
+
+        if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
             throw abortOnReadConflict();
         }
 
+        pool.put(tranlocal);
         throw abortOnTooSmallSize(2);
     }
 
@@ -710,28 +745,26 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOpenForWriteWhenReadonly(ref);
         }
 
-        lockMode = lockMode>=config.writeLockMode?lockMode:config.writeLockMode;
+        lockMode = lockMode>=config.writeLockMode? lockMode: config.writeLockMode;
 
         if(attached == null){
             //the transaction has no previous attached references.
 
-            DoubleRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
 
-            //if it was locked, lets abort.
-            if (read.isLocked) {
+            DoubleRefTranlocal tranlocal = pool.take(ref);
+            if(tranlocal == null){
+                tranlocal = new DoubleRefTranlocal(ref);
+            }
+
+            if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
+                pool.put(tranlocal);
                 throw abortOnReadConflict();
             }
 
-            DoubleRefTranlocal result = pool.take(ref);
-            if (result == null) {
-                result = new DoubleRefTranlocal(ref);
-            }
-            result.value = read.value;
-            result.read = read;
-
+            tranlocal.isCommitted = false;
             hasUpdates = true;
-            attached = result;
-            return result;
+            attached = tranlocal;
+            return tranlocal;
         }
 
         //the transaction has a previous attached reference
@@ -741,27 +774,19 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         //the reference is the one we are looking for.
-        DoubleRefTranlocal result = (DoubleRefTranlocal)attached;
+        DoubleRefTranlocal tranlocal = (DoubleRefTranlocal)attached;
 
-        if(lockMode!=LOCKMODE_NONE
-            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
+        if(lockMode != LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 
-        if(!result.isCommitted){
-            return result;
+        if(tranlocal.isCommitted){
+            tranlocal.isCommitted = false;
+            hasUpdates = true;
         }
 
-        final DoubleRefTranlocal read = result;
-        result = pool.take(ref);
-        if (result == null) {
-            result = new DoubleRefTranlocal(ref);
-        }
-        result.value = read.value;
-        result.read = read;
-        hasUpdates = true;    
-        attached = result;
-        return result;
+        return tranlocal;
     }
 
     @Override
@@ -780,14 +805,16 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOpenForConstructionWhenReadonly(ref);
         }
 
-        DoubleRefTranlocal result = (attached == null || attached.owner != ref) ? null : (DoubleRefTranlocal)attached;
+        DoubleRefTranlocal tranlocal = (attached == null || attached.owner != ref)
+            ? null
+            : (DoubleRefTranlocal)attached;
 
-        if(result != null){
-            if(result.isCommitted || result.read != null){
+        if(tranlocal != null){
+            if(!tranlocal.isConstructing){
                throw abortOpenForConstructionWithBadReference(ref);
             }
 
-            return result;
+            return tranlocal;
         }
 
         //check if there is room
@@ -795,17 +822,19 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___unsafeLoad()!=null){
+        if(ref.___getLockOwner()!=this){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
-        result =  pool.take(ref);
-        if(result == null){
-            result = new DoubleRefTranlocal(ref);
+        tranlocal =  pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new DoubleRefTranlocal(ref);
         }
-        result.isDirty = DIRTY_TRUE;
-        attached = result;
-        return result;
+        tranlocal.isDirty = true;
+        tranlocal.isLockOwner = true;
+        tranlocal.isConstructing = true;
+        attached = tranlocal;
+        return tranlocal;
     }
 
     public  void commute(
@@ -818,17 +847,17 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(function == null){
             throw abortCommuteOnNullFunction(ref);
         }
-    
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
-
+    public final  long read(BetaLongRef ref){
+        throw new TodoException();
+    }
+    
     @Override
-    public final  LongRefTranlocal openForRead(
-        final BetaLongRef ref,
-        int lockMode) {
+    public final  LongRefTranlocal openForRead(final BetaLongRef ref,int lockMode) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(ref);
@@ -838,50 +867,63 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             return null;
         }
 
-        lockMode = lockMode>=config.readLockMode?lockMode:config.readLockMode;
+        lockMode = lockMode>=config.readLockMode ? lockMode : config.readLockMode;
 
         if(attached == null){
             //the transaction has no previous attached references.
 
-            LongRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
+            LongRefTranlocal tranlocal = pool.take(ref);
+            if(tranlocal == null){
+                tranlocal = new LongRefTranlocal(ref);
+            }
 
-            if (read.isLocked) {
+            if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
+                pool.put(tranlocal);
                 throw abortOnReadConflict();
             }
 
-            if(lockMode!=LOCKMODE_NONE || !read.isPermanent || config.trackReads){
-                attached = read;
-            }else{
+            tranlocal.isCommitted = true;
+
+            if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation || config.trackReads){
+                attached = tranlocal;
+            }else{                
                 throw abortOnTooSmallSize(2);
             }
 
-            return read;
+            return tranlocal;
         }
 
         //the transaction has a previous attached reference
         if(attached.owner == ref){
             //the reference is the one we are looking for.
-            LongRefTranlocal result = (LongRefTranlocal)attached;
 
-            if(lockMode!=LOCKMODE_NONE &&
-                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
+            final LongRefTranlocal tranlocal = (LongRefTranlocal)attached;
+
+            if(lockMode != LOCKMODE_NONE
+                && !tranlocal.isConstructing
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            return result;
+            return tranlocal;
         }
 
-        if(lockMode!=LOCKMODE_NONE || config.trackReads){
+        if(lockMode != LOCKMODE_NONE || config.trackReads){
             throw abortOnTooSmallSize(2);
         }
 
-        LongRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
+        LongRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new LongRefTranlocal(ref);
+        }
 
-        //if it was locked, lets abort.
-        if (read.isLocked) {
+        tranlocal.isCommitted = true;
+
+        if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
             throw abortOnReadConflict();
         }
 
+        pool.put(tranlocal);
         throw abortOnTooSmallSize(2);
     }
 
@@ -901,28 +943,26 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOpenForWriteWhenReadonly(ref);
         }
 
-        lockMode = lockMode>=config.writeLockMode?lockMode:config.writeLockMode;
+        lockMode = lockMode>=config.writeLockMode? lockMode: config.writeLockMode;
 
         if(attached == null){
             //the transaction has no previous attached references.
 
-            LongRefTranlocal read = ref.___load(config.spinCount, this, lockMode);
 
-            //if it was locked, lets abort.
-            if (read.isLocked) {
+            LongRefTranlocal tranlocal = pool.take(ref);
+            if(tranlocal == null){
+                tranlocal = new LongRefTranlocal(ref);
+            }
+
+            if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
+                pool.put(tranlocal);
                 throw abortOnReadConflict();
             }
 
-            LongRefTranlocal result = pool.take(ref);
-            if (result == null) {
-                result = new LongRefTranlocal(ref);
-            }
-            result.value = read.value;
-            result.read = read;
-
+            tranlocal.isCommitted = false;
             hasUpdates = true;
-            attached = result;
-            return result;
+            attached = tranlocal;
+            return tranlocal;
         }
 
         //the transaction has a previous attached reference
@@ -932,27 +972,19 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         //the reference is the one we are looking for.
-        LongRefTranlocal result = (LongRefTranlocal)attached;
+        LongRefTranlocal tranlocal = (LongRefTranlocal)attached;
 
-        if(lockMode!=LOCKMODE_NONE
-            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
+        if(lockMode != LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 
-        if(!result.isCommitted){
-            return result;
+        if(tranlocal.isCommitted){
+            tranlocal.isCommitted = false;
+            hasUpdates = true;
         }
 
-        final LongRefTranlocal read = result;
-        result = pool.take(ref);
-        if (result == null) {
-            result = new LongRefTranlocal(ref);
-        }
-        result.value = read.value;
-        result.read = read;
-        hasUpdates = true;    
-        attached = result;
-        return result;
+        return tranlocal;
     }
 
     @Override
@@ -971,14 +1003,16 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOpenForConstructionWhenReadonly(ref);
         }
 
-        LongRefTranlocal result = (attached == null || attached.owner != ref) ? null : (LongRefTranlocal)attached;
+        LongRefTranlocal tranlocal = (attached == null || attached.owner != ref)
+            ? null
+            : (LongRefTranlocal)attached;
 
-        if(result != null){
-            if(result.isCommitted || result.read != null){
+        if(tranlocal != null){
+            if(!tranlocal.isConstructing){
                throw abortOpenForConstructionWithBadReference(ref);
             }
 
-            return result;
+            return tranlocal;
         }
 
         //check if there is room
@@ -986,17 +1020,19 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___unsafeLoad()!=null){
+        if(ref.___getLockOwner()!=this){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
-        result =  pool.take(ref);
-        if(result == null){
-            result = new LongRefTranlocal(ref);
+        tranlocal =  pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new LongRefTranlocal(ref);
         }
-        result.isDirty = DIRTY_TRUE;
-        attached = result;
-        return result;
+        tranlocal.isDirty = true;
+        tranlocal.isLockOwner = true;
+        tranlocal.isConstructing = true;
+        attached = tranlocal;
+        return tranlocal;
     }
 
     public  void commute(
@@ -1009,17 +1045,13 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(function == null){
             throw abortCommuteOnNullFunction(ref);
         }
-    
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
-
     @Override
-    public final  Tranlocal openForRead(
-        final BetaTransactionalObject ref,
-        int lockMode) {
+    public final  Tranlocal openForRead(final BetaTransactionalObject ref,int lockMode) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(ref);
@@ -1029,50 +1061,63 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             return null;
         }
 
-        lockMode = lockMode>=config.readLockMode?lockMode:config.readLockMode;
+        lockMode = lockMode>=config.readLockMode ? lockMode : config.readLockMode;
 
         if(attached == null){
             //the transaction has no previous attached references.
 
-            Tranlocal read = ref.___load(config.spinCount, this, lockMode);
+            Tranlocal tranlocal = pool.take(ref);
+            if(tranlocal == null){
+                tranlocal = ref.___newTranlocal();
+            }
 
-            if (read.isLocked) {
+            if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
+                pool.put(tranlocal);
                 throw abortOnReadConflict();
             }
 
-            if(lockMode!=LOCKMODE_NONE || !read.isPermanent || config.trackReads){
-                attached = read;
-            }else{
+            tranlocal.isCommitted = true;
+
+            if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation || config.trackReads){
+                attached = tranlocal;
+            }else{                
                 throw abortOnTooSmallSize(2);
             }
 
-            return read;
+            return tranlocal;
         }
 
         //the transaction has a previous attached reference
         if(attached.owner == ref){
             //the reference is the one we are looking for.
-            Tranlocal result = (Tranlocal)attached;
 
-            if(lockMode!=LOCKMODE_NONE &&
-                !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
+            final Tranlocal tranlocal = (Tranlocal)attached;
+
+            if(lockMode != LOCKMODE_NONE
+                && !tranlocal.isConstructing
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            return result;
+            return tranlocal;
         }
 
-        if(lockMode!=LOCKMODE_NONE || config.trackReads){
+        if(lockMode != LOCKMODE_NONE || config.trackReads){
             throw abortOnTooSmallSize(2);
         }
 
-        Tranlocal read = ref.___load(config.spinCount, this, lockMode);
+        Tranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = ref.___newTranlocal();
+        }
 
-        //if it was locked, lets abort.
-        if (read.isLocked) {
+        tranlocal.isCommitted = true;
+
+        if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
             throw abortOnReadConflict();
         }
 
+        pool.put(tranlocal);
         throw abortOnTooSmallSize(2);
     }
 
@@ -1092,23 +1137,26 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOpenForWriteWhenReadonly(ref);
         }
 
-        lockMode = lockMode>=config.writeLockMode?lockMode:config.writeLockMode;
+        lockMode = lockMode>=config.writeLockMode? lockMode: config.writeLockMode;
 
         if(attached == null){
             //the transaction has no previous attached references.
 
-            Tranlocal read = ref.___load(config.spinCount, this, lockMode);
 
-            //if it was locked, lets abort.
-            if (read.isLocked) {
+            Tranlocal tranlocal = pool.take(ref);
+            if(tranlocal == null){
+                tranlocal = ref.___newTranlocal();
+            }
+
+            if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
+                pool.put(tranlocal);
                 throw abortOnReadConflict();
             }
 
-            Tranlocal result = read.openForWrite(pool);
-
+            tranlocal.isCommitted = false;
             hasUpdates = true;
-            attached = result;
-            return result;
+            attached = tranlocal;
+            return tranlocal;
         }
 
         //the transaction has a previous attached reference
@@ -1118,22 +1166,19 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         //the reference is the one we are looking for.
-        Tranlocal result = (Tranlocal)attached;
+        Tranlocal tranlocal = (Tranlocal)attached;
 
-        if(lockMode!=LOCKMODE_NONE
-            && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
+        if(lockMode != LOCKMODE_NONE
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 
-        if(!result.isCommitted){
-            return result;
+        if(tranlocal.isCommitted){
+            tranlocal.isCommitted = false;
+            hasUpdates = true;
         }
 
-        final Tranlocal read = result;
-        result = read.openForWrite(pool);
-        hasUpdates = true;    
-        attached = result;
-        return result;
+        return tranlocal;
     }
 
     @Override
@@ -1152,14 +1197,16 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOpenForConstructionWhenReadonly(ref);
         }
 
-        Tranlocal result = (attached == null || attached.owner != ref) ? null : (Tranlocal)attached;
+        Tranlocal tranlocal = (attached == null || attached.owner != ref)
+            ? null
+            : (Tranlocal)attached;
 
-        if(result != null){
-            if(result.isCommitted || result.read != null){
+        if(tranlocal != null){
+            if(!tranlocal.isConstructing){
                throw abortOpenForConstructionWithBadReference(ref);
             }
 
-            return result;
+            return tranlocal;
         }
 
         //check if there is room
@@ -1167,14 +1214,19 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___unsafeLoad()!=null){
+        if(ref.___getLockOwner()!=this){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
-        result = ref.___openForConstruction(pool);
-        result.isDirty = DIRTY_TRUE;
-        attached = result;
-        return result;
+        tranlocal =  pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = ref.___newTranlocal();
+        }
+        tranlocal.isDirty = true;
+        tranlocal.isLockOwner = true;
+        tranlocal.isConstructing = true;
+        attached = tranlocal;
+        return tranlocal;
     }
 
     public  void commute(
@@ -1187,7 +1239,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(function == null){
             throw abortCommuteOnNullFunction(ref);
         }
-    
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
@@ -1222,8 +1273,9 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             }
         }
 
-        if (attached != null) {
-            attached.owner.___abort(this, attached, pool);
+        final Tranlocal tranlocal = attached;
+        if (tranlocal != null) {
+            tranlocal.owner.___abort(this, tranlocal, pool);
             attached = null;
         }
 
@@ -1250,22 +1302,29 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(abortOnly){
             throw abortOnWriteConflict();
         }
-            
+
+        final Tranlocal tranlocal = attached;
         Listeners listeners = null;
-        if(attached != null){
-            final boolean needsPrepare = status == ACTIVE && hasUpdates;
+        if(tranlocal != null){
+            final boolean needsPrepare = status == ACTIVE
+                && hasUpdates
+                && config.readLockMode != LOCKMODE_COMMIT;
+
+
             if(config.dirtyCheck){
-                if(needsPrepare && !doPrepareDirty()){
+                if(needsPrepare && !tranlocal.doPrepareDirtyUpdates(pool, this, config.spinCount)){
                     throw abortOnWriteConflict();
+                } else if(!tranlocal.isDirty){
+                    tranlocal.calculateIsDirty();
                 }
 
-                listeners = attached.owner.___commitDirty(attached, this, pool);
+                listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool);
             }else{
-                if(needsPrepare && !doPrepareAll()){
+                if(needsPrepare && !tranlocal.doPrepareAllUpdates(pool, this, config.spinCount)){
                     throw abortOnWriteConflict();
                 }
 
-                listeners = attached.owner.___commitAll(attached, this, pool);
+                listeners = tranlocal.owner.___commitAll(tranlocal, this, pool);
             }
             attached = null;
         }
@@ -1300,52 +1359,17 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnWriteConflict();
         }
 
-        if(hasUpdates){
-            if(config.dirtyCheck){
-                if(!doPrepareDirty()){
-                    throw abortOnWriteConflict();
-                }
-            }else{
-                if(!doPrepareAll()){
-                    throw abortOnWriteConflict();
-                }
+        if(hasUpdates && config.writeLockMode != LOCKMODE_COMMIT){
+            final boolean success = config.dirtyCheck
+                    ? attached.doPrepareDirtyUpdates(pool, this, config.spinCount)
+                    : attached.doPrepareAllUpdates(pool, this, config.spinCount);
+
+            if(!success){
+                throw abortOnWriteConflict();
             }
         }
 
         status = PREPARED;
-    }
-
-    private boolean doPrepareDirty(){
-        if(config.writeLockMode==LOCKMODE_COMMIT){
-            return true;
-        }
-
-        if(attached.isCommitted){
-            return true;
-        }
-
-        if (attached.calculateIsDirty()
-                    && !attached.owner.___tryLockAndCheckConflict(this, config.spinCount, attached, true)){
-            return false;
-        }
-
-        return true;
-    }
-
-    private boolean doPrepareAll(){
-        if(config.writeLockMode==LOCKMODE_COMMIT){            
-            return true;
-        }
-        
-        if(attached.isCommitted){
-            return true;
-        }
-
-        if(!attached.owner.___tryLockAndCheckConflict(this, config.spinCount, attached, true)){
-            return false;
-        }
-
-        return true;
     }
 
     // ============================ registerChangeListenerAndAbort ===================
@@ -1367,13 +1391,13 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         final long listenerEra = listener.getEra();
         final BetaTransactionalObject owner = attached.owner;
 
-        final boolean failure = owner.___registerChangeListener(listener, attached, pool, listenerEra)
-                    == REGISTRATION_NONE;
+        final boolean noRegistration =
+            owner.___registerChangeListener(listener, attached, pool, listenerEra) == REGISTRATION_NONE;
         owner.___abort(this, attached, pool);
         attached = null;
         status = ABORTED;
 
-        if(failure){
+        if(noRegistration){
             throw abortOnNoRetryPossible();
         }
     }

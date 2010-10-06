@@ -58,9 +58,9 @@ public class VetoCommitBarrier_vetoCommitTest {
         assertIsCommitted(thread2.tx);
         assertIsCommitted(thread3.tx);
 
-        assertEquals(1, ref1.___unsafeLoad().value);
-        assertEquals(1, ref2.___unsafeLoad().value);
-        assertEquals(1, ref3.___unsafeLoad().value);
+        assertEquals(1, ref1.atomicGet());
+        assertEquals(1, ref2.atomicGet());
+        assertEquals(1, ref3.atomicGet());
     }
 
     @Test

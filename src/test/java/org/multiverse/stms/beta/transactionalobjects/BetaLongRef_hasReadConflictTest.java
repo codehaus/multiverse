@@ -170,12 +170,12 @@ public class BetaLongRef_hasReadConflictTest implements BetaStmConstants {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal write = tx.openForRead(ref, LOCKMODE_NONE);
+        LongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, LOCKMODE_COMMIT);
 
-        boolean hasReadConflict = ref.___hasReadConflict(write, tx);
+        boolean hasReadConflict = ref.___hasReadConflict(tranlocal, tx);
 
         assertTrue(hasReadConflict);
     }

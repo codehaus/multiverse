@@ -8,6 +8,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_constructionTest implements BetaStmConstants {
@@ -20,51 +21,49 @@ public class BetaLongRef_constructionTest implements BetaStmConstants {
     }
 
     @Test
-    public void testBasicConstructorWithoutArguments() {
+    public void withStm() {
         BetaTransaction tx = stm.startDefaultTransaction();
-        BetaLongRef ref1 = new BetaLongRef(tx);
-        tx.openForConstruction(ref1);
+        BetaLongRef exampleRef = new BetaLongRef(tx);
+        tx.openForConstruction(exampleRef);
         tx.commit();
 
-        BetaLongRef ref2 = new BetaLongRef(stm);
-        assertEquals(ref1.___toOrecString(), ref2.___toOrecString());
 
-        assertNull(ref2.___getLockOwner());
-        assertNotNull(ref2.___unsafeLoad());
-        assertTrue(ref2.___unsafeLoad().isCommitted);
-        assertFalse(ref2.___unsafeLoad().isCommuting);
-        assertEquals(DIRTY_FALSE, ref2.___unsafeLoad().isDirty);
-        assertEquals(0, ref2.atomicGet());
+        BetaLongRef ref = new BetaLongRef(stm);
+        assertEquals(exampleRef.___toOrecString(), ref.___toOrecString());
+
+        assertHasNoCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertVersionAndValue(ref, 0, 0);
     }
 
     @Test
-    public void testBasicConstructorWithInitialValue() {
+    public void withStmAndInitialValue() {
         BetaTransaction tx = stm.startDefaultTransaction();
-        BetaLongRef ref1 = new BetaLongRef(tx);
-        tx.openForConstruction(ref1).value = 10;
+        BetaLongRef exampleRef = new BetaLongRef(tx);
+        tx.openForConstruction(exampleRef).value = 10;
         tx.commit();
 
-        BetaLongRef ref2 = new BetaLongRef(stm, 10);
-        assertEquals(ref1.___toOrecString(), ref2.___toOrecString());
+        BetaLongRef ref = new BetaLongRef(stm, 10);
+        assertEquals(exampleRef.___toOrecString(), ref.___toOrecString());
 
-        assertNull(ref2.___getLockOwner());
-        assertNotNull(ref2.___unsafeLoad());
-        assertTrue(ref2.___unsafeLoad().isCommitted);
-        assertFalse(ref2.___unsafeLoad().isCommuting);
-        assertEquals(DIRTY_FALSE, ref2.___unsafeLoad().isDirty);
-        assertEquals(10, ref2.atomicGet());
+        assertHasNoCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertVersionAndValue(ref, 0, 10);
     }
 
     @Test
-    public void test() {
+    public void withTransaction() {
         BetaTransaction tx = stm.startDefaultTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
 
         assertSurplus(1, ref);
+        assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
+        assertSame(tx, ref.___getLockOwner());
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);
-        assertNull(ref.___unsafeLoad());
-        assertSame(tx, ref.___getLockOwner());
+        assertVersionAndValue(ref, 0,0);
     }
 }

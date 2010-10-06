@@ -10,11 +10,11 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class WriteConflictTest implements BetaStmConstants {
@@ -45,7 +45,7 @@ public class WriteConflictTest implements BetaStmConstants {
         write.value++;
 
         ref.atomicIncrementAndGet(1);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         try {
             tx.commit();
@@ -55,7 +55,7 @@ public class WriteConflictTest implements BetaStmConstants {
         }
 
         assertIsAborted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 1);
     }
 
     @Test
@@ -71,12 +71,12 @@ public class WriteConflictTest implements BetaStmConstants {
         tx.openForWrite(ref, LOCKMODE_NONE);
 
         ref.atomicIncrementAndGet(1);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         tx.commit();
 
         assertIsCommitted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 1);
     }
 
 
@@ -93,7 +93,7 @@ public class WriteConflictTest implements BetaStmConstants {
         write.value++;
 
         ref.atomicIncrementAndGet(1);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         try {
             tx.commit();
@@ -102,7 +102,7 @@ public class WriteConflictTest implements BetaStmConstants {
         }
 
         assertIsAborted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 1);
     }
 
     @Test
@@ -118,7 +118,7 @@ public class WriteConflictTest implements BetaStmConstants {
         write.value++;
 
         ref.atomicIncrementAndGet(1);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         try {
             tx.commit();
@@ -127,6 +127,6 @@ public class WriteConflictTest implements BetaStmConstants {
         }
 
         assertIsAborted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 1);
     }
 }

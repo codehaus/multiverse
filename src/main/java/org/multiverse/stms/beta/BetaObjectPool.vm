@@ -126,7 +126,7 @@ public final class BetaObjectPool {
      * @param tranlocal the ${transactionalObject.tranlocal} to pool.
      */
     public void put(final ${transactionalObject.tranlocal} tranlocal) {
-        if (tranlocal.isPermanent || !tranlocalPoolingEnabled) {
+        if (!tranlocalPoolingEnabled) {
             return;
         }
 
@@ -186,7 +186,7 @@ public final class BetaObjectPool {
      *
      */
     public void put(final Tranlocal tranlocal) {
-        if (!tranlocalPoolingEnabled || tranlocal == null || tranlocal.isPermanent) {
+        if (!tranlocalPoolingEnabled || tranlocal == null) {
             return;
         }
 

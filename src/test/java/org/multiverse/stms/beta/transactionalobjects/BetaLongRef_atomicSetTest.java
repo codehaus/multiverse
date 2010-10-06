@@ -11,6 +11,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
@@ -62,8 +63,8 @@ public class BetaLongRef_atomicSetTest {
 
     @Test
     public void whenPrivatizedByOther_thenLockedException() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm,10);
+        long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.privatize(otherTx);
@@ -78,13 +79,13 @@ public class BetaLongRef_atomicSetTest {
         assertHasCommitLock(ref);
         assertHasNoUpdateLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
     public void whenEnsuredByOtherAndChange_thenLockedException() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.ensure(otherTx);
@@ -99,18 +100,18 @@ public class BetaLongRef_atomicSetTest {
         assertHasNoCommitLock(ref);
         assertHasUpdateLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 0);
     }
 
     @Test
     public void whenNoChange_thenNoCommit() {
         BetaLongRef ref = newLongRef(stm, 2);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         long result = ref.atomicSet(2);
 
         assertEquals(2, result);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 2);
         assertNull(getThreadLocalTransaction());
         assertEquals(2, ref.atomicGet());
         assertSurplus(0, ref);

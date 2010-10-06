@@ -162,7 +162,7 @@ public class IsolationStressTest implements BetaStmConstants {
             for (long k = 0; k < transactionsPerThread; k++) {
                 block.execute(closure);
 
-                if(k%100000 == 0){
+                if(k%500000 == 0){
                     System.out.printf("%s is at %s\n", getName(),k);
                 }
             }

@@ -22,7 +22,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 
 public class ReadersWritersProblemStressTest {
 
-    private long count = 1000;
+    private long count = 3000;
     private int readerThreadCount = 10;
     private int writerThreadCount = 5;
     private ReadersWritersLock readWriteLock;
@@ -70,8 +70,8 @@ public class ReadersWritersProblemStressTest {
 
         startAll(writers);
         startAll(readers);
-        joinAll(writers);
-        joinAll(readers);
+        joinAll(1000 * 1000, writers);
+        joinAll(1000 * 1000, readers);
 
         assertEquals(0, currentReaderCount.get());
         assertEquals(0, currentWriterCount.get());
@@ -112,7 +112,7 @@ public class ReadersWritersProblemStressTest {
 
                     assertNoWriters();
 
-                    if (k % 1000 == 0) {
+                    if (k % 100 == 0) {
                         System.out.printf("%s is at count %s\n", getName(), k);
                     }
                 } finally {
@@ -126,6 +126,12 @@ public class ReadersWritersProblemStressTest {
 
     private void assertNoWriters() {
         if (currentWriterCount.get() > 0) {
+            fail();
+        }
+    }
+
+    private void assertNoReaders() {
+        if (currentReaderCount.get() > 0) {
             fail();
         }
     }
@@ -160,11 +166,7 @@ public class ReadersWritersProblemStressTest {
             }
         }
 
-        private void assertNoReaders() {
-            if (currentReaderCount.get() > 0) {
-                fail();
-            }
-        }
+
     }
 
     class ReadersWritersLock {
@@ -220,6 +222,4 @@ public class ReadersWritersProblemStressTest {
             readerCount.atomicIncrementAndGet(-1);
         }
     }
-
-
 }

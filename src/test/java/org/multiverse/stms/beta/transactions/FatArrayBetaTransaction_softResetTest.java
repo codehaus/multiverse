@@ -11,9 +11,10 @@ import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.multiverse.TestUtils.LOCKMODE_COMMIT;
+import static org.multiverse.TestUtils.LOCKMODE_NONE;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
-import static org.multiverse.stms.beta.BetaStmUtils.newReadBiasedLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.*;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
@@ -59,7 +60,7 @@ public class FatArrayBetaTransaction_softResetTest {
     @Test
     public void whenContainsUnlockedNonPermanentRead() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.openForRead(ref, LOCKMODE_NONE);
@@ -72,14 +73,14 @@ public class FatArrayBetaTransaction_softResetTest {
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 0);
         assertHasNoUpdates(tx);
     }
 
     @Test
     public void whenContainsUnlockedPermanent() {
         BetaLongRef ref = newReadBiasedLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.openForRead(ref, LOCKMODE_NONE);
@@ -92,17 +93,17 @@ public class FatArrayBetaTransaction_softResetTest {
         assertReadBiased(ref);
         assertSurplus(1, ref);
         assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 0);
         assertHasNoUpdates(tx);
     }
 
     @Test
     public void whenNormalUpdate() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        tx.openForWrite(ref, LOCKMODE_NONE);
 
         boolean result = tx.softReset();
 
@@ -112,19 +113,17 @@ public class FatArrayBetaTransaction_softResetTest {
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
-        assertFalse(write.isPermanent);
-        assertFalse(write.isCommitted);
+        assertVersionAndValue(ref, version, 0);
         assertHasNoUpdates(tx);
     }
 
     @Test
     public void whendLockedWrites() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         boolean result = tx.softReset();
 
@@ -134,9 +133,7 @@ public class FatArrayBetaTransaction_softResetTest {
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
-        assertFalse(write.isPermanent);
-        assertFalse(write.isCommitted);
+        assertVersionAndValue(ref, version, 0);
         assertHasNoUpdates(tx);
     }
 
@@ -154,10 +151,10 @@ public class FatArrayBetaTransaction_softResetTest {
     @Test
     public void whenPreparedResourcesNeedRelease() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        tx.openForWrite(ref, LOCKMODE_NONE);
         tx.prepare();
 
         boolean result = tx.softReset();
@@ -168,9 +165,7 @@ public class FatArrayBetaTransaction_softResetTest {
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
-        assertFalse(write.isPermanent);
-        assertFalse(write.isCommitted);
+        assertVersionAndValue(ref, version,0);        
         assertHasNoUpdates(tx);
     }
 
@@ -185,9 +180,9 @@ public class FatArrayBetaTransaction_softResetTest {
         assertTrue(result);
         assertIsActive(tx);
         assertFalse(constructed.isCommitted);
-        assertFalse(constructed.isPermanent);
+        assertFalse(constructed.hasDepartObligation);
         assertHasCommitLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertSurplus(1, ref);
         assertHasNoUpdates(tx);
     }

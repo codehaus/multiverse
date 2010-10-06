@@ -2,25 +2,27 @@ package org.multiverse.stms.beta;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class BetaObjectPool_tranlocalArrayTest {
     private BetaObjectPool pool;
+    private BetaStm stm;
 
     @Before
     public void setUp() {
+        stm = new BetaStm();
         pool = new BetaObjectPool();
     }
 
     @Test
     public void whenItemPutInPool_thenPreparedForPooling() {
         Tranlocal[] array = new Tranlocal[2];
-        array[0] = LongRefTranlocal.LOCKED;
-        array[1] = LongRefTranlocal.LOCKED;
+        array[0] = newLongRef(stm).___newTranlocal();
+        array[1] = newLongRef(stm).___newTranlocal();
 
         pool.putTranlocalArray(array);
 

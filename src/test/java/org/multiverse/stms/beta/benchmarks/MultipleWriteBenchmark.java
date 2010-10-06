@@ -19,7 +19,7 @@ import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 /**
  * @author Peter Veentjer
  */
-public class MultipleWriteScalabilityTest implements BetaStmConstants {
+public class MultipleWriteBenchmark implements BetaStmConstants {
 
     private BetaStm stm;
     private final long transactionsPerThread = 100 * 1000 * 1000;
@@ -27,7 +27,7 @@ public class MultipleWriteScalabilityTest implements BetaStmConstants {
 
     public static void main(String[] args) {
         int refCount = Integer.parseInt(args[0]);
-        MultipleWriteScalabilityTest test = new MultipleWriteScalabilityTest();
+        MultipleWriteBenchmark test = new MultipleWriteBenchmark();
 
         test.start(refCount);
     }

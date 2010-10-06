@@ -473,6 +473,8 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract void addWatch(BetaTransactionalObject object, Watch watch);
 
+    public abstract <E> E read(BetaRef<E> ref);
+    
     public abstract <E> RefTranlocal<E> openForRead(BetaRef<E> ref, int lockMode);
 
     public abstract <E> RefTranlocal<E> openForWrite(BetaRef<E> ref, int lockMode);
@@ -481,6 +483,8 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract <E> void commute(BetaRef<E> ref, final Function<E> function);
 
+    public abstract  int read(BetaIntRef ref);
+    
     public abstract  IntRefTranlocal openForRead(BetaIntRef ref, int lockMode);
 
     public abstract  IntRefTranlocal openForWrite(BetaIntRef ref, int lockMode);
@@ -489,6 +493,8 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract  void commute(BetaIntRef ref, final IntFunction function);
 
+    public abstract  boolean read(BetaBooleanRef ref);
+    
     public abstract  BooleanRefTranlocal openForRead(BetaBooleanRef ref, int lockMode);
 
     public abstract  BooleanRefTranlocal openForWrite(BetaBooleanRef ref, int lockMode);
@@ -497,6 +503,8 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract  void commute(BetaBooleanRef ref, final BooleanFunction function);
 
+    public abstract  double read(BetaDoubleRef ref);
+    
     public abstract  DoubleRefTranlocal openForRead(BetaDoubleRef ref, int lockMode);
 
     public abstract  DoubleRefTranlocal openForWrite(BetaDoubleRef ref, int lockMode);
@@ -505,6 +513,8 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract  void commute(BetaDoubleRef ref, final DoubleFunction function);
 
+    public abstract  long read(BetaLongRef ref);
+    
     public abstract  LongRefTranlocal openForRead(BetaLongRef ref, int lockMode);
 
     public abstract  LongRefTranlocal openForWrite(BetaLongRef ref, int lockMode);

@@ -8,8 +8,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
-import static org.multiverse.stms.beta.BetaStmUtils.newReadBiasedLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.*;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
@@ -56,7 +55,7 @@ public class BetaLongRef_atomicGetTest {
     @Test
     public void whenUpdateBiasedAndPrivatizedByOther_thenLockedException() {
         BetaLongRef ref = newLongRef(stm, 100);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.privatize(otherTx);
@@ -72,13 +71,13 @@ public class BetaLongRef_atomicGetTest {
         assertUpdateBiased(ref);
         assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 100);
     }
 
     @Test
-    public void whenUpdateBiasedAndEnsuredByOther_thenLockedException() {
+    public void whenUpdateBiasedAndEnsuredByOther() {
         BetaLongRef ref = newLongRef(stm, 100);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.ensure(otherTx);
@@ -91,7 +90,7 @@ public class BetaLongRef_atomicGetTest {
         assertUpdateBiased(ref);
         assertHasUpdateLock(ref);
         assertHasNoCommitLock(ref);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 100);
     }
 
     @Test
@@ -106,7 +105,7 @@ public class BetaLongRef_atomicGetTest {
     @Test
     public void whenReadBiasedAndPrivatizedByOther_thenLockedException() {
         BetaLongRef ref = makeReadBiased(newLongRef(stm, 100));
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.privatize(otherTx);
@@ -122,25 +121,25 @@ public class BetaLongRef_atomicGetTest {
         assertReadBiased(ref);
         assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 100);
     }
 
     @Test
     public void whenReadBiasedAndEnsuredByOther_thenLockedException() {
         BetaLongRef ref = makeReadBiased(newLongRef(stm, 100));
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.ensure(otherTx);
 
-        long result = ref.atomicGet();
+        long result =    ref.atomicGet();
 
-        assertEquals(100, result);
+        assertEquals(100,result);
         assertSurplus(1, ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertReadBiased(ref);
         assertHasUpdateLock(ref);
         assertHasNoCommitLock(ref);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 100);
     }
 }

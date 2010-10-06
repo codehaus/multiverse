@@ -33,10 +33,11 @@ public class BetaObjectPool_tranlocalsTest {
         pool.put(put);
 
         assertNull(put.owner);
-        assertNull(put.read);
+        //todo:
+        //assertNull(put.read);
         assertEquals(0, put.value);
         assertFalse(put.isCommitted);
-        assertFalse(put.isPermanent);
+        assertFalse(put.hasDepartObligation);
     }
 
     @Test
@@ -47,10 +48,12 @@ public class BetaObjectPool_tranlocalsTest {
         pool.put(put);
 
         assertNull(put.owner);
-        assertNull(put.read);
+
+        //todo:
+        // assertNull(put.read);
         assertEquals(0, put.value);
         assertFalse(put.isCommitted);
-        assertFalse(put.isPermanent);
+        assertFalse(put.hasDepartObligation);
     }
 
     @Test
@@ -63,10 +66,11 @@ public class BetaObjectPool_tranlocalsTest {
 
         assertSame(put, result);
         assertSame(ref, put.owner);
-        assertNull(put.read);
+        //todo:
+        //assertNull(put.read);
         assertEquals(0, put.value);
         assertFalse(put.isCommitted);
-        assertFalse(put.isPermanent);
+        assertFalse(put.hasDepartObligation);
     }
 
     @Test

@@ -61,7 +61,7 @@ public class BetaLongRef_commute2Test {
     public void whenSuccess() {
         BetaLongRef ref = newLongRef(stm, 10);
 
-        LongFunction function = Functions.newLongIncFunction(1);
+        LongFunction function = Functions.newIncLongFunction(1);
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.commute(tx, function);
 
@@ -79,7 +79,7 @@ public class BetaLongRef_commute2Test {
         BetaLongRef ref = newLongRef(stm, 10);
         LongRefTranlocal committed = ref.___unsafeLoad();
 
-        LongFunction function = new IdentityLongFunction();
+        LongFunction function = Functions.newIdentityLongFunction();
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.commute(tx, function);
 
@@ -97,7 +97,7 @@ public class BetaLongRef_commute2Test {
     public void whenNormalTransactionUsed() {
         BetaLongRef ref = newLongRef(stm, 10);
 
-        LongFunction function = Functions.newLongIncFunction(1);
+        LongFunction function = Functions.newIncLongFunction(1);
         Transaction tx = stm.startDefaultTransaction();
         ref.commute(tx, function);
         tx.commit();
@@ -109,7 +109,7 @@ public class BetaLongRef_commute2Test {
     public void whenAlreadyOpenedForRead() {
         BetaLongRef ref = newLongRef(stm, 10);
 
-        LongFunction function = Functions.newLongIncFunction(1);
+        LongFunction function = Functions.newIncLongFunction(1);
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.get(tx);
         ref.commute(tx, function);
@@ -125,7 +125,7 @@ public class BetaLongRef_commute2Test {
 
     @Test
     public void whenAlreadyOpenedForConstruction() {
-        LongFunction function = Functions.newLongIncFunction(1);
+        LongFunction function = Functions.newIncLongFunction(1);
         BetaTransaction tx = stm.startDefaultTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
         tx.openForConstruction(ref);
@@ -144,7 +144,7 @@ public class BetaLongRef_commute2Test {
     public void whenAlreadyOpenedForWrite() {
         BetaLongRef ref = newLongRef(stm, 10);
 
-        LongFunction function = Functions.newLongIncFunction(1);
+        LongFunction function = Functions.newIncLongFunction(1);
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.set(tx, 11);
         ref.commute(tx, function);
@@ -162,8 +162,8 @@ public class BetaLongRef_commute2Test {
     public void whenAlreadyCommuting() {
         BetaLongRef ref = newLongRef(stm, 10);
 
-        LongFunction function1 = Functions.newLongIncFunction(1);
-        LongFunction function2 = Functions.newLongIncFunction(1);
+        LongFunction function1 = Functions.newIncLongFunction(1);
+        LongFunction function2 = Functions.newIncLongFunction(1);
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.commute(tx, function1);
         ref.commute(tx, function2);
@@ -275,7 +275,7 @@ public class BetaLongRef_commute2Test {
 
         BetaTransaction tx1 = stm.startDefaultTransaction();
         tx1.openForWrite(ref1, LOCKMODE_NONE).value++;
-        tx1.commute(ref2, Functions.newLongIncFunction(1));
+        tx1.commute(ref2, Functions.newIncLongFunction(1));
 
         BetaTransaction tx2 = stm.startDefaultTransaction();
         tx2.openForWrite(ref2, LOCKMODE_NONE).value++;

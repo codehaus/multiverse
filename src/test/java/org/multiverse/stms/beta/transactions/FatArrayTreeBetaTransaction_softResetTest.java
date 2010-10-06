@@ -11,9 +11,10 @@ import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.multiverse.TestUtils.LOCKMODE_COMMIT;
+import static org.multiverse.TestUtils.LOCKMODE_NONE;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
-import static org.multiverse.stms.beta.BetaStmUtils.newReadBiasedLongRef;
+import static org.multiverse.stms.beta.BetaStmUtils.*;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
@@ -59,7 +60,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
     @Test
     public void whenContainsUnlockedNonPermanentRead() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.openForRead(ref, LOCKMODE_NONE);
@@ -72,14 +73,14 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 0);        
         assertHasNoUpdates(tx);
     }
 
     @Test
     public void whenContainsUnlockedPermanent() {
         BetaLongRef ref = newReadBiasedLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.openForRead(ref, LOCKMODE_NONE);
@@ -92,14 +93,14 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         assertReadBiased(ref);
         assertSurplus(1, ref);
         assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 0);
         assertHasNoUpdates(tx);
     }
 
     @Test
     public void whenNormalUpdate() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
@@ -112,8 +113,8 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
-        assertFalse(write.isPermanent);
+        assertVersionAndValue(ref, version, 0);
+        assertFalse(write.hasDepartObligation);
         assertFalse(write.isCommitted);
         assertHasNoUpdates(tx);
     }
@@ -121,7 +122,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
     @Test
     public void whendLockedWrites() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
@@ -134,8 +135,8 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
-        assertFalse(write.isPermanent);
+        assertVersionAndValue(ref, version, 0);
+        assertFalse(write.hasDepartObligation);
         assertFalse(write.isCommitted);
         assertHasNoUpdates(tx);
     }
@@ -154,10 +155,10 @@ public class FatArrayTreeBetaTransaction_softResetTest {
     @Test
     public void whenPreparedResourcesNeedRelease() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        tx.openForWrite(ref, LOCKMODE_NONE);
         tx.prepare();
 
         boolean result = tx.softReset();
@@ -168,9 +169,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
-        assertFalse(write.isPermanent);
-        assertFalse(write.isCommitted);
+        assertVersionAndValue(ref, version, 0);
         assertHasNoUpdates(tx);
     }
 
@@ -185,9 +184,9 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         assertTrue(result);
         assertIsActive(tx);
         assertFalse(constructed.isCommitted);
-        assertFalse(constructed.isPermanent);
+        assertFalse(constructed.hasDepartObligation);
         assertHasCommitLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertNull(ref.___getLockOwner());
         assertSurplus(1, ref);
         assertHasNoUpdates(tx);
     }
@@ -204,7 +203,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
         assertHasNoNormalListeners(tx);
     }
- 
+
     @Test
     public void whenAborted() {
         BetaTransaction tx = new FatArrayTreeBetaTransaction(stm);

@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.durability;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.durability.DurableObjectLoader;
@@ -20,6 +21,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
+@Ignore
 public class SimpleDurabilityIntegrationTest implements BetaStmConstants{
     private BetaStm stm;
     private SimpleStorage storage;

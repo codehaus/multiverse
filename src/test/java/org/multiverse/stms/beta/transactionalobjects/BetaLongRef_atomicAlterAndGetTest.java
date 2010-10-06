@@ -15,6 +15,7 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
@@ -53,7 +54,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
     @Test
     public void whenNullFunction_thenNullPointerException() {
         BetaLongRef ref = newLongRef(stm, 5);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         try {
             ref.atomicAlterAndGet(null);
@@ -64,13 +65,13 @@ public class BetaLongRef_atomicAlterAndGetTest {
         assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
         assertEquals(5, ref.atomicGet());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 5);
     }
 
     @Test
     public void whenSuccess() {
         BetaLongRef ref = newLongRef(stm, 5);
-        LongFunction function = Functions.newLongIncFunction(1);
+        LongFunction function = Functions.newIncLongFunction(1);
 
         long result = ref.atomicAlterAndGet(function);
 
@@ -84,9 +85,9 @@ public class BetaLongRef_atomicAlterAndGetTest {
     @Test
     public void whenNoChange() {
         BetaLongRef ref = newLongRef(stm, 5);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
-        LongFunction function = new IdentityLongFunction();
+        LongFunction function = Functions.newIdentityLongFunction();
 
         long result = ref.atomicAlterAndGet(function);
 
@@ -95,7 +96,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
         assertEquals(5, ref.atomicGet());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 5);
     }
 
     @Test
@@ -105,7 +106,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
         setThreadLocalTransaction(tx);
         ref.set(tx, 100);
 
-        LongFunction function = Functions.newLongIncFunction(1);
+        LongFunction function = Functions.newIncLongFunction(1);
 
         long result = ref.atomicAlterAndGet(function);
 
@@ -120,8 +121,8 @@ public class BetaLongRef_atomicAlterAndGetTest {
 
     @Test
     public void whenEnsuredByOther_thenLockedException() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm,5);
+        long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.ensure(otherTx);
@@ -138,13 +139,13 @@ public class BetaLongRef_atomicAlterAndGetTest {
         assertHasUpdateLock(ref);
         assertHasNoCommitLock(ref);
         assertUpdateBiased(ref);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 5);
     }
 
     @Test
     public void whenPrivatizedByOther() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm,5);
+        long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.privatize(otherTx);
@@ -161,7 +162,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
         assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertUpdateBiased(ref);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 5);
     }
 
     @Test

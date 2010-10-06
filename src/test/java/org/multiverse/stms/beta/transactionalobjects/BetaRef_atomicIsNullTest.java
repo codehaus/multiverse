@@ -11,6 +11,7 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmUtils.newRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
@@ -47,7 +48,8 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
     @Test
     public void whenNull() {
         BetaRef<String> ref = newRef(stm, null);
-        RefTranlocal committed = ref.___unsafeLoad();
+        long initialVersion = ref.getVersion();
+
 
         boolean result = ref.atomicIsNull();
 
@@ -55,13 +57,14 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
         assertSurplus(0, ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, initialVersion, null);
     }
 
     @Test
     public void whenActiveTransactionAvailable_thenIgnored() {
-        BetaRef<String> ref = newRef(stm, "foo");
-        RefTranlocal committed = ref.___unsafeLoad();
+        String initialValue = "foo";
+        BetaRef<String> ref = newRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -73,13 +76,14 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
         assertSurplus(1, ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
     public void whenNotNull() {
-        BetaRef<String> ref = newRef(stm, "foo");
-        RefTranlocal committed = ref.___unsafeLoad();
+        String initialValue = "foo";
+        BetaRef<String> ref = newRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         boolean result = ref.atomicIsNull();
 
@@ -87,7 +91,7 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
         assertSurplus(0, ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test

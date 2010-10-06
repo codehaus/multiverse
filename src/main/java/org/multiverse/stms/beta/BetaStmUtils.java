@@ -8,6 +8,9 @@ import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
 /**
  * @author Peter Veentjer
  */
@@ -65,6 +68,16 @@ public class BetaStmUtils implements BetaStmConstants {
 
     public static BetaLongRef newLongRef(BetaStm stm) {
         return newLongRef(stm, 0);
+    }
+
+    public static void assertVersionAndValue(BetaLongRef ref, long version, long value) {
+        assertEquals("version doesn't match", version, ref.getVersion());
+        assertEquals("value doesn't match", value, ref.___weakRead());
+    }
+
+    public static void assertVersionAndValue(BetaRef ref, long version, Object value) {
+        assertEquals("version doesn't match", version, ref.getVersion());
+        assertSame("value doesn't match", value, ref.___weakRead());
     }
 
     public static BetaLongRef newReadBiasedLongRef(BetaStm stm, long value) {

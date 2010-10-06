@@ -9,6 +9,7 @@ import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
@@ -226,7 +227,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest implements BetaStmConstants
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         ref.atomicSet(20);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version =ref.getVersion();
 
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, read, true);
 
@@ -237,7 +238,7 @@ public class BetaLongRef_tryLockAndCheckConflictTest implements BetaStmConstants
         assertHasCommitLock(ref);
         assertReadonlyCount(0, ref);
         assertSurplus(1, ref);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version,20);
     }
 
     @Test

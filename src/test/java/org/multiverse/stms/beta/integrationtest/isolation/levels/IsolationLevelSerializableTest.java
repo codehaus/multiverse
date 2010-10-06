@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.integrationtest.isolation.levels;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.Transaction;
@@ -52,6 +53,7 @@ public class IsolationLevelSerializableTest {
     }
 
     @Test
+    @Ignore
     public void repeatableRead_whenNotTrackedAndConflictingUpdate_thenReadConflict() {
         final BetaLongRef ref = newReadBiasedLongRef(stm);
 

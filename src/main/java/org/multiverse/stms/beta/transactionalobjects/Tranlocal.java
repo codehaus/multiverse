@@ -5,6 +5,7 @@ import org.multiverse.durability.DurableObject;
 import org.multiverse.durability.DurableState;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStmConstants;
+import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -14,95 +15,27 @@ import java.util.LinkedList;
  */
 public abstract class Tranlocal implements DurableState, BetaStmConstants {
 
-    public final static Tranlocal LOCKED = new Tranlocal(null, true) {
-        @Override
-        public void prepareForPooling(BetaObjectPool pool) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Tranlocal openForWrite(BetaObjectPool pool) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Tranlocal openForCommute(BetaObjectPool pool) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public boolean calculateIsDirty() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void evaluateCommutingFunctions(BetaObjectPool pool) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void addCommutingFunction(Function function, BetaObjectPool pool) {
-            throw new UnsupportedOperationException();
-        }
-    };
-
     public BetaTransactionalObject owner;
-    public final boolean isLocked;      
-    public boolean isPermanent;
+    public boolean isLockOwner;
+    public boolean hasDepartObligation;
     public boolean isCommitted;
     public boolean isCommuting;
-    public int isDirty = DIRTY_UNKNOWN;
-    public Tranlocal read;
+    public boolean isConstructing;
+    public boolean isDirty;
+    public long version;
+    public CallableNode headCallable;
 
-    public Tranlocal(BetaTransactionalObject owner, boolean locked) {
+    public Tranlocal(BetaTransactionalObject owner) {
         this.owner = owner;
-        this.isLocked = locked;
     }
 
-    /**
-     * Prepares the tranlocal for pooling so that it can be reused.
-     *
-     * @param pool the BetaObjectPool used for pooling. If there are any internal resources that can be pooled, this
-     *             pool can be used for it.
-     */
-    public abstract void prepareForPooling(BetaObjectPool pool);
-
-    /**
-     * Prepares this Tranlocal for committing. If there is a read, the read is getAndSet to null (to prevent
-     * retaining an uncontrollable number of objects). Also the isDirty field is getAndSet to false and the isCommitted
-     * field to false.
-     * <p/>
-     * No checks are done if the Tranlocal is in the committed state, so make sure that this is done from
-     * the outside.
-     */
-    public final void prepareForCommit() {
-        assert !isCommitted;
-        this.isCommitted = true;
-        this.read = null;
-        this.isDirty = DIRTY_FALSE;
-    }
+    public abstract void prepareForPooling(final BetaObjectPool pool);
 
     @Override
     public final BetaTransactionalObject getOwner() {
         return owner;
     }
 
-    /**
-     * Opens the Tranlocal for writing. This means that a copy is made that is updatable.
-     *
-     * @param pool the BetaObjectPool used to retrieve a Tranlocal
-     * @return the opened Tranlocal.
-     */
-    public abstract Tranlocal openForWrite(BetaObjectPool pool);
-
-    /**
-     * Opens the Tranlocal for a commute operation. This means that an updatable copy is made that
-     * is put in the 'isCommuting' state.
-     *
-     * @param pool the BetaObjectPool used to retrieve the Tranlocal
-     * @return the opened Tranlocal.
-     */
-    public abstract Tranlocal openForCommute(BetaObjectPool pool);
 
     /**
      * Calculates if this Tranlocal is dirty (so needs to be written) and stores the result in the
@@ -151,14 +84,50 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
      * Once marked as permanent, it will never change.
      */
     public final void markAsPermanent() {
-        if (isPermanent) {
+        if (hasDepartObligation) {
             return;
         }
-        this.isPermanent = true;
+        this.hasDepartObligation = true;
     }
 
-    public final boolean isPermanent() {
-        return isPermanent;
+    public final boolean doPrepareDirtyUpdates(final BetaObjectPool pool, BetaTransaction tx, int spinCount) {
+        if (isCommitted || isConstructing) {
+            return true;
+        }
+
+        if (isCommuting) {
+            if (!owner.___load(spinCount, tx, LOCKMODE_COMMIT, this)) {
+                return false;
+            }
+            evaluateCommutingFunctions(pool);
+        } else if (!(isDirty || calculateIsDirty())) {
+            return true;
+        } else if (!owner.___tryLockAndCheckConflict(tx, spinCount, this, true)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public final boolean doPrepareAllUpdates(final BetaObjectPool pool, BetaTransaction tx, int spinCount) {
+        if (isCommitted || isConstructing) {
+            return true;
+        }
+
+        if (isCommuting) {
+            if (!owner.___load(spinCount, tx, LOCKMODE_COMMIT, this)) {
+                return false;
+            }
+            evaluateCommutingFunctions(pool);
+        } else if (!owner.___tryLockAndCheckConflict(tx, spinCount, this, true)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public final boolean isHasDepartObligation() {
+        return hasDepartObligation;
     }
 
     public Iterator<DurableObject> getReferences() {

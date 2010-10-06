@@ -1,7 +1,9 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.Transaction;
+import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.NoTransactionFoundException;
+import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.orec.FastOrec;
@@ -31,6 +33,8 @@ public abstract class VeryAbstractBetaTransactionalObject
 
     protected volatile Listeners ___listeners;
 
+    protected volatile long ___version;
+
     //This field has a controlled JMM problem (just like the hashcode of String).
     protected int ___identityHashCode;
     protected final BetaStm ___stm;
@@ -40,6 +44,10 @@ public abstract class VeryAbstractBetaTransactionalObject
             throw new NullPointerException();
         }
         this.___stm = stm;
+    }
+
+    public long getVersion() {
+        return ___version;
     }
 
     @Override
@@ -55,6 +63,134 @@ public abstract class VeryAbstractBetaTransactionalObject
     @Override
     public final Orec ___getOrec() {
         return this;
+    }
+
+    @Override
+    public final int ___registerChangeListener(
+            final Latch latch,
+            final Tranlocal tranlocal,
+            final BetaObjectPool pool,
+            final long listenerEra) {
+
+        if (tranlocal.isCommuting || tranlocal.isConstructing) {
+            return REGISTRATION_NONE;
+        }
+
+        if (tranlocal.version != ___version) {
+            //if it currently already contains a different version, we are done.
+            latch.open(listenerEra);
+            return REGISTRATION_NOT_NEEDED;
+        }
+
+        //we are going to register the listener since the current value still matches with is active.
+        //But it could be that the registration completes after the write has happened.
+
+        Listeners newListeners = pool.takeListeners();
+        if (newListeners == null) {
+            newListeners = new Listeners();
+        }
+        newListeners.listener = latch;
+        newListeners.listenerEra = listenerEra;
+
+        //we need to do this in a loop because other register thread could be contending for the same
+        //listeners field.
+        while (true) {
+            //the listeners object is mutable, but as long as it isn't yet registered, this calling
+            //thread has full ownership of it.
+            final Listeners oldListeners = ___listeners;
+
+            newListeners.next = oldListeners;
+
+            //lets try to register our listeners.
+            if (!___unsafe.compareAndSwapObject(this, listenersOffset, oldListeners, newListeners)) {
+                //so we are contending with another register thread, so lets try it again. Since the compareAndSwap
+                //didn't succeed, we know that the current thread still has exclusive ownership on the Listeners object.
+                continue;
+            }
+
+            //the registration was a success. We need to make sure that the active hasn't changed.
+            //JMM: the volatile read can't jump in front of the unsafe.compareAndSwap.
+            if (tranlocal.version == ___version) {
+                //we are lucky, the registration was done successfully and we managed to cas the listener
+                //before the update (since the update hasn't happened yet). This means that the updating thread
+                //is now responsible for notifying the listeners.
+                return REGISTRATION_DONE;
+            }
+
+            //JMM: the unsafe.compareAndSwap can't jump over the volatile read this.___version.
+            //the update has taken place, we need to check if our listeners still is in place.
+            //if it is, it should be removed and the listeners notified. If the listeners already has changed,
+            //it is the task for the other to do the listener cleanup and notify them
+            if (___unsafe.compareAndSwapObject(this, listenersOffset, newListeners, null)) {
+                newListeners.openAll(pool);
+            } else {
+                latch.open(listenerEra);
+            }
+
+            return REGISTRATION_NOT_NEEDED;
+        }
+    }
+
+    @Override
+    public final boolean ___tryLockAndCheckConflict(
+            final BetaTransaction newLockOwner,
+            final int spinCount,
+            final Tranlocal tranlocal,
+            final boolean commitLock) {
+
+        if (tranlocal.isLockOwner) {
+            if (commitLock) {
+                ___upgradeToCommitLock();
+            }
+            return true;
+        }
+
+        final long expectedVersion = tranlocal.version;
+
+        //if the version already is different, we are done since we know that there is a conflict.
+        if (___version != expectedVersion) {
+            return false;
+        }
+
+        if (!tranlocal.hasDepartObligation) {
+            //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
+            final int arriveStatus = ___tryLockAndArrive(spinCount, commitLock);
+
+            if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+                return false;
+            }
+
+            if(arriveStatus == ARRIVE_NORMAL){
+                tranlocal.hasDepartObligation = true; 
+            }
+        } else if (!___tryLockAfterNormalArrive(spinCount, commitLock)) {
+            return false;
+        }
+
+        //the lock was acquired successfully.
+        ___lockOwner = newLockOwner;
+        tranlocal.isLockOwner = true;
+        return expectedVersion == ___version;
+    }
+
+    protected final Listeners ___removeListenersAfterWrite() {
+        if (___listeners == null) {
+            return null;
+        }
+
+        //at this point it could have happened that the listener has changed.. it could also
+        Listeners result;
+        while (true) {
+            result = ___listeners;
+            if (___unsafe.compareAndSwapObject(this, listenersOffset, result, null)) {
+                return result;
+            }
+        }
+    }
+
+    @Override
+    public final boolean ___hasReadConflict(final Tranlocal tranlocal, BetaTransaction removeMe) {
+        return !tranlocal.isLockOwner && tranlocal.version != ___version;
     }
 
     @Override

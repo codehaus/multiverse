@@ -326,6 +326,8 @@ public interface DoubleRef extends TransactionalObject {
      */
     double atomicGet();
 
+    double atomicWeakGet();
+
     /**
      * Gets the value. If a Transaction currently is running, this call will lift on that transaction. If no
      * Transaction is running, it will be run under its own transaction (so executed atomically).

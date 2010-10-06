@@ -58,7 +58,7 @@ public class FatArrayTreeBetaTransaction_stressTest implements BetaStmConstants 
 
         long sum = 0;
         for (int k = 0; k < refs.length; k++) {
-            sum += refs[k].___unsafeLoad().value;
+            sum += refs[k].atomicGet();
         }
 
         assertEquals(created, sum);

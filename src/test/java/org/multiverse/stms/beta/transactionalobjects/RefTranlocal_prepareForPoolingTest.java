@@ -4,11 +4,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.BetaStmUtils;
 
 import static org.junit.Assert.assertNull;
 
-public class RefTranlocal_prepareForPoolingTest {
+public class RefTranlocal_prepareForPoolingTest implements BetaStmConstants
+{
     private BetaStm stm;
     private BetaObjectPool pool;
 
@@ -18,10 +20,15 @@ public class RefTranlocal_prepareForPoolingTest {
         pool = new BetaObjectPool();
     }
 
+    /**
+     * This test is to make sure that there is no hidden memory leak to the value, when tranlocals are pooled.
+     */
     @Test
-    public void test() {
+    public void whenReferenceHasValue_thenItIsNulled() {
         BetaRef<String> ref = BetaStmUtils.newRef(stm, "peter");
-        RefTranlocal tranlocal = ref.___unsafeLoad();
+        RefTranlocal tranlocal = ref.___newTranlocal();
+        ref.___load(1, null, LOCKMODE_NONE, tranlocal);
+
         tranlocal.prepareForPooling(pool);
 
         assertNull(tranlocal.value);

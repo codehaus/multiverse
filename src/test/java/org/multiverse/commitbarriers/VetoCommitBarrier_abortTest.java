@@ -51,7 +51,7 @@ public class VetoCommitBarrier_abortTest {
         thread1.join();
         thread2.join();
 
-        assertEquals(0, ref.___unsafeLoad().value);
+        assertEquals(0, ref.atomicGet());
         assertIsAborted(thread1.tx);
         assertIsAborted(thread2.tx);
         thread1.assertFailedWithException(CommitBarrierOpenException.class);

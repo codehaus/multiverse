@@ -21,7 +21,7 @@ public class Functions {
      *
      * @return the create identity IntFunction.
      */
-    public static IntFunction newIntIdentityFunction() {
+    public static IntFunction newIdentityIntFunction() {
         return identityIntFunction;
     }
 
@@ -31,9 +31,46 @@ public class Functions {
      *
      * @return the create identity LongFunction.
      */
-    public static LongFunction newLongIdentityFunction() {
+    public static LongFunction newIdentityLongFunction() {
         return identityLongFunction;
     }
+
+    /**
+     * Creates a IntFunction that increases the value by one.
+     *
+     * @return the created function.
+     */
+    public static IntFunction newIncIntFunction() {
+        return incOneIntFunction;
+    }
+
+    /**
+     * Creates a IntFunction that decreases the value by one.
+     *
+     * @return the created function.
+     */
+    public static IntFunction newDecIntFunction() {
+        return decOneIntFunction;
+    }
+
+    /**
+     * Creates a new LongFunction that increases the value by one.
+     *
+     * @return the created function.
+     */
+    public static LongFunction newIncLongFunction() {
+        return incOneLongFunction;
+    }
+
+    /**
+     * Creates a new LongFunction that decreases the value by one.
+     *
+     * @return the created function.
+     */
+    public static LongFunction newDecLongFunction() {
+        return decOneLongFunction;
+    }
+
 
     /**
      * Creates a IntFunction that increments. For the -1, 0 and 1 you get an already existing instance.
@@ -61,7 +98,7 @@ public class Functions {
      * @param amount the value to increment with. A negative value does a decrement.
      * @return the create identity IntFunction.
      */
-    public static LongFunction newLongIncFunction(long amount) {
+    public static LongFunction newIncLongFunction(long amount) {
         if (amount == 0) {
             return identityLongFunction;
         }
@@ -82,12 +119,22 @@ public class Functions {
         public int call(int current) {
             return current;
         }
+
+        @Override
+        public String toString() {
+            return "IdentityIntFunction";
+        }
     };
 
     private static final LongFunction identityLongFunction = new LongFunction() {
         @Override
         public long call(long current) {
             return current;
+        }
+
+        @Override
+        public String toString() {
+            return "IdentityLongFunction";
         }
     };
 
@@ -125,7 +172,7 @@ public class Functions {
 
         @Override
         public String toString() {
-            return "IncIntFunction{" +
+            return "IncLongFunction{" +
                     "value=" + value +
                     '}';
         }

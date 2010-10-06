@@ -10,6 +10,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
@@ -56,24 +57,23 @@ public class BetaLongRef_atomicIncrementAndGetTest {
 
     @Test
     public void whenNoChange() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm,10);
+        long version = ref.getVersion();
 
         long result = ref.atomicIncrementAndGet(0);
 
-        assertEquals(0, result);
+        assertEquals(10, result);
         assertHasNoCommitLock(ref);
-        assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
+        assertSurplus(0, ref);
         assertNull(getThreadLocalTransaction());
-        assertEquals(0, ref.atomicGet());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
     public void whenPrivatizedByOther_thenLockedException() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm,10);
+        long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.privatize(otherTx);
@@ -88,13 +88,13 @@ public class BetaLongRef_atomicIncrementAndGetTest {
         assertHasCommitLock(ref);
         assertHasNoUpdateLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
     public void whenEnsuredByOtherAndChange_thenLockedException() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm,10);
+        long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.ensure(otherTx);
@@ -109,7 +109,7 @@ public class BetaLongRef_atomicIncrementAndGetTest {
         assertHasNoCommitLock(ref);
         assertHasUpdateLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test

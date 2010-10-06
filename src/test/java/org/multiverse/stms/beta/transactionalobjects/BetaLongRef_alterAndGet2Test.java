@@ -18,6 +18,7 @@ import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
@@ -39,7 +40,8 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
     @Test
     public void whenNullTransaction_thenNullPointerException() {
         BetaLongRef ref = newLongRef(stm, 10);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
+
         LongFunction function = mock(LongFunction.class);
 
         try {
@@ -49,13 +51,13 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
         }
 
         verifyZeroInteractions(function);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
     public void whenNullFunction_thenNullPointerException() {
         BetaLongRef ref = newLongRef(stm, 10);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
 
@@ -66,13 +68,13 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
         }
 
         assertIsAborted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
     public void whenCommittedTransaction_thenDeadTransactionException() {
         BetaLongRef ref = newLongRef(stm, 10);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.commit();
@@ -86,13 +88,13 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
         }
 
         assertIsCommitted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
     public void whenPreparedTransaction_thenPreparedTransactionException() {
         BetaLongRef ref = newLongRef(stm, 10);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.prepare();
@@ -106,13 +108,13 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
         }
 
         assertIsAborted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
     public void whenAbortedTransaction() {
         BetaLongRef ref = newLongRef(stm, 10);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.abort();
@@ -126,7 +128,7 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
         }
 
         assertIsAborted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
@@ -152,8 +154,8 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
 
     @Test
     public void whenPrivatizedByOther() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm,10);
+        long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.privatize(otherTx);
@@ -173,20 +175,20 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
         assertIsActive(otherTx);
         assertIsAborted(tx);
         assertSame(otherTx, ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
-    
+
     @Test
     public void whenEnsuredByOther_thenOperationSucceedsButCommitFails() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm,10);
+        long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.ensure(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongFunction function = Functions.newLongIncFunction(1);
+        LongFunction function = Functions.newIncLongFunction(1);
         ref.alterAndGet(tx, function);
 
         try {
@@ -201,7 +203,7 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
         assertIsActive(otherTx);
         assertIsAborted(tx);
         assertSame(otherTx, ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test

@@ -26,20 +26,21 @@ public class LongRefTranlocal_addCommutingFunctionTest {
     @Test
     public void whenFirstAddition() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal tranlocal = ref.___openForCommute(pool);
-        tranlocal.addCommutingFunction(Functions.newLongIncFunction(1), pool);
+        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        tranlocal.isCommuting = true;
+        tranlocal.addCommutingFunction(Functions.newIncLongFunction(1), pool);
 
         assertFalse(tranlocal.isCommitted);
         assertTrue(tranlocal.isCommuting);
         assertEquals(0, tranlocal.value);
-        assertNull(tranlocal.read);
-        assertHasCommutingFunctions(tranlocal, Functions.newLongIncFunction(1));
+        assertHasCommutingFunctions(tranlocal, Functions.newIncLongFunction(1));
     }
 
     @Test
     public void whenMultipleAdditions() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal tranlocal = ref.___openForCommute(pool);
+        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        tranlocal.isCommuting = true;
 
         LongFunction function1 = mock(LongFunction.class);
         LongFunction function2 = mock(LongFunction.class);
@@ -51,8 +52,7 @@ public class LongRefTranlocal_addCommutingFunctionTest {
 
         assertFalse(tranlocal.isCommitted);
         assertTrue(tranlocal.isCommuting);
-        assertEquals(0, tranlocal.value);
-        assertNull(tranlocal.read);
+        assertEquals(0, tranlocal.value);        
         assertHasCommutingFunctions(tranlocal, function3, function2, function1);
     }
 }

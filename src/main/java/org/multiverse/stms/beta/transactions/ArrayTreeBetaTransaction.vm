@@ -87,8 +87,13 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
     }
 
-
 #foreach($ref in $transactionalObjects)
+#if(${ref.isReference})
+    public final ${ref.typeParameter} ${ref.type} read(${ref.name}${ref.typeParameter} ref){
+        throw new TodoException();
+    }
+
+#end
 #if(!${transaction.lean})
     private ${ref.typeParameter} void flattenCommute(
         final ${ref.name}${ref.typeParameter} ref,
@@ -100,19 +105,14 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             hasReads = true;
         }
 
-        final ${ref.tranlocal}${ref.typeParameter} read = ref.___load(config.spinCount, this, lockMode);
-
-        if (read.isLocked) {
+        if(!ref.___load(config.spinCount, this, lockMode,tranlocal)){
             throw abortOnReadConflict();
         }
 
-        //make sure that there are no conflicts.
         if (hasReadConflict()) {
-            ref.___abort(this, read, pool);
             throw abortOnReadConflict();
         }
 
-        tranlocal.read = read;
         boolean abort = true;
         evaluatingCommute = true;
         try{
@@ -171,27 +171,37 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             hasReads = true;
         }
 
-        //none is found in this transaction, lets load it.
-        final ${ref.tranlocal}${ref.typeParameter} read = ref.___load(config.spinCount, this, lockMode);
+        ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
+        if(tranlocal == null){
+#if(${ref.isReference})
+            tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
+#else
+            tranlocal = ref.___newTranlocal();
+#end
+        }
 
-        if (read.isLocked) {
+        if(!ref.___load(config.spinCount, this, lockMode,tranlocal)){
+            pool.put(tranlocal);
             throw abortOnReadConflict();
         }
+
+        tranlocal.isCommitted = true;
 
         //make sure that there are no conflicts.
         if (hasReadConflict()) {
-            ref.___abort(this, read, pool);
+            ref.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        if(lockMode != LOCKMODE_NONE || !read.isPermanent || config.trackReads){
-            attach(ref, read, identityHashCode);
+        if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation || config.trackReads){
+            attach(ref, tranlocal, identityHashCode);
             size++;
         }else{
+            //todo: pooling
             hasUntrackedReads = true;
         }
 
-        return read;
+        return tranlocal;
     }
 
     @Override
@@ -222,39 +232,25 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         lockMode = lockMode>= config.writeLockMode?lockMode:config.writeLockMode;
 
         if(index >- 1){
-            ${ref.tranlocal}${ref.typeParameter} result = (${ref.tranlocal}${ref.typeParameter})array[index];
+            ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})array[index];
 
 #if(!$transaction.lean)
-            if(result.isCommuting){
-                flattenCommute(ref, result, lockMode);
-                return result;
+            if(tranlocal.isCommuting){
+                flattenCommute(ref, tranlocal, lockMode);
             }else
 #end
-            if(lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, result, lockMode == LOCKMODE_COMMIT)){
+            if(!tranlocal.isConstructing
+                && lockMode != LOCKMODE_NONE
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            if(!result.isCommitted){
-                return result;
+            if(tranlocal.isCommitted){
+                tranlocal.isCommitted = false;
+                hasUpdates = true;                    
             }
 
-            //it was opened for reading so we need to open it for writing.
-#if(${ref.isReference})
-            ${ref.tranlocal}${ref.typeParameter} read = result;
-            result = pool.take(ref);
-            if (result == null) {
-                result = new ${ref.tranlocal}${ref.typeParameter}(ref);
-            }
-
-            result.value = read.value;
-            result.read = read;
-#else
-            result = result.openForWrite(pool);
-#end
-            hasUpdates = true;
-            array[index]=result;
-            return result;
+            return tranlocal;
         }
 
         //it was not previously attached to this transaction
@@ -264,32 +260,30 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             hasReads = true;
         }
 
-        final ${ref.tranlocal}${ref.typeParameter} read = ref.___load(config.spinCount, this, lockMode);
+        ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
+        if(tranlocal == null){
+#if(${ref.isReference})
+            tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
+#else
+            tranlocal = ref.___newTranlocal();
+#end
+        }
 
-        if(read.isLocked){
+        if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
+           pool.put(tranlocal);
            throw abortOnReadConflict();
         }
 
         if (hasReadConflict()) {
-            read.owner.___abort(this, read, pool);
+            tranlocal.owner.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        //open the tranlocal for writing.
-#if(${ref.isReference()})
-        ${ref.tranlocal}${ref.typeParameter} result =  pool.take(ref);
-        if(result == null){
-            result = new ${ref.tranlocal}${ref.typeParameter}(ref);
-        }
-        result.read = read;
-        result.value = read.value;
-#else
-        ${ref.tranlocal}${ref.typeParameter} result = read.openForWrite(pool);
-#end
+        tranlocal.isCommitted = false;
         hasUpdates = true;
-        attach(ref, result, identityHashCode);
+        attach(ref, tranlocal, identityHashCode);
         size++;        
-        return result;
+        return tranlocal;
     }
 
     @Override
@@ -318,30 +312,34 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         final int index = findAttachedIndex(ref, identityHashCode);
 
         if(index >- 1){
-            final ${ref.tranlocal}${ref.typeParameter} result = (${ref.tranlocal}${ref.typeParameter})array[index];
-            if(result.isCommitted || result.read!=null){
+            final ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})array[index];
+            if(!tranlocal.isConstructing){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
-            return result;
+            return tranlocal;
         }
 
-        if(ref.___unsafeLoad()!=null){
+        if(ref.___getLockOwner()!=this){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
+        ${ref.tranlocal}${ref.typeParameter} tranlocal =  pool.take(ref);
+        if(tranlocal == null){
 #if(${ref.isReference})
-        ${ref.tranlocal}${ref.typeParameter} result =  pool.take(ref);
-        if(result == null){
-            result = new ${ref.tranlocal}${ref.typeParameter}(ref);
-        }
+            tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
+
 #else
-        final ${ref.tranlocal}${ref.typeParameter} result = ref.___openForConstruction(pool);
+            tranlocal = ref.___newTranlocal();
 #end
-        result.isDirty = DIRTY_TRUE;
-        attach(ref, result, identityHashCode);
+        }
+        tranlocal.isLockOwner = true;
+        tranlocal.isConstructing = true;
+        tranlocal.isDirty = true;
+
+        attach(ref, tranlocal, identityHashCode);
         size++;
-        return result;
+        return tranlocal;
     }
 
     public ${ref.typeParameter} void commute(
@@ -354,7 +352,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         if(function == null){
             throw abortCommuteOnNullFunction(ref);
         }
-                    
 #if($transaction.lean)
         config.needsCommute();
         abort();
@@ -375,43 +372,42 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         final int identityHashCode = ref.___identityHashCode();
         final int index = findAttachedIndex(ref, identityHashCode);
         if(index == -1){
-            //todo: call to 'openForCommute' can be inlined.
-            ${ref.tranlocal}${ref.typeParameter} result = ref.___openForCommute(pool);
-            attach(ref, result, identityHashCode);
-            result.addCommutingFunction(function, pool);
-            hasUpdates = true;
-            size++;
-            return;
-        }
-
-        ${ref.tranlocal}${ref.typeParameter} result = (${ref.tranlocal}${ref.typeParameter})array[index];
-        if(result.isCommuting){
-            result.addCommutingFunction(function, pool);
-            return;
-        }
-
-        if(result.isCommitted){
-            final ${ref.tranlocal}${ref.typeParameter} read = result;
+            ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
+            if(tranlocal == null){
 #if(${ref.isReference})
-            result =  pool.take(ref);
-            if(result == null){
-                result = new ${ref.tranlocal}${ref.typeParameter}(ref);
-            }
-            result.read = read;
-            result.value = read.value;
+                tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
 #else
-            result = read.openForWrite(pool);
+                tranlocal = ref.___newTranlocal();
 #end
+            }
+
+            tranlocal.isCommuting = true;
+            tranlocal.addCommutingFunction(function, pool);
+            attach(ref, tranlocal, identityHashCode);
+            size++;
+            hasUpdates = true;                        
+            return;
+        }
+
+        ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})array[index];
+        if(tranlocal.isCommuting){
+            tranlocal.addCommutingFunction(function, pool);
+            return;
+        }
+
+        if(tranlocal.isCommitted){
+            tranlocal.isCommitted = false;
             hasUpdates = true;
-            array[index]=result;
+            array[index]=tranlocal;
          }
 
 #if(${ref.isReference})
-         result.value = function.call(result.value);
+         tranlocal.value = function.call(tranlocal.value);
 #else
          throw new TodoException();
-#end
+#end         
 #end ## if(transaction.lean)
+
     }
 
 #end ##for loop of transactionalobjects.
@@ -535,12 +531,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 //fall through
             case PREPARED:
                 status = ABORTED;
-                if(size>0){
+                if(size > 0){
                     for (int k = 0; k < array.length; k++) {
                         final Tranlocal tranlocal = array[k];
-                        array[k]=null;
                         if(tranlocal != null){
                             tranlocal.owner.___abort(this, tranlocal, pool);
+                            array[k] = null;
                         }                        
                     }
                 }
@@ -589,8 +585,11 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         Listeners[] listenersArray = null;
-        if(size>0){
-            final boolean needsPrepare = status == ACTIVE && hasUpdates;
+        if(size > 0){
+            final boolean needsPrepare = status == ACTIVE
+                && hasUpdates
+                && config.writeLockMode != LOCKMODE_COMMIT;
+
             if(config.dirtyCheck){
                 if(needsPrepare && !doPrepareDirty()){
                     throw abortOnWriteConflict();
@@ -652,12 +651,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         int listenersArrayIndex = 0;
         for (int k = 0; k < array.length; k++) {
             Tranlocal tranlocal = array[k];
-            array[k]=null;
 
             if(tranlocal == null){
                 continue;
             }
 
+            array[k] = null;            
             final Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool);
 
             if(listeners != null){
@@ -682,13 +681,14 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         int listenersArrayIndex = 0;
         for (int k = 0; k < array.length; k++) {
             Tranlocal tranlocal = array[k];
-            array[k]=null;
 
             if(tranlocal == null){
                 continue;
             }
 
-            if(tranlocal.isDirty == DIRTY_UNKNOWN){
+            array[k] = null;
+           
+            if(!tranlocal.isCommitted && !tranlocal.isDirty){
                 tranlocal.calculateIsDirty();
             }
             
@@ -736,14 +736,10 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         if(hasUpdates){
-            if(config.dirtyCheck){
-                if(!doPrepareDirty()){
-                    throw abortOnWriteConflict();
-                }
-            }else{
-                if(!doPrepareAll()){
-                    throw abortOnWriteConflict();
-                }
+            final boolean success = config.dirtyCheck ? doPrepareDirty() : doPrepareAll();
+
+            if(!success){
+                throw abortOnWriteConflict();
             }
         }
 
@@ -824,14 +820,11 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                     return false;
                 }
             }else if(tranlocal.isCommuting){
-                final Tranlocal read = tranlocal.owner.___load(spinCount, this, LOCKMODE_COMMIT);
-
-                if(read.isLocked){
+                if(!tranlocal.owner.___load(spinCount, this, LOCKMODE_COMMIT,tranlocal)){
                     return false;
                 }
 
-                tranlocal.read = read;
-                tranlocal.evaluateCommutingFunctions(pool);
+                tranlocal.evaluateCommutingFunctions(pool);                
             }else{
                 if(dirtyCheck){
                     tranlocal.calculateIsDirty();
@@ -848,7 +841,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end
 
     private boolean doPrepareAll() {
-        if(config.writeLockMode==LOCKMODE_COMMIT){
+        if(config.writeLockMode == LOCKMODE_COMMIT){
             return true;
         }
 
@@ -857,24 +850,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         for (int k = 0; k < array.length; k++) {
             final Tranlocal tranlocal = array[k];
 
-            if (tranlocal==null || tranlocal.isCommitted){
+            if (tranlocal == null || tranlocal.isCommitted){
                 continue;
             }
 
-#if(!$transaction.lean)
-            if(tranlocal.isCommuting){
-                final Tranlocal read = tranlocal.owner.___load(spinCount, this,LOCKMODE_COMMIT);
-
-                if(read.isLocked){
-                    return false;
-                }
-
-                tranlocal.read = read;
-                tranlocal.evaluateCommutingFunctions(pool);
-            }else
-#end
-            if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal, true)){
-               return false;
+            if(!tranlocal.doPrepareAllUpdates(pool, this, spinCount)) {
+                return false;
             }
         }
 
@@ -882,7 +863,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 
     private boolean doPrepareDirty() {
-        if(config.writeLockMode==LOCKMODE_COMMIT){            
+        if(config.writeLockMode == LOCKMODE_COMMIT){
             return true;
         }
 
@@ -895,22 +876,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 continue;
             }
 
-#if(!$transaction.lean)
-            if(tranlocal.isCommuting){
-                final Tranlocal read = tranlocal.owner.___load(spinCount, this, LOCKMODE_COMMIT);
-
-                if(read.isLocked){
-                    return false;
-                }
-
-                tranlocal.read = read;
-                tranlocal.evaluateCommutingFunctions(pool);
-            }else
-#end 
-            if (tranlocal.calculateIsDirty()) {
-                if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal, true)){
-                    return false;
-                }
+            if(!tranlocal.doPrepareDirtyUpdates(pool, this, spinCount)) {
+                return false;
             }
         }
 

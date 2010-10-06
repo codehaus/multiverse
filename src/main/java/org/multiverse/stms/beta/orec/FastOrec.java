@@ -13,9 +13,9 @@ import static java.lang.String.format;
  * Each transactional object (e.g. a ref) has such an Orec (it extends from it to make it cheaper). It works
  * with an arrive/depart system (semi visible reads) to prevent isolation problems; when an update is done
  * on an transactional object, where the orec has a surplus of readers, you know that transactions are still
- * dependant on this value. When this happens, the global conflict counter is increased, and all reading
+ * dependant on this ___orecValue. When this happens, the global conflict counter is increased, and all reading
  * transactions are forced to do a read conflict scan the next time they do a read (or a write since that
- * also requires a read to get the initial value).
+ * also requires a read to get the initial ___orecValue).
  * <p/>
  * Each transaction needs to track all reads (and of course all writes). To prevent contention on orecs that
  * mostly are read, an orec can become readonly after a certain number of only reads are done. Once this happens
@@ -48,7 +48,7 @@ public class FastOrec implements Orec {
 
     static {
         try {
-            valueOffset = ___unsafe.objectFieldOffset(FastOrec.class.getDeclaredField("value"));
+            valueOffset = ___unsafe.objectFieldOffset(FastOrec.class.getDeclaredField("___orecValue"));
         } catch (Exception ex) {
             throw new Error(ex);
         }
@@ -57,22 +57,22 @@ public class FastOrec implements Orec {
     //it is important that the maximum threshold is not larger than 1023 (there are 10 bits for the readonly count)
     public final static int ___READBIASED_THRESHOLD = 16;
 
-    private volatile long value;
+    private volatile long ___orecValue;
 
     @Override
     public boolean ___hasLock() {
-        final long current = value;
-        return hasUpdateLock(current) || hasCommitLock(value);
+        final long current = ___orecValue;
+        return hasUpdateLock(current) || hasCommitLock(___orecValue);
     }
 
     @Override
     public boolean ___hasUpdateLock() {
-        return hasUpdateLock(value);
+        return hasUpdateLock(___orecValue);
     }
 
     @Override
     public final boolean ___hasCommitLock() {
-        return hasCommitLock(value);
+        return hasCommitLock(___orecValue);
     }
 
     @Override
@@ -82,23 +82,23 @@ public class FastOrec implements Orec {
 
     @Override
     public final long ___getSurplus() {
-        return getSurplus(value);
+        return getSurplus(___orecValue);
     }
 
     @Override
     public final boolean ___isReadBiased() {
-        return isReadBiased(value);
+        return isReadBiased(___orecValue);
     }
 
     @Override
     public final int ___getReadonlyCount() {
-        return getReadonlyCount(value);
+        return getReadonlyCount(___orecValue);
     }
 
     @Override
     public final int ___arrive(int spinCount) {
         do {
-            long current = value;
+            long current = ___orecValue;
 
             if (hasCommitLock(current)) {
                 spinCount--;
@@ -141,7 +141,7 @@ public class FastOrec implements Orec {
     @Override
     public final int ___tryLockAndArrive(int spinCount, final boolean commitLock) {
         do {
-            long current = value;
+            long current = ___orecValue;
 
             if (hasCommitLock(current) || hasUpdateLock(current)) {
                 spinCount--;
@@ -183,7 +183,7 @@ public class FastOrec implements Orec {
     @Override
     public final boolean ___tryLockAfterNormalArrive(int spinCount, final boolean commitLock) {
         do {
-            long current = value;
+            long current = ___orecValue;
 
             if (hasCommitLock(current) || hasUpdateLock(current)) {
                 spinCount--;
@@ -216,7 +216,7 @@ public class FastOrec implements Orec {
     @Override
     public void ___upgradeToCommitLock() {
         while (true) {
-            final long current = value;
+            final long current = ___orecValue;
 
             if (hasCommitLock(current)) {
                 return;
@@ -238,7 +238,7 @@ public class FastOrec implements Orec {
     @Override
     public final void ___departAfterReading() {
         while (true) {
-            long current = value;
+            long current = ___orecValue;
             long surplus = getSurplus(current);
 
             if (surplus == 0) {
@@ -274,7 +274,7 @@ public class FastOrec implements Orec {
     @Override
     public final void ___departAfterReadingAndUnlock() {
         while (true) {
-            long current = value;
+            long current = ___orecValue;
             long surplus = getSurplus(current);
 
             if (surplus == 0) {
@@ -322,7 +322,7 @@ public class FastOrec implements Orec {
             final GlobalConflictCounter globalConflictCounter, final BetaTransactionalObject transactionalObject) {
 
         while (true) {
-            long current = value;
+            long current = ___orecValue;
 
             if (!hasCommitLock(current) && !hasUpdateLock(current)) {
                 throw new PanicError(
@@ -371,7 +371,7 @@ public class FastOrec implements Orec {
     @Override
     public final long ___departAfterFailureAndUnlock() {
         while (true) {
-            long current = value;
+            long current = ___orecValue;
 
             if (!hasCommitLock(current) && !hasUpdateLock(current)) {
                 throw new PanicError(
@@ -409,7 +409,7 @@ public class FastOrec implements Orec {
     @Override
     public final void ___departAfterFailure() {
         while (true) {
-            long current = value;
+            long current = ___orecValue;
 
             if (isReadBiased(current)) {
                 throw new PanicError("Can't departAfterFailure when orec is readbiased:" + ___toOrecString(current));
@@ -442,7 +442,7 @@ public class FastOrec implements Orec {
     @Override
     public final void ___unlockByReadBiased() {
         while (true) {
-            long current = value;
+            long current = ___orecValue;
 
             if (!isReadBiased(current)) {
                 throw new PanicError(
@@ -468,7 +468,7 @@ public class FastOrec implements Orec {
     }
 
     public final String ___toOrecString() {
-        return ___toOrecString(value);
+        return ___toOrecString(___orecValue);
     }
 
     public static long setCommitLock(final long value, final boolean commitLock) {

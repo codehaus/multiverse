@@ -25,6 +25,7 @@ public abstract class BetaTransaction_typesTest {
     @Test
     public void whenIntRefUsed() {
         BetaIntRef ref = newIntRef(stm, 100);
+        long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
         IntRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
@@ -33,12 +34,18 @@ public abstract class BetaTransaction_typesTest {
         write.value++;
         tx.commit();
 
-        assertEquals(101, ref.___unsafeLoad().value);
+        assertVersion(version+1, ref.getVersion());
+        assertEquals(101, ref.___weakRead());
+    }
+
+
+    void assertVersion(long l, long version) {
     }
 
     @Test
     public void whenLongRefUsed() {
         BetaLongRef ref = newLongRef(stm, 100);
+        long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
@@ -47,12 +54,14 @@ public abstract class BetaTransaction_typesTest {
         write.value++;
         tx.commit();
 
-        assertEquals(101, ref.___unsafeLoad().value);
+        assertVersion(version+1, ref.getVersion());
+        assertEquals(101, ref.___weakRead());
     }
 
     @Test
     public void whenRefUsed() {
         BetaRef<String> ref = newRef(stm, "peter");
+        long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
         RefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
@@ -61,12 +70,15 @@ public abstract class BetaTransaction_typesTest {
         write.value = "john";
         tx.commit();
 
-        assertEquals("john", ref.___unsafeLoad().value);
+        assertVersion(version+1, ref.getVersion());
+        assertEquals("john", ref.___weakRead());
+
     }
 
     @Test
     public void whenBooleanRefUsed() {
         BetaBooleanRef ref = new BetaBooleanRef(stm, false);
+        long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
         BooleanRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
@@ -75,12 +87,14 @@ public abstract class BetaTransaction_typesTest {
         write.value = true;
         tx.commit();
 
-        assertTrue(ref.___unsafeLoad().value);
+        assertVersion(version+1, ref.getVersion());
+        assertTrue(ref.___weakRead());
     }
 
     @Test
     public void whenDoubleUsed() {
         BetaDoubleRef ref = newDoubleRef(stm, 10);
+        long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
         DoubleRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
@@ -89,7 +103,9 @@ public abstract class BetaTransaction_typesTest {
         write.value = 20;
         tx.commit();
 
-        assertEqualsDouble(20, ref.___unsafeLoad().value);
+        assertVersion(version+1, ref.getVersion());
+        assertEqualsDouble(20, ref.___weakRead());        
+
     }
 
     @Test
@@ -98,7 +114,6 @@ public abstract class BetaTransaction_typesTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         LinkedList list = new LinkedList(tx);
         tx.commit();
-
 
 
     }

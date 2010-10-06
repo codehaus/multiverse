@@ -24,6 +24,7 @@ import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
@@ -73,7 +74,7 @@ public abstract class BetaTransaction_registerChangeListenerAndAbortTest impleme
         assumeTrue(isSupportingCommute());
 
         BetaLongRef ref = new BetaLongRef(stm, 0);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         LongFunction function = mock(LongFunction.class);
         BetaTransaction tx = newTransaction();
@@ -90,7 +91,7 @@ public abstract class BetaTransaction_registerChangeListenerAndAbortTest impleme
         assertHasNoListeners(ref);
         assertHasNoCommitLock(ref);
         assertUpdateBiased(ref);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 0);
     }
 
     @Test
@@ -200,7 +201,7 @@ public abstract class BetaTransaction_registerChangeListenerAndAbortTest impleme
     public void whenContainsConstructed_thenNoRetryPossibleException() {
         BetaTransaction tx = newTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal constructed = tx.openForConstruction(ref);
+        tx.openForConstruction(ref);
 
         Latch listener = new CheapLatch();
         try {
@@ -211,15 +212,11 @@ public abstract class BetaTransaction_registerChangeListenerAndAbortTest impleme
 
         assertIsAborted(tx);
         assertHasNoListeners(ref);
-        assertHasCommitLock(ref);
-        //assertNull(ref.getLockOwner());
-        //assertSurplus(0, ref);
+        assertHasCommitLock(ref);        
+        assertNull(ref.___getLockOwner());
+        assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertNull(ref.___unsafeLoad());
-        assertNull(constructed.read);
-        //    assertSame(ref, constructed.owner);
-        //    assertFalse(constructed.isCommitted);
-        //    assertFalse(constructed.isPermanent);
+        assertVersionAndValue(ref, 0,0);
     }
 
     @Test

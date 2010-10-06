@@ -114,7 +114,7 @@ public class CountDownCommitBarrier_tryJoinCommitWithTimeoutTest {
         t.join();
         t.assertNothingThrown();
         assertTrue(barrier.isCommitted());
-        assertEquals(1, ref.___unsafeLoad().value);
+        assertEquals(1, ref.atomicGet());
     }
 
     @Test

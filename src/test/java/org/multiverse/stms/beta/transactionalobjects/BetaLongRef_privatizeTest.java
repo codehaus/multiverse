@@ -13,6 +13,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
@@ -28,8 +29,8 @@ public class BetaLongRef_privatizeTest {
     @Test
     public void whenNoTransactionAvailable_thenNoTransactionFoundException() {
         BetaLongRef ref = newLongRef(stm);
+        long version = ref.getVersion();
 
-        LongRefTranlocal committed = ref.___unsafeLoad();
         try {
             ref.privatize();
             fail();
@@ -42,7 +43,7 @@ public class BetaLongRef_privatizeTest {
         assertHasNoUpdateLock(ref);
         assertNull(ref.___getLockOwner());
         assertNull(getThreadLocalTransaction());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 0);
     }
 
     @Test
@@ -52,7 +53,7 @@ public class BetaLongRef_privatizeTest {
         setThreadLocalTransaction(tx);
         tx.commit();
 
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
         try {
             ref.privatize();
             fail();
@@ -67,7 +68,7 @@ public class BetaLongRef_privatizeTest {
         assertNull(ref.___getLockOwner());
         assertIsCommitted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 0);
     }
 
     @Test
@@ -77,7 +78,7 @@ public class BetaLongRef_privatizeTest {
         setThreadLocalTransaction(tx);
         tx.abort();
 
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
         try {
             ref.privatize();
             fail();
@@ -92,7 +93,7 @@ public class BetaLongRef_privatizeTest {
         assertNull(ref.___getLockOwner());
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 0);
     }
 
     @Test
@@ -102,7 +103,7 @@ public class BetaLongRef_privatizeTest {
         setThreadLocalTransaction(tx);
         tx.prepare();
 
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
         try {
             ref.privatize();
             fail();
@@ -116,13 +117,13 @@ public class BetaLongRef_privatizeTest {
         assertNull(ref.___getLockOwner());
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 0);
     }
 
     @Test
     public void whenNullTransaction_thenNullPointerException() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         try {
             ref.privatize(null);
@@ -136,7 +137,7 @@ public class BetaLongRef_privatizeTest {
         assertHasNoUpdateLock(ref);
         assertNull(ref.___getLockOwner());
         assertNull(getThreadLocalTransaction());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 0);
     }
 
     @Test
@@ -204,7 +205,7 @@ public class BetaLongRef_privatizeTest {
 
         //conflicting write
         ref.atomicSet(100);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         try {
             ref.privatize();
@@ -220,7 +221,7 @@ public class BetaLongRef_privatizeTest {
         assertHasNoUpdateLock(ref);
         assertSame(tx, getThreadLocalTransaction());
         assertIsAborted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 100);
     }
 
     @Test

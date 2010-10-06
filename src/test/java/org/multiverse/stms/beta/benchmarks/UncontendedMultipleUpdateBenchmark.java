@@ -16,7 +16,7 @@ import static org.multiverse.stms.beta.BetaStmUtils.format;
 import static org.multiverse.stms.beta.BetaStmUtils.newReadBiasedLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
-public class UncontendedMultipleUpdateScalabilityTest implements BetaStmConstants {
+public class UncontendedMultipleUpdateBenchmark implements BetaStmConstants {
 
     private BetaStm stm;
     private final long transactionsPerThread = 400 * 1000 * 1000;
@@ -25,7 +25,7 @@ public class UncontendedMultipleUpdateScalabilityTest implements BetaStmConstant
     public static void main(String[] args) {
         //should be a power of two.
         int refCount = Integer.parseInt(args[0]);
-        UncontendedMultipleUpdateScalabilityTest test = new UncontendedMultipleUpdateScalabilityTest();
+        UncontendedMultipleUpdateBenchmark test = new UncontendedMultipleUpdateBenchmark();
 
         test.start(refCount);
     }

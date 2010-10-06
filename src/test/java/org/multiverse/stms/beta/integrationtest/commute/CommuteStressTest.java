@@ -88,7 +88,7 @@ public class CommuteStressTest {
                 public long execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
                     for (int k = 0; k < refs.length; k++) {
-                        btx.commute(refs[k], Functions.newLongIncFunction(1));
+                        btx.commute(refs[k], Functions.newIncLongFunction(1));
                     }
                     return refs.length;
                 }

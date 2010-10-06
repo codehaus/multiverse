@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 
-public class ConditionBenchmarkTest {
+public class ConditionBenchmark {
 
     private volatile boolean stop = false;
     private final int threadCount = 2;

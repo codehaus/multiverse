@@ -34,15 +34,7 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      */
     Orec ___getOrec();
 
-    /**
-     * Opens the TransactionalObject for construction.
-     *
-     * @param pool the BetaObjectPool to use for garbage collected objects.
-     * @return the opened Tranlocal.
-     */
-    Tranlocal ___openForConstruction(BetaObjectPool pool);
-
-    Tranlocal ___openForCommute(BetaObjectPool pool);
+    Tranlocal ___newTranlocal();
 
     /**
      * Loads the active value. If the value already is locked, by another this call will return a tranlocal
@@ -50,10 +42,10 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * null.
      *
      * @param spinCount the number of times to spin when locked.
-     * @return the loaded tranlocal. It could be that a locked tranlocal is returned, the value itself is only
-     *         used as a marked to indicate that it is locked. The value should not be used.
+     * @return true if it was a success, false otherwise.
      */
-    Tranlocal ___load(int spinCount, BetaTransaction newLockOwner, int lockMode);
+    boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, Tranlocal tranlocal);
+
 
     /**
      * Loads the current stored Tranlocal without any form of consistency guarantees. This method is purely
@@ -61,6 +53,7 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      *
      * @return the current stored tranlocal.
      */
+    @Deprecated
     Tranlocal ___unsafeLoad();
 
     /**
@@ -112,19 +105,8 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
     Listeners ___commitDirty(
             Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool);
 
-    /**
-     * Commits the all updates. The call also needs to be done when the tranlocal is readonly and
-     * not permanent and locked; so that the lock is released and the departs are done.
-     *
-     * @param tranlocal the Tranlocal to commit. It doesn't matter if this is just a readonly
-     *                  version, since it still may have a lock or
-     * @param tx        transaction that does the commit
-     * @param pool      the BetaObjectPool to use to pool the replaced tranlocal if possible.
-     * @return the listeners that should be notified after the transaction completes. Value could be null,
-     *         if no listeners need to be notified.
-     */
     Listeners ___commitAll(
-            Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool);
+                Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool);
 
     /**
      * Aborts this BetaTransactionalObject (so releases the lock if acquired, does departs etc).

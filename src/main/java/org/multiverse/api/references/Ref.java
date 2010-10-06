@@ -294,6 +294,8 @@ public interface Ref<E> extends TransactionalObject {
      */
     E get();
 
+    E atomicWeakGet();
+
     /**
      * Gets the value using the provided transaction.
      *

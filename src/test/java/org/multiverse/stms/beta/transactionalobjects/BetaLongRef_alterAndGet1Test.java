@@ -71,7 +71,7 @@ public class BetaLongRef_alterAndGet1Test {
     public void whenActiveTransactionAvailable() {
         BetaLongRef ref = newLongRef(stm);
 
-        LongFunction function = Functions.newLongIncFunction(1);
+        LongFunction function = Functions.newIncLongFunction(1);
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
@@ -107,7 +107,7 @@ public class BetaLongRef_alterAndGet1Test {
     @Test
     public void whenNoTransactionAvailable_thenExecutedAtomically() {
         BetaLongRef ref = newLongRef(stm);
-        LongFunction function = Functions.newLongIncFunction(1);
+        LongFunction function = Functions.newIncLongFunction(1);
 
         long result = ref.alterAndGet(function);
 
@@ -126,7 +126,7 @@ public class BetaLongRef_alterAndGet1Test {
         tx.commit();
 
         BetaLongRef ref = newLongRef(stm);
-        LongFunction function = Functions.newLongIncFunction(1);
+        LongFunction function = Functions.newIncLongFunction(1);
 
         long result = ref.alterAndGet(function);
 
@@ -146,7 +146,7 @@ public class BetaLongRef_alterAndGet1Test {
         tx.abort();
 
         BetaLongRef ref = newLongRef(stm);
-        LongFunction function = Functions.newLongIncFunction(1);
+        LongFunction function = Functions.newIncLongFunction(1);
 
         long result = ref.alterAndGet(function);
 

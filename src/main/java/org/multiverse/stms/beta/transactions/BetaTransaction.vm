@@ -471,6 +471,10 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     public abstract void addWatch(BetaTransactionalObject object, Watch watch);
 #foreach($ref in $transactionalObjects)
 
+#if(${ref.isReference})    
+    public abstract ${ref.typeParameter} ${ref.type} read(${ref.name}${ref.typeParameter} ref);
+    
+#end
     public abstract ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForRead(${ref.name}${ref.typeParameter} ref, int lockMode);
 
     public abstract ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForWrite(${ref.name}${ref.typeParameter} ref, int lockMode);

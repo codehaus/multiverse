@@ -15,6 +15,7 @@ import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
@@ -52,20 +53,23 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
     public void whenSuccess() {
         BetaTransaction tx = newTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
+        long version = ref.getVersion();
         LongRefTranlocal write = tx.openForConstruction(ref);
+
+        assertNotNull(write);
+        assertEquals(0, write.value);
+        assertEquals(version, write.version);
+        assertSame(ref, write.owner);
+        assertFalse(write.isCommitted);
+        assertFalse(write.hasDepartObligation);
+        assertTrue(write.isDirty);
 
         assertIsActive(tx);
         assertAttached(tx, write);
-        assertNotNull(write);
-        assertEquals(0, write.value);
-        assertSame(ref, write.owner);
-        assertNull(write.read);
-        assertFalse(write.isCommitted);
-        assertFalse(write.isPermanent);
         assertSame(tx, ref.___getLockOwner());
+
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
-        assertEquals(DIRTY_TRUE, write.isDirty);
     }
 
     @Test
@@ -75,26 +79,25 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
         LongRefTranlocal construction1 = tx.openForConstruction(ref);
         LongRefTranlocal construction2 = tx.openForConstruction(ref);
 
-        assertIsActive(tx);
-        assertAttached(tx, construction1);
-        assertSame(construction1, construction2);
         assertNotNull(construction1);
+        assertSame(construction1, construction2);
         assertEquals(0, construction1.value);
         assertSame(ref, construction1.owner);
-        assertNull(construction1.read);
         assertFalse(construction1.isCommitted);
-        assertFalse(construction1.isPermanent);
+        assertFalse(construction1.hasDepartObligation);
+
+        assertIsActive(tx);
+        assertAttached(tx, construction1);
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
-        assertEquals(DIRTY_TRUE, construction1.isDirty);
+        assertTrue(construction1.isDirty);
     }
-
 
     @Test
     public void whenAlreadyCommitted_thenIllegalArgumentException() {
         BetaLongRef ref = newLongRef(stm, 100);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
 
@@ -105,7 +108,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
         }
 
         assertIsAborted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 100);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
@@ -114,9 +117,34 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
     }
 
     @Test
+    @Ignore
+    public void whenAlreadyOpenedForReadingAndPrivatized_thenIllegalArgumentException(){
+
+    }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForReadingAndEnsured_thenIllegalArgumentException(){
+
+    }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForWritingAndPrivatized_thenIllegalArgumentException(){
+
+    }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForWritingAndEnsured_thenIllegalArgumentException(){
+
+    }
+
+
+    @Test
     public void whenAlreadyOpenedForReading_thenIllegalArgumentException() {
         BetaLongRef ref = newLongRef(stm, 100);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
         tx.openForRead(ref, LOCKMODE_NONE);
@@ -128,7 +156,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
         }
 
         assertIsAborted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 100);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
@@ -139,7 +167,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
     @Test
     public void whenAlreadyOpenedForWrite_thenIllegalArgumentException() {
         BetaLongRef ref = newLongRef(stm, 100);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
         tx.openForWrite(ref, LOCKMODE_NONE);
@@ -151,7 +179,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
         }
 
         assertIsAborted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 100);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
@@ -164,7 +192,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
     @Test
     public void whenReadonly_thenReadonlyException() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setReadonly(true);
@@ -179,7 +207,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
 
         assertIsAborted(tx);
         assertHasNoCommitLock(ref);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 0);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);

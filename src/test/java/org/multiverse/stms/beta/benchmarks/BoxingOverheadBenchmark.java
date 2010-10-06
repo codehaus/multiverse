@@ -19,12 +19,12 @@ import static org.multiverse.stms.beta.BetaStmUtils.format;
 import static org.multiverse.stms.beta.BetaStmUtils.*;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
-public class BoxingScalabilityTest implements BetaStmConstants {
+public class BoxingOverheadBenchmark implements BetaStmConstants {
 
     private BetaStm stm;
 
     public static void main(String[] args) {
-        BoxingScalabilityTest test = new BoxingScalabilityTest();
+        BoxingOverheadBenchmark test = new BoxingOverheadBenchmark();
         test.start(Long.parseLong(args[0]));
     }
 

@@ -2,12 +2,14 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.functions.Functions;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 
 import static org.junit.Assert.*;
+import static org.multiverse.api.functions.Functions.newIdentityLongFunction;
+import static org.multiverse.api.functions.Functions.newIncLongFunction;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmConstants {
@@ -23,58 +25,67 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
 
     @Test
     public void whenCommutingFunctionDoesntChangeValue() {
-        BetaLongRef ref = newLongRef(stm, 100);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        int initialValue = 100;
 
-        LongRefTranlocal tranlocal = ref.___openForCommute(pool);
-        tranlocal.addCommutingFunction(new IdentityLongFunction(), pool);
-        tranlocal.read = committed;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long version = ref.getVersion();
+
+        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        tranlocal.isCommuting = true;
+        tranlocal.addCommutingFunction(newIdentityLongFunction(), pool);
+        tranlocal.version = version;
+        tranlocal.value = initialValue;
+        tranlocal.oldValue = initialValue;
         tranlocal.evaluateCommutingFunctions(pool);
 
         assertFalse(tranlocal.isCommitted);
         assertFalse(tranlocal.isCommuting);
-        assertEquals(DIRTY_FALSE, tranlocal.isDirty);
-        assertSame(ref, tranlocal.owner);
-        assertSame(committed, tranlocal.read);
-        assertEquals(100, tranlocal.value);
+        assertFalse(tranlocal.isDirty);
+        assertEquals(initialValue, tranlocal.value);
+        assertVersionAndValue(ref, version, initialValue);
     }
-
 
     @Test
     public void whenSingleCommutingFunction() {
-        BetaLongRef ref = newLongRef(stm, 100);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        int initialValue = 100;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long version = ref.getVersion();
 
-        LongRefTranlocal tranlocal = ref.___openForCommute(pool);
-        tranlocal.addCommutingFunction(Functions.newLongIncFunction(1), pool);
-        tranlocal.read = committed;
+        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        tranlocal.isCommuting = true;
+
+        tranlocal.addCommutingFunction(newIncLongFunction(), pool);
+        tranlocal.version = version;
+        tranlocal.value = initialValue;
+        tranlocal.oldValue = initialValue;
         tranlocal.evaluateCommutingFunctions(pool);
 
         assertFalse(tranlocal.isCommitted);
         assertFalse(tranlocal.isCommuting);
-        assertEquals(DIRTY_TRUE, tranlocal.isDirty);
+        assertTrue(tranlocal.isDirty);
         assertSame(ref, tranlocal.owner);
-        assertSame(committed, tranlocal.read);
-        assertEquals(101, tranlocal.value);
+        assertEquals(initialValue + 1, tranlocal.value);
     }
 
     @Test
     public void whenMultipleCommutingFunctions() {
-        BetaLongRef ref = newLongRef(stm, 100);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        int initialValue = 100;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long version = ref.getVersion();
 
-        LongRefTranlocal tranlocal = ref.___openForCommute(pool);
-        tranlocal.addCommutingFunction(Functions.newLongIncFunction(1), pool);
-        tranlocal.addCommutingFunction(Functions.newLongIncFunction(1), pool);
-        tranlocal.addCommutingFunction(Functions.newLongIncFunction(1), pool);
-        tranlocal.read = committed;
+        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        tranlocal.isCommuting = true;
+        tranlocal.addCommutingFunction(newIncLongFunction(), pool);
+        tranlocal.addCommutingFunction(newIncLongFunction(), pool);
+        tranlocal.addCommutingFunction(newIncLongFunction(), pool);
+        tranlocal.version = version;
+        tranlocal.value = initialValue;
+        tranlocal.oldValue = initialValue;
         tranlocal.evaluateCommutingFunctions(pool);
 
         assertFalse(tranlocal.isCommitted);
         assertFalse(tranlocal.isCommuting);
-        assertEquals(DIRTY_TRUE, tranlocal.isDirty);
-        assertSame(ref, tranlocal.owner);
-        assertSame(committed, tranlocal.read);
-        assertEquals(103, tranlocal.value);
+        assertTrue(tranlocal.isDirty);
+        assertEquals(initialValue + 3, tranlocal.value);
     }
 }

@@ -19,7 +19,7 @@ import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 /**
  * @author Peter Veentjer
  */
-public class UncontendedMultipleReadScalabilityTest implements BetaStmConstants {
+public class UncontendedMultipleReadBenchmark implements BetaStmConstants {
     private BetaStm stm;
     private final long transactionCount = 100 * 1000 * 1000;
 
@@ -27,7 +27,7 @@ public class UncontendedMultipleReadScalabilityTest implements BetaStmConstants 
     public static void main(String[] args) {
         //should be a power of two.
         int refCount = Integer.parseInt(args[0]);
-        UncontendedMultipleReadScalabilityTest test = new UncontendedMultipleReadScalabilityTest();
+        UncontendedMultipleReadBenchmark test = new UncontendedMultipleReadBenchmark();
 
         test.start(refCount);
     }

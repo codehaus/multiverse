@@ -7,10 +7,12 @@ import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 /**
@@ -30,7 +32,7 @@ public class BetaLongRef_getAndIncrement2Test {
     @Test
     public void whenTransactionNull_thenNullPointerException() {
         BetaLongRef ref = newLongRef(stm, 10);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         try {
             ref.getAndIncrement(null, 10);
@@ -38,13 +40,13 @@ public class BetaLongRef_getAndIncrement2Test {
         } catch (NullPointerException expected) {
         }
 
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version,10);
     }
 
     @Test
     public void whenTransactionCommitted_thenDeadTransactionException() {
         BetaLongRef ref = newLongRef(stm, 10);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.commit();
@@ -55,13 +57,13 @@ public class BetaLongRef_getAndIncrement2Test {
         }
 
         assertIsCommitted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version,10);
     }
 
     @Test
     public void whenTransactionAborted_thenDeadTransactionException() {
         BetaLongRef ref = newLongRef(stm, 10);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.abort();
@@ -72,13 +74,13 @@ public class BetaLongRef_getAndIncrement2Test {
         }
 
         assertIsAborted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version,10);
     }
 
     @Test
     public void whenTransactionPrepared_thenPreparedTransactionException() {
         BetaLongRef ref = newLongRef(stm, 10);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.prepare();
@@ -89,13 +91,13 @@ public class BetaLongRef_getAndIncrement2Test {
         }
 
         assertIsAborted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version,10);
     }
 
     @Test
     public void whenNoChange() {
         BetaLongRef ref = newLongRef(stm, 10);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         long result = ref.getAndIncrement(tx, 0);
@@ -103,14 +105,13 @@ public class BetaLongRef_getAndIncrement2Test {
 
         assertEquals(10, result);
         assertIsCommitted(tx);
-        assertSame(committed, ref.___unsafeLoad());
-        assertEquals(10, ref.___unsafeLoad().value);
+        assertVersionAndValue(ref, version,10);
     }
 
     @Test
     public void whenSuccess() {
         BetaLongRef ref = newLongRef(stm, 10);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         long result = ref.getAndIncrement(tx, 20);
@@ -118,7 +119,6 @@ public class BetaLongRef_getAndIncrement2Test {
 
         assertIsCommitted(tx);
         assertEquals(10, result);
-        assertNotSame(committed, ref.___unsafeLoad());
-        assertEquals(30, ref.___unsafeLoad().value);
+        assertVersionAndValue(ref, version+1, 30);        
     }
 }

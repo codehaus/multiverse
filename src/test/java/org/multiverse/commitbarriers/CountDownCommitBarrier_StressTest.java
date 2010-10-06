@@ -73,7 +73,7 @@ public class CountDownCommitBarrier_StressTest {
     public long sum() {
         long sum = 0;
         for (int k = 0; k < refCount; k++) {
-            sum += refs[k].___unsafeLoad().value;
+            sum += refs[k].atomicGet();
         }
         return sum;
     }

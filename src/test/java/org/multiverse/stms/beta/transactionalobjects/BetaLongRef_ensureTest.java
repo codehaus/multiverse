@@ -14,6 +14,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
@@ -28,8 +29,8 @@ public class BetaLongRef_ensureTest {
 
     @Test
     public void whenSuccess() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm, 10);
+        long version = ref.getVersion();
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
@@ -40,13 +41,13 @@ public class BetaLongRef_ensureTest {
         assertHasNoCommitLock(ref);
         assertSurplus(1, ref);
         assertSame(tx, ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
     public void whenNoTransaction_thenNoTransactionFoundException() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm, 10);
+        long version = ref.getVersion();
 
         try {
             ref.ensure();
@@ -60,13 +61,13 @@ public class BetaLongRef_ensureTest {
         assertSurplus(0, ref);
         assertHasNoCommitLock(ref);
         assertHasNoUpdateLock(ref);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
     public void whenNullTransactionProvided_thenNullPointerException() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm, 10);
+        long version = ref.getVersion();
 
         try {
             ref.ensure(null);
@@ -80,13 +81,13 @@ public class BetaLongRef_ensureTest {
         assertSurplus(0, ref);
         assertHasNoCommitLock(ref);
         assertHasNoUpdateLock(ref);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
     public void whenCommittedTransactionProvided_thenDeadTransactionException() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm, 10);
+        long version = ref.getVersion();
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.commit();
 
@@ -96,19 +97,20 @@ public class BetaLongRef_ensureTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertUpdateBiased(ref);
         assertIsCommitted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertUpdateBiased(ref);
+        assertSurplus(0, ref);
         assertHasNoUpdateLock(ref);
         assertHasNoCommitLock(ref);
-        assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
     public void whenAbortedTransactionProvided_thenDeadTransactionException() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm, 10);
+        long version = ref.getVersion();
+
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.abort();
 
@@ -118,19 +120,19 @@ public class BetaLongRef_ensureTest {
         } catch (DeadTransactionException expected) {
         }
 
-        assertUpdateBiased(ref);
         assertIsAborted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertUpdateBiased(ref);
         assertHasNoUpdateLock(ref);
         assertHasNoCommitLock(ref);
-        assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
+        assertSurplus(0, ref);
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
     public void whenPreparedTransaction_thenPreparedTransactionException() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm, 10);
+        long version = ref.getVersion();
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.prepare();
 
@@ -140,37 +142,39 @@ public class BetaLongRef_ensureTest {
         } catch (PreparedTransactionException expected) {
         }
 
-        assertUpdateBiased(ref);
         assertIsAborted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertUpdateBiased(ref);
+        assertSurplus(0, ref);
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, version, 10);
         assertHasNoUpdateLock(ref);
         assertHasNoCommitLock(ref);
-        assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
     }
 
     @Test
     public void whenAlreadyEnsuredBySelf() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm, 10);
+        long version = ref.getVersion();
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
         ref.ensure();
         ref.ensure();
 
-        assertUpdateBiased(ref);
+        assertIsActive(tx);
         assertHasUpdateLock(ref);
         assertHasNoCommitLock(ref);
-        assertSurplus(1, ref);
         assertSame(tx, ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertUpdateBiased(ref);
+        assertSurplus(1, ref);
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
     public void whenAlreadyPrivatizedBySelf() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm,10);
+        long version = ref.getVersion();
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
@@ -182,7 +186,7 @@ public class BetaLongRef_ensureTest {
         assertHasNoUpdateLock(ref);
         assertSurplus(1, ref);
         assertSame(tx, ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
@@ -193,8 +197,8 @@ public class BetaLongRef_ensureTest {
 
     @Test
     public void whenAlreadyEnsuredByOther() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm, 10);
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -210,19 +214,19 @@ public class BetaLongRef_ensureTest {
         }
 
         assertIsAborted(tx);
+        assertIsActive(otherTx);
         assertUpdateBiased(ref);
+        assertSurplus(1, ref);
         assertHasNoCommitLock(ref);
         assertHasUpdateLock(ref);
-        assertSurplus(1, ref);
         assertSame(otherTx, ref.___getLockOwner());
-        assertIsActive(otherTx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
     public void whenAlreadyPrivatizedByOther() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm, 10);
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -234,7 +238,6 @@ public class BetaLongRef_ensureTest {
             ref.ensure(tx);
             fail();
         } catch (ReadWriteConflict expected) {
-
         }
 
         assertIsAborted(tx);
@@ -244,7 +247,7 @@ public class BetaLongRef_ensureTest {
         assertSurplus(1, ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertIsActive(otherTx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
@@ -256,7 +259,7 @@ public class BetaLongRef_ensureTest {
 
         ref.get(tx);
         ref.atomicSet(100);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         try {
             ref.ensure(tx);
@@ -271,13 +274,13 @@ public class BetaLongRef_ensureTest {
         assertHasNoUpdateLock(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref,version,100);
     }
 
     @Test
     public void whenNormalTransactionUsed() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        BetaLongRef ref = newLongRef(stm,10);
+        long version = ref.getVersion();
         Transaction tx = stm.startDefaultTransaction();
 
         ref.ensure(tx);
@@ -287,6 +290,6 @@ public class BetaLongRef_ensureTest {
         assertHasNoCommitLock(ref);
         assertSurplus(1, ref);
         assertSame(tx, ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 10);
     }
 }

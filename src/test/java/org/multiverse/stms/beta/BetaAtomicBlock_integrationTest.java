@@ -8,7 +8,6 @@ import org.multiverse.api.closures.AtomicLongClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
 import static org.junit.Assert.assertEquals;
@@ -72,7 +71,7 @@ public class BetaAtomicBlock_integrationTest implements BetaStmConstants {
                 public void execute(Transaction tx) throws Exception {
                     ref.get(tx);
                 }
-            });
+     });
 
             fail();
         } catch (TooManyRetriesException expected) {
@@ -83,14 +82,20 @@ public class BetaAtomicBlock_integrationTest implements BetaStmConstants {
     public void whenMultipleUpdatesDoneInSingleTransaction() {
         final BetaLongRef ref = newLongRef(stm);
 
-        AtomicBlock block = stm.createTransactionFactoryBuilder().buildAtomicBlock();
+        AtomicBlock block = stm.createTransactionFactoryBuilder()
+                .setDirtyCheckEnabled(false)
+                .buildAtomicBlock();
         block.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                BetaTransaction btx = (BetaTransaction) tx;
                 for (int k = 0; k < 10; k++) {
-                    ref.set(ref.get() + 1);
+                    long l = ref.get();
+                    ref.set(l + 1);
                 }
+
+
+                int a =10;
+
             }
         });
 

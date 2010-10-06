@@ -9,6 +9,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmUtils.newRef;
 
 public class BetaRef_isNull0Test {
@@ -47,8 +48,9 @@ public class BetaRef_isNull0Test {
 
     @Test
     public void whenPreparedTransactionAvailable_thenPreparedTransactionException() {
-        BetaRef ref = newRef(stm);
-        RefTranlocal committed = ref.___unsafeLoad();
+        String value = "foo";
+        BetaRef ref = newRef(stm, value);
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -62,13 +64,14 @@ public class BetaRef_isNull0Test {
 
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertSame(committed, ref.___unsafeLoad());
+        assertEquals(version, ref.getVersion());
+        assertVersionAndValue(ref, version, value);
     }
 
     @Test
     public void whenCommittedTransactionAvailable_thenCallExecutedAtomically() {
         BetaRef ref = newRef(stm);
-        RefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.commit();
@@ -79,13 +82,13 @@ public class BetaRef_isNull0Test {
         assertTrue(result);
         assertIsCommitted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, null);
     }
 
     @Test
     public void whenAbortedTransactionAvailable() {
         BetaRef ref = newRef(stm);
-        RefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.abort();
@@ -96,6 +99,6 @@ public class BetaRef_isNull0Test {
         assertTrue(result);
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, null);
     }
 }

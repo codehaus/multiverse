@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
@@ -73,7 +74,8 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
 
     @Test
     public void whenPrivatizedAndNoConflict_thenRegistered() {
-        BetaLongRef ref = newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm,10);
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
@@ -91,13 +93,14 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
         assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
-        assertSame(read, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version,10);
         assertFalse(latch.isOpen());
     }
 
     @Test
     public void whenEnsuredAndNoConflict_thenRegistered() {
-        BetaLongRef ref = newLongRef(stm);
+        BetaLongRef ref = newLongRef(stm,10);
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
@@ -115,7 +118,7 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
         assertHasUpdateLock(ref);
         assertHasNoCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
-        assertSame(read, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version,10);
         assertFalse(latch.isOpen());
     }
 
@@ -127,7 +130,7 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         ref.atomicIncrementAndGet(1);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.privatize(otherTx);
@@ -144,7 +147,7 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
         assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version,1);
     }
 
     @Test
@@ -155,7 +158,7 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         ref.atomicIncrementAndGet(1);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.ensure(otherTx);
@@ -172,7 +175,7 @@ public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants 
         assertHasUpdateLock(ref);
         assertHasNoCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version,1);
     }
 
     @Test

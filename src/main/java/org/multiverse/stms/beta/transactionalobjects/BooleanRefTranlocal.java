@@ -14,57 +14,38 @@ import org.multiverse.stms.beta.BetaObjectPool;
  */
 public final class BooleanRefTranlocal extends Tranlocal{
 
-    public final static BooleanRefTranlocal LOCKED = new BooleanRefTranlocal(null,true);
-
     public boolean value;
+    public boolean oldValue;
     public BooleanPredicate[] validators;    
-    public CallableNode headCallable;
-
+   
     public BooleanRefTranlocal(BetaBooleanRef ref){
-        super(ref, false);
+        super(ref);
     }
 
-    public BooleanRefTranlocal(BetaBooleanRef ref, boolean locked){
-        super(ref, locked);
-    }
-
-    public BooleanRefTranlocal openForWrite(final BetaObjectPool pool) {
-        assert isCommitted;
-
-        BetaBooleanRef _ref = (BetaBooleanRef)owner;
-        BooleanRefTranlocal tranlocal = pool.take(_ref);
-        if (tranlocal == null) {
-            tranlocal = new BooleanRefTranlocal(_ref);
-        }
-
-        tranlocal.read = this;
-        tranlocal.validators = validators;
-        tranlocal.value = value;
-        return tranlocal;
-    }
-
-    public void evaluateCommutingFunctions(final BetaObjectPool  pool){
+    @Override
+    public final void evaluateCommutingFunctions(final BetaObjectPool  pool){
         assert isCommuting;
 
-        BooleanRefTranlocal tranlocal
-            = (BooleanRefTranlocal)read;
-        value = tranlocal.value;
+        boolean newValue = value;
 
         CallableNode current = headCallable;
+        headCallable = null;
         do{
             BooleanFunction function =
                 (BooleanFunction)current.function;
-            value = function.call(value);
+            newValue = function.call(newValue);
+
             CallableNode old = current;
             current = current.next;
             pool.putCallableNode(old);
         }while(current != null);
 
-        isDirty = tranlocal.value != value ? DIRTY_TRUE : DIRTY_FALSE;
+        value = newValue;     
+        isDirty = newValue != oldValue;
         isCommuting = false;
-        headCallable = null;
     }
 
+    @Override
     public void addCommutingFunction(final Function function, final BetaObjectPool pool){
         assert isCommuting;
 
@@ -78,61 +59,40 @@ public final class BooleanRefTranlocal extends Tranlocal{
         }
     }
 
-    public BooleanRefTranlocal openForCommute(final BetaObjectPool pool) {
-        assert isCommitted;
-
-        BetaBooleanRef _ref = (BetaBooleanRef)owner;
-        BooleanRefTranlocal tranlocal = pool.take(_ref);
-        if (tranlocal == null) {
-            tranlocal = new BooleanRefTranlocal(_ref);
-        }
-
-        tranlocal.isCommuting = true;
-        tranlocal.read = this;
-        tranlocal.value = value;
-        tranlocal.validators = validators;
-        return tranlocal;
-    }
-
+    @Override
     public void prepareForPooling(final BetaObjectPool pool) {
-        owner = null;
+        version = 0l;
         value = false;
-        read = null;
+        oldValue = false;
+        owner = null;
+        isLockOwner = false;
+        hasDepartObligation = false;
         isCommitted = false;
-        isDirty = DIRTY_UNKNOWN;
         isCommuting = false;
+        isConstructing = false;
+        isDirty = false;
         CallableNode current = headCallable;
-        if(current!=null){
+        if (current != null) {
             headCallable = null;
-            do{
+            do {
                 CallableNode next = current.next;
                 pool.putCallableNode(current);
                 current = next;
-            }while(current!=null);
-        }
+            } while (current != null);
+      }
     }
 
+    @Override
     public boolean calculateIsDirty() {
-        if(isDirty != DIRTY_UNKNOWN){
-            return isDirty == DIRTY_TRUE;
+        if(isDirty){
+            return true;
         }
 
-        //once committed, it never can become dirty (unless it is pooled and reused)
         if (isCommitted) {
             return false;
         }
 
-        if (read == null) {
-            //when the read is null, and it is an update, then is a tranlocal for a newly created
-            //transactional object, since it certainly needs to be committed.
-            isDirty = DIRTY_TRUE;
-            return true;
-        }
-
-        //check if it really is dirty.
-        BooleanRefTranlocal _read = (BooleanRefTranlocal)read;
-        isDirty = value != _read.value? DIRTY_TRUE: DIRTY_FALSE;
-
-        return isDirty == DIRTY_TRUE;
+        isDirty = value != oldValue;
+        return isDirty;
     }
 }

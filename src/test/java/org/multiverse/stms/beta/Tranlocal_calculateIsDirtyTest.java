@@ -8,18 +8,17 @@ import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Veentjer
  */
 public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants {
     private BetaStm stm;
-    private BetaObjectPool pool;
 
     @Before
     public void setUp() {
-        pool = new BetaObjectPool();
         stm = new BetaStm();
     }
 
@@ -27,53 +26,54 @@ public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants {
     public void whenConstructed() {
         BetaTransaction tx = stm.startDefaultTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
-        Tranlocal tranlocal = new LongRefTranlocal(ref);
+        Tranlocal tranlocal = ref.___newTranlocal();
+        tranlocal.isDirty = true;
+        tranlocal.isConstructing = true;
 
         assertTrue(tranlocal.calculateIsDirty());
-        assertEquals(DIRTY_TRUE, tranlocal.isDirty);
+        assertTrue(tranlocal.isDirty);
     }
 
     @Test
     @Ignore
     public void whenCommuting() {
         BetaLongRef ref = new BetaLongRef(stm, 0);
-        Tranlocal tranlocal = ref.___openForCommute(pool);
+        Tranlocal tranlocal = ref.___newTranlocal();
+        tranlocal.isCommuting = true;
 
         assertFalse(tranlocal.calculateIsDirty());
-        assertEquals(DIRTY_FALSE, tranlocal.isDirty);
+        assertFalse(tranlocal.isDirty);
     }
 
     @Test
     public void whenCommitted() {
         BetaLongRef ref = new BetaLongRef(stm, 0);
-        Tranlocal tranlocal = new LongRefTranlocal(ref);
-        tranlocal.prepareForCommit();
+        Tranlocal tranlocal = ref.___newTranlocal();
+        tranlocal.isCommitted = true;
 
         assertFalse(tranlocal.calculateIsDirty());
-        assertEquals(DIRTY_FALSE, tranlocal.isDirty);
+        assertFalse(tranlocal.isDirty);
     }
 
     @Test
     public void whenNotDirty() {
         BetaLongRef ref = new BetaLongRef(stm, 0);
-        Tranlocal tranlocal = new LongRefTranlocal(ref);
-        tranlocal.prepareForCommit();
-        Tranlocal opened = tranlocal.openForWrite(new BetaObjectPool());
+        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        tranlocal.value = 10;
+        tranlocal.oldValue = 10;
 
-        assertFalse(opened.calculateIsDirty());
-        assertEquals(DIRTY_FALSE, tranlocal.isDirty);
+        assertFalse(tranlocal.calculateIsDirty());
+        assertFalse(tranlocal.isDirty);
     }
 
     @Test
     public void whenDirty() {
         BetaLongRef ref = new BetaLongRef(stm, 0);
-        LongRefTranlocal tranlocal = new LongRefTranlocal(ref);
-        tranlocal.prepareForCommit();
+        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        tranlocal.value = 10;
+        tranlocal.oldValue = 5;
 
-        LongRefTranlocal opened = tranlocal.openForWrite(new BetaObjectPool());
-        opened.value++;
-
-        assertTrue(opened.calculateIsDirty());
-        assertEquals(DIRTY_TRUE, opened.isDirty);
+        assertTrue(tranlocal.calculateIsDirty());
+        assertTrue(tranlocal.isDirty);
     }
 }

@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.benchmarks;
 
 import org.multiverse.TestThread;
+import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.BetaStmUtils;
@@ -11,33 +12,33 @@ import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
+import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
-public class UncontendedLeanReadScalabilityTest implements BetaStmConstants {
-
+public class UncontendedLeanUpdateBenchmark implements BetaStmConstants {
     private BetaStm stm;
 
     public static void main(String[] args) {
-        UncontendedLeanReadScalabilityTest test = new UncontendedLeanReadScalabilityTest();
+        UncontendedLeanUpdateBenchmark test = new UncontendedLeanUpdateBenchmark();
         test.start(Long.parseLong(args[0]));
     }
 
     public void start(long transactionCount) {
         int[] processors = generateProcessorRange();
 
-        System.out.println("Multiverse> Uncontended readonly lean-transaction benchmark");
-        System.out.println("Multiverse> 1 BetaRef per transaction");
-        System.out.printf("Multiverse> Running with the following processor range %s\n", Arrays.toString(processors));
+        System.out.printf("Multiverse> Uncontended update lean-transaction benchmark\n");
+        System.out.printf("Multiverse> 1 BetaRef per transaction\n");
         System.out.printf("Multiverse> %s Transactions per thread\n", format(transactionCount));
+        System.out.printf("Multiverse> Running with the following processor range %s\n", Arrays.toString(processors));
         Result[] result = new Result[processors.length];
 
         System.out.println("Multiverse> Starting warmup run");
         test(1, transactionCount);
         System.out.println("Multiverse> Finished warmup run");
-
 
         long startNs = System.nanoTime();
 
@@ -48,65 +49,72 @@ public class UncontendedLeanReadScalabilityTest implements BetaStmConstants {
         }
 
         long durationNs = System.nanoTime() - startNs;
-        System.out.printf("Benchmark took %s seconds\n", TimeUnit.NANOSECONDS.toSeconds(durationNs));
+        System.out.printf("Multiverse> Benchmark took %s seconds\n", TimeUnit.NANOSECONDS.toSeconds(durationNs));
 
         toGnuplot(result);
     }
 
     private double test(int threadCount, long transactionsPerThread) {
         System.out.printf("Multiverse> ----------------------------------------------\n");
-        System.out.printf("Multiverse> Running with %s processors\n", threadCount);
+        System.out.printf("Multiverse> Running with %s thread(s)\n", threadCount);
 
         stm = new BetaStm();
 
-        ReadThread[] threads = new ReadThread[threadCount];
+        UpdateThread[] threads = new UpdateThread[threadCount];
 
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new ReadThread(k, transactionsPerThread);
+            threads[k] = new UpdateThread(k, transactionsPerThread);
         }
 
         startAll(threads);
         joinAll(threads);
 
         long totalDurationMs = 0;
-        for (ReadThread t : threads) {
+        for (UpdateThread t : threads) {
             totalDurationMs += t.durationMs;
         }
 
-        double transactionsPerSecondPerThread = BenchmarkUtils.transactionsPerSecondPerThread(
+        double transactionsPerSecond = transactionsPerSecondPerThread(
                 transactionsPerThread, totalDurationMs, threadCount);
         System.out.printf("Multiverse> Threadcount %s\n", threadCount);
         System.out.printf("Multiverse> Performance %s transactions/second/thread\n",
-                format(transactionsPerSecondPerThread));
+                BetaStmUtils.format(transactionsPerSecond));
         System.out.printf("Multiverse> Performance %s transactions/second\n",
                 transactionsPerSecondAsString(transactionsPerThread, totalDurationMs, threadCount));
-        return transactionsPerSecondPerThread;
+        return transactionsPerSecond;
     }
 
-    @SuppressWarnings({"UnusedAssignment"})
-    class ReadThread extends TestThread {
+    class UpdateThread extends TestThread {
         private final long transactionCount;
         private long durationMs;
 
-        public ReadThread(int id, long transactionCount) {
-            super("ReadThread-" + id);
+        public UpdateThread(int id, long transactionCount) {
+            super("UpdateThread-" + id);
             setPriority(Thread.MAX_PRIORITY);
             this.transactionCount = transactionCount;
         }
 
         public void doRun() {
-            BetaLongRef ref = BetaStmUtils.newReadBiasedLongRef(stm);
+            BetaLongRef ref = newLongRef(stm);
 
+            //FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
+            //FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm,1);
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
-                    new BetaTransactionConfiguration(stm).setReadonly(true));
-
+                    new BetaTransactionConfiguration(stm)
+                            .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
+                            .setDirtyCheckEnabled(false));
             long startMs = System.currentTimeMillis();
-
             for (long k = 0; k < transactionCount; k++) {
-                long x = tx.openForRead(ref, LOCKMODE_NONE).value;
+                tx.openForWrite(ref, LOCKMODE_COMMIT).value++;
                 tx.commit();
                 tx.hardReset();
+
+                //if (k % 100000000 == 0 && k > 0) {
+                //    System.out.printf("%s is at %s\n", getName(), k);
+                //}
             }
+
+            assertEquals(transactionCount, ref.atomicGet());
 
             durationMs = System.currentTimeMillis() - startMs;
             System.out.printf("Multiverse> %s is finished in %s ms\n", getName(), durationMs);

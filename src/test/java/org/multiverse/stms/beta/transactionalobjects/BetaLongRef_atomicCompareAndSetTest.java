@@ -11,6 +11,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
@@ -28,7 +29,7 @@ public class BetaLongRef_atomicCompareAndSetTest {
     @Test
     public void whenPrivatizedByOther_thenLockedException() {
         BetaLongRef ref = newLongRef(stm, 1);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.privatize(otherTx);
 
@@ -42,13 +43,13 @@ public class BetaLongRef_atomicCompareAndSetTest {
         assertHasCommitLock(ref);
         assertHasNoUpdateLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 1);
     }
 
     @Test
     public void whenEnsuredByOther_thenlockedException() {
         BetaLongRef ref = newLongRef(stm, 1);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.ensure(otherTx);
@@ -63,13 +64,13 @@ public class BetaLongRef_atomicCompareAndSetTest {
         assertHasNoCommitLock(ref);
         assertHasUpdateLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 1);
     }
 
     @Test
     public void whenActiveTransactionAvailable_thenIgnored() {
         BetaLongRef ref = newLongRef(stm, 1);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -81,19 +82,19 @@ public class BetaLongRef_atomicCompareAndSetTest {
         assertEquals(2, ref.atomicGet());
         assertHasNoCommitLock(ref);
         assertSurplus(1, ref);
-        assertNotSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version+1, 2);
     }
 
     @Test
     public void whenExpectedValueFoundAndUpdateIsSame() {
         BetaLongRef ref = newLongRef(stm, 1);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         boolean result = ref.atomicCompareAndSet(1, 1);
 
         assertTrue(result);
         assertEquals(1, ref.atomicGet());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 1);
         assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
     }
@@ -101,7 +102,7 @@ public class BetaLongRef_atomicCompareAndSetTest {
     @Test
     public void whenExpectedValueFound() {
         BetaLongRef ref = newLongRef(stm, 1);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         boolean result = ref.atomicCompareAndSet(1, 2);
 
@@ -109,19 +110,19 @@ public class BetaLongRef_atomicCompareAndSetTest {
         assertEquals(2, ref.atomicGet());
         assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
-        assertNotSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version + 1, 2);
     }
 
     @Test
     public void whenExpectedValueNotFound() {
         BetaLongRef ref = newLongRef(stm, 2);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long version = ref.getVersion();
 
         boolean result = ref.atomicCompareAndSet(1, 3);
 
         assertFalse(result);
         assertEquals(2, ref.atomicGet());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, version, 2);
         assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
     }
