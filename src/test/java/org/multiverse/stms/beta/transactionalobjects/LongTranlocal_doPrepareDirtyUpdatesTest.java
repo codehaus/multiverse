@@ -3,7 +3,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class Tranlocal_doPrepareAllUpdatesTest {
+public class LongTranlocal_doPrepareDirtyUpdatesTest {
 
     @Test
     @Ignore

@@ -2078,7 +2078,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
     }
 
-     private boolean doPrepareWithWriteSkewPrevention() {
+    private boolean doPrepareWithWriteSkewPrevention() {
         if(config.readLockMode == LOCKMODE_COMMIT){
             return true;
         }
@@ -2090,24 +2090,10 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
             if(tranlocal == null){
                 continue;
-            }else if(tranlocal.isCommitted){
-                if(!tranlocal.owner.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, true)){
-                    return false;
-                }
-            }else if(tranlocal.isCommuting){
-                if(!tranlocal.owner.___load(spinCount, this, LOCKMODE_COMMIT,tranlocal)){
-                    return false;
-                }
+            }
 
-                tranlocal.evaluateCommutingFunctions(pool);                
-            }else{
-                if(dirtyCheck){
-                    tranlocal.calculateIsDirty();
-                }
-
-                if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal, true)){
-                    return false;
-                }
+            if(!tranlocal.doPrepareWithWriteSkewPrevention(pool,this, config.spinCount, config.dirtyCheck)){
+                return false;
             }
         }
 

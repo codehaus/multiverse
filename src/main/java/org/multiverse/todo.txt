@@ -116,7 +116,6 @@ performance.
 
 todo
 
-
 - mono transaction: support for orelse
 
 - array transaction:  support for orelse
@@ -125,8 +124,8 @@ todo
 
 - unshared atomicget, with periodic atomicset.
 
-- mono transaction can do a cheap read of the current tranlocal already is permanent.
-    - can only be done if a permanent tranlocal is never pooled.
+- mono transaction can do a cheap read of the current tranlocal already is permanent:
+  this is because no consistency guaranteed need to be provided.
 
 - transaction completely optimized for ref.
 
@@ -259,6 +258,8 @@ neer gezet?
 
 - tranlocal.prepareDirty needs to be tested
 
+- tranlocal.prepareWithWriteSkewPrevention needs to be tested.
+
 - functionality with dirty and non dirty needs to be tested better
 
 - testing: dirty/non dirty stuff in combination with commit and siolation level
@@ -267,13 +268,20 @@ neer gezet?
 
 - testing: prepare and writeskew
 
-- openForConstruction and value that already have a commit: checking only on lock owner could
-lead to accepting an already opened for read/or opened for write which is locked. Version should
-be checked.
+- improved testing with openForConstruction and illegal refs (so that have been locked..
+by another or by itself and either are committed or not).
 
 - integration tests should touch all transaction implementations.
 
 done
+
+- more cleanup of the tranlocal (removed unused methods and improved javadoc).
+
+- moved the prepareWithWriteSkew to the tranlocal 
+
+- openForConstruction and value that already have a commit: checking only on lock owner could
+lead to accepting an already opened for read/or opened for write which is locked. Version should
+be checked.
 
 - transaction is now removed from hasConflict.
 

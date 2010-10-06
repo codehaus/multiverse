@@ -2245,24 +2245,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         for (int k = 0; k < firstFreeIndex; k++) {
             final Tranlocal tranlocal = array[k];
 
-            if(tranlocal.isCommitted){
-                if(!tranlocal.owner.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, true)){
-                    return false;
-                }
-            }else if(tranlocal.isCommuting){
-                if(tranlocal.owner.___load(spinCount, this, LOCKMODE_COMMIT,tranlocal)){
-                    return false;
-                }
-
-                tranlocal.evaluateCommutingFunctions(pool);                
-            }else{
-                if(dirtyCheck){
-                    tranlocal.calculateIsDirty();
-                }
-
-                if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal, true)){
-                    return false;
-                }
+            if(!tranlocal.doPrepareWithWriteSkewPrevention(pool,this, config.spinCount, config.dirtyCheck)){
+                return false;
             }
         }
 

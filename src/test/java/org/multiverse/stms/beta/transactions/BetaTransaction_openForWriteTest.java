@@ -810,7 +810,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
         assertIsActive(tx);
         assertNotNull(write);
-        assertFalse(write.isCommitted());
+        assertFalse(write.isCommitted);
         //todo:
         //assertSame(read, write.read);
         assertSame(ref, write.owner);
@@ -896,7 +896,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
         assertIsActive(tx);
         assertSame(write2, write1);
-        assertFalse(write2.isCommitted());
+        assertFalse(write2.isCommitted);
         assertAttached(tx, write2);
         assertHasUpdates(tx);
     }

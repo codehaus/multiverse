@@ -522,6 +522,12 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
     }
 
     @Test
+    @Ignore
+    public void writeSkew(){
+
+    }
+
+    @Test
     public void whenSerializedIsolationLevel_thenWriteSkewDetectedAndReadWriteConflictThrown() {
         assumeTrue(getTransactionMaxCapacity() >= 2);
         assumeTrue(isSupportingWriteSkewDetection());
