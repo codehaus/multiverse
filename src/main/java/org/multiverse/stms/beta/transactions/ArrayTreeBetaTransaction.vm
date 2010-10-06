@@ -320,7 +320,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             return tranlocal;
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 

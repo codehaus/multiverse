@@ -46,6 +46,7 @@ public abstract class VeryAbstractBetaTransactionalObject
         this.___stm = stm;                
     }
 
+    @Override
     public long getVersion() {
         return ___version;
     }

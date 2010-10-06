@@ -74,7 +74,7 @@ public final class BetaRef<E>
         super(stm);
 
         ___value = initialValue;
-        ___version = 0;         
+        ___version = VERSION_UNCOMMITTED+1;         
     }
 
 

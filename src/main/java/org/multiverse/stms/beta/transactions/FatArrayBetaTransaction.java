@@ -322,7 +322,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         //it was not previously attached to this transaction
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -640,7 +640,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         //it was not previously attached to this transaction
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -958,7 +958,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         //it was not previously attached to this transaction
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1276,7 +1276,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         //it was not previously attached to this transaction
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1594,7 +1594,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         //it was not previously attached to this transaction
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1909,7 +1909,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         //it was not previously attached to this transaction
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
