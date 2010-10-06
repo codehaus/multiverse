@@ -17,6 +17,8 @@ import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
+import static org.multiverse.api.functions.Functions.newIncLongFunction;
+import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
@@ -61,7 +63,7 @@ public class BetaLongRef_commute2Test {
     public void whenSuccess() {
         BetaLongRef ref = newLongRef(stm, 10);
 
-        LongFunction function = Functions.newIncLongFunction(1);
+        LongFunction function = newIncLongFunction();
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.commute(tx, function);
 
@@ -76,8 +78,9 @@ public class BetaLongRef_commute2Test {
 
     @Test
     public void whenNoChange() {
-        BetaLongRef ref = newLongRef(stm, 10);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         LongFunction function = Functions.newIdentityLongFunction();
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -89,8 +92,7 @@ public class BetaLongRef_commute2Test {
         assertEquals(0, commute.value);
         tx.commit();
 
-        assertEquals(10, ref.get());
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
@@ -179,8 +181,9 @@ public class BetaLongRef_commute2Test {
 
     @Test
     public void whenNullFunction_thenNullPointerException() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
 
@@ -192,13 +195,15 @@ public class BetaLongRef_commute2Test {
         }
 
         assertIsAborted(tx);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
     public void whenNullTransaction_thenNullPointerException() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
         LongFunction function = mock(LongFunction.class);
 
         try {
@@ -208,13 +213,15 @@ public class BetaLongRef_commute2Test {
         }
 
         verifyZeroInteractions(function);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
     public void whenTransactionAborted_thenDeadTransactionException() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
         LongFunction function = mock(LongFunction.class);
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.abort();
@@ -227,13 +234,15 @@ public class BetaLongRef_commute2Test {
 
         assertIsAborted(tx);
         verifyZeroInteractions(function);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
     public void whenTransactionCommitted_thenDeadTransactionException() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long initialValue = 20;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
         LongFunction function = mock(LongFunction.class);
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.commit();
@@ -246,13 +255,15 @@ public class BetaLongRef_commute2Test {
 
         assertIsCommitted(tx);
         verifyZeroInteractions(function);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
     public void whenTransactionPrepared_thenPreparedTransactionException() {
-        BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal committed = ref.___unsafeLoad();
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
         LongFunction function = mock(LongFunction.class);
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.prepare();
@@ -265,7 +276,7 @@ public class BetaLongRef_commute2Test {
 
         assertIsAborted(tx);
         verifyZeroInteractions(function);
-        assertSame(committed, ref.___unsafeLoad());
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
