@@ -1,25 +1,9 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.functions.Functions;
-import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.*;
-import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 
 public class BetaLongRef_commute2Test {
 
@@ -31,6 +15,7 @@ public class BetaLongRef_commute2Test {
         clearThreadLocalTransaction();
     }
 
+    /*
     @Test
     public void whenCommuteFunctionCausesProblems_thenNoProblemsSinceCommuteFunctionNotEvaluatedImmediately() {
         BetaLongRef ref = newLongRef(stm);
@@ -286,5 +271,5 @@ public class BetaLongRef_commute2Test {
         assertIsCommitted(tx1);
         assertEquals(11, ref1.atomicGet());
         assertEquals(12, ref2.atomicGet());
-    }
+    }         */
 }

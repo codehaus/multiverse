@@ -7,7 +7,6 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
@@ -112,8 +111,8 @@ public class AccountBenchmark implements BetaStmConstants {
     }
 
     private void printAccounts(BetaLongRef[] accounts) {
-        for (BetaTransactionalObject account : accounts) {
-            System.out.println("Account: " + ((LongRefTranlocal) account.___unsafeLoad()).value + " " + account.___getOrec());
+        for (BetaLongRef account : accounts) {
+            System.out.println("Account: " + account.atomicGet() + " " + account.___getOrec());
         }
     }
 

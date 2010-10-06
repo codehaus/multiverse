@@ -35,10 +35,8 @@ public class AtomicReadBiasedWithPeriodicUpdateTest {
             }
         }
 
-        assertSurplus(1, ref);
-        //since no arrive/depart is done, the orec doesn't become read biased based on the
-        //atomicget.
-        assertReadBiased(ref);
+        assertSurplus(0, ref);
+        assertUpdateBiased(ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
 

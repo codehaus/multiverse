@@ -2024,7 +2024,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             return false;
         }
 
-        return attached.owner.___hasReadConflict(attached, this);
+        return attached.owner.___hasReadConflict(attached);
     }
 
     // ============================= addWatch ===================================

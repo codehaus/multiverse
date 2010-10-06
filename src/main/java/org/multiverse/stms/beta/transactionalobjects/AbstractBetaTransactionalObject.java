@@ -1,6 +1,5 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -43,13 +42,7 @@ public abstract class AbstractBetaTransactionalObject
     }
 
 
-
-    @Override
-    public final Tranlocal ___unsafeLoad() {
-        //return ___value;
-        throw new TodoException();
-    }
-
+   
 
     @Override
     public final void ___abort(

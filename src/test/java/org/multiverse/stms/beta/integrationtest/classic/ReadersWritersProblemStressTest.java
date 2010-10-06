@@ -70,8 +70,8 @@ public class ReadersWritersProblemStressTest {
 
         startAll(writers);
         startAll(readers);
-        joinAll(1000 * 1000, writers);
-        joinAll(1000 * 1000, readers);
+        joinAll(1000, writers);
+        joinAll(1000, readers);
 
         assertEquals(0, currentReaderCount.get());
         assertEquals(0, currentWriterCount.get());

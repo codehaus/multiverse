@@ -2036,7 +2036,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         for (int k = 0; k < firstFreeIndex; k++) {
             final Tranlocal tranlocal = array[k];
 
-            if (tranlocal.owner.___hasReadConflict(tranlocal, this)) {
+            if (tranlocal.owner.___hasReadConflict(tranlocal)) {
                 return true;
             }
         }

@@ -1339,7 +1339,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
         for (int k = 0; k < array.length; k++) {
             final Tranlocal tranlocal = array[k];
-            if (tranlocal != null && tranlocal.owner.___hasReadConflict(tranlocal, this)) {
+            if (tranlocal != null && tranlocal.owner.___hasReadConflict(tranlocal)) {
                 return true;
             }
         }

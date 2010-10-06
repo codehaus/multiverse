@@ -163,13 +163,7 @@ public final class BetaIntRef
             return true;
         }
    }
-
-    @Override
-    public final IntRefTranlocal ___unsafeLoad() {
-        //return ___value;
-        throw new TodoException();
-    }
-
+   
     @Override
     public final Listeners ___commitDirty(
             final Tranlocal tranlocal,
@@ -379,8 +373,7 @@ public final class BetaIntRef
         ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
 
         if(listeners!=null){
-            final BetaObjectPool pool = getThreadLocalBetaObjectPool();
-            listeners.openAll(pool);
+            listeners.openAll(getThreadLocalBetaObjectPool());
         }
 
         return newValue; 
@@ -643,8 +636,7 @@ public final class BetaIntRef
         ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
 
         if(listeners!=null){
-            BetaObjectPool pool = getThreadLocalBetaObjectPool();                                            
-            listeners.openAll(pool);
+           listeners.openAll(getThreadLocalBetaObjectPool());
         }
 
         return returnOld ? oldValue : newValue;
@@ -732,8 +724,7 @@ public final class BetaIntRef
         ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
 
         if(listeners!=null){
-            BetaObjectPool pool = getThreadLocalBetaObjectPool();                      
-            listeners.openAll(pool);
+            listeners.openAll(getThreadLocalBetaObjectPool());
         }
 
         return true;
@@ -793,6 +784,7 @@ public final class BetaIntRef
                     return read;
                 }
             }
+            ___stm.defaultBackoffPolicy.delayedUninterruptible(attempt);
             attempt++;
         }while(attempt<=___stm.spinCount);
 

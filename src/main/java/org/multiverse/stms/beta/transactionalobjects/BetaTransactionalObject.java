@@ -46,16 +46,6 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      */
     boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, Tranlocal tranlocal);
 
-
-    /**
-     * Loads the current stored Tranlocal without any form of consistency guarantees. This method is purely
-     * meant for testing/debugging purposes.
-     *
-     * @return the current stored tranlocal.
-     */
-    @Deprecated
-    Tranlocal ___unsafeLoad();
-
     /**
      * Tries to acquire the lock and checks for conflict. It is safe to call this method when it already is
      * is locked by the newLockOwner. This is useful for pessimistic locking where the locks are acquired
@@ -86,10 +76,9 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * object is locked, its value is undetermined.
      *
      * @param tranlocal   the Tranlocal to check if there is a read conflict
-     * @param transaction the transaction
      * @return true if there was a readconflict, false otherwise.
      */
-    boolean ___hasReadConflict(Tranlocal tranlocal, BetaTransaction transaction);
+    boolean ___hasReadConflict(Tranlocal tranlocal);
 
     /**
      * Commits the all the dirty changes. The call also needs to be done when the tranlocal is readonly and

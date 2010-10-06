@@ -287,18 +287,24 @@ public class TestUtils implements MultiverseConstants {
      * @param threads
      */
     public static long joinAll(TestThread... threads) {
-        return joinAll(5 * 60 * 1000, threads);
+        return joinAll(5 * 60,threads);
     }
 
+    /**
+     *
+     * @param timeoutSec
+     * @param threads
+     * @return
+     */
     @SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})
-    public static long joinAll(long joinTimeoutMs, TestThread... threads) {
-        if (joinTimeoutMs < 0) {
+    public static long joinAll(long timeoutSec, TestThread... threads) {
+        if (timeoutSec < 0) {
             throw new IllegalArgumentException();
         }
 
         List<TestThread> uncompleted = new LinkedList(Arrays.asList(threads));
 
-        long maxTimeMs = System.currentTimeMillis() + joinTimeoutMs;
+        long maxTimeMs = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(timeoutSec);
 
         long durationMs = 0;
 
@@ -309,7 +315,7 @@ public class TestUtils implements MultiverseConstants {
                     if (System.currentTimeMillis() > maxTimeMs) {
                         fail(String.format(
                                 "Failed to join all threads in %s ms, remaining threads %s",
-                                joinTimeoutMs, uncompleted));
+                                timeoutSec, uncompleted));
                     }
                     thread.join(100);
 

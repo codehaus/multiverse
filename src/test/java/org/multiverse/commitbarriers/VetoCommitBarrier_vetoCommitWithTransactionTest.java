@@ -88,7 +88,7 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest implements BetaStmC
         t.join();
         t.assertNothingThrown();
         assertTrue(barrier.isCommitted());
-        assertEquals(1, ref.___unsafeLoad().value);
+        assertEquals(1, ref.atomicGet());
         assertEquals(0, barrier.getNumberWaiting());
     }
 

@@ -245,9 +245,7 @@ neer gezet?
 
 - join all is allowed to complete even when there are exceptions, so also a join without exception
 
-- pooling: array transaction only needs fixed size array for listeners
-
-- fix all remaining failing tests 
+- fix all remaining failing tests
 
 - doPrepareWithWriteSkewPrevention needs to be moved to the tranlocal.
 
@@ -257,9 +255,9 @@ neer gezet?
 
 - ref commit dirty needs to be tested better
 
-- tranlocal.prepareAllDirty needs to be tested
+- tranlocal.prepareAll needs to be tested
 
-- tranlocal.prepareDirty needs to be tested better
+- tranlocal.prepareDirty needs to be tested
 
 - functionality with dirty and non dirty needs to be tested better
 
@@ -269,14 +267,25 @@ neer gezet?
 
 - testing: prepare and writeskew
 
-- atomic get and backoff policy should be added again.
-
 - openForConstruction and value that already have a commit: checking only on lock owner could
-lead to accepting an already opened for read/or opened for write which is locked.
+lead to accepting an already opened for read/or opened for write which is locked. Version should
+be checked.
 
 - integration tests should touch all transaction implementations.
 
 done
+
+- transaction is now removed from hasConflict.
+
+- atomic get and backoff policy should be added again.
+
+- pooling: array transaction only needs fixed size array for refs: already done
+
+- has readconflict should be moved to tranlocal instead of ref.
+
+- has conflict on ref should include locks
+
+- ref.unsafe load is now removed
 
 - all tests for transactions up and running.
 
