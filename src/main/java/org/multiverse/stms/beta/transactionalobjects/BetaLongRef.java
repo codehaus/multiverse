@@ -158,7 +158,7 @@ public final class BetaLongRef
             tranlocal.version = ___version;
             tranlocal.value = value;
             tranlocal.oldValue = value;
-            tranlocal.isLockOwner = true;
+            tranlocal.lockMode = commitLock ? LOCKMODE_COMMIT: LOCKMODE_UPDATE;
             tranlocal.hasDepartObligation = arriveStatus == ARRIVE_NORMAL;
             return true;
         }
@@ -171,7 +171,7 @@ public final class BetaLongRef
             final BetaObjectPool pool) {
 
         if(!tranlocal.isDirty){
-            if(tranlocal.isLockOwner){
+            if(tranlocal.lockMode != LOCKMODE_NONE){
                 ___lockOwner = null;
 
                 if(tranlocal.hasDepartObligation){
@@ -213,7 +213,7 @@ public final class BetaLongRef
             final BetaObjectPool pool) {
 
         if(tranlocal.isCommitted){
-            if(tranlocal.isLockOwner){
+            if(tranlocal.lockMode!=LOCKMODE_NONE){
                 ___lockOwner = null;
 
                 if(tranlocal.hasDepartObligation){
@@ -254,7 +254,7 @@ public final class BetaLongRef
         final Tranlocal tranlocal,
         final BetaObjectPool pool) {
 
-        if(tranlocal.isLockOwner){
+        if(tranlocal.lockMode!=LOCKMODE_NONE){
             ___lockOwner = null;
 
             if(!tranlocal.isConstructing){

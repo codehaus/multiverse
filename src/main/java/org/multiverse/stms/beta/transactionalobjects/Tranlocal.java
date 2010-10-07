@@ -20,7 +20,7 @@ import java.util.LinkedList;
 public abstract class Tranlocal implements DurableState, BetaStmConstants {
 
     public BetaTransactionalObject owner;
-    public boolean isLockOwner;
+    public int lockMode;
     public boolean hasDepartObligation;
     public boolean isCommitted;
     public boolean isCommuting;
@@ -77,7 +77,11 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
         }
 
         if (isCommitted) {
+            if (lockMode == LOCKMODE_COMMIT) {
+                return true;
+            }
             return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
+
         }
 
         if (isCommuting) {
@@ -93,7 +97,11 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
             calculateIsDirty();
         }
 
+        if (lockMode == LOCKMODE_COMMIT) {
+            return true;
+        }
         return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
+
     }
 
     public final boolean doPrepareDirtyUpdates(
@@ -116,14 +124,21 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
             return true;
         }
 
-        return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
+        if (lockMode == LOCKMODE_COMMIT) {
+            return true;
 
+        }
+        return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
     }
 
     public final boolean doPrepareAllUpdates(
             final BetaObjectPool pool, BetaTransaction tx, int spinCount) {
 
         if (isCommitted || isConstructing) {
+            return true;
+        }
+
+        if (lockMode == LOCKMODE_COMMIT) {
             return true;
         }
 
@@ -137,7 +152,6 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
         }
 
         return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
-
     }
 
     public Iterator<DurableObject> getReferences() {

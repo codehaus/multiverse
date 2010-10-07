@@ -74,7 +74,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         for(int k=0;k<array.length;k++){
             final Tranlocal tranlocal = array[k];
 
-            if(tranlocal==null||tranlocal.isCommitted){
+            if(tranlocal==null || tranlocal.isCommitted){
                 continue;
             }
 
@@ -140,18 +140,18 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         final int index = findAttachedIndex(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
-            RefTranlocal<E> found = (RefTranlocal<E>)array[index];
+            RefTranlocal<E> tranlocal = (RefTranlocal<E>)array[index];
 
 
-            if(found.isCommuting){
-                flattenCommute(ref, found, lockMode);
+            if(tranlocal.isCommuting){
+                flattenCommute(ref, tranlocal, lockMode);
             }else
-            if(lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount,found, lockMode == LOCKMODE_COMMIT)){
+            if(tranlocal.lockMode < lockMode
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            return found;
+            return tranlocal;
         }
 
         if(!hasReads){
@@ -219,8 +219,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             if(tranlocal.isCommuting){
                 flattenCommute(ref, tranlocal, lockMode);
             }else
-            if(!tranlocal.isConstructing
-                && lockMode != LOCKMODE_NONE
+            if(tranlocal.lockMode < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -294,7 +293,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             return tranlocal;
         }
 
-        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
+        if(ref.___getLockOwner()!=this && ref.getVersion()!=BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -303,7 +302,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             tranlocal = new RefTranlocal<E>(ref);
 
         }
-        tranlocal.isLockOwner = true;
+        tranlocal.lockMode = true ? LOCKMODE_COMMIT : LOCKMODE_UPDATE;
         tranlocal.isConstructing = true;
         tranlocal.isDirty = true;
 
@@ -422,18 +421,18 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         final int index = findAttachedIndex(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
-            IntRefTranlocal found = (IntRefTranlocal)array[index];
+            IntRefTranlocal tranlocal = (IntRefTranlocal)array[index];
 
 
-            if(found.isCommuting){
-                flattenCommute(ref, found, lockMode);
+            if(tranlocal.isCommuting){
+                flattenCommute(ref, tranlocal, lockMode);
             }else
-            if(lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount,found, lockMode == LOCKMODE_COMMIT)){
+            if(tranlocal.lockMode < lockMode
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            return found;
+            return tranlocal;
         }
 
         if(!hasReads){
@@ -501,8 +500,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             if(tranlocal.isCommuting){
                 flattenCommute(ref, tranlocal, lockMode);
             }else
-            if(!tranlocal.isConstructing
-                && lockMode != LOCKMODE_NONE
+            if(tranlocal.lockMode < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -576,7 +574,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             return tranlocal;
         }
 
-        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
+        if(ref.___getLockOwner()!=this && ref.getVersion()!=BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -585,7 +583,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             tranlocal = new IntRefTranlocal(ref);
 
         }
-        tranlocal.isLockOwner = true;
+        tranlocal.lockMode = true ? LOCKMODE_COMMIT : LOCKMODE_UPDATE;
         tranlocal.isConstructing = true;
         tranlocal.isDirty = true;
 
@@ -704,18 +702,18 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         final int index = findAttachedIndex(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
-            BooleanRefTranlocal found = (BooleanRefTranlocal)array[index];
+            BooleanRefTranlocal tranlocal = (BooleanRefTranlocal)array[index];
 
 
-            if(found.isCommuting){
-                flattenCommute(ref, found, lockMode);
+            if(tranlocal.isCommuting){
+                flattenCommute(ref, tranlocal, lockMode);
             }else
-            if(lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount,found, lockMode == LOCKMODE_COMMIT)){
+            if(tranlocal.lockMode < lockMode
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            return found;
+            return tranlocal;
         }
 
         if(!hasReads){
@@ -783,8 +781,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             if(tranlocal.isCommuting){
                 flattenCommute(ref, tranlocal, lockMode);
             }else
-            if(!tranlocal.isConstructing
-                && lockMode != LOCKMODE_NONE
+            if(tranlocal.lockMode < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -858,7 +855,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             return tranlocal;
         }
 
-        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
+        if(ref.___getLockOwner()!=this && ref.getVersion()!=BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -867,7 +864,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             tranlocal = new BooleanRefTranlocal(ref);
 
         }
-        tranlocal.isLockOwner = true;
+        tranlocal.lockMode = true ? LOCKMODE_COMMIT : LOCKMODE_UPDATE;
         tranlocal.isConstructing = true;
         tranlocal.isDirty = true;
 
@@ -986,18 +983,18 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         final int index = findAttachedIndex(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
-            DoubleRefTranlocal found = (DoubleRefTranlocal)array[index];
+            DoubleRefTranlocal tranlocal = (DoubleRefTranlocal)array[index];
 
 
-            if(found.isCommuting){
-                flattenCommute(ref, found, lockMode);
+            if(tranlocal.isCommuting){
+                flattenCommute(ref, tranlocal, lockMode);
             }else
-            if(lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount,found, lockMode == LOCKMODE_COMMIT)){
+            if(tranlocal.lockMode < lockMode
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            return found;
+            return tranlocal;
         }
 
         if(!hasReads){
@@ -1065,8 +1062,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             if(tranlocal.isCommuting){
                 flattenCommute(ref, tranlocal, lockMode);
             }else
-            if(!tranlocal.isConstructing
-                && lockMode != LOCKMODE_NONE
+            if(tranlocal.lockMode < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -1140,7 +1136,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             return tranlocal;
         }
 
-        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
+        if(ref.___getLockOwner()!=this && ref.getVersion()!=BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1149,7 +1145,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             tranlocal = new DoubleRefTranlocal(ref);
 
         }
-        tranlocal.isLockOwner = true;
+        tranlocal.lockMode = true ? LOCKMODE_COMMIT : LOCKMODE_UPDATE;
         tranlocal.isConstructing = true;
         tranlocal.isDirty = true;
 
@@ -1268,18 +1264,18 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         final int index = findAttachedIndex(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
-            LongRefTranlocal found = (LongRefTranlocal)array[index];
+            LongRefTranlocal tranlocal = (LongRefTranlocal)array[index];
 
 
-            if(found.isCommuting){
-                flattenCommute(ref, found, lockMode);
+            if(tranlocal.isCommuting){
+                flattenCommute(ref, tranlocal, lockMode);
             }else
-            if(lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount,found, lockMode == LOCKMODE_COMMIT)){
+            if(tranlocal.lockMode < lockMode
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            return found;
+            return tranlocal;
         }
 
         if(!hasReads){
@@ -1347,8 +1343,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             if(tranlocal.isCommuting){
                 flattenCommute(ref, tranlocal, lockMode);
             }else
-            if(!tranlocal.isConstructing
-                && lockMode != LOCKMODE_NONE
+            if(tranlocal.lockMode < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -1422,7 +1417,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             return tranlocal;
         }
 
-        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
+        if(ref.___getLockOwner()!=this && ref.getVersion()!=BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1431,7 +1426,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             tranlocal = new LongRefTranlocal(ref);
 
         }
-        tranlocal.isLockOwner = true;
+        tranlocal.lockMode = true ? LOCKMODE_COMMIT : LOCKMODE_UPDATE;
         tranlocal.isConstructing = true;
         tranlocal.isDirty = true;
 
@@ -1546,18 +1541,18 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         final int index = findAttachedIndex(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
-            Tranlocal found = (Tranlocal)array[index];
+            Tranlocal tranlocal = (Tranlocal)array[index];
 
 
-            if(found.isCommuting){
-                flattenCommute(ref, found, lockMode);
+            if(tranlocal.isCommuting){
+                flattenCommute(ref, tranlocal, lockMode);
             }else
-            if(lockMode!=LOCKMODE_NONE
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount,found, lockMode == LOCKMODE_COMMIT)){
+            if(tranlocal.lockMode < lockMode
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            return found;
+            return tranlocal;
         }
 
         if(!hasReads){
@@ -1625,8 +1620,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             if(tranlocal.isCommuting){
                 flattenCommute(ref, tranlocal, lockMode);
             }else
-            if(!tranlocal.isConstructing
-                && lockMode != LOCKMODE_NONE
+            if(tranlocal.lockMode < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -1700,7 +1694,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             return tranlocal;
         }
 
-        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
+        if(ref.___getLockOwner()!=this && ref.getVersion()!=BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1708,7 +1702,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         if(tranlocal == null){
             tranlocal = ref.___newTranlocal();
         }
-        tranlocal.isLockOwner = true;
+        tranlocal.lockMode = true ? LOCKMODE_COMMIT : LOCKMODE_UPDATE;
         tranlocal.isConstructing = true;
         tranlocal.isDirty = true;
 

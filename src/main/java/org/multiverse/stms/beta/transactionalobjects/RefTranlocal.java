@@ -15,8 +15,8 @@ public final class RefTranlocal<E> extends Tranlocal{
 
     public E value;
     public E oldValue;
-    public Predicate<E>[] validators;    
-   
+    public Predicate<E>[] validators;
+
     public RefTranlocal(BetaRef ref){
         super(ref);
     }
@@ -39,7 +39,7 @@ public final class RefTranlocal<E> extends Tranlocal{
             pool.putCallableNode(old);
         }while(current != null);
 
-        value = newValue;     
+        value = newValue;
         isDirty = newValue != oldValue;
         isCommuting = false;
     }
@@ -64,7 +64,7 @@ public final class RefTranlocal<E> extends Tranlocal{
         value = null;
         oldValue = null;
         owner = null;
-        isLockOwner = false;
+        lockMode = LOCKMODE_NONE;
         hasDepartObligation = false;
         isCommitted = false;
         isCommuting = false;
@@ -85,10 +85,6 @@ public final class RefTranlocal<E> extends Tranlocal{
     public boolean calculateIsDirty() {
         if(isDirty){
             return true;
-        }
-
-        if (isCommitted) {
-            return false;
         }
 
         isDirty = value != oldValue;

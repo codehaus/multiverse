@@ -16,8 +16,8 @@ public final class DoubleRefTranlocal extends Tranlocal{
 
     public double value;
     public double oldValue;
-    public DoublePredicate[] validators;    
-   
+    public DoublePredicate[] validators;
+
     public DoubleRefTranlocal(BetaDoubleRef ref){
         super(ref);
     }
@@ -40,7 +40,7 @@ public final class DoubleRefTranlocal extends Tranlocal{
             pool.putCallableNode(old);
         }while(current != null);
 
-        value = newValue;     
+        value = newValue;
         isDirty = newValue != oldValue;
         isCommuting = false;
     }
@@ -65,7 +65,7 @@ public final class DoubleRefTranlocal extends Tranlocal{
         value = 0;
         oldValue = 0;
         owner = null;
-        isLockOwner = false;
+        lockMode = LOCKMODE_NONE;
         hasDepartObligation = false;
         isCommitted = false;
         isCommuting = false;
@@ -86,10 +86,6 @@ public final class DoubleRefTranlocal extends Tranlocal{
     public boolean calculateIsDirty() {
         if(isDirty){
             return true;
-        }
-
-        if (isCommitted) {
-            return false;
         }
 
         isDirty = value != oldValue;

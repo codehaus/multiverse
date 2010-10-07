@@ -11,7 +11,7 @@ import static org.junit.Assert.assertSame;
 /**
  * @author Peter Veentjer
  */
-public class BetaStmTestUtils {
+public class BetaStmTestUtils implements BetaStmConstants {
 
     public static <E> BetaRef<E> newRef(BetaStm stm, E value) {
         BetaTransaction tx = new LeanMonoBetaTransaction(stm);
@@ -31,6 +31,17 @@ public class BetaStmTestUtils {
         return ref;
     }
 
+    public static void assertTranlocalHasNoLock(Tranlocal tranlocal) {
+        assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
+    }
+
+    public static void assertTranlocalHasCommitLock(Tranlocal tranlocal) {
+        assertEquals(LOCKMODE_COMMIT, tranlocal.lockMode);
+    }
+
+    public static void assertTranlocalHasUpdateLock(Tranlocal tranlocal) {
+        assertEquals(LOCKMODE_UPDATE, tranlocal.lockMode);
+    }
 
     public static BetaRef newRef(BetaStm stm) {
         return newRef(stm, null);

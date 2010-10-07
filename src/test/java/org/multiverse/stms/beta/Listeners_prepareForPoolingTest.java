@@ -7,9 +7,10 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
 import static org.junit.Assert.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertTranlocalHasNoLock;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
-public class Listeners_prepareForPoolingTest {
+public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     private BetaStm stm;
     private BetaObjectPool pool;
 
@@ -73,10 +74,10 @@ public class Listeners_prepareForPoolingTest {
     }
 
     @Test
-    public void whenLocked() {
+    public void whenHasCommitLock() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.isLockOwner = true;
+        tranlocal.lockMode = LOCKMODE_COMMIT;
         tranlocal.value = 100;
         tranlocal.oldValue = 100;
         tranlocal.version = 10;
@@ -87,10 +88,25 @@ public class Listeners_prepareForPoolingTest {
     }
 
     @Test
+    public void whenHasUpdateLock() {
+        BetaLongRef ref = newLongRef(stm);
+        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        tranlocal.lockMode = LOCKMODE_UPDATE;
+        tranlocal.value = 100;
+        tranlocal.oldValue = 100;
+        tranlocal.version = 10;
+
+        tranlocal.prepareForPooling(pool);
+
+        assertCleared(tranlocal);
+    }
+
+
+    @Test
     public void whenConstructed() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.isLockOwner = true;
+        tranlocal.lockMode = LOCKMODE_COMMIT;
         tranlocal.isConstructing = true;
         tranlocal.value = 100;
         tranlocal.oldValue = 0;
@@ -120,7 +136,7 @@ public class Listeners_prepareForPoolingTest {
         assertNull(tranlocal.owner);
         assertFalse(tranlocal.hasDepartObligation);
         assertFalse(tranlocal.isCommitted);
-        assertFalse(tranlocal.isLockOwner);
+        assertTranlocalHasNoLock(tranlocal);
         assertFalse(tranlocal.isCommuting);
         assertFalse(tranlocal.isConstructing);
         assertFalse(tranlocal.isDirty);

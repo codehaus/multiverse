@@ -122,9 +122,9 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             if(tranlocal.isCommuting){
                 flattenCommute(ref, tranlocal, lockMode);
             }else
-            if (!tranlocal.isConstructing
-                && lockMode != LOCKMODE_NONE
+            if (tranlocal.lockMode < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+
                 throw abortOnReadConflict();
             }
 
@@ -234,8 +234,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             if(tranlocal.isCommuting){
                 flattenCommute(ref, tranlocal, lockMode);
             }else
-            if(!tranlocal.isConstructing
-                 && lockMode != LOCKMODE_NONE
+            if(tranlocal.lockMode < lockMode
                  && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal,lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -322,7 +321,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         //it was not previously attached to this transaction
 
-        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
+        if(ref.___getLockOwner()!=this && ref.getVersion()!=BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -336,7 +335,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(tranlocal == null){
                 tranlocal = new RefTranlocal<E>(ref);
         }
-        tranlocal.isLockOwner = true;
+        tranlocal.lockMode = LOCKMODE_COMMIT;
         tranlocal.isConstructing = true;
         tranlocal.isDirty = true;
         array[firstFreeIndex] = tranlocal;
@@ -440,9 +439,9 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             if(tranlocal.isCommuting){
                 flattenCommute(ref, tranlocal, lockMode);
             }else
-            if (!tranlocal.isConstructing
-                && lockMode != LOCKMODE_NONE
+            if (tranlocal.lockMode < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+
                 throw abortOnReadConflict();
             }
 
@@ -552,8 +551,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             if(tranlocal.isCommuting){
                 flattenCommute(ref, tranlocal, lockMode);
             }else
-            if(!tranlocal.isConstructing
-                 && lockMode != LOCKMODE_NONE
+            if(tranlocal.lockMode < lockMode
                  && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal,lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -640,7 +638,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         //it was not previously attached to this transaction
 
-        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
+        if(ref.___getLockOwner()!=this && ref.getVersion()!=BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -654,7 +652,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(tranlocal == null){
                 tranlocal = new IntRefTranlocal(ref);
         }
-        tranlocal.isLockOwner = true;
+        tranlocal.lockMode = LOCKMODE_COMMIT;
         tranlocal.isConstructing = true;
         tranlocal.isDirty = true;
         array[firstFreeIndex] = tranlocal;
@@ -758,9 +756,9 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             if(tranlocal.isCommuting){
                 flattenCommute(ref, tranlocal, lockMode);
             }else
-            if (!tranlocal.isConstructing
-                && lockMode != LOCKMODE_NONE
+            if (tranlocal.lockMode < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+
                 throw abortOnReadConflict();
             }
 
@@ -870,8 +868,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             if(tranlocal.isCommuting){
                 flattenCommute(ref, tranlocal, lockMode);
             }else
-            if(!tranlocal.isConstructing
-                 && lockMode != LOCKMODE_NONE
+            if(tranlocal.lockMode < lockMode
                  && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal,lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -958,7 +955,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         //it was not previously attached to this transaction
 
-        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
+        if(ref.___getLockOwner()!=this && ref.getVersion()!=BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -972,7 +969,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(tranlocal == null){
                 tranlocal = new BooleanRefTranlocal(ref);
         }
-        tranlocal.isLockOwner = true;
+        tranlocal.lockMode = LOCKMODE_COMMIT;
         tranlocal.isConstructing = true;
         tranlocal.isDirty = true;
         array[firstFreeIndex] = tranlocal;
@@ -1076,9 +1073,9 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             if(tranlocal.isCommuting){
                 flattenCommute(ref, tranlocal, lockMode);
             }else
-            if (!tranlocal.isConstructing
-                && lockMode != LOCKMODE_NONE
+            if (tranlocal.lockMode < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+
                 throw abortOnReadConflict();
             }
 
@@ -1188,8 +1185,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             if(tranlocal.isCommuting){
                 flattenCommute(ref, tranlocal, lockMode);
             }else
-            if(!tranlocal.isConstructing
-                 && lockMode != LOCKMODE_NONE
+            if(tranlocal.lockMode < lockMode
                  && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal,lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -1276,7 +1272,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         //it was not previously attached to this transaction
 
-        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
+        if(ref.___getLockOwner()!=this && ref.getVersion()!=BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1290,7 +1286,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(tranlocal == null){
                 tranlocal = new DoubleRefTranlocal(ref);
         }
-        tranlocal.isLockOwner = true;
+        tranlocal.lockMode = LOCKMODE_COMMIT;
         tranlocal.isConstructing = true;
         tranlocal.isDirty = true;
         array[firstFreeIndex] = tranlocal;
@@ -1394,9 +1390,9 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             if(tranlocal.isCommuting){
                 flattenCommute(ref, tranlocal, lockMode);
             }else
-            if (!tranlocal.isConstructing
-                && lockMode != LOCKMODE_NONE
+            if (tranlocal.lockMode < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+
                 throw abortOnReadConflict();
             }
 
@@ -1506,8 +1502,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             if(tranlocal.isCommuting){
                 flattenCommute(ref, tranlocal, lockMode);
             }else
-            if(!tranlocal.isConstructing
-                 && lockMode != LOCKMODE_NONE
+            if(tranlocal.lockMode < lockMode
                  && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal,lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -1594,7 +1589,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         //it was not previously attached to this transaction
 
-        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
+        if(ref.___getLockOwner()!=this && ref.getVersion()!=BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1608,7 +1603,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(tranlocal == null){
                 tranlocal = new LongRefTranlocal(ref);
         }
-        tranlocal.isLockOwner = true;
+        tranlocal.lockMode = LOCKMODE_COMMIT;
         tranlocal.isConstructing = true;
         tranlocal.isDirty = true;
         array[firstFreeIndex] = tranlocal;
@@ -1709,9 +1704,9 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             if(tranlocal.isCommuting){
                 flattenCommute(ref, tranlocal, lockMode);
             }else
-            if (!tranlocal.isConstructing
-                && lockMode != LOCKMODE_NONE
+            if (tranlocal.lockMode < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+
                 throw abortOnReadConflict();
             }
 
@@ -1821,8 +1816,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             if(tranlocal.isCommuting){
                 flattenCommute(ref, tranlocal, lockMode);
             }else
-            if(!tranlocal.isConstructing
-                 && lockMode != LOCKMODE_NONE
+            if(tranlocal.lockMode < lockMode
                  && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal,lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -1909,7 +1903,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         //it was not previously attached to this transaction
 
-        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
+        if(ref.___getLockOwner()!=this && ref.getVersion()!=BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1923,7 +1917,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(tranlocal == null){
                 tranlocal = ref.___newTranlocal();
         }
-        tranlocal.isLockOwner = true;
+        tranlocal.lockMode = LOCKMODE_COMMIT;
         tranlocal.isConstructing = true;
         tranlocal.isDirty = true;
         array[firstFreeIndex] = tranlocal;

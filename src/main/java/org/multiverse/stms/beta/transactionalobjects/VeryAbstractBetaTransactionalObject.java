@@ -43,7 +43,7 @@ public abstract class VeryAbstractBetaTransactionalObject
         if (stm == null) {
             throw new NullPointerException();
         }
-        this.___stm = stm;                
+        this.___stm = stm;
     }
 
     @Override
@@ -139,8 +139,11 @@ public abstract class VeryAbstractBetaTransactionalObject
             final Tranlocal tranlocal,
             final boolean commitLock) {
 
-        if (tranlocal.isLockOwner) {
-            if (commitLock) {
+        final int lockMode = tranlocal.lockMode;
+
+        if (lockMode != LOCKMODE_NONE) {
+            if (commitLock && lockMode == LOCKMODE_UPDATE) {
+                tranlocal.lockMode = LOCKMODE_COMMIT;
                 ___upgradeToCommitLock();
             }
             return true;
@@ -161,8 +164,8 @@ public abstract class VeryAbstractBetaTransactionalObject
                 return false;
             }
 
-            if(arriveStatus == ARRIVE_NORMAL){
-                tranlocal.hasDepartObligation = true; 
+            if (arriveStatus == ARRIVE_NORMAL) {
+                tranlocal.hasDepartObligation = true;
             }
         } else if (!___tryLockAfterNormalArrive(spinCount, commitLock)) {
             return false;
@@ -170,7 +173,7 @@ public abstract class VeryAbstractBetaTransactionalObject
 
         //the lock was acquired successfully.
         ___lockOwner = newLockOwner;
-        tranlocal.isLockOwner = true;
+        tranlocal.lockMode = commitLock ? LOCKMODE_COMMIT : LOCKMODE_UPDATE;
         return expectedVersion == ___version;
     }
 
@@ -191,11 +194,11 @@ public abstract class VeryAbstractBetaTransactionalObject
 
     @Override
     public final boolean ___hasReadConflict(final Tranlocal tranlocal) {
-        if(tranlocal.isLockOwner){
+        if (tranlocal.lockMode != LOCKMODE_NONE) {
             return false;
         }
 
-        if(___hasCommitLock()){
+        if (___hasCommitLock()) {
             return true;
         }
 

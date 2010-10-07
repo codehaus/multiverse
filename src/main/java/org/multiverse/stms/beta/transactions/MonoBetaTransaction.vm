@@ -189,8 +189,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 return tranlocal;
             }
 #end
-            if(lockMode != LOCKMODE_NONE
-                && !tranlocal.isConstructing
+            if(tranlocal.lockMode < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -320,7 +319,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
 #end
-        if(lockMode != LOCKMODE_NONE
+        if(tranlocal.lockMode< lockMode
             && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
@@ -372,7 +371,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
+        if(ref.___getLockOwner()!=this && ref.getVersion()!=BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -385,7 +384,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end
         }
         tranlocal.isDirty = true;
-        tranlocal.isLockOwner = true;
+        tranlocal.lockMode = LOCKMODE_COMMIT;
         tranlocal.isConstructing = true;
         attached = tranlocal;
         return tranlocal;

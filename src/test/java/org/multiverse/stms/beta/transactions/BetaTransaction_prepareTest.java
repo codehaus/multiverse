@@ -16,8 +16,7 @@ import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.functions.Functions.newIncLongFunction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
@@ -135,20 +134,20 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_UPDATE);
-        write.value++;
+        LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_UPDATE);
+        tranlocal.value++;
         tx.prepare();
 
-        assertSame(ref, write.owner);
-        assertFalse(write.isCommitted);
-        assertTrue(write.isLockOwner);
-        assertFalse(write.isCommuting);
-        assertNull(write.headCallable);
-        assertTrue(write.hasDepartObligation);
-        assertTrue(write.isDirty);
-        assertEquals(10, write.oldValue);
-        assertEquals(11, write.value);
-        assertEquals(version, write.version);
+        assertSame(ref, tranlocal.owner);
+        assertFalse(tranlocal.isCommitted);
+        assertTranlocalHasCommitLock(tranlocal);
+        assertFalse(tranlocal.isCommuting);
+        assertNull(tranlocal.headCallable);
+        assertTrue(tranlocal.hasDepartObligation);
+        assertTrue(tranlocal.isDirty);
+        assertEquals(10, tranlocal.oldValue);
+        assertEquals(11, tranlocal.value);
+        assertEquals(version, tranlocal.version);
 
         assertIsPrepared(tx);
         assertHasCommitLock(ref);
@@ -158,6 +157,9 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
     }
+
+
+
 
     @Test
     @Ignore
@@ -401,7 +403,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         assertFalse(tranlocal.isCommuting);
         assertFalse(tranlocal.isCommitted);
         assertTrue(tranlocal.isDirty);
-        assertTrue(tranlocal.isLockOwner);
+        assertTranlocalHasCommitLock(tranlocal);
         assertSame(ref, tranlocal.owner);
 
         assertHasCommitLock(ref);
@@ -431,7 +433,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         assertEquals(initialVersion, tranlocal.version);
         assertFalse(tranlocal.isCommuting);
         assertFalse(tranlocal.isCommitted);
-        assertTrue(tranlocal.isLockOwner);
+        assertTranlocalHasCommitLock(tranlocal);
         assertSame(ref, tranlocal.owner);
 
         assertEquals(1, tranlocal.value);

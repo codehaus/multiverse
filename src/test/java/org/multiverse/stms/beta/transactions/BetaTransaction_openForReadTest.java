@@ -22,8 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.functions.Functions.newIncLongFunction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 
@@ -941,7 +940,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         assertEquals(10, tranlocal.oldValue);
         assertFalse(tranlocal.isCommuting);
         assertFalse(tranlocal.isCommitted);
-        assertFalse(tranlocal.isLockOwner);
+        assertTranlocalHasNoLock(tranlocal);
         assertTrue(tranlocal.hasDepartObligation);
 
         assertIsActive(tx);

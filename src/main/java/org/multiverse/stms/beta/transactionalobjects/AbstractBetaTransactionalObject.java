@@ -50,7 +50,7 @@ public abstract class AbstractBetaTransactionalObject
         final Tranlocal tranlocal,
         final BetaObjectPool pool) {
 
-        if(tranlocal.isLockOwner){
+        if(tranlocal.lockMode!=LOCKMODE_NONE){
             ___lockOwner = null;
 
             if(!tranlocal.isConstructing){

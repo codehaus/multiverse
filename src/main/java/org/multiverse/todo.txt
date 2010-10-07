@@ -273,6 +273,12 @@ by another or by itself and either are committed or not).
 
 - integration tests should touch all transaction implementations.
 
+- repeatable read isolation level
+
+- when a check conflict and lock is done, the communication with the orec can be skipped it already
+is privatized. This information needs to be stored in the tranlocal, so instead of storing if it is
+the lockowner, the lockmode needs to be stored.
+
 done
 
 - more cleanup of the tranlocal (removed unused methods and improved javadoc).
