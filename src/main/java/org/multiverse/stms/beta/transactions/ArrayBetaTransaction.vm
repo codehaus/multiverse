@@ -399,50 +399,52 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         final int index = indexOf(ref);
-        if(index == -1){
-            if(firstFreeIndex == array.length) {
-                throw abortOnTooSmallSize(array.length+1);
+        if(index > -1){
+            ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})array[index];
+
+            if (index > 0) {
+                array[index] = array[0];
+                array[0] = tranlocal;
             }
 
+            if(tranlocal.isCommuting){
+                tranlocal.addCommutingFunction(function, pool);
+                return;
+            }
 
-            ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
-            if(tranlocal == null){
+            if(tranlocal.isCommitted){
+                tranlocal.isCommitted = false;
+                hasUpdates = true;                
+            }
+
 #if(${ref.isReference})
-               tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
+            tranlocal.value = function.call(tranlocal.value);
+            return;
 #else
-               tranlocal = ref.___newTranlocal();
+            throw new TodoException();
 #end
-            }
-
-            tranlocal.isCommuting = true;
-            tranlocal.addCommutingFunction(function, pool);
-
-            array[firstFreeIndex]=tranlocal;
-            firstFreeIndex++;
-            hasUpdates = true;
-            return;
         }
 
-        ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})array[index];
-        if(tranlocal.isCommuting){
-            tranlocal.addCommutingFunction(function, pool);
-            return;
+        if(firstFreeIndex == array.length) {
+            throw abortOnTooSmallSize(array.length+1);
         }
 
-        if(tranlocal.isCommitted){
-            tranlocal.isCommitted = false;
-            hasUpdates = true;
-            array[index]=tranlocal;
-        }
-
+        ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
+        if(tranlocal == null){
 #if(${ref.isReference})
-        tranlocal.value = function.call(tranlocal.value);
+            tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
 #else
-        throw new TodoException();
-#end      
-#end  ## end transaction.lean
+            tranlocal = ref.___newTranlocal();
+#end
+        }
+        tranlocal.isCommuting = true;
+        tranlocal.addCommutingFunction(function, pool);
 
-    }
+        array[firstFreeIndex] = tranlocal;
+        firstFreeIndex++;
+        hasUpdates = true;        
+#end  ## end transaction.lean
+}
 
 #end ##for loop of transactionalobjects.
 

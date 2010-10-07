@@ -5,13 +5,11 @@ import org.junit.Test;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.BetaStmUtils;
 
 import static org.junit.Assert.assertNull;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newRef;
 
-public class RefTranlocal_prepareForPoolingTest implements BetaStmConstants
-{
+public class RefTranlocal_prepareForPoolingTest implements BetaStmConstants {
     private BetaStm stm;
     private BetaObjectPool pool;
 
@@ -27,7 +25,7 @@ public class RefTranlocal_prepareForPoolingTest implements BetaStmConstants
     @Test
     public void whenReferenceHasValue_thenItIsNulled() {
         BetaRef<String> ref = newRef(stm, "peter");
-        RefTranlocal tranlocal = ref.___newTranlocal();
+        RefTranlocal<String> tranlocal = ref.___newTranlocal();
         ref.___load(1, null, LOCKMODE_NONE, tranlocal);
 
         tranlocal.prepareForPooling(pool);

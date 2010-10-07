@@ -114,6 +114,14 @@ performance.
 
 - use a retry policy for re-acquiring lock. atm only spinning is used.
 
+- openForConstruction on generic transactional object should return current type of tranlocal
+
+- openForRead on generic transactional object should return current type of tranlocal
+
+- openForWrite on generic transactional object should return current type of tranlocal
+
+
+
 todo
 
 - mono transaction: support for orelse
@@ -167,12 +175,6 @@ globalconflict counter.
 the task not being executed at all.
 
 - when all reads/writes are pessimistic, cheap conflict detection and cheap prepare.
-
-- openForConstruction on generic transactional object should return current type of tranlocal
-
-- openForRead on generic transactional object should return current type of tranlocal
-
-- openForWrite on generic transactional object should return current type of tranlocal
 
 - pooling for generic transactional object tranlocals.
 
@@ -240,12 +242,6 @@ neer gezet?
 
 - when pessimistic locking level used, dirty flag not set correctly.
 
-- still an isolation problem present, see the readers/writers test
-
-- join all is allowed to complete even when there are exceptions, so also a join without exception
-
-- fix all remaining failing tests
-
 - doPrepareWithWriteSkewPrevention needs to be moved to the tranlocal.
 
 - implement read on transaction.
@@ -281,152 +277,11 @@ the lockowner, the lockmode needs to be stored.
 
 done
 
-- more cleanup of the tranlocal (removed unused methods and improved javadoc).
+- still an isolation problem present, see the readers/writers test
 
-- moved the prepareWithWriteSkew to the tranlocal 
+- join all is allowed to complete even when there are exceptions, so also a join without exception
 
-- openForConstruction and value that already have a commit: checking only on lock owner could
-lead to accepting an already opened for read/or opened for write which is locked. Version should
-be checked.
+- fix all remaining failing tests
 
-- transaction is now removed from hasConflict.
-
-- atomic get and backoff policy should be added again.
-
-- pooling: array transaction only needs fixed size array for refs: already done
-
-- has readconflict should be moved to tranlocal instead of ref.
-
-- has conflict on ref should include locks
-
-- ref.unsafe load is now removed
-
-- all tests for transactions up and running.
-
-- the array transaction doesn't need to expand, it can get the size it needs immediately: was already
-implemented.
-
-- added benchmark for the weak atomic get.
-
-- added the weak atomic get
-
-- removed .isLocked from tranlocal
-
-- additional load on the ref that doesn't need to cast.
-
-- can it be that there is an isolation problem on the load in combination with pooling? because a tranlocal
-can be pooled, the same tranlocal for different commits could be used, so the load could mistake to read an unlocked
-value even though it is locked.
-
-- commute zit op de ref en op de tranlocal.. nakijken.
-
-- can the whole tranlocal be removed once a commit is done? So work with the values themselves. Value
-can be placed on a volatile variable, so atomicget is extremely cheap. The problem is with conflict scan,
-since the aba problem can't be detected. Once the read or write is done, a tranlocal can be created. So
-tranlocals are only used within the transaction, but once the transaction commits, the values can be
-written. When combined with privatization, only volatile reads/writes are needed. Having this new approach,
-would be a big advantage for atomic gets, and transactions that allow for read-committed, since no
-reads need to be tracked. conflict detectie kan alleen op basis van value en niet van een reference.
-Een ander probleem is de load, omdat je de read/arrive/read truuk volgens mij neit kan toepassen.
-Een ander probleem is dat de openForRead nog steeds een tranlocal terug stuurd. De openForWrite en
-openForConstruction die moeten toch al tranlocals terug sturen. Een ander voordeel is dat de tranlocals
-ook onder contention niet meer weggegooid hoeven te worden. Je zit wel met privatization. For simple
-types it is not problem, since the value is immutable. But for references it becomes more complicated, because
-the values don't need to be... adding a version field.. can be coordinated from the transaction.. so every one gets
-a version field? (every transactional object).
-
-- openForConstruction remove
-
-- openForCommute remove
-
-- openForWrite remove
-
-- improved isolation stress test
-
-- very big cleanup of the transaction tests.
-
-- removed read uncomitted.
-
-- Predicates modelled in same way as Function
-
-- functions are not generated
-
-- removal of the locking methods in the betatransaction (were added for backwards compatibility)
-
-- added the newCollection methods to the stmutils.
-
-- added the isolation level and dropped writeskew from configuration
-
-- added the committed read isolation level
-
-- yield and spinning.
-
-- once a transactional object is privatized, it should not be ensured anymore.
-
-- added deadlock test for Ensure
-
-- added deadlock test for privatize
-
-- tests in stm.beta.transactionalobject are now fast again (low maxRetries count)
-
-- VeryAbstractBetaTransactionalObject_isEnsuredByOtherf0Test
-
-- VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test
-
-- VeryAbstractBetaTransactionalObject_isPrivatizedByOther0Test
-
-- VeryAbstractBetaTransactionalObject_isPrivatizedBySelf0Test
-
-- VeryAbstractBetaTransactionalObject_isPrivatizedBySelf1Test
-
-- VeryAbstractBetaTransactionalObject_isPrivatizedTest
-
-- VeryAbstractBetaTransactionalObject_isPrivatizedByOther1Test
-
-- VeryAbstractBetaTransactionalObject_isEnsuredBySelf1Test
-
-- VeryAbstractBetaTransactionalObject_isEnsuredByOther1Test
-
-- VeryAbstractBetaTransactionalObject_isEnsuredTest
-
-- VeryAbstractBetaTransactionalObject_isFreeTest
-
-- added an very abstract betatransactional object where a lot of duplicate logic can be moved. 
-
-- arrays are removed
-
-- isolation test that is primary read biased.
-
-- predicates are now generated.
-
-- tryLockAndCheck conflict needs to make use of lockLevel
-
-- array transaction: on commit/abort the array can be nulled. no need to do it when placing in the pool
-
-- array tree transaction: on commit/abort the array can be nulled. no need to do it when placing in the pool
-  or when initializing.
-
-- stmutils is now generated by velocity
-
-- added execute methods in stmutils
-
-- added newref methods in stmutils
-
-- added the isolation test for atomicincrement for ref.
-
-- added the backoff policy to the refs.
-
-- added the global stm instance
-
-- ref atomic-compareand swap
-
-- ref atomic getandalter
-
-- ref atomic alter and get
-
-- ref atomic inc
-
-- write bit in the orec? Can be used to indicate to another transaction wants to write.. when committing and
- exclusive writebit set by another transaction, no write can happen. The advantage of purely locking is that
- reads still can happen even though it is 'locked' exclusively for writing by one transaction.
+- array transaction has index optimization for repeated access of the same ref.
 

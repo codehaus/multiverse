@@ -307,8 +307,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
-  
-    }
+  }
 
 
     public final  int read(BetaIntRef ref){
@@ -533,8 +532,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
-  
-    }
+  }
 
 
     public final  boolean read(BetaBooleanRef ref){
@@ -759,8 +757,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
-  
-    }
+  }
 
 
     public final  double read(BetaDoubleRef ref){
@@ -985,8 +982,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
-  
-    }
+  }
 
 
     public final  long read(BetaLongRef ref){
@@ -1211,8 +1207,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
-  
-    }
+  }
 
 
         
@@ -1434,8 +1429,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
-  
-    }
+  }
 
  
     @Override

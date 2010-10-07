@@ -366,41 +366,43 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         final int index = indexOf(ref);
-        if(index == -1){
-            if(firstFreeIndex == array.length) {
-                throw abortOnTooSmallSize(array.length+1);
+        if(index > -1){
+            RefTranlocal<E> tranlocal = (RefTranlocal<E>)array[index];
+
+            if (index > 0) {
+                array[index] = array[0];
+                array[0] = tranlocal;
             }
 
-
-            RefTranlocal<E> tranlocal = pool.take(ref);
-            if(tranlocal == null){
-               tranlocal = new RefTranlocal<E>(ref);
+            if(tranlocal.isCommuting){
+                tranlocal.addCommutingFunction(function, pool);
+                return;
             }
 
-            tranlocal.isCommuting = true;
-            tranlocal.addCommutingFunction(function, pool);
+            if(tranlocal.isCommitted){
+                tranlocal.isCommitted = false;
+                hasUpdates = true;                
+            }
 
-            array[firstFreeIndex]=tranlocal;
-            firstFreeIndex++;
-            hasUpdates = true;
+            tranlocal.value = function.call(tranlocal.value);
             return;
         }
 
-        RefTranlocal<E> tranlocal = (RefTranlocal<E>)array[index];
-        if(tranlocal.isCommuting){
-            tranlocal.addCommutingFunction(function, pool);
-            return;
+        if(firstFreeIndex == array.length) {
+            throw abortOnTooSmallSize(array.length+1);
         }
 
-        if(tranlocal.isCommitted){
-            tranlocal.isCommitted = false;
-            hasUpdates = true;
-            array[index]=tranlocal;
+        RefTranlocal<E> tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new RefTranlocal<E>(ref);
         }
+        tranlocal.isCommuting = true;
+        tranlocal.addCommutingFunction(function, pool);
 
-        tranlocal.value = function.call(tranlocal.value);
-  
-    }
+        array[firstFreeIndex] = tranlocal;
+        firstFreeIndex++;
+        hasUpdates = true;        
+  }
 
 
     public final  int read(BetaIntRef ref){
@@ -683,41 +685,43 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         final int index = indexOf(ref);
-        if(index == -1){
-            if(firstFreeIndex == array.length) {
-                throw abortOnTooSmallSize(array.length+1);
+        if(index > -1){
+            IntRefTranlocal tranlocal = (IntRefTranlocal)array[index];
+
+            if (index > 0) {
+                array[index] = array[0];
+                array[0] = tranlocal;
             }
 
-
-            IntRefTranlocal tranlocal = pool.take(ref);
-            if(tranlocal == null){
-               tranlocal = new IntRefTranlocal(ref);
+            if(tranlocal.isCommuting){
+                tranlocal.addCommutingFunction(function, pool);
+                return;
             }
 
-            tranlocal.isCommuting = true;
-            tranlocal.addCommutingFunction(function, pool);
+            if(tranlocal.isCommitted){
+                tranlocal.isCommitted = false;
+                hasUpdates = true;                
+            }
 
-            array[firstFreeIndex]=tranlocal;
-            firstFreeIndex++;
-            hasUpdates = true;
+            tranlocal.value = function.call(tranlocal.value);
             return;
         }
 
-        IntRefTranlocal tranlocal = (IntRefTranlocal)array[index];
-        if(tranlocal.isCommuting){
-            tranlocal.addCommutingFunction(function, pool);
-            return;
+        if(firstFreeIndex == array.length) {
+            throw abortOnTooSmallSize(array.length+1);
         }
 
-        if(tranlocal.isCommitted){
-            tranlocal.isCommitted = false;
-            hasUpdates = true;
-            array[index]=tranlocal;
+        IntRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new IntRefTranlocal(ref);
         }
+        tranlocal.isCommuting = true;
+        tranlocal.addCommutingFunction(function, pool);
 
-        tranlocal.value = function.call(tranlocal.value);
-  
-    }
+        array[firstFreeIndex] = tranlocal;
+        firstFreeIndex++;
+        hasUpdates = true;        
+  }
 
 
     public final  boolean read(BetaBooleanRef ref){
@@ -1000,41 +1004,43 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         final int index = indexOf(ref);
-        if(index == -1){
-            if(firstFreeIndex == array.length) {
-                throw abortOnTooSmallSize(array.length+1);
+        if(index > -1){
+            BooleanRefTranlocal tranlocal = (BooleanRefTranlocal)array[index];
+
+            if (index > 0) {
+                array[index] = array[0];
+                array[0] = tranlocal;
             }
 
-
-            BooleanRefTranlocal tranlocal = pool.take(ref);
-            if(tranlocal == null){
-               tranlocal = new BooleanRefTranlocal(ref);
+            if(tranlocal.isCommuting){
+                tranlocal.addCommutingFunction(function, pool);
+                return;
             }
 
-            tranlocal.isCommuting = true;
-            tranlocal.addCommutingFunction(function, pool);
+            if(tranlocal.isCommitted){
+                tranlocal.isCommitted = false;
+                hasUpdates = true;                
+            }
 
-            array[firstFreeIndex]=tranlocal;
-            firstFreeIndex++;
-            hasUpdates = true;
+            tranlocal.value = function.call(tranlocal.value);
             return;
         }
 
-        BooleanRefTranlocal tranlocal = (BooleanRefTranlocal)array[index];
-        if(tranlocal.isCommuting){
-            tranlocal.addCommutingFunction(function, pool);
-            return;
+        if(firstFreeIndex == array.length) {
+            throw abortOnTooSmallSize(array.length+1);
         }
 
-        if(tranlocal.isCommitted){
-            tranlocal.isCommitted = false;
-            hasUpdates = true;
-            array[index]=tranlocal;
+        BooleanRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new BooleanRefTranlocal(ref);
         }
+        tranlocal.isCommuting = true;
+        tranlocal.addCommutingFunction(function, pool);
 
-        tranlocal.value = function.call(tranlocal.value);
-  
-    }
+        array[firstFreeIndex] = tranlocal;
+        firstFreeIndex++;
+        hasUpdates = true;        
+  }
 
 
     public final  double read(BetaDoubleRef ref){
@@ -1317,41 +1323,43 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         final int index = indexOf(ref);
-        if(index == -1){
-            if(firstFreeIndex == array.length) {
-                throw abortOnTooSmallSize(array.length+1);
+        if(index > -1){
+            DoubleRefTranlocal tranlocal = (DoubleRefTranlocal)array[index];
+
+            if (index > 0) {
+                array[index] = array[0];
+                array[0] = tranlocal;
             }
 
-
-            DoubleRefTranlocal tranlocal = pool.take(ref);
-            if(tranlocal == null){
-               tranlocal = new DoubleRefTranlocal(ref);
+            if(tranlocal.isCommuting){
+                tranlocal.addCommutingFunction(function, pool);
+                return;
             }
 
-            tranlocal.isCommuting = true;
-            tranlocal.addCommutingFunction(function, pool);
+            if(tranlocal.isCommitted){
+                tranlocal.isCommitted = false;
+                hasUpdates = true;                
+            }
 
-            array[firstFreeIndex]=tranlocal;
-            firstFreeIndex++;
-            hasUpdates = true;
+            tranlocal.value = function.call(tranlocal.value);
             return;
         }
 
-        DoubleRefTranlocal tranlocal = (DoubleRefTranlocal)array[index];
-        if(tranlocal.isCommuting){
-            tranlocal.addCommutingFunction(function, pool);
-            return;
+        if(firstFreeIndex == array.length) {
+            throw abortOnTooSmallSize(array.length+1);
         }
 
-        if(tranlocal.isCommitted){
-            tranlocal.isCommitted = false;
-            hasUpdates = true;
-            array[index]=tranlocal;
+        DoubleRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new DoubleRefTranlocal(ref);
         }
+        tranlocal.isCommuting = true;
+        tranlocal.addCommutingFunction(function, pool);
 
-        tranlocal.value = function.call(tranlocal.value);
-  
-    }
+        array[firstFreeIndex] = tranlocal;
+        firstFreeIndex++;
+        hasUpdates = true;        
+  }
 
 
     public final  long read(BetaLongRef ref){
@@ -1634,41 +1642,43 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         final int index = indexOf(ref);
-        if(index == -1){
-            if(firstFreeIndex == array.length) {
-                throw abortOnTooSmallSize(array.length+1);
+        if(index > -1){
+            LongRefTranlocal tranlocal = (LongRefTranlocal)array[index];
+
+            if (index > 0) {
+                array[index] = array[0];
+                array[0] = tranlocal;
             }
 
-
-            LongRefTranlocal tranlocal = pool.take(ref);
-            if(tranlocal == null){
-               tranlocal = new LongRefTranlocal(ref);
+            if(tranlocal.isCommuting){
+                tranlocal.addCommutingFunction(function, pool);
+                return;
             }
 
-            tranlocal.isCommuting = true;
-            tranlocal.addCommutingFunction(function, pool);
+            if(tranlocal.isCommitted){
+                tranlocal.isCommitted = false;
+                hasUpdates = true;                
+            }
 
-            array[firstFreeIndex]=tranlocal;
-            firstFreeIndex++;
-            hasUpdates = true;
+            tranlocal.value = function.call(tranlocal.value);
             return;
         }
 
-        LongRefTranlocal tranlocal = (LongRefTranlocal)array[index];
-        if(tranlocal.isCommuting){
-            tranlocal.addCommutingFunction(function, pool);
-            return;
+        if(firstFreeIndex == array.length) {
+            throw abortOnTooSmallSize(array.length+1);
         }
 
-        if(tranlocal.isCommitted){
-            tranlocal.isCommitted = false;
-            hasUpdates = true;
-            array[index]=tranlocal;
+        LongRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new LongRefTranlocal(ref);
         }
+        tranlocal.isCommuting = true;
+        tranlocal.addCommutingFunction(function, pool);
 
-        tranlocal.value = function.call(tranlocal.value);
-  
-    }
+        array[firstFreeIndex] = tranlocal;
+        firstFreeIndex++;
+        hasUpdates = true;        
+  }
 
 
         
@@ -1948,41 +1958,42 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         final int index = indexOf(ref);
-        if(index == -1){
-            if(firstFreeIndex == array.length) {
-                throw abortOnTooSmallSize(array.length+1);
+        if(index > -1){
+            Tranlocal tranlocal = (Tranlocal)array[index];
+
+            if (index > 0) {
+                array[index] = array[0];
+                array[0] = tranlocal;
             }
 
-
-            Tranlocal tranlocal = pool.take(ref);
-            if(tranlocal == null){
-               tranlocal = ref.___newTranlocal();
+            if(tranlocal.isCommuting){
+                tranlocal.addCommutingFunction(function, pool);
+                return;
             }
 
-            tranlocal.isCommuting = true;
-            tranlocal.addCommutingFunction(function, pool);
+            if(tranlocal.isCommitted){
+                tranlocal.isCommitted = false;
+                hasUpdates = true;                
+            }
 
-            array[firstFreeIndex]=tranlocal;
-            firstFreeIndex++;
-            hasUpdates = true;
-            return;
+            throw new TodoException();
         }
 
-        Tranlocal tranlocal = (Tranlocal)array[index];
-        if(tranlocal.isCommuting){
-            tranlocal.addCommutingFunction(function, pool);
-            return;
+        if(firstFreeIndex == array.length) {
+            throw abortOnTooSmallSize(array.length+1);
         }
 
-        if(tranlocal.isCommitted){
-            tranlocal.isCommitted = false;
-            hasUpdates = true;
-            array[index]=tranlocal;
+        Tranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = ref.___newTranlocal();
         }
+        tranlocal.isCommuting = true;
+        tranlocal.addCommutingFunction(function, pool);
 
-        throw new TodoException();
-  
-    }
+        array[firstFreeIndex] = tranlocal;
+        firstFreeIndex++;
+        hasUpdates = true;        
+  }
 
  
     @Override
