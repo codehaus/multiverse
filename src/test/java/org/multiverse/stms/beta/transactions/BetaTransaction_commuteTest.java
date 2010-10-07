@@ -19,8 +19,8 @@ import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
@@ -95,7 +95,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
     public void whenCommuteThenConflictCounterNotSet() {
         assumeTrue(hasLocalConflictCounter());
         assumeTrue(isTransactionSupportingCommute());
-                
+
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = newTransaction();

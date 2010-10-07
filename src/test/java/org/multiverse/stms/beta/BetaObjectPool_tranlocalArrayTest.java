@@ -6,7 +6,7 @@ import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
 public class BetaObjectPool_tranlocalArrayTest {
     private BetaObjectPool pool;

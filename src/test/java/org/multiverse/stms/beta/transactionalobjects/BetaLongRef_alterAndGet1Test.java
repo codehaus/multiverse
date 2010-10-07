@@ -15,7 +15,7 @@ import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 

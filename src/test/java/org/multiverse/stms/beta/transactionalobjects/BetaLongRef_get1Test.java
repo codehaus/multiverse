@@ -13,8 +13,8 @@ import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
 /**
  * Tests the {@link BetaLongRef#get(BetaTransaction)}.

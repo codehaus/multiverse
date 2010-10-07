@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
 public class UncontendedAtomicIncBenchmark {

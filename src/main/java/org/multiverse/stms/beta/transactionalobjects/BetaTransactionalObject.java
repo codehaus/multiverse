@@ -19,6 +19,8 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
  */
 public interface BetaTransactionalObject extends DurableObject, TransactionalObject {
 
+    int VERSION_UNCOMMITTED = 0;
+
     /**
      * Gets the index that uniquely identifies this class. This index can be used to in arrays to collect
      * information about classes of transactional objects.
@@ -34,6 +36,8 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      */
     Orec ___getOrec();
 
+    long getVersion();
+
     Tranlocal ___newTranlocal();
 
     /**
@@ -42,19 +46,12 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * null.
      *
      * @param spinCount the number of times to spin when locked.
+     * @param newLockOwner
+     * @param lockMode
+     * @param tranlocal
      * @return true if it was a success, false otherwise.
      */
     boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, Tranlocal tranlocal);
-
-
-    /**
-     * Loads the current stored Tranlocal without any form of consistency guarantees. This method is purely
-     * meant for testing/debugging purposes.
-     *
-     * @return the current stored tranlocal.
-     */
-    @Deprecated
-    Tranlocal ___unsafeLoad();
 
     /**
      * Tries to acquire the lock and checks for conflict. It is safe to call this method when it already is
@@ -86,10 +83,9 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * object is locked, its value is undetermined.
      *
      * @param tranlocal   the Tranlocal to check if there is a read conflict
-     * @param transaction the transaction
      * @return true if there was a readconflict, false otherwise.
      */
-    boolean ___hasReadConflict(Tranlocal tranlocal, BetaTransaction transaction);
+    boolean ___hasReadConflict(Tranlocal tranlocal);
 
     /**
      * Commits the all the dirty changes. The call also needs to be done when the tranlocal is readonly and

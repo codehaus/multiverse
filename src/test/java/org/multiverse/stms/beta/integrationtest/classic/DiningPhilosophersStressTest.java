@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
 
 
 /**
@@ -97,7 +98,7 @@ public class DiningPhilosophersStressTest implements BetaStmConstants {
     public void createForks() {
         forks = new BetaIntRef[philosopherCount];
         for (int k = 0; k < forks.length; k++) {
-            forks[k] = BetaStmUtils.newIntRef(stm);
+            forks[k] = newIntRef(stm);
         }
     }
 

@@ -23,7 +23,8 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.newRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newRef;
 
 /**
  * A StressTest that simulates a database connection pool. The code is quite ugly, but that is because
@@ -86,7 +87,7 @@ public class ConnectionPoolStressTest implements BetaStmConstants {
 
         final AtomicBlock sizeBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
 
-        final BetaIntRef size = BetaStmUtils.newIntRef(stm);
+        final BetaIntRef size = newIntRef(stm);
         final BetaRef<Node<Connection>> head = newRef(stm);
 
         ConnectionPool(final int poolsize) {

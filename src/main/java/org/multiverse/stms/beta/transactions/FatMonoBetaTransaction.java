@@ -318,7 +318,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -641,7 +641,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -964,7 +964,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1287,7 +1287,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1610,7 +1610,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1929,7 +1929,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -2024,7 +2024,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             return false;
         }
 
-        return attached.owner.___hasReadConflict(attached, this);
+        return attached.owner.___hasReadConflict(attached);
     }
 
     // ============================= addWatch ===================================

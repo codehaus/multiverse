@@ -23,7 +23,8 @@ import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.newRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newRef;
 
 public class QueueWithCapacityStressTest implements BetaStmConstants {
 
@@ -111,7 +112,7 @@ public class QueueWithCapacityStressTest implements BetaStmConstants {
         final Stack<E> readyToPopStack = new Stack<E>();
         final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
         final AtomicBlock popBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
-        final BetaIntRef size = BetaStmUtils.newIntRef(stm);
+        final BetaIntRef size = newIntRef(stm);
 
         public void push(final E item) {
             pushBlock.execute(new AtomicVoidClosure() {

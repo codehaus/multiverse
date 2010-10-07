@@ -14,7 +14,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
 /**

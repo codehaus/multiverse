@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 
 /**
@@ -78,9 +78,10 @@ public class TestUtils implements MultiverseConstants {
     }
 
     public static void assertHasNormalListeners(BetaTransaction tx, TransactionLifecycleListener... listeners) {
-        List<TransactionLifecycleListener> l = (List<TransactionLifecycleListener>) getField(tx, "normalListeners");
+        List<TransactionLifecycleListener> l =
+                (List<TransactionLifecycleListener>) getField(tx, "normalListeners");
         if (l == null) {
-            l = new LinkedList();
+            l = new LinkedList<TransactionLifecycleListener>();
         }
         assertEquals(Arrays.asList(listeners), l);
     }
@@ -122,7 +123,7 @@ public class TestUtils implements MultiverseConstants {
     }
 
     public static void assertHasListeners(BetaTransactionalObject ref, Latch... listeners) {
-        Set<Latch> expected = new HashSet(Arrays.asList(listeners));
+        Set<Latch> expected = new HashSet<Latch>(Arrays.asList(listeners));
 
         Set<Latch> found = new HashSet<Latch>();
         Listeners l = (Listeners) getField(ref, "___listeners");
@@ -221,6 +222,7 @@ public class TestUtils implements MultiverseConstants {
         Bugshaker.sleepUs(us);
     }
 
+    //todo: should be moved to betastmtestutils.
     public static BetaLongRef createReadBiasedLongRef(BetaStm stm, long value) {
         BetaLongRef ref = newLongRef(stm, value);
 
@@ -243,7 +245,6 @@ public class TestUtils implements MultiverseConstants {
     public static boolean randomOneOf(int chance) {
         return randomInt(Integer.MAX_VALUE) % chance == 0;
     }
-
 
     public static long getStressTestDurationMs(long defaultDuration) {
         String value = System.getProperty("org.multiverse.integrationtest.durationMs", "" + defaultDuration);
@@ -284,21 +285,31 @@ public class TestUtils implements MultiverseConstants {
     /**
      * Joins all threads. If this can't be done within 5 minutes, an assertion failure is thrown.
      *
-     * @param threads
+     * @param threads the threads to join.
+     * @see #joinAll(long, TestThread...) for more specifics.
+     * @return the total duration of all threads (so the sum of the time each thread has been running.
      */
     public static long joinAll(TestThread... threads) {
-        return joinAll(5 * 60 * 1000, threads);
+        return joinAll(5 * 60,threads);
     }
 
+    /**
+     * Joins all threads. If one of the thread throws a throwable, the join will fail as well.
+     *
+     * @param timeoutSec the timeout in seconds. If the join doesn't complete within that time, the
+     *        join fails.
+     * @param threads the threads to join.
+     * @return the total duration of all threads (so the sum of the time each thread has been running.
+     */
     @SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})
-    public static long joinAll(long joinTimeoutMs, TestThread... threads) {
-        if (joinTimeoutMs < 0) {
+    public static long joinAll(long timeoutSec, TestThread... threads) {
+        if (timeoutSec < 0) {
             throw new IllegalArgumentException();
         }
 
-        List<TestThread> uncompleted = new LinkedList(Arrays.asList(threads));
+        List<TestThread> uncompleted = new LinkedList<TestThread>(Arrays.asList(threads));
 
-        long maxTimeMs = System.currentTimeMillis() + joinTimeoutMs;
+        long maxTimeMs = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(timeoutSec);
 
         long durationMs = 0;
 
@@ -309,7 +320,7 @@ public class TestUtils implements MultiverseConstants {
                     if (System.currentTimeMillis() > maxTimeMs) {
                         fail(String.format(
                                 "Failed to join all threads in %s ms, remaining threads %s",
-                                joinTimeoutMs, uncompleted));
+                                timeoutSec, uncompleted));
                     }
                     thread.join(100);
 

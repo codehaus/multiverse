@@ -12,6 +12,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
 /**
+ * Utility class for the BetaStm.
+ *
  * @author Peter Veentjer
  */
 public class BetaStmUtils implements BetaStmConstants {
@@ -20,91 +22,9 @@ public class BetaStmUtils implements BetaStmConstants {
         if (o == null) {
             return "null";
         } else {
-            return o.getClass().getName();
+            return o.getClass().getName()+"@"+System.identityHashCode(o);
         }
     }
-
-    public static void arbitraryUpdate(BetaStm stm, BetaLongRef ref) {
-        FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(ref, LOCKMODE_NONE);
-        tx.commit();
-    }
-
-    public static <E> BetaRef<E> newRef(BetaStm stm, E value) {
-        BetaTransaction tx = new LeanMonoBetaTransaction(stm);
-        BetaRef<E> ref = new BetaRef<E>(tx);
-        RefTranlocal<E> tranlocal = tx.openForConstruction(ref);
-        tranlocal.value = value;
-        tx.commit();
-        return ref;
-    }
-
-    public static BetaDoubleRef newDoubleRef(BetaStm stm, double value) {
-        BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        BetaDoubleRef ref = new BetaDoubleRef(tx);
-        DoubleRefTranlocal tranlocal = tx.openForConstruction(ref);
-        tranlocal.value = value;
-        tx.commit();
-        return ref;
-    }
-
-
-    public static BetaRef newRef(BetaStm stm) {
-        return newRef(stm, null);
-    }
-
-    public static BetaIntRef newIntRef(BetaStm stm) {
-        return newIntRef(stm, 0);
-    }
-
-    public static BetaIntRef newIntRef(BetaStm stm, int value) {
-        BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        BetaIntRef ref = new BetaIntRef(tx);
-        tx.openForConstruction(ref).value = value;
-        tx.commit();
-        return ref;
-    }
-
-
-    public static BetaLongRef newLongRef(BetaStm stm) {
-        return newLongRef(stm, 0);
-    }
-
-    public static void assertVersionAndValue(BetaLongRef ref, long version, long value) {
-        assertEquals("version doesn't match", version, ref.getVersion());
-        assertEquals("value doesn't match", value, ref.___weakRead());
-    }
-
-    public static void assertVersionAndValue(BetaRef ref, long version, Object value) {
-        assertEquals("version doesn't match", version, ref.getVersion());
-        assertSame("value doesn't match", value, ref.___weakRead());
-    }
-
-    public static BetaLongRef newReadBiasedLongRef(BetaStm stm, long value) {
-        BetaLongRef ref = newLongRef(stm, value);
-
-        for (int k = 0; k < ref.___getOrec().___getReadBiasedThreshold(); k++) {
-            BetaTransaction tx = new FatMonoBetaTransaction(stm);
-            ref.get(tx);
-            tx.commit();
-        }
-
-        return ref;
-    }
-
-    public static BetaLongRef newReadBiasedLongRef(BetaStm stm) {
-        return newReadBiasedLongRef(stm, 0);
-    }
-
-    public static BetaLongRef newLongRef(BetaStm stm, long value) {
-        BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal tranlocal = tx.openForConstruction(ref);
-        tranlocal.value = value;
-        tx.commit();
-        return ref;
-    }
-
 
     public static String format(double value) {
         return NumberFormat.getInstance(Locale.ENGLISH).format(value);

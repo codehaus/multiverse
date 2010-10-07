@@ -13,7 +13,9 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newReadBiasedLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**

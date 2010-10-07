@@ -16,7 +16,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.newIntRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
 
 /**
  * A StressTest that checks if a the Semaphore; a traditional synchronization structure can be build

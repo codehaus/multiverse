@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newReadBiasedLongRef;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
@@ -97,7 +98,7 @@ public class UncontendedFatReadBenchmark implements BetaStmConstants {
         }
 
         public void doRun() {
-            BetaLongRef ref = BetaStmUtils.newReadBiasedLongRef(stm);
+            BetaLongRef ref = newReadBiasedLongRef(stm);
 
             FatMonoBetaTransaction tx = new FatMonoBetaTransaction(new BetaTransactionConfiguration(stm).setReadonly(true));
             long startMs = System.currentTimeMillis();

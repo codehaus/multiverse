@@ -9,8 +9,8 @@ import org.multiverse.stms.beta.BetaStmConstants;
 import static org.junit.Assert.*;
 import static org.multiverse.api.functions.Functions.newIdentityLongFunction;
 import static org.multiverse.api.functions.Functions.newIncLongFunction;
-import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
 public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmConstants {
 

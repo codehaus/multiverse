@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
 
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
 public class BetaLongRef_atomicAddDeferredValidatorTest {
     private BetaStm stm;

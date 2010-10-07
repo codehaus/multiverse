@@ -273,7 +273,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //it was not previously attached to this transaction
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -500,7 +500,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //it was not previously attached to this transaction
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -727,7 +727,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //it was not previously attached to this transaction
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -954,7 +954,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //it was not previously attached to this transaction
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1181,7 +1181,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //it was not previously attached to this transaction
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1405,7 +1405,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //it was not previously attached to this transaction
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1489,7 +1489,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         for (int k = 0; k < firstFreeIndex; k++) {
             final Tranlocal tranlocal = array[k];
 
-            if (tranlocal.owner.___hasReadConflict(tranlocal, this)) {
+            if (tranlocal.owner.___hasReadConflict(tranlocal)) {
                 return true;
             }
         }

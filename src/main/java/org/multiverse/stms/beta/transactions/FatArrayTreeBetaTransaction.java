@@ -294,7 +294,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             return tranlocal;
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -576,7 +576,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             return tranlocal;
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -858,7 +858,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             return tranlocal;
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1140,7 +1140,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             return tranlocal;
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1422,7 +1422,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             return tranlocal;
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1700,7 +1700,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             return tranlocal;
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1868,7 +1868,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         for (int k = 0; k < array.length; k++) {
             final Tranlocal tranlocal = array[k];
-            if (tranlocal != null && tranlocal.owner.___hasReadConflict(tranlocal, this)) {
+            if (tranlocal != null && tranlocal.owner.___hasReadConflict(tranlocal)) {
                 return true;
             }
         }
@@ -2078,7 +2078,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
     }
 
-     private boolean doPrepareWithWriteSkewPrevention() {
+    private boolean doPrepareWithWriteSkewPrevention() {
         if(config.readLockMode == LOCKMODE_COMMIT){
             return true;
         }
@@ -2090,24 +2090,10 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
             if(tranlocal == null){
                 continue;
-            }else if(tranlocal.isCommitted){
-                if(!tranlocal.owner.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, true)){
-                    return false;
-                }
-            }else if(tranlocal.isCommuting){
-                if(!tranlocal.owner.___load(spinCount, this, LOCKMODE_COMMIT,tranlocal)){
-                    return false;
-                }
+            }
 
-                tranlocal.evaluateCommutingFunctions(pool);                
-            }else{
-                if(dirtyCheck){
-                    tranlocal.calculateIsDirty();
-                }
-
-                if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal, true)){
-                    return false;
-                }
+            if(!tranlocal.doPrepareWithWriteSkewPrevention(pool,this, config.spinCount, config.dirtyCheck)){
+                return false;
             }
         }
 

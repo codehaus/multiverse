@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.newRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newRef;
 
 public class QueueWithoutCapacityStressTest implements BetaStmConstants {
 

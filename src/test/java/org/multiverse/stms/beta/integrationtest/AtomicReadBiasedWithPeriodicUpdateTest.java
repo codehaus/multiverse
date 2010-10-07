@@ -8,7 +8,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class AtomicReadBiasedWithPeriodicUpdateTest {
@@ -35,10 +35,8 @@ public class AtomicReadBiasedWithPeriodicUpdateTest {
             }
         }
 
-        assertSurplus(1, ref);
-        //since no arrive/depart is done, the orec doesn't become read biased based on the
-        //atomicget.
-        assertReadBiased(ref);
+        assertSurplus(0, ref);
+        assertUpdateBiased(ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
 

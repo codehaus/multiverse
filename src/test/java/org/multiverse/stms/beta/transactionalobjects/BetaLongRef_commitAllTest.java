@@ -8,14 +8,13 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
-import org.multiverse.stms.beta.orec.Orec;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.getField;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
@@ -45,7 +44,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         LongRefTranlocal load = ref.___newTranlocal();
         ref.___load(1, null, LOCKMODE_NONE, load);
         ref.___registerChangeListener(latch, load, pool, listenerEra);
-        ref.___abort(null,load,pool);
+        ref.___abort(null, load, pool);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
@@ -67,7 +66,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         assertReadonlyCount(0, ref);
         assertFalse(latch.isOpen());
         assertEquals(listenerEra, latch.getEra());
-        assertVersionAndValue(ref, initialVersion + 1, initialValue+1);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
     }
 
     @Test
@@ -118,7 +117,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         assertNull(ref.___getLockOwner());
         assertSurplus(1, ref);
         assertReadonlyCount(1, ref);
-        assertVersionAndValue(ref, initialVersion , initialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test

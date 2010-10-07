@@ -15,6 +15,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
 
 public class ReadonlyRepeatableReadStressTest {
 
@@ -28,7 +29,7 @@ public class ReadonlyRepeatableReadStressTest {
     public void setUp() {
         clearThreadLocalTransaction();
         stm = new BetaStm();
-        ref = BetaStmUtils.newIntRef(stm);
+        ref = newIntRef(stm);
         stop = false;
     }
 

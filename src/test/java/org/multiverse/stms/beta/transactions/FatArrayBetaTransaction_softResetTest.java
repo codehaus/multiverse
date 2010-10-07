@@ -11,10 +11,8 @@ import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.multiverse.TestUtils.LOCKMODE_COMMIT;
-import static org.multiverse.TestUtils.LOCKMODE_NONE;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
@@ -27,7 +25,7 @@ public class FatArrayBetaTransaction_softResetTest {
     public void setUp() {
         stm = new BetaStm();
     }
- 
+
     @Test
     public void whenMaximumNumberOfRetriesReached() {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
@@ -165,7 +163,7 @@ public class FatArrayBetaTransaction_softResetTest {
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
-        assertVersionAndValue(ref, version,0);        
+        assertVersionAndValue(ref, version, 0);
         assertHasNoUpdates(tx);
     }
 

@@ -11,7 +11,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
 public class EnsureDeadLockStressTest {
 

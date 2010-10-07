@@ -11,8 +11,8 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmUtils.newRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaRef_atomicIsNullTest implements BetaStmConstants {

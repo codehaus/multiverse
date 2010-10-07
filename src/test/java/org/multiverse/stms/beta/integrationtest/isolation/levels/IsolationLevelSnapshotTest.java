@@ -15,7 +15,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
 public class IsolationLevelSnapshotTest {
     private BetaStm stm;
@@ -73,7 +73,7 @@ public class IsolationLevelSnapshotTest {
         ref2.incrementAndGet(tx, 1);
 
         ref1.atomicIncrementAndGet(1);
-                
+
         tx.commit();
 
         assertEquals(1, ref1.atomicGet());

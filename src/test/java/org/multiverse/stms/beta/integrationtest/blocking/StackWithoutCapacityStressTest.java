@@ -21,7 +21,7 @@ import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.newRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newRef;
 
 /**
  * The test is not very efficient since a lot of temporary objects like the transaction template are created.

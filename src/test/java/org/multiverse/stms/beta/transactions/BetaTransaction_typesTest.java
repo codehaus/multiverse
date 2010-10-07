@@ -9,6 +9,7 @@ import org.multiverse.stms.beta.transactionalobjects.*;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertEqualsDouble;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 import static org.multiverse.stms.beta.BetaStmUtils.*;
 
 public abstract class BetaTransaction_typesTest {
@@ -104,8 +105,7 @@ public abstract class BetaTransaction_typesTest {
         tx.commit();
 
         assertVersion(version+1, ref.getVersion());
-        assertEqualsDouble(20, ref.___weakRead());        
-
+        assertEqualsDouble(20, ref.___weakRead());
     }
 
     @Test

@@ -7,7 +7,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
 /**
  * @author Peter Veentjer

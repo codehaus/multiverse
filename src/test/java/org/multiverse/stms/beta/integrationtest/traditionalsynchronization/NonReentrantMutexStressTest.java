@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.newIntRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
 
 /**
  * A stresstest that checks if the NonReentrantMutex; a traditional synchronization structure, can be build

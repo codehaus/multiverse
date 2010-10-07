@@ -14,6 +14,9 @@ import static org.mockito.Mockito.verify;
 import static org.multiverse.TestUtils.LOCKMODE_COMMIT;
 import static org.multiverse.TestUtils.LOCKMODE_NONE;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newReadBiasedLongRef;
 import static org.multiverse.stms.beta.BetaStmUtils.*;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
@@ -73,7 +76,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
-        assertVersionAndValue(ref, version, 0);        
+        assertVersionAndValue(ref, version, 0);
         assertHasNoUpdates(tx);
     }
 

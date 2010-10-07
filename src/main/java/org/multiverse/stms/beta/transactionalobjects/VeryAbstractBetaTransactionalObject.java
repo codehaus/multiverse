@@ -43,9 +43,10 @@ public abstract class VeryAbstractBetaTransactionalObject
         if (stm == null) {
             throw new NullPointerException();
         }
-        this.___stm = stm;
+        this.___stm = stm;                
     }
 
+    @Override
     public long getVersion() {
         return ___version;
     }
@@ -189,8 +190,16 @@ public abstract class VeryAbstractBetaTransactionalObject
     }
 
     @Override
-    public final boolean ___hasReadConflict(final Tranlocal tranlocal, BetaTransaction removeMe) {
-        return !tranlocal.isLockOwner && tranlocal.version != ___version;
+    public final boolean ___hasReadConflict(final Tranlocal tranlocal) {
+        if(tranlocal.isLockOwner){
+            return false;
+        }
+
+        if(___hasCommitLock()){
+            return true;
+        }
+
+        return tranlocal.version != ___version;
     }
 
     @Override

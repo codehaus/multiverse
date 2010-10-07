@@ -14,6 +14,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
 
 public class DeadLockStressTest {
 
@@ -61,7 +62,7 @@ public class DeadLockStressTest {
 
         refs = new BetaIntRef[refCount];
         for (int k = 0; k < refCount; k++) {
-            refs[k] = BetaStmUtils.newIntRef(stm);
+            refs[k] = newIntRef(stm);
         }
 
         threads = new ChangeThread[threadCount];

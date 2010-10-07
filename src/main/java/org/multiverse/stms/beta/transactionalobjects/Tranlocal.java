@@ -11,6 +11,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
+ * The Tranlocal contains the transaction local state of a BetaTransactionalObject (so also the refs).
+ * It only exists when a transaction is running, and when it commits, the values it contains will be
+ * written to the BetaTransactionalObject if needed.
+ *
  * @author Peter Veentjer
  */
 public abstract class Tranlocal implements DurableState, BetaStmConstants {
@@ -36,12 +40,10 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
         return owner;
     }
 
-
     /**
      * Calculates if this Tranlocal is dirty (so needs to be written) and stores the result in the
-     * isDirty field.
-     * <p/>
-     * todo: say something about repeated calls.
+     * isDirty field. The call can be made more than once, but once it is marked as dirty, it will remain
+     * dirty.
      *
      * @return true if dirty, false otherwise.
      */
@@ -67,30 +69,36 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
      */
     public abstract void addCommutingFunction(Function function, BetaObjectPool pool);
 
-    /**
-     * Checks if this Tranlocal is committed.
-     *
-     * @return true if committed, false otherwise.
-     */
-    public final boolean isCommitted() {
-        return isCommitted;
-    }
+    public final boolean doPrepareWithWriteSkewPrevention(
+            final BetaObjectPool pool, final BetaTransaction tx, final int spinCount, final boolean dirtyCheck) {
 
-    /**
-     * Marks the tranlocal as read biased. The consequence of a read biased tranlocal is that no tracking
-     * is done on the number of reads (so arrives/departs are ignored). This is important for the tranlocal
-     * pooling; a read biased tranlocal can't be
-     * <p/>
-     * Once marked as permanent, it will never change.
-     */
-    public final void markAsPermanent() {
-        if (hasDepartObligation) {
-            return;
+        if (isConstructing) {
+            return true;
         }
-        this.hasDepartObligation = true;
+
+        if (isCommitted) {
+            return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
+        }
+
+        if (isCommuting) {
+            if (owner.___load(spinCount, tx, LOCKMODE_COMMIT, this)) {
+                return false;
+            }
+
+            evaluateCommutingFunctions(pool);
+            return true;
+        }
+
+        if (dirtyCheck) {
+            calculateIsDirty();
+        }
+
+        return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
     }
 
-    public final boolean doPrepareDirtyUpdates(final BetaObjectPool pool, BetaTransaction tx, int spinCount) {
+    public final boolean doPrepareDirtyUpdates(
+            final BetaObjectPool pool, final BetaTransaction tx, final int spinCount) {
+
         if (isCommitted || isConstructing) {
             return true;
         }
@@ -99,17 +107,22 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
             if (!owner.___load(spinCount, tx, LOCKMODE_COMMIT, this)) {
                 return false;
             }
+
             evaluateCommutingFunctions(pool);
-        } else if (!(isDirty || calculateIsDirty())) {
             return true;
-        } else if (!owner.___tryLockAndCheckConflict(tx, spinCount, this, true)) {
-            return false;
         }
 
-        return true;
+        if (!(isDirty || calculateIsDirty())) {
+            return true;
+        }
+
+        return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
+
     }
 
-    public final boolean doPrepareAllUpdates(final BetaObjectPool pool, BetaTransaction tx, int spinCount) {
+    public final boolean doPrepareAllUpdates(
+            final BetaObjectPool pool, BetaTransaction tx, int spinCount) {
+
         if (isCommitted || isConstructing) {
             return true;
         }
@@ -118,16 +131,13 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
             if (!owner.___load(spinCount, tx, LOCKMODE_COMMIT, this)) {
                 return false;
             }
+
             evaluateCommutingFunctions(pool);
-        } else if (!owner.___tryLockAndCheckConflict(tx, spinCount, this, true)) {
-            return false;
+            return true;
         }
 
-        return true;
-    }
+        return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
 
-    public final boolean isHasDepartObligation() {
-        return hasDepartObligation;
     }
 
     public Iterator<DurableObject> getReferences() {

@@ -22,8 +22,8 @@ import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public abstract class BetaTransaction_openForWriteTest implements BetaStmConstants {
@@ -810,7 +810,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
         assertIsActive(tx);
         assertNotNull(write);
-        assertFalse(write.isCommitted());
+        assertFalse(write.isCommitted);
         //todo:
         //assertSame(read, write.read);
         assertSame(ref, write.owner);
@@ -896,7 +896,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
         assertIsActive(tx);
         assertSame(write2, write1);
-        assertFalse(write2.isCommitted());
+        assertFalse(write2.isCommitted);
         assertAttached(tx, write2);
         assertHasUpdates(tx);
     }

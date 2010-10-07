@@ -24,8 +24,8 @@ import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public abstract class BetaTransaction_registerChangeListenerAndAbortTest implements BetaStmConstants {
@@ -212,7 +212,7 @@ public abstract class BetaTransaction_registerChangeListenerAndAbortTest impleme
 
         assertIsAborted(tx);
         assertHasNoListeners(ref);
-        assertHasCommitLock(ref);        
+        assertHasCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);

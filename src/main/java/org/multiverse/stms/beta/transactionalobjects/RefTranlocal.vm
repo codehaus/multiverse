@@ -15,8 +15,8 @@ public final class ${transactionalObject.tranlocal}${transactionalObject.typePar
 
     public ${transactionalObject.type} value;
     public ${transactionalObject.type} oldValue;
-    public ${transactionalObject.predicateClass}${transactionalObject.typeParameter}[] validators;    
-   
+    public ${transactionalObject.predicateClass}${transactionalObject.typeParameter}[] validators;
+
     public ${transactionalObject.tranlocal}(${transactionalObject.name} ref){
         super(ref);
     }
@@ -39,7 +39,7 @@ public final class ${transactionalObject.tranlocal}${transactionalObject.typePar
             pool.putCallableNode(old);
         }while(current != null);
 
-        value = newValue;     
+        value = newValue;
         isDirty = newValue != oldValue;
         isCommuting = false;
     }
@@ -64,7 +64,7 @@ public final class ${transactionalObject.tranlocal}${transactionalObject.typePar
         value = ${transactionalObject.initialValue};
         oldValue = ${transactionalObject.initialValue};
         owner = null;
-        isLockOwner = false;
+        lockMode = LOCKMODE_NONE;
         hasDepartObligation = false;
         isCommitted = false;
         isCommuting = false;
@@ -85,10 +85,6 @@ public final class ${transactionalObject.tranlocal}${transactionalObject.typePar
     public boolean calculateIsDirty() {
         if(isDirty){
             return true;
-        }
-
-        if (isCommitted) {
-            return false;
         }
 
         isDirty = value != oldValue;

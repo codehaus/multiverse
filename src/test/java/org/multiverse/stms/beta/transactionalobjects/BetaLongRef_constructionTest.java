@@ -8,7 +8,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_constructionTest implements BetaStmConstants {
@@ -34,7 +34,7 @@ public class BetaLongRef_constructionTest implements BetaStmConstants {
         assertHasNoCommitLock(ref);
         assertHasNoUpdateLock(ref);
         assertNull(ref.___getLockOwner());
-        assertVersionAndValue(ref, 0, 0);
+        assertVersionAndValue(ref, BetaTransactionalObject.VERSION_UNCOMMITTED+1, 0);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class BetaLongRef_constructionTest implements BetaStmConstants {
         assertHasNoCommitLock(ref);
         assertHasNoUpdateLock(ref);
         assertNull(ref.___getLockOwner());
-        assertVersionAndValue(ref, 0, 10);
+        assertVersionAndValue(ref, BetaTransactionalObject.VERSION_UNCOMMITTED+1, 10);
     }
 
     @Test

@@ -7,7 +7,7 @@ import org.multiverse.stms.beta.BetaStm;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
 public class VeryAbstractBetaTransactionalObject_isPrivatizedTest {
 

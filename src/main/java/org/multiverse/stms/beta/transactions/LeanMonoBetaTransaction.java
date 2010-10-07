@@ -228,7 +228,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -426,7 +426,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -624,7 +624,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -822,7 +822,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1020,7 +1020,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -1214,7 +1214,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___getLockOwner()!=this){
+        if(ref.___getLockOwner()!=this && ref.getVersion()==BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 

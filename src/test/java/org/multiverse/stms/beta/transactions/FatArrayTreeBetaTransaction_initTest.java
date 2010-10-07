@@ -10,7 +10,7 @@ import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 
 public class FatArrayTreeBetaTransaction_initTest {
@@ -76,7 +76,7 @@ public class FatArrayTreeBetaTransaction_initTest {
 
         assertHasNoCommitLock(ref);
     }
- 
+
     @Test
     public void whenAborted() {
         BetaLongRef ref = newLongRef(stm);

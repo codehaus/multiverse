@@ -12,8 +12,8 @@ import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
 /**
  * Tests {@link BetaLongRef}
@@ -119,6 +119,6 @@ public class BetaLongRef_getAndIncrement2Test {
 
         assertIsCommitted(tx);
         assertEquals(10, result);
-        assertVersionAndValue(ref, version+1, 30);        
+        assertVersionAndValue(ref, version+1, 30);
     }
 }

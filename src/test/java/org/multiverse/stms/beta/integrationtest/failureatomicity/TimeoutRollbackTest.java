@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
 
 public class TimeoutRollbackTest {
     private BetaIntRef modifyRef;
@@ -27,8 +28,8 @@ public class TimeoutRollbackTest {
     public void setUp() {
         clearThreadLocalTransaction();
         stm = new BetaStm();
-        modifyRef = BetaStmUtils.newIntRef(stm);
-        awaitRef = BetaStmUtils.newIntRef(stm);
+        modifyRef = newIntRef(stm);
+        awaitRef = newIntRef(stm);
     }
 
     @Test

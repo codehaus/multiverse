@@ -17,6 +17,7 @@ import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
 
 public class TooManyRetriesRollbackTest {
     private BetaIntRef modifyRef;
@@ -28,8 +29,8 @@ public class TooManyRetriesRollbackTest {
     public void setUp() {
         clearThreadLocalTransaction();
         stm = new BetaStm();
-        modifyRef = BetaStmUtils.newIntRef(stm);
-        retryRef = BetaStmUtils.newIntRef(stm);
+        modifyRef = newIntRef(stm);
+        retryRef = newIntRef(stm);
         finished = false;
     }
 

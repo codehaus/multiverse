@@ -2,24 +2,9 @@ package org.multiverse.stms.beta.durability;
 
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Test;
-import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.durability.DurableObjectLoader;
-import org.multiverse.durability.DurableObjectSerializer;
 import org.multiverse.durability.SimpleStorage;
-import org.multiverse.durability.UnitOfWrite;
-import org.multiverse.durability.account.SerializeUtils;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
 
 @Ignore
 public class SimpleDurabilityIntegrationTest implements BetaStmConstants{
@@ -30,10 +15,11 @@ public class SimpleDurabilityIntegrationTest implements BetaStmConstants{
     public void setUp() {
         stm = new BetaStm();
         storage = new SimpleStorage(stm);
-        storage.register(BetaLongRef.class, new LongRefSerializer());
+    //    storage.register(BetaLongRef.class, new LongRefSerializer());
         storage.clear();
     }
 
+    /*
     @Test
     public void whenSingleItemWritten() {
         BetaLongRef ref = newLongRef(stm, 100);
@@ -121,5 +107,5 @@ public class SimpleDurabilityIntegrationTest implements BetaStmConstants{
             ref.___setStorageId(id);
             return ref;
         }
-    }
+    }          */
 }

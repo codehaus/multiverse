@@ -16,6 +16,7 @@ import static org.multiverse.TestUtils.assertAlive;
 import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
 
 public class RetryInterruptibleTest {
 
@@ -26,7 +27,7 @@ public class RetryInterruptibleTest {
     public void setUp() {
         clearThreadLocalTransaction();
         stm = new BetaStm();
-        ref = BetaStmUtils.newIntRef(stm);
+        ref = newIntRef(stm);
     }
 
     @Test

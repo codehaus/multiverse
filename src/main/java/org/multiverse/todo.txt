@@ -116,7 +116,6 @@ performance.
 
 todo
 
-
 - mono transaction: support for orelse
 
 - array transaction:  support for orelse
@@ -125,8 +124,8 @@ todo
 
 - unshared atomicget, with periodic atomicset.
 
-- mono transaction can do a cheap read of the current tranlocal already is permanent.
-    - can only be done if a permanent tranlocal is never pooled.
+- mono transaction can do a cheap read of the current tranlocal already is permanent:
+  this is because no consistency guaranteed need to be provided.
 
 - transaction completely optimized for ref.
 
@@ -245,9 +244,7 @@ neer gezet?
 
 - join all is allowed to complete even when there are exceptions, so also a join without exception
 
-- pooling: array transaction only needs fixed size array for listeners
-
-- fix all remaining failing tests 
+- fix all remaining failing tests
 
 - doPrepareWithWriteSkewPrevention needs to be moved to the tranlocal.
 
@@ -257,9 +254,11 @@ neer gezet?
 
 - ref commit dirty needs to be tested better
 
-- tranlocal.prepareAllDirty needs to be tested
+- tranlocal.prepareAll needs to be tested
 
-- tranlocal.prepareDirty needs to be tested better
+- tranlocal.prepareDirty needs to be tested
+
+- tranlocal.prepareWithWriteSkewPrevention needs to be tested.
 
 - functionality with dirty and non dirty needs to be tested better
 
@@ -269,14 +268,32 @@ neer gezet?
 
 - testing: prepare and writeskew
 
-- atomic get and backoff policy should be added again.
-
-- openForConstruction and value that already have a commit: checking only on lock owner could
-lead to accepting an already opened for read/or opened for write which is locked.
+- improved testing with openForConstruction and illegal refs (so that have been locked..
+by another or by itself and either are committed or not).
 
 - integration tests should touch all transaction implementations.
 
 done
+
+- more cleanup of the tranlocal (removed unused methods and improved javadoc).
+
+- moved the prepareWithWriteSkew to the tranlocal 
+
+- openForConstruction and value that already have a commit: checking only on lock owner could
+lead to accepting an already opened for read/or opened for write which is locked. Version should
+be checked.
+
+- transaction is now removed from hasConflict.
+
+- atomic get and backoff policy should be added again.
+
+- pooling: array transaction only needs fixed size array for refs: already done
+
+- has readconflict should be moved to tranlocal instead of ref.
+
+- has conflict on ref should include locks
+
+- ref.unsafe load is now removed
 
 - all tests for transactions up and running.
 

@@ -10,7 +10,7 @@ import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_hasReadConflictTest implements BetaStmConstants {
@@ -29,7 +29,7 @@ public class BetaLongRef_hasReadConflictTest implements BetaStmConstants {
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
-        boolean hasReadConflict = ref.___hasReadConflict(read, tx);
+        boolean hasReadConflict = ref.___hasReadConflict(read);
 
         assertFalse(hasReadConflict);
         assertSurplus(1, ref);
@@ -45,7 +45,7 @@ public class BetaLongRef_hasReadConflictTest implements BetaStmConstants {
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
-        boolean hasReadConflict = ref.___hasReadConflict(write, tx);
+        boolean hasReadConflict = ref.___hasReadConflict(write);
 
         assertFalse(hasReadConflict);
         assertSurplus(1, ref);
@@ -61,7 +61,7 @@ public class BetaLongRef_hasReadConflictTest implements BetaStmConstants {
         BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal read = tx.openForRead(ref, LOCKMODE_COMMIT);
 
-        boolean hasConflict = ref.___hasReadConflict(read, tx);
+        boolean hasConflict = ref.___hasReadConflict(read);
 
         assertFalse(hasConflict);
         assertSurplus(1, ref);
@@ -77,7 +77,7 @@ public class BetaLongRef_hasReadConflictTest implements BetaStmConstants {
         BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal read = tx.openForRead(ref, LOCKMODE_UPDATE);
 
-        boolean hasConflict = ref.___hasReadConflict(read, tx);
+        boolean hasConflict = ref.___hasReadConflict(read);
 
         assertFalse(hasConflict);
         assertSurplus(1, ref);
@@ -96,7 +96,7 @@ public class BetaLongRef_hasReadConflictTest implements BetaStmConstants {
         //conflicting update
         ref.atomicIncrementAndGet(1);
 
-        boolean hasConflict = ref.___hasReadConflict(read, tx);
+        boolean hasConflict = ref.___hasReadConflict(read);
         assertTrue(hasConflict);
         assertSurplus(1, ref);
         assertHasNoCommitLock(ref);
@@ -110,7 +110,7 @@ public class BetaLongRef_hasReadConflictTest implements BetaStmConstants {
         BetaLongRef ref = new BetaLongRef(tx);
         LongRefTranlocal tranlocal = tx.openForConstruction(ref);
 
-        boolean conflict = ref.___hasReadConflict(tranlocal, tx);
+        boolean conflict = ref.___hasReadConflict(tranlocal);
 
         assertFalse(conflict);
         assertSurplus(1, ref);
@@ -133,7 +133,7 @@ public class BetaLongRef_hasReadConflictTest implements BetaStmConstants {
         BetaTransaction otherTx = new FatMonoBetaTransaction(stm);
         ref.privatize(otherTx);
 
-        boolean hasConflict = ref.___hasReadConflict(read, tx);
+        boolean hasConflict = ref.___hasReadConflict(read);
 
         assertTrue(hasConflict);
         assertSurplus(2, ref);
@@ -156,7 +156,7 @@ public class BetaLongRef_hasReadConflictTest implements BetaStmConstants {
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.ensure(otherTx);
 
-        boolean hasConflict = ref.___hasReadConflict(read, tx);
+        boolean hasConflict = ref.___hasReadConflict(read);
 
         assertTrue(hasConflict);
         assertSurplus(2, ref);
@@ -175,7 +175,7 @@ public class BetaLongRef_hasReadConflictTest implements BetaStmConstants {
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, LOCKMODE_COMMIT);
 
-        boolean hasReadConflict = ref.___hasReadConflict(tranlocal, tx);
+        boolean hasReadConflict = ref.___hasReadConflict(tranlocal);
 
         assertTrue(hasReadConflict);
     }
@@ -190,7 +190,7 @@ public class BetaLongRef_hasReadConflictTest implements BetaStmConstants {
         BetaTransaction otherTx = stm.startDefaultTransaction();
         LongRefTranlocal read = otherTx.openForRead(ref, LOCKMODE_NONE);
 
-        boolean hasConflict = ref.___hasReadConflict(read, tx);
+        boolean hasConflict = ref.___hasReadConflict(read);
 
         assertFalse(hasConflict);
         assertSurplus(2, ref);
@@ -209,7 +209,7 @@ public class BetaLongRef_hasReadConflictTest implements BetaStmConstants {
         BetaTransaction otherTx = stm.startDefaultTransaction();
         LongRefTranlocal read = otherTx.openForRead(ref, LOCKMODE_NONE);
 
-        boolean hasConflict = ref.___hasReadConflict(read, tx);
+        boolean hasConflict = ref.___hasReadConflict(read);
 
         assertFalse(hasConflict);
         assertSurplus(2, ref);

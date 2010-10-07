@@ -9,8 +9,8 @@ import java.util.concurrent.TimeUnit;
 
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newReadBiasedLongRef;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
-import static org.multiverse.stms.beta.BetaStmUtils.newReadBiasedLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
 public class UncontendedWeakGetBenchmark {
@@ -95,7 +95,7 @@ public class UncontendedWeakGetBenchmark {
             long startMs = System.currentTimeMillis();
 
             for (long k = 0; k < transactionCount; k++) {
-                ref.atomicWeakGet();                
+                ref.atomicWeakGet();
             }
 
             durationMs = System.currentTimeMillis() - startMs;

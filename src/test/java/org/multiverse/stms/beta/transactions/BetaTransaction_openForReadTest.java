@@ -22,8 +22,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.functions.Functions.newIncLongFunction;
-import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 
@@ -281,7 +281,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertIsActive(tx);
-        assertVersionAndValue(ref, 0, 0);        
+        assertVersionAndValue(ref, 0, 0);
         assertAttached(tx, read);
     }
 
@@ -472,7 +472,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         assertEquals(100, read2.value);
 
         assertIsActive(tx);
-                        
+
         assertHasUpdateLock(ref);
         assertHasNoCommitLock(ref);
         assertSame(other, ref.___getLockOwner());
@@ -579,7 +579,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         assertUpdateBiased(ref);
         assertSame(tx, ref.___getLockOwner());
 
-        assertSurplus(1, ref);                
+        assertSurplus(1, ref);
     }
 
     @Test
@@ -869,7 +869,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         assertUpdateBiased(ref);
         assertIsActive(tx);
         assertNull(ref.___getLockOwner());
-        assertVersionAndValue(ref, version, 101);        
+        assertVersionAndValue(ref, version, 101);
         assertAttached(tx, read1);
     }
 

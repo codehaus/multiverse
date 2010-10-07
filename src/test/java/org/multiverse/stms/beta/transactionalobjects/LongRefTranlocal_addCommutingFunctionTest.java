@@ -10,7 +10,7 @@ import org.multiverse.stms.beta.BetaStm;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.assertHasCommutingFunctions;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
 public class LongRefTranlocal_addCommutingFunctionTest {
 
@@ -52,7 +52,7 @@ public class LongRefTranlocal_addCommutingFunctionTest {
 
         assertFalse(tranlocal.isCommitted);
         assertTrue(tranlocal.isCommuting);
-        assertEquals(0, tranlocal.value);        
+        assertEquals(0, tranlocal.value);
         assertHasCommutingFunctions(tranlocal, function3, function2, function1);
     }
 }

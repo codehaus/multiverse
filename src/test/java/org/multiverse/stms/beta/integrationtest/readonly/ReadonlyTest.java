@@ -16,7 +16,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.newIntRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
 
 public class ReadonlyTest {
 
@@ -30,7 +30,7 @@ public class ReadonlyTest {
 
     @Test
     public void whenReadonly_thenUpdateFails() {
-        BetaIntRef ref = BetaStmUtils.newIntRef(stm);
+        BetaIntRef ref = newIntRef(stm);
         try {
             updateInReadonlyMethod(ref, 10);
             fail();
@@ -188,7 +188,7 @@ public class ReadonlyTest {
 
     @Test
     public void whenUpdate_thenUpdateSucceeds() {
-        BetaIntRef ref = BetaStmUtils.newIntRef(stm);
+        BetaIntRef ref = newIntRef(stm);
         updateInUpdateMethod(ref, 10);
         assertEquals(10, ref.atomicGet());
     }
@@ -210,7 +210,7 @@ public class ReadonlyTest {
 
     @Test
     public void whenDefault_thenUpdateSuccess() {
-        BetaIntRef ref = BetaStmUtils.newIntRef(stm);
+        BetaIntRef ref = newIntRef(stm);
         defaultTransactionalMethod(ref);
 
         assertEquals(1, ref.atomicGet());

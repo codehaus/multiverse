@@ -10,7 +10,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
 
 public class BetaLongRef_updatePerformanceTest implements BetaStmConstants {
@@ -55,7 +55,7 @@ public class BetaLongRef_updatePerformanceTest implements BetaStmConstants {
 
         BetaTransaction tx = stm.startDefaultTransaction();
         BetaObjectPool pool = tx.getPool();
-        
+
         long transactionCount = 1000 * 1000 * 1000;
         long startMs = System.currentTimeMillis();
         for (long k = 0; k < transactionCount; k++) {

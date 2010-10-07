@@ -74,7 +74,7 @@ public final class BetaRef<E>
         super(stm);
 
         ___value = initialValue;
-        ___version = 0;         
+        ___version = VERSION_UNCOMMITTED+1;         
     }
 
 
@@ -163,13 +163,7 @@ public final class BetaRef<E>
             return true;
         }
    }
-
-    @Override
-    public final RefTranlocal<E> ___unsafeLoad() {
-        //return ___value;
-        throw new TodoException();
-    }
-
+   
     @Override
     public final Listeners ___commitDirty(
             final Tranlocal tranlocal,
@@ -573,8 +567,7 @@ public final class BetaRef<E>
         ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
 
         if(listeners!=null){
-            BetaObjectPool pool = getThreadLocalBetaObjectPool();                                            
-            listeners.openAll(pool);
+           listeners.openAll(getThreadLocalBetaObjectPool());
         }
 
         return returnOld ? oldValue : newValue;
@@ -662,8 +655,7 @@ public final class BetaRef<E>
         ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
 
         if(listeners!=null){
-            BetaObjectPool pool = getThreadLocalBetaObjectPool();                      
-            listeners.openAll(pool);
+            listeners.openAll(getThreadLocalBetaObjectPool());
         }
 
         return true;
@@ -723,6 +715,7 @@ public final class BetaRef<E>
                     return read;
                 }
             }
+            ___stm.defaultBackoffPolicy.delayedUninterruptible(attempt);
             attempt++;
         }while(attempt<=___stm.spinCount);
 

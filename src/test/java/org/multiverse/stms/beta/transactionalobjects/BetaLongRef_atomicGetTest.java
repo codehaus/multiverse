@@ -8,7 +8,9 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.BetaStmUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newReadBiasedLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
@@ -132,9 +134,9 @@ public class BetaLongRef_atomicGetTest {
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.ensure(otherTx);
 
-        long result =    ref.atomicGet();
+        long result = ref.atomicGet();
 
-        assertEquals(100,result);
+        assertEquals(100, result);
         assertSurplus(1, ref);
         assertSame(otherTx, ref.___getLockOwner());
         assertReadBiased(ref);

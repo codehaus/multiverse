@@ -15,6 +15,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
 
 /**
  * A Stresstest that check if the it is possible that a dirty read is done (this is not allowed).
@@ -34,7 +35,7 @@ public class ReadCommittedStressTest {
     public void setUp() {
         clearThreadLocalTransaction();
         stm = new BetaStm();
-        ref = BetaStmUtils.newIntRef(stm);
+        ref = newIntRef(stm);
         stop = false;
     }
 

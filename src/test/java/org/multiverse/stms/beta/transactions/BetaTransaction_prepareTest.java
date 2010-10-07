@@ -16,8 +16,8 @@ import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.functions.Functions.newIncLongFunction;
-import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
@@ -149,7 +149,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         assertEquals(10, write.oldValue);
         assertEquals(11, write.value);
         assertEquals(version, write.version);
-        
+
         assertIsPrepared(tx);
         assertHasCommitLock(ref);
         assertHasNoUpdateLock(ref);
@@ -519,6 +519,12 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
 
         tx1.prepare();
         tx2.prepare();
+    }
+
+    @Test
+    @Ignore
+    public void writeSkew(){
+
     }
 
     @Test

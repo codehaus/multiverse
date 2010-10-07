@@ -10,7 +10,7 @@ import static java.lang.System.currentTimeMillis;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondPerThreadAsString;
 
@@ -29,7 +29,7 @@ public class AtomicIncrementIsolationStressTest {
         int threadCount = 2;
         UpdateThread[] threads = new UpdateThread[threadCount];
         BetaLongRef ref = newLongRef(stm);
-        long transactionsPerThread = 100 * 1000 * 1000;
+        long transactionsPerThread = 500 * 1000 * 1000;
 
         for (int k = 0; k < threads.length; k++) {
             threads[k] = new UpdateThread(k, ref, transactionsPerThread);
@@ -39,7 +39,7 @@ public class AtomicIncrementIsolationStressTest {
             thread.start();
         }
 
-        joinAll(threads);
+        joinAll(10 * 60,threads);
         long totalDurationMs = 0;
         for (UpdateThread thread : threads) {
             totalDurationMs += thread.durationMs;

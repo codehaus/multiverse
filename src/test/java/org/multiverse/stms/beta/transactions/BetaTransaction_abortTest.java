@@ -17,8 +17,8 @@ import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 import static org.multiverse.MultiverseConstants.LOCKMODE_NONE;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public abstract class BetaTransaction_abortTest {
@@ -227,7 +227,7 @@ public abstract class BetaTransaction_abortTest {
         assertHasNoCommitLock(ref);
         assertHasNoUpdateLock(ref);
         assertNull(ref.___getLockOwner());
-        assertVersionAndValue(ref, version, 0);        
+        assertVersionAndValue(ref, version, 0);
         assertSurplus(0, ref);
 
         assertReadonlyCount(oldReadonlyCount, ref);
