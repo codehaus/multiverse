@@ -1,8 +1,8 @@
 package org.multiverse.api.exceptions;
 
 /**
- * An {@link Error} that indicates that a load a transactional object using a transaction failed. See
- * the ControlFlowError of this error for more details about these situations.
+ * An {@link ControlFlowError} that indicates that a load a transactional object using a transaction failed.
+ * See the ControlFlowError of this error for more details about these situations.
  * <p/>
  * A ReadWriteConflict can in most cases be solved by retrying the transaction.
  *

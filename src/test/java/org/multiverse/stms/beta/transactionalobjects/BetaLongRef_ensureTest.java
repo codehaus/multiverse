@@ -5,9 +5,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.NoTransactionFoundException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
+import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -52,7 +52,7 @@ public class BetaLongRef_ensureTest {
         try {
             ref.ensure();
             fail();
-        } catch (NoTransactionFoundException expected) {
+        } catch (TransactionRequiredException expected) {
         }
 
         assertUpdateBiased(ref);

@@ -137,8 +137,6 @@ todo
 
 - transaction completely optimized for ref.
 
-- integratie into the main multiverse branch
-
 - tracing
 
 - when hard reset is done, no new local conflict counter is created, so still attached to the old
@@ -177,8 +175,6 @@ the task not being executed at all.
 - when all reads/writes are pessimistic, cheap conflict detection and cheap prepare.
 
 - pooling for generic transactional object tranlocals.
-
-- generate the refs/reffactory instead of writing them manually.
 
 - should the retry by added to the transaction? Makes it easier to figure out when a retry is done when
 and not allowed. So not throw the retry error immediately..
@@ -275,7 +271,19 @@ by another or by itself and either are committed or not).
 is privatized. This information needs to be stored in the tranlocal, so instead of storing if it is
 the lockowner, the lockmode needs to be stored.
 
+- regression test for the speculative failure and atomic block updating the transaction on the threadlocal
+
 done
+
+- update javadoc on non atomic methods on ref with missing transaction.
+
+- generate reffactory instead of writing them manually.
+
+- ref is generated
+
+- have a look at the exception hierarchy
+
+- refs now throw exception when no transaction found instead of executing the method atomically.
 
 - still an isolation problem present, see the readers/writers test
 

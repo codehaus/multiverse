@@ -6,7 +6,7 @@ package org.multiverse.api.exceptions;
  *
  * @author Peter Veentjer.
  */
-public class PropagationException extends IllegalStateException {
+public class PropagationException extends TransactionalExecutionException {
 
     /**
      * Creates a new PropagationException.

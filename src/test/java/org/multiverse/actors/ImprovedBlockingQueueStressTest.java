@@ -1,20 +1,21 @@
 package org.multiverse.actors;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStmUtils;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alarmnummer
- * Date: Sep 21, 2010
- * Time: 10:35:05 PM
- * To change this template use File | Settings | File Templates.
- */
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+
 public class ImprovedBlockingQueueStressTest {
 
     private final long transactionCount = 50 * 1000 * 1000;
+
+    @Before
+    public void setUp(){
+        clearThreadLocalTransaction();
+    }
 
     @Test
     public void run() throws InterruptedException {

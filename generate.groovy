@@ -95,10 +95,12 @@ generateArrayTransaction(engine, refs, leanArrayTransaction)
 generateArrayTransaction(engine, refs, fatArrayTransaction)
 generateArrayTreeTransaction(engine, refs, leanArrayTreeTransaction)
 generateArrayTreeTransaction(engine, refs, fatArrayTreeTransaction)
+generateRefFactory(engine, refs);
 
 for (def param in refs) {
   generateTranlocal(engine, param)
-  generateTransactionalObject(engine, param)
+  generateBetaTransactionalObject(engine, param)
+  generateRefs(engine, param)
   generatePredicate(engine, param)
   generateFunction(engine, param)
 }
@@ -117,7 +119,7 @@ def abstractTransactionalObject = new TransactionalObject(
         isNumber: false
 )
 
-generateTransactionalObject(engine, abstractTransactionalObject)
+generateBetaTransactionalObject(engine, abstractTransactionalObject)
 
 generateBetaTransactionPool(engine, transactions)
 generateBetaObjectPool(engine, refs)
@@ -260,10 +262,10 @@ List<TransactionalObject> createTransactionalObjects() {
 }
 
 void generateAtomicClosure(VelocityEngine engine, AtomicClosure closure) {
-  Template t = engine.getTemplate("src/main/java/org/multiverse/api/closures/AtomicClosure.vm")
+  Template t = engine.getTemplate('src/main/java/org/multiverse/api/closures/AtomicClosure.vm')
 
   VelocityContext context = new VelocityContext()
-  context.put("closure", closure)
+  context.put('closure', closure)
 
   StringWriter writer = new StringWriter()
   t.merge(context, writer)
@@ -274,11 +276,11 @@ void generateAtomicClosure(VelocityEngine engine, AtomicClosure closure) {
 }
 
 void generateBetaAtomicBlock(VelocityEngine engine, AtomicBlock atomicBlock, List<AtomicClosure> closures) {
-  Template t = engine.getTemplate("src/main/java/org/multiverse/stms/beta/BetaAtomicBlock.vm")
+  Template t = engine.getTemplate('src/main/java/org/multiverse/stms/beta/BetaAtomicBlock.vm')
 
   VelocityContext context = new VelocityContext()
-  context.put("atomicBlock", atomicBlock)
-  context.put("closures", closures)
+  context.put('atomicBlock', atomicBlock)
+  context.put('closures', closures)
 
   StringWriter writer = new StringWriter()
   t.merge(context, writer)
@@ -289,10 +291,10 @@ void generateBetaAtomicBlock(VelocityEngine engine, AtomicBlock atomicBlock, Lis
 }
 
 void generateAtomicBlock(VelocityEngine engine, List<AtomicClosure> closures) {
-  Template t = engine.getTemplate("src/main/java/org/multiverse/api/AtomicBlock.vm")
+  Template t = engine.getTemplate('src/main/java/org/multiverse/api/AtomicBlock.vm')
 
   VelocityContext context = new VelocityContext()
-  context.put("closures", closures)
+  context.put('closures', closures)
 
   StringWriter writer = new StringWriter()
   t.merge(context, writer)
@@ -303,10 +305,10 @@ void generateAtomicBlock(VelocityEngine engine, List<AtomicClosure> closures) {
 }
 
 void generateStmUtils(VelocityEngine engine, List<AtomicClosure> closures) {
-  Template t = engine.getTemplate("src/main/java/org/multiverse/api/StmUtils.vm")
+  Template t = engine.getTemplate('src/main/java/org/multiverse/api/StmUtils.vm')
 
   VelocityContext context = new VelocityContext()
-  context.put("closures", closures)
+  context.put('closures', closures)
 
   StringWriter writer = new StringWriter()
   t.merge(context, writer)
@@ -317,10 +319,10 @@ void generateStmUtils(VelocityEngine engine, List<AtomicClosure> closures) {
 }
 
 void generateBetaTransactionPool(VelocityEngine engine, List<Transaction> transactions) {
-  Template t = engine.getTemplate("src/main/java/org/multiverse/stms/beta/transactions/BetaTransactionPool.vm")
+  Template t = engine.getTemplate('src/main/java/org/multiverse/stms/beta/transactions/BetaTransactionPool.vm')
 
   VelocityContext context = new VelocityContext()
-  context.put("transactions", transactions)
+  context.put('transactions', transactions)
 
   StringWriter writer = new StringWriter()
   t.merge(context, writer)
@@ -331,10 +333,10 @@ void generateBetaTransactionPool(VelocityEngine engine, List<Transaction> transa
 }
 
 void generateBetaObjectPool(VelocityEngine engine, List<TransactionalObject> transactionalObjects) {
-  Template t = engine.getTemplate("src/main/java/org/multiverse/stms/beta/BetaObjectPool.vm")
+  Template t = engine.getTemplate('src/main/java/org/multiverse/stms/beta/BetaObjectPool.vm')
 
   VelocityContext context = new VelocityContext()
-  context.put("transactionalObjects", transactionalObjects)
+  context.put('transactionalObjects', transactionalObjects)
 
   StringWriter writer = new StringWriter()
   t.merge(context, writer)
@@ -346,11 +348,11 @@ void generateBetaObjectPool(VelocityEngine engine, List<TransactionalObject> tra
 
 
 void generateTransaction(VelocityEngine engine, List<TransactionalObject> transactionalObjects, List<Transaction> transactions) {
-  Template t = engine.getTemplate("src/main/java/org/multiverse/stms/beta/transactions/BetaTransaction.vm")
+  Template t = engine.getTemplate('src/main/java/org/multiverse/stms/beta/transactions/BetaTransaction.vm')
 
   VelocityContext context = new VelocityContext()
-  context.put("transactionalObjects", transactionalObjects)
-  context.put("transactions", transactions)
+  context.put('transactionalObjects', transactionalObjects)
+  context.put('transactions', transactions)
 
   StringWriter writer = new StringWriter()
   t.merge(context, writer)
@@ -361,11 +363,11 @@ void generateTransaction(VelocityEngine engine, List<TransactionalObject> transa
 }
 
 void generateArrayTransaction(VelocityEngine engine, List<TransactionalObject> transactionalObjects, Transaction tx) {
-  Template t = engine.getTemplate("src/main/java/org/multiverse/stms/beta/transactions/ArrayBetaTransaction.vm")
+  Template t = engine.getTemplate('src/main/java/org/multiverse/stms/beta/transactions/ArrayBetaTransaction.vm')
 
   VelocityContext context = new VelocityContext()
-  context.put("transactionalObjects", transactionalObjects)
-  context.put("transaction", tx)
+  context.put('transactionalObjects', transactionalObjects)
+  context.put('transaction', tx)
 
   StringWriter writer = new StringWriter()
   t.merge(context, writer)
@@ -376,11 +378,11 @@ void generateArrayTransaction(VelocityEngine engine, List<TransactionalObject> t
 }
 
 void generateArrayTreeTransaction(VelocityEngine engine, List<TransactionalObject> transactionalObjects, Transaction tx) {
-  Template t = engine.getTemplate("src/main/java/org/multiverse/stms/beta/transactions/ArrayTreeBetaTransaction.vm")
+  Template t = engine.getTemplate('src/main/java/org/multiverse/stms/beta/transactions/ArrayTreeBetaTransaction.vm')
 
   VelocityContext context = new VelocityContext()
-  context.put("transactionalObjects", transactionalObjects)
-  context.put("transaction", tx)
+  context.put('transactionalObjects', transactionalObjects)
+  context.put('transaction', tx)
 
   StringWriter writer = new StringWriter()
   t.merge(context, writer)
@@ -391,11 +393,11 @@ void generateArrayTreeTransaction(VelocityEngine engine, List<TransactionalObjec
 }
 
 void generateMonoTransaction(VelocityEngine engine, List<TransactionalObject> transactionalObjects, Transaction tx) {
-  Template t = engine.getTemplate("src/main/java/org/multiverse/stms/beta/transactions/MonoBetaTransaction.vm")
+  Template t = engine.getTemplate('src/main/java/org/multiverse/stms/beta/transactions/MonoBetaTransaction.vm')
 
   VelocityContext context = new VelocityContext()
-  context.put("transactionalObjects", transactionalObjects)
-  context.put("transaction", tx)
+  context.put('transactionalObjects', transactionalObjects)
+  context.put('transaction', tx)
 
   StringWriter writer = new StringWriter()
   t.merge(context, writer)
@@ -413,7 +415,7 @@ void generateTranlocal(VelocityEngine engine, TransactionalObject transactionalO
   Template t = engine.getTemplate('src/main/java/org/multiverse/stms/beta/transactionalobjects/RefTranlocal.vm')
 
   VelocityContext context = new VelocityContext()
-  context.put("transactionalObject", transactionalObject)
+  context.put('transactionalObject', transactionalObject)
 
   StringWriter writer = new StringWriter()
   t.merge(context, writer)
@@ -431,7 +433,7 @@ void generatePredicate(VelocityEngine engine, TransactionalObject transactionalO
   Template t = engine.getTemplate('src/main/java/org/multiverse/api/predicates/Predicate.vm')
 
   VelocityContext context = new VelocityContext()
-  context.put("transactionalObject", transactionalObject)
+  context.put('transactionalObject', transactionalObject)
 
   StringWriter writer = new StringWriter()
   t.merge(context, writer)
@@ -449,7 +451,7 @@ void generateFunction(VelocityEngine engine, TransactionalObject transactionalOb
   Template t = engine.getTemplate('src/main/java/org/multiverse/api/functions/Function.vm')
 
   VelocityContext context = new VelocityContext()
-  context.put("transactionalObject", transactionalObject)
+  context.put('transactionalObject', transactionalObject)
 
   StringWriter writer = new StringWriter()
   t.merge(context, writer)
@@ -460,20 +462,52 @@ void generateFunction(VelocityEngine engine, TransactionalObject transactionalOb
 }
 
 
-void generateTransactionalObject(VelocityEngine engine, TransactionalObject transactionalObject) {
+void generateBetaTransactionalObject(VelocityEngine engine, TransactionalObject transactionalObject) {
   if (!transactionalObject.isReference && !transactionalObject.name.equals("AbstractBetaTransactionalObject")) {
     return;
   }
 
-  Template t = engine.getTemplate("src/main/java/org/multiverse/stms/beta/transactionalobjects/Ref.vm");
+  Template t = engine.getTemplate('src/main/java/org/multiverse/stms/beta/transactionalobjects/Ref.vm');
 
   VelocityContext context = new VelocityContext()
-  context.put("transactionalObject", transactionalObject)
+  context.put('transactionalObject', transactionalObject)
 
   StringWriter writer = new StringWriter()
   t.merge(context, writer)
 
   File file = new File('src/main/java/org/multiverse/stms/beta/transactionalobjects', "${transactionalObject.name}.java")
+  file.createNewFile()
+  file.text = writer.toString()
+}
+
+void generateRefs(VelocityEngine engine, TransactionalObject transactionalObject) {
+  if (!transactionalObject.isReference) {
+    return;
+  }
+
+  Template t = engine.getTemplate('src/main/java/org/multiverse/api/references/Ref.vm');
+
+  VelocityContext context = new VelocityContext()
+  context.put('transactionalObject', transactionalObject)
+
+  StringWriter writer = new StringWriter()
+  t.merge(context, writer)
+
+  File file = new File('src/main/java/org/multiverse/api/references/', "${transactionalObject.referenceInterface}.java")
+  file.createNewFile()
+  file.text = writer.toString()
+}
+
+void generateRefFactory(VelocityEngine engine, List<TransactionalObject> refs) {
+  Template t = engine.getTemplate('src/main/java/org/multiverse/api/references/RefFactory.vm');
+
+  VelocityContext context = new VelocityContext()
+  context.put('refs', refs)
+
+  StringWriter writer = new StringWriter()
+  t.merge(context, writer)
+
+  File file = new File('src/main/java/org/multiverse/api/references/RefFactory.java')
   file.createNewFile()
   file.text = writer.toString()
 }

@@ -19,7 +19,7 @@ import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
-public class BetaTransactionTemplate_timeoutTest {
+public class BetaAtomicBlock_timeoutTest {
 
     private BetaStm stm;
     private BetaLongRef ref;

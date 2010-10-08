@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.stms.beta.BetaStm;
 
 import static org.junit.Assert.*;
@@ -41,28 +42,28 @@ public class CountDownCommitBarrier_tryJoinCommitTest {
     }
 
     @Test
-    public void whenOpenAndTransactionCommitted_thenIllegalStateException() {
+    public void whenOpenAndTransactionCommitted_thenDeadTransactionException() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
         Transaction tx = stm.startDefaultTransaction();
         tx.commit();
         try {
             barrier.tryJoinCommit(tx);
-            fail("Expected Illegal state exception");
-        } catch (IllegalStateException ex) {
+            fail();
+        } catch (DeadTransactionException ex) {
         }
         assertTrue(barrier.isClosed());
         assertEquals(0, barrier.getNumberWaiting());
     }
 
     @Test
-    public void whenOpenAndTransactionAborted_thenIllegalStateException() {
+    public void whenOpenAndTransactionAborted_DeadTransactionException() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
         Transaction tx = stm.startDefaultTransaction();
         tx.abort();
         try {
             barrier.tryJoinCommit(tx);
-            fail("Expected Illegal state exception");
-        } catch (IllegalStateException ex) {
+            fail();
+        } catch (DeadTransactionException ex) {
         }
         assertTrue(barrier.isClosed());
         assertEquals(0, barrier.getNumberWaiting());

@@ -2,7 +2,9 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -22,15 +24,33 @@ public class BetaRef_isNull0Test {
     }
 
     @Test
-    public void whenNoTransactionAvailableAndNoValue() {
+    public void whenNoTransactionAvailableAndNullValue_thenNoTransactionFoundException() {
         BetaRef ref = newRef(stm);
-        assertTrue(ref.isNull());
+        long initialVersion = ref.getVersion();
+
+        try {
+            ref.isNull();
+            fail();
+        } catch (TransactionRequiredException expected) {
+        }
+
+        assertVersionAndValue(ref, initialVersion, null);
     }
 
     @Test
-    public void whenNoTransactionAvailableAndValue() {
-        BetaRef ref = newRef(stm, "foo");
-        assertFalse(ref.isNull());
+    public void whenNoTransactionAvailableAndValue_thenNoTransactionFoundException() {
+        String initialValue = "foo";
+        BetaRef ref = newRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        try {
+            ref.isNull();
+            fail();
+        } catch (TransactionRequiredException expected) {
+
+        }
+
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
@@ -69,36 +89,46 @@ public class BetaRef_isNull0Test {
     }
 
     @Test
-    public void whenCommittedTransactionAvailable_thenCallExecutedAtomically() {
-        BetaRef ref = newRef(stm);
-        long version = ref.getVersion();
+    public void whenCommittedTransactionAvailable_thenDeadTransactionException() {
+        String initialValue = "foo";
+        BetaRef ref = newRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.commit();
         setThreadLocalTransaction(tx);
 
-        boolean result = ref.isNull();
+        try {
+            ref.isNull();
+            fail();
+        } catch (DeadTransactionException expected) {
 
-        assertTrue(result);
+        }
+
         assertIsCommitted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertVersionAndValue(ref, version, null);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
-    public void whenAbortedTransactionAvailable() {
-        BetaRef ref = newRef(stm);
-        long version = ref.getVersion();
+    public void whenAbortedTransactionAvailable_thenDeadTransactionException() {
+        String initialValue = "foo";
+        BetaRef<String> ref = newRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.abort();
         setThreadLocalTransaction(tx);
 
-        boolean result = ref.isNull();
+        try {
+            ref.isNull();
+            fail();
+        } catch (DeadTransactionException expected) {
 
-        assertTrue(result);
+        }
+
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertVersionAndValue(ref, version, null);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 }

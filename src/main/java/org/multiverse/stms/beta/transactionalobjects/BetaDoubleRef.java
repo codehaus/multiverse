@@ -3,9 +3,9 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.multiverse.api.StmUtils;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LockedException;
-import org.multiverse.api.exceptions.NoTransactionFoundException;
 import org.multiverse.api.exceptions.PanicError;
 import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.api.functions.DoubleFunction;
 import org.multiverse.api.predicates.DoublePredicate;
 import org.multiverse.api.references.DoubleRef;
@@ -274,12 +274,12 @@ public  class BetaDoubleRef
     public void addDeferredValidator(DoublePredicate validator){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null && tx.isAlive()){
+        if(tx != null){
             addDeferredValidator((BetaTransaction)tx, validator);
             return;
         }
 
-        atomicAddDeferredValidator(validator);
+        throw new TransactionRequiredException();
     }
 
     @Override
@@ -324,11 +324,11 @@ public  class BetaDoubleRef
     public final double getAndIncrement(final double amount){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null && tx.isAlive()){
+        if(tx != null){
             return getAndIncrement((BetaTransaction)tx, amount);
         }
 
-        return atomicGetAndIncrement(amount);
+        throw new TransactionRequiredException();
     }
 
     @Override
@@ -383,11 +383,11 @@ public  class BetaDoubleRef
     public final double incrementAndGet(final double amount){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null && tx.isAlive()){
-            return incrementAndGet((BetaTransaction)tx, amount);
+        if(tx == null){
+            throw new TransactionRequiredException();
         }
 
-        return atomicIncrementAndGet(amount);
+        return incrementAndGet((BetaTransaction)tx, amount);
     }
 
     @Override
@@ -412,12 +412,11 @@ public  class BetaDoubleRef
     public final void ensure(){
         Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
-            ensure((BetaTransaction)tx);
-            return;
+        if(tx == null){
+            throw new TransactionRequiredException("No transaction is found for the ensure operation");
         }
 
-        throw new NoTransactionFoundException("No transaction is found for the ensure operation");
+        ensure((BetaTransaction)tx);
     }
 
     @Override
@@ -433,11 +432,11 @@ public  class BetaDoubleRef
     public final boolean tryEnsure(){
         Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
-            return tryEnsure((BetaTransaction)tx);            
+        if(tx!=null){
+            throw new TransactionRequiredException("No transaction is found for the tryEnsure operation");
         }
 
-        throw new NoTransactionFoundException("No transaction is found for the tryEnsure operation");
+        return tryEnsure((BetaTransaction)tx);
     }
 
     @Override
@@ -467,12 +466,11 @@ public  class BetaDoubleRef
     public final void privatize(){
         Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
-            privatize((BetaTransaction)tx);
-            return;
+        if(tx == null){
+            throw new TransactionRequiredException("No transaction is found for the privatize operation");
         }
 
-        throw new NoTransactionFoundException("No transaction is found for the privatize operation");
+        privatize((BetaTransaction)tx);
     }
 
     @Override
@@ -488,11 +486,11 @@ public  class BetaDoubleRef
     public final boolean tryPrivatize(){
         Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
-            return tryPrivatize((BetaTransaction)tx);
+        if(tx != null){
+            throw new TransactionRequiredException("No transaction is found for the tryPrivatize operation");
         }
 
-        throw new NoTransactionFoundException("No transaction is found for the tryPrivatize operation");
+        return tryPrivatize((BetaTransaction)tx);
     }
 
     @Override
@@ -510,12 +508,11 @@ public  class BetaDoubleRef
 
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
-            commute((BetaTransaction)tx, function);
-            return;
+        if(tx == null){
+            throw new TransactionRequiredException();
         }
 
-        atomicAlter(function, false);
+        commute((BetaTransaction)tx, function);
     }
 
     @Override
@@ -546,11 +543,11 @@ public  class BetaDoubleRef
 
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
-            return alterAndGet((BetaTransaction)tx, function);
+        if(tx == null){
+            throw new TransactionRequiredException();
         }
 
-        return atomicAlterAndGet(function);
+        return alterAndGet((BetaTransaction)tx, function);
     }
 
     @Override
@@ -648,11 +645,11 @@ public  class BetaDoubleRef
 
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null && tx.isAlive()){
-            return getAndAlter((BetaTransaction)tx, function);
+        if(tx == null){
+            throw new TransactionRequiredException();
         }
 
-        return atomicGetAndAlter(function);
+        return getAndAlter((BetaTransaction)tx, function);
     }
 
     @Override
@@ -735,32 +732,32 @@ public  class BetaDoubleRef
 
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null && tx.isAlive()){
-            return getAndSet((BetaTransaction)tx, value);
+        if(tx == null){
+            throw new TransactionRequiredException();
         }
 
-        return atomicGetAndSet(value);
+        return getAndSet((BetaTransaction)tx, value);
     }
 
     public final double set(final double value){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null && tx.isAlive()){
-            return set((BetaTransaction)tx, value);
+        if(tx == null){
+            throw new TransactionRequiredException();
         }
 
-        return atomicSet(value);
+        return set((BetaTransaction)tx, value);
     }
 
     @Override
     public final double get(){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null && tx.isAlive()){
-            return get((BetaTransaction)tx);
+        if(tx == null){
+            throw new TransactionRequiredException();
         }
 
-        return atomicGet();
+        return get((BetaTransaction)tx);
     }
 
     @Override
@@ -872,12 +869,11 @@ public  class BetaDoubleRef
     public final void await(double value){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
-            await((BetaTransaction)tx, value);
-            return;
+        if(tx == null){
+            throw new TransactionRequiredException();
         }
 
-        throw new TodoException();
+        await((BetaTransaction)tx, value);
     }
 
     @Override

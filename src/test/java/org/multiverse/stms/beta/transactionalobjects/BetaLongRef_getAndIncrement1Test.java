@@ -3,8 +3,10 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.api.exceptions.LockedException;
+import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.exceptions.ReadWriteConflict;
+import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.api.references.LongRef;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConfiguration;
@@ -90,67 +92,91 @@ public class BetaLongRef_getAndIncrement1Test implements BetaStmConstants {
     }
 
     @Test
-    public void whenLocked_thenLockedException() {
-        BetaLongRef ref = newLongRef(stm, 10);
+    public void whenLocked_thenReadWriteConflict() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
         long version = ref.getVersion();
-        BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForRead(ref, LOCKMODE_COMMIT);
 
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        otherTx.openForRead(ref, LOCKMODE_COMMIT);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
         try {
             ref.getAndIncrement(1);
             fail();
-        } catch (LockedException expected) {
+        } catch (ReadWriteConflict expected) {
         }
 
-        assertSame(tx, ref.___getLockOwner());
-        assertVersionAndValue(ref, version,10);
+        assertIsAborted(tx);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertVersionAndValue(ref, version, initialValue);
         assertSurplus(1, ref);
         assertHasCommitLock(ref);
     }
 
     @Test
-    public void whenNoTransactionAvailable_thenExecutedAtomically() {
-        BetaLongRef ref = newLongRef(stm, 10);
+    public void whenNoTransactionAvailable_thenNoTransactionFoundException() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
-        long result = ref.getAndIncrement(1);
+        try {
+            ref.getAndIncrement(1);
+            fail();
+        } catch (TransactionRequiredException expected) {
+
+        }
 
         assertSurplus(0, ref);
         assertHasNoCommitLock(ref);
-        assertEquals(result, 10);
-        assertEquals(11, ref.atomicGet());
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertNull(getThreadLocalTransaction());
     }
 
     @Test
-    public void whenCommittedTransactionAvailable() {
-        BetaLongRef ref = newLongRef(stm, 10);
+    public void whenCommittedTransactionAvailable_thenDeadTransactionException() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         tx.commit();
 
-        long result = ref.getAndIncrement(10);
+        try {
+            ref.getAndIncrement(2);
+            fail();
+        } catch (DeadTransactionException expected) {
+
+        }
 
         assertSurplus(0, ref);
         assertHasNoCommitLock(ref);
-        assertEquals(result, 10);
-        assertEquals(20, ref.atomicGet());
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertSame(tx, getThreadLocalTransaction());
         assertIsCommitted(tx);
     }
 
     @Test
-    public void whenAbortedTransactionAvailable() {
-        BetaLongRef ref = newLongRef(stm, 10);
+    public void whenAbortedTransactionAvailable_thenDeadTransactionException() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         tx.abort();
 
-        long result = ref.getAndIncrement(10);
+        try {
+            ref.getAndIncrement(1);
+            fail();
+        } catch (DeadTransactionException expected) {
+        }
 
         assertSurplus(0, ref);
         assertHasNoCommitLock(ref);
-        assertEquals(result, 10);
-        assertEquals(20, ref.atomicGet());
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertSame(tx, getThreadLocalTransaction());
         assertIsAborted(tx);
     }

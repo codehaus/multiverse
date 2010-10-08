@@ -287,12 +287,12 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public void addDeferredValidator(${transactionalObject.predicateClass}${transactionalObject.typeParameter} validator){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null && tx.isAlive()){
+        if(tx != null){
             addDeferredValidator((BetaTransaction)tx, validator);
             return;
         }
 
-        atomicAddDeferredValidator(validator);
+        throw new TransactionRequiredException();
     }
 
     @Override
@@ -338,11 +338,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final ${transactionalObject.type} getAndIncrement(final ${transactionalObject.type} amount){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null && tx.isAlive()){
+        if(tx != null){
             return getAndIncrement((BetaTransaction)tx, amount);
         }
 
-        return atomicGetAndIncrement(amount);
+        throw new TransactionRequiredException();
     }
 
     @Override
@@ -397,11 +397,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final ${transactionalObject.type} incrementAndGet(final ${transactionalObject.type} amount){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null && tx.isAlive()){
-            return incrementAndGet((BetaTransaction)tx, amount);
+        if(tx == null){
+            throw new TransactionRequiredException();
         }
 
-        return atomicIncrementAndGet(amount);
+        return incrementAndGet((BetaTransaction)tx, amount);
     }
 
     @Override
@@ -427,11 +427,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final boolean isNull(){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
-            return isNull((BetaTransaction)tx);
+        if(tx == null){
+            throw new TransactionRequiredException();
         }
 
-        return atomicIsNull();
+        return isNull((BetaTransaction)tx);
     }
 
     @Override
@@ -453,12 +453,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final void ensure(){
         Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
-            ensure((BetaTransaction)tx);
-            return;
+        if(tx == null){
+            throw new TransactionRequiredException("No transaction is found for the ensure operation");
         }
 
-        throw new NoTransactionFoundException("No transaction is found for the ensure operation");
+        ensure((BetaTransaction)tx);
     }
 
     @Override
@@ -474,11 +473,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final boolean tryEnsure(){
         Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
-            return tryEnsure((BetaTransaction)tx);            
+        if(tx!=null){
+            throw new TransactionRequiredException("No transaction is found for the tryEnsure operation");
         }
 
-        throw new NoTransactionFoundException("No transaction is found for the tryEnsure operation");
+        return tryEnsure((BetaTransaction)tx);
     }
 
     @Override
@@ -508,12 +507,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final void privatize(){
         Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
-            privatize((BetaTransaction)tx);
-            return;
+        if(tx == null){
+            throw new TransactionRequiredException("No transaction is found for the privatize operation");
         }
 
-        throw new NoTransactionFoundException("No transaction is found for the privatize operation");
+        privatize((BetaTransaction)tx);
     }
 
     @Override
@@ -529,11 +527,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final boolean tryPrivatize(){
         Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
-            return tryPrivatize((BetaTransaction)tx);
+        if(tx != null){
+            throw new TransactionRequiredException("No transaction is found for the tryPrivatize operation");
         }
 
-        throw new NoTransactionFoundException("No transaction is found for the tryPrivatize operation");
+        return tryPrivatize((BetaTransaction)tx);
     }
 
     @Override
@@ -551,12 +549,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
-            commute((BetaTransaction)tx, function);
-            return;
+        if(tx == null){
+            throw new TransactionRequiredException();
         }
 
-        atomicAlter(function, false);
+        commute((BetaTransaction)tx, function);
     }
 
     @Override
@@ -587,11 +584,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
-            return alterAndGet((BetaTransaction)tx, function);
+        if(tx == null){
+            throw new TransactionRequiredException();
         }
 
-        return atomicAlterAndGet(function);
+        return alterAndGet((BetaTransaction)tx, function);
     }
 
     @Override
@@ -689,11 +686,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null && tx.isAlive()){
-            return getAndAlter((BetaTransaction)tx, function);
+        if(tx == null){
+            throw new TransactionRequiredException();
         }
 
-        return atomicGetAndAlter(function);
+        return getAndAlter((BetaTransaction)tx, function);
     }
 
     @Override
@@ -776,32 +773,32 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null && tx.isAlive()){
-            return getAndSet((BetaTransaction)tx, value);
+        if(tx == null){
+            throw new TransactionRequiredException();
         }
 
-        return atomicGetAndSet(value);
+        return getAndSet((BetaTransaction)tx, value);
     }
 
     public final ${transactionalObject.type} set(final ${transactionalObject.type} value){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null && tx.isAlive()){
-            return set((BetaTransaction)tx, value);
+        if(tx == null){
+            throw new TransactionRequiredException();
         }
 
-        return atomicSet(value);
+        return set((BetaTransaction)tx, value);
     }
 
     @Override
     public final ${transactionalObject.type} get(){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null && tx.isAlive()){
-            return get((BetaTransaction)tx);
+        if(tx == null){
+            throw new TransactionRequiredException();
         }
 
-        return atomicGet();
+        return get((BetaTransaction)tx);
     }
 
     @Override
@@ -913,12 +910,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final void await(${transactionalObject.type} value){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null && tx.isAlive()){
-            await((BetaTransaction)tx, value);
-            return;
+        if(tx == null){
+            throw new TransactionRequiredException();
         }
 
-        throw new TodoException();
+        await((BetaTransaction)tx, value);
     }
 
     @Override

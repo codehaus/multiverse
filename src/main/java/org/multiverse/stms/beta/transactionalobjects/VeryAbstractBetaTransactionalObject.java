@@ -2,7 +2,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.Latch;
-import org.multiverse.api.exceptions.NoTransactionFoundException;
+import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.Listeners;
@@ -223,7 +223,7 @@ public abstract class VeryAbstractBetaTransactionalObject
             return isPrivatizedBySelf(tx);
         }
 
-        throw new NoTransactionFoundException("No transaction is found for the isPrivatizedBySelf operation");
+        throw new TransactionRequiredException("No transaction is found for the isPrivatizedBySelf operation");
     }
 
     @Override
@@ -247,7 +247,7 @@ public abstract class VeryAbstractBetaTransactionalObject
             return isPrivatizedByOther(tx);
         }
 
-        throw new NoTransactionFoundException("No transaction is found for the isPrivatizedByOther operation");
+        throw new TransactionRequiredException("No transaction is found for the isPrivatizedByOther operation");
     }
 
     @Override
@@ -276,7 +276,7 @@ public abstract class VeryAbstractBetaTransactionalObject
             return isEnsuredBySelf(tx);
         }
 
-        throw new NoTransactionFoundException("No transaction is found for the isEnsuredBySelf operation");
+        throw new TransactionRequiredException("No transaction is found for the isEnsuredBySelf operation");
     }
 
     @Override
@@ -300,7 +300,7 @@ public abstract class VeryAbstractBetaTransactionalObject
             return isEnsuredByOther(tx);
         }
 
-        throw new NoTransactionFoundException("No transaction is found for the isEnsuredByOther operation");
+        throw new TransactionRequiredException("No transaction is found for the isEnsuredByOther operation");
     }
 
     @Override

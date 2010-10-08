@@ -2,8 +2,10 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
+import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
@@ -46,7 +48,7 @@ public class BetaLongRef_commute1Test {
         assertSame(tx, getThreadLocalTransaction());
         tx.commit();
 
-        assertEquals(1, ref.get());
+        assertEquals(1, ref.atomicGet());
         assertIsCommitted(tx);
         assertSurplus(0, ref);
         assertHasNoCommitLock(ref);
@@ -74,8 +76,8 @@ public class BetaLongRef_commute1Test {
         assertSame(tx, getThreadLocalTransaction());
         tx.commit();
 
-        assertEquals(0, ref.get());
-        assertVersionAndValue(ref,version,0);
+        assertEquals(0, ref.atomicGet());
+        assertVersionAndValue(ref, version, 0);
         assertIsCommitted(tx);
         assertSurplus(0, ref);
         assertHasNoCommitLock(ref);
@@ -104,29 +106,43 @@ public class BetaLongRef_commute1Test {
     }
 
     @Test
-    public void whenNoTransactionAvailable_thenExecutedAtomically() {
-        BetaLongRef ref = newLongRef(stm, 2);
+    public void whenNoTransactionAvailable_thenNoTransactionFoundException() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         LongFunction function = Functions.newIncLongFunction(1);
-        ref.commute(function);
+        try {
+            ref.commute(function);
+            fail();
+        } catch (TransactionRequiredException expected) {
+
+        }
 
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
-        assertEquals(3, ref.atomicGet());
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
-    public void whenCommittedTransactionAvailable_thenExecuteAtomically() {
-        BetaLongRef ref = newLongRef(stm, 2);
+    public void whenCommittedTransactionAvailable_thenDeadTransactionException() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         tx.commit();
 
         LongFunction function = Functions.newIncLongFunction(1);
-        ref.commute(function);
+        try {
+            ref.commute(function);
+            fail();
+        } catch (DeadTransactionException expected) {
+
+        }
 
         assertIsCommitted(tx);
         assertSame(tx, getThreadLocalTransaction());
@@ -134,19 +150,26 @@ public class BetaLongRef_commute1Test {
         assertUpdateBiased(ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
-        assertEquals(3, ref.atomicGet());
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
-    public void whenAbortedTransactionAvailable_thenExecuteAtomically() {
-        BetaLongRef ref = newLongRef(stm, 2);
+    public void whenAbortedTransactionAvailable_thenDeadTransactionException() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         tx.abort();
 
         LongFunction function = Functions.newIncLongFunction(1);
-        ref.commute(function);
+        try {
+            ref.commute(function);
+            fail();
+        } catch (DeadTransactionException expected) {
+
+        }
 
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
@@ -154,7 +177,7 @@ public class BetaLongRef_commute1Test {
         assertUpdateBiased(ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
-        assertEquals(3, ref.atomicGet());
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
@@ -324,7 +347,7 @@ public class BetaLongRef_commute1Test {
         assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
-        assertVersionAndValue(ref, version,2);
+        assertVersionAndValue(ref, version, 2);
         assertSurplus(1, ref);
     }
 }

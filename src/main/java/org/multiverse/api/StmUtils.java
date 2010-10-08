@@ -4,8 +4,8 @@ import org.multiverse.api.closures.*;
 import org.multiverse.api.collections.*;
 import org.multiverse.api.exceptions.ControlFlowError;
 import org.multiverse.api.exceptions.IllegalTransactionStateException;
-import org.multiverse.api.exceptions.NoTransactionFoundException;
 import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.api.references.*;
@@ -398,7 +398,7 @@ public class StmUtils {
      * <p/>
      * For more information see {@link Transaction#prepare()}.
      *
-     * @throws NoTransactionFoundException if no active transaction is found.
+     * @throws TransactionRequiredException if no active transaction is found.
      * @throws IllegalTransactionStateException if the active transaction is not in the correct
      *                                           state for this operation.
      * @throws ControlFlowError
@@ -413,7 +413,7 @@ public class StmUtils {
      * <p/>
      * For more information see {@link Transaction#abort()}.
      *
-     * @throws NoTransactionFoundException if no active transaction is found.
+     * @throws TransactionRequiredException if no active transaction is found.
      * @throws IllegalTransactionStateException if the active transaction is not in the correct
      *                                           state for this operation.
      * @throws ControlFlowError
@@ -428,7 +428,7 @@ public class StmUtils {
      *
      * For more information see {@link Transaction#ensureWrites()}
      *
-     * @throws NoTransactionFoundException if no active transaction is found.
+     * @throws TransactionRequiredException if no active transaction is found.
      * @throws IllegalTransactionStateException if the active transaction is not in the correct
      *                                           state for this operation.
      * @throws ControlFlowError
@@ -443,7 +443,7 @@ public class StmUtils {
      * <p/>
      * For more information see {@link Transaction#commit()}.
      *
-     * @throws NoTransactionFoundException if no active transaction is found.
+     * @throws TransactionRequiredException if no active transaction is found.
      * @throws IllegalTransactionStateException if the active transaction is not in the correct
      *                                           state for this operation.
      * @throws ControlFlowError                                
@@ -459,7 +459,7 @@ public class StmUtils {
      * <p/>
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
-     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
+     * @throws org.multiverse.api.exceptions.TransactionRequiredException
      *                              if no Transaction is getAndSet at the
      *                              {@link org.multiverse.api.ThreadLocalTransaction}.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
@@ -489,7 +489,7 @@ public class StmUtils {
      * <p/>
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
-     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
+     * @throws org.multiverse.api.exceptions.TransactionRequiredException
      *                              if no Transaction is getAndSet at the
      *                              {@link org.multiverse.api.ThreadLocalTransaction}.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
@@ -518,7 +518,7 @@ public class StmUtils {
      * <p/>
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
-     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
+     * @throws org.multiverse.api.exceptions.TransactionRequiredException
      *                              if no Transaction is getAndSet at the
      *                              {@link org.multiverse.api.ThreadLocalTransaction}.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException

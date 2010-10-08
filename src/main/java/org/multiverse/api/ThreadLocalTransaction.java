@@ -1,6 +1,6 @@
 package org.multiverse.api;
 
-import org.multiverse.api.exceptions.NoTransactionFoundException;
+import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.stms.beta.transactions.BetaTransactionPool;
 
 /**
@@ -54,13 +54,13 @@ public final class ThreadLocalTransaction {
      * returned).
      *
      * @return the threadlocal transaction.
-     * @throws NoTransactionFoundException if no thread local transaction is found.
+     * @throws org.multiverse.api.exceptions.TransactionRequiredException if no thread local transaction is found.
      */
     public static Transaction getRequiredThreadLocalTransaction() {
         Transaction tx = threadlocal.get().transaction;
 
         if (tx == null) {
-            throw new NoTransactionFoundException("No transaction is found on the ThreadLocalTransaction");
+            throw new TransactionRequiredException("No transaction is found on the ThreadLocalTransaction");
         }
 
         return tx;

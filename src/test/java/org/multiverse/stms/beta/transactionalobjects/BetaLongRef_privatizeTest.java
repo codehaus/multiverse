@@ -4,9 +4,10 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.NoTransactionFoundException;
+import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
+import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -34,7 +35,7 @@ public class BetaLongRef_privatizeTest {
         try {
             ref.privatize();
             fail();
-        } catch (NoTransactionFoundException expected) {
+        } catch (TransactionRequiredException expected) {
         }
 
         assertSurplus(0, ref);
@@ -47,17 +48,19 @@ public class BetaLongRef_privatizeTest {
     }
 
     @Test
-    public void whenCommittedTransactionAvailable() {
-        BetaLongRef ref = newLongRef(stm);
+    public void whenCommittedTransactionAvailable_thenNoTransactionFoundException() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
         Transaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         tx.commit();
 
-        long version = ref.getVersion();
         try {
             ref.privatize();
             fail();
-        } catch (NoTransactionFoundException expected) {
+        } catch (DeadTransactionException expected) {
         }
 
 
@@ -68,21 +71,23 @@ public class BetaLongRef_privatizeTest {
         assertNull(ref.___getLockOwner());
         assertIsCommitted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertVersionAndValue(ref, version, 0);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
-    public void whenAbortedTransactionAvailable() {
-        BetaLongRef ref = newLongRef(stm);
+    public void whenAbortedTransactionAvailable_thenDeadTransactionException() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
         Transaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         tx.abort();
 
-        long version = ref.getVersion();
         try {
             ref.privatize();
             fail();
-        } catch (NoTransactionFoundException expected) {
+        } catch (DeadTransactionException expected) {
         }
 
 
@@ -93,7 +98,7 @@ public class BetaLongRef_privatizeTest {
         assertNull(ref.___getLockOwner());
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertVersionAndValue(ref, version, 0);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test

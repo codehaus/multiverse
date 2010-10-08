@@ -2,7 +2,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.exceptions.NoTransactionFoundException;
+import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -22,7 +22,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
         clearThreadLocalTransaction();
     }
 
-    @Test(expected = NoTransactionFoundException.class)
+    @Test(expected = TransactionRequiredException.class)
     public void whenNoTransactionFound() {
         BetaLongRef ref = newLongRef(stm);
 

@@ -94,6 +94,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
+                        transactionContainer.transaction = tx;                        
                     } catch (ReadWriteConflict e) {
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
@@ -201,6 +202,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
+                        transactionContainer.transaction = tx;                        
                     } catch (ReadWriteConflict e) {
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
@@ -308,6 +310,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
+                        transactionContainer.transaction = tx;                        
                     } catch (ReadWriteConflict e) {
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
@@ -415,6 +418,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
+                        transactionContainer.transaction = tx;                        
                     } catch (ReadWriteConflict e) {
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
@@ -522,6 +526,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
+                        transactionContainer.transaction = tx;                        
                     } catch (ReadWriteConflict e) {
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
@@ -630,6 +635,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
+                        transactionContainer.transaction = tx;                        
                     } catch (ReadWriteConflict e) {
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {

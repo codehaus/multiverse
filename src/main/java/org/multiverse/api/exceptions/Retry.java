@@ -5,6 +5,10 @@ package org.multiverse.api.exceptions;
  * a transaction wants to pop an item from an empty queue. The RetryError is caught by the transaction
  * handling logic (e.g the {@link org.multiverse.api.AtomicBlock}.
  *
+ * An Retry instance is available, since the Retry is thrown when the {@link org.multiverse.api.StmUtils#retry()}
+ * is called and this is used for control flow. Creating exceptions is quite expensive (especially the stacktrace)
+ * so that is why a pre-existing instance is created.
+ *
  * @author Peter Veentjer.
  */
 public class Retry extends ControlFlowError {

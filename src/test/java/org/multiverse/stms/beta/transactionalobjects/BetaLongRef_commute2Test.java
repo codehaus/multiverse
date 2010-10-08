@@ -61,7 +61,9 @@ public class BetaLongRef_commute2Test {
 
     @Test
     public void whenSuccess() {
-        BetaLongRef ref = newLongRef(stm, 10);
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         LongFunction function = newIncLongFunction();
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -73,7 +75,7 @@ public class BetaLongRef_commute2Test {
         assertEquals(0, commute.value);
         tx.commit();
 
-        assertEquals(11, ref.get());
+        assertVersionAndValue(ref, initialVersion+1, initialValue+1);
     }
 
     @Test
@@ -97,19 +99,23 @@ public class BetaLongRef_commute2Test {
 
     @Test
     public void whenNormalTransactionUsed() {
-        BetaLongRef ref = newLongRef(stm, 10);
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         LongFunction function = Functions.newIncLongFunction(1);
         Transaction tx = stm.startDefaultTransaction();
         ref.commute(tx, function);
         tx.commit();
 
-        assertEquals(11, ref.get());
+        assertVersionAndValue(ref, initialVersion+1, initialValue+1);
     }
 
     @Test
     public void whenAlreadyOpenedForRead() {
-        BetaLongRef ref = newLongRef(stm, 10);
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         LongFunction function = Functions.newIncLongFunction(1);
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -122,7 +128,7 @@ public class BetaLongRef_commute2Test {
         assertEquals(11, commute.value);
         tx.commit();
 
-        assertEquals(11, ref.get());
+        assertVersionAndValue(ref, initialVersion+1, initialValue+1);
     }
 
     @Test
@@ -139,14 +145,14 @@ public class BetaLongRef_commute2Test {
         assertEquals(1, commute.value);
         tx.commit();
 
-        assertEquals(1, ref.get());
+        assertEquals(1, ref.atomicGet());
     }
 
     @Test
     public void whenAlreadyOpenedForWrite() {
         BetaLongRef ref = newLongRef(stm, 10);
 
-        LongFunction function = Functions.newIncLongFunction(1);
+        LongFunction function = newIncLongFunction();
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.set(tx, 11);
         ref.commute(tx, function);
@@ -157,15 +163,17 @@ public class BetaLongRef_commute2Test {
         assertEquals(12, commute.value);
         tx.commit();
 
-        assertEquals(12, ref.get());
+        assertEquals(12, ref.atomicGet());
     }
 
     @Test
     public void whenAlreadyCommuting() {
-        BetaLongRef ref = newLongRef(stm, 10);
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
-        LongFunction function1 = Functions.newIncLongFunction(1);
-        LongFunction function2 = Functions.newIncLongFunction(1);
+        LongFunction function1 = newIncLongFunction();
+        LongFunction function2 = newIncLongFunction();
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.commute(tx, function1);
         ref.commute(tx, function2);
@@ -176,7 +184,7 @@ public class BetaLongRef_commute2Test {
         assertEquals(0, commute.value);
         tx.commit();
 
-        assertEquals(12, ref.get());
+        assertVersionAndValue(ref, initialVersion+1, initialValue+2);
     }
 
     @Test

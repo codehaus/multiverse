@@ -35,7 +35,7 @@ public interface TransactionalObject {
      * The lock acquired will automatically be acquired for the duration of the transaction and automatically
      * released when the transaction commits or aborts.
      *
-     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
+     * @throws org.multiverse.api.exceptions.TransactionRequiredException
      *          if no transaction is found.
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
@@ -71,7 +71,7 @@ public interface TransactionalObject {
      * automatically released when the transaction commits or aborts.
      *
      * @return true if the privatization was a success, false otherwise.
-     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
+     * @throws org.multiverse.api.exceptions.TransactionRequiredException
      *          if no transaction was found
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if the transaction found was not
@@ -119,7 +119,7 @@ public interface TransactionalObject {
      *
      * @return true if the TransactionalObject has been privatized by another transaction than the
      *         active transaction.
-     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
+     * @throws org.multiverse.api.exceptions.TransactionRequiredException
      *          if no alive transaction is found.
      */
     boolean isPrivatizedByOther();
@@ -142,7 +142,7 @@ public interface TransactionalObject {
      * The value could be stale as soon as it is returned.
      *
      * @return true if the TransactionalObject is privatized by the active transaction.
-     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
+     * @throws org.multiverse.api.exceptions.TransactionRequiredException
      *          if no alive transaction is found.
      */
     boolean isPrivatizedBySelf();
@@ -173,7 +173,7 @@ public interface TransactionalObject {
      * The value could be stale as soon as it is returned.
      *
      * @return true if ensured by itself, false otherwise.
-     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
+     * @throws org.multiverse.api.exceptions.TransactionRequiredException
      *          if no alive transaction is found.
      */
     boolean isEnsuredBySelf();
@@ -195,7 +195,7 @@ public interface TransactionalObject {
      * The value could be stale as soon as it is returned.
      *
      * @return true if the TransactionalObject is ensured by another, false otherwise.
-     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
+     * @throws org.multiverse.api.exceptions.TransactionRequiredException
      *          if no alive transaction is found
      */
     boolean isEnsuredByOther();
@@ -267,7 +267,7 @@ public interface TransactionalObject {
      * released when the transaction commits or aborts.
      *
      * @return true if the ensure was a success, false otherwise.
-     * @throws org.multiverse.api.exceptions.NoTransactionFoundException
+     * @throws org.multiverse.api.exceptions.TransactionRequiredException
      *          if no transaction was found
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if the transaction was not

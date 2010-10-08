@@ -1,12 +1,12 @@
 package org.multiverse.api.exceptions;
 
 /**
- * An {@link IllegalStateException} that is thrown when an operations is executed on a
+ * An {@link TransactionalExecutionException} that is thrown when an operations is executed on a
  * Transaction when it is not in a valid state for that operation.
  *
  * @author Peter Veentjer
  */
-public class IllegalTransactionStateException extends IllegalStateException {
+public class IllegalTransactionStateException extends TransactionalExecutionException {
 
     /**
      * Creates a new IllegalTransactionStateException.

@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.exampletransactionalobjects;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -9,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
+@Ignore
 public class LinkedListTest {
     private BetaStm stm;
 

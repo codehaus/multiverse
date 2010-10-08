@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
+import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.stms.beta.BetaStm;
 
 import static org.junit.Assert.*;
@@ -102,7 +103,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyTest {
     }
 
     @Test
-    public void whenOpenAndTransactionAborted_thenIllegalStateException() {
+    public void whenOpenAndTransactionAborted_thenDeadTransactionException() {
         Transaction tx = stm.startDefaultTransaction();
         tx.abort();
 
@@ -110,7 +111,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyTest {
         try {
             barrier.joinCommitUninterruptibly(tx);
             fail();
-        } catch (IllegalStateException ex) {
+        } catch (DeadTransactionException ex) {
         }
 
         assertTrue(barrier.isClosed());
@@ -118,7 +119,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyTest {
     }
 
     @Test
-    public void whenOpenAndTransactionCommitted_thenIllegalStateException() {
+    public void whenOpenAndTransactionCommitted_thenDeadTransactionException() {
         Transaction tx = stm.startDefaultTransaction();
         tx.commit();
 
@@ -126,7 +127,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyTest {
         try {
             barrier.joinCommitUninterruptibly(tx);
             fail();
-        } catch (IllegalStateException ex) {
+        } catch (DeadTransactionException ex) {
         }
 
         assertTrue(barrier.isClosed());

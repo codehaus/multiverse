@@ -12,11 +12,114 @@ import org.multiverse.api.predicates.Predicate;
  */
 public interface Ref<E> extends TransactionalObject {
 
-    void addDeferredValidator(Predicate<E> predicate);
+    /**
+     * Sets the value and returns the previous value. If a transaction is running, it will lift on that
+     * transaction, else it will be executed atomically (so executed under its own transaction).
+     *
+     * @param value the new value.
+     * @return the old value.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if tx is not in the correct state
+     *          for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
+    E getAndSet(E value);
 
-    void addDeferredValidator(Transaction tx, Predicate<E> predicate);
+    /**
+     * Sets the new value. If a transaction is running, it will lift on that transaction, else it will
+     * be executed atomically (so executed under its own transaction).
+     *
+     * @param value the new value.
+     * @return the new value.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if tx is not in the correct state
+     *          for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
+    E set(E value);
 
-    void atomicAddDeferredValidator(Predicate<E> predicate);
+    /**
+     * Sets the new value using the provided transaction.
+     *
+     * @param tx    the transaction used to do the set.
+     * @param value the new value
+     * @return the old value
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if the transaction is not in the correct
+     *                              state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
+    E set(Transaction tx, E value);
+
+    /**
+     * Gets the value. If a Transaction currently is running, this call will lift on that transaction. If no
+     * Transaction is running, it will be run under its own transaction (so executed atomically).
+     *
+     * @return the current value.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *          if tx is not in the correct state
+     *          for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     * @see #atomicGet()
+     */
+    E get();
+
+    /**
+     * Gets the value using the provided transaction.
+     *
+     * @param tx the Transaction to lift on.
+     * @return the value stored in the ref.
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if the transaction is not in the
+     *                              correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
+    E get(Transaction tx);
+
+    /**
+     * Atomically gets the value. The value could be stale as soon as it is returned. This
+     * method doesn't care about any running transactions.
+     *
+     * @return the current value.
+     */
+    E atomicGet();
+
+    E atomicWeakGet();
+
+    /**
+     * Atomically sets the value and returns the new value. This method doesn't care about any
+     * running transactions.
+     *
+     * @param newValue the new value.
+     * @return the new value.
+     */
+    E atomicSet(E newValue);
+
+    /**
+     * Atomically sets the value and returns the previous value. This method doesn't care about
+     * any running transactions.
+     *
+     * @param newValue the new value.
+     * @return the old value.
+     */
+    E atomicGetAndSet(E newValue);
+
+    /**
+     * Sets the value using the provided transaction.
+     *
+     * @param value the new value.
+     * @param tx    the transaction used to do the getAndSet.
+     * @return the old value.
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                              if the transaction is not
+     *                              in the correct state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
+    E getAndSet(Transaction tx, E value);
 
     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
@@ -32,7 +135,6 @@ public interface Ref<E> extends TransactionalObject {
      * @param function the function to apply to this reference.
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     void commute(Function<E> function);
 
@@ -52,45 +154,8 @@ public interface Ref<E> extends TransactionalObject {
      * @throws NullPointerException  if function is null.
      * @throws IllegalStateException if the transaction is not in the correct state for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
-    void commute(Transaction tx, Function<E> function);
-
-    /**
-     * Checks if the current value is null. If a transaction is available, it will lift on that transaction,
-     * else it will be run under its own transaction.
-     *
-     * @return true if null, false otherwise.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if tx is not in the correct state
-     *          for this operation.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    boolean isNull();
-
-    /**
-     * Checks if the current value is null.
-     *
-     * @param tx the transaction used for this operation.
-     * @return true if the value is null, false otherwise.
-     * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is not in the
-     *                              correct state for this operation.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    boolean isNull(Transaction tx);
-
-    /**
-     * Atomically check if the current value is null. This method doesn't care about any running transactions.
-     *
-     * @return true if null, false otherwise.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    boolean atomicIsNull();
+    void commute(Transaction tx,Function<E> function);
 
     /**
      * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
@@ -99,8 +164,6 @@ public interface Ref<E> extends TransactionalObject {
      * @param function the Function responsible to alterAndGet the function.
      * @return the new value.
      * @throws NullPointerException if function is null.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     E atomicAlterAndGet(Function<E> function);
 
@@ -115,7 +178,6 @@ public interface Ref<E> extends TransactionalObject {
      *                              if tx is not in the correct state
      *                              for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     E alterAndGet(Function<E> function);
 
@@ -130,9 +192,8 @@ public interface Ref<E> extends TransactionalObject {
      *                              if the transaction is not in the
      *                              correct state.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
-    E alterAndGet(Transaction tx, Function<E> function);
+    E alterAndGet(Transaction tx,Function<E> function);
 
     /**
      * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
@@ -141,8 +202,6 @@ public interface Ref<E> extends TransactionalObject {
      * @param function the Function responsible to alterAndGet the function.
      * @return the old value.
      * @throws NullPointerException if function is null.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     E atomicGetAndAlter(Function<E> function);
 
@@ -157,7 +216,6 @@ public interface Ref<E> extends TransactionalObject {
      *                              if tx is not in the correct state
      *                              for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     E getAndAlter(Function<E> function);
 
@@ -172,155 +230,58 @@ public interface Ref<E> extends TransactionalObject {
      *                              if the transaction is not in the
      *                              correct state.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     E getAndAlter(Transaction tx, Function<E> function);
 
     /**
      * Executes a compare and set atomically. This method doesn't care about any running transactions.
      *
-     * @param oldValue the old value.
+     * @param expectedValue the expected value.
      * @param newValue the new value.
      * @return true if the compareAndSwap was a success, false otherwise.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
-    boolean atomicCompareAndSet(E oldValue, E newValue);
+    boolean atomicCompareAndSet(E expectedValue, E newValue);
+
+    void await(E value);
+
+    void await(Transaction tx,E value);
+
+    void addDeferredValidator(Predicate<E> validator);
+
+    void addDeferredValidator(Transaction tx, Predicate<E> validator);
+
+    void atomicAddDeferredValidator(Predicate<E> validator);
 
     /**
-     * Atomically sets the value and returns the previous value. This method doesn't care about
-     * any running transactions.
+     * Checks if the current value is null. If a transaction is available, it will lift on that transaction,
+     * else it will be run under its own transaction.
      *
-     * @param value the new value.
-     * @return the old value.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    E atomicGetAndSet(E value);
-
-    /**
-     * Atomically sets the value and returns the new value. This method doesn't care about any
-     * running transactions.
-     *
-     * @param value the new value.
-     * @return the new value.
+     * @return true if null, false otherwise.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if tx is not in the correct state
      *          for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
-    E atomicSet(E value);
+    boolean isNull();
 
     /**
-     * Sets the value and returns the previous value. If a transaction is running, it will lift on that
-     * transaction, else it will be executed atomically (so executed under its own transaction).
+     * Checks if the current value is null.
      *
-     * @param value the new value.
-     * @return the old value.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if tx is not in the correct state
-     *          for this operation.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    E getAndSet(E value);
-
-    /**
-     * Sets the new value. If a transaction is running, it will lift on that transaction, else it will
-     * be executed atomically (so executed under its own transaction).
-     *
-     * @param value the new value.
-     * @return the new value.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if tx is not in the correct state
-     *          for this operation.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    E set(E value);
-
-    /**
-     * Sets the new value using the provided transaction.
-     *
-     * @param tx    the transaction used to do the set.
-     * @param value the new value
-     * @return the old value
-     * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is not in the correct
-     *                              state for this operation.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    E set(Transaction tx, E value);
-
-    /**
-     * Sets the value using the provided transaction.
-     *
-     * @param value the new value.
-     * @param tx    the transaction used to do the getAndSet.
-     * @return the old value.
-     * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is not
-     *                              in the correct state for this operation.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    E getAndSet(Transaction tx, E value);
-
-    /**
-     * Atomically gets the value. The value could be stale as soon as it is returned. This
-     * method doesn't care about any running transactions.
-     *
-     * @return the current value.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    E atomicGet();
-
-    /**
-     * Gets the value. If a Transaction currently is running, this call will lift on that transaction. If no
-     * Transaction is running, it will be run under its own transaction (so executed atomically).
-     *
-     * @return the current value.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if tx is not in the correct state
-     *          for this operation.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     * @see #atomicGet()
-     */
-    E get();
-
-    E atomicWeakGet();
-
-    /**
-     * Gets the value using the provided transaction.
-     *
-     * @param tx the Transaction to lift on.
-     * @return the value stored in the ref.
+     * @param tx the transaction used for this operation.
+     * @return true if the value is null, false otherwise.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the
      *                              correct state for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
-    E get(Transaction tx);
+    boolean isNull(Transaction tx);
 
     /**
-     * @param value
-     * @throws org.multiverse.api.exceptions.ControlFlowError
+     * Atomically check if the current value is null. This method doesn't care about any running transactions.
      *
+     * @return true if null, false otherwise.
      */
-    void await(E value);
+    boolean atomicIsNull();
 
-    /**
-     * @param value
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    void await(Transaction tx, E value);
 }

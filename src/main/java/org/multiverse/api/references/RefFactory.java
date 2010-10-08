@@ -8,12 +8,20 @@ package org.multiverse.api.references;
 public interface RefFactory {
 
     /**
-     * Creates a committed DoubleRef.
+     * Creates a committed Ref.
      *
      * @param value the initial value.
-     * @return the created DoubleRef.
+     * @return the created Ref.
      */
-    DoubleRef newDoubleRef(double value);
+    <E> Ref<E> newRef(E value);
+
+    /**
+     * Creates a committed IntRef.
+     *
+     * @param value the initial value.
+     * @return the created IntRef.
+     */
+     IntRef newIntRef(int value);
 
     /**
      * Creates a committed BooleanRef.
@@ -21,30 +29,21 @@ public interface RefFactory {
      * @param value the initial value.
      * @return the created BooleanRef.
      */
-    BooleanRef newBooleanRef(boolean value);
+     BooleanRef newBooleanRef(boolean value);
 
     /**
-     * Creates a committed BetaIntRef.
+     * Creates a committed DoubleRef.
      *
      * @param value the initial value.
-     * @return the created BetaIntRef.
+     * @return the created DoubleRef.
      */
-    IntRef newIntRef(int value);
+     DoubleRef newDoubleRef(double value);
 
     /**
-     * Creates a committed BetaLongRef.
+     * Creates a committed LongRef.
      *
      * @param value the initial value.
-     * @return the created BetaLongRef.
+     * @return the created LongRef.
      */
-    LongRef newLongRef(long value);
-
-    /**
-     * Creates a committed BetaRef.
-     *
-     * @param value the initial value
-     * @param <E>   the type of the value.
-     * @return the created BetaRef.
-     */
-    <E> Ref<E> newRef(E value);
+     LongRef newLongRef(long value);
 }

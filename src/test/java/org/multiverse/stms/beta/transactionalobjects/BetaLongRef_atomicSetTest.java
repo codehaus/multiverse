@@ -34,7 +34,7 @@ public class BetaLongRef_atomicSetTest {
 
         assertEquals(10, result);
         assertNull(getThreadLocalTransaction());
-        assertEquals(10, ref.get());
+        assertEquals(10, ref.atomicGet());
         assertSurplus(0, ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());

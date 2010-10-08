@@ -95,7 +95,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                                         transactionConfiguration.familyName));
                             }
                         }
-                        throw new NoTransactionFoundException(
+                        throw new TransactionRequiredException(
                             format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                 transactionConfiguration.familyName));
                     }
@@ -228,6 +228,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
+                        transactionContainer.transaction = tx;                        
                     } catch (ReadWriteConflict e) {
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
@@ -333,7 +334,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                                         transactionConfiguration.familyName));
                             }
                         }
-                        throw new NoTransactionFoundException(
+                        throw new TransactionRequiredException(
                             format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                 transactionConfiguration.familyName));
                     }
@@ -466,6 +467,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
+                        transactionContainer.transaction = tx;                        
                     } catch (ReadWriteConflict e) {
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
@@ -571,7 +573,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                                         transactionConfiguration.familyName));
                             }
                         }
-                        throw new NoTransactionFoundException(
+                        throw new TransactionRequiredException(
                             format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                 transactionConfiguration.familyName));
                     }
@@ -704,6 +706,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
+                        transactionContainer.transaction = tx;                        
                     } catch (ReadWriteConflict e) {
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
@@ -809,7 +812,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                                         transactionConfiguration.familyName));
                             }
                         }
-                        throw new NoTransactionFoundException(
+                        throw new TransactionRequiredException(
                             format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                 transactionConfiguration.familyName));
                     }
@@ -942,6 +945,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
+                        transactionContainer.transaction = tx;                        
                     } catch (ReadWriteConflict e) {
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
@@ -1047,7 +1051,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                                         transactionConfiguration.familyName));
                             }
                         }
-                        throw new NoTransactionFoundException(
+                        throw new TransactionRequiredException(
                             format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                 transactionConfiguration.familyName));
                     }
@@ -1180,6 +1184,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
+                        transactionContainer.transaction = tx;                        
                     } catch (ReadWriteConflict e) {
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
@@ -1287,7 +1292,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                                         transactionConfiguration.familyName));
                             }
                         }
-                        throw new NoTransactionFoundException(
+                        throw new TransactionRequiredException(
                             format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                 transactionConfiguration.familyName));
                     }
@@ -1425,6 +1430,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                         BetaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
                         transactionContainer.transactionPool.putBetaTransaction(old);
+                        transactionContainer.transaction = tx;                        
                     } catch (ReadWriteConflict e) {
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
