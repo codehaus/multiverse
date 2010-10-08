@@ -260,18 +260,18 @@ neer gezet?
 
 - testing: prepare and writeskew
 
-- improved testing with openForConstruction and illegal refs (so that have been locked..
-by another or by itself and either are committed or not).
-
 - integration tests should touch all transaction implementations.
 
 - repeatable read isolation level
+
+done
 
 - when a check conflict and lock is done, the communication with the orec can be skipped it already
 is privatized. This information needs to be stored in the tranlocal, so instead of storing if it is
 the lockowner, the lockmode needs to be stored.
 
-done
+- improved testing with openForConstruction and illegal refs (so that have been locked..
+by another or by itself and either are committed or not).
 
 - regression test for the speculative failure and atomic block updating the transaction on the threadlocal
 

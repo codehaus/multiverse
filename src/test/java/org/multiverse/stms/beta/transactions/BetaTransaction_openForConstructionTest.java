@@ -117,29 +117,150 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
     }
 
     @Test
-    @Ignore
-    public void whenAlreadyOpenedForReadingAndPrivatized_thenIllegalArgumentException(){
+    public void whenAlreadyOpenedForReadingAndPrivatized_thenIllegalArgumentException() {
+        long initialValue = 100;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
+        BetaTransaction tx = newTransaction();
+        ref.get(tx);
+        ref.privatize(tx);
+
+        try {
+            tx.openForConstruction(ref);
+            fail();
+        } catch (IllegalArgumentException expected) {
+
+        }
+
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertNull(ref.___getLockOwner());
+        assertHasNoUpdateLock(ref);
+        assertHasNoCommitLock(ref);
     }
 
     @Test
-    @Ignore
-    public void whenAlreadyOpenedForReadingAndEnsured_thenIllegalArgumentException(){
+    public void whenAlreadyOpenedForReadingAndEnsured_thenIllegalArgumentException() {
+        long initialValue = 100;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
+        BetaTransaction tx = newTransaction();
+        ref.get(tx);
+        ref.ensure(tx);
+
+        try {
+            tx.openForConstruction(ref);
+            fail();
+        } catch (IllegalArgumentException expected) {
+
+        }
+
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertNull(ref.___getLockOwner());
+        assertHasNoUpdateLock(ref);
+        assertHasNoCommitLock(ref);
     }
 
     @Test
-    @Ignore
-    public void whenAlreadyOpenedForWritingAndPrivatized_thenIllegalArgumentException(){
+    public void whenAlreadyPrivatizedByOther_thenIllegalArgumentException() {
+         long initialValue = 100;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
+        BetaTransaction tx = newTransaction();
+        ref.set(tx, initialValue + 1);
+        ref.privatize(tx);
+
+        try {
+            tx.openForConstruction(ref);
+            fail();
+        } catch (IllegalArgumentException expected) {
+
+        }
+
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertNull(ref.___getLockOwner());
+        assertHasNoUpdateLock(ref);
+        assertHasNoCommitLock(ref);
     }
 
     @Test
-    @Ignore
-    public void whenAlreadyOpenedForWritingAndEnsured_thenIllegalArgumentException(){
+    public void whenAlreadyEnsuredByOther_thenIllegalArgumentException() {
+        long initialValue = 100;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.ensure(otherTx);
+
+        BetaTransaction tx = newTransaction();
+
+        try {
+            tx.openForConstruction(ref);
+            fail();
+        } catch (IllegalArgumentException expected) {
+
+        }
+
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertHasUpdateLock(ref);
+        assertHasNoCommitLock(ref);
     }
 
+    @Test
+    public void whenAlreadyOpenedForWritingAndPrivatized_thenIllegalArgumentException() {
+        long initialValue = 100;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.privatize(otherTx);
+
+        BetaTransaction tx = newTransaction();
+
+        try {
+            tx.openForConstruction(ref);
+            fail();
+        } catch (IllegalArgumentException expected) {
+
+        }
+
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertSame(otherTx, ref.___getLockOwner());
+        assertHasNoUpdateLock(ref);
+        assertHasCommitLock(ref);
+    }
+
+    @Test
+    public void whenAlreadyOpenedForWritingAndEnsured_thenIllegalArgumentException() {
+        long initialValue = 100;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        BetaTransaction tx = newTransaction();
+        ref.set(tx, initialValue + 1);
+        ref.ensure(tx);
+
+        try {
+            tx.openForConstruction(ref);
+            fail();
+        } catch (IllegalArgumentException expected) {
+
+        }
+
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertNull(ref.___getLockOwner());
+        assertHasNoUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+    }
 
     @Test
     public void whenAlreadyOpenedForReading_thenIllegalArgumentException() {
