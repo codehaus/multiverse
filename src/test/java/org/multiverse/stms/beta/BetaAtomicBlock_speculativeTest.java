@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.assertInstanceof;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
 public class BetaAtomicBlock_speculativeTest implements BetaStmConstants{
@@ -48,6 +48,7 @@ public class BetaAtomicBlock_speculativeTest implements BetaStmConstants{
         block.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
+                assertSame(tx, getThreadLocalTransaction());
                 BetaTransaction btx = (BetaTransaction) tx;
                 assertEquals(attempt.get(), tx.getAttempt());
                 attempt.incrementAndGet();
@@ -109,6 +110,7 @@ public class BetaAtomicBlock_speculativeTest implements BetaStmConstants{
         block.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
+                assertSame(tx, getThreadLocalTransaction());
                 BetaTransaction btx = (BetaTransaction) tx;
                 transactions.add(btx);
                 btx.commute(ref, function);
@@ -133,6 +135,7 @@ public class BetaAtomicBlock_speculativeTest implements BetaStmConstants{
         block.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
+                assertSame(tx, getThreadLocalTransaction());
                 BetaTransaction btx = (BetaTransaction) tx;
                 transactions.add(btx);
 
@@ -169,6 +172,7 @@ public class BetaAtomicBlock_speculativeTest implements BetaStmConstants{
         block.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
+                assertSame(tx, getThreadLocalTransaction());
                 BetaTransaction btx = (BetaTransaction) tx;
                 transactions.add(btx);
 
