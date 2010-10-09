@@ -26,6 +26,7 @@ public final class TransactionSensor {
      * Creates a new TransactionSensor.
      *
      * @param configuration the TransactionConfiguration this TransactionSensor measures.
+     * @throws NullPointerException if configuration is null.
      */
     public TransactionSensor(TransactionConfiguration configuration) {
         if (configuration == null) {

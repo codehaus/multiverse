@@ -36,7 +36,6 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
         assertIsActive(tx);
     }
 
-
     @Test
     public void whenContainsWrite() {
         BetaLongRef ref = newLongRef(stm);

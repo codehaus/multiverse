@@ -7,6 +7,7 @@ import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.multiverse.TestUtils.assertEqualsDouble;
 
 /**
  * @author Peter Veentjer
@@ -71,6 +72,22 @@ public class BetaStmTestUtils implements BetaStmConstants {
         tranlocal.value = value;
         tx.commit();
         return ref;
+    }
+
+    public static void assertVersionAndValue(BetaBooleanRef ref, long version, boolean value) {
+        assertEquals("version doesn't match", version, ref.getVersion());
+        assertEquals("value doesn't match", value, ref.___weakRead());
+    }
+
+    public static void assertVersionAndValue(BetaDoubleRef ref, long version, double value) {
+        assertEquals("version doesn't match", version, ref.getVersion());
+        assertEqualsDouble("value doesn't match", value, ref.___weakRead());
+    }
+
+
+    public static void assertVersionAndValue(BetaIntRef ref, long version, int value) {
+        assertEquals("version doesn't match", version, ref.getVersion());
+        assertEquals("value doesn't match", value, ref.___weakRead());
     }
 
     public static void assertVersionAndValue(BetaLongRef ref, long version, long value) {

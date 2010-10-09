@@ -24,7 +24,7 @@ public class SensorExampleTest implements BetaStmConstants {
     @Before
     public void setUp() {
         stm = new BetaStm();
-        stm.getSimpleProfiler().startPrintingDaemon();
+        //stm.getProfiler().startPrintingDaemon();
         ref = newLongRef(stm);
     }
 

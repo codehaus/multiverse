@@ -20,7 +20,6 @@ public abstract class BetaTransaction_registerTest implements BetaStmConstants {
 
     public abstract BetaTransaction newTransaction(BetaTransactionConfiguration config);
 
-
     @Before
     public void setUp() {
         stm = new BetaStm();

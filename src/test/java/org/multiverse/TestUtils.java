@@ -32,8 +32,12 @@ public class TestUtils implements MultiverseConstants {
         Thread.interrupted();
     }
 
+    public static void assertEqualsDouble(String msg, double expected, double found) {
+        assertEquals(msg, Double.doubleToLongBits(expected), Double.doubleToLongBits(found));
+    }
+
     public static void assertEqualsDouble(double expected, double found) {
-        assertEquals(Double.doubleToLongBits(expected), Double.doubleToLongBits(found));
+        assertEqualsDouble(null, expected, found);
     }
 
     public static int processorCount() {
@@ -223,6 +227,7 @@ public class TestUtils implements MultiverseConstants {
     }
 
     //todo: should be moved to betastmtestutils.
+
     public static BetaLongRef createReadBiasedLongRef(BetaStm stm, long value) {
         BetaLongRef ref = newLongRef(stm, value);
 
@@ -286,19 +291,19 @@ public class TestUtils implements MultiverseConstants {
      * Joins all threads. If this can't be done within 5 minutes, an assertion failure is thrown.
      *
      * @param threads the threads to join.
-     * @see #joinAll(long, TestThread...) for more specifics.
      * @return the total duration of all threads (so the sum of the time each thread has been running.
+     * @see #joinAll(long, TestThread...) for more specifics.
      */
     public static long joinAll(TestThread... threads) {
-        return joinAll(5 * 60,threads);
+        return joinAll(5 * 60, threads);
     }
 
     /**
      * Joins all threads. If one of the thread throws a throwable, the join will fail as well.
      *
      * @param timeoutSec the timeout in seconds. If the join doesn't complete within that time, the
-     *        join fails.
-     * @param threads the threads to join.
+     *                   join fails.
+     * @param threads    the threads to join.
      * @return the total duration of all threads (so the sum of the time each thread has been running.
      */
     @SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})

@@ -7,10 +7,9 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.exampletransactionalobjects.LinkedList;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.assertEqualsDouble;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.BetaStmUtils.*;
 
 public abstract class BetaTransaction_typesTest {
 
@@ -25,87 +24,86 @@ public abstract class BetaTransaction_typesTest {
 
     @Test
     public void whenIntRefUsed() {
-        BetaIntRef ref = newIntRef(stm, 100);
-        long version = ref.getVersion();
+        int initialValue = 100;
+        BetaIntRef ref = newIntRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
         IntRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
-        assertEquals(100, read.value);
+        assertEquals(initialValue, read.value);
         IntRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
         tx.commit();
 
-        assertVersion(version+1, ref.getVersion());
-        assertEquals(101, ref.___weakRead());
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
     }
 
-
-    void assertVersion(long l, long version) {
-    }
 
     @Test
     public void whenLongRefUsed() {
-        BetaLongRef ref = newLongRef(stm, 100);
-        long version = ref.getVersion();
+        long initialValue = 100;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
-        assertEquals(100, read.value);
+        assertEquals(initialValue, read.value);
         LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
         tx.commit();
 
-        assertVersion(version+1, ref.getVersion());
-        assertEquals(101, ref.___weakRead());
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
     }
 
     @Test
     public void whenRefUsed() {
-        BetaRef<String> ref = newRef(stm, "peter");
-        long version = ref.getVersion();
+        String initialValue = "peter";
+        BetaRef<String> ref = newRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
         RefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
-        assertEquals("peter", read.value);
+        assertEquals(initialValue, read.value);
         RefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
-        write.value = "john";
+        String newValue = "john";
+        write.value = newValue;
         tx.commit();
 
-        assertVersion(version+1, ref.getVersion());
-        assertEquals("john", ref.___weakRead());
+        assertVersionAndValue(ref, initialVersion+1, newValue);
 
     }
 
     @Test
     public void whenBooleanRefUsed() {
-        BetaBooleanRef ref = new BetaBooleanRef(stm, false);
-        long version = ref.getVersion();
+        boolean initialValue = false;
+        BetaBooleanRef ref = new BetaBooleanRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
         BooleanRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
-        assertFalse(read.value);
+        assertEquals(initialValue,read.value);
         BooleanRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value = true;
         tx.commit();
 
-        assertVersion(version+1, ref.getVersion());
-        assertTrue(ref.___weakRead());
+        assertVersionAndValue(ref, initialVersion + 1, !initialValue);
     }
 
     @Test
     public void whenDoubleUsed() {
-        BetaDoubleRef ref = newDoubleRef(stm, 10);
-        long version = ref.getVersion();
+        int initialValue = 10;
+        BetaDoubleRef ref = newDoubleRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
         DoubleRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
-        assertEqualsDouble(10, read.value);
+        assertEqualsDouble(initialValue, read.value);
         DoubleRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
-        write.value = 20;
+        double newValue = 20;
+        write.value = newValue;
         tx.commit();
 
-        assertVersion(version+1, ref.getVersion());
-        assertEqualsDouble(20, ref.___weakRead());
+        assertVersionAndValue(ref, initialVersion+1, newValue);
     }
 
     @Test

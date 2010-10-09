@@ -5,6 +5,7 @@ import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.durability.SimpleStorage;
 import org.multiverse.durability.Storage;
+import org.multiverse.sensors.Profiler;
 import org.multiverse.sensors.SimpleProfiler;
 import org.multiverse.stms.beta.collections.BetaTransactionalCollectionsFactory;
 import org.multiverse.stms.beta.collections.BetaTransactionalLinkedList;
@@ -31,7 +32,7 @@ public final class BetaStm implements Stm {
     public final int spinCount;
     public final BetaTransactionConfiguration defaultConfig;
     public final SimpleStorage storage;
-    public final SimpleProfiler simpleProfiler = new SimpleProfiler();
+    public final SimpleProfiler profiler = new SimpleProfiler();
     public final BackoffPolicy defaultBackoffPolicy;
     public final int defaultMaxRetries;
     public final BetaRefFactoryImpl defaultRefFactory = new BetaRefFactoryImpl();
@@ -55,8 +56,8 @@ public final class BetaStm implements Stm {
                 .buildAtomicBlock();
     }
 
-    public SimpleProfiler getSimpleProfiler() {
-        return simpleProfiler;
+    public Profiler getProfiler() {
+        return profiler;
     }
 
     public Storage getStorage() {
