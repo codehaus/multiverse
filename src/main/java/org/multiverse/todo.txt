@@ -233,10 +233,6 @@ and not allowed. So not throw the retry error immediately..
 
 - implement read on transaction.
 
-- ref commit all needs to be tested better
-
-- ref commit dirty needs to be tested better
-
 - tranlocal.prepareAll needs to be tested
 
 - tranlocal.prepareDirty needs to be tested
@@ -256,6 +252,8 @@ and not allowed. So not throw the retry error immediately..
 - repeatable read isolation level
 
 done
+
+- transaction.isAlive is removed from transaction interface and part of the beta transaction
 
 - improved testing of tranlocal.commitDirty
 

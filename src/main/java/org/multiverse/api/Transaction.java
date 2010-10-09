@@ -54,14 +54,6 @@ public interface Transaction {
     TransactionStatus getStatus();
 
     /**
-     * Checks if this Transaction is alive. The same information can be retrieved by calling the getStatus,
-     * but this is a bit better performing.
-     *
-     * @return true if alive (so active or prepared), false otherwise.
-     */
-    boolean isAlive();
-
-    /**
      * Gets the current attempt (so the number of tries this transaction already had). Value will
      * always be equal or larger than 1.
      *

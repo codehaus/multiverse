@@ -219,11 +219,12 @@ public abstract class VeryAbstractBetaTransactionalObject
     public final boolean isPrivatizedBySelf() {
         final Transaction tx = getThreadLocalTransaction();
 
-        if (tx != null && tx.isAlive()) {
-            return isPrivatizedBySelf(tx);
+        if (tx == null) {
+            throw new TransactionRequiredException("No transaction is found for the isPrivatizedBySelf operation");
+
         }
 
-        throw new TransactionRequiredException("No transaction is found for the isPrivatizedBySelf operation");
+        return isPrivatizedBySelf(tx);
     }
 
     @Override
@@ -243,11 +244,11 @@ public abstract class VeryAbstractBetaTransactionalObject
     public final boolean isPrivatizedByOther() {
         final Transaction tx = getThreadLocalTransaction();
 
-        if (tx != null && tx.isAlive()) {
-            return isPrivatizedByOther(tx);
+        if (tx != null) {
+            throw new TransactionRequiredException("No transaction is found for the isPrivatizedByOther operation");
         }
 
-        throw new TransactionRequiredException("No transaction is found for the isPrivatizedByOther operation");
+        return isPrivatizedByOther(tx);
     }
 
     @Override
@@ -272,11 +273,11 @@ public abstract class VeryAbstractBetaTransactionalObject
     public final boolean isEnsuredBySelf() {
         final Transaction tx = getThreadLocalTransaction();
 
-        if (tx != null && tx.isAlive()) {
-            return isEnsuredBySelf(tx);
+        if (tx != null) {
+            throw new TransactionRequiredException("No transaction is found for the isEnsuredBySelf operation");
         }
 
-        throw new TransactionRequiredException("No transaction is found for the isEnsuredBySelf operation");
+        return isEnsuredBySelf(tx);
     }
 
     @Override
@@ -296,11 +297,11 @@ public abstract class VeryAbstractBetaTransactionalObject
     public final boolean isEnsuredByOther() {
         final Transaction tx = getThreadLocalTransaction();
 
-        if (tx != null && tx.isAlive()) {
-            return isEnsuredByOther(tx);
+        if (tx != null) {
+            throw new TransactionRequiredException("No transaction is found for the isEnsuredByOther operation");
         }
 
-        throw new TransactionRequiredException("No transaction is found for the isEnsuredByOther operation");
+        return isEnsuredByOther(tx);
     }
 
     @Override

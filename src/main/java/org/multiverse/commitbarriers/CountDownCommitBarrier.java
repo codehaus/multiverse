@@ -190,7 +190,7 @@ public final class CountDownCommitBarrier extends CommitBarrier {
             throw new IllegalArgumentException();
         }
 
-        if (!tx.isAlive()) {
+        if (!tx.getStatus().isAlive()) {
             String msg = format("[%s] Can't call incParties on dead transaction because it is %s",
                     tx.getConfiguration().getFamilyName(),
                     tx.getStatus());

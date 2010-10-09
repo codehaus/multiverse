@@ -493,7 +493,7 @@ public abstract class CommitBarrier {
             throw new NullPointerException();
         }
 
-        if (!tx.isAlive()) {
+        if (!tx.getStatus().isAlive()) {
             throw new DeadTransactionException(
                     format("[%s] Transaction can't be used for %s since it isn't alive",
                             tx.getConfiguration().getFamilyName(), operation)

@@ -48,6 +48,12 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract LocalConflictCounter getLocalConflictCounter();
 
+    /**
+     * Checks if this Transaction is alive. The same information can be retrieved by calling the getStatus,
+     * but this is a bit better performing.
+     *
+     * @return true if alive (so active or prepared), false otherwise.
+     */    
     public final boolean isAlive(){
         return status == ACTIVE || status == PREPARED;
     }
