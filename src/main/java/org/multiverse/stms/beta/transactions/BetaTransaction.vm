@@ -37,16 +37,13 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     protected BetaTransactionConfiguration config;
     protected boolean abortOnly;
     protected final BetaObjectPool pool = new BetaObjectPool();
-    protected LocalConflictCounter localConflictCounter;
-
+ 
     public BetaTransaction(int poolTransactionType, BetaTransactionConfiguration config) {
         this.poolTransactionType = poolTransactionType;
         this.config = config;
     }
 
-    public final LocalConflictCounter getLocalConflictCounter(){
-        return localConflictCounter;
-    }
+    public abstract LocalConflictCounter getLocalConflictCounter();
 
     public final boolean isAlive(){
         return status == ACTIVE || status == PREPARED;

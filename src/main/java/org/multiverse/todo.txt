@@ -257,6 +257,8 @@ and not allowed. So not throw the retry error immediately..
 
 done
 
+- check javadoc of the TransactionalObject.
+
 - ref orelse.
 
 - atomic update methods don't need expensive load: the lock still needs to be set, so it can lift on the

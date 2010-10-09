@@ -206,12 +206,12 @@ public abstract class VeryAbstractBetaTransactionalObject
     }
 
     @Override
-    public final boolean isFree() {
+    public final boolean atomicIsFree() {
         return !___hasLock();
     }
 
     @Override
-    public final boolean isPrivatized() {
+    public final boolean atomicIsPrivatized() {
         return ___hasCommitLock();
     }
 
@@ -264,7 +264,7 @@ public abstract class VeryAbstractBetaTransactionalObject
     }
 
     @Override
-    public final boolean isEnsured() {
+    public final boolean atomicIsEnsured() {
         return ___hasUpdateLock();
     }
 

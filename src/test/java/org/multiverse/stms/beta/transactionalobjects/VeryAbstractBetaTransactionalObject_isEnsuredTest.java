@@ -22,7 +22,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredTest {
     @Test
     public void whenFree_thenFalse() {
         BetaLongRef ref = newLongRef(stm);
-        assertFalse(ref.isEnsured());
+        assertFalse(ref.atomicIsEnsured());
     }
 
     @Test
@@ -30,7 +30,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredTest {
         BetaLongRef ref = newLongRef(stm);
         ref.privatize(stm.startDefaultTransaction());
 
-        assertFalse(ref.isEnsured());
+        assertFalse(ref.atomicIsEnsured());
     }
 
     @Test
@@ -38,6 +38,6 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredTest {
         BetaLongRef ref = newLongRef(stm);
         ref.ensure(stm.startDefaultTransaction());
 
-        assertTrue(ref.isEnsured());
+        assertTrue(ref.atomicIsEnsured());
     }
 }

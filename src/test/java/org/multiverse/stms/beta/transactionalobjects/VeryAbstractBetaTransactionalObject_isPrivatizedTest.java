@@ -22,7 +22,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedTest {
     @Test
     public void whenFree_thenFalse() {
         BetaLongRef ref = newLongRef(stm);
-        assertFalse(ref.isPrivatized());
+        assertFalse(ref.atomicIsPrivatized());
     }
 
     @Test
@@ -30,7 +30,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedTest {
         BetaLongRef ref = newLongRef(stm);
         ref.privatize(stm.startDefaultTransaction());
 
-        assertTrue(ref.isPrivatized());
+        assertTrue(ref.atomicIsPrivatized());
     }
 
     @Test
@@ -38,6 +38,6 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedTest {
         BetaLongRef ref = newLongRef(stm);
         ref.ensure(stm.startDefaultTransaction());
 
-        assertFalse(ref.isPrivatized());
+        assertFalse(ref.atomicIsPrivatized());
     }
 }
