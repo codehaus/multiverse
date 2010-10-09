@@ -257,6 +257,8 @@ and not allowed. So not throw the retry error immediately..
 
 done
 
+- added test for atomicIsFree/atomicIsPrivatized/atomicIsEnsured.
+
 - check javadoc of the TransactionalObject.
 
 - ref orelse.
