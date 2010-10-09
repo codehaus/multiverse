@@ -362,8 +362,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
          }
 
          tranlocal.value = function.call(tranlocal.value);
- 
-    }
+     }
 
     public final  int read(BetaIntRef ref){
         throw new TodoException();
@@ -643,8 +642,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
          }
 
          tranlocal.value = function.call(tranlocal.value);
- 
-    }
+     }
 
     public final  boolean read(BetaBooleanRef ref){
         throw new TodoException();
@@ -924,8 +922,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
          }
 
          tranlocal.value = function.call(tranlocal.value);
- 
-    }
+     }
 
     public final  double read(BetaDoubleRef ref){
         throw new TodoException();
@@ -1205,8 +1202,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
          }
 
          tranlocal.value = function.call(tranlocal.value);
- 
-    }
+     }
 
     public final  long read(BetaLongRef ref){
         throw new TodoException();
@@ -1486,8 +1482,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
          }
 
          tranlocal.value = function.call(tranlocal.value);
- 
-    }
+     }
 
     private  void flattenCommute(
         final BetaTransactionalObject ref,
@@ -1762,8 +1757,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
          }
 
          throw new TodoException();
- 
-    }
+     }
 
  
     @Override
@@ -1844,7 +1838,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
     }
 
     private boolean hasReadConflict() {
-        if(config.readLockMode!=LOCKMODE_NONE||config.inconsistentReadAllowed) {
+        if(config.readLockMode!=LOCKMODE_NONE || config.inconsistentReadAllowed) {
             return false;
         }
 
@@ -2086,7 +2080,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 continue;
             }
 
-            if(!tranlocal.doPrepareWithWriteSkewPrevention(pool,this, config.spinCount, config.dirtyCheck)){
+            if(!tranlocal.doPrepareWithWriteSkewPrevention(pool,this, spinCount, dirtyCheck)){
                 return false;
             }
         }

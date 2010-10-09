@@ -1250,7 +1250,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         throw new TodoException();
     }
 
-
     // ======================= abort =======================================
 
     @Override

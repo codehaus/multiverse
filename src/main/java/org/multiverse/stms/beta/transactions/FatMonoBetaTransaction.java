@@ -2027,7 +2027,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         throw new TodoException();
     }
 
-
     // ======================= abort =======================================
 
     @Override

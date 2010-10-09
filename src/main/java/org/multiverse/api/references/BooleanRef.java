@@ -8,6 +8,7 @@ import org.multiverse.api.predicates.BooleanPredicate;
 /**
  * A Transactional Reference comparable to the <a href="http://clojure.org/refs">Clojure Ref</a>.
  *
+ * @author Peter Veentjer.
  */
 public interface BooleanRef extends TransactionalObject {
 
@@ -224,15 +225,48 @@ public interface BooleanRef extends TransactionalObject {
      */
     boolean atomicCompareAndSet(boolean expectedValue, boolean newValue);
 
+    /**
+     * Adds a deferred validator. A deferred validator is executed once the transaction commits, so it
+     * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
+     * validator is added multiple times, it will be called multiple times.
+     *
+     * This call lifts on the transaction stored in the ThreadLocalTransaction.
+     *
+     * @param validator the BooleanPredicate to add.
+     * @throws NullPointerException if validator or tx is null. If validator is null and transaction is not, the
+     *                              transaction if aborted.
+     */
+    void addDeferredValidator(BooleanPredicate validator);
+
+    /**
+     * Adds a deferred validator. A deferred validator is executed once the transaction commits, so it
+     * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
+     * validator is added multiple times, it will be called multiple times.
+     *
+     * This call lifts on the provided transaction.
+     *
+     * @param tx the Transaction this call lifts on
+     * param validator the BooleanPredicate to add.
+     * @throws NullPointerException if validator or tx is null. If validator is null and transaction is not, the
+     *                              transaction if aborted.
+     */
+    void addDeferredValidator(Transaction tx, BooleanPredicate validator);
+
+    /**
+     * Atomically adds a deferred validator. A deferred validator is executed once the transaction commits, so it
+     * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
+     * validator is added multiple times, it will be called multiple times.
+     *
+     * @param validator the BooleanPredicate to add.
+     * @throws NullPointerException if validator is null.
+     * @throws TransactionalExecutionException
+     */
+    void atomicAddDeferredValidator(BooleanPredicate validator);
+
+
     void await(boolean value);
 
     void await(Transaction tx,boolean value);
 
-    void addDeferredValidator(BooleanPredicate validator);
-
-    void addDeferredValidator(Transaction tx, BooleanPredicate validator);
-
-    void atomicAddDeferredValidator(BooleanPredicate validator);
-
-
+    //todo: atomicAwait.
 }

@@ -8,6 +8,7 @@ import org.multiverse.api.predicates.LongPredicate;
 /**
  * A Transactional Reference comparable to the <a href="http://clojure.org/refs">Clojure Ref</a>.
  *
+ * @author Peter Veentjer.
  */
 public interface LongRef extends TransactionalObject {
 
@@ -224,14 +225,42 @@ public interface LongRef extends TransactionalObject {
      */
     boolean atomicCompareAndSet(long expectedValue, long newValue);
 
-    void await(long value);
-
-    void await(Transaction tx,long value);
-
+    /**
+     * Adds a deferred validator. A deferred validator is executed once the transaction commits, so it
+     * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
+     * validator is added multiple times, it will be called multiple times.
+     *
+     * This call lifts on the transaction stored in the ThreadLocalTransaction.
+     *
+     * @param validator the LongPredicate to add.
+     * @throws NullPointerException if validator or tx is null. If validator is null and transaction is not, the
+     *                              transaction if aborted.
+     */
     void addDeferredValidator(LongPredicate validator);
 
+    /**
+     * Adds a deferred validator. A deferred validator is executed once the transaction commits, so it
+     * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
+     * validator is added multiple times, it will be called multiple times.
+     *
+     * This call lifts on the provided transaction.
+     *
+     * @param tx the Transaction this call lifts on
+     * param validator the LongPredicate to add.
+     * @throws NullPointerException if validator or tx is null. If validator is null and transaction is not, the
+     *                              transaction if aborted.
+     */
     void addDeferredValidator(Transaction tx, LongPredicate validator);
 
+    /**
+     * Atomically adds a deferred validator. A deferred validator is executed once the transaction commits, so it
+     * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
+     * validator is added multiple times, it will be called multiple times.
+     *
+     * @param validator the LongPredicate to add.
+     * @throws NullPointerException if validator is null.
+     * @throws TransactionalExecutionException
+     */
     void atomicAddDeferredValidator(LongPredicate validator);
 
     /**
@@ -297,4 +326,9 @@ public interface LongRef extends TransactionalObject {
     long incrementAndGet(Transaction tx,long amount);
 
 
+    void await(long value);
+
+    void await(Transaction tx,long value);
+
+    //todo: atomicAwait.
 }

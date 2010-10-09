@@ -273,8 +273,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
- 
-    }
+     }
 
     public final  int read(BetaIntRef ref){
         throw new TodoException();
@@ -466,8 +465,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
- 
-    }
+     }
 
     public final  boolean read(BetaBooleanRef ref){
         throw new TodoException();
@@ -659,8 +657,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
- 
-    }
+     }
 
     public final  double read(BetaDoubleRef ref){
         throw new TodoException();
@@ -852,8 +849,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
- 
-    }
+     }
 
     public final  long read(BetaLongRef ref){
         throw new TodoException();
@@ -1045,8 +1041,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
- 
-    }
+     }
 
     @Override
     public  Tranlocal openForRead(
@@ -1233,8 +1228,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         config.needsCommute();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
- 
-    }
+     }
 
  
     @Override
@@ -1315,7 +1309,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
     }
 
     private boolean hasReadConflict() {
-        if(config.readLockMode!=LOCKMODE_NONE||config.inconsistentReadAllowed) {
+        if(config.readLockMode!=LOCKMODE_NONE || config.inconsistentReadAllowed) {
             return false;
         }
 

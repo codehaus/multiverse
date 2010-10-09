@@ -8,6 +8,7 @@ import org.multiverse.api.predicates.DoublePredicate;
 /**
  * A Transactional Reference comparable to the <a href="http://clojure.org/refs">Clojure Ref</a>.
  *
+ * @author Peter Veentjer.
  */
 public interface DoubleRef extends TransactionalObject {
 
@@ -224,14 +225,42 @@ public interface DoubleRef extends TransactionalObject {
      */
     boolean atomicCompareAndSet(double expectedValue, double newValue);
 
-    void await(double value);
-
-    void await(Transaction tx,double value);
-
+    /**
+     * Adds a deferred validator. A deferred validator is executed once the transaction commits, so it
+     * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
+     * validator is added multiple times, it will be called multiple times.
+     *
+     * This call lifts on the transaction stored in the ThreadLocalTransaction.
+     *
+     * @param validator the DoublePredicate to add.
+     * @throws NullPointerException if validator or tx is null. If validator is null and transaction is not, the
+     *                              transaction if aborted.
+     */
     void addDeferredValidator(DoublePredicate validator);
 
+    /**
+     * Adds a deferred validator. A deferred validator is executed once the transaction commits, so it
+     * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
+     * validator is added multiple times, it will be called multiple times.
+     *
+     * This call lifts on the provided transaction.
+     *
+     * @param tx the Transaction this call lifts on
+     * param validator the DoublePredicate to add.
+     * @throws NullPointerException if validator or tx is null. If validator is null and transaction is not, the
+     *                              transaction if aborted.
+     */
     void addDeferredValidator(Transaction tx, DoublePredicate validator);
 
+    /**
+     * Atomically adds a deferred validator. A deferred validator is executed once the transaction commits, so it
+     * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
+     * validator is added multiple times, it will be called multiple times.
+     *
+     * @param validator the DoublePredicate to add.
+     * @throws NullPointerException if validator is null.
+     * @throws TransactionalExecutionException
+     */
     void atomicAddDeferredValidator(DoublePredicate validator);
 
     /**
@@ -297,4 +326,9 @@ public interface DoubleRef extends TransactionalObject {
     double incrementAndGet(Transaction tx,double amount);
 
 
+    void await(double value);
+
+    void await(Transaction tx,double value);
+
+    //todo: atomicAwait.
 }

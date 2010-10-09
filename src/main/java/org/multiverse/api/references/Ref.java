@@ -9,6 +9,7 @@ import org.multiverse.api.predicates.Predicate;
  * A Transactional Reference comparable to the <a href="http://clojure.org/refs">Clojure Ref</a>.
  *
  * @param <E>
+ * @author Peter Veentjer.
  */
 public interface Ref<E> extends TransactionalObject {
 
@@ -225,14 +226,42 @@ public interface Ref<E> extends TransactionalObject {
      */
     boolean atomicCompareAndSet(E expectedValue, E newValue);
 
-    void await(E value);
-
-    void await(Transaction tx,E value);
-
+    /**
+     * Adds a deferred validator. A deferred validator is executed once the transaction commits, so it
+     * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
+     * validator is added multiple times, it will be called multiple times.
+     *
+     * This call lifts on the transaction stored in the ThreadLocalTransaction.
+     *
+     * @param validator the Predicate<E> to add.
+     * @throws NullPointerException if validator or tx is null. If validator is null and transaction is not, the
+     *                              transaction if aborted.
+     */
     void addDeferredValidator(Predicate<E> validator);
 
+    /**
+     * Adds a deferred validator. A deferred validator is executed once the transaction commits, so it
+     * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
+     * validator is added multiple times, it will be called multiple times.
+     *
+     * This call lifts on the provided transaction.
+     *
+     * @param tx the Transaction this call lifts on
+     * param validator the Predicate<E> to add.
+     * @throws NullPointerException if validator or tx is null. If validator is null and transaction is not, the
+     *                              transaction if aborted.
+     */
     void addDeferredValidator(Transaction tx, Predicate<E> validator);
 
+    /**
+     * Atomically adds a deferred validator. A deferred validator is executed once the transaction commits, so it
+     * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
+     * validator is added multiple times, it will be called multiple times.
+     *
+     * @param validator the Predicate<E> to add.
+     * @throws NullPointerException if validator is null.
+     * @throws TransactionalExecutionException
+     */
     void atomicAddDeferredValidator(Predicate<E> validator);
 
     /**
@@ -262,4 +291,9 @@ public interface Ref<E> extends TransactionalObject {
      */
     boolean atomicIsNull();
 
+    void await(E value);
+
+    void await(Transaction tx,E value);
+
+    //todo: atomicAwait.
 }
