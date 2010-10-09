@@ -12,28 +12,22 @@ import org.multiverse.api.predicates.BooleanPredicate;
 public interface BooleanRef extends TransactionalObject {
 
     /**
-     * Sets the value and returns the previous value. If a transaction is running, it will lift on that
-     * transaction, else it will be executed atomically (so executed under its own transaction).
+     * Sets the value and returns the previous value using the Transaction on the ThreadLocalTransaction.
      *
      * @param value the new value.
      * @return the old value.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if tx is not in the correct state
-     *          for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     * @throws TransactionalExecutionException
      */
     boolean getAndSet(boolean value);
 
     /**
-     * Sets the new value. If a transaction is running, it will lift on that transaction, else it will
-     * be executed atomically (so executed under its own transaction).
+     * Sets the new value using the Transaction on the ThreadLocalTransaction.
      *
      * @param value the new value.
      * @return the new value.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if tx is not in the correct state
-     *          for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     * @throws TransactionalExecutionException
      */
     boolean set(boolean value);
 
@@ -44,21 +38,16 @@ public interface BooleanRef extends TransactionalObject {
      * @param value the new value
      * @return the old value
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is not in the correct
-     *                              state for this operation.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean set(Transaction tx, boolean value);
 
     /**
-     * Gets the value. If a Transaction currently is running, this call will lift on that transaction. If no
-     * Transaction is running, it will be run under its own transaction (so executed atomically).
+     * Gets the value using the provided transaction.
      *
      * @return the current value.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if tx is not in the correct state
-     *          for this operation.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
      * @see #atomicGet()
@@ -71,9 +60,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param tx the Transaction to lift on.
      * @return the value stored in the ref.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is not in the
-     *                              correct state for this operation.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean get(Transaction tx);
@@ -86,6 +73,11 @@ public interface BooleanRef extends TransactionalObject {
      */
     boolean atomicGet();
 
+    /**
+     * Atomically gets the value without providing any ordering guarantees. This method is extremely
+     * cheap and will never fail. It is the best method to call if you just want to get the current
+     * value stored.
+     */
     boolean atomicWeakGet();
 
     /**
@@ -113,9 +105,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param tx    the transaction used to do the getAndSet.
      * @return the old value.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is not
-     *                              in the correct state for this operation.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean getAndSet(Transaction tx, boolean value);
@@ -128,12 +118,13 @@ public interface BooleanRef extends TransactionalObject {
      * This is different than the behavior in Clojure where the commute will be re-applied at the end
      * of the transaction, even though some dependency is introduced, which can lead to inconsistencies.
      * <p/>
-     * This call lifts on an existing transaction if available, else it will be run under its own transaction.
+     * This call uses the Transaction stored in the ThreadLocalTransaction.
      * <p/>
      *
      * @param function the function to apply to this reference.
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     * @throws TransactionalExecutionException
      */
     void commute(BooleanFunction function);
 
@@ -145,13 +136,13 @@ public interface BooleanRef extends TransactionalObject {
      * This is different than the behavior in Clojure where the commute will be re-applied at the end
      * of the transaction, even though some dependency is introduced, which can lead to inconsistencies.
      * <p/>
-     * This call lifts on an existing transaction if available, else it will be run under its own transaction.
+     * This call lifts on the Transaction stored in the ThreadLocalTransaction.
      * <p/>
      *
      * @param tx       the transaction used for this operation.
      * @param function the function to apply to this reference.
      * @throws NullPointerException  if function is null.
-     * @throws IllegalStateException if the transaction is not in the correct state for this operation.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void commute(Transaction tx,BooleanFunction function);
@@ -167,29 +158,25 @@ public interface BooleanRef extends TransactionalObject {
     boolean atomicAlterAndGet(BooleanFunction function);
 
     /**
-     * Alters the value stored in this Ref using the alterAndGet function. If a transaction is available it will
-     * lift on that transaction, else it will be run under its own transaction.
+     * Alters the value stored in this Ref using the alterAndGet function. It lifts on the Transaction stored in the
+     * ThreadLocalTransaction.
      *
      * @param function the function that alters the value stored in this Ref.
      * @return the new value.
      * @throws NullPointerException if function is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if tx is not in the correct state
-     *                              for this operation.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean alterAndGet(BooleanFunction function);
 
     /**
-     * Alters the value stored in this Ref using the alterAndGet function.
+     * Alters the value stored in this Ref using the alterAndGet function and lifting on the provided transaction.
      *
      * @param function the function that alters the value stored in this Ref.
      * @param tx       the Transaction used by this operation.
      * @return the new value.
      * @throws NullPointerException if function or transaction is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is not in the
-     *                              correct state.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean alterAndGet(Transaction tx,BooleanFunction function);
@@ -205,29 +192,25 @@ public interface BooleanRef extends TransactionalObject {
     boolean atomicGetAndAlter(BooleanFunction function);
 
     /**
-     * Alters the value stored in this Ref using the alterAndGet function. If a transaction is available it will
-     * lift on that transaction, else it will be run under its own transaction.
+     * Alters the value stored in this Ref using the alterAndGet function. This call lifts on the Transaction stored
+     * in the ThreadLocalTransaction.
      *
      * @param function the function that alters the value stored in this Ref.
      * @return the old value.
      * @throws NullPointerException if function is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if tx is not in the correct state
-     *                              for this operation.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean getAndAlter(BooleanFunction function);
 
     /**
-     * Alters the value stored in this Ref using the alterAndGet function.
+     * Alters the value stored in this Ref using the alterAndGet function using the provided transaction.
      *
      * @param function the function that alters the value stored in this Ref.
      * @param tx       the Transaction used by this operation.
      * @return the old value
      * @throws NullPointerException if function or transaction is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is not in the
-     *                              correct state.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean getAndAlter(Transaction tx, BooleanFunction function);

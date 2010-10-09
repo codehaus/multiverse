@@ -37,13 +37,16 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     protected BetaTransactionConfiguration config;
     protected boolean abortOnly;
     protected final BetaObjectPool pool = new BetaObjectPool();
+    protected LocalConflictCounter localConflictCounter;
 
     public BetaTransaction(int poolTransactionType, BetaTransactionConfiguration config) {
         this.poolTransactionType = poolTransactionType;
         this.config = config;
     }
 
-    public abstract LocalConflictCounter getLocalConflictCounter();
+    public final LocalConflictCounter getLocalConflictCounter(){
+        return localConflictCounter;
+    }
 
     public final boolean isAlive(){
         return status == ACTIVE || status == PREPARED;
@@ -447,10 +450,8 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     *
     * @param changeListener the Latch the is notified when a change happens on one of the reads.
     * @throws NullPointerException if changeListener is null (will also ___abort the transaction).
-    * @throws org.multiverse.api.exceptions.NoRetryPossibleException
-    *                              if no registration can be done because the
-    *                              transaction doesn't have any reads. When this exception happens, the transaction
-    *                              will also be aborted.
+    * @throws org.multiverse.api.exceptions.RetryException
+    *                              if the retry fails
     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
     *                              if the transaction isn't in the correct
     *                              state for this transaction. When this exception happens, the transaction will also

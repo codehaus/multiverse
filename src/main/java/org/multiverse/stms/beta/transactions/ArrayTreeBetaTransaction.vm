@@ -406,7 +406,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
          throw new TodoException();
 #end         
 #end ## if(transaction.lean)
-
     }
 
 #end ##for loop of transactionalobjects.
@@ -489,7 +488,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 
     private boolean hasReadConflict() {
-        if(config.readLockMode!=LOCKMODE_NONE||config.inconsistentReadAllowed) {
+        if(config.readLockMode!=LOCKMODE_NONE || config.inconsistentReadAllowed) {
             return false;
         }
 
@@ -816,7 +815,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 continue;
             }
 
-            if(!tranlocal.doPrepareWithWriteSkewPrevention(pool,this, config.spinCount, config.dirtyCheck)){
+            if(!tranlocal.doPrepareWithWriteSkewPrevention(pool,this, spinCount, dirtyCheck)){
                 return false;
             }
         }
@@ -1021,34 +1020,21 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     // ================== orelse ============================
 
+#if(!$transaction.lean)
     @Override
     public final void startEitherBranch(){
-#if($transaction.lean)
-        config.needsOrelse();
-        abort();
-        throw SpeculativeConfigurationError.INSTANCE;
-#else
         throw new TodoException();
-#end
     }
 
     @Override
     public final void endEitherBranch(){
-#if($transaction.lean)
-        abort();
-        throw new IllegalStateException();
-#else
         throw new TodoException();
-#end
     }
 
     @Override
     public final void startOrElseBranch(){
-#if($transaction.lean)
-        abort();
-        throw new IllegalStateException();
-#else
         throw new TodoException();
-#end
     }
+#end
+    
 }

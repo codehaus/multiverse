@@ -19,7 +19,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     public final static AtomicLong conflictScan = new AtomicLong();
 
     private final Tranlocal[] array;
-    private LocalConflictCounter localConflictCounter;    
+    private LocalConflictCounter localConflictCounter;
     private int firstFreeIndex = 0;
     private boolean hasReads;
     private boolean hasUpdates;
@@ -970,34 +970,21 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     // ================== orelse ============================
 
+#if(!$transaction.lean)
     @Override
     public final void startEitherBranch(){
-#if($transaction.lean)
-        config.needsOrelse();
-        abort();
-        throw SpeculativeConfigurationError.INSTANCE;
-#else
         throw new TodoException();
-#end
     }
 
     @Override
     public final void endEitherBranch(){
-#if($transaction.lean)
-        abort();
-        throw new IllegalStateException();
-#else
         throw new TodoException();
-#end
     }
 
     @Override
     public final void startOrElseBranch(){
-#if($transaction.lean)
-        abort();
-        throw new IllegalStateException();
-#else
         throw new TodoException();
-#end    
     }
+
+#end
 }

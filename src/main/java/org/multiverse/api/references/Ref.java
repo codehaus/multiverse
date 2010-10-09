@@ -13,28 +13,22 @@ import org.multiverse.api.predicates.Predicate;
 public interface Ref<E> extends TransactionalObject {
 
     /**
-     * Sets the value and returns the previous value. If a transaction is running, it will lift on that
-     * transaction, else it will be executed atomically (so executed under its own transaction).
+     * Sets the value and returns the previous value using the Transaction on the ThreadLocalTransaction.
      *
      * @param value the new value.
      * @return the old value.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if tx is not in the correct state
-     *          for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     * @throws TransactionalExecutionException
      */
     E getAndSet(E value);
 
     /**
-     * Sets the new value. If a transaction is running, it will lift on that transaction, else it will
-     * be executed atomically (so executed under its own transaction).
+     * Sets the new value using the Transaction on the ThreadLocalTransaction.
      *
      * @param value the new value.
      * @return the new value.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if tx is not in the correct state
-     *          for this operation.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     * @throws TransactionalExecutionException
      */
     E set(E value);
 
@@ -45,21 +39,16 @@ public interface Ref<E> extends TransactionalObject {
      * @param value the new value
      * @return the old value
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is not in the correct
-     *                              state for this operation.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E set(Transaction tx, E value);
 
     /**
-     * Gets the value. If a Transaction currently is running, this call will lift on that transaction. If no
-     * Transaction is running, it will be run under its own transaction (so executed atomically).
+     * Gets the value using the provided transaction.
      *
      * @return the current value.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if tx is not in the correct state
-     *          for this operation.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
      * @see #atomicGet()
@@ -72,9 +61,7 @@ public interface Ref<E> extends TransactionalObject {
      * @param tx the Transaction to lift on.
      * @return the value stored in the ref.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is not in the
-     *                              correct state for this operation.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E get(Transaction tx);
@@ -87,6 +74,11 @@ public interface Ref<E> extends TransactionalObject {
      */
     E atomicGet();
 
+    /**
+     * Atomically gets the value without providing any ordering guarantees. This method is extremely
+     * cheap and will never fail. It is the best method to call if you just want to get the current
+     * value stored.
+     */
     E atomicWeakGet();
 
     /**
@@ -114,9 +106,7 @@ public interface Ref<E> extends TransactionalObject {
      * @param tx    the transaction used to do the getAndSet.
      * @return the old value.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is not
-     *                              in the correct state for this operation.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E getAndSet(Transaction tx, E value);
@@ -129,12 +119,13 @@ public interface Ref<E> extends TransactionalObject {
      * This is different than the behavior in Clojure where the commute will be re-applied at the end
      * of the transaction, even though some dependency is introduced, which can lead to inconsistencies.
      * <p/>
-     * This call lifts on an existing transaction if available, else it will be run under its own transaction.
+     * This call uses the Transaction stored in the ThreadLocalTransaction.
      * <p/>
      *
      * @param function the function to apply to this reference.
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     * @throws TransactionalExecutionException
      */
     void commute(Function<E> function);
 
@@ -146,13 +137,13 @@ public interface Ref<E> extends TransactionalObject {
      * This is different than the behavior in Clojure where the commute will be re-applied at the end
      * of the transaction, even though some dependency is introduced, which can lead to inconsistencies.
      * <p/>
-     * This call lifts on an existing transaction if available, else it will be run under its own transaction.
+     * This call lifts on the Transaction stored in the ThreadLocalTransaction.
      * <p/>
      *
      * @param tx       the transaction used for this operation.
      * @param function the function to apply to this reference.
      * @throws NullPointerException  if function is null.
-     * @throws IllegalStateException if the transaction is not in the correct state for this operation.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void commute(Transaction tx,Function<E> function);
@@ -168,29 +159,25 @@ public interface Ref<E> extends TransactionalObject {
     E atomicAlterAndGet(Function<E> function);
 
     /**
-     * Alters the value stored in this Ref using the alterAndGet function. If a transaction is available it will
-     * lift on that transaction, else it will be run under its own transaction.
+     * Alters the value stored in this Ref using the alterAndGet function. It lifts on the Transaction stored in the
+     * ThreadLocalTransaction.
      *
      * @param function the function that alters the value stored in this Ref.
      * @return the new value.
      * @throws NullPointerException if function is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if tx is not in the correct state
-     *                              for this operation.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E alterAndGet(Function<E> function);
 
     /**
-     * Alters the value stored in this Ref using the alterAndGet function.
+     * Alters the value stored in this Ref using the alterAndGet function and lifting on the provided transaction.
      *
      * @param function the function that alters the value stored in this Ref.
      * @param tx       the Transaction used by this operation.
      * @return the new value.
      * @throws NullPointerException if function or transaction is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is not in the
-     *                              correct state.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E alterAndGet(Transaction tx,Function<E> function);
@@ -206,29 +193,25 @@ public interface Ref<E> extends TransactionalObject {
     E atomicGetAndAlter(Function<E> function);
 
     /**
-     * Alters the value stored in this Ref using the alterAndGet function. If a transaction is available it will
-     * lift on that transaction, else it will be run under its own transaction.
+     * Alters the value stored in this Ref using the alterAndGet function. This call lifts on the Transaction stored
+     * in the ThreadLocalTransaction.
      *
      * @param function the function that alters the value stored in this Ref.
      * @return the old value.
      * @throws NullPointerException if function is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if tx is not in the correct state
-     *                              for this operation.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E getAndAlter(Function<E> function);
 
     /**
-     * Alters the value stored in this Ref using the alterAndGet function.
+     * Alters the value stored in this Ref using the alterAndGet function using the provided transaction.
      *
      * @param function the function that alters the value stored in this Ref.
      * @param tx       the Transaction used by this operation.
      * @return the old value
      * @throws NullPointerException if function or transaction is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is not in the
-     *                              correct state.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     E getAndAlter(Transaction tx, Function<E> function);
@@ -253,26 +236,21 @@ public interface Ref<E> extends TransactionalObject {
     void atomicAddDeferredValidator(Predicate<E> validator);
 
     /**
-     * Checks if the current value is null. If a transaction is available, it will lift on that transaction,
-     * else it will be run under its own transaction.
+     * Checks if the current value is null. This call lifts on the Transaction stored in the ThreadLocalTransaction.
      *
      * @return true if null, false otherwise.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if tx is not in the correct state
-     *          for this operation.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean isNull();
 
     /**
-     * Checks if the current value is null.
+     * Checks if the current value is null. This call lifts on the provided Transaction.
      *
      * @param tx the transaction used for this operation.
      * @return true if the value is null, false otherwise.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *                              if the transaction is not in the
-     *                              correct state for this operation.
+     * @throws TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean isNull(Transaction tx);

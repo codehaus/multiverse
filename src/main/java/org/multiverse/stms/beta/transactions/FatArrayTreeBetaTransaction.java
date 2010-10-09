@@ -2298,4 +2298,5 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
     public final void startOrElseBranch(){
         throw new TodoException();
     }
+    
 }

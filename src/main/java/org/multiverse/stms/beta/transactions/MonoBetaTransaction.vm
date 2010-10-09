@@ -496,7 +496,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         throw new TodoException();
     }
 
-
     // ======================= abort =======================================
 
     @Override
@@ -831,35 +830,21 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     // ================== orelse ============================
 
+#if(!$transaction.lean)
     @Override
     public final void startEitherBranch(){
-#if($transaction.lean)
-        config.needsOrelse();
-        abort();
-        throw SpeculativeConfigurationError.INSTANCE;
-#else
         throw new TodoException();
-#end
     }
 
     @Override
     public final void endEitherBranch(){
-#if($transaction.lean)
-        abort();
-        throw new IllegalStateException();
-#else
         throw new TodoException();
-#end
     }
 
     @Override
     public final void startOrElseBranch(){
-#if($transaction.lean)
-        abort();
-        throw new IllegalStateException();
-#else
         throw new TodoException();
-#end
     }
+#end
 }
 

@@ -1815,22 +1815,4 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
     // ================== orelse ============================
 
-    @Override
-    public final void startEitherBranch(){
-        config.needsOrelse();
-        abort();
-        throw SpeculativeConfigurationError.INSTANCE;
-    }
-
-    @Override
-    public final void endEitherBranch(){
-        abort();
-        throw new IllegalStateException();
-    }
-
-    @Override
-    public final void startOrElseBranch(){
-        abort();
-        throw new IllegalStateException();
-    }
 }
