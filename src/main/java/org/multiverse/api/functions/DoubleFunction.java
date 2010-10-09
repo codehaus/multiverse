@@ -7,7 +7,7 @@ package org.multiverse.api.functions;
  *
  * @author Peter Veentjer.
  */
-public abstract class DoubleFunction implements Function<Double> {
+public abstract class DoubleFunction implements Function<Double>{
 
     /**
      * Calculates the new value based on the current value.

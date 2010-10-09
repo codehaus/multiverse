@@ -7,7 +7,7 @@ package org.multiverse.api.functions;
  *
  * @author Peter Veentjer.
  */
-public abstract class IntFunction implements Function<Integer> {
+public abstract class IntFunction implements Function<Integer>{
 
     /**
      * Calculates the new value based on the current value.

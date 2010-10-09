@@ -5,7 +5,7 @@ package org.multiverse.api.predicates;
  *
  * @author Peter Veentjer.
  */
-public abstract class LongPredicate implements Predicate<Long> {
+public abstract class LongPredicate implements Predicate<Long>{
 
     /**
      * Evaluates the predicate

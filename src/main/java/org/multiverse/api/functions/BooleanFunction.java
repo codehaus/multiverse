@@ -7,7 +7,7 @@ package org.multiverse.api.functions;
  *
  * @author Peter Veentjer.
  */
-public abstract class BooleanFunction implements Function<Boolean> {
+public abstract class BooleanFunction implements Function<Boolean>{
 
     /**
      * Calculates the new value based on the current value.

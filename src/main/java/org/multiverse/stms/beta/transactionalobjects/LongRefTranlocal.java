@@ -7,38 +7,38 @@ import org.multiverse.stms.beta.BetaObjectPool;
 
 /**
  * The {@link Tranlocal} for the {@link BetaLongRef).
- * <p/>
+ *
  * This class is generated.
  *
  * @author Peter Veentjer
  */
-public final class LongRefTranlocal extends Tranlocal {
+public final class LongRefTranlocal extends Tranlocal{
 
     public long value;
     public long oldValue;
     public LongPredicate[] validators;
 
-    public LongRefTranlocal(BetaLongRef ref) {
+    public LongRefTranlocal(BetaLongRef ref){
         super(ref);
     }
 
     @Override
-    public final void evaluateCommutingFunctions(final BetaObjectPool pool) {
+    public final void evaluateCommutingFunctions(final BetaObjectPool  pool){
         assert isCommuting;
 
         long newValue = value;
 
         CallableNode current = headCallable;
         headCallable = null;
-        do {
+        do{
             LongFunction function =
-                    (LongFunction) current.function;
+                (LongFunction)current.function;
             newValue = function.call(newValue);
 
             CallableNode old = current;
             current = current.next;
             pool.putCallableNode(old);
-        } while (current != null);
+        }while(current != null);
 
         value = newValue;
         isDirty = newValue != oldValue;
@@ -46,13 +46,13 @@ public final class LongRefTranlocal extends Tranlocal {
     }
 
     @Override
-    public void addCommutingFunction(final Function function, final BetaObjectPool pool) {
+    public void addCommutingFunction(final Function function, final BetaObjectPool pool){
         assert isCommuting;
 
         CallableNode node = pool.takeCallableNode();
-        if (node == null) {
+        if(node == null){
             headCallable = new CallableNode(function, headCallable);
-        } else {
+        }else{
             node.function = function;
             node.next = headCallable;
             headCallable = node;
@@ -79,12 +79,12 @@ public final class LongRefTranlocal extends Tranlocal {
                 pool.putCallableNode(current);
                 current = next;
             } while (current != null);
-        }
+      }
     }
 
     @Override
     public boolean calculateIsDirty() {
-        if (isDirty) {
+        if(isDirty){
             return true;
         }
 

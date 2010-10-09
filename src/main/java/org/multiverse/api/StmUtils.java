@@ -25,11 +25,11 @@ import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTr
 public class StmUtils {
 
     private final static RefFactory refFactory
-            = getGlobalStmInstance().getDefaultRefFactory();
+        = getGlobalStmInstance().getDefaultRefFactory();
     private final static AtomicBlock defaultAtomicBlock
-            = getGlobalStmInstance().getDefaultAtomicBlock();
+        = getGlobalStmInstance().getDefaultAtomicBlock();
     private final static TransactionalCollectionsFactory collectionsFactory
-            = getGlobalStmInstance().getCollectionsFactory();
+        = getGlobalStmInstance().getCollectionsFactory();
 
     /**
      * Creates a new committed TransactionalList that is based on linked nodes using the GlobalStmInstance.
@@ -37,11 +37,11 @@ public class StmUtils {
      * @param <E> the type of the elements in the list.
      * @return the created list.
      */
-    public static <E> TransactionalList<E> newLinkedList() {
+    public static <E> TransactionalList<E> newLinkedList(){
         return collectionsFactory.newLinkedList();
     }
 
-    /**
+     /**
      * Creates a new committed TransactionalList that is based on linked nodes and
      * is initialized with the given collection and using the GlobalStmInstance.
      *
@@ -50,47 +50,47 @@ public class StmUtils {
      * @return the created list.
      * @throws NullPointerException if c is null.
      */
-    public static <E> TransactionalList<E> newLinkedList(Collection<? extends E> c) {
+    public static <E> TransactionalList<E> newLinkedList(Collection<? extends E> c){
         return collectionsFactory.newLinkedList(c);
     }
 
-    public static <E> TransactionalDeque<E> newLinkedDeque() {
+    public static <E> TransactionalDeque<E> newLinkedDeque(){
         return collectionsFactory.newLinkedDeque();
     }
 
-    public static <E> TransactionalDeque<E> newLinkedDeque(Collection<? extends E> c) {
+    public static <E> TransactionalDeque<E> newLinkedDeque(Collection<? extends E> c){
         return collectionsFactory.newLinkedDeque(c);
     }
 
-    public static <E> TransactionalBlockingDeque<E> newLinkedBlockingDeque() {
+    public static <E> TransactionalBlockingDeque<E> newLinkedBlockingDeque(){
         return collectionsFactory.newLinkedBlockingDeque();
     }
 
-    public static <E> TransactionalBlockingDeque<E> newLinkedBlockingDeque(int capacity) {
+    public static <E> TransactionalBlockingDeque<E> newLinkedBlockingDeque(int capacity){
         return collectionsFactory.newLinkedBlockingDeque(capacity);
     }
 
-    public static <E> TransactionalBlockingDeque<E> newLinkedBlockingDeque(Collection<? extends E> c) {
+    public static <E> TransactionalBlockingDeque<E> newLinkedBlockingDeque(Collection<? extends E> c){
         return collectionsFactory.newLinkedBlockingDeque(c);
     }
 
-    public static <E> TransactionalQueue<E> newLinkedQueue() {
+    public static <E> TransactionalQueue<E> newLinkedQueue(){
         return collectionsFactory.newLinkedQueue();
     }
 
-    public static <E> TransactionalQueue<E> newLinkedQueue(Collection<? extends E> c) {
+    public static <E> TransactionalQueue<E> newLinkedQueue(Collection<? extends E> c){
         return collectionsFactory.newLinkedQueue(c);
     }
 
-    public static <E> TransactionalBlockingQueue<E> newLinkedBlockingQueue() {
+    public static <E> TransactionalBlockingQueue<E> newLinkedBlockingQueue(){
         return collectionsFactory.newLinkedBlockingQueue();
     }
 
-    public static <E> TransactionalBlockingQueue<E> newLinkedBlockingQueue(int capacity) {
+    public static <E> TransactionalBlockingQueue<E> newLinkedBlockingQueue(int capacity){
         return collectionsFactory.newLinkedBlockingQueue(capacity);
     }
 
-    public static <E> TransactionalBlockingQueue<E> newLinkedBlockingQueue(Collection<? extends E> c) {
+    public static <E> TransactionalBlockingQueue<E> newLinkedBlockingQueue(Collection<? extends E> c){
         return collectionsFactory.newLinkedBlockingQueue(c);
     }
 
@@ -98,7 +98,7 @@ public class StmUtils {
      * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
      * transaction (so the propagation level is Requires) and will not commit this transaction.
-     * <p/>
+     *
      * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
      *
@@ -106,31 +106,31 @@ public class StmUtils {
      * @return the result of the execution
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if the closure throws a checked exception.
+     *                                  if the closure throws a checked exception.
      */
-    public static <E> E execute(AtomicClosure<E> closure) {
+    public static <E> E execute(AtomicClosure<E> closure){
         return defaultAtomicBlock.execute(closure);
     }
+
+   /**
+    * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
+    * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
+    * transaction (so the propagation level is Requires) and will not commit this transaction.
+    *
+    * @param closure The {AtomicClosure} to execute.
+    * @return the result of the execution
+    * @throws NullPointerException if closure is null.
+    * @throws Exception is the closure throws an Exception
+    */
+   public static <E> E executeChecked(AtomicClosure<E> closure) throws Exception{
+       return defaultAtomicBlock.executeChecked(closure);
+   }
 
     /**
      * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
      * transaction (so the propagation level is Requires) and will not commit this transaction.
      *
-     * @param closure The {AtomicClosure} to execute.
-     * @return the result of the execution
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            is the closure throws an Exception
-     */
-    public static <E> E executeChecked(AtomicClosure<E> closure) throws Exception {
-        return defaultAtomicBlock.executeChecked(closure);
-    }
-
-    /**
-     * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-     * transaction (so the propagation level is Requires) and will not commit this transaction.
-     * <p/>
      * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
      *
@@ -138,31 +138,31 @@ public class StmUtils {
      * @return the result of the execution
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if the closure throws a checked exception.
+     *                                  if the closure throws a checked exception.
      */
-    public static int execute(AtomicIntClosure closure) {
+    public static  int execute(AtomicIntClosure closure){
         return defaultAtomicBlock.execute(closure);
     }
+
+   /**
+    * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
+    * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
+    * transaction (so the propagation level is Requires) and will not commit this transaction.
+    *
+    * @param closure The {AtomicIntClosure} to execute.
+    * @return the result of the execution
+    * @throws NullPointerException if closure is null.
+    * @throws Exception is the closure throws an Exception
+    */
+   public static  int executeChecked(AtomicIntClosure closure) throws Exception{
+       return defaultAtomicBlock.executeChecked(closure);
+   }
 
     /**
      * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
      * transaction (so the propagation level is Requires) and will not commit this transaction.
      *
-     * @param closure The {AtomicIntClosure} to execute.
-     * @return the result of the execution
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            is the closure throws an Exception
-     */
-    public static int executeChecked(AtomicIntClosure closure) throws Exception {
-        return defaultAtomicBlock.executeChecked(closure);
-    }
-
-    /**
-     * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-     * transaction (so the propagation level is Requires) and will not commit this transaction.
-     * <p/>
      * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
      *
@@ -170,31 +170,31 @@ public class StmUtils {
      * @return the result of the execution
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if the closure throws a checked exception.
+     *                                  if the closure throws a checked exception.
      */
-    public static long execute(AtomicLongClosure closure) {
+    public static  long execute(AtomicLongClosure closure){
         return defaultAtomicBlock.execute(closure);
     }
+
+   /**
+    * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
+    * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
+    * transaction (so the propagation level is Requires) and will not commit this transaction.
+    *
+    * @param closure The {AtomicLongClosure} to execute.
+    * @return the result of the execution
+    * @throws NullPointerException if closure is null.
+    * @throws Exception is the closure throws an Exception
+    */
+   public static  long executeChecked(AtomicLongClosure closure) throws Exception{
+       return defaultAtomicBlock.executeChecked(closure);
+   }
 
     /**
      * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
      * transaction (so the propagation level is Requires) and will not commit this transaction.
      *
-     * @param closure The {AtomicLongClosure} to execute.
-     * @return the result of the execution
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            is the closure throws an Exception
-     */
-    public static long executeChecked(AtomicLongClosure closure) throws Exception {
-        return defaultAtomicBlock.executeChecked(closure);
-    }
-
-    /**
-     * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-     * transaction (so the propagation level is Requires) and will not commit this transaction.
-     * <p/>
      * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
      *
@@ -202,31 +202,31 @@ public class StmUtils {
      * @return the result of the execution
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if the closure throws a checked exception.
+     *                                  if the closure throws a checked exception.
      */
-    public static double execute(AtomicDoubleClosure closure) {
+    public static  double execute(AtomicDoubleClosure closure){
         return defaultAtomicBlock.execute(closure);
     }
+
+   /**
+    * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
+    * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
+    * transaction (so the propagation level is Requires) and will not commit this transaction.
+    *
+    * @param closure The {AtomicDoubleClosure} to execute.
+    * @return the result of the execution
+    * @throws NullPointerException if closure is null.
+    * @throws Exception is the closure throws an Exception
+    */
+   public static  double executeChecked(AtomicDoubleClosure closure) throws Exception{
+       return defaultAtomicBlock.executeChecked(closure);
+   }
 
     /**
      * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
      * transaction (so the propagation level is Requires) and will not commit this transaction.
      *
-     * @param closure The {AtomicDoubleClosure} to execute.
-     * @return the result of the execution
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            is the closure throws an Exception
-     */
-    public static double executeChecked(AtomicDoubleClosure closure) throws Exception {
-        return defaultAtomicBlock.executeChecked(closure);
-    }
-
-    /**
-     * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-     * transaction (so the propagation level is Requires) and will not commit this transaction.
-     * <p/>
      * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
      *
@@ -234,55 +234,55 @@ public class StmUtils {
      * @return the result of the execution
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if the closure throws a checked exception.
+     *                                  if the closure throws a checked exception.
      */
-    public static boolean execute(AtomicBooleanClosure closure) {
+    public static  boolean execute(AtomicBooleanClosure closure){
         return defaultAtomicBlock.execute(closure);
     }
+
+   /**
+    * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
+    * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
+    * transaction (so the propagation level is Requires) and will not commit this transaction.
+    *
+    * @param closure The {AtomicBooleanClosure} to execute.
+    * @return the result of the execution
+    * @throws NullPointerException if closure is null.
+    * @throws Exception is the closure throws an Exception
+    */
+   public static  boolean executeChecked(AtomicBooleanClosure closure) throws Exception{
+       return defaultAtomicBlock.executeChecked(closure);
+   }
 
     /**
      * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
      * transaction (so the propagation level is Requires) and will not commit this transaction.
      *
-     * @param closure The {AtomicBooleanClosure} to execute.
-     * @return the result of the execution
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            is the closure throws an Exception
-     */
-    public static boolean executeChecked(AtomicBooleanClosure closure) throws Exception {
-        return defaultAtomicBlock.executeChecked(closure);
-    }
-
-    /**
-     * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-     * transaction (so the propagation level is Requires) and will not commit this transaction.
-     * <p/>
      * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
      *
      * @param closure The {AtomicVoidClosure} to execute.
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if the closure throws a checked exception.
+     *                                  if the closure throws a checked exception.
      */
-    public static void execute(AtomicVoidClosure closure) {
+    public static  void execute(AtomicVoidClosure closure){
         defaultAtomicBlock.execute(closure);
     }
 
-    /**
-     * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-     * transaction (so the propagation level is Requires) and will not commit this transaction.
-     *
-     * @param closure The {AtomicVoidClosure} to execute.
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            is the closure throws an Exception
-     */
-    public static void executeChecked(AtomicVoidClosure closure) throws Exception {
-        defaultAtomicBlock.executeChecked(closure);
-    }
+   /**
+    * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
+    * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
+    * transaction (so the propagation level is Requires) and will not commit this transaction.
+    *
+    * @param closure The {AtomicVoidClosure} to execute.
+    * @throws NullPointerException if closure is null.
+    * @throws Exception is the closure throws an Exception
+    */
+   public static  void executeChecked(AtomicVoidClosure closure) throws Exception{
+       defaultAtomicBlock.executeChecked(closure);
+   }
 
     /**
      * Creates a committed IntRef with the provided value using the GlobalStmInstance.
@@ -399,9 +399,8 @@ public class StmUtils {
      * For more information see {@link Transaction#prepare()}.
      *
      * @throws TransactionRequiredException if no active transaction is found.
-     * @throws IllegalTransactionStateException
-     *                                      if the active transaction is not in the correct
-     *                                      state for this operation.
+     * @throws IllegalTransactionStateException if the active transaction is not in the correct
+     *                                           state for this operation.
      * @throws ControlFlowError
      */
     public static void prepare() {
@@ -415,9 +414,8 @@ public class StmUtils {
      * For more information see {@link Transaction#abort()}.
      *
      * @throws TransactionRequiredException if no active transaction is found.
-     * @throws IllegalTransactionStateException
-     *                                      if the active transaction is not in the correct
-     *                                      state for this operation.
+     * @throws IllegalTransactionStateException if the active transaction is not in the correct
+     *                                           state for this operation.
      * @throws ControlFlowError
      */
     public static void abort() {
@@ -427,16 +425,15 @@ public class StmUtils {
 
     /**
      * Ensures all writes (so you get the guarantee that all writes are able to commit).
-     * <p/>
+     *
      * For more information see {@link Transaction#ensureWrites()}
      *
      * @throws TransactionRequiredException if no active transaction is found.
-     * @throws IllegalTransactionStateException
-     *                                      if the active transaction is not in the correct
-     *                                      state for this operation.
+     * @throws IllegalTransactionStateException if the active transaction is not in the correct
+     *                                           state for this operation.
      * @throws ControlFlowError
      */
-    public static void ensureWrites() {
+    public static void ensureWrites(){
         Transaction tx = getRequiredThreadLocalTransaction();
         tx.ensureWrites();
     }
@@ -447,9 +444,8 @@ public class StmUtils {
      * For more information see {@link Transaction#commit()}.
      *
      * @throws TransactionRequiredException if no active transaction is found.
-     * @throws IllegalTransactionStateException
-     *                                      if the active transaction is not in the correct
-     *                                      state for this operation.
+     * @throws IllegalTransactionStateException if the active transaction is not in the correct
+     *                                           state for this operation.
      * @throws ControlFlowError
      */
     public static void commit() {
@@ -461,7 +457,6 @@ public class StmUtils {
      * Scheduled an deferred or compensating task on the Transaction in the ThreadLocalTransaction. This task is
      * executed after the transaction commits or aborts.
      * <p/>
-     *
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
      * @throws org.multiverse.api.exceptions.TransactionRequiredException
@@ -492,7 +487,6 @@ public class StmUtils {
      * Scheduled an deferred task on the Transaction in the ThreadLocalTransaction. This task is executed after
      * the transaction commits and one of the use cases is starting transactions.
      * <p/>
-     *
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
      * @throws org.multiverse.api.exceptions.TransactionRequiredException
@@ -522,7 +516,6 @@ public class StmUtils {
      * Scheduled an compensating task on the Transaction in the ThreadLocalTransaction. This task is executed after
      * the transaction aborts and one of the use cases is cleaning up non transaction resources like the file system.
      * <p/>
-     *
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
      * @throws org.multiverse.api.exceptions.TransactionRequiredException

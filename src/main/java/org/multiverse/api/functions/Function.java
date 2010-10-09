@@ -7,7 +7,7 @@ package org.multiverse.api.functions;
  *
  * @author Peter Veentjer.
  */
-public interface Function<E> {
+public interface Function<E>{
 
     /**
      * Evaluates the function.

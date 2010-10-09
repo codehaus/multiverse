@@ -16,1026 +16,1025 @@ import static java.lang.String.format;
 
 
 /**
-* A {@link BetaTransaction} for arbitrary size transactions.
-*
-* @author Peter Veentjer.
-*/
+ * A {@link BetaTransaction} for arbitrary size transactions.
+ *
+ * @author Peter Veentjer.
+ */
 public final class ${transaction.name} extends ${transaction.superClass} {
 
-private Tranlocal[] array;
-private LocalConflictCounter localConflictCounter;
-private int size;
-private boolean hasReads;
-private boolean hasUntrackedReads;
-private boolean hasUpdates;
+    private Tranlocal[] array;
+    private LocalConflictCounter localConflictCounter;
+    private int size;
+    private boolean hasReads;
+    private boolean hasUntrackedReads;
+    private boolean hasUpdates;
 #if(!${transaction.lean})
-private boolean evaluatingCommute;
+    private boolean evaluatingCommute;
 #end
 
-public ${transaction.name}(BetaStm stm) {
-this(new BetaTransactionConfiguration(stm).init());
-}
+    public ${transaction.name}(BetaStm stm) {
+        this(new BetaTransactionConfiguration(stm).init());
+    }
 
-public ${transaction.name}(BetaTransactionConfiguration config) {
-super(${transaction.poolName}, config);
-this.localConflictCounter = config.globalConflictCounter.createLocalConflictCounter();
-this.array = new Tranlocal[config.minimalArrayTreeSize];
-this.remainingTimeoutNs = config.timeoutNs;
-}
+    public ${transaction.name}(BetaTransactionConfiguration config) {
+        super(${transaction.poolName}, config);
+        this.localConflictCounter = config.globalConflictCounter.createLocalConflictCounter();
+        this.array = new Tranlocal[config.minimalArrayTreeSize];
+        this.remainingTimeoutNs = config.timeoutNs;
+    }
 
-@Override
-public final LocalConflictCounter getLocalConflictCounter() {
-return localConflictCounter;
-}
+    @Override
+    public final LocalConflictCounter getLocalConflictCounter() {
+        return localConflictCounter;
+    }
 
-public int size(){
-return size;
-}
+    public int size(){
+        return size;
+    }
 
-public float getUsage(){
-return (size * 1.0f)/array.length;
-}
+    public float getUsage(){
+        return (size * 1.0f)/array.length;
+    }
 
-public final boolean tryLock(BetaTransactionalObject ref, int lockMode){
-throw new TodoException();
-}
+    public final boolean tryLock(BetaTransactionalObject ref, int lockMode){
+        throw new TodoException();
+    }
 
-public void ensureWrites(){
-if(status != ACTIVE){
-throw abortEnsureWrites();
-}
+    public void ensureWrites(){
+        if(status != ACTIVE){
+            throw abortEnsureWrites();
+        }
 
-if(config.writeLockMode!=LOCKMODE_NONE){
-return;
-}
+        if(config.writeLockMode!=LOCKMODE_NONE){
+            return;
+        }
 
-if(size == 0){
-return;
-}
+        if(size == 0){
+            return;
+        }
 
-final int spinCount = config.spinCount;
-for(int k=0;k
-<array.length;k++){
-final Tranlocal tranlocal = array[k];
+        final int spinCount = config.spinCount;
+        for(int k=0;k<array.length;k++){
+            final Tranlocal tranlocal = array[k];
 
-if(tranlocal==null || tranlocal.isCommitted){
-continue;
-}
+            if(tranlocal==null || tranlocal.isCommitted){
+                continue;
+            }
 
-if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal, false)){
-throw abortOnReadConflict();
-}
-}
-}
+            if(!tranlocal.owner.___tryLockAndCheckConflict(this, spinCount, tranlocal, false)){
+                throw abortOnReadConflict();
+            }
+        }
+    }
 
 #foreach($ref in $transactionalObjects)
-    #if(${ref.isReference})
+#if(${ref.isReference})
     public final ${ref.typeParameter} ${ref.type} read(${ref.name}${ref.typeParameter} ref){
-    throw new TodoException();
+        throw new TodoException();
     }
 
-    #end
-    #if(!${transaction.lean})
+#end
+#if(!${transaction.lean})
     private ${ref.typeParameter} void flattenCommute(
-    final ${ref.name}${ref.typeParameter} ref,
-    final ${ref.tranlocal}${ref.typeParameter} tranlocal,
-    final int lockMode){
+        final ${ref.name}${ref.typeParameter} ref,
+        final ${ref.tranlocal}${ref.typeParameter} tranlocal,
+        final int lockMode){
 
-    if(!hasReads){
-    localConflictCounter.reset();
-    hasReads = true;
+        if(!hasReads){
+            localConflictCounter.reset();
+            hasReads = true;
+        }
+
+        if(!ref.___load(config.spinCount, this, lockMode,tranlocal)){
+            throw abortOnReadConflict();
+        }
+
+        if (hasReadConflict()) {
+            throw abortOnReadConflict();
+        }
+
+        boolean abort = true;
+        evaluatingCommute = true;
+        try{
+            tranlocal.evaluateCommutingFunctions(pool);
+            abort = false;
+        }finally{
+            evaluatingCommute = false;
+            if(abort){
+                abort();
+            }
+        }
     }
 
-    if(!ref.___load(config.spinCount, this, lockMode,tranlocal)){
-    throw abortOnReadConflict();
-    }
+#end
+    @Override
+    public ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForRead(
+        final ${ref.name}${ref.typeParameter} ref, int lockMode) {
 
-    if (hasReadConflict()) {
-    throw abortOnReadConflict();
-    }
+        if (status != ACTIVE) {
+            throw abortOpenForRead(ref);
+        }
 
-    boolean abort = true;
-    evaluatingCommute = true;
-    try{
-    tranlocal.evaluateCommutingFunctions(pool);
-    abort = false;
-    }finally{
-    evaluatingCommute = false;
-    if(abort){
-    abort();
-    }
-    }
-    }
+#if(!${transaction.lean})
+        if(evaluatingCommute){
+            throw abortOnOpenForReadWhileEvaluatingCommute(ref);
+        }
 
-    #end
-@Override
-public ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForRead(
-final ${ref.name}${ref.typeParameter} ref, int lockMode) {
+#end
+        if (ref == null) {
+            return null;
+        }
 
-if (status != ACTIVE) {
-throw abortOpenForRead(ref);
-}
+        lockMode = lockMode>=config.readLockMode?lockMode:config.readLockMode;
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = findAttachedIndex(ref, identityHashCode);
+        if (index > -1) {
+            //we are lucky, at already is attached to the session
+            ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})array[index];
 
-    #if(!${transaction.lean})
-    if(evaluatingCommute){
-    throw abortOnOpenForReadWhileEvaluatingCommute(ref);
-    }
+#if(!$transaction.lean)
 
-    #end
-if (ref == null) {
-return null;
-}
+            if(tranlocal.isCommuting){
+                flattenCommute(ref, tranlocal, lockMode);
+            }else
+#end
+            if(tranlocal.lockMode < lockMode
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
+                throw abortOnReadConflict();
+            }
 
-lockMode = lockMode>=config.readLockMode?lockMode:config.readLockMode;
-final int identityHashCode = ref.___identityHashCode();
-final int index = findAttachedIndex(ref, identityHashCode);
-if (index > -1) {
-//we are lucky, at already is attached to the session
-    ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})array[index];
+            return tranlocal;
+        }
 
-    #if(!$transaction.lean)
+        if(!hasReads){
+            localConflictCounter.reset();
+            hasReads = true;
+        }
 
-    if(tranlocal.isCommuting){
-    flattenCommute(ref, tranlocal, lockMode);
-    }else
-    #end
-if(tranlocal.lockMode < lockMode
-&& !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
-throw abortOnReadConflict();
-}
-
-return tranlocal;
-}
-
-if(!hasReads){
-localConflictCounter.reset();
-hasReads = true;
-}
-
-    ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
-if(tranlocal == null){
-    #if(${ref.isReference})
-    tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
-    #else
-    tranlocal = ref.___newTranlocal();
-    #end
-}
-
-if(!ref.___load(config.spinCount, this, lockMode,tranlocal)){
-pool.put(tranlocal);
-throw abortOnReadConflict();
-}
-
-tranlocal.isCommitted = true;
-
-//make sure that there are no conflicts.
-if (hasReadConflict()) {
-ref.___abort(this, tranlocal, pool);
-throw abortOnReadConflict();
-}
-
-if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation || config.trackReads){
-attach(ref, tranlocal, identityHashCode);
-size++;
-}else{
-//todo: pooling
-hasUntrackedReads = true;
-}
-
-return tranlocal;
-}
-
-@Override
-public ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForWrite(
-final ${ref.name}${ref.typeParameter}  ref, int lockMode) {
-
-if (status != ACTIVE) {
-throw abortOpenForWrite(ref);
-}
-
-    #if(!${transaction.lean})
-    if(evaluatingCommute){
-    throw abortOnOpenForWriteWhileEvaluatingCommute(ref);
-    }
-
-    #end
-if (config.readonly) {
-throw abortOpenForWriteWhenReadonly(ref);
-}
-
-if (ref == null) {
-throw abortOpenForWriteWhenNullReference();
-}
-
-//lets find the tranlocal
-final int identityHashCode = ref.___identityHashCode();
-final int index = findAttachedIndex(ref, identityHashCode);
-lockMode = lockMode>= config.writeLockMode?lockMode:config.writeLockMode;
-
-if(index >- 1){
-    ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})array[index];
-
-    #if(!$transaction.lean)
-    if(tranlocal.isCommuting){
-    flattenCommute(ref, tranlocal, lockMode);
-    }else
-    #end
-if(tranlocal.lockMode < lockMode
-&& !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
-throw abortOnReadConflict();
-}
-
-if(tranlocal.isCommitted){
-tranlocal.isCommitted = false;
-hasUpdates = true;
-}
-
-return tranlocal;
-}
-
-//it was not previously attached to this transaction
-
-if(!hasReads){
-localConflictCounter.reset();
-hasReads = true;
-}
-
-    ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
-if(tranlocal == null){
-    #if(${ref.isReference})
-    tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
-    #else
-    tranlocal = ref.___newTranlocal();
-    #end
-}
-
-if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
-pool.put(tranlocal);
-throw abortOnReadConflict();
-}
-
-if (hasReadConflict()) {
-tranlocal.owner.___abort(this, tranlocal, pool);
-throw abortOnReadConflict();
-}
-
-tranlocal.isCommitted = false;
-hasUpdates = true;
-attach(ref, tranlocal, identityHashCode);
-size++;
-return tranlocal;
-}
-
-@Override
-public final ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForConstruction(
-final ${ref.name}${ref.typeParameter} ref) {
-
-if (status != ACTIVE) {
-throw abortOpenForConstruction(ref);
-}
-
-    #if(!${transaction.lean})
-    if(evaluatingCommute){
-    throw abortOnOpenForConstructionWhileEvaluatingCommute(ref);
-    }
-
-    #end
-if (config.readonly) {
-throw abortOpenForWriteWhenReadonly(ref);
-}
-
-if (ref == null) {
-throw abortOpenForWriteWhenNullReference();
-}
-
-final int identityHashCode = ref.___identityHashCode();
-final int index = findAttachedIndex(ref, identityHashCode);
-
-if(index >- 1){
-final ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})array[index];
-if(!tranlocal.isConstructing){
-throw abortOpenForConstructionWithBadReference(ref);
-}
-
-return tranlocal;
-}
-
-if(ref.___getLockOwner()!=this && ref.getVersion()!=BetaTransactionalObject.VERSION_UNCOMMITTED){
-throw abortOpenForConstructionWithBadReference(ref);
-}
-
-    ${ref.tranlocal}${ref.typeParameter} tranlocal =  pool.take(ref);
-if(tranlocal == null){
-    #if(${ref.isReference})
-    tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
-
-    #else
-    tranlocal = ref.___newTranlocal();
-    #end
-}
-tranlocal.lockMode = true ? LOCKMODE_COMMIT : LOCKMODE_UPDATE;
-tranlocal.isConstructing = true;
-tranlocal.isDirty = true;
-
-attach(ref, tranlocal, identityHashCode);
-size++;
-return tranlocal;
-}
-
-public ${ref.typeParameter} void commute(
-final ${ref.name}${ref.typeParameter} ref, final ${ref.functionClass}${ref.typeParameter} function){
-
-if (status != ACTIVE) {
-throw abortCommute(ref, function);
-}
-
-if(function == null){
-throw abortCommuteOnNullFunction(ref);
-}
-    #if($transaction.lean)
-    config.needsCommute();
-    abort();
-    throw SpeculativeConfigurationError.INSTANCE;
-    #else
-    if(evaluatingCommute){
-    throw abortOnCommuteWhileEvaluatingCommute(ref);
-    }
-
-    if (config.readonly) {
-    throw abortCommuteWhenReadonly(ref, function);
-    }
-
-    if (ref == null) {
-    throw abortCommuteWhenNullReference(function);
-    }
-
-    final int identityHashCode = ref.___identityHashCode();
-    final int index = findAttachedIndex(ref, identityHashCode);
-    if(index == -1){
         ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
-    if(tranlocal == null){
-        #if(${ref.isReference})
-        tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
-        #else
-        tranlocal = ref.___newTranlocal();
-        #end
+        if(tranlocal == null){
+#if(${ref.isReference})
+            tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
+#else
+            tranlocal = ref.___newTranlocal();
+#end
+        }
+
+        if(!ref.___load(config.spinCount, this, lockMode,tranlocal)){
+            pool.put(tranlocal);
+            throw abortOnReadConflict();
+        }
+
+        tranlocal.isCommitted = true;
+
+        //make sure that there are no conflicts.
+        if (hasReadConflict()) {
+            ref.___abort(this, tranlocal, pool);
+            throw abortOnReadConflict();
+        }
+
+        if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation || config.trackReads){
+            attach(ref, tranlocal, identityHashCode);
+            size++;
+        }else{
+            //todo: pooling
+            hasUntrackedReads = true;
+        }
+
+        return tranlocal;
     }
 
-    tranlocal.isCommuting = true;
-    tranlocal.addCommutingFunction(function, pool);
-    attach(ref, tranlocal, identityHashCode);
-    size++;
-    hasUpdates = true;
-    return;
+    @Override
+    public ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForWrite(
+        final ${ref.name}${ref.typeParameter}  ref, int lockMode) {
+
+        if (status != ACTIVE) {
+            throw abortOpenForWrite(ref);
+        }
+
+#if(!${transaction.lean})
+        if(evaluatingCommute){
+            throw abortOnOpenForWriteWhileEvaluatingCommute(ref);
+        }
+
+#end
+        if (config.readonly) {
+            throw abortOpenForWriteWhenReadonly(ref);
+        }
+
+        if (ref == null) {
+            throw abortOpenForWriteWhenNullReference();
+        }
+
+        //lets find the tranlocal
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = findAttachedIndex(ref, identityHashCode);
+        lockMode = lockMode>= config.writeLockMode?lockMode:config.writeLockMode;
+
+        if(index >- 1){
+            ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})array[index];
+
+#if(!$transaction.lean)
+            if(tranlocal.isCommuting){
+                flattenCommute(ref, tranlocal, lockMode);
+            }else
+#end
+            if(tranlocal.lockMode < lockMode
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+                throw abortOnReadConflict();
+            }
+
+            if(tranlocal.isCommitted){
+                tranlocal.isCommitted = false;
+                hasUpdates = true;
+            }
+
+            return tranlocal;
+        }
+
+        //it was not previously attached to this transaction
+
+        if(!hasReads){
+            localConflictCounter.reset();
+            hasReads = true;
+        }
+
+        ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
+        if(tranlocal == null){
+#if(${ref.isReference})
+            tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
+#else
+            tranlocal = ref.___newTranlocal();
+#end
+        }
+
+        if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
+           pool.put(tranlocal);
+           throw abortOnReadConflict();
+        }
+
+        if (hasReadConflict()) {
+            tranlocal.owner.___abort(this, tranlocal, pool);
+            throw abortOnReadConflict();
+        }
+
+        tranlocal.isCommitted = false;
+        hasUpdates = true;
+        attach(ref, tranlocal, identityHashCode);
+        size++;
+        return tranlocal;
     }
+
+    @Override
+    public final ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForConstruction(
+        final ${ref.name}${ref.typeParameter} ref) {
+
+        if (status != ACTIVE) {
+            throw abortOpenForConstruction(ref);
+        }
+
+#if(!${transaction.lean})
+        if(evaluatingCommute){
+            throw abortOnOpenForConstructionWhileEvaluatingCommute(ref);
+        }
+
+#end
+        if (config.readonly) {
+            throw abortOpenForWriteWhenReadonly(ref);
+        }
+
+        if (ref == null) {
+            throw abortOpenForWriteWhenNullReference();
+        }
+
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = findAttachedIndex(ref, identityHashCode);
+
+        if(index >- 1){
+            final ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})array[index];
+            if(!tranlocal.isConstructing){
+                throw abortOpenForConstructionWithBadReference(ref);
+            }
+
+            return tranlocal;
+        }
+
+        if(ref.___getLockOwner()!=this && ref.getVersion()!=BetaTransactionalObject.VERSION_UNCOMMITTED){
+            throw abortOpenForConstructionWithBadReference(ref);
+        }
+
+        ${ref.tranlocal}${ref.typeParameter} tranlocal =  pool.take(ref);
+        if(tranlocal == null){
+#if(${ref.isReference})
+            tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
+
+#else
+            tranlocal = ref.___newTranlocal();
+#end
+        }
+        tranlocal.lockMode = true ? LOCKMODE_COMMIT : LOCKMODE_UPDATE;
+        tranlocal.isConstructing = true;
+        tranlocal.isDirty = true;
+
+        attach(ref, tranlocal, identityHashCode);
+        size++;
+        return tranlocal;
+    }
+
+    public ${ref.typeParameter} void commute(
+        final ${ref.name}${ref.typeParameter} ref, final ${ref.functionClass}${ref.typeParameter} function){
+
+        if (status != ACTIVE) {
+            throw abortCommute(ref, function);
+        }
+
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+#if($transaction.lean)
+        config.needsCommute();
+        abort();
+        throw SpeculativeConfigurationError.INSTANCE;
+#else
+        if(evaluatingCommute){
+            throw abortOnCommuteWhileEvaluatingCommute(ref);
+        }
+
+        if (config.readonly) {
+            throw abortCommuteWhenReadonly(ref, function);
+        }
+
+        if (ref == null) {
+            throw abortCommuteWhenNullReference(function);
+        }
+
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = findAttachedIndex(ref, identityHashCode);
+        if(index == -1){
+            ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
+            if(tranlocal == null){
+#if(${ref.isReference})
+                tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
+#else
+                tranlocal = ref.___newTranlocal();
+#end
+            }
+
+            tranlocal.isCommuting = true;
+            tranlocal.addCommutingFunction(function, pool);
+            attach(ref, tranlocal, identityHashCode);
+            size++;
+            hasUpdates = true;
+            return;
+        }
 
         ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})array[index];
-    if(tranlocal.isCommuting){
-    tranlocal.addCommutingFunction(function, pool);
-    return;
-    }
+        if(tranlocal.isCommuting){
+            tranlocal.addCommutingFunction(function, pool);
+            return;
+        }
 
-    if(tranlocal.isCommitted){
-    tranlocal.isCommitted = false;
-    hasUpdates = true;
-    array[index]=tranlocal;
-    }
+        if(tranlocal.isCommitted){
+            tranlocal.isCommitted = false;
+            hasUpdates = true;
+            array[index]=tranlocal;
+         }
 
-        #if(${ref.isReference})
-        tranlocal.value = function.call(tranlocal.value);
-        #else
-        throw new TodoException();
-        #end
-    #end ## if(transaction.lean)
+#if(${ref.isReference})
+         tranlocal.value = function.call(tranlocal.value);
+#else
+         throw new TodoException();
+#end
+#end ## if(transaction.lean)
     }
 
 #end ##for loop of transactionalobjects.
 
-@Override
-public Tranlocal get(BetaTransactionalObject ref){
-final int indexOf = findAttachedIndex(ref, ref.___identityHashCode());
-if(indexOf == -1){
-return null;
-}
+    @Override
+    public Tranlocal get(BetaTransactionalObject ref){
+        final int indexOf = findAttachedIndex(ref, ref.___identityHashCode());
+        if(indexOf == -1){
+            return null;
+        }
 
-return array[indexOf];
-}
+        return array[indexOf];
+    }
 
-public int findAttachedIndex(final BetaTransactionalObject ref, final int hash){
-int jump = 0;
-boolean goLeft = true;
+    public int findAttachedIndex(final BetaTransactionalObject ref, final int hash){
+        int jump = 0;
+        boolean goLeft = true;
 
-do{
-final int offset = goLeft?-jump:jump;
-final int index = (hash + offset) % array.length;
+        do{
+            final int offset = goLeft?-jump:jump;
+            final int index = (hash + offset) % array.length;
 
-final Tranlocal current = array[index];
-if(current == null){
-return -1;
-}
+            final Tranlocal current = array[index];
+            if(current == null){
+                return -1;
+            }
 
-if(current.owner == ref){
-return index;
-}
+            if(current.owner == ref){
+                return index;
+            }
 
-final int currentHash = current.owner.___identityHashCode();
-goLeft = currentHash > hash;
-jump = jump == 0 ? 1 : jump*2;
-}while(jump < array.length);
+            final int currentHash = current.owner.___identityHashCode();
+            goLeft = currentHash > hash;
+            jump = jump == 0 ? 1 : jump*2;
+        }while(jump < array.length);
 
-return -1;
-}
+        return -1;
+    }
 
-private void attach(final BetaTransactionalObject ref, final Tranlocal tranlocal, final int hash){
-int jump = 0;
-boolean goLeft = true;
+    private void attach(final BetaTransactionalObject ref, final Tranlocal tranlocal, final int hash){
+        int jump = 0;
+        boolean goLeft = true;
 
-do{
-final int offset = goLeft?-jump:jump;
-final int index = (hash + offset) % array.length;
+        do{
+            final int offset = goLeft?-jump:jump;
+            final int index = (hash + offset) % array.length;
 
-Tranlocal current = array[index];
-if(current == null){
-array[index] = tranlocal;
-return;
-}
+            Tranlocal current = array[index];
+            if(current == null){
+                array[index] = tranlocal;
+                return;
+            }
 
-final int currentHash = current.owner.___identityHashCode();
-goLeft = currentHash > hash;
-jump = jump == 0?1:jump*2;
-}while(jump < array.length);
+            final int currentHash = current.owner.___identityHashCode();
+            goLeft = currentHash > hash;
+            jump = jump == 0?1:jump*2;
+        }while(jump < array.length);
 
-expand();
-attach(ref, tranlocal, hash);
-}
+        expand();
+        attach(ref, tranlocal, hash);
+    }
 
-private void expand(){
-Tranlocal[] oldArray = array;
-int newSize = oldArray.length*2;
-array = pool.takeTranlocalArray(newSize);
-if(array == null){
-array = new Tranlocal[newSize];
-}
+    private void expand(){
+        Tranlocal[] oldArray = array;
+        int newSize = oldArray.length*2;
+        array = pool.takeTranlocalArray(newSize);
+        if(array == null){
+            array = new Tranlocal[newSize];
+        }
 
-for(int k=0; k < oldArray.length; k++){
-final Tranlocal tranlocal = oldArray[k];
+        for(int k=0; k < oldArray.length; k++){
+            final Tranlocal tranlocal = oldArray[k];
 
-if(tranlocal != null){
-attach(tranlocal.owner, tranlocal, tranlocal.owner.___identityHashCode());
-}
-}
+            if(tranlocal != null){
+               attach(tranlocal.owner, tranlocal, tranlocal.owner.___identityHashCode());
+            }
+        }
 
-pool.putTranlocalArray(oldArray);
-}
+        pool.putTranlocalArray(oldArray);
+    }
 
-private boolean hasReadConflict() {
-if(config.readLockMode!=LOCKMODE_NONE || config.inconsistentReadAllowed) {
-return false;
-}
+    private boolean hasReadConflict() {
+        if(config.readLockMode!=LOCKMODE_NONE || config.inconsistentReadAllowed) {
+            return false;
+        }
 
-if(hasUntrackedReads){
-return localConflictCounter.syncAndCheckConflict();
-}
+        if(hasUntrackedReads){
+            return localConflictCounter.syncAndCheckConflict();
+        }
 
-if(size == 0){
-return false;
-}
+        if(size == 0){
+            return false;
+        }
 
-if (!localConflictCounter.syncAndCheckConflict()) {
-return false;
-}
+        if (!localConflictCounter.syncAndCheckConflict()) {
+            return false;
+        }
 
-for (int k = 0; k < array.length; k++) {
-final Tranlocal tranlocal = array[k];
-if (tranlocal != null && tranlocal.owner.___hasReadConflict(tranlocal)) {
-return true;
-}
-}
+        for (int k = 0; k < array.length; k++) {
+            final Tranlocal tranlocal = array[k];
+            if (tranlocal != null && tranlocal.owner.___hasReadConflict(tranlocal)) {
+                return true;
+            }
+        }
 
-return false;
-}
+        return false;
+    }
 
-// ============================= addWatch ===================================
+    // ============================= addWatch ===================================
 
-public void addWatch(BetaTransactionalObject object, Watch watch){
-throw new TodoException();
-}
+    public void addWatch(BetaTransactionalObject object, Watch watch){
+        throw new TodoException();
+    }
 
-// ============================== abort ===================================================
+    // ============================== abort ===================================================
 
-@Override
-public void abort() {
-switch (status) {
-case ACTIVE:
-//fall through
-case PREPARED:
-status = ABORTED;
-if(size > 0){
-for (int k = 0; k < array.length; k++) {
-final Tranlocal tranlocal = array[k];
-if(tranlocal != null){
-tranlocal.owner.___abort(this, tranlocal, pool);
-array[k] = null;
-}
-}
-}
+    @Override
+    public void abort() {
+        switch (status) {
+            case ACTIVE:
+                //fall through
+            case PREPARED:
+                status = ABORTED;
+                if(size > 0){
+                    for (int k = 0; k < array.length; k++) {
+                        final Tranlocal tranlocal = array[k];
+                        if(tranlocal != null){
+                            tranlocal.owner.___abort(this, tranlocal, pool);
+                            array[k] = null;
+                        }
+                    }
+                }
 
 #if(!$transaction.lean)
-if(config.permanentListeners != null){
-notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
-}
+                if(config.permanentListeners != null){
+                    notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
+                }
 
-if(normalListeners != null){
-notifyListeners(normalListeners, TransactionLifecycleEvent.PostAbort);
-}
+                if(normalListeners != null){
+                    notifyListeners(normalListeners, TransactionLifecycleEvent.PostAbort);
+                }
 #end
-break;
-case ABORTED:
-break;
-case COMMITTED:
-throw new DeadTransactionException(
-format("[%s] Can't abort an already committed transaction",config.familyName));
-default:
-throw new IllegalStateException();
-}
-}
+              break;
+          case ABORTED:
+              break;
+            case COMMITTED:
+                throw new DeadTransactionException(
+                    format("[%s] Can't abort an already committed transaction",config.familyName));
+            default:
+                throw new IllegalStateException();
+        }
+    }
 
-// ============================== commit ==================================================
+    // ============================== commit ==================================================
 
 #if($transaction.lean)
-@Override
-public void commit() {
-if (status != ACTIVE) {
-switch (status) {
-case PREPARED:
-break;
-case ABORTED:
-throw new DeadTransactionException(
-format("[%s] Can't commit an already aborted transaction",config.familyName));
-case COMMITTED:
-return;
-default:
-throw new IllegalStateException();
-}
-}
+    @Override
+    public void commit() {
+        if (status != ACTIVE) {
+            switch (status) {
+                case PREPARED:
+                    break;
+                case ABORTED:
+                    throw new DeadTransactionException(
+                        format("[%s] Can't commit an already aborted transaction",config.familyName));
+                case COMMITTED:
+                    return;
+                default:
+                    throw new IllegalStateException();
+            }
+        }
 
-if(abortOnly){
-throw abortOnWriteConflict();
-}
+        if(abortOnly){
+            throw abortOnWriteConflict();
+        }
 
-Listeners[] listenersArray = null;
-if(size > 0){
-final boolean needsPrepare = status == ACTIVE
-&& hasUpdates
-&& config.writeLockMode != LOCKMODE_COMMIT;
+        Listeners[] listenersArray = null;
+        if(size > 0){
+            final boolean needsPrepare = status == ACTIVE
+                && hasUpdates
+                && config.writeLockMode != LOCKMODE_COMMIT;
 
-if(config.dirtyCheck){
-if(needsPrepare && !doPrepareDirty()){
-throw abortOnWriteConflict();
-}
+            if(config.dirtyCheck){
+                if(needsPrepare && !doPrepareDirty()){
+                    throw abortOnWriteConflict();
+                }
 
-listenersArray = commitDirty();
-}else{
-if(needsPrepare && !doPrepareAll()){
-throw abortOnWriteConflict();
-}
+                listenersArray = commitDirty();
+            }else{
+                if(needsPrepare && !doPrepareAll()){
+                    throw abortOnWriteConflict();
+                }
 
-listenersArray = commitAll();
-}
-}
-status = COMMITTED;
+                listenersArray = commitAll();
+            }
+        }
+        status = COMMITTED;
 
-if(listenersArray != null){
-Listeners.openAll(listenersArray, pool);
-}
-}
+        if(listenersArray != null){
+            Listeners.openAll(listenersArray, pool);
+        }
+    }
 #else
-@Override
-public void commit() {
-if(status == COMMITTED){
-return;
-}
+    @Override
+    public void commit() {
+        if(status == COMMITTED){
+            return;
+        }
 
-prepare();
+        prepare();
 
-Listeners[] listenersArray = null;
+        Listeners[] listenersArray = null;
 
-if(size>0){
-if(config.dirtyCheck){
-listenersArray = commitDirty();
-}else{
-listenersArray = commitAll();
-}
-}
+        if(size>0){
+            if(config.dirtyCheck){
+                listenersArray = commitDirty();
+            }else{
+                listenersArray = commitAll();
+            }
+        }
 
-status = COMMITTED;
+        status = COMMITTED;
 
-if(listenersArray != null){
-Listeners.openAll(listenersArray, pool);
-}
+        if(listenersArray != null){
+            Listeners.openAll(listenersArray, pool);
+        }
 
-if(config.permanentListeners != null){
-notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostCommit);
-}
+        if(config.permanentListeners != null){
+            notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostCommit);
+        }
 
-if(normalListeners != null){
-notifyListeners(normalListeners, TransactionLifecycleEvent.PostCommit);
-}
-}
+        if(normalListeners != null){
+            notifyListeners(normalListeners, TransactionLifecycleEvent.PostCommit);
+        }
+    }
 #end
 
-private Listeners[] commitAll() {
-Listeners[] listenersArray = null;
+    private Listeners[] commitAll() {
+        Listeners[] listenersArray = null;
 
-int listenersArrayIndex = 0;
-for (int k = 0; k < array.length; k++) {
-Tranlocal tranlocal = array[k];
+        int listenersArrayIndex = 0;
+        for (int k = 0; k < array.length; k++) {
+            Tranlocal tranlocal = array[k];
 
-if(tranlocal == null){
-continue;
-}
+            if(tranlocal == null){
+                continue;
+            }
 
-array[k] = null;
-final Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool);
+            array[k] = null;
+            final Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool);
 
-if(listeners != null){
-if(listenersArray == null){
-int length = array.length - k;
-listenersArray = pool.takeListenersArray(length);
-if(listenersArray == null){
-listenersArray = new Listeners[length];
-}
-}
-listenersArray[listenersArrayIndex]=listeners;
-listenersArrayIndex++;
-}
-}
+            if(listeners != null){
+                if(listenersArray == null){
+                    int length = array.length - k;
+                    listenersArray = pool.takeListenersArray(length);
+                    if(listenersArray == null){
+                        listenersArray = new Listeners[length];
+                    }
+                }
+                listenersArray[listenersArrayIndex]=listeners;
+                listenersArrayIndex++;
+            }
+        }
 
-return listenersArray;
-}
+        return listenersArray;
+    }
 
-private Listeners[] commitDirty() {
-Listeners[] listenersArray = null;
+    private Listeners[] commitDirty() {
+        Listeners[] listenersArray = null;
 
-int listenersArrayIndex = 0;
-for (int k = 0; k < array.length; k++) {
-Tranlocal tranlocal = array[k];
+        int listenersArrayIndex = 0;
+        for (int k = 0; k < array.length; k++) {
+            Tranlocal tranlocal = array[k];
 
-if(tranlocal == null){
-continue;
-}
+            if(tranlocal == null){
+                continue;
+            }
 
-array[k] = null;
+            array[k] = null;
 
-if(!tranlocal.isCommitted && !tranlocal.isDirty){
-tranlocal.calculateIsDirty();
-}
+            if(!tranlocal.isCommitted && !tranlocal.isDirty){
+                tranlocal.calculateIsDirty();
+            }
 
-final Listeners listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool);
+            final Listeners listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool);
 
-if(listeners != null){
-if(listenersArray == null){
-int length = array.length - k;
-listenersArray = pool.takeListenersArray(length);
-if(listenersArray == null){
-listenersArray = new Listeners[length];
-}
-}
-listenersArray[listenersArrayIndex]=listeners;
-listenersArrayIndex++;
-}
-}
+            if(listeners != null){
+                if(listenersArray == null){
+                    int length = array.length - k;
+                    listenersArray = pool.takeListenersArray(length);
+                    if(listenersArray == null){
+                        listenersArray = new Listeners[length];
+                    }
+                }
+                listenersArray[listenersArrayIndex]=listeners;
+                listenersArrayIndex++;
+            }
+        }
 
-return listenersArray;
-}
+        return listenersArray;
+    }
 
-// ============================== prepare ==================================================
+    // ============================== prepare ==================================================
 
 #if($transaction.lean)
-@Override
-public void prepare() {
-if (status != ACTIVE) {
-switch (status) {
-case PREPARED:
-return;
-case ABORTED:
-throw new DeadTransactionException(
-format("[%s] Can't prepare an already aborted transaction",config.familyName));
-case COMMITTED:
-throw new DeadTransactionException(
-format("[%s] Can't prepare already committed transaction",config.familyName));
-default:
-throw new IllegalStateException();
+    @Override
+    public void prepare() {
+        if (status != ACTIVE) {
+            switch (status) {
+                case PREPARED:
+                     return;
+                case ABORTED:
+                    throw new DeadTransactionException(
+                        format("[%s] Can't prepare an already aborted transaction",config.familyName));
+                case COMMITTED:
+                    throw new DeadTransactionException(
+                        format("[%s] Can't prepare already committed transaction",config.familyName));
+                default:
+                    throw new IllegalStateException();
 
-}
-}
+            }
+        }
 
-if(abortOnly){
-throw abortOnWriteConflict();
-}
+        if(abortOnly){
+            throw abortOnWriteConflict();
+        }
 
-if(hasUpdates){
-final boolean success = config.dirtyCheck ? doPrepareDirty() : doPrepareAll();
+        if(hasUpdates){
+            final boolean success = config.dirtyCheck ? doPrepareDirty() : doPrepareAll();
 
-if(!success){
-throw abortOnWriteConflict();
-}
-}
+            if(!success){
+                throw abortOnWriteConflict();
+            }
+        }
 
-status = PREPARED;
-}
+        status = PREPARED;
+    }
 #else
-@Override
-public void prepare() {
-if (status != ACTIVE) {
-switch (status) {
-case PREPARED:
-return;
-case ABORTED:
-throw new DeadTransactionException(
-format("[%s] Can't prepare already aborted transaction",config.familyName));
-case COMMITTED:
-throw new DeadTransactionException(
-format("[%s] Can't prepare already committed transaction",config.familyName));
-default:
-throw new IllegalStateException();
+    @Override
+    public void prepare() {
+        if (status != ACTIVE) {
+            switch (status) {
+                case PREPARED:
+                     return;
+                case ABORTED:
+                    throw new DeadTransactionException(
+                        format("[%s] Can't prepare already aborted transaction",config.familyName));
+                case COMMITTED:
+                    throw new DeadTransactionException(
+                        format("[%s] Can't prepare already committed transaction",config.familyName));
+                default:
+                    throw new IllegalStateException();
 
-}
-}
+            }
+        }
 
-boolean abort = true;
-try{
-if(config.permanentListeners != null){
-notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PrePrepare);
-}
+        boolean abort = true;
+        try{
+            if(config.permanentListeners != null){
+                notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PrePrepare);
+            }
 
-if(normalListeners != null){
-notifyListeners(normalListeners, TransactionLifecycleEvent.PrePrepare);
-}
+            if(normalListeners != null){
+                notifyListeners(normalListeners, TransactionLifecycleEvent.PrePrepare);
+            }
 
-if(abortOnly){
-throw abortOnWriteConflict();
-}
+            if(abortOnly){
+                throw abortOnWriteConflict();
+            }
 
-if(hasUpdates){
-if(!config.writeSkewAllowed){
-if(!doPrepareWithWriteSkewPrevention()){
-throw abortOnWriteConflict();
-}
-} else if(config.dirtyCheck){
-if(!doPrepareDirty()){
-throw abortOnWriteConflict();
-}
-}else{
-if(!doPrepareAll()){
-throw abortOnWriteConflict();
-}
-}
-}
+            if(hasUpdates){
+                if(!config.writeSkewAllowed){
+                    if(!doPrepareWithWriteSkewPrevention()){
+                        throw abortOnWriteConflict();
+                    }
+                } else if(config.dirtyCheck){
+                    if(!doPrepareDirty()){
+                        throw abortOnWriteConflict();
+                    }
+                }else{
+                    if(!doPrepareAll()){
+                        throw abortOnWriteConflict();
+                    }
+                }
+            }
 
-status = PREPARED;
-abort = false;
-}finally{
-if(abort){
-abort();
-}
-}
-}
+            status = PREPARED;
+            abort = false;
+        }finally{
+            if(abort){
+                abort();
+            }
+        }
+    }
 
-private boolean doPrepareWithWriteSkewPrevention() {
-if(config.readLockMode == LOCKMODE_COMMIT){
-return true;
-}
+    private boolean doPrepareWithWriteSkewPrevention() {
+        if(config.readLockMode == LOCKMODE_COMMIT){
+            return true;
+        }
 
-final int spinCount = config.spinCount;
-final boolean dirtyCheck = config.dirtyCheck;
-for (int k = 0; k < array.length; k++) {
-final Tranlocal tranlocal = array[k];
+        final int spinCount = config.spinCount;
+        final boolean dirtyCheck = config.dirtyCheck;
+        for (int k = 0; k < array.length; k++) {
+            final Tranlocal tranlocal = array[k];
 
-if(tranlocal == null){
-continue;
-}
+            if(tranlocal == null){
+                continue;
+            }
 
-if(!tranlocal.prepareWithWriteSkewPrevention(pool,this, spinCount, dirtyCheck)){
-return false;
-}
-}
+            if(!tranlocal.prepareWithWriteSkewPrevention(pool,this, spinCount, dirtyCheck)){
+                return false;
+            }
+        }
 
-return true;
-}
+        return true;
+    }
 #end
 
-private boolean doPrepareAll() {
-if(config.writeLockMode == LOCKMODE_COMMIT){
-return true;
-}
+    private boolean doPrepareAll() {
+        if(config.writeLockMode == LOCKMODE_COMMIT){
+            return true;
+        }
 
-final int spinCount = config.spinCount;
+        final int spinCount = config.spinCount;
 
-for (int k = 0; k < array.length; k++) {
-final Tranlocal tranlocal = array[k];
+        for (int k = 0; k < array.length; k++) {
+            final Tranlocal tranlocal = array[k];
 
-if (tranlocal == null || tranlocal.isCommitted){
-continue;
-}
+            if (tranlocal == null || tranlocal.isCommitted){
+                continue;
+            }
 
-if(!tranlocal.prepareAllUpdates(pool, this, spinCount)) {
-return false;
-}
-}
+            if(!tranlocal.prepareAllUpdates(pool, this, spinCount)) {
+                return false;
+            }
+        }
 
-return true;
-}
+        return true;
+    }
 
-private boolean doPrepareDirty() {
-if(config.writeLockMode == LOCKMODE_COMMIT){
-return true;
-}
+    private boolean doPrepareDirty() {
+        if(config.writeLockMode == LOCKMODE_COMMIT){
+            return true;
+        }
 
-final int spinCount = config.spinCount;
+        final int spinCount = config.spinCount;
 
-for (int k = 0; k < array.length; k++) {
-final Tranlocal tranlocal = array[k];
+        for (int k = 0; k < array.length; k++) {
+            final Tranlocal tranlocal = array[k];
 
-if(tranlocal == null || tranlocal.isCommitted){
-continue;
-}
+            if(tranlocal == null || tranlocal.isCommitted){
+                continue;
+            }
 
-if(!tranlocal.prepareDirtyUpdates(pool, this, spinCount)) {
-return false;
-}
-}
+            if(!tranlocal.prepareDirtyUpdates(pool, this, spinCount)) {
+                return false;
+            }
+        }
 
-return true;
-}
+        return true;
+    }
 
-// ============================ registerChangeListener ===============================
+    // ============================ registerChangeListener ===============================
 
-@Override
-public void registerChangeListenerAndAbort(final Latch listener) {
-if (status != ACTIVE) {
-throw abortOnFaultyStatusOfRegisterChangeListenerAndAbort();
-}
+    @Override
+    public void registerChangeListenerAndAbort(final Latch listener) {
+        if (status != ACTIVE) {
+            throw abortOnFaultyStatusOfRegisterChangeListenerAndAbort();
+        }
 
-if(!config.blockingAllowed){
-throw abortOnNoBlockingAllowed();
-}
+        if(!config.blockingAllowed){
+            throw abortOnNoBlockingAllowed();
+        }
 
-if( size == 0){
-throw abortOnNoRetryPossible();
-}
+        if( size == 0){
+            throw abortOnNoRetryPossible();
+        }
 
-final long listenerEra = listener.getEra();
-boolean furtherRegistrationNeeded = true;
-boolean atLeastOneRegistration = false;
-for(int k=0; k < array.length; k++){
-final Tranlocal tranlocal = array[k];
+        final long listenerEra = listener.getEra();
+        boolean furtherRegistrationNeeded = true;
+        boolean atLeastOneRegistration = false;
+        for(int k=0; k < array.length; k++){
+            final Tranlocal tranlocal = array[k];
 
-if(tranlocal == null){
-continue;
-}
+            if(tranlocal == null){
+                continue;
+            }
 
-array[k]=null;
-final BetaTransactionalObject owner = tranlocal.owner;
+            array[k]=null;
+            final BetaTransactionalObject owner = tranlocal.owner;
 
-if(furtherRegistrationNeeded){
-switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
-case REGISTRATION_DONE:
-atLeastOneRegistration = true;
-break;
-case REGISTRATION_NOT_NEEDED:
-furtherRegistrationNeeded = false;
-atLeastOneRegistration = true;
-break;
-case REGISTRATION_NONE:
-break;
-default:
-throw new IllegalStateException();
-}
+            if(furtherRegistrationNeeded){
+                switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
+                    case REGISTRATION_DONE:
+                        atLeastOneRegistration = true;
+                        break;
+                    case REGISTRATION_NOT_NEEDED:
+                        furtherRegistrationNeeded = false;
+                        atLeastOneRegistration = true;
+                        break;
+                    case REGISTRATION_NONE:
+                        break;
+                    default:
+                        throw new IllegalStateException();
+                }
 
-owner.___abort(this, tranlocal, pool);
-}
-}
+                owner.___abort(this, tranlocal, pool);
+            }
+        }
 
-status = ABORTED;
+        status = ABORTED;
 #if(!$transaction.lean)
-if(config.permanentListeners != null){
-notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
-}
+        if(config.permanentListeners != null){
+            notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
+        }
 
-if(normalListeners != null){
-notifyListeners(normalListeners, TransactionLifecycleEvent.PostAbort);
-}
+        if(normalListeners != null){
+            notifyListeners(normalListeners, TransactionLifecycleEvent.PostAbort);
+        }
 
 #end
-if(!atLeastOneRegistration){
-throw abortOnNoRetryPossible();
-}
-}
+        if(!atLeastOneRegistration){
+            throw abortOnNoRetryPossible();
+        }
+    }
 
-// ============================== reset ========================================
+    // ============================== reset ========================================
 
-@Override
-public boolean softReset() {
-if (status == ACTIVE || status == PREPARED) {
-abort();
-}
+    @Override
+    public boolean softReset() {
+        if (status == ACTIVE || status == PREPARED) {
+            abort();
+        }
 
-if(attempt>=config.getMaxRetries()){
-return false;
-}
+        if(attempt>=config.getMaxRetries()){
+            return false;
+        }
 
-if(array.length > config.minimalArrayTreeSize){
-pool.putTranlocalArray(array);
-array = pool.takeTranlocalArray(config.minimalArrayTreeSize);
-if(array == null){
-array = new Tranlocal[config.minimalArrayTreeSize];
-}
-}
+        if(array.length > config.minimalArrayTreeSize){
+            pool.putTranlocalArray(array);
+            array = pool.takeTranlocalArray(config.minimalArrayTreeSize);
+            if(array == null){
+                array = new Tranlocal[config.minimalArrayTreeSize];
+            }
+        }
 
-status = ACTIVE;
-abortOnly = false;
-hasReads = false;
-hasUpdates = false;
-hasUntrackedReads = false;
-size = 0;
-attempt++;
+        status = ACTIVE;
+        abortOnly = false;
+        hasReads = false;
+        hasUpdates = false;
+        hasUntrackedReads = false;
+        size = 0;
+        attempt++;
 #if(!$transaction.lean)
-evaluatingCommute = false;
-if(normalListeners!=null){
-normalListeners.clear();
-}
+        evaluatingCommute = false;
+        if(normalListeners!=null){
+            normalListeners.clear();
+        }
 #end
-return true;
-}
+        return true;
+    }
 
-@Override
-public void hardReset(){
-if (status == ACTIVE || status == PREPARED) {
-abort();
-}
+    @Override
+    public void hardReset(){
+        if (status == ACTIVE || status == PREPARED) {
+            abort();
+        }
 
-if(array.length>config.minimalArrayTreeSize){
-pool.putTranlocalArray(array);
-array = pool.takeTranlocalArray(config.minimalArrayTreeSize);
-if(array == null){
-array = new Tranlocal[config.minimalArrayTreeSize];
-}
-}
+        if(array.length>config.minimalArrayTreeSize){
+            pool.putTranlocalArray(array);
+            array = pool.takeTranlocalArray(config.minimalArrayTreeSize);
+            if(array == null){
+                array = new Tranlocal[config.minimalArrayTreeSize];
+            }
+        }
 
-status = ACTIVE;
-abortOnly = false;
-hasUpdates = false;
-hasReads = false;
-hasUntrackedReads = false;
-attempt = 1;
-remainingTimeoutNs = config.timeoutNs;
-size = 0;
+        status = ACTIVE;
+        abortOnly = false;
+        hasUpdates = false;
+        hasReads = false;
+        hasUntrackedReads = false;
+        attempt = 1;
+        remainingTimeoutNs = config.timeoutNs;
+        size = 0;
 #if(!$transaction.lean)
-evaluatingCommute = false;
-if(normalListeners !=null){
-pool.putArrayList(normalListeners);
-normalListeners = null;
-}
+        evaluatingCommute = false;
+        if(normalListeners !=null){
+            pool.putArrayList(normalListeners);
+            normalListeners = null;
+        }
 #end
-}
+    }
 
-// ============================== init =======================================
+    // ============================== init =======================================
 
-@Override
-public void init(BetaTransactionConfiguration transactionConfig){
-if(transactionConfig == null){
-abort();
-throw new NullPointerException();
-}
+    @Override
+    public void init(BetaTransactionConfiguration transactionConfig){
+        if(transactionConfig == null){
+            abort();
+            throw new NullPointerException();
+        }
 
-if(status == ACTIVE || status == PREPARED){
-abort();
-}
+        if(status == ACTIVE || status == PREPARED){
+            abort();
+        }
 
-this.config = transactionConfig;
-hardReset();
-}
+        this.config = transactionConfig;
+        hardReset();
+    }
 
-// ================== orelse ============================
+    // ================== orelse ============================
 
-// ================== orelse ============================
+    // ================== orelse ============================
 
 #if(!$transaction.lean)
-@Override
-public final void startEitherBranch(){
-throw new TodoException();
-}
+    @Override
+    public final void startEitherBranch(){
+        throw new TodoException();
+    }
 
-@Override
-public final void endEitherBranch(){
-throw new TodoException();
-}
+    @Override
+    public final void endEitherBranch(){
+        throw new TodoException();
+    }
 
-@Override
-public final void startOrElseBranch(){
-throw new TodoException();
-}
+    @Override
+    public final void startOrElseBranch(){
+        throw new TodoException();
+    }
 #end
 
 }

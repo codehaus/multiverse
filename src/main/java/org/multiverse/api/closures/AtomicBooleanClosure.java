@@ -3,11 +3,11 @@ package org.multiverse.api.closures;
 import org.multiverse.api.Transaction;
 
 /**
- * An AtomicClosure tailored for boolean
- *
- * @author Peter Veentjer.
- */
-public interface AtomicBooleanClosure {
+* An AtomicClosure tailored for boolean
+*
+* @author Peter Veentjer.
+*/
+public interface AtomicBooleanClosure{
 
     /**
      * Executes the closure.
@@ -17,5 +17,5 @@ public interface AtomicBooleanClosure {
      * @return the result of the execution.
      * @throws Exception if unable to compute a result
      */
-    boolean execute(Transaction tx) throws Exception;
+     boolean execute(Transaction tx)throws Exception;
 }

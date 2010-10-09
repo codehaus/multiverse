@@ -5,7 +5,7 @@ package org.multiverse.api.predicates;
  *
  * @author Peter Veentjer.
  */
-public abstract class BooleanPredicate implements Predicate<Boolean> {
+public abstract class BooleanPredicate implements Predicate<Boolean>{
 
     /**
      * Evaluates the predicate

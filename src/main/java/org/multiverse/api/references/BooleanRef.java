@@ -18,9 +18,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param value the new value.
      * @return the old value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      * @throws TransactionalExecutionException
-     *
      */
     boolean getAndSet(boolean value);
 
@@ -30,9 +28,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param value the new value.
      * @return the new value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      * @throws TransactionalExecutionException
-     *
      */
     boolean set(boolean value);
 
@@ -44,9 +40,7 @@ public interface BooleanRef extends TransactionalObject {
      * @return the old value
      * @throws NullPointerException if tx is null.
      * @throws TransactionalExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     boolean set(Transaction tx, boolean value);
 
@@ -55,7 +49,6 @@ public interface BooleanRef extends TransactionalObject {
      *
      * @return the current value.
      * @throws TransactionalExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
      * @see #atomicGet()
@@ -69,9 +62,7 @@ public interface BooleanRef extends TransactionalObject {
      * @return the value stored in the ref.
      * @throws NullPointerException if tx is null.
      * @throws TransactionalExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     boolean get(Transaction tx);
 
@@ -116,9 +107,7 @@ public interface BooleanRef extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if tx is null.
      * @throws TransactionalExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     boolean getAndSet(Transaction tx, boolean value);
 
@@ -136,9 +125,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param function the function to apply to this reference.
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      * @throws TransactionalExecutionException
-     *
      */
     void commute(BooleanFunction function);
 
@@ -155,13 +142,11 @@ public interface BooleanRef extends TransactionalObject {
      *
      * @param tx       the transaction used for this operation.
      * @param function the function to apply to this reference.
-     * @throws NullPointerException if function is null.
+     * @throws NullPointerException  if function is null.
      * @throws TransactionalExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
-    void commute(Transaction tx, BooleanFunction function);
+    void commute(Transaction tx,BooleanFunction function);
 
     /**
      * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
@@ -181,9 +166,7 @@ public interface BooleanRef extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if function is null.
      * @throws TransactionalExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     boolean alterAndGet(BooleanFunction function);
 
@@ -195,11 +178,9 @@ public interface BooleanRef extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if function or transaction is null.
      * @throws TransactionalExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
-    boolean alterAndGet(Transaction tx, BooleanFunction function);
+    boolean alterAndGet(Transaction tx,BooleanFunction function);
 
     /**
      * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
@@ -219,9 +200,7 @@ public interface BooleanRef extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if function is null.
      * @throws TransactionalExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     boolean getAndAlter(BooleanFunction function);
 
@@ -233,9 +212,7 @@ public interface BooleanRef extends TransactionalObject {
      * @return the old value
      * @throws NullPointerException if function or transaction is null.
      * @throws TransactionalExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     boolean getAndAlter(Transaction tx, BooleanFunction function);
 
@@ -243,7 +220,7 @@ public interface BooleanRef extends TransactionalObject {
      * Executes a compare and set atomically. This method doesn't care about any running transactions.
      *
      * @param expectedValue the expected value.
-     * @param newValue      the new value.
+     * @param newValue the new value.
      * @return true if the compareAndSwap was a success, false otherwise.
      */
     boolean atomicCompareAndSet(boolean expectedValue, boolean newValue);
@@ -252,7 +229,7 @@ public interface BooleanRef extends TransactionalObject {
      * Adds a deferred validator. A deferred validator is executed once the transaction commits, so it
      * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
      * validator is added multiple times, it will be called multiple times.
-     * <p/>
+     *
      * This call lifts on the transaction stored in the ThreadLocalTransaction.
      *
      * @param validator the BooleanPredicate to add.
@@ -265,11 +242,11 @@ public interface BooleanRef extends TransactionalObject {
      * Adds a deferred validator. A deferred validator is executed once the transaction commits, so it
      * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
      * validator is added multiple times, it will be called multiple times.
-     * <p/>
+     *
      * This call lifts on the provided transaction.
      *
      * @param tx the Transaction this call lifts on
-     *           param validator the BooleanPredicate to add.
+     * param validator the BooleanPredicate to add.
      * @throws NullPointerException if validator or tx is null. If validator is null and transaction is not, the
      *                              transaction if aborted.
      */
@@ -283,14 +260,13 @@ public interface BooleanRef extends TransactionalObject {
      * @param validator the BooleanPredicate to add.
      * @throws NullPointerException if validator is null.
      * @throws TransactionalExecutionException
-     *
      */
     void atomicAddDeferredValidator(BooleanPredicate validator);
 
 
     void await(boolean value);
 
-    void await(Transaction tx, boolean value);
+    void await(Transaction tx,boolean value);
 
     //todo: atomicAwait.
 }

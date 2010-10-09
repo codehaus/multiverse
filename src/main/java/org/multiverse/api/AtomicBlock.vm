@@ -18,38 +18,38 @@ import org.multiverse.api.closures.*;
 */
 public interface AtomicBlock extends MultiverseConstants{
 
-/**
-* Returns the TransactionFactory that is used by this AtomicBlock to create Transactions used inside.
-*
-* @return the TransactionFactory used by this AtomicBlock.
-*/
-TransactionFactory getTransactionFactory();
+   /**
+    * Returns the TransactionFactory that is used by this AtomicBlock to create Transactions used inside.
+    *
+    * @return the TransactionFactory used by this AtomicBlock.
+    */
+    TransactionFactory getTransactionFactory();
 
 #foreach($closure in $closures)
-/**
-* Executes the closure. If in the execution of the closure a checked exception is thrown, the exception
-* is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
-* getCause method.
-*
-* @param closure the closure to execute.
-    #if(${closure.type} ne 'void')
+   /**
+    * Executes the closure. If in the execution of the closure a checked exception is thrown, the exception
+    * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
+    * getCause method.
+    *
+    * @param closure the closure to execute.
+#if(${closure.type} ne 'void')
     * @return the result of the execution.
-    #end
-* @throws NullPointerException if closure is null.
-* @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
-*/
+#end
+    * @throws NullPointerException if closure is null.
+    * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
+    */
     ${closure.typeParameter} ${closure.type} execute(${closure.name}${closure.typeParameter} closure);
 
-/**
-* Executes the closure.
-*
-* @param closure the closure to execute.
-    #if(${closure.type} ne 'void')
+    /**
+    * Executes the closure.
+    *
+    * @param closure the closure to execute.
+#if(${closure.type} ne 'void')
     * @return the result of the execution.
-    #end
-* @throws NullPointerException if closure is null.
-* @throws Exception if the execute call fails.
-*/
+#end
+    * @throws NullPointerException if closure is null.
+    * @throws Exception if the execute call fails.
+    */
     ${closure.typeParameter} ${closure.type} executeChecked(${closure.name}${closure.typeParameter} closure)throws Exception;
 
 #end

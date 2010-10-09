@@ -23,30 +23,31 @@ import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalB
  * <p/>
  * remember:
  * it could be that the lock is acquired, but the lockOwner has not been set yet.
- * <p/>
+ *
  * The whole idea of code generation is that once you are inside a concrete class,
  * polymorphism is needed anymore.
- * <p/>
+ *
  * This class is generated.
  *
  * @author Peter Veentjer
  */
 public final class BetaRef<E>
-        extends VeryAbstractBetaTransactionalObject
-        implements Ref<E> {
+    extends VeryAbstractBetaTransactionalObject
+    implements Ref<E>
+{
 
     //Active needs to be volatile. If not, the both load statements in the load function, can be reordered
     //(the instruction above can jump below the orec.arrive if no write is done)
     private volatile E ___value;
 
-    /**
+     /**
      * Creates a uncommitted BetaRef that should be attached to the transaction (this
      * is not done)
      *
      * @param tx the transaction this BetaRef should be attached to.
      * @throws NullPointerException if tx is null.
      */
-    public BetaRef(BetaTransaction tx) {
+    public BetaRef(BetaTransaction tx){
         super(tx.getConfiguration().stm);
         ___tryLockAndArrive(0, true);
         this.___lockOwner = tx;
@@ -58,51 +59,51 @@ public final class BetaRef<E>
      * @param stm the BetaStm this reference belongs to.
      * @throws NullPointerException if stm is null.
      */
-    public BetaRef(BetaStm stm) {
-        this(stm, (E) null);
+    public BetaRef(BetaStm stm){
+        this(stm, (E)null);
     }
 
     /**
      * Creates a committed BetaRef with the given initial value.
      *
-     * @param stm          the BetaStm this reference belongs to.
+     * @param stm the BetaStm this reference belongs to.
      * @param initialValue the initial value
      * @throws NullPointerException is stm is null.
      */
-    public BetaRef(BetaStm stm, final E initialValue) {
+    public BetaRef(BetaStm stm, final E initialValue){
         super(stm);
 
         ___value = initialValue;
-        ___version = VERSION_UNCOMMITTED + 1;
+        ___version = VERSION_UNCOMMITTED+1;
     }
 
 
-    @Override
-    public final int ___getClassIndex() {
+   @Override
+    public final int ___getClassIndex(){
         return 0;
     }
 
 
-    public final E ___weakRead() {
+    public final E ___weakRead(){
         return ___value;
     }
 
     @Override
-    public final RefTranlocal<E> ___newTranlocal() {
+    public final RefTranlocal<E> ___newTranlocal(){
         return new RefTranlocal<E>(this);
     }
 
     @Override
-    public final boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, Tranlocal tranlocal) {
+    public final boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, Tranlocal tranlocal){
         return ___load(
-                spinCount,
-                newLockOwner,
-                lockMode,
-                (RefTranlocal<E>) tranlocal);
+            spinCount,
+            newLockOwner,
+            lockMode,
+            (RefTranlocal<E>)tranlocal);
     }
 
-    public final boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, RefTranlocal<E> tranlocal) {
-        if (lockMode == LOCKMODE_NONE) {
+    public final boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, RefTranlocal<E> tranlocal){
+        if(lockMode == LOCKMODE_NONE){
             while (true) {
                 //JMM: nothing can jump behind the following statement
                 final E firstValue = ___value;
@@ -138,16 +139,16 @@ public final class BetaRef<E>
                     ___departAfterFailure();
                 }
             }
-        } else {
+        }else{
             final boolean commitLock = lockMode == LOCKMODE_COMMIT;
 
-            if (newLockOwner == null) {
+            if(newLockOwner == null){
                 throw new PanicError();
             }
 
             //JMM: no instructions will jump in front of a volatile read. So this stays on top.
             final int arriveStatus = ___tryLockAndArrive(___stm.spinCount, commitLock);
-            if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+            if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
                 return false;
             }
 
@@ -157,11 +158,11 @@ public final class BetaRef<E>
             tranlocal.version = ___version;
             tranlocal.value = value;
             tranlocal.oldValue = value;
-            tranlocal.lockMode = commitLock ? LOCKMODE_COMMIT : LOCKMODE_UPDATE;
+            tranlocal.lockMode = commitLock ? LOCKMODE_COMMIT: LOCKMODE_UPDATE;
             tranlocal.hasDepartObligation = arriveStatus == ARRIVE_NORMAL;
             return true;
         }
-    }
+   }
 
     @Override
     public final Listeners ___commitDirty(
@@ -169,17 +170,17 @@ public final class BetaRef<E>
             final BetaTransaction expectedLockOwner,
             final BetaObjectPool pool) {
 
-        if (!tranlocal.isDirty) {
-            if (tranlocal.lockMode != LOCKMODE_NONE) {
+        if(!tranlocal.isDirty){
+            if(tranlocal.lockMode != LOCKMODE_NONE){
                 ___lockOwner = null;
 
-                if (tranlocal.hasDepartObligation) {
+                if(tranlocal.hasDepartObligation){
                     ___departAfterReadingAndUnlock();
-                } else {
+                }else{
                     ___unlockByReadBiased();
                 }
-            } else {
-                if (tranlocal.hasDepartObligation) {
+            }else{
+                if(tranlocal.hasDepartObligation){
                     ___departAfterReading();
                 }
             }
@@ -189,15 +190,15 @@ public final class BetaRef<E>
 
         //it is a full blown update (so locked).
 
-        final RefTranlocal<E> specializedTranlocal = (RefTranlocal<E>) tranlocal;
+        final RefTranlocal<E> specializedTranlocal = (RefTranlocal<E>)tranlocal;
 
         ___value = specializedTranlocal.value;
-        ___version = specializedTranlocal.version + 1;
+        ___version = specializedTranlocal.version+1;
         ___lockOwner = null;
         Listeners listenersAfterWrite = ___listeners;
 
-        if (listenersAfterWrite != null) {
-            listenersAfterWrite = ___removeListenersAfterWrite();
+        if(listenersAfterWrite != null){
+           listenersAfterWrite = ___removeListenersAfterWrite();
         }
 
         ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
@@ -211,17 +212,17 @@ public final class BetaRef<E>
             final BetaTransaction expectedLockOwner,
             final BetaObjectPool pool) {
 
-        if (tranlocal.isCommitted) {
-            if (tranlocal.lockMode != LOCKMODE_NONE) {
+        if(tranlocal.isCommitted){
+            if(tranlocal.lockMode!=LOCKMODE_NONE){
                 ___lockOwner = null;
 
-                if (tranlocal.hasDepartObligation) {
+                if(tranlocal.hasDepartObligation){
                     ___departAfterReadingAndUnlock();
-                } else {
+                }else{
                     ___unlockByReadBiased();
                 }
-            } else {
-                if (tranlocal.hasDepartObligation) {
+            }else{
+                if(tranlocal.hasDepartObligation){
                     ___departAfterReading();
                 }
             }
@@ -231,15 +232,15 @@ public final class BetaRef<E>
 
         //it is a full blown update (so locked).
 
-        final RefTranlocal<E> specializedTranlocal = (RefTranlocal<E>) tranlocal;
+        final RefTranlocal<E> specializedTranlocal = (RefTranlocal<E>)tranlocal;
 
         ___value = specializedTranlocal.value;
-        ___version = specializedTranlocal.version + 1;
+        ___version = specializedTranlocal.version+1;
         ___lockOwner = null;
         Listeners listenersAfterWrite = ___listeners;
 
-        if (listenersAfterWrite != null) {
-            listenersAfterWrite = ___removeListenersAfterWrite();
+        if(listenersAfterWrite != null){
+           listenersAfterWrite = ___removeListenersAfterWrite();
         }
 
         ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
@@ -249,32 +250,32 @@ public final class BetaRef<E>
 
     @Override
     public final void ___abort(
-            final BetaTransaction transaction,
-            final Tranlocal tranlocal,
-            final BetaObjectPool pool) {
+        final BetaTransaction transaction,
+        final Tranlocal tranlocal,
+        final BetaObjectPool pool) {
 
-        if (tranlocal.lockMode != LOCKMODE_NONE) {
+        if(tranlocal.lockMode!=LOCKMODE_NONE){
             ___lockOwner = null;
 
-            if (!tranlocal.isConstructing) {
+            if(!tranlocal.isConstructing){
                 //depart and release the lock. This call is able to deal with readbiased and normal reads.
                 ___departAfterFailureAndUnlock();
             }
-        } else {
-            if (tranlocal.hasDepartObligation) {
+        }else{
+            if(tranlocal.hasDepartObligation){
                 ___departAfterFailure();
             }
         }
 
-        pool.put((RefTranlocal) tranlocal);
+        pool.put((RefTranlocal)tranlocal);
     }
 
     @Override
-    public void addDeferredValidator(Predicate<E> validator) {
+    public void addDeferredValidator(Predicate<E> validator){
         final Transaction tx = getThreadLocalTransaction();
 
-        if (tx != null) {
-            addDeferredValidator((BetaTransaction) tx, validator);
+        if(tx != null){
+            addDeferredValidator((BetaTransaction)tx, validator);
             return;
         }
 
@@ -282,229 +283,229 @@ public final class BetaRef<E>
     }
 
     @Override
-    public void addDeferredValidator(Transaction tx, Predicate<E> validator) {
-        addDeferredValidator((BetaTransaction) tx, validator);
+    public void addDeferredValidator(Transaction tx, Predicate<E> validator){
+        addDeferredValidator((BetaTransaction)tx, validator);
     }
 
-    public void addDeferredValidator(BetaTransaction tx, Predicate<E> validator) {
-        if (tx == null) {
+    public void addDeferredValidator(BetaTransaction tx, Predicate<E> validator){
+        if(tx == null){
             throw new NullPointerException();
         }
 
-        if (validator == null) {
+        if(validator == null){
             tx.abort();
             throw new NullPointerException();
         }
 
-        RefTranlocal write = tx.openForWrite(this, LOCKMODE_NONE);
-        if (write.validators == null) {
+        RefTranlocal write= tx.openForWrite(this, LOCKMODE_NONE);
+        if(write.validators == null){
             write.validators = new Predicate[1];
-            write.validators[0] = validator;
-        } else {
+            write.validators[0]=validator;
+        }else{
             throw new TodoException();
         }
     }
 
     @Override
-    public void atomicAddDeferredValidator(Predicate<E> validator) {
-        if (validator == null) {
+    public void atomicAddDeferredValidator(Predicate<E> validator){
+        if(validator == null){
             throw new NullPointerException();
         }
         throw new TodoException();
     }
 
     @Override
-    public final boolean isNull() {
+    public final boolean isNull(){
         final Transaction tx = getThreadLocalTransaction();
 
-        if (tx == null) {
+        if(tx == null){
             throw new TransactionRequiredException();
         }
 
-        return isNull((BetaTransaction) tx);
+        return isNull((BetaTransaction)tx);
     }
 
     @Override
-    public final boolean isNull(final Transaction tx) {
-        return isNull((BetaTransaction) tx);
+    public final boolean isNull(final Transaction tx){
+        return isNull((BetaTransaction)tx);
     }
 
-    public final boolean isNull(final BetaTransaction tx) {
+    public final boolean isNull(final BetaTransaction tx){
         return get(tx) == null;
     }
 
     @Override
-    public final boolean atomicIsNull() {
+    public final boolean atomicIsNull(){
         return atomicGet() == null;
     }
 
     @Override
-    public final void ensure() {
+    public final void ensure(){
         Transaction tx = getThreadLocalTransaction();
 
-        if (tx == null) {
+        if(tx == null){
             throw new TransactionRequiredException("No transaction is found for the ensure operation");
         }
 
-        ensure((BetaTransaction) tx);
+        ensure((BetaTransaction)tx);
     }
 
     @Override
-    public final void ensure(Transaction tx) {
-        ensure((BetaTransaction) tx);
+    public final void ensure(Transaction tx){
+        ensure((BetaTransaction)tx);
     }
 
-    public final void ensure(BetaTransaction tx) {
+    public final void ensure(BetaTransaction tx){
         tx.openForRead(this, LOCKMODE_UPDATE);
     }
 
     @Override
-    public final boolean tryEnsure() {
+    public final boolean tryEnsure(){
         Transaction tx = getThreadLocalTransaction();
 
-        if (tx != null) {
+        if(tx!=null){
             throw new TransactionRequiredException("No transaction is found for the tryEnsure operation");
         }
 
-        return tryEnsure((BetaTransaction) tx);
+        return tryEnsure((BetaTransaction)tx);
     }
 
     @Override
-    public final boolean tryEnsure(final Transaction tx) {
-        return tryEnsure((BetaTransaction) tx);
+    public final boolean tryEnsure(final Transaction tx){
+        return tryEnsure((BetaTransaction)tx);
     }
 
-    public final boolean tryEnsure(BetaTransaction tx) {
+    public final boolean tryEnsure(BetaTransaction tx){
         return tx.tryLock(this, LOCKMODE_UPDATE);
     }
 
     @Override
-    public final void ensureOptimistic() {
+    public final void ensureOptimistic(){
         throw new TodoException();
     }
 
     @Override
-    public final void ensureOptimistic(final Transaction tx) {
-        ensureOptimistic((BetaTransaction) tx);
+    public final void ensureOptimistic(final Transaction tx){
+        ensureOptimistic((BetaTransaction)tx);
     }
 
-    public final void ensureOptimistic(final BetaTransaction tx) {
+    public final void ensureOptimistic(final BetaTransaction tx){
         throw new TodoException();
     }
 
     @Override
-    public final void privatize() {
+    public final void privatize(){
         Transaction tx = getThreadLocalTransaction();
 
-        if (tx == null) {
+        if(tx == null){
             throw new TransactionRequiredException("No transaction is found for the privatize operation");
         }
 
-        privatize((BetaTransaction) tx);
+        privatize((BetaTransaction)tx);
     }
 
     @Override
-    public final void privatize(Transaction tx) {
-        privatize((BetaTransaction) tx);
+    public final void privatize(Transaction tx){
+        privatize((BetaTransaction)tx);
     }
 
-    public final void privatize(BetaTransaction tx) {
+    public final void privatize(BetaTransaction tx){
         tx.openForRead(this, LOCKMODE_COMMIT);
     }
 
     @Override
-    public final boolean tryPrivatize() {
+    public final boolean tryPrivatize(){
         Transaction tx = getThreadLocalTransaction();
 
-        if (tx != null) {
+        if(tx != null){
             throw new TransactionRequiredException("No transaction is found for the tryPrivatize operation");
         }
 
-        return tryPrivatize((BetaTransaction) tx);
+        return tryPrivatize((BetaTransaction)tx);
     }
 
     @Override
-    public final boolean tryPrivatize(Transaction tx) {
-        return tryPrivatize((BetaTransaction) tx);
+    public final boolean tryPrivatize(Transaction tx){
+        return tryPrivatize((BetaTransaction)tx);
     }
 
-    public final boolean tryPrivatize(BetaTransaction tx) {
+    public final boolean tryPrivatize(BetaTransaction tx){
         return tx.tryLock(this, LOCKMODE_COMMIT);
     }
 
     @Override
     public final void commute(
-            Function<E> function) {
+        Function<E> function){
 
         final Transaction tx = getThreadLocalTransaction();
 
-        if (tx == null) {
+        if(tx == null){
             throw new TransactionRequiredException();
         }
 
-        commute((BetaTransaction) tx, function);
+        commute((BetaTransaction)tx, function);
     }
 
     @Override
     public final void commute(
-            final Transaction tx,
-            final Function<E> function) {
+        final Transaction tx,
+        final Function<E> function){
 
-        commute((BetaTransaction) tx, function);
+        commute((BetaTransaction)tx, function);
     }
 
     public final void commute(
-            BetaTransaction tx,
-            Function<E> function) {
+        BetaTransaction tx,
+        Function<E> function){
 
         tx.commute(this, function);
     }
 
     @Override
     public final E atomicAlterAndGet(
-            final Function<E> function) {
+        final Function<E> function){
 
         return atomicAlter(function, false);
     }
 
     @Override
     public final E alterAndGet(
-            final Function<E> function) {
+        final Function<E> function){
 
         final Transaction tx = getThreadLocalTransaction();
 
-        if (tx == null) {
+        if(tx == null){
             throw new TransactionRequiredException();
         }
 
-        return alterAndGet((BetaTransaction) tx, function);
+        return alterAndGet((BetaTransaction)tx, function);
     }
 
     @Override
     public final E alterAndGet(
-            final Transaction tx,
-            final Function<E> function) {
-        return alterAndGet((BetaTransaction) tx, function);
+        final Transaction tx,
+        final Function<E> function){
+        return alterAndGet((BetaTransaction)tx, function);
     }
 
     public final E alterAndGet(
-            final BetaTransaction tx,
-            final Function<E> function) {
+        final BetaTransaction tx,
+        final Function<E> function){
 
-        if (function == null) {
+        if(function == null){
             tx.abort();
             throw new NullPointerException("Function can't be null");
         }
 
         RefTranlocal<E> write
-                = (RefTranlocal<E>) tx.openForWrite(this, LOCKMODE_NONE);
+            = (RefTranlocal<E>)tx.openForWrite(this, LOCKMODE_NONE);
 
         boolean abort = true;
-        try {
+        try{
             write.value = function.call(write.value);
             abort = false;
-        } finally {
-            if (abort) {
+        }finally{
+            if(abort){
                 tx.abort();
             }
         }
@@ -513,41 +514,41 @@ public final class BetaRef<E>
 
     @Override
     public final E atomicGetAndAlter(
-            final Function<E> function) {
+        final Function<E> function){
 
-        return atomicAlter(function, true);
+        return atomicAlter(function,true);
     }
 
     private E atomicAlter(
-            final Function<E> function,
-            final boolean returnOld) {
+        final Function<E> function,
+        final boolean returnOld){
 
-        if (function == null) {
+        if(function == null){
             throw new NullPointerException("Function can't be null");
         }
 
         final int arriveStatus = ___arriveAndLockOrBackoff();
 
-        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+        if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
             throw new LockedException();
         }
 
         final E oldValue = ___value;
         E newValue;
         boolean abort = true;
-        try {
+        try{
             newValue = function.call(oldValue);
             abort = false;
-        } finally {
-            if (abort) {
+        }finally{
+            if(abort){
                 ___departAfterFailureAndUnlock();
             }
         }
 
-        if (oldValue == newValue) {
-            if (arriveStatus == ARRIVE_UNREGISTERED) {
+        if(oldValue == newValue){
+            if(arriveStatus == ARRIVE_UNREGISTERED){
                 ___unlockByReadBiased();
-            } else {
+            } else{
                 ___departAfterReadingAndUnlock();
             }
 
@@ -562,8 +563,8 @@ public final class BetaRef<E>
 
         ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
 
-        if (listeners != null) {
-            listeners.openAll(getThreadLocalBetaObjectPool());
+        if(listeners!=null){
+           listeners.openAll(getThreadLocalBetaObjectPool());
         }
 
         return returnOld ? oldValue : newValue;
@@ -571,44 +572,44 @@ public final class BetaRef<E>
 
     @Override
     public final E getAndAlter(
-            final Function<E> function) {
+        final Function<E> function){
 
         final Transaction tx = getThreadLocalTransaction();
 
-        if (tx == null) {
+        if(tx == null){
             throw new TransactionRequiredException();
         }
 
-        return getAndAlter((BetaTransaction) tx, function);
+        return getAndAlter((BetaTransaction)tx, function);
     }
 
     @Override
     public final E getAndAlter(
-            final Transaction tx,
-            final Function<E> function) {
+        final Transaction tx,
+        final Function<E> function){
 
-        return getAndAlter((BetaTransaction) tx, function);
+        return getAndAlter((BetaTransaction)tx, function);
     }
 
     public final E getAndAlter(
-            final BetaTransaction tx,
-            final Function<E> function) {
+        final BetaTransaction tx,
+        final Function<E> function){
 
-        if (function == null) {
+        if(function == null){
             tx.abort();
             throw new NullPointerException("Function can't be null");
         }
 
         RefTranlocal<E> write
-                = (RefTranlocal<E>) tx.openForWrite(this, LOCKMODE_NONE);
+            = (RefTranlocal<E>)tx.openForWrite(this, LOCKMODE_NONE);
 
         final E oldValue = write.value;
         boolean abort = true;
-        try {
+        try{
             write.value = function.call(write.value);
-            abort = false;
-        } finally {
-            if (abort) {
+            abort  = false;
+        }finally{
+            if(abort){
                 tx.abort();
             }
         }
@@ -617,26 +618,26 @@ public final class BetaRef<E>
 
     @Override
     public final boolean atomicCompareAndSet(
-            final E expectedValue,
-            final E newValue) {
+        final E expectedValue,
+        final E newValue){
 
         final int arriveStatus = ___arriveAndLockOrBackoff();
 
-        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+        if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
             throw new LockedException();
         }
 
         final E currentValue = ___value;
 
-        if (currentValue != expectedValue) {
+        if(currentValue != expectedValue){
             ___departAfterFailureAndUnlock();
             return false;
         }
 
-        if (expectedValue == newValue) {
-            if (arriveStatus == ARRIVE_UNREGISTERED) {
+        if(expectedValue == newValue){
+            if(arriveStatus == ARRIVE_UNREGISTERED){
                 ___unlockByReadBiased();
-            } else {
+            } else{
                 ___departAfterReadingAndUnlock();
             }
 
@@ -650,7 +651,7 @@ public final class BetaRef<E>
 
         ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
 
-        if (listeners != null) {
+        if(listeners!=null){
             listeners.openAll(getThreadLocalBetaObjectPool());
         }
 
@@ -658,91 +659,91 @@ public final class BetaRef<E>
     }
 
     @Override
-    public final E getAndSet(final E value) {
+    public final E getAndSet(final E value){
 
         final Transaction tx = getThreadLocalTransaction();
 
-        if (tx == null) {
+        if(tx == null){
             throw new TransactionRequiredException();
         }
 
-        return getAndSet((BetaTransaction) tx, value);
+        return getAndSet((BetaTransaction)tx, value);
     }
 
-    public final E set(final E value) {
+    public final E set(final E value){
         final Transaction tx = getThreadLocalTransaction();
 
-        if (tx == null) {
+        if(tx == null){
             throw new TransactionRequiredException();
         }
 
-        return set((BetaTransaction) tx, value);
+        return set((BetaTransaction)tx, value);
     }
 
     @Override
-    public final E get() {
+    public final E get(){
         final Transaction tx = getThreadLocalTransaction();
 
-        if (tx == null) {
+        if(tx == null){
             throw new TransactionRequiredException();
         }
 
-        return get((BetaTransaction) tx);
+        return get((BetaTransaction)tx);
     }
 
     @Override
-    public final E get(final Transaction tx) {
-        return get((BetaTransaction) tx);
+    public final E get(final Transaction tx){
+        return get((BetaTransaction)tx);
     }
 
-    public final E get(final BetaTransaction transaction) {
+    public final E get(final BetaTransaction transaction){
         return transaction.openForRead(this, LOCKMODE_NONE).value;
     }
 
     @Override
-    public final E atomicGet() {
+    public final E atomicGet(){
         int attempt = 1;
-        do {
-            if (!___hasCommitLock()) {
+        do{
+            if(!___hasCommitLock()){
 
                 E read = ___value;
 
-                if (!___hasCommitLock()) {
+                if(!___hasCommitLock()){
                     return read;
                 }
             }
             ___stm.defaultBackoffPolicy.delayedUninterruptible(attempt);
             attempt++;
-        } while (attempt <= ___stm.spinCount);
+        }while(attempt<=___stm.spinCount);
 
         throw new LockedException();
     }
 
     @Override
-    public final E atomicWeakGet() {
-        return ___value;
+    public final E atomicWeakGet(){
+       return ___value;
     }
 
     @Override
-    public final E atomicSet(final E newValue) {
+    public final E atomicSet(final E newValue){
         atomicGetAndSet(newValue);
         return newValue;
     }
 
     @Override
-    public final E atomicGetAndSet(final E newValue) {
+    public final E atomicGetAndSet(final E newValue){
         final int arriveStatus = ___arriveAndLockOrBackoff();
 
-        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+        if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
             throw new LockedException();
         }
 
         final E oldValue = ___value;
 
-        if (oldValue == newValue) {
-            if (arriveStatus == ARRIVE_UNREGISTERED) {
+        if(oldValue == newValue){
+            if(arriveStatus == ARRIVE_UNREGISTERED){
                 ___unlockByReadBiased();
-            } else {
+            } else{
                 ___departAfterReadingAndUnlock();
             }
 
@@ -756,7 +757,7 @@ public final class BetaRef<E>
 
         ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
 
-        if (listeners != null) {
+        if(listeners != null){
             BetaObjectPool pool = getThreadLocalBetaObjectPool();
             listeners.openAll(pool);
         }
@@ -765,13 +766,13 @@ public final class BetaRef<E>
     }
 
     @Override
-    public final E set(Transaction tx, E value) {
-        return set((BetaTransaction) tx, value);
+    public final E set(Transaction tx, E value){
+        return set((BetaTransaction)tx, value);
     }
 
     public final E set(
-            final BetaTransaction tx,
-            final E value) {
+        final BetaTransaction tx,
+        final E value){
 
         tx.openForWrite(this, LOCKMODE_NONE).value = value;
         return value;
@@ -779,15 +780,15 @@ public final class BetaRef<E>
 
     @Override
     public final E getAndSet(
-            final Transaction tx,
-            final E value) {
+        final Transaction tx,
+        final E value){
 
-        return getAndSet((BetaTransaction) tx, value);
+        return getAndSet((BetaTransaction)tx, value);
     }
 
     public final E getAndSet(
-            final BetaTransaction tx,
-            final E value) {
+        final BetaTransaction tx,
+        final E value){
 
         RefTranlocal<E> write = tx.openForWrite(this, LOCKMODE_NONE);
         E oldValue = write.value;
@@ -796,30 +797,30 @@ public final class BetaRef<E>
     }
 
     @Override
-    public final void await(E value) {
+    public final void await(E value){
         final Transaction tx = getThreadLocalTransaction();
 
-        if (tx == null) {
+        if(tx == null){
             throw new TransactionRequiredException();
         }
 
-        await((BetaTransaction) tx, value);
+        await((BetaTransaction)tx, value);
     }
 
     @Override
     public final void await(
-            final Transaction tx,
-            final E value) {
+        final Transaction tx,
+        final E value){
 
-        await((BetaTransaction) tx, value);
+        await((BetaTransaction)tx, value);
     }
 
     public final void await(
-            final BetaTransaction tx,
-            final E value) {
+        final BetaTransaction tx,
+        final E value){
 
-        RefTranlocal<E> read = tx.openForRead(this, LOCKMODE_NONE);
-        if (read.value != value) {
+        RefTranlocal<E> read = tx.openForRead(this,LOCKMODE_NONE);
+        if(read.value != value){
             StmUtils.retry();
         }
     }
