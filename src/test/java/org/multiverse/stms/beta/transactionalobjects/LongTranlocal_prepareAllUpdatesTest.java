@@ -12,7 +12,7 @@ import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoUpdateLock;
 
-public class LongTranlocal_doPrepareAllUpdatesTest {
+public class LongTranlocal_prepareAllUpdatesTest {
     private BetaStm stm;
     private BetaObjectPool pool;
 
@@ -35,7 +35,7 @@ public class LongTranlocal_doPrepareAllUpdatesTest {
         tranlocal.isCommitted = true;
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        tranlocal.doPrepareAllUpdates(pool, tx, 0);
+        tranlocal.prepareAllUpdates(pool, tx, 0);
 
         assertNull(ref.___getLockOwner());
         assertHasNoCommitLock(ref);

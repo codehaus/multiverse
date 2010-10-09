@@ -1305,7 +1305,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
 
             if(config.dirtyCheck){
-                if(needsPrepare && !tranlocal.doPrepareDirtyUpdates(pool, this, config.spinCount)){
+                if(needsPrepare && !tranlocal.prepareDirtyUpdates(pool, this, config.spinCount)){
                     throw abortOnWriteConflict();
                 } else if(!tranlocal.isDirty){
                     tranlocal.calculateIsDirty();
@@ -1313,7 +1313,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
                 listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool);
             }else{
-                if(needsPrepare && !tranlocal.doPrepareAllUpdates(pool, this, config.spinCount)){
+                if(needsPrepare && !tranlocal.prepareAllUpdates(pool, this, config.spinCount)){
                     throw abortOnWriteConflict();
                 }
 
@@ -1354,8 +1354,8 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
         if(hasUpdates && config.writeLockMode != LOCKMODE_COMMIT){
             final boolean success = config.dirtyCheck
-                    ? attached.doPrepareDirtyUpdates(pool, this, config.spinCount)
-                    : attached.doPrepareAllUpdates(pool, this, config.spinCount);
+                    ? attached.prepareDirtyUpdates(pool, this, config.spinCount)
+                    : attached.prepareAllUpdates(pool, this, config.spinCount);
 
             if(!success){
                 throw abortOnWriteConflict();

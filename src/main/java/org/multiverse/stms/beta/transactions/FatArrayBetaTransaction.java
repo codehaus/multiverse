@@ -2250,7 +2250,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         for (int k = 0; k < firstFreeIndex; k++) {
             final Tranlocal tranlocal = array[k];
 
-            if(!tranlocal.doPrepareWithWriteSkewPrevention(pool,this, config.spinCount, config.dirtyCheck)){
+            if(!tranlocal.prepareWithWriteSkewPrevention(pool,this, config.spinCount, config.dirtyCheck)){
                 return false;
             }
         }
@@ -2272,7 +2272,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 continue;
             }
 
-            if(!tranlocal.doPrepareAllUpdates(pool, this, spinCount)) {
+            if(!tranlocal.prepareAllUpdates(pool, this, spinCount)) {
                 return false;
             }
         }
@@ -2294,7 +2294,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 continue;
             }
 
-            if(!tranlocal.doPrepareDirtyUpdates(pool, this, spinCount)) {
+            if(!tranlocal.prepareDirtyUpdates(pool, this, spinCount)) {
                 return false;
             } 
         }

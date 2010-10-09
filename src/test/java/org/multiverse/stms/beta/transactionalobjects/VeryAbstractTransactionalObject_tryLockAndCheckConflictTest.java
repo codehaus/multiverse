@@ -16,7 +16,7 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 /**
  * @author Peter Veentjer
  */
-public class BetaLongRef_tryLockAndCheckConflictTest implements BetaStmConstants {
+public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest implements BetaStmConstants {
     private BetaStm stm;
 
     @Before

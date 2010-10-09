@@ -69,7 +69,7 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
      */
     public abstract void addCommutingFunction(Function function, BetaObjectPool pool);
 
-    public final boolean doPrepareWithWriteSkewPrevention(
+    public final boolean prepareWithWriteSkewPrevention(
             final BetaObjectPool pool, final BetaTransaction tx, final int spinCount, final boolean dirtyCheck) {
 
         if (isConstructing) {
@@ -104,7 +104,7 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
 
     }
 
-    public final boolean doPrepareDirtyUpdates(
+    public final boolean prepareDirtyUpdates(
             final BetaObjectPool pool, final BetaTransaction tx, final int spinCount) {
 
         if (isCommitted || isConstructing) {
@@ -131,7 +131,7 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
         return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
     }
 
-    public final boolean doPrepareAllUpdates(
+    public final boolean prepareAllUpdates(
             final BetaObjectPool pool, BetaTransaction tx, int spinCount) {
 
         if (isCommitted || isConstructing) {

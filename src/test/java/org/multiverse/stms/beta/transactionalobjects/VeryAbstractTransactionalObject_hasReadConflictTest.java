@@ -13,7 +13,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
-public class BetaLongRef_hasReadConflictTest implements BetaStmConstants {
+public class VeryAbstractTransactionalObject_hasReadConflictTest implements BetaStmConstants {
     private BetaStm stm;
 
     @Before

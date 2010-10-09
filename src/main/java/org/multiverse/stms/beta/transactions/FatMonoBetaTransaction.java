@@ -2133,8 +2133,8 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
           
             if(hasUpdates && config.writeLockMode != LOCKMODE_COMMIT){
                 final boolean success = config.dirtyCheck
-                    ? attached.doPrepareDirtyUpdates(pool, this, config.spinCount)
-                    : attached.doPrepareAllUpdates(pool, this, config.spinCount);
+                    ? attached.prepareDirtyUpdates(pool, this, config.spinCount)
+                    : attached.prepareAllUpdates(pool, this, config.spinCount);
 
                 if(!success){
                     throw abortOnWriteConflict();

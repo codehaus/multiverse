@@ -10,9 +10,8 @@ import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
-public class BetaLongRef_atomicIsEnsuredTest {
-
-     private BetaStm stm;
+public class VeryAbstractBetaTransactionalObject_atomicIsFreeTest {
+    private BetaStm stm;
 
     @Before
     public void setUp(){
@@ -25,9 +24,9 @@ public class BetaLongRef_atomicIsEnsuredTest {
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        boolean result = ref.atomicIsEnsured();
+        boolean result = ref.atomicIsFree();
 
-        assertFalse(result);
+        assertTrue(result);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertNull(ref.___getLockOwner());
         assertHasNoCommitLock(ref);
@@ -43,9 +42,9 @@ public class BetaLongRef_atomicIsEnsuredTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.ensure(tx);
 
-        boolean result = ref.atomicIsEnsured();
+        boolean result = ref.atomicIsFree();
 
-        assertTrue(result);
+        assertFalse(result);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertSame(tx, ref.___getLockOwner());
         assertHasNoCommitLock(ref);
@@ -61,7 +60,7 @@ public class BetaLongRef_atomicIsEnsuredTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.privatize(tx);
 
-        boolean result = ref.atomicIsEnsured();
+        boolean result = ref.atomicIsFree();
 
         assertFalse(result);
         assertVersionAndValue(ref, initialVersion, initialValue);

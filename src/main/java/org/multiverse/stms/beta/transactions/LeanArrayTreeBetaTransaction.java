@@ -1534,7 +1534,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                 continue;
             }
 
-            if(!tranlocal.doPrepareAllUpdates(pool, this, spinCount)) {
+            if(!tranlocal.prepareAllUpdates(pool, this, spinCount)) {
                 return false;
             }
         }
@@ -1556,7 +1556,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                 continue;
             }
 
-            if(!tranlocal.doPrepareDirtyUpdates(pool, this, spinCount)) {
+            if(!tranlocal.prepareDirtyUpdates(pool, this, spinCount)) {
                 return false;
             }
         }

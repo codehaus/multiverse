@@ -18,7 +18,7 @@ import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
-public class BetaLongRef_ensureTest {
+public class VeryAbstractTransactionalObject_ensureTest {
     private BetaStm stm;
 
     @Before

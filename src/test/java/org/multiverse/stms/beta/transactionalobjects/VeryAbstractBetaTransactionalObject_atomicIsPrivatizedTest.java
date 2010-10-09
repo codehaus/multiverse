@@ -10,23 +10,24 @@ import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
-public class BetaLongRef_atomicIsFreeTest {
+public class VeryAbstractBetaTransactionalObject_atomicIsPrivatizedTest {
+
     private BetaStm stm;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         stm = new BetaStm();
     }
 
     @Test
-    public void whenIsFree(){
+    public void whenIsFree() {
         long initialValue = 10;
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        boolean result = ref.atomicIsFree();
+        boolean result = ref.atomicIsPrivatized();
 
-        assertTrue(result);
+        assertFalse(result);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertNull(ref.___getLockOwner());
         assertHasNoCommitLock(ref);
@@ -34,7 +35,7 @@ public class BetaLongRef_atomicIsFreeTest {
     }
 
     @Test
-    public void whenIsEnsured(){
+    public void whenIsEnsured() {
         long initialValue = 10;
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -42,7 +43,7 @@ public class BetaLongRef_atomicIsFreeTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.ensure(tx);
 
-        boolean result = ref.atomicIsFree();
+        boolean result = ref.atomicIsPrivatized();
 
         assertFalse(result);
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -52,7 +53,7 @@ public class BetaLongRef_atomicIsFreeTest {
     }
 
     @Test
-    public void whenIsPrivatized(){
+    public void whenIsPrivatized() {
         long initialValue = 10;
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -60,9 +61,9 @@ public class BetaLongRef_atomicIsFreeTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.privatize(tx);
 
-        boolean result = ref.atomicIsFree();
+        boolean result = ref.atomicIsPrivatized();
 
-        assertFalse(result);
+        assertTrue(result);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);

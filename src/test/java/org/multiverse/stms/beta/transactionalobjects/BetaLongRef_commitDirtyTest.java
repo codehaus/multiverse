@@ -17,10 +17,7 @@ import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
-/**
- * @author Peter Veentjer
- */
-public class BetaLongRef_commitAllTest implements BetaStmConstants {
+public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
     private BetaStm stm;
     private BetaObjectPool pool;
     private GlobalConflictCounter globalConflictCounter;
@@ -50,9 +47,9 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tranlocal.value++;
         tranlocal.isDirty = true;
-        tranlocal.prepareAllUpdates(pool, tx, 1);
+        tranlocal.prepareDirtyUpdates(pool, tx, 1);
         long oldConflictCount = globalConflictCounter.count();
-        Listeners listeners = ref.___commitAll(tranlocal, tx, pool);
+        Listeners listeners = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNotNull(listeners);
         assertNull(listeners.next);
@@ -69,21 +66,22 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenCommitingUpdateWithConflictingListener_thenGlobalConflictCounterIncreased() {
+    public void whenCommittingDirtyUpdateWithConflictingListener_thenGlobalConflictCounterIncreased() {
         long initialValue = 10;
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
+        LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
+        tranlocal.value++;
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, LOCKMODE_NONE);
 
         long oldConflictCount = globalConflictCounter.count();
 
-        tranlocal.prepareAllUpdates(pool, tx, 1);
-        Listeners listeners = ref.___commitAll(tranlocal, tx, pool);
+        tranlocal.prepareDirtyUpdates(pool, tx, 1);
+        Listeners listeners = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(listeners);
         assertEquals(oldConflictCount + 1, globalConflictCounter.count());
@@ -92,7 +90,34 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         assertNull(ref.___getLockOwner());
         assertSurplus(1, ref);
         assertReadonlyCount(0, ref);
-        assertVersionAndValue(ref, initialVersion + 1, initialValue);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
+    }
+
+    @Test
+    public void whenCommittingNonDirtyUpdateWithConflictingListener_thenGlobalConflictCounterNotIncreased() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        otherTx.openForRead(ref, LOCKMODE_NONE);
+
+        long oldConflictCount = globalConflictCounter.count();
+
+        tranlocal.prepareDirtyUpdates(pool, tx, 1);
+        Listeners listeners = ref.___commitDirty(tranlocal, tx, pool);
+
+        assertNull(listeners);
+        assertEquals(oldConflictCount, globalConflictCounter.count());
+        assertHasNoCommitLock(ref);
+        assertHasNoUpdateLock(ref);
+        assertNull(ref.___getLockOwner());
+        assertSurplus(1, ref);
+        assertReadonlyCount(1, ref);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
@@ -107,9 +132,9 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, LOCKMODE_NONE);
 
-        tranlocal.prepareAllUpdates(pool, tx, 1);
+        tranlocal.prepareDirtyUpdates(pool, tx, 1);
         long oldConflictCount = globalConflictCounter.count();
-        Listeners listeners = ref.___commitAll(tranlocal, tx, pool);
+        Listeners listeners = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(listeners);
         assertEquals(oldConflictCount, globalConflictCounter.count());
@@ -130,9 +155,9 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
 
-        tranlocal.prepareAllUpdates(pool, tx, 1);
+        tranlocal.prepareDirtyUpdates(pool, tx, 1);
         long oldConflictCount = globalConflictCounter.count();
-        Listeners result = ref.___commitAll(tranlocal, tx, pool);
+        Listeners result = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
@@ -153,9 +178,9 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
 
-        tranlocal.prepareAllUpdates(pool, tx, 1);
+        tranlocal.prepareDirtyUpdates(pool, tx, 1);
         long oldConflictCount = globalConflictCounter.count();
-        Listeners result = ref.___commitAll(tranlocal, tx, pool);
+        Listeners result = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
@@ -178,9 +203,9 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tranlocal.value = updateValue;
 
-        tranlocal.prepareAllUpdates(pool, tx, 1);
+        tranlocal.prepareDirtyUpdates(pool, tx, 1);
         long oldConflictCount = globalConflictCounter.count();
-        Listeners result = ref.___commitAll(tranlocal, tx, pool);
+        Listeners result = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
@@ -194,48 +219,47 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenNonDirtyWrite_thenChangeWritten() {
+    public void whenNonDirtyWrite_thenNoChangeWritten() {
         long initialValue = 10;
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
-        tranlocal.prepareAllUpdates(pool,tx, 1);
+        tranlocal.prepareDirtyUpdates(pool, tx, 1);
 
         long oldConflictCount = globalConflictCounter.count();
-        Listeners result = ref.___commitAll(tranlocal, tx, pool);
+        Listeners result = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
-        assertVersionAndValue(ref, initialVersion + 1, initialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertHasNoUpdateLock(ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
-        assertReadonlyCount(0, ref);
+        assertReadonlyCount(1, ref);
     }
 
     @Test
-    public void whenUpdateOnReadBiasedRead_thenGlobalConflictCounterIncreased() {
+    public void whenCommitOnReadBiasedRead_thenGlobalConflictCounterNotIncreased() {
         long initialValue = 10;
         BetaLongRef ref = makeReadBiased(newLongRef(stm, initialValue));
         long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         Tranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
-        tranlocal.prepareAllUpdates(pool,tx, 1);
+        tranlocal.prepareDirtyUpdates(pool, tx, 1);
 
         long oldConflictCount = globalConflictCounter.count();
-        Listeners listeners = ref.___commitAll(tranlocal, tx, pool);
+        Listeners listeners = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(listeners);
-        assertEquals(oldConflictCount + 1, globalConflictCounter.count());
+        assertEquals(oldConflictCount, globalConflictCounter.count());
         assertHasNoCommitLock(ref);
-        assertUpdateBiased(ref);
-        assertSurplus(0, ref);
-        assertReadonlyCount(0, ref);
-        assertVersionAndValue(ref, version+1 , initialValue);
+        assertReadBiased(ref);
+        assertSurplus(1, ref);
+        assertVersionAndValue(ref, version, initialValue);
     }
 
     @Test
@@ -248,8 +272,8 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         ref.privatize(tx);
         ref.get(tx);
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
-        tranlocal.prepareAllUpdates(pool,tx, 1);
-        Listeners listeners = ref.___commitAll(tranlocal, tx, pool);
+        tranlocal.prepareDirtyUpdates(pool, tx, 1);
+        Listeners listeners = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(listeners);
         assertHasNoUpdateLock(ref);
@@ -272,8 +296,8 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         ref.privatize(tx);
         LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tranlocal.value = updateValue;
-        tranlocal.prepareAllUpdates(pool,tx, 1);
-        Listeners listeners = ref.___commitAll(tranlocal, tx, pool);
+        tranlocal.prepareDirtyUpdates(pool, tx, 1);
+        Listeners listeners = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(listeners);
         assertHasNoUpdateLock(ref);
@@ -286,7 +310,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
     }
 
     @Test
-    public void locked_whenPrivatizedBySelfAndNoDirtyWrite_thenLockReleasedAndChangeWritten() {
+    public void locked_whenPrivatizedBySelfAndNoDirtyWrite_thenLockReleasedAndNoChangeWritten() {
         long initialValue = 10;
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -295,17 +319,17 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         ref.privatize(tx);
         LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tranlocal.value = initialValue;
-        tranlocal.prepareAllUpdates(pool,tx, 1);
-        Listeners listeners = ref.___commitAll(tranlocal, tx, pool);
+        tranlocal.prepareDirtyUpdates(pool, tx, 1);
+        Listeners listeners = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(listeners);
         assertHasNoUpdateLock(ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
-        assertReadonlyCount(0, ref);
+        assertReadonlyCount(1, ref);
         assertUpdateBiased(ref);
-        assertVersionAndValue(ref, initialVersion + 1, initialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
@@ -318,8 +342,8 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         ref.ensure(tx);
         ref.get(tx);
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
-        tranlocal.prepareAllUpdates(pool,tx, 1);
-        Listeners listeners = ref.___commitAll(tranlocal, tx, pool);
+        tranlocal.prepareDirtyUpdates(pool, tx, 1);
+        Listeners listeners = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(listeners);
         assertHasNoUpdateLock(ref);
@@ -342,8 +366,8 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         int updatedValue = 1;
         ref.set(tx, updatedValue);
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
-        tranlocal.prepareAllUpdates(pool,tx, 1);
-        Listeners listeners = ref.___commitAll(tranlocal, tx, pool);
+        tranlocal.prepareDirtyUpdates(pool, tx, 1);
+        Listeners listeners = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(listeners);
         assertHasNoUpdateLock(ref);
@@ -356,7 +380,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
     }
 
     @Test
-    public void locked_whenEnsuredBySelfAndNoDirtyWrite_thenLockReleasedAndChangeWritten() {
+    public void locked_whenEnsuredBySelfAndNoDirtyWrite_thenLockReleasedAndNoChangeWritten() {
         long initialValue = 10;
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -365,20 +389,20 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         ref.ensure(tx);
         ref.set(tx, initialValue);
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
-        tranlocal.prepareAllUpdates(pool,tx, 1);
-        Listeners listeners = ref.___commitAll(tranlocal, tx, pool);
+        tranlocal.prepareDirtyUpdates(pool, tx, 1);
+        Listeners listeners = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(listeners);
         assertHasNoUpdateLock(ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
-        assertReadonlyCount(0, ref);
+        assertReadonlyCount(1, ref);
         assertUpdateBiased(ref);
-        assertVersionAndValue(ref, initialVersion + 1, initialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
-     @Test
+    @Test
     public void whenCommittingDirtyConstructedObject() {
         long initialValue = 10;
 
@@ -387,10 +411,10 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         LongRefTranlocal tranlocal = tx.openForConstruction(ref);
         tranlocal.value = 10;
 
-        tranlocal.prepareAllUpdates(pool, tx, 1);
+        tranlocal.prepareDirtyUpdates(pool, tx, 1);
 
         long oldConflictCount = globalConflictCounter.count();
-        Listeners result = ref.___commitAll(tranlocal, tx, pool);
+        Listeners result = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
@@ -408,10 +432,10 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         BetaLongRef ref = new BetaLongRef(tx);
         LongRefTranlocal tranlocal = tx.openForConstruction(ref);
 
-        tranlocal.prepareAllUpdates(pool, tx, 1);
+        tranlocal.prepareDirtyUpdates(pool, tx, 1);
 
         long oldConflictCount = globalConflictCounter.count();
-        Listeners result = ref.___commitAll(tranlocal, tx, pool);
+        Listeners result = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(result);
         assertEquals(oldConflictCount, globalConflictCounter.count());

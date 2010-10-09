@@ -2080,7 +2080,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 continue;
             }
 
-            if(!tranlocal.doPrepareWithWriteSkewPrevention(pool,this, spinCount, dirtyCheck)){
+            if(!tranlocal.prepareWithWriteSkewPrevention(pool,this, spinCount, dirtyCheck)){
                 return false;
             }
         }
@@ -2102,7 +2102,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 continue;
             }
 
-            if(!tranlocal.doPrepareAllUpdates(pool, this, spinCount)) {
+            if(!tranlocal.prepareAllUpdates(pool, this, spinCount)) {
                 return false;
             }
         }
@@ -2124,7 +2124,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 continue;
             }
 
-            if(!tranlocal.doPrepareDirtyUpdates(pool, this, spinCount)) {
+            if(!tranlocal.prepareDirtyUpdates(pool, this, spinCount)) {
                 return false;
             }
         }

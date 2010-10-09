@@ -21,7 +21,7 @@ import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
-public class BetaLongRef_registerChangeListenerTest implements BetaStmConstants {
+public class VeryAbstractTransactionalObject_registerChangeListenerTest implements BetaStmConstants {
     private BetaStm stm;
     private BetaObjectPool pool;
 

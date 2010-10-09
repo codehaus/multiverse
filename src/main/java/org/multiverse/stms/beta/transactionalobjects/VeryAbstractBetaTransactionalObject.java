@@ -47,7 +47,7 @@ public abstract class VeryAbstractBetaTransactionalObject
     }
 
     @Override
-    public long getVersion() {
+    public final long getVersion() {
         return ___version;
     }
 
