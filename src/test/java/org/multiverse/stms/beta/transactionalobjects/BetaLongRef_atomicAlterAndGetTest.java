@@ -121,7 +121,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
 
     @Test
     public void whenEnsuredByOther_thenLockedException() {
-        BetaLongRef ref = newLongRef(stm,5);
+        BetaLongRef ref = newLongRef(stm, 5);
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
@@ -144,7 +144,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
 
     @Test
     public void whenPrivatizedByOther() {
-        BetaLongRef ref = newLongRef(stm,5);
+        BetaLongRef ref = newLongRef(stm, 5);
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();

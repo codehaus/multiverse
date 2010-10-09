@@ -5,7 +5,7 @@ package org.multiverse.api.predicates;
  *
  * @author Peter Veentjer.
  */
-public abstract class DoublePredicate implements Predicate<Double>{
+public abstract class DoublePredicate implements Predicate<Double> {
 
     /**
      * Evaluates the predicate

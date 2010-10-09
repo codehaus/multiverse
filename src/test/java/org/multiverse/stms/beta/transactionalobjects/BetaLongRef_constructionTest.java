@@ -34,7 +34,7 @@ public class BetaLongRef_constructionTest implements BetaStmConstants {
         assertHasNoCommitLock(ref);
         assertHasNoUpdateLock(ref);
         assertNull(ref.___getLockOwner());
-        assertVersionAndValue(ref, BetaTransactionalObject.VERSION_UNCOMMITTED+1, 0);
+        assertVersionAndValue(ref, BetaTransactionalObject.VERSION_UNCOMMITTED + 1, 0);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class BetaLongRef_constructionTest implements BetaStmConstants {
         assertHasNoCommitLock(ref);
         assertHasNoUpdateLock(ref);
         assertNull(ref.___getLockOwner());
-        assertVersionAndValue(ref, BetaTransactionalObject.VERSION_UNCOMMITTED+1, 10);
+        assertVersionAndValue(ref, BetaTransactionalObject.VERSION_UNCOMMITTED + 1, 10);
     }
 
     @Test
@@ -64,6 +64,6 @@ public class BetaLongRef_constructionTest implements BetaStmConstants {
         assertSame(tx, ref.___getLockOwner());
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);
-        assertVersionAndValue(ref, 0,0);
+        assertVersionAndValue(ref, 0, 0);
     }
 }

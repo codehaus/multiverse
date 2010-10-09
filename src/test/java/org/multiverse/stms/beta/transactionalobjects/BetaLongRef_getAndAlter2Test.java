@@ -63,7 +63,7 @@ public class BetaLongRef_getAndAlter2Test {
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, version,10);
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class BetaLongRef_getAndAlter2Test {
         }
 
         assertIsCommitted(tx);
-        assertVersionAndValue(ref, version,10);
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
@@ -103,7 +103,7 @@ public class BetaLongRef_getAndAlter2Test {
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, version,10);
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
@@ -123,7 +123,7 @@ public class BetaLongRef_getAndAlter2Test {
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, version,10);
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test

@@ -45,7 +45,7 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * with the locked flag getAndSet. This call can safely be done if already locked by self. It will never return
      * null.
      *
-     * @param spinCount the number of times to spin when locked.
+     * @param spinCount    the number of times to spin when locked.
      * @param newLockOwner
      * @param lockMode
      * @param tranlocal
@@ -82,7 +82,7 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * different or when it is locked (since a conflicting write could be pending). Once a transactional
      * object is locked, its value is undetermined.
      *
-     * @param tranlocal   the Tranlocal to check if there is a read conflict
+     * @param tranlocal the Tranlocal to check if there is a read conflict
      * @return true if there was a readconflict, false otherwise.
      */
     boolean ___hasReadConflict(Tranlocal tranlocal);
@@ -102,7 +102,7 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
             Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool);
 
     Listeners ___commitAll(
-                Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool);
+            Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool);
 
     /**
      * Aborts this BetaTransactionalObject (so releases the lock if acquired, does departs etc).

@@ -39,7 +39,7 @@ public class AtomicIncrementIsolationStressTest {
             thread.start();
         }
 
-        joinAll(10 * 60,threads);
+        joinAll(10 * 60, threads);
         long totalDurationMs = 0;
         for (UpdateThread thread : threads) {
             totalDurationMs += thread.durationMs;

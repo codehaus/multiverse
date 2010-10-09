@@ -101,10 +101,10 @@ public class ImprovedBlockingQueue<E> implements BetaStmConstants {
     private final AtomicClosure<E> takeClosure = new AtomicClosure<E>() {
         @Override
         public E execute(Transaction tx) throws Exception {
-           BetaTransaction btx = (BetaTransaction) tx;
+            BetaTransaction btx = (BetaTransaction) tx;
 
             IntRefTranlocal head = btx.openForRead(headIndex, LOCKMODE_NONE);
-            
+
             IntRefTranlocal tail = btx.openForWrite(tailIndex, LOCKMODE_NONE);
 
             if (head.value == tail.value) {

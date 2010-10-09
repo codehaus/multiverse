@@ -227,7 +227,7 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         ref.atomicSet(20);
-        long version =ref.getVersion();
+        long version = ref.getVersion();
 
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, read, true);
 
@@ -235,10 +235,10 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         assertNull(ref.___getLockOwner());
         assertHasNoCommitLock(ref);
         assertHasNoCommitLock(ref);
-        assertUpdateBiased(ref);        
+        assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertSurplus(1, ref);
-        assertVersionAndValue(ref, version,20);
+        assertVersionAndValue(ref, version, 20);
     }
 
     @Test

@@ -25,7 +25,7 @@ public class FatArrayBetaTransaction_openForWriteTest
 
     @Override
     public boolean isSupportingCommute() {
-        return  true;
+        return true;
     }
 
     @Override

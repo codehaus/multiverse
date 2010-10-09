@@ -57,7 +57,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.privatize(tx);
 
-        LongRefTranlocal tranlocal = (LongRefTranlocal)tx.get(ref);
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
         tranlocal.prepareForPooling(pool);
 
         assertPreparedForPooling(tranlocal);

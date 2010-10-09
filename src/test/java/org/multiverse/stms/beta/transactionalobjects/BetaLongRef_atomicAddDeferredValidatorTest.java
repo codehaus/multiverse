@@ -26,19 +26,19 @@ public class BetaLongRef_atomicAddDeferredValidatorTest {
 
     @Test
     @Ignore
-    public void whenActiveTransactionAvailable_thenIgnored(){
+    public void whenActiveTransactionAvailable_thenIgnored() {
 
     }
 
     @Test
     @Ignore
-    public void whenAlreadyInList(){
+    public void whenAlreadyInList() {
 
     }
 
     @Test
     @Ignore
-    public void whenSuccess(){
+    public void whenSuccess() {
 
     }
 }

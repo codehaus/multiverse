@@ -28,7 +28,7 @@ public class BetaStm_transactionFactoryBuilderTest implements BetaStmConstants {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
         config.init();
 
-        assertEquals(IsolationLevel.Snapshot,config.isolationLevel);
+        assertEquals(IsolationLevel.Snapshot, config.isolationLevel);
         assertFalse(config.isInterruptible());
         assertFalse(config.isReadonly());
         assertEquals(LOCKMODE_NONE, config.readLockMode);

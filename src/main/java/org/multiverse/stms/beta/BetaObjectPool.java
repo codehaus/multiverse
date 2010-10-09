@@ -17,7 +17,7 @@ import java.util.ArrayList;
  * second array (that contains pooled tranlocals) can be found easily.
  * <p/>
  * ObjectPool is not thread safe and should not be shared between threads.
- *
+ * <p/>
  * This class is generated.
  *
  * @author Peter Veentjer
@@ -25,28 +25,28 @@ import java.util.ArrayList;
 public final class BetaObjectPool {
 
     private final static boolean ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm,beta.BetaObjectPool.enabled","true"));
+            System.getProperty("org.multiverse.stm,beta.BetaObjectPool.enabled", "true"));
 
     private final static boolean TRANLOCAL_POOLING_ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.tranlocalPooling",""+ENABLED));
+            System.getProperty("org.multiverse.stm.beta.BetaObjectPool.tranlocalPooling", "" + ENABLED));
 
     private final static boolean TRANLOCALARRAY_POOLING_ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.tranlocalArrayPooling",""+ENABLED));
+            System.getProperty("org.multiverse.stm.beta.BetaObjectPool.tranlocalArrayPooling", "" + ENABLED));
 
     private final static boolean LATCH_POOLING_ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.latchPooling",""+ENABLED));
+            System.getProperty("org.multiverse.stm.beta.BetaObjectPool.latchPooling", "" + ENABLED));
 
-    private final static boolean LISTENER_POOLING_ENABLED  = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.listenersPooling",""+ENABLED));
+    private final static boolean LISTENER_POOLING_ENABLED = Boolean.parseBoolean(
+            System.getProperty("org.multiverse.stm.beta.BetaObjectPool.listenersPooling", "" + ENABLED));
 
-    private final static boolean LISTENERSARRAY_POOLING_ENABLED  = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.listenersArrayPooling",""+ENABLED));
+    private final static boolean LISTENERSARRAY_POOLING_ENABLED = Boolean.parseBoolean(
+            System.getProperty("org.multiverse.stm.beta.BetaObjectPool.listenersArrayPooling", "" + ENABLED));
 
     private final static boolean ARRAYLIST_POOLING_ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.arrayListPooling",""+ENABLED));
+            System.getProperty("org.multiverse.stm.beta.BetaObjectPool.arrayListPooling", "" + ENABLED));
 
     private final static boolean CALLABLENODE_POOLING_ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.callableNodePooling",""+ENABLED));
+            System.getProperty("org.multiverse.stm.beta.BetaObjectPool.callableNodePooling", "" + ENABLED));
 
     private final boolean tranlocalPoolingEnabled;
     private final boolean tranlocalArrayPoolingEnabled;
@@ -338,35 +338,35 @@ public final class BetaObjectPool {
             throw new NullPointerException();
         }
 
-        if(!tranlocalPoolingEnabled){
+        if (!tranlocalPoolingEnabled) {
             return null;
         }
 
         int classIndex = owner.___getClassIndex();
 
-        if(classIndex == -1){
+        if (classIndex == -1) {
             return null;
         }
 
-        switch(classIndex){
+        switch (classIndex) {
             case 0:
-                return take((BetaRef)owner);
+                return take((BetaRef) owner);
             case 1:
-                return take((BetaIntRef)owner);
+                return take((BetaIntRef) owner);
             case 2:
-                return take((BetaBooleanRef)owner);
+                return take((BetaBooleanRef) owner);
             case 3:
-                return take((BetaDoubleRef)owner);
+                return take((BetaDoubleRef) owner);
             case 4:
-                return take((BetaLongRef)owner);
+                return take((BetaLongRef) owner);
         }
 
-        if(classIndex >= pools.length){
+        if (classIndex >= pools.length) {
             return null;
         }
 
         TranlocalPool pool = pools[classIndex];
-        if(pool.lastUsed == -1){
+        if (pool.lastUsed == -1) {
             return null;
         }
 
@@ -379,7 +379,6 @@ public final class BetaObjectPool {
 
     /**
      * Puts a Tranlocal in the pool.
-     *
      */
     public void put(final Tranlocal tranlocal) {
         if (!tranlocalPoolingEnabled || tranlocal == null) {
@@ -389,41 +388,41 @@ public final class BetaObjectPool {
         BetaTransactionalObject owner = tranlocal.owner;
         int classIndex = owner.___getClassIndex();
 
-        if(classIndex == -1){
+        if (classIndex == -1) {
             return;
         }
 
-        switch(classIndex){
+        switch (classIndex) {
             case 0:
-                put((RefTranlocal)tranlocal);
+                put((RefTranlocal) tranlocal);
                 return;
             case 1:
-                put((IntRefTranlocal)tranlocal);
+                put((IntRefTranlocal) tranlocal);
                 return;
             case 2:
-                put((BooleanRefTranlocal)tranlocal);
+                put((BooleanRefTranlocal) tranlocal);
                 return;
             case 3:
-                put((DoubleRefTranlocal)tranlocal);
+                put((DoubleRefTranlocal) tranlocal);
                 return;
             case 4:
-                put((LongRefTranlocal)tranlocal);
+                put((LongRefTranlocal) tranlocal);
                 return;
         }
 
-        if(classIndex >= pools.length){
+        if (classIndex >= pools.length) {
             TranlocalPool[] newPools = new TranlocalPool[pools.length * 2];
             System.arraycopy(pools, 0, newPools, 0, pools.length);
             pools = newPools;
         }
 
         TranlocalPool pool = pools[classIndex];
-        if(pool == null){
+        if (pool == null) {
             pool = new TranlocalPool();
-            pools[classIndex]=pool;
+            pools[classIndex] = pool;
         }
 
-        if(pool.lastUsed == pool.tranlocals.length - 1){
+        if (pool.lastUsed == pool.tranlocals.length - 1) {
             return;
         }
 
@@ -432,7 +431,7 @@ public final class BetaObjectPool {
         pool.tranlocals[pool.lastUsed] = tranlocal;
     }
 
-    static class TranlocalPool{
+    static class TranlocalPool {
         int lastUsed = -1;
         Tranlocal[] tranlocals = new Tranlocal[100];
     }
@@ -445,31 +444,31 @@ public final class BetaObjectPool {
      * @param array the Tranlocal array to put in the pool.
      * @throws NullPointerException is array is null.
      */
-    public void putTranlocalArray(final Tranlocal[] array){
-        if(array == null){
+    public void putTranlocalArray(final Tranlocal[] array) {
+        if (array == null) {
             throw new NullPointerException();
         }
 
-        if(!tranlocalArrayPoolingEnabled){
+        if (!tranlocalArrayPoolingEnabled) {
             return;
         }
 
-        if(array.length-1>tranlocalArrayPool.length){
+        if (array.length - 1 > tranlocalArrayPool.length) {
             return;
         }
 
         int index = array.length;
 
-        if(tranlocalArrayPool[index]!=null){
+        if (tranlocalArrayPool[index] != null) {
             return;
         }
 
         //lets clean the array
-        for(int k=0;k < array.length;k++){
-            array[k]=null;
+        for (int k = 0; k < array.length; k++) {
+            array[k] = null;
         }
 
-        tranlocalArrayPool[index]=array;
+        tranlocalArrayPool[index] = array;
     }
 
     /**
@@ -479,42 +478,42 @@ public final class BetaObjectPool {
      * @return the Tranlocal array taken from the pool, or null if none available.
      * @throws IllegalArgumentException if size smaller than 0.
      */
-    public Tranlocal[] takeTranlocalArray(final int size){
-        if(size<0){
+    public Tranlocal[] takeTranlocalArray(final int size) {
+        if (size < 0) {
             throw new IllegalArgumentException();
         }
 
-        if(!tranlocalArrayPoolingEnabled){
+        if (!tranlocalArrayPoolingEnabled) {
             return null;
         }
 
         int index = size;
 
-        if(index >= tranlocalArrayPool.length){
+        if (index >= tranlocalArrayPool.length) {
             return null;
         }
 
-        if(tranlocalArrayPool[index]==null){
+        if (tranlocalArrayPool[index] == null) {
             return null;
         }
 
         Tranlocal[] array = tranlocalArrayPool[index];
-        tranlocalArrayPool[index]=null;
+        tranlocalArrayPool[index] = null;
         return array;
     }
 
-  /**
+    /**
      * Takes a CallableNode from the pool, or null if none is available.
      *
      * @return the CallableNode from the pool, or null if none available.
      */
-    public CallableNode takeCallableNode(){
-        if(!callableNodePoolingEnabled || callableNodePoolIndex == -1){
+    public CallableNode takeCallableNode() {
+        if (!callableNodePoolingEnabled || callableNodePoolIndex == -1) {
             return null;
         }
 
         CallableNode node = callableNodePool[callableNodePoolIndex];
-        callableNodePool[callableNodePoolIndex]=null;
+        callableNodePool[callableNodePoolIndex] = null;
         callableNodePoolIndex--;
         return node;
     }
@@ -525,18 +524,18 @@ public final class BetaObjectPool {
      * @param node the CallableNode to pool.
      * @throws NullPointerException if node is null.
      */
-    public void putCallableNode(CallableNode node){
-        if(node == null){
+    public void putCallableNode(CallableNode node) {
+        if (node == null) {
             throw new NullPointerException();
         }
 
-        if(!callableNodePoolingEnabled || callableNodePoolIndex == callableNodePool.length-1){
+        if (!callableNodePoolingEnabled || callableNodePoolIndex == callableNodePool.length - 1) {
             return;
         }
 
         node.prepareForPooling();
         callableNodePoolIndex++;
-        callableNodePool[callableNodePoolIndex]=node;
+        callableNodePool[callableNodePoolIndex] = node;
     }
 
     /**
@@ -544,13 +543,13 @@ public final class BetaObjectPool {
      *
      * @return the CheapLatch from the pool, or null if none available.
      */
-    public CheapLatch takeCheapLatch(){
-        if(!latchPoolingEnabled || cheapLatchPoolIndex == -1){
+    public CheapLatch takeCheapLatch() {
+        if (!latchPoolingEnabled || cheapLatchPoolIndex == -1) {
             return null;
         }
 
         CheapLatch latch = cheapLatchPool[cheapLatchPoolIndex];
-        cheapLatchPool[cheapLatchPoolIndex]=null;
+        cheapLatchPool[cheapLatchPoolIndex] = null;
         cheapLatchPoolIndex--;
         return latch;
     }
@@ -561,18 +560,18 @@ public final class BetaObjectPool {
      * @param latch the CheapLatch to pool.
      * @throws NullPointerException if latch is null.
      */
-    public void putCheapLatch(CheapLatch latch){
-        if(latch == null){
+    public void putCheapLatch(CheapLatch latch) {
+        if (latch == null) {
             throw new NullPointerException();
         }
 
-        if(!latchPoolingEnabled || cheapLatchPoolIndex == cheapLatchPool.length-1){
+        if (!latchPoolingEnabled || cheapLatchPoolIndex == cheapLatchPool.length - 1) {
             return;
         }
 
         latch.prepareForPooling();
         cheapLatchPoolIndex++;
-        cheapLatchPool[cheapLatchPoolIndex]=latch;
+        cheapLatchPool[cheapLatchPoolIndex] = latch;
     }
 
     /**
@@ -580,13 +579,13 @@ public final class BetaObjectPool {
      *
      * @return the taken StandardLatch is null if none is available.
      */
-    public StandardLatch takeStandardLatch(){
-        if(!latchPoolingEnabled || standardLatchPoolIndex == -1){
+    public StandardLatch takeStandardLatch() {
+        if (!latchPoolingEnabled || standardLatchPoolIndex == -1) {
             return null;
         }
 
         StandardLatch latch = standardLatchPool[standardLatchPoolIndex];
-        standardLatchPool[standardLatchPoolIndex]=null;
+        standardLatchPool[standardLatchPoolIndex] = null;
         standardLatchPoolIndex--;
         return latch;
     }
@@ -597,18 +596,18 @@ public final class BetaObjectPool {
      * @param latch the StandardLatch to pool.
      * @throws NullPointerException if latch is null.
      */
-    public void putStandardLatch(StandardLatch latch){
-        if(latch == null){
+    public void putStandardLatch(StandardLatch latch) {
+        if (latch == null) {
             throw new NullPointerException();
         }
 
-        if(!latchPoolingEnabled || standardLatchPoolIndex == standardLatchPool.length-1){
+        if (!latchPoolingEnabled || standardLatchPoolIndex == standardLatchPool.length - 1) {
             return;
         }
 
         latch.prepareForPooling();
         standardLatchPoolIndex++;
-        standardLatchPool[standardLatchPoolIndex]=latch;
+        standardLatchPool[standardLatchPoolIndex] = latch;
     }
 
     // ====================== array list ===================================
@@ -618,13 +617,13 @@ public final class BetaObjectPool {
      *
      * @return the ArrayList from the pool, or null of none is found.
      */
-    public ArrayList takeArrayList(){
-        if(!arrayListPoolingEnabled || arrayListPoolIndex == -1){
+    public ArrayList takeArrayList() {
+        if (!arrayListPoolingEnabled || arrayListPoolIndex == -1) {
             return null;
         }
 
         ArrayList list = arrayListPool[arrayListPoolIndex];
-        arrayListPool[arrayListPoolIndex]=null;
+        arrayListPool[arrayListPoolIndex] = null;
         arrayListPoolIndex--;
         return list;
     }
@@ -636,18 +635,18 @@ public final class BetaObjectPool {
      * @param list the ArrayList to place in the pool.
      * @throws NullPointerException if list is null.
      */
-    public void putArrayList(ArrayList list){
-        if(list == null){
+    public void putArrayList(ArrayList list) {
+        if (list == null) {
             throw new NullPointerException();
         }
 
-        if(!arrayListPoolingEnabled || arrayListPoolIndex == arrayListPool.length-1){
+        if (!arrayListPoolingEnabled || arrayListPoolIndex == arrayListPool.length - 1) {
             return;
         }
 
         list.clear();
         arrayListPoolIndex++;
-        arrayListPool[arrayListPoolIndex]=list;
+        arrayListPool[arrayListPoolIndex] = list;
     }
 
 
@@ -658,13 +657,13 @@ public final class BetaObjectPool {
      *
      * @return the Listeners object taken from the pool. or null if none is taken.
      */
-    public Listeners takeListeners(){
-        if(!listenersPoolingEnabled || listenersPoolIndex == -1){
+    public Listeners takeListeners() {
+        if (!listenersPoolingEnabled || listenersPoolIndex == -1) {
             return null;
         }
 
         Listeners listeners = listenersPool[listenersPoolIndex];
-        listenersPool[listenersPoolIndex]=null;
+        listenersPool[listenersPoolIndex] = null;
         listenersPoolIndex--;
         return listeners;
     }
@@ -676,18 +675,18 @@ public final class BetaObjectPool {
      * @param listeners the Listeners object to pool.
      * @throws NullPointerException is listeners is null.
      */
-    public void putListeners(Listeners listeners){
-        if(listeners == null){
+    public void putListeners(Listeners listeners) {
+        if (listeners == null) {
             throw new NullPointerException();
         }
 
-        if(!listenersPoolingEnabled || listenersPoolIndex == listenersPool.length-1){
+        if (!listenersPoolingEnabled || listenersPoolIndex == listenersPool.length - 1) {
             return;
         }
 
         listeners.prepareForPooling();
         listenersPoolIndex++;
-        listenersPool[listenersPoolIndex]=listeners;
+        listenersPool[listenersPoolIndex] = listeners;
     }
 
     // ============================= listeners array =============================
@@ -701,16 +700,16 @@ public final class BetaObjectPool {
      * @return the found Listeners array, or null if none is taken from the pool.
      * @throws IllegalArgumentException if minimalSize is smaller than 0.
      */
-    public Listeners[] takeListenersArray(int minimalSize){
-        if( minimalSize < 0 ){
+    public Listeners[] takeListenersArray(int minimalSize) {
+        if (minimalSize < 0) {
             throw new IllegalArgumentException();
         }
 
-        if(!listenersArrayPoolingEnabled){
+        if (!listenersArrayPoolingEnabled) {
             return null;
         }
 
-        if(listenersArray == null || listenersArray.length < minimalSize){
+        if (listenersArray == null || listenersArray.length < minimalSize) {
             return null;
         }
 
@@ -721,23 +720,23 @@ public final class BetaObjectPool {
 
     /**
      * Puts a Listeners array in the pool.
-     *
+     * <p/>
      * Listeners array should be nulled before being put in the pool. It is not going to be done by this
      * BetaObjectPool but should be done when the listeners on the listeners array are notified.
      *
      * @param listenersArray the array to pool.
      * @throws NullPointerException if listenersArray is null.
      */
-    public void putListenersArray(Listeners[] listenersArray){
-        if(listenersArray == null){
+    public void putListenersArray(Listeners[] listenersArray) {
+        if (listenersArray == null) {
             throw new NullPointerException();
         }
 
-        if(!listenersArrayPoolingEnabled){
+        if (!listenersArrayPoolingEnabled) {
             return;
         }
 
-        if(this.listenersArray!=listenersArray){
+        if (this.listenersArray != listenersArray) {
             return;
         }
 

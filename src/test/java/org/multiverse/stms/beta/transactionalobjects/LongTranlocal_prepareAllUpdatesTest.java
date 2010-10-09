@@ -22,7 +22,8 @@ public class LongTranlocal_prepareAllUpdatesTest {
         pool = new BetaObjectPool();
     }
 
-    public void testWhenConflict(){}
+    public void testWhenConflict() {
+    }
 
 
     @Test

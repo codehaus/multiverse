@@ -28,7 +28,7 @@ public class LeanArrayTreeBetaTransaction_commitTest
         return false;
     }
 
-     @Override
+    @Override
     public int getTransactionMaxCapacity() {
         return Integer.MAX_VALUE;
     }

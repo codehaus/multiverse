@@ -11,353 +11,353 @@ import static java.lang.String.format;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 
 /**
- * An AbstractBetaAtomicBlock made for the BetaStm.
- *
- * This code is generated.
- *
- * @author Peter Veentjer
- */
+* An AbstractBetaAtomicBlock made for the BetaStm.
+*
+* This code is generated.
+*
+* @author Peter Veentjer
+*/
 public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
-    private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.getName());
+private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.getName());
 
 
 #if(!${atomicBlock.lean})
 
-    private final PropagationLevel propagationLevel;
+private final PropagationLevel propagationLevel;
 #end
 
-    public ${atomicBlock.name}(final BetaTransactionFactory transactionFactory) {
-        super(transactionFactory);
+public ${atomicBlock.name}(final BetaTransactionFactory transactionFactory) {
+super(transactionFactory);
 #if(!${atomicBlock.lean})
-        this.propagationLevel = transactionConfiguration.propagationLevel;
+this.propagationLevel = transactionConfiguration.propagationLevel;
 #end
-    }
+}
 
-    @Override
-    public BetaTransactionFactory getTransactionFactory(){
-        return transactionFactory;
-    }
+@Override
+public BetaTransactionFactory getTransactionFactory(){
+return transactionFactory;
+}
 
 #foreach($closure in $closures)
-    @Override
-    public ${closure.typeParameter} ${closure.type} executeChecked(
-        final ${closure.name}${closure.typeParameter} closure)throws Exception{
+@Override
+public ${closure.typeParameter} ${closure.type} executeChecked(
+final ${closure.name}${closure.typeParameter} closure)throws Exception{
 
-        try{
-#if(${closure.type} eq 'void')
-            execute(closure);
-#else
-            return execute(closure);
-#end
-        }catch(InvisibleCheckedException e){
-            throw e.getCause();
-        }
-    }
+try{
+    #if(${closure.type} eq 'void')
+    execute(closure);
+    #else
+    return execute(closure);
+    #end
+}catch(InvisibleCheckedException e){
+throw e.getCause();
+}
+}
 
-#if(${atomicBlock.lean})
+    #if(${atomicBlock.lean})
     @Override
     public ${closure.typeParameter} ${closure.type} execute(final ${closure.name}${closure.typeParameter} closure){
 
-        if(closure == null){
-            throw new NullPointerException();
-        }
+    if(closure == null){
+    throw new NullPointerException();
+    }
 
-        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
-        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
-        if(tx == null || !tx.isAlive()){
-            tx = null;
-        }
+    ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+    BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
+    if(tx == null || !tx.isAlive()){
+    tx = null;
+    }
 
-        try{
-            if(tx != null && tx.isAlive()){
-#if(${closure.type} eq 'void')
-                closure.execute(tx);
-                return;
-#else
-                return closure.execute(tx);
-#end
-            }
+    try{
+    if(tx != null && tx.isAlive()){
+        #if(${closure.type} eq 'void')
+        closure.execute(tx);
+        return;
+        #else
+        return closure.execute(tx);
+        #end
+    }
 
-            tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
-            transactionContainer.transaction=tx;
-#transactionLogic()
+    tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
+    transactionContainer.transaction=tx;
+        #transactionLogic()
 
     }
-#else ## end of atomicblock.lean
+    #else ## end of atomicblock.lean
     public ${closure.typeParameter} ${closure.type} execute(final ${closure.name}${closure.typeParameter} closure){
 
-        if(closure == null){
-            throw new NullPointerException();
-        }
+    if(closure == null){
+    throw new NullPointerException();
+    }
 
-        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
-        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
-        if(tx == null || !tx.isAlive()){
-            tx = null;
-        }
+    ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+    BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
+    if(tx == null || !tx.isAlive()){
+    tx = null;
+    }
 
-        try{
-            switch (propagationLevel) {
-                case Requires:
-                    if (tx == null) {
-                        if (___TracingEnabled) {
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(
-                                    format("[%s] Has 'Requires' propagation level and no transaction found, starting a new transaction",
-                                        transactionConfiguration.familyName));
-                            }
-                        }
+    try{
+    switch (propagationLevel) {
+    case Requires:
+    if (tx == null) {
+    if (___TracingEnabled) {
+    if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+    logger.info(
+    format("[%s] Has 'Requires' propagation level and no transaction found, starting a new transaction",
+    transactionConfiguration.familyName));
+    }
+    }
 
-                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
-                        transactionContainer.transaction = tx;
-#if($closure.type eq 'void')
-                        execute(tx, transactionContainer, closure);
-                        return;
-#else
-                        return execute(tx, transactionContainer, closure);
-#end
-                    } else {
-                        if (___TracingEnabled) {
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(
-                                    format("[%s] Has 'Requires' propagation level, and existing transaction [%s] found",
-                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
-                            }
-                        }
+    tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
+    transactionContainer.transaction = tx;
+        #if($closure.type eq 'void')
+        execute(tx, transactionContainer, closure);
+        return;
+        #else
+        return execute(tx, transactionContainer, closure);
+        #end
+    } else {
+    if (___TracingEnabled) {
+    if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+    logger.info(
+    format("[%s] Has 'Requires' propagation level, and existing transaction [%s] found",
+    transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+    }
+    }
 
-#if($closure.type eq 'void')
-                        closure.execute(tx);
-                        return;
-#else
-                        return closure.execute(tx);
-#end
-                    }
-                case Mandatory:
-                    if (tx == null) {
-                        if (___TracingEnabled) {
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(
-                                    format("[%s] Has 'Mandatory' propagation level, and no transaction is found",
-                                        transactionConfiguration.familyName));
-                            }
-                        }
-                        throw new TransactionRequiredException(
-                            format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
-                                transactionConfiguration.familyName));
-                    }
+        #if($closure.type eq 'void')
+        closure.execute(tx);
+        return;
+        #else
+        return closure.execute(tx);
+        #end
+    }
+    case Mandatory:
+    if (tx == null) {
+    if (___TracingEnabled) {
+    if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+    logger.info(
+    format("[%s] Has 'Mandatory' propagation level, and no transaction is found",
+    transactionConfiguration.familyName));
+    }
+    }
+    throw new TransactionRequiredException(
+    format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
+    transactionConfiguration.familyName));
+    }
 
-                    if (___TracingEnabled) {
-                        if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                            logger.info(
-                                format("[%s] Has 'Mandatory' propagation level and transaction [%s] found",
-                                    transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
-                        }
-                    }
-                                            
-#if($closure.type eq 'void')
-                    closure.execute(tx);
-                    return;
-#else
-                    return closure.execute(tx);
-#end
-                case Never:
-                    if (tx != null) {
-                        if (___TracingEnabled) {
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(
-                                    format("[%s] Has 'Never' propagation level, but transaction [%s] is found",
-                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
-                            }
-                        }
+    if (___TracingEnabled) {
+    if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+    logger.info(
+    format("[%s] Has 'Mandatory' propagation level and transaction [%s] found",
+    transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+    }
+    }
 
-                        throw new NoTransactionAllowedException(
-                            format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
-                                ", but transaction '%s' was found",
-                                transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
-                        );
-                    }
+        #if($closure.type eq 'void')
+        closure.execute(tx);
+        return;
+        #else
+        return closure.execute(tx);
+        #end
+    case Never:
+    if (tx != null) {
+    if (___TracingEnabled) {
+    if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+    logger.info(
+    format("[%s] Has 'Never' propagation level, but transaction [%s] is found",
+    transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+    }
+    }
 
-                    if (___TracingEnabled) {
-                        if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                            logger.info(
-                                format("[%s] Has 'Never' propagation level and no transaction is found",
-                                    transactionConfiguration.familyName));
-                        }
-                    }
+    throw new NoTransactionAllowedException(
+    format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
+    ", but transaction '%s' was found",
+    transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
+    );
+    }
 
-#if($closure.type eq 'void')
-                    closure.execute(null);
-                    return;
-#else
-                    return closure.execute(null);
-#end
-                case RequiresNew:
-                    if (tx == null) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(
-                                    format("[%s] Has 'RequiresNew' propagation level and no transaction is found, starting new transaction",
-                                        transactionConfiguration.familyName));
-                            }
-                        }
+    if (___TracingEnabled) {
+    if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+    logger.info(
+    format("[%s] Has 'Never' propagation level and no transaction is found",
+    transactionConfiguration.familyName));
+    }
+    }
 
-                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
-                        transactionContainer.transaction = tx;
-#if($closure.type eq 'void')
-                        execute(tx, transactionContainer, closure);
-                        return;
-#else
-                        return execute(tx, transactionContainer, closure);
-#end
-                    } else {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(
-                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
-                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
-                            }
-                        }
+        #if($closure.type eq 'void')
+        closure.execute(null);
+        return;
+        #else
+        return closure.execute(null);
+        #end
+    case RequiresNew:
+    if (tx == null) {
+    if(___TracingEnabled){
+    if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+    logger.info(
+    format("[%s] Has 'RequiresNew' propagation level and no transaction is found, starting new transaction",
+    transactionConfiguration.familyName));
+    }
+    }
 
-                        BetaTransaction suspendedTransaction = tx;
-                        tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
-                        transactionContainer.transaction = tx;
-                        try {
-#if($closure.type eq 'void')
-                            execute(tx, transactionContainer, closure);
-                            return;
-#else
-                            return execute(tx, transactionContainer, closure);
-#end
-                        } finally {
-                            transactionContainer.transaction = suspendedTransaction;
-                        }
-                    }
-                case Supports:
-                    if(___TracingEnabled){
-                        if(tx!=null){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(
-                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
-                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
-                            }
-                        }else{
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(
-                                    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
-                                        transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
-                            }                                
-                        }
-                    }
+    tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
+    transactionContainer.transaction = tx;
+        #if($closure.type eq 'void')
+        execute(tx, transactionContainer, closure);
+        return;
+        #else
+        return execute(tx, transactionContainer, closure);
+        #end
+    } else {
+    if(___TracingEnabled){
+    if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+    logger.info(
+    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+    transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+    }
+    }
 
-#if($closure.type eq 'void')
-                    closure.execute(tx);
-                    return;
-#else
-                    return closure.execute(tx);
-#end
-                default:
-                    throw new IllegalStateException();
-            }
-        }catch(RuntimeException e){
-            throw e;
-        }catch(Exception e){
-            throw new InvisibleCheckedException(e);
-        }
-   }
+    BetaTransaction suspendedTransaction = tx;
+    tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
+    transactionContainer.transaction = tx;
+    try {
+        #if($closure.type eq 'void')
+        execute(tx, transactionContainer, closure);
+        return;
+        #else
+        return execute(tx, transactionContainer, closure);
+        #end
+    } finally {
+    transactionContainer.transaction = suspendedTransaction;
+    }
+    }
+    case Supports:
+    if(___TracingEnabled){
+    if(tx!=null){
+    if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+    logger.info(
+    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+    transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+    }
+    }else{
+    if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+    logger.info(
+    format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
+    transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
+    }
+    }
+    }
 
-   private ${closure.typeParameter} ${closure.type} execute(
-       BetaTransaction tx, final ThreadLocalTransaction.Container transactionContainer, final ${closure.name}${closure.typeParameter} closure)throws Exception{
+        #if($closure.type eq 'void')
+        closure.execute(tx);
+        return;
+        #else
+        return closure.execute(tx);
+        #end
+    default:
+    throw new IllegalStateException();
+    }
+    }catch(RuntimeException e){
+    throw e;
+    }catch(Exception e){
+    throw new InvisibleCheckedException(e);
+    }
+    }
 
-       try{
-#transactionLogic()
+    private ${closure.typeParameter} ${closure.type} execute(
+    BetaTransaction tx, final ThreadLocalTransaction.Container transactionContainer, final ${closure.name}${closure.typeParameter} closure)throws Exception{
 
-   }
+    try{
+        #transactionLogic()
 
-#end ##end of atomicblock.lean
+    }
+
+    #end ##end of atomicblock.lean
 #end ##end of for loop over closures
 #macro( transactionLogic )
-            boolean abort = true;
+boolean abort = true;
 
-            try {
-                do {
-                    try {
-#if(${closure.type} eq 'void')
-                        closure.execute(tx);
-#else
-                        ${closure.type} result = closure.execute(tx);
-#end
-                        tx.commit();
-                        abort = false;
-#if(${closure.type} eq 'void')
-                        return;
-#else
-                        return result;
-#end
-                    } catch (Retry e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(
-                                    format("[%s] Encountered a retry",
-                                        transactionConfiguration.familyName));
-                            }
-                        }
-                        waitForChange(tx);
-                    } catch (SpeculativeConfigurationError e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(
-                                    format("[%s] Encountered a speculative configuration error",
-                                        transactionConfiguration.familyName));
-                            }
-                        }
+try {
+do {
+try {
+    #if(${closure.type} eq 'void')
+    closure.execute(tx);
+    #else
+        ${closure.type} result = closure.execute(tx);
+    #end
+tx.commit();
+abort = false;
+    #if(${closure.type} eq 'void')
+    return;
+    #else
+    return result;
+    #end
+} catch (Retry e) {
+if(___TracingEnabled){
+if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+logger.info(
+format("[%s] Encountered a retry",
+transactionConfiguration.familyName));
+}
+}
+waitForChange(tx);
+} catch (SpeculativeConfigurationError e) {
+if(___TracingEnabled){
+if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+logger.info(
+format("[%s] Encountered a speculative configuration error",
+transactionConfiguration.familyName));
+}
+}
 
-                        BetaTransaction old = tx;
-                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
-                        transactionContainer.transactionPool.putBetaTransaction(old);
-                        transactionContainer.transaction = tx;                        
-                    } catch (ReadWriteConflict e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(
-                                    format("[%s] Encountered a read or write conflict",
-                                        transactionConfiguration.familyName));
-                            }
-                        }
+BetaTransaction old = tx;
+tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
+transactionContainer.transactionPool.putBetaTransaction(old);
+transactionContainer.transaction = tx;
+} catch (ReadWriteConflict e) {
+if(___TracingEnabled){
+if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+logger.info(
+format("[%s] Encountered a read or write conflict",
+transactionConfiguration.familyName));
+}
+}
 
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    } 
-                } while (tx.softReset());
-            } finally {
-                if(___ProfilingEnabled){
-                    TransactionSensor sensor = transactionConfiguration.transactionSensor;
-                    if(sensor != null){
-                        sensor.signalExecution(tx.getAttempt(), !abort);
-                    }
-                }
+backoffPolicy.delayedUninterruptible(tx.getAttempt());
+}
+} while (tx.softReset());
+} finally {
+if(___ProfilingEnabled){
+TransactionSensor sensor = transactionConfiguration.transactionSensor;
+if(sensor != null){
+sensor.signalExecution(tx.getAttempt(), !abort);
+}
+}
 
-                if (abort) {
-                    tx.abort();
-                }
+if (abort) {
+tx.abort();
+}
 
-                transactionContainer.transactionPool.putBetaTransaction(tx);
-                transactionContainer.transaction = null;
-            }
-        }catch(RuntimeException e){
-            throw e;
-        }catch(Exception e){
-            throw new InvisibleCheckedException(e);
-        }
+transactionContainer.transactionPool.putBetaTransaction(tx);
+transactionContainer.transaction = null;
+}
+}catch(RuntimeException e){
+throw e;
+}catch(Exception e){
+throw new InvisibleCheckedException(e);
+}
 
-            if(___TracingEnabled){
-                if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                    logger.info(
-                        format("[%s] Too many retries, a maximum of %s is allowed",
-                            transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
-                }
-            }
+if(___TracingEnabled){
+if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
+logger.info(
+format("[%s] Too many retries, a maximum of %s is allowed",
+transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
+}
+}
 
-        throw new TooManyRetriesException(
-            format("[%s] Maximum number of %s retries has been reached",
-                transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
+throw new TooManyRetriesException(
+format("[%s] Maximum number of %s retries has been reached",
+transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
 #end ##end of macro
 }

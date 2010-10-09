@@ -48,20 +48,20 @@ public abstract class AbstractLeanBetaTransaction extends BetaTransaction {
 
 
     @Override
-    public final void startEitherBranch(){
+    public final void startEitherBranch() {
         config.needsOrelse();
         abort();
         throw SpeculativeConfigurationError.INSTANCE;
     }
 
     @Override
-    public final void endEitherBranch(){
+    public final void endEitherBranch() {
         abort();
         throw new IllegalStateException();
     }
 
     @Override
-    public final void startOrElseBranch(){
+    public final void startOrElseBranch() {
         abort();
         throw new IllegalStateException();
     }

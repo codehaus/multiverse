@@ -75,7 +75,7 @@ public class BetaLongRef_commute2Test {
         assertEquals(0, commute.value);
         tx.commit();
 
-        assertVersionAndValue(ref, initialVersion+1, initialValue+1);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
     }
 
     @Test
@@ -108,7 +108,7 @@ public class BetaLongRef_commute2Test {
         ref.commute(tx, function);
         tx.commit();
 
-        assertVersionAndValue(ref, initialVersion+1, initialValue+1);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
     }
 
     @Test
@@ -128,7 +128,7 @@ public class BetaLongRef_commute2Test {
         assertEquals(11, commute.value);
         tx.commit();
 
-        assertVersionAndValue(ref, initialVersion+1, initialValue+1);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
     }
 
     @Test
@@ -184,7 +184,7 @@ public class BetaLongRef_commute2Test {
         assertEquals(0, commute.value);
         tx.commit();
 
-        assertVersionAndValue(ref, initialVersion+1, initialValue+2);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 2);
     }
 
     @Test

@@ -184,7 +184,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         assertUpdateBiased(ref);
         assertIsActive(tx);
         assertNull(ref.___getLockOwner());
-        assertVersionAndValue(ref, version+1, 101);
+        assertVersionAndValue(ref, version + 1, 101);
         assertAttached(tx, read);
     }
 
@@ -207,9 +207,9 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         Tranlocal read3 = tx.openForRead(ref3, LOCKMODE_NONE);
 
         assertIsActive(tx);
-        assertVersionAndValue(ref1,versionRef1, 0);
-        assertVersionAndValue(ref1,versionRef2, 0);
-        assertVersionAndValue(ref1,versionRef3, 0);
+        assertVersionAndValue(ref1, versionRef1, 0);
+        assertVersionAndValue(ref1, versionRef2, 0);
+        assertVersionAndValue(ref1, versionRef3, 0);
 
         assertAttached(tx, read1);
         assertAttached(tx, read2);
@@ -427,7 +427,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
 
     @Test
     public void locking_whenPrivatizedByOther_thenReadConflict() {
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long version = ref.getVersion();
 
         BetaTransaction other = stm.startDefaultTransaction();
@@ -467,7 +467,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
 
         assertNotSame(read1, read2);
         assertTrue(read2.isCommitted);
-        assertEquals(version,read2.version);
+        assertEquals(version, read2.version);
         assertEquals(100, read2.value);
 
         assertIsActive(tx);
@@ -569,7 +569,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_COMMIT);
 
         assertSame(construction, read);
-        assertVersionAndValue(ref, 0,0);
+        assertVersionAndValue(ref, 0, 0);
 
         assertIsActive(tx);
         assertAttached(tx, read);
@@ -666,7 +666,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
 
     @Test
     public void pessimisticLockLevel__whenPrivatizeWritesLevelUsed() {
-        BetaLongRef ref = newLongRef(stm,100);
+        BetaLongRef ref = newLongRef(stm, 100);
         long version = ref.getVersion();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)

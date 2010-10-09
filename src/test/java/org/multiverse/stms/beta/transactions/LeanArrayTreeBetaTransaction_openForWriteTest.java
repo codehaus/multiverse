@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
-public class LeanArrayTreeBetaTransaction_openForWriteTest 
-        extends BetaTransaction_openForWriteTest{
+public class LeanArrayTreeBetaTransaction_openForWriteTest
+        extends BetaTransaction_openForWriteTest {
 
     @Override
     public boolean hasLocalConflictCounter() {

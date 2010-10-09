@@ -12,15 +12,15 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class VeryAbstractBetaTransactionalObject_atomicIsEnsuredTest {
 
-     private BetaStm stm;
+    private BetaStm stm;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         stm = new BetaStm();
     }
 
     @Test
-    public void whenIsFree(){
+    public void whenIsFree() {
         long initialValue = 10;
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -35,7 +35,7 @@ public class VeryAbstractBetaTransactionalObject_atomicIsEnsuredTest {
     }
 
     @Test
-    public void whenIsEnsured(){
+    public void whenIsEnsured() {
         long initialValue = 10;
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -53,7 +53,7 @@ public class VeryAbstractBetaTransactionalObject_atomicIsEnsuredTest {
     }
 
     @Test
-    public void whenIsPrivatized(){
+    public void whenIsPrivatized() {
         long initialValue = 10;
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();

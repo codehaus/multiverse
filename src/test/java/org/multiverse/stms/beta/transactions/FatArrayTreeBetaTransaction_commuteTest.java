@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 public class FatArrayTreeBetaTransaction_commuteTest
-        extends BetaTransaction_commuteTest{
+        extends BetaTransaction_commuteTest {
 
     @Override
     public BetaTransaction newTransaction() {

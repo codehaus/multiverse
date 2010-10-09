@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 public class LeanArrayTreeBetaTransaction_abortTest
-        extends BetaTransaction_abortTest{
+        extends BetaTransaction_abortTest {
 
     @Override
     public BetaTransaction newTransaction() {

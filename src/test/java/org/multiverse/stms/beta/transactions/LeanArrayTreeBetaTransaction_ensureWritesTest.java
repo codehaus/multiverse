@@ -1,6 +1,6 @@
 package org.multiverse.stms.beta.transactions;
 
-public class LeanArrayTreeBetaTransaction_ensureWritesTest     
+public class LeanArrayTreeBetaTransaction_ensureWritesTest
         extends BetaTransaction_ensureWritesTest {
 
     @Override

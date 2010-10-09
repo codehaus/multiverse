@@ -1,35 +1,35 @@
 package org.multiverse.api.predicates;
 
 /**
- * A predicate that checks if some value leads to true or false.
- *
- * @author Peter Veentjer.
- */
+* A predicate that checks if some value leads to true or false.
+*
+* @author Peter Veentjer.
+*/
 #if(${transactionalObject.referenceInterface} eq 'Ref')
 public interface ${transactionalObject.predicateClass}${transactionalObject.typeParameter}{
 
-    /**
-     * Evaluates the predicate.
-     *
-     * @param value the value to evaluate.
-     * @return true or false.
-     */
-    boolean evaluate(${transactionalObject.type} value);
+/**
+* Evaluates the predicate.
+*
+* @param value the value to evaluate.
+* @return true or false.
+*/
+boolean evaluate(${transactionalObject.type} value);
 }
 #else
 public abstract class ${transactionalObject.predicateClass} implements Predicate<${transactionalObject.objectType}>{
 
-    /**
-     * Evaluates the predicate
-     *
-     * @param current the current value.
-     * @return true or false.
-     */
-    public abstract boolean evaluate(${transactionalObject.type} current);
+/**
+* Evaluates the predicate
+*
+* @param current the current value.
+* @return true or false.
+*/
+public abstract boolean evaluate(${transactionalObject.type} current);
 
-    @Override
-    public final boolean evaluate(${transactionalObject.objectType} arg) {
-        return evaluate((${transactionalObject.type}) arg);
-    }
+@Override
+public final boolean evaluate(${transactionalObject.objectType} arg) {
+return evaluate((${transactionalObject.type}) arg);
+}
 }
 #end

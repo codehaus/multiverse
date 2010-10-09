@@ -54,7 +54,8 @@ public final class ThreadLocalTransaction {
      * returned).
      *
      * @return the threadlocal transaction.
-     * @throws org.multiverse.api.exceptions.TransactionRequiredException if no thread local transaction is found.
+     * @throws org.multiverse.api.exceptions.TransactionRequiredException
+     *          if no thread local transaction is found.
      */
     public static Transaction getRequiredThreadLocalTransaction() {
         Transaction tx = threadlocal.get().transaction;

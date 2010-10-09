@@ -18,35 +18,36 @@ public class BetaLongRef_addDeferredValidator2Test {
     }
 
     @After
-    public void tearDown(){
+    public void tearDown() {
         clearThreadLocalTransaction();
     }
 
     @Test
     @Ignore
-    public void whenSuccess(){
+    public void whenSuccess() {
 
     }
 
     @Test
     @Ignore
-    public void whenTransactionCommitted_thenDeadTransactionException(){
+    public void whenTransactionCommitted_thenDeadTransactionException() {
 
     }
 
     @Test
     @Ignore
-    public void whenTransactionAborted_thenDeadTransactionException(){
+    public void whenTransactionAborted_thenDeadTransactionException() {
 
     }
 
     @Test
     @Ignore
-    public void whenTransactionPrepared_thenPreparedTransactionException(){}
+    public void whenTransactionPrepared_thenPreparedTransactionException() {
+    }
 
     @Test
     @Ignore
-    public void whenNullTransaction(){
+    public void whenNullTransaction() {
 
     }
 

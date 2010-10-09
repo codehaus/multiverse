@@ -7,7 +7,7 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 
 @Ignore
-public class SimpleDurabilityIntegrationTest implements BetaStmConstants{
+public class SimpleDurabilityIntegrationTest implements BetaStmConstants {
     private BetaStm stm;
     private SimpleStorage storage;
 
@@ -15,7 +15,7 @@ public class SimpleDurabilityIntegrationTest implements BetaStmConstants{
     public void setUp() {
         stm = new BetaStm();
         storage = new SimpleStorage(stm);
-    //    storage.register(BetaLongRef.class, new LongRefSerializer());
+        //    storage.register(BetaLongRef.class, new LongRefSerializer());
         storage.clear();
     }
 

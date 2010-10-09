@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 public class LeanMonoBetaTransaction_openForWriteTest
-        extends BetaTransaction_openForWriteTest{
+        extends BetaTransaction_openForWriteTest {
 
     @Override
     public BetaTransaction newTransaction() {

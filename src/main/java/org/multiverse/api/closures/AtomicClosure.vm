@@ -9,15 +9,15 @@ import org.multiverse.api.Transaction;
 */
 public interface ${closure.name}${closure.typeParameter}{
 
-    /**
-     * Executes the closure.
-     *
-     * @param tx the Transaction. Depending on the TransactionPropagation level, this could
-     *           be null.
+/**
+* Executes the closure.
+*
+* @param tx the Transaction. Depending on the TransactionPropagation level, this could
+*           be null.
 #if(${closure.type} ne 'void')
-     * @return the result of the execution.
+* @return the result of the execution.
 #end
-     * @throws Exception if unable to compute a result
-     */
-     ${closure.type} execute(Transaction tx)throws Exception;
+* @throws Exception if unable to compute a result
+*/
+${closure.type} execute(Transaction tx)throws Exception;
 }

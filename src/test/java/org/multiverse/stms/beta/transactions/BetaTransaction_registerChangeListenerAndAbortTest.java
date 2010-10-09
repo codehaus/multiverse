@@ -48,7 +48,7 @@ public abstract class BetaTransaction_registerChangeListenerAndAbortTest impleme
 
     @Test
     public void whenMultipleReads_thenMultipleRegisters() {
-        assumeTrue(getTransactionMaxCapacity()>=3);
+        assumeTrue(getTransactionMaxCapacity() >= 3);
 
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
@@ -216,12 +216,12 @@ public abstract class BetaTransaction_registerChangeListenerAndAbortTest impleme
         assertNull(ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertVersionAndValue(ref, 0,0);
+        assertVersionAndValue(ref, 0, 0);
     }
 
     @Test
     public void whenOneOfThemItemsIsConstructed() {
-        assumeTrue(getTransactionMaxCapacity()>=2);
+        assumeTrue(getTransactionMaxCapacity() >= 2);
 
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
@@ -305,7 +305,7 @@ public abstract class BetaTransaction_registerChangeListenerAndAbortTest impleme
         verifyZeroInteractions(latch);
     }
 
-   @Test
+    @Test
     public void whenCommitted_thenDeadTransactionException() {
         Latch latch = mock(Latch.class);
         BetaTransaction tx = newTransaction();

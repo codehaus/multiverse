@@ -173,7 +173,8 @@ public interface TransactionFactoryBuilder {
      * @return the updated TransactionFactoryBuilder
      * @throws NullPointerException if isolationLevel is null.
      */
-   TransactionFactoryBuilder setIsolationLevel(IsolationLevel isolationLevel);
+    TransactionFactoryBuilder setIsolationLevel(IsolationLevel isolationLevel);
+
     /**
      * Sets if the Transaction is allowed to do an explicit retry (needed for a blocking operation). One use case
      * for disallowing it, it when the transaction is used inside an actor, and you don't want that inside the logic

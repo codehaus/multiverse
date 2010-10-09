@@ -204,7 +204,7 @@ class LinkedListTranlocal<E> extends Tranlocal {
     //@Override
     //public LinkedListTranlocal<E> openForCommute(BetaObjectPool pool) {
 //        throw new TodoException();
-  //  }
+    //  }
 
     @Override
     public boolean calculateIsDirty() {
@@ -233,7 +233,6 @@ class LinkedListTranlocal<E> extends Tranlocal {
         return false;  */
         throw new TodoException();
     }
-
 
 
     @Override
@@ -268,7 +267,7 @@ class LinkedListNode<E> extends AbstractBetaTransactionalObject {
         throw new TodoException();
     }
 
-   @Override
+    @Override
     public Listeners ___commitDirty(Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool) {
         throw new TodoException();
     }
@@ -387,7 +386,7 @@ class LinkedListNodeTranlocal<E> extends Tranlocal {
         isDirty = DIRTY_FALSE;
         return false;
         .*/
-          throw new TodoException();
+        throw new TodoException();
     }
 
     @Override

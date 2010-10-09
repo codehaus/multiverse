@@ -244,7 +244,7 @@ public abstract class VeryAbstractBetaTransactionalObject
     public final boolean isPrivatizedByOther() {
         final Transaction tx = getThreadLocalTransaction();
 
-        if (tx != null) {
+        if (tx == null) {
             throw new TransactionRequiredException("No transaction is found for the isPrivatizedByOther operation");
         }
 
@@ -273,7 +273,7 @@ public abstract class VeryAbstractBetaTransactionalObject
     public final boolean isEnsuredBySelf() {
         final Transaction tx = getThreadLocalTransaction();
 
-        if (tx != null) {
+        if (tx == null) {
             throw new TransactionRequiredException("No transaction is found for the isEnsuredBySelf operation");
         }
 
@@ -297,7 +297,7 @@ public abstract class VeryAbstractBetaTransactionalObject
     public final boolean isEnsuredByOther() {
         final Transaction tx = getThreadLocalTransaction();
 
-        if (tx != null) {
+        if (tx == null) {
             throw new TransactionRequiredException("No transaction is found for the isEnsuredByOther operation");
         }
 

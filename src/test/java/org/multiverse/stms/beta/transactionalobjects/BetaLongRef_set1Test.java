@@ -101,13 +101,13 @@ public class BetaLongRef_set1Test {
         assertIsAborted(tx);
 
         otherTx.abort();
-        assertVersionAndValue(ref,initialVersion, initialValue );
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertHasNoUpdateLock(ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
-        assertSame(tx,getThreadLocalTransaction());
+        assertSame(tx, getThreadLocalTransaction());
     }
 
     @Test

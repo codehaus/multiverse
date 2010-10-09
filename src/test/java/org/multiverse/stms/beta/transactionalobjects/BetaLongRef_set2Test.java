@@ -77,7 +77,7 @@ public class BetaLongRef_set2Test {
         }
 
         assertIsAborted(tx);
-            assertVersionAndValue(ref, version, 10);
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
@@ -94,7 +94,7 @@ public class BetaLongRef_set2Test {
         }
 
         assertIsCommitted(tx);
-            assertVersionAndValue(ref, version, 10);
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
@@ -107,7 +107,7 @@ public class BetaLongRef_set2Test {
         tx.commit();
 
         assertEquals(20, result);
-        assertVersionAndValue(ref,version+1, 20);
+        assertVersionAndValue(ref, version + 1, 20);
     }
 
     @Test
@@ -120,6 +120,6 @@ public class BetaLongRef_set2Test {
         tx.commit();
 
         assertEquals(20, result);
-        assertVersionAndValue(ref,version+1, 20);
+        assertVersionAndValue(ref, version + 1, 20);
     }
 }

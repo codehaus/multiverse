@@ -3,7 +3,7 @@ package org.multiverse.api;
 /**
  * With the IsolationLevel you have a way to provide declarative control to guarantee isolation between transactions.
  * The transaction is free to provide a higher isolation than the one specified.
- *
+ * <p/>
  * The dirty read isn't added since atm we already have an extremely cheap read using the atomicWeakGet on the
  * refs.
  *

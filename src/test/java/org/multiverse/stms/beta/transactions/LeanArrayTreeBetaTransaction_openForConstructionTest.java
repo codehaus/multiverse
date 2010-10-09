@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
-public class LeanArrayTreeBetaTransaction_openForConstructionTest 
-    extends BetaTransaction_openForConstructionTest{
+public class LeanArrayTreeBetaTransaction_openForConstructionTest
+        extends BetaTransaction_openForConstructionTest {
 
     @Override
     protected int getMaxTransactionCapacity() {

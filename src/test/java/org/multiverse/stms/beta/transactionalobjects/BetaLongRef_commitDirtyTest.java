@@ -418,7 +418,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
 
         assertNull(result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
-        assertVersionAndValue(ref, BetaLongRef.VERSION_UNCOMMITTED+1, initialValue);
+        assertVersionAndValue(ref, BetaLongRef.VERSION_UNCOMMITTED + 1, initialValue);
         assertHasNoUpdateLock(ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
@@ -426,7 +426,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         assertReadonlyCount(0, ref);
     }
 
-      @Test
+    @Test
     public void whenCommittingNonDirtyConstructedObject() {
         BetaTransaction tx = stm.startDefaultTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
@@ -439,7 +439,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
 
         assertNull(result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
-        assertVersionAndValue(ref, BetaLongRef.VERSION_UNCOMMITTED+1, 0);
+        assertVersionAndValue(ref, BetaLongRef.VERSION_UNCOMMITTED + 1, 0);
         assertHasNoUpdateLock(ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());

@@ -47,6 +47,7 @@ public class BetaLongRef_addDeferredValidator1Test {
 
     @Test
     @Ignore
-    public void whenSuccess(){}
+    public void whenSuccess() {
+    }
 
 }

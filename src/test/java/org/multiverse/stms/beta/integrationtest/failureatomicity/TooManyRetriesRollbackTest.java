@@ -8,7 +8,6 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 

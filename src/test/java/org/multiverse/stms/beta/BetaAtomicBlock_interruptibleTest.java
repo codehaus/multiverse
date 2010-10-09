@@ -20,7 +20,7 @@ import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
-public class BetaAtomicBlock_interruptibleTest implements BetaStmConstants{
+public class BetaAtomicBlock_interruptibleTest implements BetaStmConstants {
 
     private BetaStm stm;
 

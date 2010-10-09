@@ -18,7 +18,6 @@ import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newRef;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
-import static org.multiverse.stms.beta.BetaStmUtils.*;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
 public class BoxingOverheadBenchmark implements BetaStmConstants {

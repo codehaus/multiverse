@@ -14,12 +14,12 @@ public class VeryAbstractBetaTransactionalObject_atomicIsFreeTest {
     private BetaStm stm;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         stm = new BetaStm();
     }
 
     @Test
-    public void whenIsFree(){
+    public void whenIsFree() {
         long initialValue = 10;
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -34,7 +34,7 @@ public class VeryAbstractBetaTransactionalObject_atomicIsFreeTest {
     }
 
     @Test
-    public void whenIsEnsured(){
+    public void whenIsEnsured() {
         long initialValue = 10;
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -52,7 +52,7 @@ public class VeryAbstractBetaTransactionalObject_atomicIsFreeTest {
     }
 
     @Test
-    public void whenIsPrivatized(){
+    public void whenIsPrivatized() {
         long initialValue = 10;
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();

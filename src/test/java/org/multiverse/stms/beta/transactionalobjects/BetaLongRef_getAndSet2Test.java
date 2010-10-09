@@ -109,7 +109,7 @@ public class BetaLongRef_getAndSet2Test {
         tx.commit();
 
         assertEquals(10, result);
-        assertVersionAndValue(ref, version+1, 20);
+        assertVersionAndValue(ref, version + 1, 20);
     }
 
     @Test
@@ -122,7 +122,7 @@ public class BetaLongRef_getAndSet2Test {
         tx.commit();
 
         assertEquals(10, result);
-        assertVersionAndValue(ref, version+1, 20);
+        assertVersionAndValue(ref, version + 1, 20);
     }
 
     @Test
@@ -139,6 +139,6 @@ public class BetaLongRef_getAndSet2Test {
         assertEquals(10, ref.atomicGet());
         assertNull(getThreadLocalTransaction());
         assertSurplus(0, ref);
-        assertVersionAndValue(ref, version,10);
+        assertVersionAndValue(ref, version, 10);
     }
 }

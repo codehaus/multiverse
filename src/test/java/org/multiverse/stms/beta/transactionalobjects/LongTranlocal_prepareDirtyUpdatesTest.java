@@ -7,5 +7,6 @@ public class LongTranlocal_prepareDirtyUpdatesTest {
 
     @Test
     @Ignore
-    public void test(){}
+    public void test() {
+    }
 }

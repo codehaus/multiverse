@@ -57,7 +57,7 @@ public class BetaLongRef_atomicIncrementAndGetTest {
 
     @Test
     public void whenNoChange() {
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long version = ref.getVersion();
 
         long result = ref.atomicIncrementAndGet(0);
@@ -72,7 +72,7 @@ public class BetaLongRef_atomicIncrementAndGetTest {
 
     @Test
     public void whenPrivatizedByOther_thenLockedException() {
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
@@ -93,7 +93,7 @@ public class BetaLongRef_atomicIncrementAndGetTest {
 
     @Test
     public void whenEnsuredByOtherAndChange_thenLockedException() {
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();

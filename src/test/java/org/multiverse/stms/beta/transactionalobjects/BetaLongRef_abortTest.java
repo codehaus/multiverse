@@ -137,7 +137,7 @@ public class BetaLongRef_abortTest implements BetaStmConstants {
 
     @Test
     public void whenPrivatizedByOtherAndOpenedForRead() {
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -159,7 +159,7 @@ public class BetaLongRef_abortTest implements BetaStmConstants {
 
     @Test
     public void whenPrivatizedBySelfAndOpenedForWrite() {
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -177,7 +177,7 @@ public class BetaLongRef_abortTest implements BetaStmConstants {
 
     @Test
     public void whenEnsuredBySelfAndOpenedForWrite() {
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -196,7 +196,7 @@ public class BetaLongRef_abortTest implements BetaStmConstants {
 
     @Test
     public void whenLockedByOtherAndOpenedForWrite() {
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();

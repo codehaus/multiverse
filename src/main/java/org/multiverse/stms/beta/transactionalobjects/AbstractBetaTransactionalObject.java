@@ -9,61 +9,58 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
  * <p/>
  * remember:
  * it could be that the lock is acquired, but the lockOwner has not been set yet.
- *
+ * <p/>
  * The whole idea of code generation is that once you are inside a concrete class,
  * polymorphism is needed anymore.
- *
+ * <p/>
  * This class is generated.
  *
  * @author Peter Veentjer
  */
 public abstract class AbstractBetaTransactionalObject
-    extends VeryAbstractBetaTransactionalObject
-{
+        extends VeryAbstractBetaTransactionalObject {
 
 
-     /**
+    /**
      * Creates a uncommitted AbstractBetaTransactionalObject that should be attached to the transaction (this
      * is not done)
      *
      * @param tx the transaction this AbstractBetaTransactionalObject should be attached to.
      * @throws NullPointerException if tx is null.
      */
-    public AbstractBetaTransactionalObject(BetaTransaction tx){
+    public AbstractBetaTransactionalObject(BetaTransaction tx) {
         super(tx.getConfiguration().stm);
         ___tryLockAndArrive(0, true);
         this.___lockOwner = tx;
     }
 
 
-   @Override
-    public final int ___getClassIndex(){
+    @Override
+    public final int ___getClassIndex() {
         return -1;
     }
 
 
-   
-
     @Override
     public final void ___abort(
-        final BetaTransaction transaction,
-        final Tranlocal tranlocal,
-        final BetaObjectPool pool) {
+            final BetaTransaction transaction,
+            final Tranlocal tranlocal,
+            final BetaObjectPool pool) {
 
-        if(tranlocal.lockMode!=LOCKMODE_NONE){
+        if (tranlocal.lockMode != LOCKMODE_NONE) {
             ___lockOwner = null;
 
-            if(!tranlocal.isConstructing){
+            if (!tranlocal.isConstructing) {
                 //depart and release the lock. This call is able to deal with readbiased and normal reads.
                 ___departAfterFailureAndUnlock();
             }
-        }else{
-            if(tranlocal.hasDepartObligation){
+        } else {
+            if (tranlocal.hasDepartObligation) {
                 ___departAfterFailure();
             }
         }
 
-        pool.put((Tranlocal)tranlocal);        
+        pool.put((Tranlocal) tranlocal);
     }
 
 }

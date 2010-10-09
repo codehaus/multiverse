@@ -5,7 +5,7 @@ package org.multiverse.api.predicates;
  *
  * @author Peter Veentjer.
  */
-public abstract class IntPredicate implements Predicate<Integer>{
+public abstract class IntPredicate implements Predicate<Integer> {
 
     /**
      * Evaluates the predicate

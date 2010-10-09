@@ -21,7 +21,7 @@ public interface RefFactory {
      * @param value the initial value.
      * @return the created IntRef.
      */
-     IntRef newIntRef(int value);
+    IntRef newIntRef(int value);
 
     /**
      * Creates a committed BooleanRef.
@@ -29,7 +29,7 @@ public interface RefFactory {
      * @param value the initial value.
      * @return the created BooleanRef.
      */
-     BooleanRef newBooleanRef(boolean value);
+    BooleanRef newBooleanRef(boolean value);
 
     /**
      * Creates a committed DoubleRef.
@@ -37,7 +37,7 @@ public interface RefFactory {
      * @param value the initial value.
      * @return the created DoubleRef.
      */
-     DoubleRef newDoubleRef(double value);
+    DoubleRef newDoubleRef(double value);
 
     /**
      * Creates a committed LongRef.
@@ -45,5 +45,5 @@ public interface RefFactory {
      * @param value the initial value.
      * @return the created LongRef.
      */
-     LongRef newLongRef(long value);
+    LongRef newLongRef(long value);
 }

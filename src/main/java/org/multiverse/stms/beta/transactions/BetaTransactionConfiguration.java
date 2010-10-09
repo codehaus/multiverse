@@ -71,7 +71,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         this.isAnonymous = isAnonymous;
         this.globalConflictCounter = stm.getGlobalConflictCounter();
         if (isAnonymous) {
-            this.transactionSensor = null;            
+            this.transactionSensor = null;
         } else {
             this.transactionSensor = stm.getProfiler().getTransactionSensor(this);
         }

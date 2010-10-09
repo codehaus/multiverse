@@ -32,7 +32,7 @@ public class WriteSkewTest {
 
     @Test
     @Ignore
-    public void whenSerializedIsolationLevel_thenWriteSkewNotPossible(){
+    public void whenSerializedIsolationLevel_thenWriteSkewNotPossible() {
 
     }
 

@@ -1,8 +1,6 @@
 package org.multiverse.api.exceptions;
 
 /**
- * 
- *
  * @author Peter Veentjer.
  */
 public class TransactionalExecutionException extends RuntimeException {
@@ -27,7 +25,7 @@ public class TransactionalExecutionException extends RuntimeException {
      * Creates a new TransactionalExecutionException with the provided message and cause.
      *
      * @param message the message of the exception.
-     * @param cause the Throwable that caused the exception.
+     * @param cause   the Throwable that caused the exception.
      */
     public TransactionalExecutionException(String message, Throwable cause) {
         super(message, cause);

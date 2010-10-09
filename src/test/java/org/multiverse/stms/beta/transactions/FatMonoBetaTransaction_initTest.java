@@ -20,7 +20,7 @@ public class FatMonoBetaTransaction_initTest {
         stm = new BetaStm();
     }
 
-   @Test
+    @Test
     public void whenTimeoutSetThenCopied() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
 

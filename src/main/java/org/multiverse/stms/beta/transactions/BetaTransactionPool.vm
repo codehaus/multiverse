@@ -7,81 +7,81 @@ import org.multiverse.stms.beta.transactions.*;
 import java.util.ArrayList;
 
 /**
- * A pool for Transactions. This is only meant to reduce the performance overhead of creating and garbage collecting
- * transactions, it should not be compared to a connection pool of a database for example. 
- *
- * The pool is not threadsafe and should be connected to a thread (can
- * be stored in a threadlocal). Eventually the performance of the stm will be limited to the rate
- * of cleanup, and using a pool seriously improves scalability.
- *
- * This class is generated.
- *
- * @author Peter Veentjer
- */
+* A pool for Transactions. This is only meant to reduce the performance overhead of creating and garbage collecting
+* transactions, it should not be compared to a connection pool of a database for example.
+*
+* The pool is not threadsafe and should be connected to a thread (can
+* be stored in a threadlocal). Eventually the performance of the stm will be limited to the rate
+* of cleanup, and using a pool seriously improves scalability.
+*
+* This class is generated.
+*
+* @author Peter Veentjer
+*/
 public final class BetaTransactionPool {
 
-    private final static boolean ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm,beta.transactions.BetaTransactionPool.enabled","true"));
+private final static boolean ENABLED = Boolean.parseBoolean(
+System.getProperty("org.multiverse.stm,beta.transactions.BetaTransactionPool.enabled","true"));
 
-    private final boolean enabled;
-
-#foreach($transaction in $transactions)
-    private final ${transaction.name}[] pool${transaction.name} = new ${transaction.name}[10];
-    private int pool${transaction.name}Index = -1;
-#end
-
-    public BetaTransactionPool() {
-        enabled = ENABLED;
-    }
+private final boolean enabled;
 
 #foreach($transaction in $transactions)
-    /**
-     * Takes a ${transaction.name} from the pool.
-     *
-     * @return the taken ${transaction.name} or null of none available.
-     */
-    public ${transaction.name} take${transaction.name}(){
-        if(!enabled || pool${transaction.name}Index == -1){
-            return null;
-        }
-
-        ${transaction.name} tx = pool${transaction.name}[pool${transaction.name}Index];
-        pool${transaction.name}[pool${transaction.name}Index]=null;
-        pool${transaction.name}Index--;
-        return tx;
-    }
-
+private final ${transaction.name}[] pool${transaction.name} = new ${transaction.name}[10];
+private int pool${transaction.name}Index = -1;
 #end
-    /**
-     * Puts a BetaTransaction in the pool.
-     *
-     * todo: This is where the cleanup of the Transaction should be done..
-     *
-     * @param tx the BetaTransaction to put in the pool.
-     * @throws NullPointerException if tx is null.
-     */
-    public void putBetaTransaction(BetaTransaction tx){
-        if(!enabled){
-            return;
-        }
 
-        if(tx == null){
-            throw new NullPointerException();
-        }
+public BetaTransactionPool() {
+enabled = ENABLED;
+}
 
-        switch(tx.getPoolTransactionType()){
 #foreach($transaction in $transactions)
-            case BetaTransaction.${transaction.poolName}:
-                if(pool${transaction.name}Index == pool${transaction.name}.length - 1){
-                    return;
-                }
+/**
+* Takes a ${transaction.name} from the pool.
+*
+* @return the taken ${transaction.name} or null of none available.
+*/
+public ${transaction.name} take${transaction.name}(){
+if(!enabled || pool${transaction.name}Index == -1){
+return null;
+}
 
-                pool${transaction.name}Index++;
-                pool${transaction.name}[pool${transaction.name}Index] = (${transaction.name})tx;            
-                break;
+    ${transaction.name} tx = pool${transaction.name}[pool${transaction.name}Index];
+pool${transaction.name}[pool${transaction.name}Index]=null;
+pool${transaction.name}Index--;
+return tx;
+}
+
 #end
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
+/**
+* Puts a BetaTransaction in the pool.
+*
+* todo: This is where the cleanup of the Transaction should be done..
+*
+* @param tx the BetaTransaction to put in the pool.
+* @throws NullPointerException if tx is null.
+*/
+public void putBetaTransaction(BetaTransaction tx){
+if(!enabled){
+return;
+}
+
+if(tx == null){
+throw new NullPointerException();
+}
+
+switch(tx.getPoolTransactionType()){
+#foreach($transaction in $transactions)
+case BetaTransaction.${transaction.poolName}:
+if(pool${transaction.name}Index == pool${transaction.name}.length - 1){
+return;
+}
+
+pool${transaction.name}Index++;
+pool${transaction.name}[pool${transaction.name}Index] = (${transaction.name})tx;
+break;
+#end
+default:
+throw new IllegalArgumentException();
+}
+}
 }

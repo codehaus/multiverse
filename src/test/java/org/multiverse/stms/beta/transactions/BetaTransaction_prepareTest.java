@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.IsolationLevel;
+import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.functions.Functions;
@@ -159,8 +160,6 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
     }
 
 
-
-
     @Test
     @Ignore
     public void whenContainsEnsuredNonDirtyWriteBySelf_thenLockUpgradedToPrivatized() {
@@ -199,7 +198,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
 
     @Test
     @Ignore
-    public void whenNonDirtyUpdateAndEnsuredByOther_then(){
+    public void whenNonDirtyUpdateAndEnsuredByOther_then() {
 
     }
 
@@ -505,7 +504,37 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenWriteSkewStillPossibleWithWriteSkewEnabled() {
+    public void pessimisticLockLevel_whenEnsureReads_thenWriteSkewNotPossible() {
+        assumeTrue(getTransactionMaxCapacity() >= 2);
+        assumeTrue(isSupportingWriteSkewDetection());
+
+        BetaLongRef ref1 = newLongRef(stm, 0);
+        BetaLongRef ref2 = newLongRef(stm, 0);
+
+        BetaTransaction tx1 = newTransaction();
+        tx1.openForWrite(ref1, LOCKMODE_NONE).value++;
+        tx1.openForRead(ref2, LOCKMODE_NONE);
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setPessimisticLockLevel(PessimisticLockLevel.EnsureReads);
+        BetaTransaction tx2 = newTransaction(config);
+        tx2.openForRead(ref1, LOCKMODE_NONE);
+        tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
+
+        tx2.prepare();
+
+        try {
+            tx1.prepare();
+            fail();
+        } catch (ReadWriteConflict expected) {
+        }
+
+        assertIsAborted(tx1);
+        assertIsPrepared(tx2);
+    }
+
+    @Test
+    public void pessimisticLockLevel_whenEnsureWrites_thenWriteSkewPossible() {
         assumeTrue(getTransactionMaxCapacity() >= 2);
 
         BetaLongRef ref1 = newLongRef(stm, 0);
@@ -515,22 +544,154 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         tx1.openForWrite(ref1, LOCKMODE_NONE).value++;
         tx1.openForRead(ref2, LOCKMODE_NONE);
 
-        BetaTransaction tx2 = newTransaction();
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setPessimisticLockLevel(PessimisticLockLevel.EnsureWrites);
+        BetaTransaction tx2 = newTransaction(config);
         tx2.openForRead(ref1, LOCKMODE_NONE);
         tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
 
         tx1.prepare();
+
         tx2.prepare();
+
+        assertIsPrepared(tx1);
+        assertIsPrepared(tx2);
+    }
+
+
+    @Test
+    public void pessimisticLockLevel_whenPrivatizeReads_thenWriteSkewNotPossible() {
+        assumeTrue(getTransactionMaxCapacity() >= 2);
+        assumeTrue(isSupportingWriteSkewDetection());
+
+        BetaLongRef ref1 = newLongRef(stm, 0);
+        BetaLongRef ref2 = newLongRef(stm, 0);
+
+        BetaTransaction tx1 = newTransaction();
+        tx1.openForWrite(ref1, LOCKMODE_NONE).value++;
+        tx1.openForRead(ref2, LOCKMODE_NONE);
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
+        BetaTransaction tx2 = newTransaction(config);
+        tx2.openForRead(ref1, LOCKMODE_NONE);
+        tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
+
+        tx2.prepare();
+
+        try {
+            tx1.prepare();
+            fail();
+        } catch (ReadWriteConflict expected) {
+        }
+
+        assertIsAborted(tx1);
+        assertIsPrepared(tx2);
+    }
+
+
+    @Test
+    public void pessimisticLockLevel_whenPrivatizeWrites_thenWriteSkewPossible() {
+        assumeTrue(getTransactionMaxCapacity() >= 2);
+
+        BetaLongRef ref1 = newLongRef(stm, 0);
+        BetaLongRef ref2 = newLongRef(stm, 0);
+
+        BetaTransaction tx1 = newTransaction();
+        tx1.openForWrite(ref1, LOCKMODE_NONE).value++;
+        tx1.openForRead(ref2, LOCKMODE_NONE);
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites);
+        BetaTransaction tx2 = newTransaction(config);
+        tx2.openForRead(ref1, LOCKMODE_NONE);
+        tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
+
+        tx1.prepare();
+
+        tx2.prepare();
+
+        assertIsPrepared(tx1);
+        assertIsPrepared(tx2);
     }
 
     @Test
-    @Ignore
-    public void writeSkew(){
+    public void isolationLevel_whenRepeatableReadIsolationLevel_thenWriteSkewNoDetected() {
+        assumeTrue(getTransactionMaxCapacity() >= 2);
 
+        BetaLongRef ref1 = newLongRef(stm, 0);
+        BetaLongRef ref2 = newLongRef(stm, 0);
+
+        BetaTransaction tx1 = newTransaction();
+        tx1.openForWrite(ref1, LOCKMODE_NONE).value++;
+        tx1.openForRead(ref2, LOCKMODE_NONE);
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setIsolationLevel(IsolationLevel.ReadCommitted);
+        BetaTransaction tx2 = newTransaction(config);
+        tx2.openForRead(ref1, LOCKMODE_NONE);
+        tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
+
+        tx1.prepare();
+
+        tx2.prepare();
+
+        assertIsPrepared(tx1);
+        assertIsPrepared(tx2);
     }
 
     @Test
-    public void whenSerializedIsolationLevel_thenWriteSkewDetectedAndReadWriteConflictThrown() {
+    public void isolationLevel_whenReadCommittedIsolationLevel_thenWriteSkewNoDetected() {
+        assumeTrue(getTransactionMaxCapacity() >= 2);
+
+        BetaLongRef ref1 = newLongRef(stm, 0);
+        BetaLongRef ref2 = newLongRef(stm, 0);
+
+        BetaTransaction tx1 = newTransaction();
+        tx1.openForWrite(ref1, LOCKMODE_NONE).value++;
+        tx1.openForRead(ref2, LOCKMODE_NONE);
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setIsolationLevel(IsolationLevel.ReadCommitted);
+        BetaTransaction tx2 = newTransaction(config);
+        tx2.openForRead(ref1, LOCKMODE_NONE);
+        tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
+
+        tx1.prepare();
+
+        tx2.prepare();
+
+        assertIsPrepared(tx1);
+        assertIsPrepared(tx2);
+    }
+
+    @Test
+    public void isolationLevel_whenSnapshotIsolationLevel_thenWriteSkewNoDetected() {
+        assumeTrue(getTransactionMaxCapacity() >= 2);
+
+        BetaLongRef ref1 = newLongRef(stm, 0);
+        BetaLongRef ref2 = newLongRef(stm, 0);
+
+        BetaTransaction tx1 = newTransaction();
+        tx1.openForWrite(ref1, LOCKMODE_NONE).value++;
+        tx1.openForRead(ref2, LOCKMODE_NONE);
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .setIsolationLevel(IsolationLevel.Snapshot);
+        BetaTransaction tx2 = newTransaction(config);
+        tx2.openForRead(ref1, LOCKMODE_NONE);
+        tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
+
+        tx1.prepare();
+
+        tx2.prepare();
+
+        assertIsPrepared(tx1);
+        assertIsPrepared(tx2);
+    }
+
+    @Test
+    public void isolationLevel_whenSerializedIsolationLevel_thenWriteSkewDetectedAndReadWriteConflictThrown() {
         assumeTrue(getTransactionMaxCapacity() >= 2);
         assumeTrue(isSupportingWriteSkewDetection());
 
@@ -559,7 +720,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenAlreadyPrepared_thenNoProblems() {
+    public void state_whenAlreadyPrepared_thenNoProblems() {
         BetaLongRef ref = newLongRef(stm);
         long version = ref.getVersion();
 
@@ -580,7 +741,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenCommitted_thenDeadTransactionException() {
+    public void state_whenAlreadyCommitted_thenDeadTransactionException() {
         BetaTransaction tx = newTransaction();
         tx.commit();
 
@@ -594,7 +755,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenAborted_thenDeadTransactionException() {
+    public void state_whenAlreadyAborted_thenDeadTransactionException() {
         BetaTransaction tx = newTransaction();
         tx.abort();
 

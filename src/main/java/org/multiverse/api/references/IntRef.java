@@ -18,7 +18,9 @@ public interface IntRef extends TransactionalObject {
      * @param value the new value.
      * @return the old value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      * @throws TransactionalExecutionException
+     *
      */
     int getAndSet(int value);
 
@@ -28,7 +30,9 @@ public interface IntRef extends TransactionalObject {
      * @param value the new value.
      * @return the new value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      * @throws TransactionalExecutionException
+     *
      */
     int set(int value);
 
@@ -40,7 +44,9 @@ public interface IntRef extends TransactionalObject {
      * @return the old value
      * @throws NullPointerException if tx is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     int set(Transaction tx, int value);
 
@@ -49,6 +55,7 @@ public interface IntRef extends TransactionalObject {
      *
      * @return the current value.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
      * @see #atomicGet()
@@ -62,7 +69,9 @@ public interface IntRef extends TransactionalObject {
      * @return the value stored in the ref.
      * @throws NullPointerException if tx is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     int get(Transaction tx);
 
@@ -107,7 +116,9 @@ public interface IntRef extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if tx is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     int getAndSet(Transaction tx, int value);
 
@@ -125,7 +136,9 @@ public interface IntRef extends TransactionalObject {
      * @param function the function to apply to this reference.
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      * @throws TransactionalExecutionException
+     *
      */
     void commute(IntFunction function);
 
@@ -142,11 +155,13 @@ public interface IntRef extends TransactionalObject {
      *
      * @param tx       the transaction used for this operation.
      * @param function the function to apply to this reference.
-     * @throws NullPointerException  if function is null.
+     * @throws NullPointerException if function is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
-    void commute(Transaction tx,IntFunction function);
+    void commute(Transaction tx, IntFunction function);
 
     /**
      * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
@@ -166,7 +181,9 @@ public interface IntRef extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if function is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     int alterAndGet(IntFunction function);
 
@@ -178,9 +195,11 @@ public interface IntRef extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if function or transaction is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
-    int alterAndGet(Transaction tx,IntFunction function);
+    int alterAndGet(Transaction tx, IntFunction function);
 
     /**
      * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
@@ -200,7 +219,9 @@ public interface IntRef extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if function is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     int getAndAlter(IntFunction function);
 
@@ -212,7 +233,9 @@ public interface IntRef extends TransactionalObject {
      * @return the old value
      * @throws NullPointerException if function or transaction is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     int getAndAlter(Transaction tx, IntFunction function);
 
@@ -220,7 +243,7 @@ public interface IntRef extends TransactionalObject {
      * Executes a compare and set atomically. This method doesn't care about any running transactions.
      *
      * @param expectedValue the expected value.
-     * @param newValue the new value.
+     * @param newValue      the new value.
      * @return true if the compareAndSwap was a success, false otherwise.
      */
     boolean atomicCompareAndSet(int expectedValue, int newValue);
@@ -229,7 +252,7 @@ public interface IntRef extends TransactionalObject {
      * Adds a deferred validator. A deferred validator is executed once the transaction commits, so it
      * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
      * validator is added multiple times, it will be called multiple times.
-     *
+     * <p/>
      * This call lifts on the transaction stored in the ThreadLocalTransaction.
      *
      * @param validator the IntPredicate to add.
@@ -242,11 +265,11 @@ public interface IntRef extends TransactionalObject {
      * Adds a deferred validator. A deferred validator is executed once the transaction commits, so it
      * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
      * validator is added multiple times, it will be called multiple times.
-     *
+     * <p/>
      * This call lifts on the provided transaction.
      *
      * @param tx the Transaction this call lifts on
-     * param validator the IntPredicate to add.
+     *           param validator the IntPredicate to add.
      * @throws NullPointerException if validator or tx is null. If validator is null and transaction is not, the
      *                              transaction if aborted.
      */
@@ -260,6 +283,7 @@ public interface IntRef extends TransactionalObject {
      * @param validator the IntPredicate to add.
      * @throws NullPointerException if validator is null.
      * @throws TransactionalExecutionException
+     *
      */
     void atomicAddDeferredValidator(IntPredicate validator);
 
@@ -278,7 +302,9 @@ public interface IntRef extends TransactionalObject {
      * @param amount the amount to increment with.
      * @return the old value.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     int getAndIncrement(int amount);
 
@@ -290,7 +316,9 @@ public interface IntRef extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if tx is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     int getAndIncrement(Transaction tx, int amount);
 
@@ -309,7 +337,9 @@ public interface IntRef extends TransactionalObject {
      * @param amount the amount to increment with.
      * @return the new value.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     int incrementAndGet(int amount);
 
@@ -321,14 +351,16 @@ public interface IntRef extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if tx is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
-    int incrementAndGet(Transaction tx,int amount);
+    int incrementAndGet(Transaction tx, int amount);
 
 
     void await(int value);
 
-    void await(Transaction tx,int value);
+    void await(Transaction tx, int value);
 
     //todo: atomicAwait.
 }

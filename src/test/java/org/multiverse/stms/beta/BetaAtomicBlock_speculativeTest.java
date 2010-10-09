@@ -22,7 +22,7 @@ import static org.multiverse.TestUtils.assertInstanceof;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
-public class BetaAtomicBlock_speculativeTest implements BetaStmConstants{
+public class BetaAtomicBlock_speculativeTest implements BetaStmConstants {
 
     private BetaStm stm;
 

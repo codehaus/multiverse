@@ -40,7 +40,7 @@ public class BetaLongRef_getAndIncrement2Test {
         } catch (NullPointerException expected) {
         }
 
-        assertVersionAndValue(ref, version,10);
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class BetaLongRef_getAndIncrement2Test {
         }
 
         assertIsCommitted(tx);
-        assertVersionAndValue(ref, version,10);
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
@@ -74,7 +74,7 @@ public class BetaLongRef_getAndIncrement2Test {
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, version,10);
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
@@ -91,7 +91,7 @@ public class BetaLongRef_getAndIncrement2Test {
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, version,10);
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
@@ -105,7 +105,7 @@ public class BetaLongRef_getAndIncrement2Test {
 
         assertEquals(10, result);
         assertIsCommitted(tx);
-        assertVersionAndValue(ref, version,10);
+        assertVersionAndValue(ref, version, 10);
     }
 
     @Test
@@ -119,6 +119,6 @@ public class BetaLongRef_getAndIncrement2Test {
 
         assertIsCommitted(tx);
         assertEquals(10, result);
-        assertVersionAndValue(ref, version+1, 30);
+        assertVersionAndValue(ref, version + 1, 30);
     }
 }

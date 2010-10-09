@@ -21,7 +21,7 @@ public class LeanArrayBetaTransaction_openForReadTest
     public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
         return new LeanArrayBetaTransaction(config);
     }
-    
+
     @Override
     public boolean doesTransactionSupportCommute() {
         return false;

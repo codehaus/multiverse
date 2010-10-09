@@ -3,7 +3,7 @@ package org.multiverse.stms.beta.transactions;
 import org.multiverse.stms.beta.BetaStmConfiguration;
 
 public class LeanArrayBetaTransaction_abortTest
-        extends BetaTransaction_abortTest{
+        extends BetaTransaction_abortTest {
 
 
     @Override

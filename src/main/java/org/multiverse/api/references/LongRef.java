@@ -18,7 +18,9 @@ public interface LongRef extends TransactionalObject {
      * @param value the new value.
      * @return the old value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      * @throws TransactionalExecutionException
+     *
      */
     long getAndSet(long value);
 
@@ -28,7 +30,9 @@ public interface LongRef extends TransactionalObject {
      * @param value the new value.
      * @return the new value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      * @throws TransactionalExecutionException
+     *
      */
     long set(long value);
 
@@ -40,7 +44,9 @@ public interface LongRef extends TransactionalObject {
      * @return the old value
      * @throws NullPointerException if tx is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long set(Transaction tx, long value);
 
@@ -49,6 +55,7 @@ public interface LongRef extends TransactionalObject {
      *
      * @return the current value.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
      * @see #atomicGet()
@@ -62,7 +69,9 @@ public interface LongRef extends TransactionalObject {
      * @return the value stored in the ref.
      * @throws NullPointerException if tx is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long get(Transaction tx);
 
@@ -107,7 +116,9 @@ public interface LongRef extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if tx is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long getAndSet(Transaction tx, long value);
 
@@ -125,7 +136,9 @@ public interface LongRef extends TransactionalObject {
      * @param function the function to apply to this reference.
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      * @throws TransactionalExecutionException
+     *
      */
     void commute(LongFunction function);
 
@@ -142,11 +155,13 @@ public interface LongRef extends TransactionalObject {
      *
      * @param tx       the transaction used for this operation.
      * @param function the function to apply to this reference.
-     * @throws NullPointerException  if function is null.
+     * @throws NullPointerException if function is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
-    void commute(Transaction tx,LongFunction function);
+    void commute(Transaction tx, LongFunction function);
 
     /**
      * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
@@ -166,7 +181,9 @@ public interface LongRef extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if function is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long alterAndGet(LongFunction function);
 
@@ -178,9 +195,11 @@ public interface LongRef extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if function or transaction is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
-    long alterAndGet(Transaction tx,LongFunction function);
+    long alterAndGet(Transaction tx, LongFunction function);
 
     /**
      * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
@@ -200,7 +219,9 @@ public interface LongRef extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if function is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long getAndAlter(LongFunction function);
 
@@ -212,7 +233,9 @@ public interface LongRef extends TransactionalObject {
      * @return the old value
      * @throws NullPointerException if function or transaction is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long getAndAlter(Transaction tx, LongFunction function);
 
@@ -220,7 +243,7 @@ public interface LongRef extends TransactionalObject {
      * Executes a compare and set atomically. This method doesn't care about any running transactions.
      *
      * @param expectedValue the expected value.
-     * @param newValue the new value.
+     * @param newValue      the new value.
      * @return true if the compareAndSwap was a success, false otherwise.
      */
     boolean atomicCompareAndSet(long expectedValue, long newValue);
@@ -229,7 +252,7 @@ public interface LongRef extends TransactionalObject {
      * Adds a deferred validator. A deferred validator is executed once the transaction commits, so it
      * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
      * validator is added multiple times, it will be called multiple times.
-     *
+     * <p/>
      * This call lifts on the transaction stored in the ThreadLocalTransaction.
      *
      * @param validator the LongPredicate to add.
@@ -242,11 +265,11 @@ public interface LongRef extends TransactionalObject {
      * Adds a deferred validator. A deferred validator is executed once the transaction commits, so it
      * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
      * validator is added multiple times, it will be called multiple times.
-     *
+     * <p/>
      * This call lifts on the provided transaction.
      *
      * @param tx the Transaction this call lifts on
-     * param validator the LongPredicate to add.
+     *           param validator the LongPredicate to add.
      * @throws NullPointerException if validator or tx is null. If validator is null and transaction is not, the
      *                              transaction if aborted.
      */
@@ -260,6 +283,7 @@ public interface LongRef extends TransactionalObject {
      * @param validator the LongPredicate to add.
      * @throws NullPointerException if validator is null.
      * @throws TransactionalExecutionException
+     *
      */
     void atomicAddDeferredValidator(LongPredicate validator);
 
@@ -278,7 +302,9 @@ public interface LongRef extends TransactionalObject {
      * @param amount the amount to increment with.
      * @return the old value.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long getAndIncrement(long amount);
 
@@ -290,7 +316,9 @@ public interface LongRef extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if tx is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long getAndIncrement(Transaction tx, long amount);
 
@@ -309,7 +337,9 @@ public interface LongRef extends TransactionalObject {
      * @param amount the amount to increment with.
      * @return the new value.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     long incrementAndGet(long amount);
 
@@ -321,14 +351,16 @@ public interface LongRef extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if tx is null.
      * @throws TransactionalExecutionException
+     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
-    long incrementAndGet(Transaction tx,long amount);
+    long incrementAndGet(Transaction tx, long amount);
 
 
     void await(long value);
 
-    void await(Transaction tx,long value);
+    void await(Transaction tx, long value);
 
     //todo: atomicAwait.
 }

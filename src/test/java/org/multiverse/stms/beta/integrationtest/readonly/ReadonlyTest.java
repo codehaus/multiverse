@@ -9,7 +9,6 @@ import org.multiverse.api.closures.AtomicIntClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmUtils;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;

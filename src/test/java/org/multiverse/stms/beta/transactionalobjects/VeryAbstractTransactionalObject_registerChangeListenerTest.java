@@ -74,7 +74,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
 
     @Test
     public void whenPrivatizedAndNoConflict_thenRegistered() {
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -93,13 +93,13 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
-        assertVersionAndValue(ref, version,10);
+        assertVersionAndValue(ref, version, 10);
         assertFalse(latch.isOpen());
     }
 
     @Test
     public void whenEnsuredAndNoConflict_thenRegistered() {
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
@@ -118,7 +118,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         assertHasUpdateLock(ref);
         assertHasNoCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
-        assertVersionAndValue(ref, version,10);
+        assertVersionAndValue(ref, version, 10);
         assertFalse(latch.isOpen());
     }
 
@@ -147,7 +147,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
-        assertVersionAndValue(ref, version,1);
+        assertVersionAndValue(ref, version, 1);
     }
 
     @Test
@@ -175,7 +175,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         assertHasUpdateLock(ref);
         assertHasNoCommitLock(ref);
         assertSame(otherTx, ref.___getLockOwner());
-        assertVersionAndValue(ref, version,1);
+        assertVersionAndValue(ref, version, 1);
     }
 
     @Test

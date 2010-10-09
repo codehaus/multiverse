@@ -214,6 +214,6 @@ public class BetaLongRef_get0Test {
 
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertVersionAndValue(ref,initialVersion, initialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 }

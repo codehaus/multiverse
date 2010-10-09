@@ -7,7 +7,7 @@ package org.multiverse.api.functions;
  *
  * @author Peter Veentjer.
  */
-public abstract class LongFunction implements Function<Long>{
+public abstract class LongFunction implements Function<Long> {
 
     /**
      * Calculates the new value based on the current value.

@@ -20,919 +20,919 @@ import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.*;
 
 /**
- * The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
- * once this project leaves the prototype stage.
- * <p/>
- * remember:
- * it could be that the lock is acquired, but the lockOwner has not been set yet.
- *
- * The whole idea of code generation is that once you are inside a concrete class,
- * polymorphism is needed anymore.
- *
- * This class is generated.
- *
- * @author Peter Veentjer
- */
+* The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
+* once this project leaves the prototype stage.
+* <p/>
+* remember:
+* it could be that the lock is acquired, but the lockOwner has not been set yet.
+*
+* The whole idea of code generation is that once you are inside a concrete class,
+* polymorphism is needed anymore.
+*
+* This class is generated.
+*
+* @author Peter Veentjer
+*/
 public ${transactionalObject.accessModifier} class ${transactionalObject.name}${transactionalObject.typeParameter}
-    extends VeryAbstractBetaTransactionalObject
+extends VeryAbstractBetaTransactionalObject
 #if(${transactionalObject.isReference})
-    implements ${transactionalObject.referenceInterface}${transactionalObject.typeParameter}
+implements ${transactionalObject.referenceInterface}${transactionalObject.typeParameter}
 #end
 {
 
 #if(${transactionalObject.isReference})
-    //Active needs to be volatile. If not, the both load statements in the load function, can be reordered
-    //(the instruction above can jump below the orec.arrive if no write is done)
-    private volatile ${transactionalObject.type} ___value;
+//Active needs to be volatile. If not, the both load statements in the load function, can be reordered
+//(the instruction above can jump below the orec.arrive if no write is done)
+private volatile ${transactionalObject.type} ___value;
 #end
 
-     /**
-     * Creates a uncommitted ${transactionalObject.name} that should be attached to the transaction (this
-     * is not done)
-     *
-     * @param tx the transaction this ${transactionalObject.name} should be attached to.
-     * @throws NullPointerException if tx is null.
-     */
-    public ${transactionalObject.name}(BetaTransaction tx){
-        super(tx.getConfiguration().stm);
-        ___tryLockAndArrive(0, true);
-        this.___lockOwner = tx;
-    }
+/**
+* Creates a uncommitted ${transactionalObject.name} that should be attached to the transaction (this
+* is not done)
+*
+* @param tx the transaction this ${transactionalObject.name} should be attached to.
+* @throws NullPointerException if tx is null.
+*/
+public ${transactionalObject.name}(BetaTransaction tx){
+super(tx.getConfiguration().stm);
+___tryLockAndArrive(0, true);
+this.___lockOwner = tx;
+}
 
 #if(${transactionalObject.isReference})
-    /**
-     * Creates a committed ${transactionalObject.name} with ${transactionalObject.initialValue} as initial value.
-     *
-     * @param stm the BetaStm this reference belongs to.
-     * @throws NullPointerException if stm is null.
-     */
-    public ${transactionalObject.name}(BetaStm stm){
-        this(stm, (${transactionalObject.type})${transactionalObject.initialValue});
-    }
+/**
+* Creates a committed ${transactionalObject.name} with ${transactionalObject.initialValue} as initial value.
+*
+* @param stm the BetaStm this reference belongs to.
+* @throws NullPointerException if stm is null.
+*/
+public ${transactionalObject.name}(BetaStm stm){
+this(stm, (${transactionalObject.type})${transactionalObject.initialValue});
+}
 
-    /**
-     * Creates a committed ${transactionalObject.name} with the given initial value.
-     *
-     * @param stm the BetaStm this reference belongs to.
-     * @param initialValue the initial value
-     * @throws NullPointerException is stm is null.     
-     */
-    public ${transactionalObject.name}(BetaStm stm, final ${transactionalObject.type} initialValue){
-        super(stm);
+/**
+* Creates a committed ${transactionalObject.name} with the given initial value.
+*
+* @param stm the BetaStm this reference belongs to.
+* @param initialValue the initial value
+* @throws NullPointerException is stm is null.
+*/
+public ${transactionalObject.name}(BetaStm stm, final ${transactionalObject.type} initialValue){
+super(stm);
 
-        ___value = initialValue;
-        ___version = VERSION_UNCOMMITTED+1;         
-    }
+___value = initialValue;
+___version = VERSION_UNCOMMITTED+1;
+}
 
 #end
 
-   @Override
-    public final int ___getClassIndex(){
-        return ${transactionalObject.classIndex};
-    }
+@Override
+public final int ___getClassIndex(){
+return ${transactionalObject.classIndex};
+}
 
 
 #if(${transactionalObject.isReference})
-    public final ${transactionalObject.type} ___weakRead(){
-        return ___value;
-    }
+public final ${transactionalObject.type} ___weakRead(){
+return ___value;
+}
 
-    @Override
-    public final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} ___newTranlocal(){
-        return new ${transactionalObject.tranlocal}${transactionalObject.typeParameter}(this);
-    }
+@Override
+public final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} ___newTranlocal(){
+return new ${transactionalObject.tranlocal}${transactionalObject.typeParameter}(this);
+}
 
-    @Override
-    public final boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, Tranlocal tranlocal){
-        return ___load(
-            spinCount,
-            newLockOwner,
-            lockMode,
-            (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tranlocal);
-    }
+@Override
+public final boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, Tranlocal tranlocal){
+return ___load(
+spinCount,
+newLockOwner,
+lockMode,
+(${transactionalObject.tranlocal}${transactionalObject.typeParameter})tranlocal);
+}
 
-    public final boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, ${transactionalObject.tranlocal}${transactionalObject.typeParameter} tranlocal){
-        if(lockMode == LOCKMODE_NONE){
-            while (true) {
-                //JMM: nothing can jump behind the following statement
-                final ${transactionalObject.type} firstValue = ___value;
-                final long firstVersion = ___version;
+public final boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, ${transactionalObject.tranlocal}${transactionalObject.typeParameter} tranlocal){
+if(lockMode == LOCKMODE_NONE){
+while (true) {
+//JMM: nothing can jump behind the following statement
+final ${transactionalObject.type} firstValue = ___value;
+final long firstVersion = ___version;
 
-                //JMM: the read for the arrive can't jump over the read of the active.
-                final int arriveStatus = ___arrive(spinCount);
+//JMM: the read for the arrive can't jump over the read of the active.
+final int arriveStatus = ___arrive(spinCount);
 
-                if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
-                    return false;
-                }
+if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+return false;
+}
 
-                //JMM safety:
-                //The volatile read of active can't be reordered so that it jump in front of the volatile read of
-                //the orec-value when the arrive method is called.
-                //An instruction is allowed to jump in front of the write of orec-value, but it is not allowed to
-                //jump in front of the read or orec-value (volatile read happens before rule).
-                //This means that it isn't possible that a locked value illegally is seen as unlocked.
+//JMM safety:
+//The volatile read of active can't be reordered so that it jump in front of the volatile read of
+//the orec-value when the arrive method is called.
+//An instruction is allowed to jump in front of the write of orec-value, but it is not allowed to
+//jump in front of the read or orec-value (volatile read happens before rule).
+//This means that it isn't possible that a locked value illegally is seen as unlocked.
 
-                if (firstVersion == ___version && firstValue == ___value) {
-                    //at this point we are sure that the read was unlocked.
+if (firstVersion == ___version && firstValue == ___value) {
+//at this point we are sure that the read was unlocked.
 
-                    tranlocal.version = firstVersion;
-                    tranlocal.value = firstValue;
-                    tranlocal.oldValue = firstValue;
-                    tranlocal.hasDepartObligation = arriveStatus == ARRIVE_NORMAL;
-                    return true;
-                }
+tranlocal.version = firstVersion;
+tranlocal.value = firstValue;
+tranlocal.oldValue = firstValue;
+tranlocal.hasDepartObligation = arriveStatus == ARRIVE_NORMAL;
+return true;
+}
 
-                //we are not lucky, the value has changed. But before retrying, we need to depart if the arrive was
-                //not permanent.
-                if (arriveStatus == ARRIVE_NORMAL) {
-                    ___departAfterFailure();
-                }
-            }
-        }else{
-            final boolean commitLock = lockMode == LOCKMODE_COMMIT;
+//we are not lucky, the value has changed. But before retrying, we need to depart if the arrive was
+//not permanent.
+if (arriveStatus == ARRIVE_NORMAL) {
+___departAfterFailure();
+}
+}
+}else{
+final boolean commitLock = lockMode == LOCKMODE_COMMIT;
 
-            if(newLockOwner == null){
-                throw new PanicError();
-            }
+if(newLockOwner == null){
+throw new PanicError();
+}
 
-            //JMM: no instructions will jump in front of a volatile read. So this stays on top.
-            final int arriveStatus = ___tryLockAndArrive(___stm.spinCount, commitLock);
-            if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
-                return false;
-            }
+//JMM: no instructions will jump in front of a volatile read. So this stays on top.
+final int arriveStatus = ___tryLockAndArrive(___stm.spinCount, commitLock);
+if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
+return false;
+}
 
-            ___lockOwner = newLockOwner;
-            final ${transactionalObject.type} value = ___value;
+___lockOwner = newLockOwner;
+final ${transactionalObject.type} value = ___value;
 
-            tranlocal.version = ___version;
-            tranlocal.value = value;
-            tranlocal.oldValue = value;
-            tranlocal.lockMode = commitLock ? LOCKMODE_COMMIT: LOCKMODE_UPDATE;
-            tranlocal.hasDepartObligation = arriveStatus == ARRIVE_NORMAL;
-            return true;
-        }
-   }
+tranlocal.version = ___version;
+tranlocal.value = value;
+tranlocal.oldValue = value;
+tranlocal.lockMode = commitLock ? LOCKMODE_COMMIT: LOCKMODE_UPDATE;
+tranlocal.hasDepartObligation = arriveStatus == ARRIVE_NORMAL;
+return true;
+}
+}
 #end
-   
-#if(${transactionalObject.isReference})
-    @Override
-    public final Listeners ___commitDirty(
-            final Tranlocal tranlocal,
-            final BetaTransaction expectedLockOwner,
-            final BetaObjectPool pool) {
-
-        if(!tranlocal.isDirty){
-            if(tranlocal.lockMode != LOCKMODE_NONE){
-                ___lockOwner = null;
-
-                if(tranlocal.hasDepartObligation){
-                    ___departAfterReadingAndUnlock();
-                }else{
-                    ___unlockByReadBiased();
-                }
-            }else{
-                if(tranlocal.hasDepartObligation){
-                    ___departAfterReading();
-                }
-            }
-
-            return null;
-        }
-
-        //it is a full blown update (so locked).
-
-        final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} specializedTranlocal = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tranlocal;
-
-        ___value = specializedTranlocal.value;
-        ___version = specializedTranlocal.version+1;
-        ___lockOwner = null;
-        Listeners listenersAfterWrite = ___listeners;
-
-        if(listenersAfterWrite != null){
-           listenersAfterWrite = ___removeListenersAfterWrite();
-        }
-
-        ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
-        pool.put(specializedTranlocal);
-        return listenersAfterWrite;
-    }
-
-    @Override
-    public final Listeners ___commitAll(
-            final Tranlocal tranlocal,
-            final BetaTransaction expectedLockOwner,
-            final BetaObjectPool pool) {
-
-        if(tranlocal.isCommitted){
-            if(tranlocal.lockMode!=LOCKMODE_NONE){
-                ___lockOwner = null;
-
-                if(tranlocal.hasDepartObligation){
-                    ___departAfterReadingAndUnlock();
-                }else{
-                    ___unlockByReadBiased();
-                }
-            }else{
-                if(tranlocal.hasDepartObligation){
-                    ___departAfterReading();
-                }
-            }
-
-            return null;
-        }
-
-        //it is a full blown update (so locked).
-
-        final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} specializedTranlocal = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tranlocal;
-
-        ___value = specializedTranlocal.value;
-        ___version = specializedTranlocal.version+1;
-        ___lockOwner = null;
-        Listeners listenersAfterWrite = ___listeners;
-
-        if(listenersAfterWrite != null){
-           listenersAfterWrite = ___removeListenersAfterWrite();
-        }
-
-        ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
-        pool.put(specializedTranlocal);
-        return listenersAfterWrite;
-    }
-#end    
-
-    @Override
-    public final void ___abort(
-        final BetaTransaction transaction,
-        final Tranlocal tranlocal,
-        final BetaObjectPool pool) {
-
-        if(tranlocal.lockMode!=LOCKMODE_NONE){
-            ___lockOwner = null;
-
-            if(!tranlocal.isConstructing){
-                //depart and release the lock. This call is able to deal with readbiased and normal reads.
-                ___departAfterFailureAndUnlock();
-            }
-        }else{
-            if(tranlocal.hasDepartObligation){
-                ___departAfterFailure();
-            }
-        }
-
-        pool.put((${transactionalObject.tranlocal})tranlocal);        
-    }
 
 #if(${transactionalObject.isReference})
-    @Override
-    public void addDeferredValidator(${transactionalObject.predicateClass}${transactionalObject.typeParameter} validator){
-        final Transaction tx = getThreadLocalTransaction();
+@Override
+public final Listeners ___commitDirty(
+final Tranlocal tranlocal,
+final BetaTransaction expectedLockOwner,
+final BetaObjectPool pool) {
 
-        if(tx != null){
-            addDeferredValidator((BetaTransaction)tx, validator);
-            return;
-        }
+if(!tranlocal.isDirty){
+if(tranlocal.lockMode != LOCKMODE_NONE){
+___lockOwner = null;
 
-        throw new TransactionRequiredException();
-    }
+if(tranlocal.hasDepartObligation){
+___departAfterReadingAndUnlock();
+}else{
+___unlockByReadBiased();
+}
+}else{
+if(tranlocal.hasDepartObligation){
+___departAfterReading();
+}
+}
 
-    @Override
-    public void addDeferredValidator(Transaction tx, ${transactionalObject.predicateClass}${transactionalObject.typeParameter} validator){
-        addDeferredValidator((BetaTransaction)tx, validator);
-    }
+return null;
+}
 
-    public void addDeferredValidator(BetaTransaction tx, ${transactionalObject.predicateClass}${transactionalObject.typeParameter} validator){
-        if(tx == null){
-            throw new NullPointerException();
-        }
+//it is a full blown update (so locked).
 
-        if(validator == null){
-            tx.abort();
-            throw new NullPointerException();
-        }
+final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} specializedTranlocal = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tranlocal;
 
-        ${transactionalObject.tranlocal} write= tx.openForWrite(this, LOCKMODE_NONE);
-        if(write.validators == null){
-            write.validators = new ${transactionalObject.predicateClass}[1];
-            write.validators[0]=validator;
-        }else{
-            throw new TodoException();
-        }        
-    }
+___value = specializedTranlocal.value;
+___version = specializedTranlocal.version+1;
+___lockOwner = null;
+Listeners listenersAfterWrite = ___listeners;
 
-    @Override
-    public void atomicAddDeferredValidator(${transactionalObject.predicateClass}${transactionalObject.typeParameter} validator){
-        if(validator == null){
-            throw new NullPointerException();
-        }
-        throw new TodoException();
-    }
+if(listenersAfterWrite != null){
+listenersAfterWrite = ___removeListenersAfterWrite();
+}
 
-#if(${transactionalObject.isNumber})
+___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
+pool.put(specializedTranlocal);
+return listenersAfterWrite;
+}
+
+@Override
+public final Listeners ___commitAll(
+final Tranlocal tranlocal,
+final BetaTransaction expectedLockOwner,
+final BetaObjectPool pool) {
+
+if(tranlocal.isCommitted){
+if(tranlocal.lockMode!=LOCKMODE_NONE){
+___lockOwner = null;
+
+if(tranlocal.hasDepartObligation){
+___departAfterReadingAndUnlock();
+}else{
+___unlockByReadBiased();
+}
+}else{
+if(tranlocal.hasDepartObligation){
+___departAfterReading();
+}
+}
+
+return null;
+}
+
+//it is a full blown update (so locked).
+
+final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} specializedTranlocal = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tranlocal;
+
+___value = specializedTranlocal.value;
+___version = specializedTranlocal.version+1;
+___lockOwner = null;
+Listeners listenersAfterWrite = ___listeners;
+
+if(listenersAfterWrite != null){
+listenersAfterWrite = ___removeListenersAfterWrite();
+}
+
+___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
+pool.put(specializedTranlocal);
+return listenersAfterWrite;
+}
+#end
+
+@Override
+public final void ___abort(
+final BetaTransaction transaction,
+final Tranlocal tranlocal,
+final BetaObjectPool pool) {
+
+if(tranlocal.lockMode!=LOCKMODE_NONE){
+___lockOwner = null;
+
+if(!tranlocal.isConstructing){
+//depart and release the lock. This call is able to deal with readbiased and normal reads.
+___departAfterFailureAndUnlock();
+}
+}else{
+if(tranlocal.hasDepartObligation){
+___departAfterFailure();
+}
+}
+
+pool.put((${transactionalObject.tranlocal})tranlocal);
+}
+
+#if(${transactionalObject.isReference})
+@Override
+public void addDeferredValidator(${transactionalObject.predicateClass}${transactionalObject.typeParameter} validator){
+final Transaction tx = getThreadLocalTransaction();
+
+if(tx != null){
+addDeferredValidator((BetaTransaction)tx, validator);
+return;
+}
+
+throw new TransactionRequiredException();
+}
+
+@Override
+public void addDeferredValidator(Transaction tx, ${transactionalObject.predicateClass}${transactionalObject.typeParameter} validator){
+addDeferredValidator((BetaTransaction)tx, validator);
+}
+
+public void addDeferredValidator(BetaTransaction tx, ${transactionalObject.predicateClass}${transactionalObject.typeParameter} validator){
+if(tx == null){
+throw new NullPointerException();
+}
+
+if(validator == null){
+tx.abort();
+throw new NullPointerException();
+}
+
+    ${transactionalObject.tranlocal} write= tx.openForWrite(this, LOCKMODE_NONE);
+if(write.validators == null){
+write.validators = new ${transactionalObject.predicateClass}[1];
+write.validators[0]=validator;
+}else{
+throw new TodoException();
+}
+}
+
+@Override
+public void atomicAddDeferredValidator(${transactionalObject.predicateClass}${transactionalObject.typeParameter} validator){
+if(validator == null){
+throw new NullPointerException();
+}
+throw new TodoException();
+}
+
+    #if(${transactionalObject.isNumber})
     @Override
     public final ${transactionalObject.type} atomicGetAndIncrement(final ${transactionalObject.type} amount){
         ${transactionalObject.type} result = atomicIncrementAndGet(amount);
-        return result - amount;
+    return result - amount;
     }
 
     @Override
     public final ${transactionalObject.type} getAndIncrement(final ${transactionalObject.type} amount){
-        final Transaction tx = getThreadLocalTransaction();
+    final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null){
-            return getAndIncrement((BetaTransaction)tx, amount);
-        }
+    if(tx != null){
+    return getAndIncrement((BetaTransaction)tx, amount);
+    }
 
-        throw new TransactionRequiredException();
+    throw new TransactionRequiredException();
     }
 
     @Override
     public final ${transactionalObject.type} getAndIncrement(final Transaction tx, final ${transactionalObject.type} amount){
-        return getAndIncrement((BetaTransaction)tx, amount);
+    return getAndIncrement((BetaTransaction)tx, amount);
     }
 
     public final ${transactionalObject.type} getAndIncrement(final BetaTransaction tx, final ${transactionalObject.type} amount){
         ${transactionalObject.tranlocal} write= tx.openForWrite(this, LOCKMODE_NONE);
 
         ${transactionalObject.type} oldValue = write.value;
-        write.value+=amount;
-        return oldValue;
+    write.value+=amount;
+    return oldValue;
     }
 
     @Override
     public final ${transactionalObject.type} atomicIncrementAndGet(final ${transactionalObject.type} amount){
-        final int arriveStatus = ___arriveAndLockOrBackoff();
+    final int arriveStatus = ___arriveAndLockOrBackoff();
 
-        if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
-            throw new LockedException();
-        }
+    if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
+    throw new LockedException();
+    }
 
-        final ${transactionalObject.type} oldValue = ___value;
+    final ${transactionalObject.type} oldValue = ___value;
 
-        if(amount == 0){
-            if(arriveStatus == ARRIVE_UNREGISTERED){
-                ___unlockByReadBiased();
-            } else{
-                ___departAfterReadingAndUnlock();
-            }
+    if(amount == 0){
+    if(arriveStatus == ARRIVE_UNREGISTERED){
+    ___unlockByReadBiased();
+    } else{
+    ___departAfterReadingAndUnlock();
+    }
 
-            return oldValue;
-        }
+    return oldValue;
+    }
 
-        final ${transactionalObject.type} newValue = oldValue + amount;
-        ___value = newValue;
-        ___version++;
+    final ${transactionalObject.type} newValue = oldValue + amount;
+    ___value = newValue;
+    ___version++;
 
-        Listeners listeners = ___removeListenersAfterWrite();
+    Listeners listeners = ___removeListenersAfterWrite();
 
-        ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
+    ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
 
-        if(listeners!=null){
-            listeners.openAll(getThreadLocalBetaObjectPool());
-        }
+    if(listeners!=null){
+    listeners.openAll(getThreadLocalBetaObjectPool());
+    }
 
-        return newValue; 
+    return newValue;
     }
 
     @Override
     public final ${transactionalObject.type} incrementAndGet(final ${transactionalObject.type} amount){
-        final Transaction tx = getThreadLocalTransaction();
+    final Transaction tx = getThreadLocalTransaction();
 
-        if(tx == null){
-            throw new TransactionRequiredException();
-        }
+    if(tx == null){
+    throw new TransactionRequiredException();
+    }
 
-        return incrementAndGet((BetaTransaction)tx, amount);
+    return incrementAndGet((BetaTransaction)tx, amount);
     }
 
     @Override
     public final ${transactionalObject.type} incrementAndGet(
-        final Transaction tx,
-        final ${transactionalObject.type} amount){
+    final Transaction tx,
+    final ${transactionalObject.type} amount){
 
-        return incrementAndGet((BetaTransaction)tx, amount);
+    return incrementAndGet((BetaTransaction)tx, amount);
     }
 
     public final ${transactionalObject.type} incrementAndGet(
-        final BetaTransaction tx,
-        final ${transactionalObject.type} amount){
+    final BetaTransaction tx,
+    final ${transactionalObject.type} amount){
 
         ${transactionalObject.tranlocal} write= tx.openForWrite(this, LOCKMODE_NONE);
 
-        write.value+=amount;
-        return write.value;
+    write.value+=amount;
+    return write.value;
     }
 
-#elseif(${transactionalObject.name} eq "BetaRef")
+    #elseif(${transactionalObject.name} eq "BetaRef")
     @Override
     public final boolean isNull(){
-        final Transaction tx = getThreadLocalTransaction();
+    final Transaction tx = getThreadLocalTransaction();
 
-        if(tx == null){
-            throw new TransactionRequiredException();
-        }
+    if(tx == null){
+    throw new TransactionRequiredException();
+    }
 
-        return isNull((BetaTransaction)tx);
+    return isNull((BetaTransaction)tx);
     }
 
     @Override
     public final boolean isNull(final Transaction tx){
-        return isNull((BetaTransaction)tx);
+    return isNull((BetaTransaction)tx);
     }
 
     public final boolean isNull(final BetaTransaction tx){
-        return get(tx) == null;
+    return get(tx) == null;
     }
 
     @Override
     public final boolean atomicIsNull(){
-        return atomicGet() == null;
+    return atomicGet() == null;
     }
 
-#end
-    @Override
-    public final void ensure(){
-        Transaction tx = getThreadLocalTransaction();
-
-        if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the ensure operation");
-        }
+    #end
+@Override
+public final void ensure(){
+Transaction tx = getThreadLocalTransaction();
+
+if(tx == null){
+throw new TransactionRequiredException("No transaction is found for the ensure operation");
+}
 
-        ensure((BetaTransaction)tx);
-    }
-
-    @Override
-    public final void ensure(Transaction tx){
-        ensure((BetaTransaction)tx);
-    }
+ensure((BetaTransaction)tx);
+}
+
+@Override
+public final void ensure(Transaction tx){
+ensure((BetaTransaction)tx);
+}
 
-    public final void ensure(BetaTransaction tx){
-        tx.openForRead(this, LOCKMODE_UPDATE);
-    }
+public final void ensure(BetaTransaction tx){
+tx.openForRead(this, LOCKMODE_UPDATE);
+}
 
-    @Override
-    public final boolean tryEnsure(){
-        Transaction tx = getThreadLocalTransaction();
+@Override
+public final boolean tryEnsure(){
+Transaction tx = getThreadLocalTransaction();
 
-        if(tx!=null){
-            throw new TransactionRequiredException("No transaction is found for the tryEnsure operation");
-        }
+if(tx!=null){
+throw new TransactionRequiredException("No transaction is found for the tryEnsure operation");
+}
 
-        return tryEnsure((BetaTransaction)tx);
-    }
+return tryEnsure((BetaTransaction)tx);
+}
 
-    @Override
-    public final boolean tryEnsure(final Transaction tx){
-        return tryEnsure((BetaTransaction)tx);
-    }
+@Override
+public final boolean tryEnsure(final Transaction tx){
+return tryEnsure((BetaTransaction)tx);
+}
 
-    public final boolean tryEnsure(BetaTransaction tx){
-        return tx.tryLock(this, LOCKMODE_UPDATE);
-    }
+public final boolean tryEnsure(BetaTransaction tx){
+return tx.tryLock(this, LOCKMODE_UPDATE);
+}
 
-    @Override
-    public final void ensureOptimistic(){
-        throw new TodoException();
-    }
+@Override
+public final void ensureOptimistic(){
+throw new TodoException();
+}
 
-    @Override
-    public final void ensureOptimistic(final Transaction tx){
-        ensureOptimistic((BetaTransaction)tx);
-    }
+@Override
+public final void ensureOptimistic(final Transaction tx){
+ensureOptimistic((BetaTransaction)tx);
+}
 
-    public final void ensureOptimistic(final BetaTransaction tx){
-        throw new TodoException();
-    }
+public final void ensureOptimistic(final BetaTransaction tx){
+throw new TodoException();
+}
 
-    @Override
-    public final void privatize(){
-        Transaction tx = getThreadLocalTransaction();
-
-        if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the privatize operation");
-        }
+@Override
+public final void privatize(){
+Transaction tx = getThreadLocalTransaction();
+
+if(tx == null){
+throw new TransactionRequiredException("No transaction is found for the privatize operation");
+}
 
-        privatize((BetaTransaction)tx);
-    }
-
-    @Override
-    public final void privatize(Transaction tx){
-        privatize((BetaTransaction)tx);
-    }
-
-    public final void privatize(BetaTransaction tx){
-        tx.openForRead(this, LOCKMODE_COMMIT);
-    }
-
-    @Override
-    public final boolean tryPrivatize(){
-        Transaction tx = getThreadLocalTransaction();
-
-        if(tx != null){
-            throw new TransactionRequiredException("No transaction is found for the tryPrivatize operation");
-        }
-
-        return tryPrivatize((BetaTransaction)tx);
-    }
-
-    @Override
-    public final boolean tryPrivatize(Transaction tx){
-        return tryPrivatize((BetaTransaction)tx);
-    }
-
-    public final boolean tryPrivatize(BetaTransaction tx){
-        return tx.tryLock(this, LOCKMODE_COMMIT);
-    }
-
-    @Override
-    public final void commute(
-        ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-
-        final Transaction tx = getThreadLocalTransaction();
-
-        if(tx == null){
-            throw new TransactionRequiredException();
-        }
-
-        commute((BetaTransaction)tx, function);
-    }
-
-    @Override
-    public final void commute(
-        final Transaction tx,
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-
-        commute((BetaTransaction)tx, function);
-    }
-
-    public final void commute(
-        BetaTransaction tx,
-        ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-
-        tx.commute(this, function);
-    }
-
-    @Override
-    public final ${transactionalObject.type} atomicAlterAndGet(
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-
-        return atomicAlter(function, false);
-    }
-
-    @Override
-    public final ${transactionalObject.type} alterAndGet(
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-
-        final Transaction tx = getThreadLocalTransaction();
-
-        if(tx == null){
-            throw new TransactionRequiredException();
-        }
+privatize((BetaTransaction)tx);
+}
+
+@Override
+public final void privatize(Transaction tx){
+privatize((BetaTransaction)tx);
+}
+
+public final void privatize(BetaTransaction tx){
+tx.openForRead(this, LOCKMODE_COMMIT);
+}
+
+@Override
+public final boolean tryPrivatize(){
+Transaction tx = getThreadLocalTransaction();
+
+if(tx != null){
+throw new TransactionRequiredException("No transaction is found for the tryPrivatize operation");
+}
+
+return tryPrivatize((BetaTransaction)tx);
+}
+
+@Override
+public final boolean tryPrivatize(Transaction tx){
+return tryPrivatize((BetaTransaction)tx);
+}
+
+public final boolean tryPrivatize(BetaTransaction tx){
+return tx.tryLock(this, LOCKMODE_COMMIT);
+}
+
+@Override
+public final void commute(
+    ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+
+final Transaction tx = getThreadLocalTransaction();
+
+if(tx == null){
+throw new TransactionRequiredException();
+}
+
+commute((BetaTransaction)tx, function);
+}
+
+@Override
+public final void commute(
+final Transaction tx,
+final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+
+commute((BetaTransaction)tx, function);
+}
+
+public final void commute(
+BetaTransaction tx,
+    ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+
+tx.commute(this, function);
+}
+
+@Override
+public final ${transactionalObject.type} atomicAlterAndGet(
+final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+
+return atomicAlter(function, false);
+}
+
+@Override
+public final ${transactionalObject.type} alterAndGet(
+final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+
+final Transaction tx = getThreadLocalTransaction();
+
+if(tx == null){
+throw new TransactionRequiredException();
+}
 
-        return alterAndGet((BetaTransaction)tx, function);
-    }
+return alterAndGet((BetaTransaction)tx, function);
+}
 
-    @Override
-    public final ${transactionalObject.type} alterAndGet(
-        final Transaction tx,
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-        return alterAndGet((BetaTransaction)tx, function);
-    }
-
-    public final ${transactionalObject.type} alterAndGet(
-        final BetaTransaction tx,
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+@Override
+public final ${transactionalObject.type} alterAndGet(
+final Transaction tx,
+final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+return alterAndGet((BetaTransaction)tx, function);
+}
+
+public final ${transactionalObject.type} alterAndGet(
+final BetaTransaction tx,
+final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
-        if(function == null){
-            tx.abort();
-            throw new NullPointerException("Function can't be null");
-        }
+if(function == null){
+tx.abort();
+throw new NullPointerException("Function can't be null");
+}
 
-        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write
-            = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tx.openForWrite(this, LOCKMODE_NONE);
-
-        boolean abort = true;
-        try{
-            write.value = function.call(write.value);
-            abort = false;
-        }finally{
-            if(abort){
-                tx.abort();
-            }
-        }
-        return write.value;
-    }
-
-    @Override
-    public final ${transactionalObject.type} atomicGetAndAlter(
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-
-        return atomicAlter(function,true);
-    }
-
-    private ${transactionalObject.type} atomicAlter(
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function,
-        final boolean returnOld){
-
-        if(function == null){
-            throw new NullPointerException("Function can't be null");
-        }
-
-        final int arriveStatus = ___arriveAndLockOrBackoff();
-
-        if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
-            throw new LockedException();
-        }
-
-        final ${transactionalObject.type} oldValue = ___value;
-        ${transactionalObject.type} newValue;
-        boolean abort = true;
-        try{
-            newValue = function.call(oldValue);
-            abort = false;
-        }finally{
-            if(abort){
-                ___departAfterFailureAndUnlock();
-            }
-        }
-
-        if(oldValue == newValue){
-            if(arriveStatus == ARRIVE_UNREGISTERED){
-                ___unlockByReadBiased();
-            } else{
-                ___departAfterReadingAndUnlock();
-            }
-
-            return oldValue;
-        }
-
-
-        ___value = newValue;
-        ___version++;
+    ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write
+= (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tx.openForWrite(this, LOCKMODE_NONE);
+
+boolean abort = true;
+try{
+write.value = function.call(write.value);
+abort = false;
+}finally{
+if(abort){
+tx.abort();
+}
+}
+return write.value;
+}
+
+@Override
+public final ${transactionalObject.type} atomicGetAndAlter(
+final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+
+return atomicAlter(function,true);
+}
+
+private ${transactionalObject.type} atomicAlter(
+final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function,
+final boolean returnOld){
+
+if(function == null){
+throw new NullPointerException("Function can't be null");
+}
+
+final int arriveStatus = ___arriveAndLockOrBackoff();
+
+if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
+throw new LockedException();
+}
+
+final ${transactionalObject.type} oldValue = ___value;
+    ${transactionalObject.type} newValue;
+boolean abort = true;
+try{
+newValue = function.call(oldValue);
+abort = false;
+}finally{
+if(abort){
+___departAfterFailureAndUnlock();
+}
+}
+
+if(oldValue == newValue){
+if(arriveStatus == ARRIVE_UNREGISTERED){
+___unlockByReadBiased();
+} else{
+___departAfterReadingAndUnlock();
+}
+
+return oldValue;
+}
+
+
+___value = newValue;
+___version++;
 
-        Listeners listeners = ___removeListenersAfterWrite();
-
-        ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
+Listeners listeners = ___removeListenersAfterWrite();
+
+___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
 
-        if(listeners!=null){
-           listeners.openAll(getThreadLocalBetaObjectPool());
-        }
+if(listeners!=null){
+listeners.openAll(getThreadLocalBetaObjectPool());
+}
 
-        return returnOld ? oldValue : newValue;
-    }
+return returnOld ? oldValue : newValue;
+}
 
-    @Override
-    public final ${transactionalObject.type} getAndAlter(
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+@Override
+public final ${transactionalObject.type} getAndAlter(
+final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
-        final Transaction tx = getThreadLocalTransaction();
+final Transaction tx = getThreadLocalTransaction();
 
-        if(tx == null){
-            throw new TransactionRequiredException();
-        }
+if(tx == null){
+throw new TransactionRequiredException();
+}
 
-        return getAndAlter((BetaTransaction)tx, function);
-    }
+return getAndAlter((BetaTransaction)tx, function);
+}
 
-    @Override
-    public final ${transactionalObject.type} getAndAlter(
-        final Transaction tx,
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+@Override
+public final ${transactionalObject.type} getAndAlter(
+final Transaction tx,
+final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
-        return getAndAlter((BetaTransaction)tx, function);
-    }
+return getAndAlter((BetaTransaction)tx, function);
+}
 
-    public final ${transactionalObject.type} getAndAlter(
-        final BetaTransaction tx,
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+public final ${transactionalObject.type} getAndAlter(
+final BetaTransaction tx,
+final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
-        if(function == null){
-            tx.abort();
-            throw new NullPointerException("Function can't be null");
-        }
+if(function == null){
+tx.abort();
+throw new NullPointerException("Function can't be null");
+}
 
-        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write
-            = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tx.openForWrite(this, LOCKMODE_NONE);
+    ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write
+= (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tx.openForWrite(this, LOCKMODE_NONE);
 
-        final ${transactionalObject.type} oldValue = write.value;
-        boolean abort = true;
-        try{
-            write.value = function.call(write.value);
-            abort  = false;
-        }finally{
-            if(abort){
-                tx.abort();
-            }
-        }
-        return oldValue;
-    }
-
-    @Override
-    public final boolean atomicCompareAndSet(
-        final ${transactionalObject.type} expectedValue,
-        final ${transactionalObject.type} newValue){
+final ${transactionalObject.type} oldValue = write.value;
+boolean abort = true;
+try{
+write.value = function.call(write.value);
+abort  = false;
+}finally{
+if(abort){
+tx.abort();
+}
+}
+return oldValue;
+}
+
+@Override
+public final boolean atomicCompareAndSet(
+final ${transactionalObject.type} expectedValue,
+final ${transactionalObject.type} newValue){
 
-        final int arriveStatus = ___arriveAndLockOrBackoff();
+final int arriveStatus = ___arriveAndLockOrBackoff();
 
-        if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
-            throw new LockedException();
-        }
-
-        final ${transactionalObject.type} currentValue = ___value;
-
-        if(currentValue != expectedValue){
-            ___departAfterFailureAndUnlock();
-            return false;
-        }
-
-        if(expectedValue == newValue){
-            if(arriveStatus == ARRIVE_UNREGISTERED){
-                ___unlockByReadBiased();
-            } else{
-                ___departAfterReadingAndUnlock();
-            }
-
-            return true;
-        }
-
-
-        ___value = newValue;
-        ___version++;
-        Listeners listeners = ___removeListenersAfterWrite();
-
-        ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
-
-        if(listeners!=null){
-            listeners.openAll(getThreadLocalBetaObjectPool());
-        }
-
-        return true;
-    }
+if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
+throw new LockedException();
+}
 
-    @Override
-    public final ${transactionalObject.type} getAndSet(final ${transactionalObject.type} value){
-
-        final Transaction tx = getThreadLocalTransaction();
+final ${transactionalObject.type} currentValue = ___value;
+
+if(currentValue != expectedValue){
+___departAfterFailureAndUnlock();
+return false;
+}
+
+if(expectedValue == newValue){
+if(arriveStatus == ARRIVE_UNREGISTERED){
+___unlockByReadBiased();
+} else{
+___departAfterReadingAndUnlock();
+}
 
-        if(tx == null){
-            throw new TransactionRequiredException();
-        }
+return true;
+}
+
+
+___value = newValue;
+___version++;
+Listeners listeners = ___removeListenersAfterWrite();
+
+___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
 
-        return getAndSet((BetaTransaction)tx, value);
-    }
-
-    public final ${transactionalObject.type} set(final ${transactionalObject.type} value){
-        final Transaction tx = getThreadLocalTransaction();
-
-        if(tx == null){
-            throw new TransactionRequiredException();
-        }
-
-        return set((BetaTransaction)tx, value);
-    }
-
-    @Override
-    public final ${transactionalObject.type} get(){
-        final Transaction tx = getThreadLocalTransaction();
-
-        if(tx == null){
-            throw new TransactionRequiredException();
-        }
-
-        return get((BetaTransaction)tx);
-    }
+if(listeners!=null){
+listeners.openAll(getThreadLocalBetaObjectPool());
+}
 
-    @Override
-    public final ${transactionalObject.type} get(final Transaction tx){
-        return get((BetaTransaction)tx);
-    }
-
-    public final ${transactionalObject.type} get(final BetaTransaction transaction){
-        return transaction.openForRead(this, LOCKMODE_NONE).value;
-    }
-
-    @Override
-    public final ${transactionalObject.type} atomicGet(){
-        int attempt = 1;
-        do{
-            if(!___hasCommitLock()){
-
-                ${transactionalObject.type} read = ___value;
-
-                if(!___hasCommitLock()){
-                    return read;
-                }
-            }
-            ___stm.defaultBackoffPolicy.delayedUninterruptible(attempt);
-            attempt++;
-        }while(attempt<=___stm.spinCount);
-
-        throw new LockedException();
-    }
-
-    @Override
-    public final ${transactionalObject.type} atomicWeakGet(){
-       return ___value;
-    }
-        
-    @Override
-    public final ${transactionalObject.type} atomicSet(final ${transactionalObject.type} newValue){
-        atomicGetAndSet(newValue);
-        return newValue;
-    }
-
-    @Override
-    public final ${transactionalObject.type} atomicGetAndSet(final ${transactionalObject.type} newValue){
-        final int arriveStatus = ___arriveAndLockOrBackoff();
-
-        if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
-            throw new LockedException();
-        }
-
-        final ${transactionalObject.type} oldValue = ___value;
-
-        if(oldValue == newValue){
-            if(arriveStatus == ARRIVE_UNREGISTERED){
-                ___unlockByReadBiased();
-            } else{
-                ___departAfterReadingAndUnlock();
-            }
-
-            return newValue;
-        }
-
-        ___value = newValue;
-        ___version++;
-
-        Listeners listeners = ___removeListenersAfterWrite();
-
-        ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
-
-        if(listeners != null){
-            BetaObjectPool pool = getThreadLocalBetaObjectPool();
-            listeners.openAll(pool);
-        }
-
-        return oldValue;
-    }
-
-    @Override
-    public final ${transactionalObject.type} set(Transaction tx, ${transactionalObject.type} value){
-        return set((BetaTransaction)tx, value);
-    }
-
-    public final ${transactionalObject.type} set(
-        final BetaTransaction tx,
-        final ${transactionalObject.type} value){
-
-        tx.openForWrite(this, LOCKMODE_NONE).value = value;
-        return value;
-    }
-
-    @Override
-    public final ${transactionalObject.type} getAndSet(
-        final Transaction tx,
-        final ${transactionalObject.type} value){
-
-        return getAndSet((BetaTransaction)tx, value);
-    }
-
-    public final ${transactionalObject.type} getAndSet(
-        final BetaTransaction tx,
-        final ${transactionalObject.type} value){
-
-        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write = tx.openForWrite(this, LOCKMODE_NONE);
-        ${transactionalObject.type} oldValue = write.value;
-        write.value = value;
-        return oldValue;
-    }
-
-    @Override
-    public final void await(${transactionalObject.type} value){
-        final Transaction tx = getThreadLocalTransaction();
-
-        if(tx == null){
-            throw new TransactionRequiredException();
-        }
-
-        await((BetaTransaction)tx, value);
-    }
-
-    @Override
-    public final void await(
-        final Transaction tx,
-        final ${transactionalObject.type} value){
-
-        await((BetaTransaction)tx, value);
-    }
-
-    public final void await(
-        final BetaTransaction tx,
-        final ${transactionalObject.type} value){
-
-        ${transactionalObject.tranlocal}${transactionalObject.typeParameter} read = tx.openForRead(this,LOCKMODE_NONE);
-        if(read.value != value){
-            StmUtils.retry();
-        }        
-    }
+return true;
+}
+
+@Override
+public final ${transactionalObject.type} getAndSet(final ${transactionalObject.type} value){
+
+final Transaction tx = getThreadLocalTransaction();
+
+if(tx == null){
+throw new TransactionRequiredException();
+}
+
+return getAndSet((BetaTransaction)tx, value);
+}
+
+public final ${transactionalObject.type} set(final ${transactionalObject.type} value){
+final Transaction tx = getThreadLocalTransaction();
+
+if(tx == null){
+throw new TransactionRequiredException();
+}
+
+return set((BetaTransaction)tx, value);
+}
+
+@Override
+public final ${transactionalObject.type} get(){
+final Transaction tx = getThreadLocalTransaction();
+
+if(tx == null){
+throw new TransactionRequiredException();
+}
+
+return get((BetaTransaction)tx);
+}
+
+@Override
+public final ${transactionalObject.type} get(final Transaction tx){
+return get((BetaTransaction)tx);
+}
+
+public final ${transactionalObject.type} get(final BetaTransaction transaction){
+return transaction.openForRead(this, LOCKMODE_NONE).value;
+}
+
+@Override
+public final ${transactionalObject.type} atomicGet(){
+int attempt = 1;
+do{
+if(!___hasCommitLock()){
+
+    ${transactionalObject.type} read = ___value;
+
+if(!___hasCommitLock()){
+return read;
+}
+}
+___stm.defaultBackoffPolicy.delayedUninterruptible(attempt);
+attempt++;
+}while(attempt<=___stm.spinCount);
+
+throw new LockedException();
+}
+
+@Override
+public final ${transactionalObject.type} atomicWeakGet(){
+return ___value;
+}
+
+@Override
+public final ${transactionalObject.type} atomicSet(final ${transactionalObject.type} newValue){
+atomicGetAndSet(newValue);
+return newValue;
+}
+
+@Override
+public final ${transactionalObject.type} atomicGetAndSet(final ${transactionalObject.type} newValue){
+final int arriveStatus = ___arriveAndLockOrBackoff();
+
+if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
+throw new LockedException();
+}
+
+final ${transactionalObject.type} oldValue = ___value;
+
+if(oldValue == newValue){
+if(arriveStatus == ARRIVE_UNREGISTERED){
+___unlockByReadBiased();
+} else{
+___departAfterReadingAndUnlock();
+}
+
+return newValue;
+}
+
+___value = newValue;
+___version++;
+
+Listeners listeners = ___removeListenersAfterWrite();
+
+___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
+
+if(listeners != null){
+BetaObjectPool pool = getThreadLocalBetaObjectPool();
+listeners.openAll(pool);
+}
+
+return oldValue;
+}
+
+@Override
+public final ${transactionalObject.type} set(Transaction tx, ${transactionalObject.type} value){
+return set((BetaTransaction)tx, value);
+}
+
+public final ${transactionalObject.type} set(
+final BetaTransaction tx,
+final ${transactionalObject.type} value){
+
+tx.openForWrite(this, LOCKMODE_NONE).value = value;
+return value;
+}
+
+@Override
+public final ${transactionalObject.type} getAndSet(
+final Transaction tx,
+final ${transactionalObject.type} value){
+
+return getAndSet((BetaTransaction)tx, value);
+}
+
+public final ${transactionalObject.type} getAndSet(
+final BetaTransaction tx,
+final ${transactionalObject.type} value){
+
+    ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write = tx.openForWrite(this, LOCKMODE_NONE);
+    ${transactionalObject.type} oldValue = write.value;
+write.value = value;
+return oldValue;
+}
+
+@Override
+public final void await(${transactionalObject.type} value){
+final Transaction tx = getThreadLocalTransaction();
+
+if(tx == null){
+throw new TransactionRequiredException();
+}
+
+await((BetaTransaction)tx, value);
+}
+
+@Override
+public final void await(
+final Transaction tx,
+final ${transactionalObject.type} value){
+
+await((BetaTransaction)tx, value);
+}
+
+public final void await(
+final BetaTransaction tx,
+final ${transactionalObject.type} value){
+
+    ${transactionalObject.tranlocal}${transactionalObject.typeParameter} read = tx.openForRead(this,LOCKMODE_NONE);
+if(read.value != value){
+StmUtils.retry();
+}
+}
 #end
 }

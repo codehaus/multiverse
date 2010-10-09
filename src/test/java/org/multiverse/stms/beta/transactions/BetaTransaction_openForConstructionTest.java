@@ -166,7 +166,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
 
     @Test
     public void whenAlreadyPrivatizedByOther_thenIllegalArgumentException() {
-         long initialValue = 100;
+        long initialValue = 100;
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 

@@ -63,7 +63,7 @@ public class BetaLongRef_atomicSetTest {
 
     @Test
     public void whenPrivatizedByOther_thenLockedException() {
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();

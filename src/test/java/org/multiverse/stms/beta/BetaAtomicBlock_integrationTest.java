@@ -71,7 +71,7 @@ public class BetaAtomicBlock_integrationTest implements BetaStmConstants {
                 public void execute(Transaction tx) throws Exception {
                     ref.get(tx);
                 }
-     });
+            });
 
             fail();
         } catch (TooManyRetriesException expected) {
@@ -94,7 +94,7 @@ public class BetaAtomicBlock_integrationTest implements BetaStmConstants {
                 }
 
 
-                int a =10;
+                int a = 10;
 
             }
         });

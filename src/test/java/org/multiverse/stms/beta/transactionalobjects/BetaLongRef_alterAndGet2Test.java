@@ -154,7 +154,7 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
 
     @Test
     public void whenPrivatizedByOther() {
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
@@ -181,7 +181,7 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
 
     @Test
     public void whenEnsuredByOther_thenOperationSucceedsButCommitFails() {
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();

@@ -173,7 +173,7 @@ public class VeryAbstractTransactionalObject_ensureTest {
 
     @Test
     public void whenAlreadyPrivatizedBySelf() {
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long version = ref.getVersion();
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -274,12 +274,12 @@ public class VeryAbstractTransactionalObject_ensureTest {
         assertHasNoUpdateLock(ref);
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
-        assertVersionAndValue(ref,version,100);
+        assertVersionAndValue(ref, version, 100);
     }
 
     @Test
     public void whenNormalTransactionUsed() {
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long version = ref.getVersion();
         Transaction tx = stm.startDefaultTransaction();
 

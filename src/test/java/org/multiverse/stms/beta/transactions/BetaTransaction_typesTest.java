@@ -69,7 +69,7 @@ public abstract class BetaTransaction_typesTest {
         write.value = newValue;
         tx.commit();
 
-        assertVersionAndValue(ref, initialVersion+1, newValue);
+        assertVersionAndValue(ref, initialVersion + 1, newValue);
 
     }
 
@@ -81,7 +81,7 @@ public abstract class BetaTransaction_typesTest {
 
         BetaTransaction tx = newTransaction();
         BooleanRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
-        assertEquals(initialValue,read.value);
+        assertEquals(initialValue, read.value);
         BooleanRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value = true;
         tx.commit();
@@ -103,7 +103,7 @@ public abstract class BetaTransaction_typesTest {
         write.value = newValue;
         tx.commit();
 
-        assertVersionAndValue(ref, initialVersion+1, newValue);
+        assertVersionAndValue(ref, initialVersion + 1, newValue);
     }
 
     @Test

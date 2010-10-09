@@ -3,7 +3,7 @@ package org.multiverse.stms.beta.transactions;
 import org.multiverse.stms.beta.BetaStmConfiguration;
 
 public class LeanArrayBetaTransaction_commitTest
-        extends BetaTransaction_commitTest{
+        extends BetaTransaction_commitTest {
 
     @Override
     public boolean isSupportingWriteSkewDetection() {
@@ -30,7 +30,7 @@ public class LeanArrayBetaTransaction_commitTest
         return false;
     }
 
-     @Override
+    @Override
     public int getTransactionMaxCapacity() {
         return new BetaStmConfiguration().maxArrayTransactionSize;
     }

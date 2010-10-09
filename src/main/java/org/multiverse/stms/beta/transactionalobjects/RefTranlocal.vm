@@ -5,89 +5,89 @@ import org.multiverse.api.predicates.*;
 import org.multiverse.stms.beta.*;
 
 /**
- * The {@link Tranlocal} for the {@link ${transactionalObject.name}).
- *
- * This class is generated.
- *
- * @author Peter Veentjer
- */
+* The {@link Tranlocal} for the {@link ${transactionalObject.name}).
+*
+* This class is generated.
+*
+* @author Peter Veentjer
+*/
 public final class ${transactionalObject.tranlocal}${transactionalObject.typeParameter} extends Tranlocal{
 
-    public ${transactionalObject.type} value;
-    public ${transactionalObject.type} oldValue;
-    public ${transactionalObject.predicateClass}${transactionalObject.typeParameter}[] validators;
+public ${transactionalObject.type} value;
+public ${transactionalObject.type} oldValue;
+public ${transactionalObject.predicateClass}${transactionalObject.typeParameter}[] validators;
 
-    public ${transactionalObject.tranlocal}(${transactionalObject.name} ref){
-        super(ref);
-    }
+public ${transactionalObject.tranlocal}(${transactionalObject.name} ref){
+super(ref);
+}
 
-    @Override
-    public final void evaluateCommutingFunctions(final BetaObjectPool  pool){
-        assert isCommuting;
+@Override
+public final void evaluateCommutingFunctions(final BetaObjectPool  pool){
+assert isCommuting;
 
-        ${transactionalObject.type} newValue = value;
+${transactionalObject.type} newValue = value;
 
-        CallableNode current = headCallable;
-        headCallable = null;
-        do{
-            ${transactionalObject.functionClass}${transactionalObject.typeParameter} function =
-                (${transactionalObject.functionClass}${transactionalObject.typeParameter})current.function;
-            newValue = function.call(newValue);
+CallableNode current = headCallable;
+headCallable = null;
+do{
+${transactionalObject.functionClass}${transactionalObject.typeParameter} function =
+(${transactionalObject.functionClass}${transactionalObject.typeParameter})current.function;
+newValue = function.call(newValue);
 
-            CallableNode old = current;
-            current = current.next;
-            pool.putCallableNode(old);
-        }while(current != null);
+CallableNode old = current;
+current = current.next;
+pool.putCallableNode(old);
+}while(current != null);
 
-        value = newValue;
-        isDirty = newValue != oldValue;
-        isCommuting = false;
-    }
+value = newValue;
+isDirty = newValue != oldValue;
+isCommuting = false;
+}
 
-    @Override
-    public void addCommutingFunction(final Function function, final BetaObjectPool pool){
-        assert isCommuting;
+@Override
+public void addCommutingFunction(final Function function, final BetaObjectPool pool){
+assert isCommuting;
 
-        CallableNode node = pool.takeCallableNode();
-        if(node == null){
-            headCallable = new CallableNode(function, headCallable);
-        }else{
-            node.function = function;
-            node.next = headCallable;
-            headCallable = node;
-        }
-    }
+CallableNode node = pool.takeCallableNode();
+if(node == null){
+headCallable = new CallableNode(function, headCallable);
+}else{
+node.function = function;
+node.next = headCallable;
+headCallable = node;
+}
+}
 
-    @Override
-    public void prepareForPooling(final BetaObjectPool pool) {
-        version = 0l;
-        value = ${transactionalObject.initialValue};
-        oldValue = ${transactionalObject.initialValue};
-        owner = null;
-        lockMode = LOCKMODE_NONE;
-        hasDepartObligation = false;
-        isCommitted = false;
-        isCommuting = false;
-        isConstructing = false;
-        isDirty = false;
-        CallableNode current = headCallable;
-        if (current != null) {
-            headCallable = null;
-            do {
-                CallableNode next = current.next;
-                pool.putCallableNode(current);
-                current = next;
-            } while (current != null);
-      }
-    }
+@Override
+public void prepareForPooling(final BetaObjectPool pool) {
+version = 0l;
+value = ${transactionalObject.initialValue};
+oldValue = ${transactionalObject.initialValue};
+owner = null;
+lockMode = LOCKMODE_NONE;
+hasDepartObligation = false;
+isCommitted = false;
+isCommuting = false;
+isConstructing = false;
+isDirty = false;
+CallableNode current = headCallable;
+if (current != null) {
+headCallable = null;
+do {
+CallableNode next = current.next;
+pool.putCallableNode(current);
+current = next;
+} while (current != null);
+}
+}
 
-    @Override
-    public boolean calculateIsDirty() {
-        if(isDirty){
-            return true;
-        }
+@Override
+public boolean calculateIsDirty() {
+if(isDirty){
+return true;
+}
 
-        isDirty = value != oldValue;
-        return isDirty;
-    }
+isDirty = value != oldValue;
+return isDirty;
+}
 }

@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 public class LeanMonoBetaTransaction_commitTest
-        extends BetaTransaction_commitTest{
+        extends BetaTransaction_commitTest {
 
     @Override
     public boolean isSupportingListeners() {

@@ -28,7 +28,7 @@ import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPer
  */
 public class IsolationStressTest implements BetaStmConstants {
 
-    public  long transactionsPerThread = 100 * 1000 * 1000;
+    public long transactionsPerThread = 100 * 1000 * 1000;
     public final int threadCount = 2;
 
     private BetaStm stm;
@@ -162,8 +162,8 @@ public class IsolationStressTest implements BetaStmConstants {
             for (long k = 0; k < transactionsPerThread; k++) {
                 block.execute(closure);
 
-                if(k%500000 == 0){
-                    System.out.printf("%s is at %s\n", getName(),k);
+                if (k % 500000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), k);
                 }
             }
 

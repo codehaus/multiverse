@@ -20,7 +20,7 @@ import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
-public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants{
+public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants {
     private BetaStm stm;
 
     @Before

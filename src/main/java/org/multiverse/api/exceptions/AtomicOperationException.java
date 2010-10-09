@@ -24,6 +24,7 @@ public class AtomicOperationException extends TransactionalExecutionException {
 
     /**
      * Creates a new Atomic
+     *
      * @param message
      * @param cause
      */

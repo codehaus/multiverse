@@ -75,7 +75,7 @@ public class BetaRef_isNull1Test {
     @Test
     public void whenTransactionAborted_thenDeadTransactionException() {
         BetaRef ref = newRef(stm);
-        long version =ref.getVersion();
+        long version = ref.getVersion();
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.abort();
 
@@ -107,7 +107,7 @@ public class BetaRef_isNull1Test {
     public void whenNotNull() {
         String value = "foo";
         BetaRef ref = newRef(stm, value);
-        long version =ref.getVersion();
+        long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         boolean result = ref.isNull(tx);

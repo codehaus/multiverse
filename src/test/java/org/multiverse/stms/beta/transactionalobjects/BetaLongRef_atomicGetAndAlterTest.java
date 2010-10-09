@@ -47,7 +47,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
 
     @Test
     public void whenNullFunction_thenNullPointerException() {
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long version = ref.getVersion();
 
         try {

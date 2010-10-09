@@ -54,10 +54,10 @@ public class IsolationLevelSnapshotTest {
             }
         });
 
-        try{
+        try {
             ref2.get(tx);
             fail();
-        }catch(ReadWriteConflict expected){
+        } catch (ReadWriteConflict expected) {
 
         }
     }

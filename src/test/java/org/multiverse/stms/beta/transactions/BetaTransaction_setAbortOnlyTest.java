@@ -19,10 +19,10 @@ public abstract class BetaTransaction_setAbortOnlyTest {
     }
 
     public abstract BetaTransaction newTransaction();
-  
+
     @Test
     public void whenActive() {
-        BetaTransaction tx  = newTransaction();
+        BetaTransaction tx = newTransaction();
 
         tx.setAbortOnly();
 
@@ -32,7 +32,7 @@ public abstract class BetaTransaction_setAbortOnlyTest {
 
     @Test
     public void whenPrepared_thenPreparedTransactionException() {
-        BetaTransaction tx  = newTransaction();
+        BetaTransaction tx = newTransaction();
         tx.prepare();
 
         try {
@@ -47,7 +47,7 @@ public abstract class BetaTransaction_setAbortOnlyTest {
 
     @Test
     public void whenAborted_thenDeadTransactionException() {
-        BetaTransaction tx  = newTransaction();
+        BetaTransaction tx = newTransaction();
         tx.abort();
 
         try {
@@ -62,7 +62,7 @@ public abstract class BetaTransaction_setAbortOnlyTest {
 
     @Test
     public void whenCommitted_thenDeadTransactionException() {
-        BetaTransaction tx  = newTransaction();
+        BetaTransaction tx = newTransaction();
         tx.commit();
 
         try {

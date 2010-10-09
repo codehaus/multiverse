@@ -115,6 +115,6 @@ public class BetaLongRef_incrementAndGet2Test {
 
         assertIsCommitted(tx);
         assertEquals(30, result);
-        assertVersionAndValue(ref, version+1, 30);
+        assertVersionAndValue(ref, version + 1, 30);
     }
 }

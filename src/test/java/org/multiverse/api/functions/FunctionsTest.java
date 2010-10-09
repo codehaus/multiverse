@@ -9,7 +9,7 @@ import static org.multiverse.api.functions.Functions.newIdentityLongFunction;
 public class FunctionsTest {
 
     @Test
-    public void testIntIdentityFunction(){
+    public void testIntIdentityFunction() {
         IntFunction function = newIdentityIntFunction();
 
         assertEquals(0, function.call(0));
@@ -18,7 +18,7 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testLongIdentityFunction(){
+    public void testLongIdentityFunction() {
         LongFunction function = newIdentityLongFunction();
 
         assertEquals(0, function.call(0));

@@ -13,7 +13,7 @@ public class ImprovedBlockingQueueStressTest {
     private final long transactionCount = 50 * 1000 * 1000;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         clearThreadLocalTransaction();
     }
 

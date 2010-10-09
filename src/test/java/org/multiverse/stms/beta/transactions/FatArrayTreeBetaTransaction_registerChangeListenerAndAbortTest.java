@@ -4,7 +4,7 @@ package org.multiverse.stms.beta.transactions;
  * @author Peter Veentjer
  */
 public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest
-    extends BetaTransaction_registerChangeListenerAndAbortTest{
+        extends BetaTransaction_registerChangeListenerAndAbortTest {
 
     @Override
     public boolean isSupportingListeners() {

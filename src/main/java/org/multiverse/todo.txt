@@ -245,13 +245,13 @@ and not allowed. So not throw the retry error immediately..
 
 - testing: dirty/non dirty stuff in combination with prepare and isolation level
 
-- testing: prepare and writeskew
-
 - integration tests should touch all transaction implementations.
 
 - repeatable read isolation level
 
 done
+
+- testing: prepare and writeskew
 
 - transaction.isAlive is removed from transaction interface and part of the beta transaction
 

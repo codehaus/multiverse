@@ -1,15 +1,9 @@
 package org.multiverse.stms.beta;
 
-import org.multiverse.stms.beta.transactionalobjects.*;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
-import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
-import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
+import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
 
 import java.text.NumberFormat;
 import java.util.Locale;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 
 /**
  * Utility class for the BetaStm.
@@ -22,7 +16,7 @@ public class BetaStmUtils implements BetaStmConstants {
         if (o == null) {
             return "null";
         } else {
-            return o.getClass().getName()+"@"+System.identityHashCode(o);
+            return o.getClass().getName() + "@" + System.identityHashCode(o);
         }
     }
 

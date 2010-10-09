@@ -17,7 +17,7 @@ public class LeanArrayBetaTransaction_openForConstructionTest
 
     @Override
     public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
-            return new LeanArrayBetaTransaction(config);
+        return new LeanArrayBetaTransaction(config);
     }
 
     @Override

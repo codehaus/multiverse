@@ -25,7 +25,7 @@ public class ReadBiasedTest implements BetaStmConstants {
 
     @Test
     public void test() {
-        BetaLongRef ref = newLongRef(stm,100);
+        BetaLongRef ref = newLongRef(stm, 100);
         long version = ref.getVersion();
 
         for (int k = 0; k < 10000; k++) {

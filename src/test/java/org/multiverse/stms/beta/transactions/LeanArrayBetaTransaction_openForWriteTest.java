@@ -3,7 +3,7 @@ package org.multiverse.stms.beta.transactions;
 import org.multiverse.stms.beta.BetaStmConfiguration;
 
 public class LeanArrayBetaTransaction_openForWriteTest
-        extends BetaTransaction_openForWriteTest{
+        extends BetaTransaction_openForWriteTest {
 
     @Override
     public BetaTransaction newTransaction() {

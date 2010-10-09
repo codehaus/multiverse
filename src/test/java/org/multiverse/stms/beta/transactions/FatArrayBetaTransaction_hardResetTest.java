@@ -99,7 +99,7 @@ public class FatArrayBetaTransaction_hardResetTest {
         assertEquals(100, tx.getRemainingTimeoutNs());
     }
 
-     @Test
+    @Test
     public void whenPrepared() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.prepare();

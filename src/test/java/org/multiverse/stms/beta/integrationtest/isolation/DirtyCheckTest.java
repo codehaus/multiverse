@@ -34,7 +34,7 @@ public class DirtyCheckTest {
         tx.commit();
 
         assertEquals(0, ref.atomicGet());
-        assertVersionAndValue(ref, initialVersion+1, 0);
+        assertVersionAndValue(ref, initialVersion + 1, 0);
     }
 
     @Test
@@ -51,7 +51,7 @@ public class DirtyCheckTest {
         tx.commit();
 
         assertEquals(1, ref.atomicGet());
-        assertVersionAndValue(ref, initialVersion+1, 1);
+        assertVersionAndValue(ref, initialVersion + 1, 1);
     }
 
     @Test
@@ -85,6 +85,6 @@ public class DirtyCheckTest {
         tx.commit();
 
         assertEquals(1, ref.atomicGet());
-        assertVersionAndValue(ref, initialVersion+1, 1);
+        assertVersionAndValue(ref, initialVersion + 1, 1);
     }
 }

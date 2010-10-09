@@ -306,7 +306,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertUpdateBiased(ref);
         assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
-        assertSame(tx,ref.___getLockOwner());
+        assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertReadonlyCount(0, ref);
         assertIsActive(tx);
@@ -328,7 +328,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertUpdateBiased(ref);
         assertHasUpdateLock(ref);
         assertHasNoCommitLock(ref);
-        assertSame(tx,ref.___getLockOwner());
+        assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertReadonlyCount(0, ref);
         assertIsActive(tx);
@@ -450,7 +450,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertVersionAndValue(ref, 0, 0);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertVersionAndValue(ref, 0,0);
+        assertVersionAndValue(ref, 0, 0);
     }
 
     @Test
@@ -482,7 +482,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
         BetaTransaction tx = newTransaction();
         LongRefTranlocal write1 = tx.openForWrite(ref, LOCKMODE_UPDATE);
-       LongRefTranlocal write2 = tx.openForWrite(ref, LOCKMODE_UPDATE);
+        LongRefTranlocal write2 = tx.openForWrite(ref, LOCKMODE_UPDATE);
 
         assertSame(write1, write2);
         assertEquals(100, write2.value);
@@ -546,7 +546,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
     @Test
     public void pessimisticLockLevel_whenPessimisticReadEnabled() {
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long version = ref.getVersion();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
@@ -748,7 +748,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertUpdateBiased(ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
-        assertVersionAndValue(ref, initialVersion,10);
+        assertVersionAndValue(ref, initialVersion, 10);
     }
 
 
@@ -778,7 +778,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertUpdateBiased(ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
-        assertVersionAndValue(ref, initialVersion,10);
+        assertVersionAndValue(ref, initialVersion, 10);
     }
 
     // ========================= consistency ======================

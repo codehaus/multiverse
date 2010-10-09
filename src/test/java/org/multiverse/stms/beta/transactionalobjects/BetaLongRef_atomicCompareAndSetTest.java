@@ -82,7 +82,7 @@ public class BetaLongRef_atomicCompareAndSetTest {
         assertEquals(2, ref.atomicGet());
         assertHasNoCommitLock(ref);
         assertSurplus(1, ref);
-        assertVersionAndValue(ref, version+1, 2);
+        assertVersionAndValue(ref, version + 1, 2);
     }
 
     @Test

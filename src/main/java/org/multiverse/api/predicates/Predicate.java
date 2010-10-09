@@ -5,7 +5,7 @@ package org.multiverse.api.predicates;
  *
  * @author Peter Veentjer.
  */
-public interface Predicate<E>{
+public interface Predicate<E> {
 
     /**
      * Evaluates the predicate.

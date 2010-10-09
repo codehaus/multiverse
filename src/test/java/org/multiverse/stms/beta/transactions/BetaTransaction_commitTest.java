@@ -119,16 +119,16 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         BetaLongRef ref = newLongRef(stm);
         long version = ref.getVersion();
 
-        System.out.println("ref.orec: "+ref.___toOrecString());
+        System.out.println("ref.orec: " + ref.___toOrecString());
         BetaTransaction tx = newTransaction();
-        System.out.println("ref.orec: "+ref.___toOrecString());
+        System.out.println("ref.orec: " + ref.___toOrecString());
         LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
-        System.out.println("ref.orec: "+ref.___toOrecString());
+        System.out.println("ref.orec: " + ref.___toOrecString());
         tranlocal.value++;
-        System.out.println("ref.orec: "+ref.___toOrecString());
+        System.out.println("ref.orec: " + ref.___toOrecString());
         tx.commit();
 
-        System.out.println("ref.orec: "+ref.___toOrecString());
+        System.out.println("ref.orec: " + ref.___toOrecString());
 
         assertIsCommitted(tx);
         assertVersionAndValue(ref, version + 1, 1);
@@ -172,7 +172,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         tx.commit();
 
         assertIsCommitted(tx);
-        assertVersionAndValue(ref, version+1, 11);
+        assertVersionAndValue(ref, version + 1, 11);
         assertHasNoCommitLock(ref);
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
@@ -210,7 +210,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         tx.commit();
 
         assertIsCommitted(tx);
-        assertVersionAndValue(ref, version+1, 0);
+        assertVersionAndValue(ref, version + 1, 0);
         assertHasNoCommitLock(ref);
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
@@ -264,14 +264,14 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         tx.openForConstruction(ref2);
         tx.commit();
 
-        assertVersionAndValue(ref1, 1,0);
+        assertVersionAndValue(ref1, 1, 0);
         assertIsCommitted(tx);
         assertNull(ref1.___getLockOwner());
         assertHasNoCommitLock(ref1);
         assertSurplus(0, ref1);
         assertUpdateBiased(ref1);
 
-        assertVersionAndValue(ref2, 1,0);
+        assertVersionAndValue(ref2, 1, 0);
         assertNull(ref2.___getLockOwner());
         assertHasNoCommitLock(ref2);
         assertSurplus(0, ref2);
@@ -620,7 +620,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         tx.openForWrite(ref, LOCKMODE_NONE).value++;
         tx.commit();
 
-        assertVersionAndValue(ref, initialVersion+1, 1);
+        assertVersionAndValue(ref, initialVersion + 1, 1);
     }
 
     @Test
@@ -635,7 +635,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         tx.openForWrite(ref, LOCKMODE_NONE).value++;
         tx.commit();
 
-        assertVersionAndValue(ref, initialVersion+1, 1);
+        assertVersionAndValue(ref, initialVersion + 1, 1);
     }
 
 
@@ -648,7 +648,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(false);
 
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = newTransaction(config);
@@ -659,7 +659,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertVersionAndValue(ref, initialVersion+1,11);
+        assertVersionAndValue(ref, initialVersion + 1, 11);
     }
 
     @Test
@@ -669,7 +669,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setDirtyCheckEnabled(true);
 
-        BetaLongRef ref = newLongRef(stm,10);
+        BetaLongRef ref = newLongRef(stm, 10);
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = newTransaction(config);
@@ -680,7 +680,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
-        assertVersionAndValue(ref, initialVersion+1, 11);
+        assertVersionAndValue(ref, initialVersion + 1, 11);
     }
 
     @Test
@@ -916,7 +916,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         assertHasNoCommitLock(ref);
         assertHasNoUpdateLock(ref);
         assertNull(ref.___getLockOwner());
-        assertVersionAndValue(ref, version+1, 1);
+        assertVersionAndValue(ref, version + 1, 1);
         assertSurplus(0, ref);
         assertReadonlyCount(oldReadonlyCount, ref);
         assertUpdateBiased(ref);
