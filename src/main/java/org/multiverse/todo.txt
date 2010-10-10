@@ -1,5 +1,8 @@
 ideas:
 
+- instead of going through the transaction to deal with tranlocals, one you have a reference to one,
+all operations like openForWrite/checkConflict/ensure etc.
+
 - the skipreadconflict logic can be made cheaper by merging the config.readlocklevel and config.inconsistentread.
 
 - ensure on the transaction? To make all changes 'committable'.
