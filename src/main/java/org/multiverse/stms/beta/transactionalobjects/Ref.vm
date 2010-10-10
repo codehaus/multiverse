@@ -91,7 +91,6 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         return ${transactionalObject.classIndex};
     }
 
-
 #if(${transactionalObject.isReference})
     public final ${transactionalObject.type} ___weakRead(){
         return ___value;
@@ -287,12 +286,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public void addDeferredValidator(${transactionalObject.predicateClass}${transactionalObject.typeParameter} validator){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null){
-            addDeferredValidator((BetaTransaction)tx, validator);
-            return;
+        if(tx == null){
+            throw new TransactionRequiredException("No transaction is found for the addDeferredValidator operation");
         }
 
-        throw new TransactionRequiredException();
+        addDeferredValidator((BetaTransaction)tx, validator);
     }
 
     @Override
@@ -338,11 +336,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final ${transactionalObject.type} getAndIncrement(final ${transactionalObject.type} amount){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null){
-            return getAndIncrement((BetaTransaction)tx, amount);
+        if(tx == null){
+            throw new TransactionRequiredException("No transaction is found for the getAndIncrement operation");
         }
 
-        throw new TransactionRequiredException();
+        return getAndIncrement((BetaTransaction)tx, amount);
     }
 
     @Override
@@ -398,7 +396,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the incrementAndGet operation");
         }
 
         return incrementAndGet((BetaTransaction)tx, amount);
@@ -428,7 +426,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the isNull operation");
         }
 
         return isNull((BetaTransaction)tx);
@@ -537,7 +535,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final boolean tryPrivatize(){
         Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null){
+        if(tx == null){
             throw new TransactionRequiredException("No transaction is found for the tryPrivatize operation");
         }
 
@@ -560,7 +558,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the commute operation");
         }
 
         commute((BetaTransaction)tx, function);
@@ -595,7 +593,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the alterAndGet operation");
         }
 
         return alterAndGet((BetaTransaction)tx, function);
@@ -697,7 +695,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the getAndAlter operation");
         }
 
         return getAndAlter((BetaTransaction)tx, function);
@@ -780,11 +778,10 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     @Override
     public final ${transactionalObject.type} getAndSet(final ${transactionalObject.type} value){
-
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the getAndSet operation");
         }
 
         return getAndSet((BetaTransaction)tx, value);
@@ -794,7 +791,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the set operation");
         }
 
         return set((BetaTransaction)tx, value);
@@ -805,7 +802,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the get operation");
         }
 
         return get((BetaTransaction)tx);
@@ -921,7 +918,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the await operation");                                            
         }
 
         await((BetaTransaction)tx, value);

@@ -83,7 +83,6 @@ public  class BetaDoubleRef
         return 3;
     }
 
-
     public final double ___weakRead(){
         return ___value;
     }
@@ -274,12 +273,11 @@ public  class BetaDoubleRef
     public void addDeferredValidator(DoublePredicate validator){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null){
-            addDeferredValidator((BetaTransaction)tx, validator);
-            return;
+        if(tx == null){
+            throw new TransactionRequiredException("No transaction is found for the addDeferredValidator operation");
         }
 
-        throw new TransactionRequiredException();
+        addDeferredValidator((BetaTransaction)tx, validator);
     }
 
     @Override
@@ -324,11 +322,11 @@ public  class BetaDoubleRef
     public final double getAndIncrement(final double amount){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null){
-            return getAndIncrement((BetaTransaction)tx, amount);
+        if(tx == null){
+            throw new TransactionRequiredException("No transaction is found for the getAndIncrement operation");
         }
 
-        throw new TransactionRequiredException();
+        return getAndIncrement((BetaTransaction)tx, amount);
     }
 
     @Override
@@ -384,7 +382,7 @@ public  class BetaDoubleRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the incrementAndGet operation");
         }
 
         return incrementAndGet((BetaTransaction)tx, amount);
@@ -496,7 +494,7 @@ public  class BetaDoubleRef
     public final boolean tryPrivatize(){
         Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null){
+        if(tx == null){
             throw new TransactionRequiredException("No transaction is found for the tryPrivatize operation");
         }
 
@@ -519,7 +517,7 @@ public  class BetaDoubleRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the commute operation");
         }
 
         commute((BetaTransaction)tx, function);
@@ -554,7 +552,7 @@ public  class BetaDoubleRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the alterAndGet operation");
         }
 
         return alterAndGet((BetaTransaction)tx, function);
@@ -656,7 +654,7 @@ public  class BetaDoubleRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the getAndAlter operation");
         }
 
         return getAndAlter((BetaTransaction)tx, function);
@@ -739,11 +737,10 @@ public  class BetaDoubleRef
 
     @Override
     public final double getAndSet(final double value){
-
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the getAndSet operation");
         }
 
         return getAndSet((BetaTransaction)tx, value);
@@ -753,7 +750,7 @@ public  class BetaDoubleRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the set operation");
         }
 
         return set((BetaTransaction)tx, value);
@@ -764,7 +761,7 @@ public  class BetaDoubleRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the get operation");
         }
 
         return get((BetaTransaction)tx);
@@ -880,7 +877,7 @@ public  class BetaDoubleRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the await operation");                                            
         }
 
         await((BetaTransaction)tx, value);

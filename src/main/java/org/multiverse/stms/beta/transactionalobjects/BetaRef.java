@@ -83,7 +83,6 @@ public final class BetaRef<E>
         return 0;
     }
 
-
     public final E ___weakRead(){
         return ___value;
     }
@@ -274,12 +273,11 @@ public final class BetaRef<E>
     public void addDeferredValidator(Predicate<E> validator){
         final Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null){
-            addDeferredValidator((BetaTransaction)tx, validator);
-            return;
+        if(tx == null){
+            throw new TransactionRequiredException("No transaction is found for the addDeferredValidator operation");
         }
 
-        throw new TransactionRequiredException();
+        addDeferredValidator((BetaTransaction)tx, validator);
     }
 
     @Override
@@ -319,7 +317,7 @@ public final class BetaRef<E>
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the isNull operation");
         }
 
         return isNull((BetaTransaction)tx);
@@ -427,7 +425,7 @@ public final class BetaRef<E>
     public final boolean tryPrivatize(){
         Transaction tx = getThreadLocalTransaction();
 
-        if(tx != null){
+        if(tx == null){
             throw new TransactionRequiredException("No transaction is found for the tryPrivatize operation");
         }
 
@@ -450,7 +448,7 @@ public final class BetaRef<E>
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the commute operation");
         }
 
         commute((BetaTransaction)tx, function);
@@ -485,7 +483,7 @@ public final class BetaRef<E>
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the alterAndGet operation");
         }
 
         return alterAndGet((BetaTransaction)tx, function);
@@ -587,7 +585,7 @@ public final class BetaRef<E>
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the getAndAlter operation");
         }
 
         return getAndAlter((BetaTransaction)tx, function);
@@ -670,11 +668,10 @@ public final class BetaRef<E>
 
     @Override
     public final E getAndSet(final E value){
-
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the getAndSet operation");
         }
 
         return getAndSet((BetaTransaction)tx, value);
@@ -684,7 +681,7 @@ public final class BetaRef<E>
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the set operation");
         }
 
         return set((BetaTransaction)tx, value);
@@ -695,7 +692,7 @@ public final class BetaRef<E>
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the get operation");
         }
 
         return get((BetaTransaction)tx);
@@ -811,7 +808,7 @@ public final class BetaRef<E>
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException();
+            throw new TransactionRequiredException("No transaction is found for the await operation");                                            
         }
 
         await((BetaTransaction)tx, value);

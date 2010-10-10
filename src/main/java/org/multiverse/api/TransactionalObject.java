@@ -3,6 +3,10 @@ package org.multiverse.api;
 /**
  * The interface each transactional object needs to implement.
  *
+ * <h1>Ensure</h1>
+ * 
+ * <h1>Privatize</h1>
+ *
  * @author Peter Veentjer.
  */
 public interface TransactionalObject {

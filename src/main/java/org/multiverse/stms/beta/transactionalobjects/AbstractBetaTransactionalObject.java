@@ -43,7 +43,6 @@ public abstract class AbstractBetaTransactionalObject
 
 
 
-
     @Override
     public final void ___abort(
         final BetaTransaction transaction,
