@@ -490,17 +490,27 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     @Override
-    public final void ensureOptimistic(){
-        throw new TodoException();
+    public final void deferredEnsure(){
+        Transaction tx = getThreadLocalTransaction();
+
+        if(tx == null){
+            throw new TransactionRequiredException("No transaction is found for the deferredEnsure operation");
+        }
+
+        deferredEnsure((BetaTransaction)tx);
     }
 
     @Override
-    public final void ensureOptimistic(final Transaction tx){
-        ensureOptimistic((BetaTransaction)tx);
+    public final void deferredEnsure(final Transaction tx){
+        deferredEnsure((BetaTransaction)tx);
     }
 
-    public final void ensureOptimistic(final BetaTransaction tx){
-        throw new TodoException();
+    public final void deferredEnsure(final BetaTransaction tx){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        tx.materializeConflict(this);
     }
 
     @Override

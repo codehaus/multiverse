@@ -25,6 +25,17 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
     }
 
     @Test
+    public void whenCheckConflict(){
+        BetaLongRef ref = newLongRef(stm);
+
+        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        tranlocal.checkConflict = true;
+        tranlocal.prepareForPooling(pool);
+
+        assertPreparedForPooling(tranlocal);
+    }
+
+    @Test
     public void whenConstructed() {
         BetaLongRef ref = newLongRef(stm);
 
@@ -126,6 +137,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
         assertFalse(tranlocal.isConstructing);
         assertNull(tranlocal.headCallable);
         assertNull(tranlocal.owner);
+        assertFalse(tranlocal.checkConflict);
         assertEquals(0, tranlocal.version);
     }
 }

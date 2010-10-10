@@ -71,6 +71,7 @@ public final class IntRefTranlocal extends Tranlocal{
         isCommuting = false;
         isConstructing = false;
         isDirty = false;
+        checkConflict = false;
         CallableNode current = headCallable;
         if (current != null) {
             headCallable = null;

@@ -2268,10 +2268,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         for (int k = 0; k < firstFreeIndex; k++) {
             final Tranlocal tranlocal = array[k];
 
-            if(tranlocal.isCommitted){
-                continue;
-            }
-
             if(!tranlocal.prepareAllUpdates(pool, this, spinCount)) {
                 return false;
             }
@@ -2289,10 +2285,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         for (int k = 0; k < firstFreeIndex; k++) {
             final Tranlocal tranlocal = array[k];
-
-            if(tranlocal.isCommitted){
-                continue;
-            }
 
             if(!tranlocal.prepareDirtyUpdates(pool, this, spinCount)) {
                 return false;

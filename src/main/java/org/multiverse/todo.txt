@@ -1,5 +1,7 @@
 ideas:
 
+- the skipreadconflict logic can be made cheaper by merging the config.readlocklevel and config.inconsistentread.
+
 - ensure on the transaction? To make all changes 'committable'.
 
 - http://iamchrislewis.tumblr.com/post/239967776/a-look-at-how-scala-compiles-to-java
@@ -219,8 +221,6 @@ and not allowed. So not throw the retry error immediately..
 
 - improved testing in the transaction for read committed isolation level
 
-- the skipreadconflict logic can be made cheaper by merging the config.readlocklevel and config.inconsistentread.
-
 - when an inconsistent read is done, instead of going through the arrive and depart, do it faster.
  The arrive/depart is needed for consistency, but when an inconsistent read is done, it isn't needed.
 
@@ -248,6 +248,10 @@ and not allowed. So not throw the retry error immediately..
 - integration tests should touch all transaction implementations.
 
 - repeatable read isolation level
+
+- drop doPrepareWithWriteSkewPrevention
+    - set the check conflict on load
+
 
 done
 

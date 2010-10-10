@@ -72,12 +72,12 @@ public class LinkedList<E> extends AbstractBetaTransactionalObject {
     }
 
     @Override
-    public void ensureOptimistic() {
+    public void deferredEnsure() {
         throw new TodoException();
     }
 
     @Override
-    public void ensureOptimistic(Transaction tx) {
+    public void deferredEnsure(Transaction tx) {
         throw new TodoException();
     }
 
@@ -313,12 +313,12 @@ class LinkedListNode<E> extends AbstractBetaTransactionalObject {
     }
 
     @Override
-    public void ensureOptimistic() {
+    public void deferredEnsure() {
         throw new TodoException();
     }
 
     @Override
-    public void ensureOptimistic(Transaction tx) {
+    public void deferredEnsure(Transaction tx) {
         throw new TodoException();
     }
 }

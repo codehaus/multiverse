@@ -2098,7 +2098,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         for (int k = 0; k < array.length; k++) {
             final Tranlocal tranlocal = array[k];
 
-            if (tranlocal == null || tranlocal.isCommitted){
+            if (tranlocal == null){
                 continue;
             }
 
@@ -2120,7 +2120,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         for (int k = 0; k < array.length; k++) {
             final Tranlocal tranlocal = array[k];
 
-            if(tranlocal == null || tranlocal.isCommitted){
+            if(tranlocal == null){
                 continue;
             }
 

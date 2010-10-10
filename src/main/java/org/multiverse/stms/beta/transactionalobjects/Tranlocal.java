@@ -22,11 +22,12 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
     public BetaTransactionalObject owner;
     public int lockMode;
     public boolean hasDepartObligation;
+    public long version;
     public boolean isCommitted;
     public boolean isCommuting;
     public boolean isConstructing;
     public boolean isDirty;
-    public long version;
+    public boolean checkConflict;
     public CallableNode headCallable;
 
     public Tranlocal(BetaTransactionalObject owner) {
@@ -80,8 +81,8 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
             if (lockMode == LOCKMODE_COMMIT) {
                 return true;
             }
-            return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
 
+            return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
         }
 
         if (isCommuting) {
@@ -100,6 +101,7 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
         if (lockMode == LOCKMODE_COMMIT) {
             return true;
         }
+
         return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
 
     }
@@ -107,8 +109,20 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
     public final boolean prepareDirtyUpdates(
             final BetaObjectPool pool, final BetaTransaction tx, final int spinCount) {
 
-        if (isCommitted || isConstructing) {
+        if (isConstructing) {
             return true;
+        }
+
+        if (isCommitted) {
+            if (!checkConflict) {
+                return true;
+            }
+
+            if (lockMode != LOCKMODE_NONE) {
+                return true;
+            }
+
+            return owner.___tryLockAndCheckConflict(tx, spinCount, this, false);
         }
 
         if (isCommuting) {
@@ -121,25 +135,46 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
         }
 
         if (!(isDirty || calculateIsDirty())) {
-            return true;
+            if (!checkConflict) {
+                return true;
+            }
+
+            if (lockMode != LOCKMODE_NONE) {
+                return true;
+            }
+
+            return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
+
         }
 
         if (lockMode == LOCKMODE_COMMIT) {
             return true;
-
         }
+
         return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
     }
 
     public final boolean prepareAllUpdates(
             final BetaObjectPool pool, BetaTransaction tx, int spinCount) {
 
-        if (isCommitted || isConstructing) {
+        if (lockMode == LOCKMODE_COMMIT) {
             return true;
         }
 
-        if (lockMode == LOCKMODE_COMMIT) {
+        if (isConstructing) {
             return true;
+        }
+
+        if (isCommitted) {
+            if (!checkConflict) {
+                return true;
+            }
+
+            if (lockMode != LOCKMODE_NONE) {
+                return true;
+            }
+
+            return owner.___tryLockAndCheckConflict(tx, spinCount, this, false);
         }
 
         if (isCommuting) {

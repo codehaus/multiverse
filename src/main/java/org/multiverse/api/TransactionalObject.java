@@ -332,10 +332,10 @@ public interface TransactionalObject {
     /**
      *
      */
-    void ensureOptimistic();
+    void deferredEnsure();
 
     /**
      * @param self
      */
-    void ensureOptimistic(Transaction self);
+    void deferredEnsure(Transaction self);
 }

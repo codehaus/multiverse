@@ -140,6 +140,11 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
         return ReadWriteConflict.INSTANCE;
     }
 
+    public final void materializeConflict(BetaTransactionalObject ref){
+        Tranlocal tranlocal = openForRead(ref, LOCKMODE_NONE);
+        tranlocal.checkConflict = true;
+    }
+
     @Override
     public final void setAbortOnly() {
         switch (status) {
