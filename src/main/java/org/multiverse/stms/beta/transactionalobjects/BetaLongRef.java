@@ -274,7 +274,7 @@ public final class BetaLongRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the addDeferredValidator operation");
+            throw new TransactionRequiredException(getClass(),"addDeferredValidator");
         }
 
         addDeferredValidator((BetaTransaction)tx, validator);
@@ -323,7 +323,7 @@ public final class BetaLongRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the getAndIncrement operation");
+            throw new TransactionRequiredException(getClass(),"getAndIncrement");
         }
 
         return getAndIncrement((BetaTransaction)tx, amount);
@@ -382,7 +382,7 @@ public final class BetaLongRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the incrementAndGet operation");
+            throw new TransactionRequiredException(getClass(),"incrementAndGet");
         }
 
         return incrementAndGet((BetaTransaction)tx, amount);
@@ -411,7 +411,7 @@ public final class BetaLongRef
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the ensure operation");
+            throw new TransactionRequiredException(getClass(),"ensure");
         }
 
         ensure((BetaTransaction)tx);
@@ -431,7 +431,7 @@ public final class BetaLongRef
         Transaction tx = getThreadLocalTransaction();
 
         if(tx!=null){
-            throw new TransactionRequiredException("No transaction is found for the tryEnsure operation");
+            throw new TransactionRequiredException(getClass(),"tryEnsure");
         }
 
         return tryEnsure((BetaTransaction)tx);
@@ -451,7 +451,7 @@ public final class BetaLongRef
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the deferredEnsure operation");
+            throw new TransactionRequiredException(getClass(),"deferredEnsure");
         }
 
         deferredEnsure((BetaTransaction)tx);
@@ -475,7 +475,7 @@ public final class BetaLongRef
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the privatize operation");
+            throw new TransactionRequiredException(getClass(),"privatize");
         }
 
         privatize((BetaTransaction)tx);
@@ -495,7 +495,7 @@ public final class BetaLongRef
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the tryPrivatize operation");
+            throw new TransactionRequiredException(getClass(),"tryPrivatize");
         }
 
         return tryPrivatize((BetaTransaction)tx);
@@ -511,64 +511,47 @@ public final class BetaLongRef
     }
 
     @Override
-    public final void commute(
-        LongFunction function){
-
+    public final void commute(LongFunction function){
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the commute operation");
+            throw new TransactionRequiredException(getClass(),"commute");
         }
 
         commute((BetaTransaction)tx, function);
     }
 
     @Override
-    public final void commute(
-        final Transaction tx,
-        final LongFunction function){
-
+    public final void commute(final Transaction tx, final LongFunction function){
         commute((BetaTransaction)tx, function);
     }
 
-    public final void commute(
-        BetaTransaction tx,
-        LongFunction function){
-
+    public final void commute(BetaTransaction tx,LongFunction function){
         tx.commute(this, function);
     }
 
     @Override
-    public final long atomicAlterAndGet(
-        final LongFunction function){
-
+    public final long atomicAlterAndGet(final LongFunction function){
         return atomicAlter(function, false);
     }
 
     @Override
-    public final long alterAndGet(
-        final LongFunction function){
-
+    public final long alterAndGet(final LongFunction function){
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the alterAndGet operation");
+            throw new TransactionRequiredException(getClass(),"alterAndGet");
         }
 
         return alterAndGet((BetaTransaction)tx, function);
     }
 
     @Override
-    public final long alterAndGet(
-        final Transaction tx,
-        final LongFunction function){
+    public final long alterAndGet(final Transaction tx,final LongFunction function){
         return alterAndGet((BetaTransaction)tx, function);
     }
 
-    public final long alterAndGet(
-        final BetaTransaction tx,
-        final LongFunction function){
-
+    public final long alterAndGet(final BetaTransaction tx,final LongFunction function){
         if(function == null){
             tx.abort();
             throw new NullPointerException("Function can't be null");
@@ -590,16 +573,12 @@ public final class BetaLongRef
     }
 
     @Override
-    public final long atomicGetAndAlter(
-        final LongFunction function){
+    public final long atomicGetAndAlter(final LongFunction function){
 
         return atomicAlter(function,true);
     }
 
-    private long atomicAlter(
-        final LongFunction function,
-        final boolean returnOld){
-
+    private long atomicAlter(final LongFunction function,final boolean returnOld){
         if(function == null){
             throw new NullPointerException("Function can't be null");
         }
@@ -648,30 +627,22 @@ public final class BetaLongRef
     }
 
     @Override
-    public final long getAndAlter(
-        final LongFunction function){
-
+    public final long getAndAlter(final LongFunction function){
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the getAndAlter operation");
+            throw new TransactionRequiredException(getClass(),"getAndAlter");
         }
 
         return getAndAlter((BetaTransaction)tx, function);
     }
 
     @Override
-    public final long getAndAlter(
-        final Transaction tx,
-        final LongFunction function){
-
+    public final long getAndAlter(final Transaction tx,final LongFunction function){
         return getAndAlter((BetaTransaction)tx, function);
     }
 
-    public final long getAndAlter(
-        final BetaTransaction tx,
-        final LongFunction function){
-
+    public final long getAndAlter(final BetaTransaction tx,final LongFunction function){
         if(function == null){
             tx.abort();
             throw new NullPointerException("Function can't be null");
@@ -694,10 +665,7 @@ public final class BetaLongRef
     }
 
     @Override
-    public final boolean atomicCompareAndSet(
-        final long expectedValue,
-        final long newValue){
-
+    public final boolean atomicCompareAndSet(final long expectedValue,final long newValue){
         final int arriveStatus = ___arriveAndLockOrBackoff();
 
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
@@ -721,7 +689,6 @@ public final class BetaLongRef
             return true;
         }
 
-
         ___value = newValue;
         ___version++;
         Listeners listeners = ___removeListenersAfterWrite();
@@ -740,7 +707,7 @@ public final class BetaLongRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the getAndSet operation");
+            throw new TransactionRequiredException(getClass(),"getAndSet");
         }
 
         return getAndSet((BetaTransaction)tx, value);
@@ -750,7 +717,7 @@ public final class BetaLongRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the set operation");
+            throw new TransactionRequiredException(getClass(),"set");
         }
 
         return set((BetaTransaction)tx, value);
@@ -761,7 +728,7 @@ public final class BetaLongRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the get operation");
+            throw new TransactionRequiredException(getClass(),"get");
         }
 
         return get((BetaTransaction)tx);
@@ -846,26 +813,17 @@ public final class BetaLongRef
         return set((BetaTransaction)tx, value);
     }
 
-    public final long set(
-        final BetaTransaction tx,
-        final long value){
-
+    public final long set(final BetaTransaction tx,final long value){
         tx.openForWrite(this, LOCKMODE_NONE).value = value;
         return value;
     }
 
     @Override
-    public final long getAndSet(
-        final Transaction tx,
-        final long value){
-
+    public final long getAndSet(final Transaction tx,final long value){
         return getAndSet((BetaTransaction)tx, value);
     }
 
-    public final long getAndSet(
-        final BetaTransaction tx,
-        final long value){
-
+    public final long getAndSet(final BetaTransaction tx,final long value){
         LongRefTranlocal write = tx.openForWrite(this, LOCKMODE_NONE);
         long oldValue = write.value;
         write.value = value;
@@ -877,24 +835,18 @@ public final class BetaLongRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the await operation");                                            
+            throw new TransactionRequiredException(getClass(),"await");                                            
         }
 
         await((BetaTransaction)tx, value);
     }
 
     @Override
-    public final void await(
-        final Transaction tx,
-        final long value){
-
+    public final void await(final Transaction tx,final long value){
         await((BetaTransaction)tx, value);
     }
 
-    public final void await(
-        final BetaTransaction tx,
-        final long value){
-
+    public final void await(final BetaTransaction tx,final long value){
         LongRefTranlocal read = tx.openForRead(this,LOCKMODE_NONE);
         if(read.value != value){
             StmUtils.retry();

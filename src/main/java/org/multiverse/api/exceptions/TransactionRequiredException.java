@@ -1,5 +1,7 @@
 package org.multiverse.api.exceptions;
 
+import static java.lang.String.format;
+
 /**
  * An {@link PropagationException} that can be thrown when no transaction but if it was expected. A typical
  * cause of this exception is that the PropagationLevel.Mandatory is used.
@@ -23,6 +25,10 @@ public class TransactionRequiredException extends PropagationException {
      */
     public TransactionRequiredException(String message) {
         super(message);
+    }
+
+    public TransactionRequiredException(Class clazz, String method){
+        super(format("%s.%s is missing a required transaction", clazz.getName(),method));
     }
 
     /**

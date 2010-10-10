@@ -274,7 +274,7 @@ public final class BetaIntRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the addDeferredValidator operation");
+            throw new TransactionRequiredException(getClass(),"addDeferredValidator");
         }
 
         addDeferredValidator((BetaTransaction)tx, validator);
@@ -323,7 +323,7 @@ public final class BetaIntRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the getAndIncrement operation");
+            throw new TransactionRequiredException(getClass(),"getAndIncrement");
         }
 
         return getAndIncrement((BetaTransaction)tx, amount);
@@ -382,7 +382,7 @@ public final class BetaIntRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the incrementAndGet operation");
+            throw new TransactionRequiredException(getClass(),"incrementAndGet");
         }
 
         return incrementAndGet((BetaTransaction)tx, amount);
@@ -411,7 +411,7 @@ public final class BetaIntRef
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the ensure operation");
+            throw new TransactionRequiredException(getClass(),"ensure");
         }
 
         ensure((BetaTransaction)tx);
@@ -431,7 +431,7 @@ public final class BetaIntRef
         Transaction tx = getThreadLocalTransaction();
 
         if(tx!=null){
-            throw new TransactionRequiredException("No transaction is found for the tryEnsure operation");
+            throw new TransactionRequiredException(getClass(),"tryEnsure");
         }
 
         return tryEnsure((BetaTransaction)tx);
@@ -451,7 +451,7 @@ public final class BetaIntRef
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the deferredEnsure operation");
+            throw new TransactionRequiredException(getClass(),"deferredEnsure");
         }
 
         deferredEnsure((BetaTransaction)tx);
@@ -475,7 +475,7 @@ public final class BetaIntRef
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the privatize operation");
+            throw new TransactionRequiredException(getClass(),"privatize");
         }
 
         privatize((BetaTransaction)tx);
@@ -495,7 +495,7 @@ public final class BetaIntRef
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the tryPrivatize operation");
+            throw new TransactionRequiredException(getClass(),"tryPrivatize");
         }
 
         return tryPrivatize((BetaTransaction)tx);
@@ -511,64 +511,47 @@ public final class BetaIntRef
     }
 
     @Override
-    public final void commute(
-        IntFunction function){
-
+    public final void commute(IntFunction function){
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the commute operation");
+            throw new TransactionRequiredException(getClass(),"commute");
         }
 
         commute((BetaTransaction)tx, function);
     }
 
     @Override
-    public final void commute(
-        final Transaction tx,
-        final IntFunction function){
-
+    public final void commute(final Transaction tx, final IntFunction function){
         commute((BetaTransaction)tx, function);
     }
 
-    public final void commute(
-        BetaTransaction tx,
-        IntFunction function){
-
+    public final void commute(BetaTransaction tx,IntFunction function){
         tx.commute(this, function);
     }
 
     @Override
-    public final int atomicAlterAndGet(
-        final IntFunction function){
-
+    public final int atomicAlterAndGet(final IntFunction function){
         return atomicAlter(function, false);
     }
 
     @Override
-    public final int alterAndGet(
-        final IntFunction function){
-
+    public final int alterAndGet(final IntFunction function){
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the alterAndGet operation");
+            throw new TransactionRequiredException(getClass(),"alterAndGet");
         }
 
         return alterAndGet((BetaTransaction)tx, function);
     }
 
     @Override
-    public final int alterAndGet(
-        final Transaction tx,
-        final IntFunction function){
+    public final int alterAndGet(final Transaction tx,final IntFunction function){
         return alterAndGet((BetaTransaction)tx, function);
     }
 
-    public final int alterAndGet(
-        final BetaTransaction tx,
-        final IntFunction function){
-
+    public final int alterAndGet(final BetaTransaction tx,final IntFunction function){
         if(function == null){
             tx.abort();
             throw new NullPointerException("Function can't be null");
@@ -590,16 +573,12 @@ public final class BetaIntRef
     }
 
     @Override
-    public final int atomicGetAndAlter(
-        final IntFunction function){
+    public final int atomicGetAndAlter(final IntFunction function){
 
         return atomicAlter(function,true);
     }
 
-    private int atomicAlter(
-        final IntFunction function,
-        final boolean returnOld){
-
+    private int atomicAlter(final IntFunction function,final boolean returnOld){
         if(function == null){
             throw new NullPointerException("Function can't be null");
         }
@@ -648,30 +627,22 @@ public final class BetaIntRef
     }
 
     @Override
-    public final int getAndAlter(
-        final IntFunction function){
-
+    public final int getAndAlter(final IntFunction function){
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the getAndAlter operation");
+            throw new TransactionRequiredException(getClass(),"getAndAlter");
         }
 
         return getAndAlter((BetaTransaction)tx, function);
     }
 
     @Override
-    public final int getAndAlter(
-        final Transaction tx,
-        final IntFunction function){
-
+    public final int getAndAlter(final Transaction tx,final IntFunction function){
         return getAndAlter((BetaTransaction)tx, function);
     }
 
-    public final int getAndAlter(
-        final BetaTransaction tx,
-        final IntFunction function){
-
+    public final int getAndAlter(final BetaTransaction tx,final IntFunction function){
         if(function == null){
             tx.abort();
             throw new NullPointerException("Function can't be null");
@@ -694,10 +665,7 @@ public final class BetaIntRef
     }
 
     @Override
-    public final boolean atomicCompareAndSet(
-        final int expectedValue,
-        final int newValue){
-
+    public final boolean atomicCompareAndSet(final int expectedValue,final int newValue){
         final int arriveStatus = ___arriveAndLockOrBackoff();
 
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
@@ -721,7 +689,6 @@ public final class BetaIntRef
             return true;
         }
 
-
         ___value = newValue;
         ___version++;
         Listeners listeners = ___removeListenersAfterWrite();
@@ -740,7 +707,7 @@ public final class BetaIntRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the getAndSet operation");
+            throw new TransactionRequiredException(getClass(),"getAndSet");
         }
 
         return getAndSet((BetaTransaction)tx, value);
@@ -750,7 +717,7 @@ public final class BetaIntRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the set operation");
+            throw new TransactionRequiredException(getClass(),"set");
         }
 
         return set((BetaTransaction)tx, value);
@@ -761,7 +728,7 @@ public final class BetaIntRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the get operation");
+            throw new TransactionRequiredException(getClass(),"get");
         }
 
         return get((BetaTransaction)tx);
@@ -846,26 +813,17 @@ public final class BetaIntRef
         return set((BetaTransaction)tx, value);
     }
 
-    public final int set(
-        final BetaTransaction tx,
-        final int value){
-
+    public final int set(final BetaTransaction tx,final int value){
         tx.openForWrite(this, LOCKMODE_NONE).value = value;
         return value;
     }
 
     @Override
-    public final int getAndSet(
-        final Transaction tx,
-        final int value){
-
+    public final int getAndSet(final Transaction tx,final int value){
         return getAndSet((BetaTransaction)tx, value);
     }
 
-    public final int getAndSet(
-        final BetaTransaction tx,
-        final int value){
-
+    public final int getAndSet(final BetaTransaction tx,final int value){
         IntRefTranlocal write = tx.openForWrite(this, LOCKMODE_NONE);
         int oldValue = write.value;
         write.value = value;
@@ -877,24 +835,18 @@ public final class BetaIntRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the await operation");                                            
+            throw new TransactionRequiredException(getClass(),"await");                                            
         }
 
         await((BetaTransaction)tx, value);
     }
 
     @Override
-    public final void await(
-        final Transaction tx,
-        final int value){
-
+    public final void await(final Transaction tx,final int value){
         await((BetaTransaction)tx, value);
     }
 
-    public final void await(
-        final BetaTransaction tx,
-        final int value){
-
+    public final void await(final BetaTransaction tx,final int value){
         IntRefTranlocal read = tx.openForRead(this,LOCKMODE_NONE);
         if(read.value != value){
             StmUtils.retry();

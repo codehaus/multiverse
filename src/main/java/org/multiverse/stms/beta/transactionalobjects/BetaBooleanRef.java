@@ -274,7 +274,7 @@ public final class BetaBooleanRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the addDeferredValidator operation");
+            throw new TransactionRequiredException(getClass(),"addDeferredValidator");
         }
 
         addDeferredValidator((BetaTransaction)tx, validator);
@@ -317,7 +317,7 @@ public final class BetaBooleanRef
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the ensure operation");
+            throw new TransactionRequiredException(getClass(),"ensure");
         }
 
         ensure((BetaTransaction)tx);
@@ -337,7 +337,7 @@ public final class BetaBooleanRef
         Transaction tx = getThreadLocalTransaction();
 
         if(tx!=null){
-            throw new TransactionRequiredException("No transaction is found for the tryEnsure operation");
+            throw new TransactionRequiredException(getClass(),"tryEnsure");
         }
 
         return tryEnsure((BetaTransaction)tx);
@@ -357,7 +357,7 @@ public final class BetaBooleanRef
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the deferredEnsure operation");
+            throw new TransactionRequiredException(getClass(),"deferredEnsure");
         }
 
         deferredEnsure((BetaTransaction)tx);
@@ -381,7 +381,7 @@ public final class BetaBooleanRef
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the privatize operation");
+            throw new TransactionRequiredException(getClass(),"privatize");
         }
 
         privatize((BetaTransaction)tx);
@@ -401,7 +401,7 @@ public final class BetaBooleanRef
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the tryPrivatize operation");
+            throw new TransactionRequiredException(getClass(),"tryPrivatize");
         }
 
         return tryPrivatize((BetaTransaction)tx);
@@ -417,64 +417,47 @@ public final class BetaBooleanRef
     }
 
     @Override
-    public final void commute(
-        BooleanFunction function){
-
+    public final void commute(BooleanFunction function){
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the commute operation");
+            throw new TransactionRequiredException(getClass(),"commute");
         }
 
         commute((BetaTransaction)tx, function);
     }
 
     @Override
-    public final void commute(
-        final Transaction tx,
-        final BooleanFunction function){
-
+    public final void commute(final Transaction tx, final BooleanFunction function){
         commute((BetaTransaction)tx, function);
     }
 
-    public final void commute(
-        BetaTransaction tx,
-        BooleanFunction function){
-
+    public final void commute(BetaTransaction tx,BooleanFunction function){
         tx.commute(this, function);
     }
 
     @Override
-    public final boolean atomicAlterAndGet(
-        final BooleanFunction function){
-
+    public final boolean atomicAlterAndGet(final BooleanFunction function){
         return atomicAlter(function, false);
     }
 
     @Override
-    public final boolean alterAndGet(
-        final BooleanFunction function){
-
+    public final boolean alterAndGet(final BooleanFunction function){
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the alterAndGet operation");
+            throw new TransactionRequiredException(getClass(),"alterAndGet");
         }
 
         return alterAndGet((BetaTransaction)tx, function);
     }
 
     @Override
-    public final boolean alterAndGet(
-        final Transaction tx,
-        final BooleanFunction function){
+    public final boolean alterAndGet(final Transaction tx,final BooleanFunction function){
         return alterAndGet((BetaTransaction)tx, function);
     }
 
-    public final boolean alterAndGet(
-        final BetaTransaction tx,
-        final BooleanFunction function){
-
+    public final boolean alterAndGet(final BetaTransaction tx,final BooleanFunction function){
         if(function == null){
             tx.abort();
             throw new NullPointerException("Function can't be null");
@@ -496,16 +479,12 @@ public final class BetaBooleanRef
     }
 
     @Override
-    public final boolean atomicGetAndAlter(
-        final BooleanFunction function){
+    public final boolean atomicGetAndAlter(final BooleanFunction function){
 
         return atomicAlter(function,true);
     }
 
-    private boolean atomicAlter(
-        final BooleanFunction function,
-        final boolean returnOld){
-
+    private boolean atomicAlter(final BooleanFunction function,final boolean returnOld){
         if(function == null){
             throw new NullPointerException("Function can't be null");
         }
@@ -554,30 +533,22 @@ public final class BetaBooleanRef
     }
 
     @Override
-    public final boolean getAndAlter(
-        final BooleanFunction function){
-
+    public final boolean getAndAlter(final BooleanFunction function){
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the getAndAlter operation");
+            throw new TransactionRequiredException(getClass(),"getAndAlter");
         }
 
         return getAndAlter((BetaTransaction)tx, function);
     }
 
     @Override
-    public final boolean getAndAlter(
-        final Transaction tx,
-        final BooleanFunction function){
-
+    public final boolean getAndAlter(final Transaction tx,final BooleanFunction function){
         return getAndAlter((BetaTransaction)tx, function);
     }
 
-    public final boolean getAndAlter(
-        final BetaTransaction tx,
-        final BooleanFunction function){
-
+    public final boolean getAndAlter(final BetaTransaction tx,final BooleanFunction function){
         if(function == null){
             tx.abort();
             throw new NullPointerException("Function can't be null");
@@ -600,10 +571,7 @@ public final class BetaBooleanRef
     }
 
     @Override
-    public final boolean atomicCompareAndSet(
-        final boolean expectedValue,
-        final boolean newValue){
-
+    public final boolean atomicCompareAndSet(final boolean expectedValue,final boolean newValue){
         final int arriveStatus = ___arriveAndLockOrBackoff();
 
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
@@ -627,7 +595,6 @@ public final class BetaBooleanRef
             return true;
         }
 
-
         ___value = newValue;
         ___version++;
         Listeners listeners = ___removeListenersAfterWrite();
@@ -646,7 +613,7 @@ public final class BetaBooleanRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the getAndSet operation");
+            throw new TransactionRequiredException(getClass(),"getAndSet");
         }
 
         return getAndSet((BetaTransaction)tx, value);
@@ -656,7 +623,7 @@ public final class BetaBooleanRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the set operation");
+            throw new TransactionRequiredException(getClass(),"set");
         }
 
         return set((BetaTransaction)tx, value);
@@ -667,7 +634,7 @@ public final class BetaBooleanRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the get operation");
+            throw new TransactionRequiredException(getClass(),"get");
         }
 
         return get((BetaTransaction)tx);
@@ -752,26 +719,17 @@ public final class BetaBooleanRef
         return set((BetaTransaction)tx, value);
     }
 
-    public final boolean set(
-        final BetaTransaction tx,
-        final boolean value){
-
+    public final boolean set(final BetaTransaction tx,final boolean value){
         tx.openForWrite(this, LOCKMODE_NONE).value = value;
         return value;
     }
 
     @Override
-    public final boolean getAndSet(
-        final Transaction tx,
-        final boolean value){
-
+    public final boolean getAndSet(final Transaction tx,final boolean value){
         return getAndSet((BetaTransaction)tx, value);
     }
 
-    public final boolean getAndSet(
-        final BetaTransaction tx,
-        final boolean value){
-
+    public final boolean getAndSet(final BetaTransaction tx,final boolean value){
         BooleanRefTranlocal write = tx.openForWrite(this, LOCKMODE_NONE);
         boolean oldValue = write.value;
         write.value = value;
@@ -783,24 +741,18 @@ public final class BetaBooleanRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the await operation");                                            
+            throw new TransactionRequiredException(getClass(),"await");                                            
         }
 
         await((BetaTransaction)tx, value);
     }
 
     @Override
-    public final void await(
-        final Transaction tx,
-        final boolean value){
-
+    public final void await(final Transaction tx,final boolean value){
         await((BetaTransaction)tx, value);
     }
 
-    public final void await(
-        final BetaTransaction tx,
-        final boolean value){
-
+    public final void await(final BetaTransaction tx,final boolean value){
         BooleanRefTranlocal read = tx.openForRead(this,LOCKMODE_NONE);
         if(read.value != value){
             StmUtils.retry();

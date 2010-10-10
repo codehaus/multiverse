@@ -287,7 +287,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the addDeferredValidator operation");
+            throw new TransactionRequiredException(getClass(),"addDeferredValidator");
         }
 
         addDeferredValidator((BetaTransaction)tx, validator);
@@ -337,7 +337,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the getAndIncrement operation");
+            throw new TransactionRequiredException(getClass(),"getAndIncrement");
         }
 
         return getAndIncrement((BetaTransaction)tx, amount);
@@ -396,7 +396,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the incrementAndGet operation");
+            throw new TransactionRequiredException(getClass(),"incrementAndGet");
         }
 
         return incrementAndGet((BetaTransaction)tx, amount);
@@ -426,7 +426,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the isNull operation");
+            throw new TransactionRequiredException(getClass(),"isNull");
         }
 
         return isNull((BetaTransaction)tx);
@@ -452,7 +452,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the ensure operation");
+            throw new TransactionRequiredException(getClass(),"ensure");
         }
 
         ensure((BetaTransaction)tx);
@@ -472,7 +472,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         Transaction tx = getThreadLocalTransaction();
 
         if(tx!=null){
-            throw new TransactionRequiredException("No transaction is found for the tryEnsure operation");
+            throw new TransactionRequiredException(getClass(),"tryEnsure");
         }
 
         return tryEnsure((BetaTransaction)tx);
@@ -492,7 +492,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the deferredEnsure operation");
+            throw new TransactionRequiredException(getClass(),"deferredEnsure");
         }
 
         deferredEnsure((BetaTransaction)tx);
@@ -516,7 +516,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the privatize operation");
+            throw new TransactionRequiredException(getClass(),"privatize");
         }
 
         privatize((BetaTransaction)tx);
@@ -536,7 +536,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the tryPrivatize operation");
+            throw new TransactionRequiredException(getClass(),"tryPrivatize");
         }
 
         return tryPrivatize((BetaTransaction)tx);
@@ -552,64 +552,47 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     @Override
-    public final void commute(
-        ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-
+    public final void commute(${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the commute operation");
+            throw new TransactionRequiredException(getClass(),"commute");
         }
 
         commute((BetaTransaction)tx, function);
     }
 
     @Override
-    public final void commute(
-        final Transaction tx,
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-
+    public final void commute(final Transaction tx, final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
         commute((BetaTransaction)tx, function);
     }
 
-    public final void commute(
-        BetaTransaction tx,
-        ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-
+    public final void commute(BetaTransaction tx,${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
         tx.commute(this, function);
     }
 
     @Override
-    public final ${transactionalObject.type} atomicAlterAndGet(
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-
+    public final ${transactionalObject.type} atomicAlterAndGet(final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
         return atomicAlter(function, false);
     }
 
     @Override
-    public final ${transactionalObject.type} alterAndGet(
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-
+    public final ${transactionalObject.type} alterAndGet(final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the alterAndGet operation");
+            throw new TransactionRequiredException(getClass(),"alterAndGet");
         }
 
         return alterAndGet((BetaTransaction)tx, function);
     }
 
     @Override
-    public final ${transactionalObject.type} alterAndGet(
-        final Transaction tx,
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+    public final ${transactionalObject.type} alterAndGet(final Transaction tx,final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
         return alterAndGet((BetaTransaction)tx, function);
     }
 
-    public final ${transactionalObject.type} alterAndGet(
-        final BetaTransaction tx,
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-
+    public final ${transactionalObject.type} alterAndGet(final BetaTransaction tx,final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
         if(function == null){
             tx.abort();
             throw new NullPointerException("Function can't be null");
@@ -631,16 +614,12 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     @Override
-    public final ${transactionalObject.type} atomicGetAndAlter(
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
+    public final ${transactionalObject.type} atomicGetAndAlter(final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
 
         return atomicAlter(function,true);
     }
 
-    private ${transactionalObject.type} atomicAlter(
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function,
-        final boolean returnOld){
-
+    private ${transactionalObject.type} atomicAlter(final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function,final boolean returnOld){
         if(function == null){
             throw new NullPointerException("Function can't be null");
         }
@@ -689,30 +668,22 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     @Override
-    public final ${transactionalObject.type} getAndAlter(
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-
+    public final ${transactionalObject.type} getAndAlter(final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the getAndAlter operation");
+            throw new TransactionRequiredException(getClass(),"getAndAlter");
         }
 
         return getAndAlter((BetaTransaction)tx, function);
     }
 
     @Override
-    public final ${transactionalObject.type} getAndAlter(
-        final Transaction tx,
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-
+    public final ${transactionalObject.type} getAndAlter(final Transaction tx,final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
         return getAndAlter((BetaTransaction)tx, function);
     }
 
-    public final ${transactionalObject.type} getAndAlter(
-        final BetaTransaction tx,
-        final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
-
+    public final ${transactionalObject.type} getAndAlter(final BetaTransaction tx,final ${transactionalObject.functionClass}${transactionalObject.typeParameter} function){
         if(function == null){
             tx.abort();
             throw new NullPointerException("Function can't be null");
@@ -735,10 +706,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     @Override
-    public final boolean atomicCompareAndSet(
-        final ${transactionalObject.type} expectedValue,
-        final ${transactionalObject.type} newValue){
-
+    public final boolean atomicCompareAndSet(final ${transactionalObject.type} expectedValue,final ${transactionalObject.type} newValue){
         final int arriveStatus = ___arriveAndLockOrBackoff();
 
         if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
@@ -762,7 +730,6 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             return true;
         }
 
-
         ___value = newValue;
         ___version++;
         Listeners listeners = ___removeListenersAfterWrite();
@@ -781,7 +748,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the getAndSet operation");
+            throw new TransactionRequiredException(getClass(),"getAndSet");
         }
 
         return getAndSet((BetaTransaction)tx, value);
@@ -791,7 +758,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the set operation");
+            throw new TransactionRequiredException(getClass(),"set");
         }
 
         return set((BetaTransaction)tx, value);
@@ -802,7 +769,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the get operation");
+            throw new TransactionRequiredException(getClass(),"get");
         }
 
         return get((BetaTransaction)tx);
@@ -887,26 +854,17 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         return set((BetaTransaction)tx, value);
     }
 
-    public final ${transactionalObject.type} set(
-        final BetaTransaction tx,
-        final ${transactionalObject.type} value){
-
+    public final ${transactionalObject.type} set(final BetaTransaction tx,final ${transactionalObject.type} value){
         tx.openForWrite(this, LOCKMODE_NONE).value = value;
         return value;
     }
 
     @Override
-    public final ${transactionalObject.type} getAndSet(
-        final Transaction tx,
-        final ${transactionalObject.type} value){
-
+    public final ${transactionalObject.type} getAndSet(final Transaction tx,final ${transactionalObject.type} value){
         return getAndSet((BetaTransaction)tx, value);
     }
 
-    public final ${transactionalObject.type} getAndSet(
-        final BetaTransaction tx,
-        final ${transactionalObject.type} value){
-
+    public final ${transactionalObject.type} getAndSet(final BetaTransaction tx,final ${transactionalObject.type} value){
         ${transactionalObject.tranlocal}${transactionalObject.typeParameter} write = tx.openForWrite(this, LOCKMODE_NONE);
         ${transactionalObject.type} oldValue = write.value;
         write.value = value;
@@ -918,24 +876,18 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException("No transaction is found for the await operation");                                            
+            throw new TransactionRequiredException(getClass(),"await");                                            
         }
 
         await((BetaTransaction)tx, value);
     }
 
     @Override
-    public final void await(
-        final Transaction tx,
-        final ${transactionalObject.type} value){
-
+    public final void await(final Transaction tx,final ${transactionalObject.type} value){
         await((BetaTransaction)tx, value);
     }
 
-    public final void await(
-        final BetaTransaction tx,
-        final ${transactionalObject.type} value){
-
+    public final void await(final BetaTransaction tx,final ${transactionalObject.type} value){
         ${transactionalObject.tranlocal}${transactionalObject.typeParameter} read = tx.openForRead(this,LOCKMODE_NONE);
         if(read.value != value){
             StmUtils.retry();
