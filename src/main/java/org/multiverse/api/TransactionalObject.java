@@ -328,14 +328,46 @@ public interface TransactionalObject {
      */
     boolean tryEnsure(Transaction self);
 
-
     /**
+     * Does a deferred ensure. What is means is that at the end of the transaction (so deferred)
+     * checks if no other transaction has made an update and also guarantees that till the transaction
+     * completes no other transaction is able to do an update. Using the deferredEnsure you can
+     * coordinate writeskew problem on the reference level. This can safely be called on already
+     * ensured/privatized tranlocals (although it doesn't provide any value anymore since the ensure
+     * privatize already prevent conflicts).
+     * <p/>
+     * Unlike the {@link #ensure()} which is pessimistic, this is optimistic.
+     * <p/>
+     * This method doesn't provide any value if the transaction is readonly.
+     * <p/>
+     * This call lifts on the Transaction stored in the ThreadLocalTransaction.
+     *
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     *
+     * @throws org.multiverse.api.exceptions.ControlFlowError
      *
      */
     void deferredEnsure();
 
     /**
-     * @param self
+     * Does a deferred ensure. What is means is that at the end of the transaction (so deferred)
+     * checks if no other transaction has made an update and also guarantees that till the transaction
+     * completes no other transaction is able to do an update. Using the deferredEnsure you can
+     * coordinate writeskew problem on the reference level. This can safely be called on already
+     * ensured/privatized tranlocals (although it doesn't provide any value anymore since the ensure
+     * privatize already prevent conflicts).
+     * <p/>
+     * Unlike the {@link #ensure(Transaction)} which is pessimistic, this is optimistic.
+     * <p/>
+     * This method doesn't provide any value if the transaction is readonly.
+     * <p/>
+     *
+     * @param self the Transaction this call lifts on.
+     * @throws NullPointerException if self is null.
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     *
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     void deferredEnsure(Transaction self);
 }
