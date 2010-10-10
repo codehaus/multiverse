@@ -213,8 +213,6 @@ and not allowed. So not throw the retry error immediately..
 
 - tryPrivatizeWhen
 
-- ensureOptimistic
-
 - read uncommitted isolation level
 
 - improved testing in the transaction for the ensure functionality
@@ -249,11 +247,14 @@ and not allowed. So not throw the retry error immediately..
 
 - repeatable read isolation level
 
-- drop doPrepareWithWriteSkewPrevention
-    - set the check conflict on load
+- testing on checkConflict on openForRead
 
+- testing on checkConflict on openForWrite.
 
 done
+
+- drop doPrepareWithWriteSkewPrevention
+    - set the check conflict on load
 
 - testing: prepare and writeskew
 

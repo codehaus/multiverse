@@ -1303,7 +1303,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
                 && hasUpdates
                 && config.readLockMode != LOCKMODE_COMMIT;
 
-
             if(config.dirtyCheck){
                 if(needsPrepare && !tranlocal.prepareDirtyUpdates(pool, this, config.spinCount)){
                     throw abortOnWriteConflict();
@@ -1352,7 +1351,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnWriteConflict();
         }
 
-        if(hasUpdates && config.writeLockMode != LOCKMODE_COMMIT){
+        if(hasUpdates && config.readLockMode != LOCKMODE_COMMIT){
             final boolean success = config.dirtyCheck
                     ? attached.prepareDirtyUpdates(pool, this, config.spinCount)
                     : attached.prepareAllUpdates(pool, this, config.spinCount);

@@ -152,6 +152,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         tranlocal.isCommitted = true;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             ref.___abort(this, tranlocal, pool);
@@ -270,6 +271,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         tranlocal.isCommitted = false;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             tranlocal.owner.___abort(this, tranlocal, pool);
@@ -396,7 +398,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(tranlocal == null){
             tranlocal = new RefTranlocal<E>(ref);
         }
-        tranlocal.isCommuting = true;
+        tranlocal.isCommuting = true;        
         tranlocal.addCommutingFunction(function, pool);
 
         array[firstFreeIndex] = tranlocal;
@@ -471,6 +473,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         tranlocal.isCommitted = true;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             ref.___abort(this, tranlocal, pool);
@@ -589,6 +592,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         tranlocal.isCommitted = false;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             tranlocal.owner.___abort(this, tranlocal, pool);
@@ -715,7 +719,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(tranlocal == null){
             tranlocal = new IntRefTranlocal(ref);
         }
-        tranlocal.isCommuting = true;
+        tranlocal.isCommuting = true;        
         tranlocal.addCommutingFunction(function, pool);
 
         array[firstFreeIndex] = tranlocal;
@@ -790,6 +794,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         tranlocal.isCommitted = true;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             ref.___abort(this, tranlocal, pool);
@@ -908,6 +913,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         tranlocal.isCommitted = false;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             tranlocal.owner.___abort(this, tranlocal, pool);
@@ -1034,7 +1040,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(tranlocal == null){
             tranlocal = new BooleanRefTranlocal(ref);
         }
-        tranlocal.isCommuting = true;
+        tranlocal.isCommuting = true;        
         tranlocal.addCommutingFunction(function, pool);
 
         array[firstFreeIndex] = tranlocal;
@@ -1109,6 +1115,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         tranlocal.isCommitted = true;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             ref.___abort(this, tranlocal, pool);
@@ -1227,6 +1234,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         tranlocal.isCommitted = false;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             tranlocal.owner.___abort(this, tranlocal, pool);
@@ -1353,7 +1361,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(tranlocal == null){
             tranlocal = new DoubleRefTranlocal(ref);
         }
-        tranlocal.isCommuting = true;
+        tranlocal.isCommuting = true;        
         tranlocal.addCommutingFunction(function, pool);
 
         array[firstFreeIndex] = tranlocal;
@@ -1428,6 +1436,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         tranlocal.isCommitted = true;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             ref.___abort(this, tranlocal, pool);
@@ -1546,6 +1555,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         tranlocal.isCommitted = false;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             tranlocal.owner.___abort(this, tranlocal, pool);
@@ -1672,7 +1682,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(tranlocal == null){
             tranlocal = new LongRefTranlocal(ref);
         }
-        tranlocal.isCommuting = true;
+        tranlocal.isCommuting = true;        
         tranlocal.addCommutingFunction(function, pool);
 
         array[firstFreeIndex] = tranlocal;
@@ -1744,6 +1754,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         tranlocal.isCommitted = true;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             ref.___abort(this, tranlocal, pool);
@@ -1862,6 +1873,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         tranlocal.isCommitted = false;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             tranlocal.owner.___abort(this, tranlocal, pool);
@@ -1987,7 +1999,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(tranlocal == null){
             tranlocal = ref.___newTranlocal();
         }
-        tranlocal.isCommuting = true;
+        tranlocal.isCommuting = true;        
         tranlocal.addCommutingFunction(function, pool);
 
         array[firstFreeIndex] = tranlocal;
@@ -2126,10 +2138,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             final Tranlocal tranlocal = array[k];
             array[k] = null;
 
-            if(!tranlocal.isCommitted){
-                tranlocal.isDirty = true;
-            }
-
             final Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool);
 
             if(listeners != null){
@@ -2215,22 +2223,13 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnWriteConflict();
             }
 
-            if(hasUpdates){
-                if(!config.writeSkewAllowed){
-                    if(!doPrepareWithWriteSkewPrevention()){
-                        throw abortOnWriteConflict();
-                    }
-                }else if(config.dirtyCheck){
-                    if(!doPrepareDirty()){
-                        throw abortOnWriteConflict();
-                    }
-                }else{
-                    if(!doPrepareAll()){
-                        throw abortOnWriteConflict();
-                    }
+            if(hasUpdates && config.readLockMode != LOCKMODE_COMMIT){
+                final boolean success = config.dirtyCheck ? doPrepareDirty(): doPrepareAll();
+                if(!success){
+                    throw abortOnWriteConflict();
                 }
             }
-
+            
             status = PREPARED;
             abort = false;
         }finally{
@@ -2240,29 +2239,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
     }
 
-    private boolean doPrepareWithWriteSkewPrevention() {
-        if(config.readLockMode == LOCKMODE_COMMIT){
-            return true;
-        }
-
-        final int spinCount = config.spinCount;
-        final boolean dirtyCheck = config.dirtyCheck;
-        for (int k = 0; k < firstFreeIndex; k++) {
-            final Tranlocal tranlocal = array[k];
-
-            if(!tranlocal.prepareWithWriteSkewPrevention(pool,this, config.spinCount, config.dirtyCheck)){
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     private boolean doPrepareAll() {
-        if(config.writeLockMode == LOCKMODE_COMMIT){
-            return true;
-        }
-
         final int spinCount = config.spinCount;
 
         for (int k = 0; k < firstFreeIndex; k++) {
@@ -2277,10 +2254,6 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     private boolean doPrepareDirty() {
-        if(config.writeLockMode == LOCKMODE_COMMIT){
-            return true;
-        }
-
         final int spinCount = config.spinCount;
 
         for (int k = 0; k < firstFreeIndex; k++) {

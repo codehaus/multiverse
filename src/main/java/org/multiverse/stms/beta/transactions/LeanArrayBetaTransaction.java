@@ -144,6 +144,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         tranlocal.isCommitted = true;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             ref.___abort(this, tranlocal, pool);
@@ -225,6 +226,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         tranlocal.isCommitted = false;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             tranlocal.owner.___abort(this, tranlocal, pool);
@@ -369,6 +371,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         tranlocal.isCommitted = true;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             ref.___abort(this, tranlocal, pool);
@@ -450,6 +453,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         tranlocal.isCommitted = false;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             tranlocal.owner.___abort(this, tranlocal, pool);
@@ -594,6 +598,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         tranlocal.isCommitted = true;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             ref.___abort(this, tranlocal, pool);
@@ -675,6 +680,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         tranlocal.isCommitted = false;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             tranlocal.owner.___abort(this, tranlocal, pool);
@@ -819,6 +825,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         tranlocal.isCommitted = true;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             ref.___abort(this, tranlocal, pool);
@@ -900,6 +907,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         tranlocal.isCommitted = false;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             tranlocal.owner.___abort(this, tranlocal, pool);
@@ -1044,6 +1052,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         tranlocal.isCommitted = true;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             ref.___abort(this, tranlocal, pool);
@@ -1125,6 +1134,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         tranlocal.isCommitted = false;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             tranlocal.owner.___abort(this, tranlocal, pool);
@@ -1266,6 +1276,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         tranlocal.isCommitted = true;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             ref.___abort(this, tranlocal, pool);
@@ -1347,6 +1358,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         tranlocal.isCommitted = false;
+        tranlocal.checkConflict = !config.writeSkewAllowed;
 
         if (hasReadConflict()) {
             tranlocal.owner.___abort(this, tranlocal, pool);
@@ -1541,7 +1553,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if (firstFreeIndex > 0) {
             final boolean needsPrepare = status == ACTIVE
                     && hasUpdates
-                    && config.writeLockMode != LOCKMODE_COMMIT;
+                    && config.readLockMode != LOCKMODE_COMMIT;
 
             if(config.dirtyCheck){
                 if(needsPrepare && !doPrepareDirty()){
@@ -1572,10 +1584,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         for (int k = 0; k < firstFreeIndex; k++) {
             final Tranlocal tranlocal = array[k];
             array[k] = null;
-
-            if(!tranlocal.isCommitted){
-                tranlocal.isDirty = true;
-            }
 
             final Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool);
 
@@ -1652,9 +1660,9 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnWriteConflict();
         }
 
-        if(hasUpdates && config.writeLockMode != LOCKMODE_COMMIT){
-            final boolean prepareSuccess = config.dirtyCheck ? doPrepareDirty() : doPrepareAll();
-            if(!prepareSuccess){
+        if(hasUpdates && config.readLockMode != LOCKMODE_COMMIT){
+            final boolean success = config.dirtyCheck ? doPrepareDirty() : doPrepareAll();
+            if(!success){
                 throw abortOnWriteConflict();
             }
         }
@@ -1663,10 +1671,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     }
 
     private boolean doPrepareAll() {
-        if(config.writeLockMode == LOCKMODE_COMMIT){
-            return true;
-        }
-
         final int spinCount = config.spinCount;
 
         for (int k = 0; k < firstFreeIndex; k++) {
@@ -1681,10 +1685,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     }
 
     private boolean doPrepareDirty() {
-        if(config.writeLockMode == LOCKMODE_COMMIT){
-            return true;
-        }
-
         final int spinCount = config.spinCount;
 
         for (int k = 0; k < firstFreeIndex; k++) {

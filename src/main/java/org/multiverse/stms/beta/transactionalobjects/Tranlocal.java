@@ -70,43 +70,7 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
      */
     public abstract void addCommutingFunction(Function function, BetaObjectPool pool);
 
-    public final boolean prepareWithWriteSkewPrevention(
-            final BetaObjectPool pool, final BetaTransaction tx, final int spinCount, final boolean dirtyCheck) {
-
-        if (isConstructing) {
-            return true;
-        }
-
-        if (isCommitted) {
-            if (lockMode == LOCKMODE_COMMIT) {
-                return true;
-            }
-
-            return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
-        }
-
-        if (isCommuting) {
-            if (owner.___load(spinCount, tx, LOCKMODE_COMMIT, this)) {
-                return false;
-            }
-
-            evaluateCommutingFunctions(pool);
-            return true;
-        }
-
-        if (dirtyCheck) {
-            calculateIsDirty();
-        }
-
-        if (lockMode == LOCKMODE_COMMIT) {
-            return true;
-        }
-
-        return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
-
-    }
-
-    public final boolean prepareDirtyUpdates(
+     public final boolean prepareDirtyUpdates(
             final BetaObjectPool pool, final BetaTransaction tx, final int spinCount) {
 
         if (isConstructing) {

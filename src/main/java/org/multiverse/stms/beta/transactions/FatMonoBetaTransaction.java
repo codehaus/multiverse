@@ -2002,7 +2002,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     // ======================= read conflict =======================================
 
     private boolean hasReadConflict() {
-        if(config.readLockMode!=LOCKMODE_NONE || config.inconsistentReadAllowed){
+        if(config.readLockMode != LOCKMODE_NONE || config.inconsistentReadAllowed){
             return false;
         }
 
@@ -2131,7 +2131,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnWriteConflict();
             }
 
-            if(hasUpdates && config.writeLockMode != LOCKMODE_COMMIT){
+            if(hasUpdates && config.readLockMode != LOCKMODE_COMMIT){
                 final boolean success = config.dirtyCheck
                     ? attached.prepareDirtyUpdates(pool, this, config.spinCount)
                     : attached.prepareAllUpdates(pool, this, config.spinCount);
