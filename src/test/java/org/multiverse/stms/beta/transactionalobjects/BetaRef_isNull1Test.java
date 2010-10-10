@@ -26,8 +26,9 @@ public class BetaRef_isNull1Test {
 
     @Test
     public void whenTransactionNull_thenNullPointerException() {
-        BetaRef ref = newRef(stm);
-        long version = ref.getVersion();
+        String initialValue = "foo";
+        BetaRef<String> ref = newRef(stm,initialValue);
+        long initialVersion = ref.getVersion();
 
         try {
             ref.isNull(null);
@@ -35,13 +36,14 @@ public class BetaRef_isNull1Test {
         } catch (NullPointerException expected) {
         }
 
-        assertVersionAndValue(ref, version, null);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
     public void whenTransactionPrepared_thenPreparedTransactionException() {
-        BetaRef ref = newRef(stm);
-        long version = ref.getVersion();
+        String initialValue = "foo";
+        BetaRef<String> ref = newRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.prepare();
 
@@ -52,13 +54,14 @@ public class BetaRef_isNull1Test {
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, version, null);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
     public void whenTransactionCommitted_thenDeadTransactionException() {
-        BetaRef ref = newRef(stm);
-        long version = ref.getVersion();
+        String initialValue = "foo";
+        BetaRef<String> ref = newRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.commit();
 
@@ -69,13 +72,14 @@ public class BetaRef_isNull1Test {
         }
 
         assertIsCommitted(tx);
-        assertVersionAndValue(ref, version, null);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
     public void whenTransactionAborted_thenDeadTransactionException() {
-        BetaRef ref = newRef(stm);
-        long version = ref.getVersion();
+        String initialValue = "foo";
+        BetaRef<String> ref = newRef(stm,initialValue);
+        long initialVersion = ref.getVersion();
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.abort();
 
@@ -86,13 +90,13 @@ public class BetaRef_isNull1Test {
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, version, null);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
     public void whenNull() {
         BetaRef ref = newRef(stm);
-        long version = ref.getVersion();
+        long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         boolean result = ref.isNull(tx);
@@ -100,14 +104,14 @@ public class BetaRef_isNull1Test {
 
         assertTrue(result);
         assertIsCommitted(tx);
-        assertVersionAndValue(ref, version, null);
+        assertVersionAndValue(ref, initialVersion, null);
     }
 
     @Test
     public void whenNotNull() {
-        String value = "foo";
-        BetaRef ref = newRef(stm, value);
-        long version = ref.getVersion();
+        String initialValue = "foo";
+        BetaRef ref = newRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         boolean result = ref.isNull(tx);
@@ -115,19 +119,21 @@ public class BetaRef_isNull1Test {
 
         assertFalse(result);
         assertIsCommitted(tx);
-        assertVersionAndValue(ref, version, value);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
     public void whenNormalTransactionUsed() {
-        BetaRef ref = newRef(stm);
-        long version = ref.getVersion();
+        String initialValue =null;
+        BetaRef<String> ref = newRef(stm,initialValue);
+        long initialVersion = ref.getVersion();
+
         Transaction tx = stm.startDefaultTransaction();
         boolean result = ref.isNull(tx);
         tx.commit();
 
         assertTrue(result);
         assertIsCommitted(tx);
-        assertVersionAndValue(ref, version, null);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 }

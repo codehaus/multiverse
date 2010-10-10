@@ -55,7 +55,9 @@ public class BetaRef_isNull0Test {
 
     @Test
     public void whenActiveTransactionAvailable() {
-        BetaRef<String> ref = newRef(stm, "foo");
+        String initialValue = "foo";
+        BetaRef<String> ref = newRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -64,13 +66,14 @@ public class BetaRef_isNull0Test {
         assertTrue(ref.isNull());
 
         assertIsActive(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
     public void whenPreparedTransactionAvailable_thenPreparedTransactionException() {
-        String value = "foo";
-        BetaRef ref = newRef(stm, value);
-        long version = ref.getVersion();
+        String initialValue = "foo";
+        BetaRef ref = newRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -84,8 +87,8 @@ public class BetaRef_isNull0Test {
 
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertEquals(version, ref.getVersion());
-        assertVersionAndValue(ref, version, value);
+        assertEquals(initialVersion, ref.getVersion());
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test

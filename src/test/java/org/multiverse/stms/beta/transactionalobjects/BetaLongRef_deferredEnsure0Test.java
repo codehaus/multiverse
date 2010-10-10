@@ -174,5 +174,4 @@ public class BetaLongRef_deferredEnsure0Test {
 
         assertIsAborted(tx2);
     }
-
 }
