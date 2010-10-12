@@ -23,7 +23,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
     private LocalConflictCounter localConflictCounter;
     private int firstFreeIndex = 0;
     private boolean hasReads;
-    private boolean hasUpdates;
     private boolean hasUntrackedReads;
 
     public LeanArrayBetaTransaction(final BetaStm stm) {
@@ -59,7 +58,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         for(int k=0;k<firstFreeIndex;k++){
             final Tranlocal tranlocal = array[k];
 
-            if(tranlocal.isCommitted){
+            if(tranlocal.isReadonly()){
                 continue;
             }
 
@@ -89,6 +88,33 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         throw new TodoException();
     }
 
+    public final <E> RefTranlocal<E> open(BetaRef<E> ref){
+        if (status != ACTIVE) {
+            throw abortOpen(ref);
+        }
+        
+        final int index = indexOf(ref);
+        if(index != -1){
+            return (RefTranlocal<E>)array[index];
+        }
+
+        //check if the size is not exceeded.
+        if (firstFreeIndex == array.length) {
+            throw abortOnTooSmallSize(array.length+1);
+        }
+
+        RefTranlocal<E> tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new RefTranlocal<E>(ref);
+        }
+
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
+        tranlocal.tx = this;
+        array[firstFreeIndex] = tranlocal;
+        firstFreeIndex++;
+        return tranlocal;
+    }
+
     @Override
     public <E> RefTranlocal<E> openForRead(
         final BetaRef<E> ref, int lockMode) {
@@ -114,7 +140,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 array[0] = tranlocal;
             }
 
-            if (tranlocal.lockMode < lockMode
+            if (tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
 
                 throw abortOnReadConflict();
@@ -143,15 +169,15 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = true;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_READONLY);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
         if (hasReadConflict()) {
             ref.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        if( lockMode != LOCKMODE_NONE || config.trackReads || tranlocal.hasDepartObligation){
+        if( lockMode != LOCKMODE_NONE || config.trackReads || tranlocal.hasDepartObligation()){
             array[firstFreeIndex] = tranlocal;
             firstFreeIndex++;
         }else{
@@ -190,14 +216,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 array[0] = tranlocal;
             }
 
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                  && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal,lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            if(tranlocal.isCommitted){
+            if(tranlocal.isReadonly()){
                 hasUpdates = true;
-                tranlocal.isCommitted = false;
+                tranlocal.setStatus(STATUS_UPDATE);
             }
 
             return tranlocal;
@@ -225,15 +251,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
            throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = false;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_UPDATE);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
         if (hasReadConflict()) {
             tranlocal.owner.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = false;
         hasUpdates = true;
         array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
@@ -260,7 +285,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(index >= 0){
             RefTranlocal<E> result = (RefTranlocal<E>)array[index];
 
-            if(!result.isConstructing){
+            if(!result.isConstructing()){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -288,9 +313,9 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(tranlocal == null){
                 tranlocal = new RefTranlocal<E>(ref);
         }
-        tranlocal.lockMode = LOCKMODE_COMMIT;
-        tranlocal.isConstructing = true;
-        tranlocal.isDirty = true;
+        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setStatus(STATUS_CONSTRUCTING);
+        tranlocal.setDirty(true);
         array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
         return tranlocal;
@@ -314,6 +339,33 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
     public final  int read(BetaIntRef ref){
         throw new TodoException();
+    }
+
+    public final  IntRefTranlocal open(BetaIntRef ref){
+        if (status != ACTIVE) {
+            throw abortOpen(ref);
+        }
+        
+        final int index = indexOf(ref);
+        if(index != -1){
+            return (IntRefTranlocal)array[index];
+        }
+
+        //check if the size is not exceeded.
+        if (firstFreeIndex == array.length) {
+            throw abortOnTooSmallSize(array.length+1);
+        }
+
+        IntRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new IntRefTranlocal(ref);
+        }
+
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
+        tranlocal.tx = this;
+        array[firstFreeIndex] = tranlocal;
+        firstFreeIndex++;
+        return tranlocal;
     }
 
     @Override
@@ -341,7 +393,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 array[0] = tranlocal;
             }
 
-            if (tranlocal.lockMode < lockMode
+            if (tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
 
                 throw abortOnReadConflict();
@@ -370,15 +422,15 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = true;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_READONLY);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
         if (hasReadConflict()) {
             ref.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        if( lockMode != LOCKMODE_NONE || config.trackReads || tranlocal.hasDepartObligation){
+        if( lockMode != LOCKMODE_NONE || config.trackReads || tranlocal.hasDepartObligation()){
             array[firstFreeIndex] = tranlocal;
             firstFreeIndex++;
         }else{
@@ -417,14 +469,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 array[0] = tranlocal;
             }
 
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                  && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal,lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            if(tranlocal.isCommitted){
+            if(tranlocal.isReadonly()){
                 hasUpdates = true;
-                tranlocal.isCommitted = false;
+                tranlocal.setStatus(STATUS_UPDATE);
             }
 
             return tranlocal;
@@ -452,15 +504,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
            throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = false;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_UPDATE);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
         if (hasReadConflict()) {
             tranlocal.owner.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = false;
         hasUpdates = true;
         array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
@@ -487,7 +538,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(index >= 0){
             IntRefTranlocal result = (IntRefTranlocal)array[index];
 
-            if(!result.isConstructing){
+            if(!result.isConstructing()){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -515,9 +566,9 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(tranlocal == null){
                 tranlocal = new IntRefTranlocal(ref);
         }
-        tranlocal.lockMode = LOCKMODE_COMMIT;
-        tranlocal.isConstructing = true;
-        tranlocal.isDirty = true;
+        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setStatus(STATUS_CONSTRUCTING);
+        tranlocal.setDirty(true);
         array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
         return tranlocal;
@@ -541,6 +592,33 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
     public final  boolean read(BetaBooleanRef ref){
         throw new TodoException();
+    }
+
+    public final  BooleanRefTranlocal open(BetaBooleanRef ref){
+        if (status != ACTIVE) {
+            throw abortOpen(ref);
+        }
+        
+        final int index = indexOf(ref);
+        if(index != -1){
+            return (BooleanRefTranlocal)array[index];
+        }
+
+        //check if the size is not exceeded.
+        if (firstFreeIndex == array.length) {
+            throw abortOnTooSmallSize(array.length+1);
+        }
+
+        BooleanRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new BooleanRefTranlocal(ref);
+        }
+
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
+        tranlocal.tx = this;
+        array[firstFreeIndex] = tranlocal;
+        firstFreeIndex++;
+        return tranlocal;
     }
 
     @Override
@@ -568,7 +646,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 array[0] = tranlocal;
             }
 
-            if (tranlocal.lockMode < lockMode
+            if (tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
 
                 throw abortOnReadConflict();
@@ -597,15 +675,15 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = true;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_READONLY);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
         if (hasReadConflict()) {
             ref.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        if( lockMode != LOCKMODE_NONE || config.trackReads || tranlocal.hasDepartObligation){
+        if( lockMode != LOCKMODE_NONE || config.trackReads || tranlocal.hasDepartObligation()){
             array[firstFreeIndex] = tranlocal;
             firstFreeIndex++;
         }else{
@@ -644,14 +722,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 array[0] = tranlocal;
             }
 
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                  && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal,lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            if(tranlocal.isCommitted){
+            if(tranlocal.isReadonly()){
                 hasUpdates = true;
-                tranlocal.isCommitted = false;
+                tranlocal.setStatus(STATUS_UPDATE);
             }
 
             return tranlocal;
@@ -679,15 +757,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
            throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = false;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_UPDATE);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
         if (hasReadConflict()) {
             tranlocal.owner.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = false;
         hasUpdates = true;
         array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
@@ -714,7 +791,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(index >= 0){
             BooleanRefTranlocal result = (BooleanRefTranlocal)array[index];
 
-            if(!result.isConstructing){
+            if(!result.isConstructing()){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -742,9 +819,9 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(tranlocal == null){
                 tranlocal = new BooleanRefTranlocal(ref);
         }
-        tranlocal.lockMode = LOCKMODE_COMMIT;
-        tranlocal.isConstructing = true;
-        tranlocal.isDirty = true;
+        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setStatus(STATUS_CONSTRUCTING);
+        tranlocal.setDirty(true);
         array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
         return tranlocal;
@@ -768,6 +845,33 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
     public final  double read(BetaDoubleRef ref){
         throw new TodoException();
+    }
+
+    public final  DoubleRefTranlocal open(BetaDoubleRef ref){
+        if (status != ACTIVE) {
+            throw abortOpen(ref);
+        }
+        
+        final int index = indexOf(ref);
+        if(index != -1){
+            return (DoubleRefTranlocal)array[index];
+        }
+
+        //check if the size is not exceeded.
+        if (firstFreeIndex == array.length) {
+            throw abortOnTooSmallSize(array.length+1);
+        }
+
+        DoubleRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new DoubleRefTranlocal(ref);
+        }
+
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
+        tranlocal.tx = this;
+        array[firstFreeIndex] = tranlocal;
+        firstFreeIndex++;
+        return tranlocal;
     }
 
     @Override
@@ -795,7 +899,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 array[0] = tranlocal;
             }
 
-            if (tranlocal.lockMode < lockMode
+            if (tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
 
                 throw abortOnReadConflict();
@@ -824,15 +928,15 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = true;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_READONLY);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
         if (hasReadConflict()) {
             ref.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        if( lockMode != LOCKMODE_NONE || config.trackReads || tranlocal.hasDepartObligation){
+        if( lockMode != LOCKMODE_NONE || config.trackReads || tranlocal.hasDepartObligation()){
             array[firstFreeIndex] = tranlocal;
             firstFreeIndex++;
         }else{
@@ -871,14 +975,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 array[0] = tranlocal;
             }
 
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                  && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal,lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            if(tranlocal.isCommitted){
+            if(tranlocal.isReadonly()){
                 hasUpdates = true;
-                tranlocal.isCommitted = false;
+                tranlocal.setStatus(STATUS_UPDATE);
             }
 
             return tranlocal;
@@ -906,15 +1010,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
            throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = false;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_UPDATE);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
         if (hasReadConflict()) {
             tranlocal.owner.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = false;
         hasUpdates = true;
         array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
@@ -941,7 +1044,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(index >= 0){
             DoubleRefTranlocal result = (DoubleRefTranlocal)array[index];
 
-            if(!result.isConstructing){
+            if(!result.isConstructing()){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -969,9 +1072,9 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(tranlocal == null){
                 tranlocal = new DoubleRefTranlocal(ref);
         }
-        tranlocal.lockMode = LOCKMODE_COMMIT;
-        tranlocal.isConstructing = true;
-        tranlocal.isDirty = true;
+        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setStatus(STATUS_CONSTRUCTING);
+        tranlocal.setDirty(true);
         array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
         return tranlocal;
@@ -995,6 +1098,33 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
     public final  long read(BetaLongRef ref){
         throw new TodoException();
+    }
+
+    public final  LongRefTranlocal open(BetaLongRef ref){
+        if (status != ACTIVE) {
+            throw abortOpen(ref);
+        }
+        
+        final int index = indexOf(ref);
+        if(index != -1){
+            return (LongRefTranlocal)array[index];
+        }
+
+        //check if the size is not exceeded.
+        if (firstFreeIndex == array.length) {
+            throw abortOnTooSmallSize(array.length+1);
+        }
+
+        LongRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new LongRefTranlocal(ref);
+        }
+
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
+        tranlocal.tx = this;
+        array[firstFreeIndex] = tranlocal;
+        firstFreeIndex++;
+        return tranlocal;
     }
 
     @Override
@@ -1022,7 +1152,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 array[0] = tranlocal;
             }
 
-            if (tranlocal.lockMode < lockMode
+            if (tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
 
                 throw abortOnReadConflict();
@@ -1051,15 +1181,15 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = true;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_READONLY);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
         if (hasReadConflict()) {
             ref.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        if( lockMode != LOCKMODE_NONE || config.trackReads || tranlocal.hasDepartObligation){
+        if( lockMode != LOCKMODE_NONE || config.trackReads || tranlocal.hasDepartObligation()){
             array[firstFreeIndex] = tranlocal;
             firstFreeIndex++;
         }else{
@@ -1098,14 +1228,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 array[0] = tranlocal;
             }
 
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                  && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal,lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            if(tranlocal.isCommitted){
+            if(tranlocal.isReadonly()){
                 hasUpdates = true;
-                tranlocal.isCommitted = false;
+                tranlocal.setStatus(STATUS_UPDATE);
             }
 
             return tranlocal;
@@ -1133,15 +1263,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
            throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = false;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_UPDATE);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
         if (hasReadConflict()) {
             tranlocal.owner.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = false;
         hasUpdates = true;
         array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
@@ -1168,7 +1297,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(index >= 0){
             LongRefTranlocal result = (LongRefTranlocal)array[index];
 
-            if(!result.isConstructing){
+            if(!result.isConstructing()){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -1196,9 +1325,9 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(tranlocal == null){
                 tranlocal = new LongRefTranlocal(ref);
         }
-        tranlocal.lockMode = LOCKMODE_COMMIT;
-        tranlocal.isConstructing = true;
-        tranlocal.isDirty = true;
+        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setStatus(STATUS_CONSTRUCTING);
+        tranlocal.setDirty(true);
         array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
         return tranlocal;
@@ -1220,6 +1349,33 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
   }
 
 
+
+    public final  Tranlocal open(BetaTransactionalObject ref){
+        if (status != ACTIVE) {
+            throw abortOpen(ref);
+        }
+        
+        final int index = indexOf(ref);
+        if(index != -1){
+            return (Tranlocal)array[index];
+        }
+
+        //check if the size is not exceeded.
+        if (firstFreeIndex == array.length) {
+            throw abortOnTooSmallSize(array.length+1);
+        }
+
+        Tranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = ref.___newTranlocal();
+        }
+
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
+        tranlocal.tx = this;
+        array[firstFreeIndex] = tranlocal;
+        firstFreeIndex++;
+        return tranlocal;
+    }
 
     @Override
     public  Tranlocal openForRead(
@@ -1246,7 +1402,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 array[0] = tranlocal;
             }
 
-            if (tranlocal.lockMode < lockMode
+            if (tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
 
                 throw abortOnReadConflict();
@@ -1275,15 +1431,15 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = true;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_READONLY);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
         if (hasReadConflict()) {
             ref.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        if( lockMode != LOCKMODE_NONE || config.trackReads || tranlocal.hasDepartObligation){
+        if( lockMode != LOCKMODE_NONE || config.trackReads || tranlocal.hasDepartObligation()){
             array[firstFreeIndex] = tranlocal;
             firstFreeIndex++;
         }else{
@@ -1322,14 +1478,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 array[0] = tranlocal;
             }
 
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                  && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal,lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            if(tranlocal.isCommitted){
+            if(tranlocal.isReadonly()){
                 hasUpdates = true;
-                tranlocal.isCommitted = false;
+                tranlocal.setStatus(STATUS_UPDATE);
             }
 
             return tranlocal;
@@ -1357,15 +1513,14 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
            throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = false;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_UPDATE);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
         if (hasReadConflict()) {
             tranlocal.owner.___abort(this, tranlocal, pool);
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = false;
         hasUpdates = true;
         array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
@@ -1392,7 +1547,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(index >= 0){
             Tranlocal result = (Tranlocal)array[index];
 
-            if(!result.isConstructing){
+            if(!result.isConstructing()){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -1420,9 +1575,9 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(tranlocal == null){
                 tranlocal = ref.___newTranlocal();
         }
-        tranlocal.lockMode = LOCKMODE_COMMIT;
-        tranlocal.isConstructing = true;
-        tranlocal.isDirty = true;
+        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setStatus(STATUS_CONSTRUCTING);
+        tranlocal.setDirty(true);
         array[firstFreeIndex] = tranlocal;
         firstFreeIndex++;
         return tranlocal;
@@ -1613,7 +1768,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
             //we need to make sure that the dirty flag is set since it could happen that the
             //prepare completes before setting the dirty flags
-            if(!tranlocal.isCommitted && !tranlocal.isDirty){
+            if(!tranlocal.isReadonly() && !tranlocal.isDirty()){
                 tranlocal.calculateIsDirty();
             }
 

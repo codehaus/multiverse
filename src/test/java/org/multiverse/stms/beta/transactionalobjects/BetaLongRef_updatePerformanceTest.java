@@ -35,8 +35,8 @@ public class BetaLongRef_updatePerformanceTest implements BetaStmConstants {
         long startMs = System.currentTimeMillis();
         for (long k = 0; k < transactionCount; k++) {
             ref.___load(2, tx, LOCKMODE_COMMIT, tranlocal);
-            tranlocal.isCommitted = false;
-            tranlocal.isDirty = true;
+            tranlocal.setStatus(STATUS_UPDATE);
+            tranlocal.setDirty(true);
             ref.___commitDirty(tranlocal, tx, pool);
         }
         long durationMs = System.currentTimeMillis() - startMs;

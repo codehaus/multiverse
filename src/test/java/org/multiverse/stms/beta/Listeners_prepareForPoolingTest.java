@@ -24,7 +24,7 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     public void whenCommuting() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.isCommuting = true;
+        tranlocal.setStatus(STATUS_COMMUTING);
         tranlocal.addCommutingFunction(Functions.newDecLongFunction(), pool);
 
         tranlocal.prepareForPooling(pool);
@@ -33,13 +33,13 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     }
 
     @Test
-    public void whenCommitted() {
+    public void whenReadonly() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.value = 100;
         tranlocal.oldValue = 100;
         tranlocal.version = 10;
-        tranlocal.isCommitted = true;
+        tranlocal.setStatus(STATUS_READONLY);
 
         tranlocal.prepareForPooling(pool);
 
@@ -63,7 +63,8 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     public void whenUpdateWithDirtyFlag() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.isDirty = true;
+        //todo: setUpdate
+        tranlocal.setDirty(true);
         tranlocal.value = 100;
         tranlocal.oldValue = 100;
         tranlocal.version = 10;
@@ -77,7 +78,7 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     public void whenHasCommitLock() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.lockMode = LOCKMODE_COMMIT;
+        tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.value = 100;
         tranlocal.oldValue = 100;
         tranlocal.version = 10;
@@ -91,7 +92,7 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     public void whenHasUpdateLock() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.lockMode = LOCKMODE_UPDATE;
+        tranlocal.setLockMode(LOCKMODE_UPDATE);
         tranlocal.value = 100;
         tranlocal.oldValue = 100;
         tranlocal.version = 10;
@@ -106,8 +107,8 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     public void whenConstructed() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.lockMode = LOCKMODE_COMMIT;
-        tranlocal.isConstructing = true;
+        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.value = 100;
         tranlocal.oldValue = 0;
 
@@ -120,7 +121,7 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     public void whenHasDepartObligation() {
         BetaLongRef ref = newLongRef(stm);
         LongRefTranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.hasDepartObligation = true;
+        tranlocal.setDepartObligation(true);
         tranlocal.value = 100;
         tranlocal.oldValue = 0;
 
@@ -134,12 +135,12 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
         assertEquals(0, tranlocal.value);
         assertEquals(0, tranlocal.oldValue);
         assertNull(tranlocal.owner);
-        assertFalse(tranlocal.hasDepartObligation);
-        assertFalse(tranlocal.isCommitted);
+        assertFalse(tranlocal.hasDepartObligation());
+        assertFalse(tranlocal.isReadonly());
         assertTranlocalHasNoLock(tranlocal);
-        assertFalse(tranlocal.isCommuting);
-        assertFalse(tranlocal.isConstructing);
-        assertFalse(tranlocal.isDirty);
+        assertFalse(tranlocal.isCommuting());
+        assertFalse(tranlocal.isConstructing());
+        assertFalse(tranlocal.isDirty());
         assertNull(tranlocal.headCallable);
     }
 }

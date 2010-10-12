@@ -20,8 +20,7 @@ import static java.lang.String.format;
  */
 public final class ${transaction.name} extends ${transaction.superClass} {
 
-    private Tranlocal attached;
-    private boolean hasUpdates;
+    private Tranlocal attached;  
 #if(!${transaction.lean})
     private boolean hasReads;
     private boolean hasUntrackedReads;
@@ -64,7 +63,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             return;
         }
 
-        if(attached == null||attached.isCommitted){
+        if(attached == null||attached.isReadonly()){
             return;
         }
 
@@ -113,6 +112,30 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 
 #end
+    public final ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} open(${ref.name}${ref.typeParameter} ref){
+        if (status != ACTIVE) {
+            throw abortOpen(ref);
+        }
+                
+        if(attached!=null && attached.owner == ref){
+            return (${ref.tranlocal}${ref.typeParameter})attached;
+        }
+
+        ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
+        if(tranlocal == null){
+#if(${ref.isReference})
+            tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
+#else
+            tranlocal = ref.___newTranlocal();
+#end
+        }
+
+        tranlocal.tx = this;
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
+        attached = tranlocal;
+        return tranlocal;
+    }
+
     @Override
     public final ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForRead(final ${ref.name}${ref.typeParameter} ref,int lockMode) {
 
@@ -155,7 +178,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 throw abortOnReadConflict();
             }
 
-            tranlocal.isCommitted = true;
+            tranlocal.setStatus(STATUS_READONLY);
 
 #if(!$transaction.lean)
             if(hasReadConflict()){
@@ -164,7 +187,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             }
 
 #end
-            if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation || config.trackReads){
+            if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation() || config.trackReads){
                 attached = tranlocal;
             }else{
 #if(!$transaction.lean)
@@ -184,12 +207,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             final ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})attached;
 
 #if(!$transaction.lean)
-            if(tranlocal.isCommuting){
+            if(tranlocal.isCommuting()){
                 flattenCommute(ref, tranlocal, lockMode);
                 return tranlocal;
             }
 #end
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -217,7 +240,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end
         }
 
-        tranlocal.isCommitted = true;
+        tranlocal.setStatus(STATUS_READONLY);
 
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
             throw abortOnReadConflict();
@@ -227,7 +250,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         pool.put(tranlocal);
         throw abortOnTooSmallSize(2);
 #else
-        if(tranlocal.hasDepartObligation){
+        if(tranlocal.hasDepartObligation()){
             pool.put(tranlocal);
             throw abortOnTooSmallSize(2);
         }
@@ -297,7 +320,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             }
 
 #end
-            tranlocal.isCommitted = false;
+            tranlocal.setStatus(STATUS_UPDATE);
             hasUpdates = true;
             attached = tranlocal;
             return tranlocal;
@@ -313,19 +336,19 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})attached;
 
 #if(!$transaction.lean)
-        if(tranlocal.isCommuting){
+        if(tranlocal.isCommuting()){
             flattenCommute(ref, tranlocal, lockMode);
             return tranlocal;
         }
 
 #end
-        if(tranlocal.lockMode< lockMode
+        if(tranlocal.getLockMode() < lockMode
             && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
             throw abortOnReadConflict();
         }
 
-        if(tranlocal.isCommitted){
-            tranlocal.isCommitted = false;
+        if(tranlocal.isReadonly()){
+            tranlocal.setStatus(STATUS_UPDATE);
             hasUpdates = true;
         }
 
@@ -359,7 +382,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             : (${ref.tranlocal}${ref.typeParameter})attached;
 
         if(tranlocal != null){
-            if(!tranlocal.isConstructing){
+            if(!tranlocal.isConstructing()){
                throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -383,9 +406,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             tranlocal = ref.___newTranlocal();
 #end
         }
-        tranlocal.isDirty = true;
-        tranlocal.lockMode = LOCKMODE_COMMIT;
-        tranlocal.isConstructing = true;
+        tranlocal.setDirty(true);
+        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setStatus(STATUS_CONSTRUCTING);
         attached = tranlocal;
         return tranlocal;
     }
@@ -433,20 +456,20 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end
             }
 
-            tranlocal.isCommuting = true;
+            tranlocal.setStatus(STATUS_COMMUTING);
             tranlocal.addCommutingFunction(function, pool);
             attached = tranlocal;
             hasUpdates = true;
             return;
         }
         ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})attached;
-        if(tranlocal.isCommuting){
+        if(tranlocal.isCommuting()){
             tranlocal.addCommutingFunction(function, pool);
             return;
         }
 
-        if(tranlocal.isCommitted){
-            tranlocal.isCommitted = false;
+        if(tranlocal.isReadonly()){
+            tranlocal.setStatus(STATUS_UPDATE);
             hasUpdates = true;
         }
 
@@ -555,24 +578,28 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         final Tranlocal tranlocal = attached;
         Listeners listeners = null;
         if(tranlocal != null){
-            final boolean needsPrepare = status == ACTIVE
-                && hasUpdates
-                && config.readLockMode != LOCKMODE_COMMIT;
-
-            if(config.dirtyCheck){
-                if(needsPrepare && !tranlocal.prepareDirtyUpdates(pool, this, config.spinCount)){
-                    throw abortOnWriteConflict();
-                } else if(!tranlocal.isDirty){
-                    tranlocal.calculateIsDirty();
-                }
-
-                listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool);
+            if(tranlocal.ignore()){
+                pool.put(tranlocal);
             }else{
-                if(needsPrepare && !tranlocal.prepareAllUpdates(pool, this, config.spinCount)){
-                    throw abortOnWriteConflict();
-                }
+                final boolean needsPrepare = status == ACTIVE
+                    && hasUpdates
+                    && config.readLockMode != LOCKMODE_COMMIT;
 
-                listeners = tranlocal.owner.___commitAll(tranlocal, this, pool);
+                if(config.dirtyCheck){
+                    if(needsPrepare && !tranlocal.prepareDirtyUpdates(pool, this, config.spinCount)){
+                        throw abortOnWriteConflict();
+                    } else if(!tranlocal.isReadonly() && !tranlocal.isDirty()){
+                        tranlocal.calculateIsDirty();
+                    }
+
+                    listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool);
+                }else{
+                    if(needsPrepare && !tranlocal.prepareAllUpdates(pool, this, config.spinCount)){
+                        throw abortOnWriteConflict();
+                    }
+
+                    listeners = tranlocal.owner.___commitAll(tranlocal, this, pool);
+                }
             }
             attached = null;
         }
@@ -596,7 +623,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         final Tranlocal tranlocal = attached;
         if (tranlocal != null) {
             if(config.dirtyCheck){
-                if(!tranlocal.isCommitted && !tranlocal.isDirty){
+                if(!tranlocal.isReadonly() && !tranlocal.isDirty()){
                     tranlocal.calculateIsDirty();
                 }
                 listeners = attached.owner.___commitDirty(tranlocal, this, pool);

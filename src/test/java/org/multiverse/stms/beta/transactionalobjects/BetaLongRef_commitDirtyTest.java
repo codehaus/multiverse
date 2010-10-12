@@ -46,7 +46,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tranlocal.value++;
-        tranlocal.isDirty = true;
+        tranlocal.setDirty(true);
         tranlocal.prepareDirtyUpdates(pool, tx, 1);
         long oldConflictCount = globalConflictCounter.count();
         Listeners listeners = ref.___commitDirty(tranlocal, tx, pool);

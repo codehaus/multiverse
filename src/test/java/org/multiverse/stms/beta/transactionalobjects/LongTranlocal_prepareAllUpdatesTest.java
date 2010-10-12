@@ -5,6 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertNull;
@@ -12,7 +13,7 @@ import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoUpdateLock;
 
-public class LongTranlocal_prepareAllUpdatesTest {
+public class LongTranlocal_prepareAllUpdatesTest implements BetaStmConstants {
     private BetaStm stm;
     private BetaObjectPool pool;
 
@@ -33,7 +34,7 @@ public class LongTranlocal_prepareAllUpdatesTest {
         long initialVersion = ref.getVersion();
 
         LongRefTranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.isCommitted = true;
+        tranlocal.setStatus(STATUS_READONLY);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tranlocal.prepareAllUpdates(pool, tx, 0);

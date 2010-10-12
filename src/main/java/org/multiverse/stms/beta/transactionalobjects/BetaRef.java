@@ -128,7 +128,7 @@ public final class BetaRef<E>
                     tranlocal.version = firstVersion;
                     tranlocal.value = firstValue;
                     tranlocal.oldValue = firstValue;
-                    tranlocal.hasDepartObligation = arriveStatus == ARRIVE_NORMAL;
+                    tranlocal.setDepartObligation(arriveStatus == ARRIVE_NORMAL);
                     return true;
                 }
 
@@ -157,8 +157,8 @@ public final class BetaRef<E>
             tranlocal.version = ___version;
             tranlocal.value = value;
             tranlocal.oldValue = value;
-            tranlocal.lockMode = commitLock ? LOCKMODE_COMMIT: LOCKMODE_UPDATE;
-            tranlocal.hasDepartObligation = arriveStatus == ARRIVE_NORMAL;
+            tranlocal.setLockMode(commitLock ? LOCKMODE_COMMIT: LOCKMODE_UPDATE);
+            tranlocal.setDepartObligation(arriveStatus == ARRIVE_NORMAL);
             return true;
         }
    }
@@ -169,17 +169,17 @@ public final class BetaRef<E>
             final BetaTransaction expectedLockOwner,
             final BetaObjectPool pool) {
 
-        if(!tranlocal.isDirty){
-            if(tranlocal.lockMode != LOCKMODE_NONE){
+        if(!tranlocal.isDirty()){
+            if(tranlocal.getLockMode() != LOCKMODE_NONE){
                 ___lockOwner = null;
 
-                if(tranlocal.hasDepartObligation){
+                if(tranlocal.hasDepartObligation()){
                     ___departAfterReadingAndUnlock();
                 }else{
                     ___unlockByReadBiased();
                 }
             }else{
-                if(tranlocal.hasDepartObligation){
+                if(tranlocal.hasDepartObligation()){
                     ___departAfterReading();
                 }
             }
@@ -211,17 +211,17 @@ public final class BetaRef<E>
             final BetaTransaction expectedLockOwner,
             final BetaObjectPool pool) {
 
-        if(tranlocal.isCommitted){
-            if(tranlocal.lockMode!=LOCKMODE_NONE){
+        if(tranlocal.isReadonly()){
+            if(tranlocal.getLockMode() != LOCKMODE_NONE){
                 ___lockOwner = null;
 
-                if(tranlocal.hasDepartObligation){
+                if(tranlocal.hasDepartObligation()){
                     ___departAfterReadingAndUnlock();
                 }else{
                     ___unlockByReadBiased();
                 }
             }else{
-                if(tranlocal.hasDepartObligation){
+                if(tranlocal.hasDepartObligation()){
                     ___departAfterReading();
                 }
             }
@@ -253,15 +253,15 @@ public final class BetaRef<E>
         final Tranlocal tranlocal,
         final BetaObjectPool pool) {
 
-        if(tranlocal.lockMode!=LOCKMODE_NONE){
+        if(tranlocal.getLockMode() != LOCKMODE_NONE){
             ___lockOwner = null;
 
-            if(!tranlocal.isConstructing){
+            if(!tranlocal.isConstructing()){
                 //depart and release the lock. This call is able to deal with readbiased and normal reads.
                 ___departAfterFailureAndUnlock();
             }
         }else{
-            if(tranlocal.hasDepartObligation){
+            if(tranlocal.hasDepartObligation()){
                 ___departAfterFailure();
             }
         }
@@ -335,6 +335,61 @@ public final class BetaRef<E>
     @Override
     public final boolean atomicIsNull(){
         return atomicGet() == null;
+    }
+
+    @Override
+    public final E awaitNotNullAndGet(){
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx == null){
+            throw new TransactionRequiredException(getClass(),"awaitNotNull");
+        }
+
+        return awaitNotNullAndGet((BetaTransaction)tx);
+    }
+
+    @Override
+    public final E awaitNotNullAndGet(Transaction tx){
+        return awaitNotNull((BetaTransaction)tx);
+    }
+
+    public final E awaitNotNull(BetaTransaction tx){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        E value = get(tx);
+        if(value == null){
+            StmUtils.retry();
+        }
+
+        return value;
+    }
+
+    @Override
+    public final void awaitNull(){
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx == null){
+            throw new TransactionRequiredException(getClass(),"awaitNull");
+        }
+
+        awaitNull((BetaTransaction)tx);
+    }
+
+    @Override
+    public final void awaitNull(Transaction tx){
+        awaitNull((BetaTransaction)tx);
+    }
+
+    public final void awaitNull(BetaTransaction tx){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        if(get(tx)!=null){
+            StmUtils.retry();
+        }
     }
 
     @Override

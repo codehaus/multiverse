@@ -34,12 +34,13 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     public final static int COMMITTED = 4;
 
     private final int poolTransactionType;
-    protected int status = ACTIVE;
-    protected int attempt = 1;
-    protected long remainingTimeoutNs;
-    protected BetaTransactionConfiguration config;
-    protected boolean abortOnly;
-    protected final BetaObjectPool pool = new BetaObjectPool();
+    public int status = ACTIVE;
+    public int attempt = 1;
+    public long remainingTimeoutNs;
+    public BetaTransactionConfiguration config;
+    public boolean abortOnly;
+    public final BetaObjectPool pool = new BetaObjectPool();
+    public boolean hasUpdates;
 
     public BetaTransaction(int poolTransactionType, BetaTransactionConfiguration config) {
         this.poolTransactionType = poolTransactionType;
@@ -127,25 +128,25 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     */
     public abstract ArrayList<TransactionLifecycleListener> getNormalListeners();
 
-    protected final SpeculativeConfigurationError abortOnTooSmallSize(int minimalSize) {
+    public final SpeculativeConfigurationError abortOnTooSmallSize(int minimalSize) {
         config.needsMinimalTransactionLength(minimalSize);
         abort();
         return SpeculativeConfigurationError.INSTANCE;
     }
 
-    protected final ReadWriteConflict abortOnReadConflict() {
+    public  final ReadWriteConflict abortOnReadConflict() {
         abort();
         return ReadWriteConflict.INSTANCE;
     }
 
-    protected final ReadWriteConflict abortOnWriteConflict() {
+    public  final ReadWriteConflict abortOnWriteConflict() {
         abort();
         return ReadWriteConflict.INSTANCE;
     }
 
     public final void materializeConflict(BetaTransactionalObject ref){
         Tranlocal tranlocal = openForRead(ref, LOCKMODE_NONE);
-        tranlocal.checkConflict = true;
+        tranlocal.setIsConflictCheckNeeded(true);
     }
 
     @Override
@@ -231,6 +232,27 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
             format("[%s] Can't openForWrite '%s' while evaluating a commuting function",
                 config.familyName, toDebugString(ref)));
     }
+
+    public final RuntimeException abortOpen(final BetaTransactionalObject ref){
+        switch (status) {
+            case PREPARED:
+                abort();
+                return new PreparedTransactionException(
+                    format("[%s] Can't open a transactional object on already prepared transaction",
+                        config.familyName));
+            case ABORTED:
+                return new DeadTransactionException(
+                    format("[%s] Can't open a transactional object on already aborted transaction",
+                        config.familyName));
+            case COMMITTED:
+                return new DeadTransactionException(
+                    format("[%s] Can't open a transactional object on already committed transaction",
+                        config.familyName));
+            default:
+                throw new IllegalStateException();
+        }
+   }
+
 
     public final RuntimeException abortOnOpenForConstructionWhileEvaluatingCommute(
         final BetaTransactionalObject ref){
@@ -478,6 +500,9 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract <E> E read(BetaRef<E> ref);
 
+
+    public abstract <E> RefTranlocal<E> open(BetaRef<E> ref);
+    
     public abstract <E> RefTranlocal<E> openForRead(BetaRef<E> ref, int lockMode);
 
     public abstract <E> RefTranlocal<E> openForWrite(BetaRef<E> ref, int lockMode);
@@ -488,6 +513,9 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract  int read(BetaIntRef ref);
 
+
+    public abstract  IntRefTranlocal open(BetaIntRef ref);
+    
     public abstract  IntRefTranlocal openForRead(BetaIntRef ref, int lockMode);
 
     public abstract  IntRefTranlocal openForWrite(BetaIntRef ref, int lockMode);
@@ -498,6 +526,9 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract  boolean read(BetaBooleanRef ref);
 
+
+    public abstract  BooleanRefTranlocal open(BetaBooleanRef ref);
+    
     public abstract  BooleanRefTranlocal openForRead(BetaBooleanRef ref, int lockMode);
 
     public abstract  BooleanRefTranlocal openForWrite(BetaBooleanRef ref, int lockMode);
@@ -508,6 +539,9 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract  double read(BetaDoubleRef ref);
 
+
+    public abstract  DoubleRefTranlocal open(BetaDoubleRef ref);
+    
     public abstract  DoubleRefTranlocal openForRead(BetaDoubleRef ref, int lockMode);
 
     public abstract  DoubleRefTranlocal openForWrite(BetaDoubleRef ref, int lockMode);
@@ -518,6 +552,9 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract  long read(BetaLongRef ref);
 
+
+    public abstract  LongRefTranlocal open(BetaLongRef ref);
+    
     public abstract  LongRefTranlocal openForRead(BetaLongRef ref, int lockMode);
 
     public abstract  LongRefTranlocal openForWrite(BetaLongRef ref, int lockMode);
@@ -526,6 +563,9 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract  void commute(BetaLongRef ref, final LongFunction function);
 
+
+    public abstract  Tranlocal open(BetaTransactionalObject ref);
+    
     public abstract  Tranlocal openForRead(BetaTransactionalObject ref, int lockMode);
 
     public abstract  Tranlocal openForWrite(BetaTransactionalObject ref, int lockMode);

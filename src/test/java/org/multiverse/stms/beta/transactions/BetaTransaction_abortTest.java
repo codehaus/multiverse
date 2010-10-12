@@ -269,8 +269,8 @@ public abstract class BetaTransaction_abortTest {
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertVersionAndValue(ref, 0, 0);
-        assertFalse(write.hasDepartObligation);
-        assertFalse(write.isCommitted);
+        assertFalse(write.hasDepartObligation());
+        assertFalse(write.isReadonly());
     }
 
     // ================= state ===================

@@ -351,8 +351,28 @@ public interface IntRef extends TransactionalObject {
      */
     int incrementAndGet(Transaction tx,int amount);
 
+    /**
+     * Awaits for the value to become the given value. If the value already has the
+     * the specified value, the call continues, else a retry is done.
+     *
+     * This call lifts on the Transaction in the ThreadLocalTransaction.
+     *
+     * @param value the value to wait for.
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
     void await(int value);
 
+    /**
+     * Awaits for the reference to become the given value. If the value already has the
+     * the specified value, the call continues, else a retry is done.
+     *
+     * @param tx the transaction this method lifts on
+     * @param value the value to wait for.
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
     void await(Transaction tx,int value);
 
     //todo: atomicAwait.

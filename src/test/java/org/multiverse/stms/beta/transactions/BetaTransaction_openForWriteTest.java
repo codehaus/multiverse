@@ -69,8 +69,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
         assertNotNull(write);
         assertEquals(100, write.value);
-        assertFalse(write.isCommitted);
-        assertFalse(write.hasDepartObligation);
+        assertFalse(write.isReadonly());
+        assertFalse(write.hasDepartObligation());
 
         assertIsActive(tx);
         assertHasUpdates(tx);
@@ -97,8 +97,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertNotNull(write);
         assertEquals(100, write.value);
         assertSame(ref, write.owner);
-        assertFalse(write.isCommitted);
-        assertTrue(write.hasDepartObligation);
+        assertFalse(write.isReadonly());
+        assertTrue(write.hasDepartObligation());
 
         assertIsActive(tx);
         assertAttached(tx, write);
@@ -118,7 +118,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertSame(ref, tranlocal.owner);
         //todo:
         //assertSame(ref.___unsafeLoad(), tranlocal.read);
-        assertFalse(tranlocal.isCommitted);
+        assertFalse(tranlocal.isReadonly());
     }
 
     @Test
@@ -133,8 +133,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertSame(read, write);
         assertEquals(100, write.value);
         assertSame(ref, write.owner);
-        assertFalse(write.isCommitted);
-        assertTrue(write.hasDepartObligation);
+        assertFalse(write.isReadonly());
+        assertTrue(write.hasDepartObligation());
 
         assertIsActive(tx);
         assertAttached(tx, write);
@@ -172,8 +172,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertIsActive(tx);
         assertSame(constructed, write);
         assertEquals(100, constructed.value);
-        assertFalse(constructed.isCommitted);
-        assertFalse(constructed.hasDepartObligation);
+        assertFalse(constructed.isReadonly());
+        assertFalse(constructed.hasDepartObligation());
         assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
@@ -196,8 +196,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
         assertNotNull(write);
         assertSame(ref, write.owner);
-        assertFalse(write.isCommitted);
-        assertTrue(write.hasDepartObligation);
+        assertFalse(write.isReadonly());
+        assertTrue(write.hasDepartObligation());
         assertEquals(100, write.value);
 
         assertIsActive(tx);
@@ -224,8 +224,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertSame(constructed, write);
         assertEquals(100, write.value);
         assertSame(ref, write.owner);
-        assertFalse(write.isCommitted);
-        assertFalse(write.hasDepartObligation);
+        assertFalse(write.isReadonly());
+        assertFalse(write.hasDepartObligation());
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
@@ -248,8 +248,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertNotNull(write);
         assertEquals(100, write.value);
         assertSame(ref, write.owner);
-        assertFalse(write.isCommitted);
-        assertTrue(write.hasDepartObligation);
+        assertFalse(write.isReadonly());
+        assertTrue(write.hasDepartObligation());
 
         assertIsActive(tx);
         assertSame(tx, ref.___getLockOwner());
@@ -277,8 +277,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertEquals(100, write.value);
         assertEquals(version, write.version);
         assertSame(ref, write.owner);
-        assertFalse(write.isCommitted);
-        assertFalse(write.hasDepartObligation);
+        assertFalse(write.isReadonly());
+        assertFalse(write.hasDepartObligation());
 
         assertIsActive(tx);
         assertAttached(tx, write);
@@ -301,8 +301,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
         assertEquals(100, write.value);
         assertSame(ref, write.owner);
-        assertFalse(write.isCommitted);
-        assertTrue(write.hasDepartObligation);
+        assertFalse(write.isReadonly());
+        assertTrue(write.hasDepartObligation());
         assertUpdateBiased(ref);
         assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
@@ -323,8 +323,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
         assertEquals(100, write.value);
         assertSame(ref, write.owner);
-        assertFalse(write.isCommitted);
-        assertTrue(write.hasDepartObligation);
+        assertFalse(write.isReadonly());
+        assertTrue(write.hasDepartObligation());
         assertUpdateBiased(ref);
         assertHasUpdateLock(ref);
         assertHasNoCommitLock(ref);
@@ -346,8 +346,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
         assertEquals(100, write.value);
         assertSame(ref, write.owner);
-        assertFalse(write.isCommitted);
-        assertTrue(write.hasDepartObligation);
+        assertFalse(write.isReadonly());
+        assertTrue(write.hasDepartObligation());
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
@@ -369,8 +369,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertSame(write2, write1);
         assertEquals(100, write2.value);
         assertSame(ref, write2.owner);
-        assertFalse(write2.isCommitted);
-        assertTrue(write2.hasDepartObligation);
+        assertFalse(write2.isReadonly());
+        assertTrue(write2.hasDepartObligation());
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
@@ -393,8 +393,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertSame(read, write);
         assertEquals(100, write.value);
         assertSame(ref, write.owner);
-        assertFalse(write.isCommitted);
-        assertTrue(write.hasDepartObligation);
+        assertFalse(write.isReadonly());
+        assertTrue(write.hasDepartObligation());
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
@@ -416,8 +416,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertSame(write1, write2);
         assertEquals(100, write2.value);
         assertSame(ref, write2.owner);
-        assertFalse(write2.isCommitted);
-        assertTrue(write2.hasDepartObligation);
+        assertFalse(write2.isReadonly());
+        assertTrue(write2.hasDepartObligation());
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
@@ -439,8 +439,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertNotNull(write);
         assertSame(constructed, write);
         assertEquals(100, constructed.value);
-        assertFalse(constructed.isCommitted);
-        assertFalse(constructed.hasDepartObligation);
+        assertFalse(constructed.isReadonly());
+        assertFalse(constructed.hasDepartObligation());
 
         assertIsActive(tx);
         assertHasNoUpdates(tx);
@@ -464,8 +464,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertSame(write1, write2);
         assertEquals(100, write2.value);
         assertSame(ref, write2.owner);
-        assertFalse(write2.isCommitted);
-        assertTrue(write2.hasDepartObligation);
+        assertFalse(write2.isReadonly());
+        assertTrue(write2.hasDepartObligation());
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
@@ -487,8 +487,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertSame(write1, write2);
         assertEquals(100, write2.value);
         assertSame(ref, write2.owner);
-        assertFalse(write2.isCommitted);
-        assertTrue(write2.hasDepartObligation);
+        assertFalse(write2.isReadonly());
+        assertTrue(write2.hasDepartObligation());
         assertHasUpdateLock(ref);
         assertHasNoCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
@@ -555,8 +555,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
         LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
-        assertFalse(write.isCommitted);
-        assertTrue(write.hasDepartObligation);
+        assertFalse(write.isReadonly());
+        assertTrue(write.hasDepartObligation());
         assertEquals(version, write.version);
         assertEquals(10, write.value);
 
@@ -583,8 +583,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertIsActive(tx);
         assertEquals(version, write.version);
         assertEquals(10, write.value);
-        assertFalse(write.isCommitted);
-        assertTrue(write.hasDepartObligation);
+        assertFalse(write.isReadonly());
+        assertTrue(write.hasDepartObligation());
 
         assertVersionAndValue(ref, version, 10);
         assertHasCommitLock(ref);
@@ -616,8 +616,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertIsActive(tx);
         assertSame(commuting, write);
         assertVersionAndValue(ref, initialVersion, 10);
-        assertFalse(write.isCommuting);
-        assertFalse(write.isCommitted);
+        assertFalse(write.isCommuting());
+        assertFalse(write.isReadonly());
         assertEquals(11, write.value);
         assertNull(ref.___getLockOwner());
         assertHasNoCommutingFunctions(write);
@@ -831,7 +831,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
         assertIsActive(tx);
         assertNotNull(write);
-        assertFalse(write.isCommitted);
+        assertFalse(write.isReadonly());
         //todo:
         //assertSame(read, write.read);
         assertSame(ref, write.owner);
@@ -917,7 +917,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
         assertIsActive(tx);
         assertSame(write2, write1);
-        assertFalse(write2.isCommitted);
+        assertFalse(write2.isReadonly());
         assertAttached(tx, write2);
         assertHasUpdates(tx);
     }

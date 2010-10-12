@@ -938,7 +938,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(1, ref);
-        assertFalse(write.isCommitted);
+        assertFalse(write.isReadonly());
     }
 
     @Test

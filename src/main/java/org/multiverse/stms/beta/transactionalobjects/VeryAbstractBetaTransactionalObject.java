@@ -33,7 +33,7 @@ public abstract class VeryAbstractBetaTransactionalObject
 
     protected volatile Listeners ___listeners;
 
-    protected volatile long ___version;
+    protected  long ___version;
 
     //This field has a controlled JMM problem (just like the hashcode of String).
     protected int ___identityHashCode;
@@ -73,7 +73,7 @@ public abstract class VeryAbstractBetaTransactionalObject
             final BetaObjectPool pool,
             final long listenerEra) {
 
-        if (tranlocal.isCommuting || tranlocal.isConstructing) {
+        if (tranlocal.isCommuting() || tranlocal.isConstructing()) {
             return REGISTRATION_NONE;
         }
 
@@ -139,11 +139,11 @@ public abstract class VeryAbstractBetaTransactionalObject
             final Tranlocal tranlocal,
             final boolean commitLock) {
 
-        final int lockMode = tranlocal.lockMode;
+        final int currentLockMode = tranlocal.getLockMode();
 
-        if (lockMode != LOCKMODE_NONE) {
-            if (commitLock && lockMode == LOCKMODE_UPDATE) {
-                tranlocal.lockMode = LOCKMODE_COMMIT;
+        if (currentLockMode != LOCKMODE_NONE) {
+            if (commitLock && currentLockMode == LOCKMODE_UPDATE) {
+                tranlocal.setLockMode(LOCKMODE_COMMIT);
                 ___upgradeToCommitLock();
             }
             return true;
@@ -156,7 +156,7 @@ public abstract class VeryAbstractBetaTransactionalObject
             return false;
         }
 
-        if (!tranlocal.hasDepartObligation) {
+        if (!tranlocal.hasDepartObligation()) {
             //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
             final int arriveStatus = ___tryLockAndArrive(spinCount, commitLock);
 
@@ -165,7 +165,7 @@ public abstract class VeryAbstractBetaTransactionalObject
             }
 
             if (arriveStatus == ARRIVE_NORMAL) {
-                tranlocal.hasDepartObligation = true;
+                tranlocal.setDepartObligation(true);
             }
         } else if (!___tryLockAfterNormalArrive(spinCount, commitLock)) {
             return false;
@@ -173,7 +173,7 @@ public abstract class VeryAbstractBetaTransactionalObject
 
         //the lock was acquired successfully.
         ___lockOwner = newLockOwner;
-        tranlocal.lockMode = commitLock ? LOCKMODE_COMMIT : LOCKMODE_UPDATE;
+        tranlocal.setLockMode(commitLock ? LOCKMODE_COMMIT : LOCKMODE_UPDATE);
         return expectedVersion == ___version;
     }
 
@@ -194,7 +194,7 @@ public abstract class VeryAbstractBetaTransactionalObject
 
     @Override
     public final boolean ___hasReadConflict(final Tranlocal tranlocal) {
-        if (tranlocal.lockMode != LOCKMODE_NONE) {
+        if (tranlocal.getLockMode() != LOCKMODE_NONE) {
             return false;
         }
 

@@ -60,9 +60,9 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
         assertEquals(0, write.value);
         assertEquals(version, write.version);
         assertSame(ref, write.owner);
-        assertFalse(write.isCommitted);
-        assertFalse(write.hasDepartObligation);
-        assertTrue(write.isDirty);
+        assertFalse(write.isCommuting());
+        assertFalse(write.hasDepartObligation());
+        assertTrue(write.isDirty());
 
         assertIsActive(tx);
         assertAttached(tx, write);
@@ -83,15 +83,15 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
         assertSame(construction1, construction2);
         assertEquals(0, construction1.value);
         assertSame(ref, construction1.owner);
-        assertFalse(construction1.isCommitted);
-        assertFalse(construction1.hasDepartObligation);
+        assertFalse(construction1.isReadonly());
+        assertFalse(construction1.hasDepartObligation());
 
         assertIsActive(tx);
         assertAttached(tx, construction1);
         assertSame(tx, ref.___getLockOwner());
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
-        assertTrue(construction1.isDirty);
+        assertTrue(construction1.isDirty());
     }
 
     @Test

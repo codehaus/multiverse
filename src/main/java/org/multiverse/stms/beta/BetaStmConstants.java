@@ -17,8 +17,9 @@ public interface BetaStmConstants extends MultiverseConstants {
     int REGISTRATION_NOT_NEEDED = 1;
     int REGISTRATION_NONE = 2;
 
-    int DIRTY_FALSE = 0;
-    int DIRTY_TRUE = 1;
-    int DIRTY_UNKNOWN = 2;
-
+    int STATUS_NEW = 0;
+    int STATUS_CONSTRUCTING = 1;
+    int STATUS_UPDATE = 2;
+    int STATUS_COMMUTING = 3;
+    int STATUS_READONLY = 4;
 }

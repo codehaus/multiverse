@@ -81,8 +81,8 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
         assertNotNull(tranlocal);
         assertSame(ref, tranlocal.owner);
-        assertTrue(tranlocal.isCommuting);
-        assertFalse(tranlocal.isCommitted);
+        assertTrue(tranlocal.isCommuting());
+        assertFalse(tranlocal.isReadonly());
         //todo:
         //assertNull(tranlocal.read);
         assertHasCommutingFunctions(tranlocal, function);
@@ -112,8 +112,8 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
         assertNotNull(tranlocal);
         assertSame(ref, tranlocal.owner);
-        assertTrue(tranlocal.isCommuting);
-        assertFalse(tranlocal.isCommitted);
+        assertTrue(tranlocal.isCommuting());
+        assertFalse(tranlocal.isReadonly());
         //todo:
         //assertNull(tranlocal.read);
         assertHasCommutingFunctions(tranlocal, function);
@@ -142,8 +142,8 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
         assertNotNull(tranlocal);
         assertSame(ref, tranlocal.owner);
-        assertTrue(tranlocal.isCommuting);
-        assertFalse(tranlocal.isCommitted);
+        assertTrue(tranlocal.isCommuting());
+        assertFalse(tranlocal.isReadonly());
         //todo:
         //assertNull(tranlocal.read);
         assertHasCommutingFunctions(tranlocal, function3, function2, function1);
@@ -231,8 +231,8 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
 
         assertNotNull(tranlocal);
         assertSame(ref, tranlocal.owner);
-        assertTrue(tranlocal.isCommuting);
-        assertFalse(tranlocal.isCommitted);
+        assertTrue(tranlocal.isCommuting());
+        assertFalse(tranlocal.isReadonly());
         //todo:
         // assertNull(tranlocal.read);
         assertHasCommutingFunctions(tranlocal, function2, function1);
@@ -255,8 +255,8 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
 
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
         assertIsActive(tx);
-        assertFalse(tranlocal.isCommuting);
-        assertFalse(tranlocal.isCommitted);
+        assertFalse(tranlocal.isCommuting());
+        assertFalse(tranlocal.isReadonly());
         //todo:
         //assertSame(read, tranlocal.read);
         assertEquals(101, tranlocal.value);
@@ -279,8 +279,8 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
 
         assertIsActive(tx);
         assertSame(ref, tranlocal.owner);
-        assertFalse(tranlocal.isCommuting);
-        assertFalse(tranlocal.isCommitted);
+        assertFalse(tranlocal.isCommuting());
+        assertFalse(tranlocal.isReadonly());
         assertEquals(101, tranlocal.value);
         assertHasNoCommutingFunctions(tranlocal);
         assertHasNoCommitLock(ref);
@@ -308,8 +308,8 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
 
         assertIsActive(tx);
         assertSame(ref, tranlocal.owner);
-        assertFalse(tranlocal.isCommuting);
-        assertFalse(tranlocal.isCommitted);
+        assertFalse(tranlocal.isCommuting());
+        assertFalse(tranlocal.isReadonly());
         //todo:
         //assertNull(tranlocal.read);
         assertEquals(1, tranlocal.value);
@@ -335,8 +335,8 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
 
         assertIsActive(tx);
-        assertTrue(commuting.isCommuting);
-        assertFalse(commuting.isCommitted);
+        assertTrue(commuting.isCommuting());
+        assertFalse(commuting.isReadonly());
         //todo:
         // assertNull(commuting.read);
         assertHasCommutingFunctions(commuting, function);
@@ -363,8 +363,8 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
 
         assertIsActive(tx);
-        assertTrue(commuting.isCommuting);
-        assertFalse(commuting.isCommitted);
+        assertTrue(commuting.isCommuting());
+        assertFalse(commuting.isReadonly());
         //todo:
         //assertNull(commuting.read);
         assertHasCommutingFunctions(commuting, function);

@@ -179,8 +179,8 @@ public class FatArrayBetaTransaction_softResetTest {
 
         assertTrue(result);
         assertIsActive(tx);
-        assertFalse(constructed.isCommitted);
-        assertFalse(constructed.hasDepartObligation);
+        assertFalse(constructed.isReadonly());
+        assertFalse(constructed.hasDepartObligation());
         assertHasCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(1, ref);

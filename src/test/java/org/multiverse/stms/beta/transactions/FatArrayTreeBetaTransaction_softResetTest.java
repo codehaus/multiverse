@@ -114,8 +114,8 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
         assertVersionAndValue(ref, version, 0);
-        assertFalse(write.hasDepartObligation);
-        assertFalse(write.isCommitted);
+        assertFalse(write.hasDepartObligation());
+        assertFalse(write.isReadonly());
         assertHasNoUpdates(tx);
     }
 
@@ -136,8 +136,8 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         assertSurplus(0, ref);
         assertNull(ref.___getLockOwner());
         assertVersionAndValue(ref, version, 0);
-        assertFalse(write.hasDepartObligation);
-        assertFalse(write.isCommitted);
+        assertFalse(write.hasDepartObligation());
+        assertFalse(write.isReadonly());
         assertHasNoUpdates(tx);
     }
 
@@ -183,8 +183,8 @@ public class FatArrayTreeBetaTransaction_softResetTest {
 
         assertTrue(result);
         assertIsActive(tx);
-        assertFalse(constructed.isCommitted);
-        assertFalse(constructed.hasDepartObligation);
+        assertFalse(constructed.isReadonly());
+        assertFalse(constructed.hasDepartObligation());
         assertHasCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertSurplus(1, ref);

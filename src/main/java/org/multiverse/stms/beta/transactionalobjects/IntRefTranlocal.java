@@ -1,9 +1,13 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.functions.Function;
 import org.multiverse.api.functions.IntFunction;
 import org.multiverse.api.predicates.IntPredicate;
 import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
+
 
 /**
  * The {@link Tranlocal} for the {@link BetaIntRef).
@@ -22,9 +26,64 @@ public final class IntRefTranlocal extends Tranlocal{
         super(ref);
     }
 
+    public final void openForRead(int desiredLockMode) {
+        if (tx.status != BetaTransaction.ACTIVE) {
+            throw tx.abortOpenForRead(owner);
+        }
+
+        if (isConstructing()) {
+            return;
+        }
+
+        final BetaTransactionConfiguration config = tx.config;
+
+        desiredLockMode = desiredLockMode >= config.readLockMode
+                ? desiredLockMode
+                : config.readLockMode;
+
+        if (isNew()) {
+            BetaIntRef o = (BetaIntRef)owner;
+
+            final boolean loadSuccess = o.___load(
+                config.spinCount, tx, desiredLockMode, this);
+
+            if (!loadSuccess) {
+                tx.abort();
+                throw ReadWriteConflict.INSTANCE;
+            }
+
+            setStatus(STATUS_READONLY);
+            setIgnore(desiredLockMode == LOCKMODE_NONE && !hasDepartObligation());
+            return;
+        }
+
+        if (isCommuting()) {
+            final boolean loadSuccess = ((BetaIntRef)owner).___load(
+                config.spinCount, tx, LOCKMODE_COMMIT, this);
+
+            if (!loadSuccess) {
+                tx.abort();
+                throw ReadWriteConflict.INSTANCE;
+            }
+
+            evaluateCommutingFunctions(tx.pool);
+            return;
+        }
+
+        if (getLockMode() < desiredLockMode) {
+            boolean loadSuccess = owner.___tryLockAndCheckConflict(
+                    tx, config.spinCount, this, desiredLockMode == LOCKMODE_COMMIT);
+
+            if (!loadSuccess) {
+                tx.abort();
+                throw ReadWriteConflict.INSTANCE;
+            }
+        }
+    }
+
     @Override
     public final void evaluateCommutingFunctions(final BetaObjectPool  pool){
-        assert isCommuting;
+        assert isCommuting();
 
         int newValue = value;
 
@@ -41,13 +100,13 @@ public final class IntRefTranlocal extends Tranlocal{
         }while(current != null);
 
         value = newValue;
-        isDirty = newValue != oldValue;
-        isCommuting = false;
+        setDirty(newValue != oldValue);
+        setStatus(STATUS_UPDATE);
     }
 
     @Override
     public void addCommutingFunction(final Function function, final BetaObjectPool pool){
-        assert isCommuting;
+        assert isCommuting();
 
         CallableNode node = pool.takeCallableNode();
         if(node == null){
@@ -65,13 +124,14 @@ public final class IntRefTranlocal extends Tranlocal{
         value = 0;
         oldValue = 0;
         owner = null;
-        lockMode = LOCKMODE_NONE;
-        hasDepartObligation = false;
-        isCommitted = false;
-        isCommuting = false;
-        isConstructing = false;
-        isDirty = false;
-        checkConflict = false;
+
+        setLockMode(LOCKMODE_NONE);
+        setDepartObligation(false);
+        setStatus(STATUS_NEW);
+        setDirty(false);
+        setIsConflictCheckNeeded(false);
+
+        tx = null;
         CallableNode current = headCallable;
         if (current != null) {
             headCallable = null;
@@ -85,11 +145,11 @@ public final class IntRefTranlocal extends Tranlocal{
 
     @Override
     public boolean calculateIsDirty() {
-        if(isDirty){
+        if(isDirty()){
             return true;
         }
 
-        isDirty = value != oldValue;
-        return isDirty;
+        setDirty(value != oldValue);
+        return isDirty();
     }
 }

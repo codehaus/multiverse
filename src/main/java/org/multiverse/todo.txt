@@ -127,7 +127,19 @@ performance.
 
 - cram all logic of the tranlocal in a long
 
+- testing: ref.awaitNull
+
+- testing: ref.awaitNotNull
+
 todo
+
+- awaitNotNull -> awaitNotNullAndGet
+
+- improved javadoc on ref.awaitNull
+
+- added ref.awaitNull
+
+- added ref.awaitNotNull
 
 - mono transaction: support for orelse
 
@@ -254,7 +266,11 @@ and not allowed. So not throw the retry error immediately..
 
 - testing on checkConflict on openForWrite.
 
+- logic needs to be moved to concrete threadlocal classes.
+
 done
+
+- tranlocal needs to have access to transaction.
 
 - drop doPrepareWithWriteSkewPrevention
     - set the check conflict on load

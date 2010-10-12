@@ -25,8 +25,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
     private LocalConflictCounter localConflictCounter;
     private int size;
     private boolean hasReads;
-    private boolean hasUntrackedReads;
-    private boolean hasUpdates;
+    private boolean hasUntrackedReads;  
 
     public LeanArrayTreeBetaTransaction(BetaStm stm) {
         this(new BetaTransactionConfiguration(stm).init());
@@ -73,7 +72,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         for(int k=0;k<array.length;k++){
             final Tranlocal tranlocal = array[k];
 
-            if(tranlocal==null || tranlocal.isCommitted){
+            if(tranlocal==null || tranlocal.isReadonly()){
                 continue;
             }
 
@@ -85,6 +84,29 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
     public final <E> E read(BetaRef<E> ref){
         throw new TodoException();
+    }
+
+    public final <E> RefTranlocal<E> open(BetaRef<E> ref){
+        if (status != ACTIVE) {
+            throw abortOpen(ref);
+        }
+
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = indexOf(ref, identityHashCode);
+        if(index != -1){
+            return (RefTranlocal<E>)array[index];
+        }
+
+        RefTranlocal<E> tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new RefTranlocal<E>(ref);
+        }
+
+        tranlocal.tx = this;
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
+        attach(ref, tranlocal, identityHashCode);
+        size++;
+        return tranlocal;
     }
 
     @Override
@@ -101,12 +123,12 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
         lockMode = lockMode>=config.readLockMode?lockMode:config.readLockMode;
         final int identityHashCode = ref.___identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
+        final int index = indexOf(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
             RefTranlocal<E> tranlocal = (RefTranlocal<E>)array[index];
 
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -129,8 +151,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = true;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_READONLY);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
         //make sure that there are no conflicts.
         if (hasReadConflict()) {
@@ -138,7 +160,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
-        if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation || config.trackReads){
+        if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation() || config.trackReads){
             attach(ref, tranlocal, identityHashCode);
             size++;
         }else{
@@ -167,19 +189,19 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
         //lets find the tranlocal
         final int identityHashCode = ref.___identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
+        final int index = indexOf(ref, identityHashCode);
         lockMode = lockMode>= config.writeLockMode?lockMode:config.writeLockMode;
 
         if(index >- 1){
             RefTranlocal<E> tranlocal = (RefTranlocal<E>)array[index];
 
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            if(tranlocal.isCommitted){
-                tranlocal.isCommitted = false;
+            if(tranlocal.isReadonly()){
+                tranlocal.setStatus(STATUS_UPDATE);
                 hasUpdates = true;
             }
 
@@ -208,8 +230,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = false;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_UPDATE);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         hasUpdates = true;
         attach(ref, tranlocal, identityHashCode);
         size++;
@@ -233,11 +255,11 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         final int identityHashCode = ref.___identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
+        final int index = indexOf(ref, identityHashCode);
 
         if(index >- 1){
             final RefTranlocal<E> tranlocal = (RefTranlocal<E>)array[index];
-            if(!tranlocal.isConstructing){
+            if(!tranlocal.isConstructing()){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -253,9 +275,9 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             tranlocal = new RefTranlocal<E>(ref);
 
         }
-        tranlocal.lockMode = LOCKMODE_COMMIT;
-        tranlocal.isConstructing = true;
-        tranlocal.isDirty = true;
+        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setStatus(STATUS_CONSTRUCTING);
+        tranlocal.setDirty(true);
 
         attach(ref, tranlocal, identityHashCode);
         size++;
@@ -281,6 +303,29 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         throw new TodoException();
     }
 
+    public final  IntRefTranlocal open(BetaIntRef ref){
+        if (status != ACTIVE) {
+            throw abortOpen(ref);
+        }
+
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = indexOf(ref, identityHashCode);
+        if(index != -1){
+            return (IntRefTranlocal)array[index];
+        }
+
+        IntRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new IntRefTranlocal(ref);
+        }
+
+        tranlocal.tx = this;
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
+        attach(ref, tranlocal, identityHashCode);
+        size++;
+        return tranlocal;
+    }
+
     @Override
     public  IntRefTranlocal openForRead(
         final BetaIntRef ref, int lockMode) {
@@ -295,12 +340,12 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
         lockMode = lockMode>=config.readLockMode?lockMode:config.readLockMode;
         final int identityHashCode = ref.___identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
+        final int index = indexOf(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
             IntRefTranlocal tranlocal = (IntRefTranlocal)array[index];
 
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -323,8 +368,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = true;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_READONLY);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
         //make sure that there are no conflicts.
         if (hasReadConflict()) {
@@ -332,7 +377,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
-        if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation || config.trackReads){
+        if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation() || config.trackReads){
             attach(ref, tranlocal, identityHashCode);
             size++;
         }else{
@@ -361,19 +406,19 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
         //lets find the tranlocal
         final int identityHashCode = ref.___identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
+        final int index = indexOf(ref, identityHashCode);
         lockMode = lockMode>= config.writeLockMode?lockMode:config.writeLockMode;
 
         if(index >- 1){
             IntRefTranlocal tranlocal = (IntRefTranlocal)array[index];
 
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            if(tranlocal.isCommitted){
-                tranlocal.isCommitted = false;
+            if(tranlocal.isReadonly()){
+                tranlocal.setStatus(STATUS_UPDATE);
                 hasUpdates = true;
             }
 
@@ -402,8 +447,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = false;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_UPDATE);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         hasUpdates = true;
         attach(ref, tranlocal, identityHashCode);
         size++;
@@ -427,11 +472,11 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         final int identityHashCode = ref.___identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
+        final int index = indexOf(ref, identityHashCode);
 
         if(index >- 1){
             final IntRefTranlocal tranlocal = (IntRefTranlocal)array[index];
-            if(!tranlocal.isConstructing){
+            if(!tranlocal.isConstructing()){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -447,9 +492,9 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             tranlocal = new IntRefTranlocal(ref);
 
         }
-        tranlocal.lockMode = LOCKMODE_COMMIT;
-        tranlocal.isConstructing = true;
-        tranlocal.isDirty = true;
+        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setStatus(STATUS_CONSTRUCTING);
+        tranlocal.setDirty(true);
 
         attach(ref, tranlocal, identityHashCode);
         size++;
@@ -475,6 +520,29 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         throw new TodoException();
     }
 
+    public final  BooleanRefTranlocal open(BetaBooleanRef ref){
+        if (status != ACTIVE) {
+            throw abortOpen(ref);
+        }
+
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = indexOf(ref, identityHashCode);
+        if(index != -1){
+            return (BooleanRefTranlocal)array[index];
+        }
+
+        BooleanRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new BooleanRefTranlocal(ref);
+        }
+
+        tranlocal.tx = this;
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
+        attach(ref, tranlocal, identityHashCode);
+        size++;
+        return tranlocal;
+    }
+
     @Override
     public  BooleanRefTranlocal openForRead(
         final BetaBooleanRef ref, int lockMode) {
@@ -489,12 +557,12 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
         lockMode = lockMode>=config.readLockMode?lockMode:config.readLockMode;
         final int identityHashCode = ref.___identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
+        final int index = indexOf(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
             BooleanRefTranlocal tranlocal = (BooleanRefTranlocal)array[index];
 
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -517,8 +585,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = true;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_READONLY);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
         //make sure that there are no conflicts.
         if (hasReadConflict()) {
@@ -526,7 +594,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
-        if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation || config.trackReads){
+        if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation() || config.trackReads){
             attach(ref, tranlocal, identityHashCode);
             size++;
         }else{
@@ -555,19 +623,19 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
         //lets find the tranlocal
         final int identityHashCode = ref.___identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
+        final int index = indexOf(ref, identityHashCode);
         lockMode = lockMode>= config.writeLockMode?lockMode:config.writeLockMode;
 
         if(index >- 1){
             BooleanRefTranlocal tranlocal = (BooleanRefTranlocal)array[index];
 
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            if(tranlocal.isCommitted){
-                tranlocal.isCommitted = false;
+            if(tranlocal.isReadonly()){
+                tranlocal.setStatus(STATUS_UPDATE);
                 hasUpdates = true;
             }
 
@@ -596,8 +664,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = false;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_UPDATE);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         hasUpdates = true;
         attach(ref, tranlocal, identityHashCode);
         size++;
@@ -621,11 +689,11 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         final int identityHashCode = ref.___identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
+        final int index = indexOf(ref, identityHashCode);
 
         if(index >- 1){
             final BooleanRefTranlocal tranlocal = (BooleanRefTranlocal)array[index];
-            if(!tranlocal.isConstructing){
+            if(!tranlocal.isConstructing()){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -641,9 +709,9 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             tranlocal = new BooleanRefTranlocal(ref);
 
         }
-        tranlocal.lockMode = LOCKMODE_COMMIT;
-        tranlocal.isConstructing = true;
-        tranlocal.isDirty = true;
+        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setStatus(STATUS_CONSTRUCTING);
+        tranlocal.setDirty(true);
 
         attach(ref, tranlocal, identityHashCode);
         size++;
@@ -669,6 +737,29 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         throw new TodoException();
     }
 
+    public final  DoubleRefTranlocal open(BetaDoubleRef ref){
+        if (status != ACTIVE) {
+            throw abortOpen(ref);
+        }
+
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = indexOf(ref, identityHashCode);
+        if(index != -1){
+            return (DoubleRefTranlocal)array[index];
+        }
+
+        DoubleRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new DoubleRefTranlocal(ref);
+        }
+
+        tranlocal.tx = this;
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
+        attach(ref, tranlocal, identityHashCode);
+        size++;
+        return tranlocal;
+    }
+
     @Override
     public  DoubleRefTranlocal openForRead(
         final BetaDoubleRef ref, int lockMode) {
@@ -683,12 +774,12 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
         lockMode = lockMode>=config.readLockMode?lockMode:config.readLockMode;
         final int identityHashCode = ref.___identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
+        final int index = indexOf(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
             DoubleRefTranlocal tranlocal = (DoubleRefTranlocal)array[index];
 
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -711,8 +802,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = true;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_READONLY);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
         //make sure that there are no conflicts.
         if (hasReadConflict()) {
@@ -720,7 +811,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
-        if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation || config.trackReads){
+        if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation() || config.trackReads){
             attach(ref, tranlocal, identityHashCode);
             size++;
         }else{
@@ -749,19 +840,19 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
         //lets find the tranlocal
         final int identityHashCode = ref.___identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
+        final int index = indexOf(ref, identityHashCode);
         lockMode = lockMode>= config.writeLockMode?lockMode:config.writeLockMode;
 
         if(index >- 1){
             DoubleRefTranlocal tranlocal = (DoubleRefTranlocal)array[index];
 
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            if(tranlocal.isCommitted){
-                tranlocal.isCommitted = false;
+            if(tranlocal.isReadonly()){
+                tranlocal.setStatus(STATUS_UPDATE);
                 hasUpdates = true;
             }
 
@@ -790,8 +881,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = false;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_UPDATE);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         hasUpdates = true;
         attach(ref, tranlocal, identityHashCode);
         size++;
@@ -815,11 +906,11 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         final int identityHashCode = ref.___identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
+        final int index = indexOf(ref, identityHashCode);
 
         if(index >- 1){
             final DoubleRefTranlocal tranlocal = (DoubleRefTranlocal)array[index];
-            if(!tranlocal.isConstructing){
+            if(!tranlocal.isConstructing()){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -835,9 +926,9 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             tranlocal = new DoubleRefTranlocal(ref);
 
         }
-        tranlocal.lockMode = LOCKMODE_COMMIT;
-        tranlocal.isConstructing = true;
-        tranlocal.isDirty = true;
+        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setStatus(STATUS_CONSTRUCTING);
+        tranlocal.setDirty(true);
 
         attach(ref, tranlocal, identityHashCode);
         size++;
@@ -863,6 +954,29 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         throw new TodoException();
     }
 
+    public final  LongRefTranlocal open(BetaLongRef ref){
+        if (status != ACTIVE) {
+            throw abortOpen(ref);
+        }
+
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = indexOf(ref, identityHashCode);
+        if(index != -1){
+            return (LongRefTranlocal)array[index];
+        }
+
+        LongRefTranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = new LongRefTranlocal(ref);
+        }
+
+        tranlocal.tx = this;
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
+        attach(ref, tranlocal, identityHashCode);
+        size++;
+        return tranlocal;
+    }
+
     @Override
     public  LongRefTranlocal openForRead(
         final BetaLongRef ref, int lockMode) {
@@ -877,12 +991,12 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
         lockMode = lockMode>=config.readLockMode?lockMode:config.readLockMode;
         final int identityHashCode = ref.___identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
+        final int index = indexOf(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
             LongRefTranlocal tranlocal = (LongRefTranlocal)array[index];
 
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -905,8 +1019,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = true;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_READONLY);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
         //make sure that there are no conflicts.
         if (hasReadConflict()) {
@@ -914,7 +1028,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
-        if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation || config.trackReads){
+        if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation() || config.trackReads){
             attach(ref, tranlocal, identityHashCode);
             size++;
         }else{
@@ -943,19 +1057,19 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
         //lets find the tranlocal
         final int identityHashCode = ref.___identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
+        final int index = indexOf(ref, identityHashCode);
         lockMode = lockMode>= config.writeLockMode?lockMode:config.writeLockMode;
 
         if(index >- 1){
             LongRefTranlocal tranlocal = (LongRefTranlocal)array[index];
 
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            if(tranlocal.isCommitted){
-                tranlocal.isCommitted = false;
+            if(tranlocal.isReadonly()){
+                tranlocal.setStatus(STATUS_UPDATE);
                 hasUpdates = true;
             }
 
@@ -984,8 +1098,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = false;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_UPDATE);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         hasUpdates = true;
         attach(ref, tranlocal, identityHashCode);
         size++;
@@ -1009,11 +1123,11 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         final int identityHashCode = ref.___identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
+        final int index = indexOf(ref, identityHashCode);
 
         if(index >- 1){
             final LongRefTranlocal tranlocal = (LongRefTranlocal)array[index];
-            if(!tranlocal.isConstructing){
+            if(!tranlocal.isConstructing()){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -1029,9 +1143,9 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             tranlocal = new LongRefTranlocal(ref);
 
         }
-        tranlocal.lockMode = LOCKMODE_COMMIT;
-        tranlocal.isConstructing = true;
-        tranlocal.isDirty = true;
+        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setStatus(STATUS_CONSTRUCTING);
+        tranlocal.setDirty(true);
 
         attach(ref, tranlocal, identityHashCode);
         size++;
@@ -1053,6 +1167,29 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
+    public final  Tranlocal open(BetaTransactionalObject ref){
+        if (status != ACTIVE) {
+            throw abortOpen(ref);
+        }
+
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = indexOf(ref, identityHashCode);
+        if(index != -1){
+            return (Tranlocal)array[index];
+        }
+
+        Tranlocal tranlocal = pool.take(ref);
+        if(tranlocal == null){
+            tranlocal = ref.___newTranlocal();
+        }
+
+        tranlocal.tx = this;
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
+        attach(ref, tranlocal, identityHashCode);
+        size++;
+        return tranlocal;
+    }
+
     @Override
     public  Tranlocal openForRead(
         final BetaTransactionalObject ref, int lockMode) {
@@ -1067,12 +1204,12 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
         lockMode = lockMode>=config.readLockMode?lockMode:config.readLockMode;
         final int identityHashCode = ref.___identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
+        final int index = indexOf(ref, identityHashCode);
         if (index > -1) {
             //we are lucky, at already is attached to the session
             Tranlocal tranlocal = (Tranlocal)array[index];
 
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
@@ -1095,8 +1232,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = true;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_READONLY);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
         //make sure that there are no conflicts.
         if (hasReadConflict()) {
@@ -1104,7 +1241,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
-        if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation || config.trackReads){
+        if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation() || config.trackReads){
             attach(ref, tranlocal, identityHashCode);
             size++;
         }else{
@@ -1133,19 +1270,19 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
         //lets find the tranlocal
         final int identityHashCode = ref.___identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
+        final int index = indexOf(ref, identityHashCode);
         lockMode = lockMode>= config.writeLockMode?lockMode:config.writeLockMode;
 
         if(index >- 1){
             Tranlocal tranlocal = (Tranlocal)array[index];
 
-            if(tranlocal.lockMode < lockMode
+            if(tranlocal.getLockMode() < lockMode
                 && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
                 throw abortOnReadConflict();
             }
 
-            if(tranlocal.isCommitted){
-                tranlocal.isCommitted = false;
+            if(tranlocal.isReadonly()){
+                tranlocal.setStatus(STATUS_UPDATE);
                 hasUpdates = true;
             }
 
@@ -1174,8 +1311,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
-        tranlocal.isCommitted = false;
-        tranlocal.checkConflict = !config.writeSkewAllowed;
+        tranlocal.setStatus(STATUS_UPDATE);
+        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         hasUpdates = true;
         attach(ref, tranlocal, identityHashCode);
         size++;
@@ -1199,11 +1336,11 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         final int identityHashCode = ref.___identityHashCode();
-        final int index = findAttachedIndex(ref, identityHashCode);
+        final int index = indexOf(ref, identityHashCode);
 
         if(index >- 1){
             final Tranlocal tranlocal = (Tranlocal)array[index];
-            if(!tranlocal.isConstructing){
+            if(!tranlocal.isConstructing()){
                 throw abortOpenForConstructionWithBadReference(ref);
             }
 
@@ -1218,9 +1355,9 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(tranlocal == null){
             tranlocal = ref.___newTranlocal();
         }
-        tranlocal.lockMode = LOCKMODE_COMMIT;
-        tranlocal.isConstructing = true;
-        tranlocal.isDirty = true;
+        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setStatus(STATUS_CONSTRUCTING);
+        tranlocal.setDirty(true);
 
         attach(ref, tranlocal, identityHashCode);
         size++;
@@ -1245,7 +1382,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
  
     @Override
     public Tranlocal get(BetaTransactionalObject ref){
-        final int indexOf = findAttachedIndex(ref, ref.___identityHashCode());
+        final int indexOf = indexOf(ref, ref.___identityHashCode());
         if(indexOf == -1){
             return null;
         }
@@ -1253,7 +1390,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         return array[indexOf];
     }
 
-    public int findAttachedIndex(final BetaTransactionalObject ref, final int hash){
+    public int indexOf(final BetaTransactionalObject ref, final int hash){
         int jump = 0;
         boolean goLeft = true;
 
@@ -1475,7 +1612,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
 
             array[k] = null;
 
-            if(!tranlocal.isCommitted && !tranlocal.isDirty){
+            if(!tranlocal.isReadonly() && !tranlocal.isDirty()){
                 tranlocal.calculateIsDirty();
             }
 

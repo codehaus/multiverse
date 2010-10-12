@@ -128,7 +128,7 @@ public  class BetaDoubleRef
                     tranlocal.version = firstVersion;
                     tranlocal.value = firstValue;
                     tranlocal.oldValue = firstValue;
-                    tranlocal.hasDepartObligation = arriveStatus == ARRIVE_NORMAL;
+                    tranlocal.setDepartObligation(arriveStatus == ARRIVE_NORMAL);
                     return true;
                 }
 
@@ -157,8 +157,8 @@ public  class BetaDoubleRef
             tranlocal.version = ___version;
             tranlocal.value = value;
             tranlocal.oldValue = value;
-            tranlocal.lockMode = commitLock ? LOCKMODE_COMMIT: LOCKMODE_UPDATE;
-            tranlocal.hasDepartObligation = arriveStatus == ARRIVE_NORMAL;
+            tranlocal.setLockMode(commitLock ? LOCKMODE_COMMIT: LOCKMODE_UPDATE);
+            tranlocal.setDepartObligation(arriveStatus == ARRIVE_NORMAL);
             return true;
         }
    }
@@ -169,17 +169,17 @@ public  class BetaDoubleRef
             final BetaTransaction expectedLockOwner,
             final BetaObjectPool pool) {
 
-        if(!tranlocal.isDirty){
-            if(tranlocal.lockMode != LOCKMODE_NONE){
+        if(!tranlocal.isDirty()){
+            if(tranlocal.getLockMode() != LOCKMODE_NONE){
                 ___lockOwner = null;
 
-                if(tranlocal.hasDepartObligation){
+                if(tranlocal.hasDepartObligation()){
                     ___departAfterReadingAndUnlock();
                 }else{
                     ___unlockByReadBiased();
                 }
             }else{
-                if(tranlocal.hasDepartObligation){
+                if(tranlocal.hasDepartObligation()){
                     ___departAfterReading();
                 }
             }
@@ -211,17 +211,17 @@ public  class BetaDoubleRef
             final BetaTransaction expectedLockOwner,
             final BetaObjectPool pool) {
 
-        if(tranlocal.isCommitted){
-            if(tranlocal.lockMode!=LOCKMODE_NONE){
+        if(tranlocal.isReadonly()){
+            if(tranlocal.getLockMode() != LOCKMODE_NONE){
                 ___lockOwner = null;
 
-                if(tranlocal.hasDepartObligation){
+                if(tranlocal.hasDepartObligation()){
                     ___departAfterReadingAndUnlock();
                 }else{
                     ___unlockByReadBiased();
                 }
             }else{
-                if(tranlocal.hasDepartObligation){
+                if(tranlocal.hasDepartObligation()){
                     ___departAfterReading();
                 }
             }
@@ -253,15 +253,15 @@ public  class BetaDoubleRef
         final Tranlocal tranlocal,
         final BetaObjectPool pool) {
 
-        if(tranlocal.lockMode!=LOCKMODE_NONE){
+        if(tranlocal.getLockMode() != LOCKMODE_NONE){
             ___lockOwner = null;
 
-            if(!tranlocal.isConstructing){
+            if(!tranlocal.isConstructing()){
                 //depart and release the lock. This call is able to deal with readbiased and normal reads.
                 ___departAfterFailureAndUnlock();
             }
         }else{
-            if(tranlocal.hasDepartObligation){
+            if(tranlocal.hasDepartObligation()){
                 ___departAfterFailure();
             }
         }

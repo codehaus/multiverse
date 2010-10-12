@@ -49,7 +49,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tranlocal.value++;
-        tranlocal.isDirty = true;
+        tranlocal.setDirty(true);
         tranlocal.prepareAllUpdates(pool, tx, 1);
         long oldConflictCount = globalConflictCounter.count();
         Listeners listeners = ref.___commitAll(tranlocal, tx, pool);

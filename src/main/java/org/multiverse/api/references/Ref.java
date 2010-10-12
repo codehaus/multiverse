@@ -316,8 +316,73 @@ public interface Ref<E> extends TransactionalObject {
      */
     boolean atomicIsNull();
 
+    /**
+     * Awaits for the value to become not null. If the value already is not null,
+     * this call returns the stored value. If the value is null, a retry is done.
+     *
+     * This call lifts on the Transaction in the ThreadLocalTransaction.
+     *
+     * @return the stored value.
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
+    E awaitNotNullAndGet();
+
+    /**
+     * Awaits for the value to become not null. If the value already is not null,
+     * this call returns the stored value. If the value is null, a retry is done.
+     *
+     * @param tx the transaction this method lifts on.
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
+    E awaitNotNullAndGet(Transaction tx);
+
+    /**
+     * Awaits for the value to become null. If the value already is null,
+     * this call continues. If the reference is not null, a retry is done.
+     *
+     * This call lifts on the Transaction in the ThreadLocalTransaction.
+     *
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
+    void awaitNull();
+
+   /**
+    * Awaits for the value to become not null. If the value already is null,
+    * this call continues. If the value is not null, a retry is done.
+    *
+    * @param tx the transaction this method lifts on.
+    * @throws NullPointerException if tx is null.
+    * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+    * @throws org.multiverse.api.exceptions.ControlFlowError
+    */
+    void awaitNull(Transaction tx);
+
+    /**
+     * Awaits for the value to become the given value. If the value already has the
+     * the specified value, the call continues, else a retry is done.
+     *
+     * This call lifts on the Transaction in the ThreadLocalTransaction.
+     *
+     * @param value the value to wait for.
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
     void await(E value);
 
+    /**
+     * Awaits for the reference to become the given value. If the value already has the
+     * the specified value, the call continues, else a retry is done.
+     *
+     * @param tx the transaction this method lifts on
+     * @param value the value to wait for.
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
     void await(Transaction tx,E value);
 
     //todo: atomicAwait.

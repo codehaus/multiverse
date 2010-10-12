@@ -45,7 +45,7 @@ public class BetaLongRef_deferredEnsure0Test {
 
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
 
-        assertTrue(tranlocal.checkConflict);
+        assertTrue(tranlocal.isConflictCheckNeeded());
         assertHasNoUpdateLock(ref);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());

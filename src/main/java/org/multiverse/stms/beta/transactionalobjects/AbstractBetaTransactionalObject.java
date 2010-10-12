@@ -49,15 +49,15 @@ public abstract class AbstractBetaTransactionalObject
         final Tranlocal tranlocal,
         final BetaObjectPool pool) {
 
-        if(tranlocal.lockMode!=LOCKMODE_NONE){
+        if(tranlocal.getLockMode() != LOCKMODE_NONE){
             ___lockOwner = null;
 
-            if(!tranlocal.isConstructing){
+            if(!tranlocal.isConstructing()){
                 //depart and release the lock. This call is able to deal with readbiased and normal reads.
                 ___departAfterFailureAndUnlock();
             }
         }else{
-            if(tranlocal.hasDepartObligation){
+            if(tranlocal.hasDepartObligation()){
                 ___departAfterFailure();
             }
         }

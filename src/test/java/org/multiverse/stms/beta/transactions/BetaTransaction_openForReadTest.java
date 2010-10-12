@@ -89,8 +89,8 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
 
         assertIsActive(tx);
         assertEquals(100, read.value);
-        assertFalse(read.hasDepartObligation);
-        assertTrue(read.isCommitted);
+        assertFalse(read.hasDepartObligation());
+        assertTrue(read.isReadonly());
         assertHasNoCommitLock(ref);
         assertSurplus(1, ref);
         assertReadBiased(ref);
@@ -109,8 +109,8 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         assertEquals(100, read.value);
-        assertTrue(read.hasDepartObligation);
-        assertTrue(read.isCommitted);
+        assertTrue(read.hasDepartObligation());
+        assertTrue(read.isReadonly());
         assertHasNoCommitLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -152,8 +152,8 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
 
         assertSame(write, read);
         assertEquals(100, write.value);
-        assertFalse(write.isCommitted);
-        assertTrue(write.hasDepartObligation);
+        assertFalse(write.isReadonly());
+        assertTrue(write.hasDepartObligation());
         assertHasNoCommitLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -177,8 +177,8 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
 
         assertSame(write, read);
         assertEquals(100, write.value);
-        assertFalse(write.isCommitted);
-        assertTrue(write.hasDepartObligation);
+        assertFalse(write.isReadonly());
+        assertTrue(write.hasDepartObligation());
         assertHasNoCommitLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -229,8 +229,8 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
 
         assertSame(constructed, read);
         assertEquals(100, constructed.value);
-        assertFalse(constructed.isCommitted);
-        assertFalse(constructed.hasDepartObligation);
+        assertFalse(constructed.isReadonly());
+        assertFalse(constructed.hasDepartObligation());
         assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
         assertSurplus(1, ref);
@@ -251,8 +251,8 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         assertSame(constructed, read);
         assertEquals(100, constructed.value);
         assertEquals(0, constructed.version);
-        assertFalse(constructed.isCommitted);
-        assertFalse(constructed.hasDepartObligation);
+        assertFalse(constructed.isReadonly());
+        assertFalse(constructed.hasDepartObligation());
         assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
@@ -272,8 +272,8 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
 
         assertSame(constructed, read);
         assertEquals(100, constructed.value);
-        assertFalse(constructed.isCommitted);
-        assertFalse(constructed.hasDepartObligation);
+        assertFalse(constructed.isReadonly());
+        assertFalse(constructed.hasDepartObligation());
         assertHasNoUpdateLock(ref);
         assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
@@ -296,8 +296,8 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_COMMIT);
 
         assertEquals(100, read.value);
-        assertFalse(read.hasDepartObligation);
-        assertTrue(read.isCommitted);
+        assertFalse(read.hasDepartObligation());
+        assertTrue(read.isReadonly());
         assertHasCommitLock(ref);
         assertHasNoUpdateLock(ref);
         assertSurplus(1, ref);
@@ -317,8 +317,8 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_UPDATE);
 
         assertEquals(100, read.value);
-        assertFalse(read.hasDepartObligation);
-        assertTrue(read.isCommitted);
+        assertFalse(read.hasDepartObligation());
+        assertTrue(read.isReadonly());
 
         assertHasNoCommitLock(ref);
         assertHasUpdateLock(ref);
@@ -342,8 +342,8 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_COMMIT);
 
         assertIsActive(tx);
-        assertTrue(read.isCommitted);
-        assertFalse(read.hasDepartObligation);
+        assertTrue(read.isReadonly());
+        assertFalse(read.hasDepartObligation());
         assertEquals(10, read.value);
         assertAttached(tx, read);
         assertSurplus(1, ref);
@@ -368,8 +368,8 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
 
         assertIsActive(tx);
 
-        assertTrue(read.isCommitted);
-        assertFalse(read.hasDepartObligation);
+        assertTrue(read.isReadonly());
+        assertFalse(read.hasDepartObligation());
         assertEquals(10, read.value);
         assertSurplus(1, ref);
         assertHasUpdateLock(ref);
@@ -391,8 +391,8 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
 
         assertEquals(100, read.value);
         assertEquals(version, read.version);
-        assertTrue(read.hasDepartObligation);
-        assertTrue(read.isCommitted);
+        assertTrue(read.hasDepartObligation());
+        assertTrue(read.isReadonly());
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -411,8 +411,8 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_UPDATE);
 
         assertEquals(100, read.value);
-        assertTrue(read.hasDepartObligation);
-        assertTrue(read.isCommitted);
+        assertTrue(read.hasDepartObligation());
+        assertTrue(read.isReadonly());
 
         assertIsActive(tx);
         assertAttached(tx, read);
@@ -466,7 +466,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         LongRefTranlocal read2 = tx.openForRead(ref, LOCKMODE_NONE);
 
         assertNotSame(read1, read2);
-        assertTrue(read2.isCommitted);
+        assertTrue(read2.isReadonly());
         assertEquals(version, read2.version);
         assertEquals(100, read2.value);
 
@@ -612,8 +612,8 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         BetaTransaction tx = newTransaction(config);
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
-        assertTrue(read.isCommitted);
-        assertTrue(read.hasDepartObligation);
+        assertTrue(read.isReadonly());
+        assertTrue(read.hasDepartObligation());
         assertAttached(tx, read);
         assertHasCommitLock(ref);
         assertSame(tx, ref.___getLockOwner());
@@ -632,8 +632,8 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         BetaTransaction tx = newTransaction(config);
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
-        assertTrue(read.isCommitted);
-        assertTrue(read.hasDepartObligation);
+        assertTrue(read.isReadonly());
+        assertTrue(read.hasDepartObligation());
         assertAttached(tx, read);
         assertVersionAndValue(ref, version, 100);
         assertHasNoCommitLock(ref);
@@ -653,8 +653,8 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         BetaTransaction tx = newTransaction(config);
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
-        assertTrue(read.isCommitted);
-        assertTrue(read.hasDepartObligation);
+        assertTrue(read.isReadonly());
+        assertTrue(read.hasDepartObligation());
         assertAttached(tx, read);
         assertVersionAndValue(ref, version, 100);
         assertHasNoCommitLock(ref);
@@ -676,8 +676,8 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
 
         assertEquals(100, read.value);
         assertEquals(version, read.version);
-        assertTrue(read.isCommitted);
-        assertTrue(read.hasDepartObligation);
+        assertTrue(read.isReadonly());
+        assertTrue(read.hasDepartObligation());
         assertIsActive(tx);
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
@@ -938,10 +938,10 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         assertEquals(version, tranlocal.version);
         assertEquals(11, tranlocal.value);
         assertEquals(10, tranlocal.oldValue);
-        assertFalse(tranlocal.isCommuting);
-        assertFalse(tranlocal.isCommitted);
+        assertFalse(tranlocal.isCommuting());
+        assertFalse(tranlocal.isReadonly());
         assertTranlocalHasNoLock(tranlocal);
-        assertTrue(tranlocal.hasDepartObligation);
+        assertTrue(tranlocal.hasDepartObligation());
 
         assertIsActive(tx);
         assertAttached(tx, tranlocal);

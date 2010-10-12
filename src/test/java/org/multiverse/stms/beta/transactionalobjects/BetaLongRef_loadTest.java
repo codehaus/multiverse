@@ -101,7 +101,7 @@ public class BetaLongRef_loadTest implements BetaStmConstants {
 
         assertSame(ref, tranlocal.owner);
         assertTrue(tranlocal.isCommitted);
-        assertFalse(tranlocal.isDirty);
+        assertFalse(tranlocal.isDirty());
         assertFalse(tranlocal.isCommuting);
         assertEquals(version, tranlocal.version);
         assertEquals(10, tranlocal.value);

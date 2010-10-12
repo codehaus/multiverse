@@ -192,7 +192,12 @@ class LinkedListTranlocal<E> extends Tranlocal {
         tail = null;
     }
 
-//    @Override
+    @Override
+    public void openForRead(int desiredLockMode) {
+        throw new TodoException();
+    }
+
+    //    @Override
 //    public LinkedListTranlocal<E> openForWrite(BetaObjectPool pool) {
 //        LinkedListTranlocal<E> tranlocal = new LinkedListTranlocal<E>((LinkedList<E>) owner);
 //        //tranlocal.read = this;
@@ -208,7 +213,7 @@ class LinkedListTranlocal<E> extends Tranlocal {
 
     @Override
     public boolean calculateIsDirty() {
-        if (isCommitted) {
+        if (isReadonly()) {
             return false;
         }
 
@@ -331,6 +336,11 @@ class LinkedListNodeTranlocal<E> extends Tranlocal {
 
     LinkedListNodeTranlocal(BetaTransactionalObject owner) {
         super(owner);
+    }
+
+    @Override
+    public void openForRead(int desiredLockMode) {
+        throw new TodoException();
     }
 
     @Override

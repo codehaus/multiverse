@@ -1,11 +1,13 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.functions.Function;
 import org.multiverse.durability.DurableObject;
 import org.multiverse.durability.DurableState;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -19,26 +21,214 @@ import java.util.LinkedList;
  */
 public abstract class Tranlocal implements DurableState, BetaStmConstants {
 
-    public BetaTransactionalObject owner;
-    public int lockMode;
-    public boolean hasDepartObligation;
     public long version;
-    public boolean isCommitted;
-    public boolean isCommuting;
-    public boolean isConstructing;
-    public boolean isDirty;
-    public boolean checkConflict;
+    public BetaTransaction tx;
+    public BetaTransactionalObject owner;
     public CallableNode headCallable;
+
+    public int status = STATUS_NEW;        
+    private int lockMode;
+
+    private boolean checkConflict;
+    private boolean hasDepartObligation;
+    private boolean isDirty;
+    private boolean ignore;
 
     public Tranlocal(BetaTransactionalObject owner) {
         this.owner = owner;
     }
 
+    public final boolean isNew() {
+        return status == STATUS_NEW;
+    }
+
+    public final boolean isConstructing() {
+        return status == STATUS_CONSTRUCTING;
+    }
+
+    public final void setStatus(int state){
+        this.status = state;
+    }
+
+    public final boolean isReadonly() {
+        return status == STATUS_READONLY;
+    }
+
+    public final boolean isConflictCheckNeeded() {
+        return checkConflict;
+    }
+
+    public final void setIsConflictCheckNeeded(boolean value) {
+        checkConflict = value;
+    }
+
+    public final int getLockMode() {
+        return lockMode;
+    }
+
+    public final void setLockMode(int lockMode) {
+        this.lockMode = lockMode;
+    }
+
+    public final boolean isDirty() {
+        return isDirty;
+    }
+
+    public final void setDirty(boolean value) {
+        this.isDirty = value;
+    }
+
+    public final boolean isCommuting() {
+        return status == STATUS_COMMUTING;
+    }
+
+     public final boolean hasDepartObligation() {
+        return hasDepartObligation;
+    }
+
+    public final void setDepartObligation(boolean value) {
+        hasDepartObligation = value;
+    }
+
     public abstract void prepareForPooling(final BetaObjectPool pool);
+
+    public boolean ignore(){
+        return ignore;
+    }
+
+    public void setIgnore(boolean value){
+        this.ignore = value;
+    }
 
     @Override
     public final BetaTransactionalObject getOwner() {
         return owner;
+    }
+
+    public final void openForCommute() {
+        if (tx.status != BetaTransaction.ACTIVE) {
+            //todo: function needs to be set.
+            throw tx.abortCommute(owner, null);
+        }
+    }
+
+    public final void openForConstruction() {
+        if (tx.status != BetaTransaction.ACTIVE) {
+            throw tx.abortOpenForConstruction(owner);
+        }
+
+        if (isConstructing()) {
+            return;
+        }
+
+        if (!isNew()) {
+            //todo:
+        }
+
+        setStatus(STATUS_CONSTRUCTING);
+    }
+
+    public abstract void openForRead(int desiredLockMode);
+
+    public final void openForWrite(int desiredLockMode) {
+        if (tx.status != BetaTransaction.ACTIVE) {
+            throw tx.abortOpenForWrite(owner);
+        }
+
+        if (isConstructing()) {
+            return;
+        }
+
+        final BetaTransactionConfiguration config = tx.config;
+
+        ignore = false;
+
+        if (config.readonly) {
+            throw tx.abortOpenForWriteWhenReadonly(owner);
+        }
+
+        desiredLockMode = desiredLockMode >= config.writeLockMode
+                ? desiredLockMode
+                : config.writeLockMode;
+
+        if (isNew()) {
+            boolean loadSuccess = owner.___load(config.spinCount, tx, desiredLockMode, this);
+
+            if (!loadSuccess) {
+                tx.abort();
+                throw ReadWriteConflict.INSTANCE;
+            }
+
+
+            setStatus(STATUS_UPDATE);
+            tx.hasUpdates = true;
+            return;
+        }
+
+        if (isCommuting()) {
+            //todo:
+        }
+
+        if (lockMode < desiredLockMode) {
+            boolean loadSuccess = owner.___tryLockAndCheckConflict(
+                    tx, config.spinCount, this, desiredLockMode == LOCKMODE_COMMIT);
+
+            if (!loadSuccess) {
+                tx.abort();
+                throw ReadWriteConflict.INSTANCE;
+            }
+        }
+
+        if (isReadonly()) {
+            setStatus(STATUS_UPDATE);
+            tx.hasUpdates = true;
+        }
+    }
+
+    public final void upgradeLockMode(int desiredLockMode) {
+        if (tx.status != BetaTransaction.ACTIVE) {
+            //todo: make use of the correct abort method
+            throw tx.abortOpenForWrite(owner);
+        }
+
+        //desiredLockMode = desiredLockMode >= config.writeLockMode
+        //               ? desiredLockMode
+        //               : config.writeLockMode;
+        //
+
+        if (lockMode >= desiredLockMode) {
+            return;
+        }
+
+        if (!isCommuting()) {
+            //todo
+        }
+
+        final BetaTransactionConfiguration config = tx.config;
+
+        final boolean lockSuccess = owner.___tryLockAndCheckConflict(
+                tx, config.spinCount, this, desiredLockMode == LOCKMODE_COMMIT);
+
+        if (!lockSuccess) {
+            throw ReadWriteConflict.INSTANCE;
+        }
+    }
+
+    public final void checkConflict() {
+        if (tx.status != BetaTransaction.ACTIVE) {
+            //todo: make use of the correct abort method
+            throw tx.abortOpenForWrite(owner);
+        }
+
+        if (lockMode != LOCKMODE_NONE) {
+            return;
+        }
+
+        if (checkConflict) {
+            return;
+        }
+
+        checkConflict = true;
     }
 
     /**
@@ -70,14 +260,14 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
      */
     public abstract void addCommutingFunction(Function function, BetaObjectPool pool);
 
-     public final boolean prepareDirtyUpdates(
+    public final boolean prepareDirtyUpdates(
             final BetaObjectPool pool, final BetaTransaction tx, final int spinCount) {
 
-        if (isConstructing) {
+        if (isConstructing()) {
             return true;
         }
 
-        if (isCommitted) {
+        if (isReadonly()) {
             if (!checkConflict) {
                 return true;
             }
@@ -89,7 +279,7 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
             return owner.___tryLockAndCheckConflict(tx, spinCount, this, false);
         }
 
-        if (isCommuting) {
+        if (isCommuting()) {
             if (!owner.___load(spinCount, tx, LOCKMODE_COMMIT, this)) {
                 return false;
             }
@@ -125,11 +315,11 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
             return true;
         }
 
-        if (isConstructing) {
+        if (isConstructing()) {
             return true;
         }
 
-        if (isCommitted) {
+        if (isReadonly()) {
             if (!checkConflict) {
                 return true;
             }
@@ -141,7 +331,7 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
             return owner.___tryLockAndCheckConflict(tx, spinCount, this, false);
         }
 
-        if (isCommuting) {
+        if (isCommuting()) {
             if (!owner.___load(spinCount, tx, LOCKMODE_COMMIT, this)) {
                 return false;
             }

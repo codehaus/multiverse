@@ -31,16 +31,16 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
         long version = ref.getVersion();
 
         LongRefTranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.isCommuting = true;
+        tranlocal.setStatus(STATUS_COMMUTING);
         tranlocal.addCommutingFunction(newIdentityLongFunction(), pool);
         tranlocal.version = version;
         tranlocal.value = initialValue;
         tranlocal.oldValue = initialValue;
         tranlocal.evaluateCommutingFunctions(pool);
 
-        assertFalse(tranlocal.isCommitted);
-        assertFalse(tranlocal.isCommuting);
-        assertFalse(tranlocal.isDirty);
+        assertFalse(tranlocal.isReadonly());
+        assertFalse(tranlocal.isCommuting());
+        assertFalse(tranlocal.isDirty());
         assertEquals(initialValue, tranlocal.value);
         assertVersionAndValue(ref, version, initialValue);
     }
@@ -52,7 +52,7 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
         long version = ref.getVersion();
 
         LongRefTranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.isCommuting = true;
+        tranlocal.setStatus(STATUS_COMMUTING);
 
         tranlocal.addCommutingFunction(newIncLongFunction(), pool);
         tranlocal.version = version;
@@ -60,9 +60,9 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
         tranlocal.oldValue = initialValue;
         tranlocal.evaluateCommutingFunctions(pool);
 
-        assertFalse(tranlocal.isCommitted);
-        assertFalse(tranlocal.isCommuting);
-        assertTrue(tranlocal.isDirty);
+        assertFalse(tranlocal.isReadonly());
+        assertFalse(tranlocal.isCommuting());
+        assertTrue(tranlocal.isDirty());
         assertSame(ref, tranlocal.owner);
         assertEquals(initialValue + 1, tranlocal.value);
     }
@@ -74,7 +74,7 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
         long version = ref.getVersion();
 
         LongRefTranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.isCommuting = true;
+        tranlocal.setStatus(STATUS_COMMUTING);
         tranlocal.addCommutingFunction(newIncLongFunction(), pool);
         tranlocal.addCommutingFunction(newIncLongFunction(), pool);
         tranlocal.addCommutingFunction(newIncLongFunction(), pool);
@@ -83,9 +83,9 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
         tranlocal.oldValue = initialValue;
         tranlocal.evaluateCommutingFunctions(pool);
 
-        assertFalse(tranlocal.isCommitted);
-        assertFalse(tranlocal.isCommuting);
-        assertTrue(tranlocal.isDirty);
+        assertFalse(tranlocal.isReadonly());
+        assertFalse(tranlocal.isCommuting());
+        assertTrue(tranlocal.isDirty());
         assertEquals(initialValue + 3, tranlocal.value);
     }
 }

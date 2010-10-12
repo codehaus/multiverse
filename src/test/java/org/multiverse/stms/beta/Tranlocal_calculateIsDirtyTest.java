@@ -27,11 +27,11 @@ public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants {
         BetaTransaction tx = stm.startDefaultTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
         Tranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.isDirty = true;
-        tranlocal.isConstructing = true;
+        tranlocal.setDirty(true);
+        tranlocal.setStatus(STATUS_CONSTRUCTING);
 
         assertTrue(tranlocal.calculateIsDirty());
-        assertTrue(tranlocal.isDirty);
+        assertTrue(tranlocal.isDirty());
     }
 
     @Test
@@ -39,20 +39,20 @@ public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants {
     public void whenCommuting() {
         BetaLongRef ref = new BetaLongRef(stm, 0);
         Tranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.isCommuting = true;
+        tranlocal.setStatus(STATUS_COMMUTING);
 
         assertFalse(tranlocal.calculateIsDirty());
-        assertFalse(tranlocal.isDirty);
+        assertFalse(tranlocal.isDirty());
     }
 
     @Test
-    public void whenCommitted() {
+    public void whenReadonly() {
         BetaLongRef ref = new BetaLongRef(stm, 0);
         Tranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.isCommitted = true;
+        tranlocal.setStatus(STATUS_READONLY);
 
         assertFalse(tranlocal.calculateIsDirty());
-        assertFalse(tranlocal.isDirty);
+        assertFalse(tranlocal.isDirty());
     }
 
     @Test
@@ -63,7 +63,7 @@ public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants {
         tranlocal.oldValue = 10;
 
         assertFalse(tranlocal.calculateIsDirty());
-        assertFalse(tranlocal.isDirty);
+        assertFalse(tranlocal.isDirty());
     }
 
     @Test
@@ -74,6 +74,6 @@ public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants {
         tranlocal.oldValue = 5;
 
         assertTrue(tranlocal.calculateIsDirty());
-        assertTrue(tranlocal.isDirty);
+        assertTrue(tranlocal.isDirty());
     }
 }

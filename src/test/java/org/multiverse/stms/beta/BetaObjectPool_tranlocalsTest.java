@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Veentjer
  */
-public class BetaObjectPool_tranlocalsTest {
+public class BetaObjectPool_tranlocalsTest implements BetaStmConstants{
     private BetaObjectPool pool;
     private BetaStm stm;
 
@@ -36,15 +36,15 @@ public class BetaObjectPool_tranlocalsTest {
         //todo:
         //assertNull(put.read);
         assertEquals(0, put.value);
-        assertFalse(put.isCommitted);
-        assertFalse(put.hasDepartObligation);
+        assertFalse(put.isReadonly());
+        assertFalse(put.hasDepartObligation());
     }
 
     @Test
-    public void putCommitted() {
+    public void putReadonly() {
         BetaLongRef ref = new BetaLongRef(stm.startDefaultTransaction());
         LongRefTranlocal put = new LongRefTranlocal(ref);
-        put.isCommitted = true;
+        put.setStatus(STATUS_READONLY);
         pool.put(put);
 
         assertNull(put.owner);
@@ -52,8 +52,8 @@ public class BetaObjectPool_tranlocalsTest {
         //todo:
         // assertNull(put.read);
         assertEquals(0, put.value);
-        assertFalse(put.isCommitted);
-        assertFalse(put.hasDepartObligation);
+        assertFalse(put.isReadonly());
+        assertFalse(put.hasDepartObligation());
     }
 
     @Test
@@ -69,8 +69,8 @@ public class BetaObjectPool_tranlocalsTest {
         //todo:
         //assertNull(put.read);
         assertEquals(0, put.value);
-        assertFalse(put.isCommitted);
-        assertFalse(put.hasDepartObligation);
+        assertFalse(put.isReadonly());
+        assertFalse(put.hasDepartObligation());
     }
 
     @Test

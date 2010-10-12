@@ -29,7 +29,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
         BetaLongRef ref = newLongRef(stm);
 
         LongRefTranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.checkConflict = true;
+        tranlocal.setIsConflictCheckNeeded(true);
         tranlocal.prepareForPooling(pool);
 
         assertPreparedForPooling(tranlocal);
@@ -40,7 +40,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
         BetaLongRef ref = newLongRef(stm);
 
         LongRefTranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.isConstructing = true;
+        tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.value = 200;
 
         tranlocal.prepareForPooling(pool);
@@ -75,12 +75,12 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
     }
 
     @Test
-    public void whenCommittedAndPermanent() {
+    public void whenReadonlyAndPermanent() {
         BetaLongRef ref = makeReadBiased(newLongRef(stm, 100));
 
         LongRefTranlocal tranlocal = ref.___newTranlocal();
         ref.___load(1, null, LOCKMODE_NONE, tranlocal);
-        tranlocal.isCommitted = true;
+        tranlocal.setStatus(STATUS_READONLY);
 
         tranlocal.prepareForPooling(pool);
 
@@ -93,7 +93,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
 
         LongRefTranlocal tranlocal = ref.___newTranlocal();
         ref.___load(1, null, LOCKMODE_NONE, tranlocal);
-        tranlocal.isCommitted = true;
+        tranlocal.setStatus(STATUS_READONLY);
 
         tranlocal.prepareForPooling(pool);
 
@@ -117,7 +117,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
     public void whenCommuting() {
         BetaLongRef ref = newLongRef(stm, 100);
         LongRefTranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.isCommuting = true;
+        tranlocal.setStatus(STATUS_COMMUTING);
 
         LongFunction function = mock(LongFunction.class);
         tranlocal.addCommutingFunction(function, pool);
@@ -128,16 +128,16 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
     }
 
     private void assertPreparedForPooling(LongRefTranlocal tranlocal) {
-        assertFalse(tranlocal.hasDepartObligation);
-        assertFalse(tranlocal.isDirty);
+        assertFalse(tranlocal.hasDepartObligation());
+        assertFalse(tranlocal.isDirty());
         assertEquals(0, tranlocal.value);
         assertEquals(0, tranlocal.oldValue);
-        assertFalse(tranlocal.isCommitted);
-        assertFalse(tranlocal.isCommuting);
-        assertFalse(tranlocal.isConstructing);
+        assertFalse(tranlocal.isReadonly());
+        assertFalse(tranlocal.isCommuting());
+        assertFalse(tranlocal.isConstructing());
         assertNull(tranlocal.headCallable);
         assertNull(tranlocal.owner);
-        assertFalse(tranlocal.checkConflict);
+        assertFalse(tranlocal.isConflictCheckNeeded());
         assertEquals(0, tranlocal.version);
     }
 }
