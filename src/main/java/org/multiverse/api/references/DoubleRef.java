@@ -349,7 +349,7 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
-    double incrementAndGet(Transaction tx,double amount);
+    double incrementAndGet(Transaction tx, double amount);
 
     /**
      * Awaits for the value to become the given value. If the value already has the
@@ -374,6 +374,4 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx,double value);
-
-    //todo: atomicAwait.
 }

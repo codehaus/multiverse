@@ -352,8 +352,26 @@ public interface ${transactionalObject.referenceInterface}${transactionalObject.
      * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
-    ${transactionalObject.type} incrementAndGet(Transaction tx,${transactionalObject.type} amount);
+    ${transactionalObject.type} incrementAndGet(Transaction tx, ${transactionalObject.type} amount);
 
+#if(${transactionalObject.incFunctionMethod} ne '')
+    void increment();
+
+    void increment(Transaction tx);
+
+    void increment(${transactionalObject.type} amount);
+
+    void increment(Transaction tx, ${transactionalObject.type} amount);
+
+    void decrement();
+
+    void decrement(Transaction tx);
+
+    void decrement(${transactionalObject.type} amount);
+
+    void decrement(Transaction tx, ${transactionalObject.type} amount);
+
+#end
 #elseif(${transactionalObject.referenceInterface} eq "Ref")
     /**
      * Checks if the current value is null. This call lifts on the Transaction stored in the ThreadLocalTransaction.

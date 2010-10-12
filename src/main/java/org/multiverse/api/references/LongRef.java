@@ -349,7 +349,23 @@ public interface LongRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
-    long incrementAndGet(Transaction tx,long amount);
+    long incrementAndGet(Transaction tx, long amount);
+
+    void increment();
+
+    void increment(Transaction tx);
+
+    void increment(long amount);
+
+    void increment(Transaction tx, long amount);
+
+    void decrement();
+
+    void decrement(Transaction tx);
+
+    void decrement(long amount);
+
+    void decrement(Transaction tx, long amount);
 
     /**
      * Awaits for the value to become the given value. If the value already has the
@@ -374,6 +390,4 @@ public interface LongRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx,long value);
-
-    //todo: atomicAwait.
 }

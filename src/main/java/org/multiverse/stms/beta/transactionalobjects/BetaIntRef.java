@@ -6,6 +6,7 @@ import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.PanicError;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.exceptions.TransactionRequiredException;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.IntFunction;
 import org.multiverse.api.predicates.IntPredicate;
 import org.multiverse.api.references.IntRef;
@@ -406,6 +407,38 @@ public final class BetaIntRef
         return write.value;
     }
 
+
+    public final void increment(){
+        commute(Functions.newIncIntFunction());
+    }
+
+    public final void increment(Transaction tx){
+        commute(tx, Functions.newIncIntFunction());
+    }
+
+    public final void increment(int amount){
+        commute(Functions.newIncIntFunction(amount));
+    }
+
+    public final void increment(Transaction tx, int amount){
+        commute(tx, Functions.newIncIntFunction(amount));
+    }
+
+    public final void decrement(){
+        commute(Functions.newIncIntFunction(-1));
+    }
+
+    public final void decrement(Transaction tx){
+        commute(tx, Functions.newIncIntFunction(-1));
+    }
+
+    public final void decrement(int amount){
+        commute(Functions.newIncIntFunction(-amount));
+    }
+
+    public final void decrement(Transaction tx, int amount){
+        commute(tx, Functions.newIncIntFunction(-amount));
+    }
     @Override
     public final void ensure(){
         Transaction tx = getThreadLocalTransaction();

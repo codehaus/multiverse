@@ -34,6 +34,7 @@ class TransactionalObject {
 //  String parametrizedTranlocal
   String accessModifier//the access modifier the ref gets
   String functionClass//the class of the callable used for commuting operations
+  String incFunctionMethod
   boolean isReference
   String referenceInterface
   boolean isNumber
@@ -187,7 +188,8 @@ List<TransactionalObject> createTransactionalObjects() {
           functionClass: 'Function',
           isReference: true,
           isNumber: false,
-          predicateClass: "Predicate")
+          predicateClass: "Predicate",
+          incFunctionMethod: '')
   result.add new TransactionalObject(
           name: 'BetaIntRef',
           tranlocal: 'IntRefTranlocal',
@@ -201,7 +203,8 @@ List<TransactionalObject> createTransactionalObjects() {
           functionClass: 'IntFunction',
           isReference: true,
           isNumber: true,
-          predicateClass: "IntPredicate")
+          predicateClass: "IntPredicate",
+          incFunctionMethod: 'newIncIntFunction')
   result.add new TransactionalObject(
           name: 'BetaBooleanRef',
           tranlocal: 'BooleanRefTranlocal',
@@ -215,7 +218,8 @@ List<TransactionalObject> createTransactionalObjects() {
           functionClass: 'BooleanFunction',
           isReference: true,
           isNumber: false,
-          predicateClass: "BooleanPredicate")
+          predicateClass: "BooleanPredicate",
+          incFunctionMethod: '')
   result.add new TransactionalObject(
           name: 'BetaDoubleRef',
           tranlocal: 'DoubleRefTranlocal',
@@ -229,7 +233,8 @@ List<TransactionalObject> createTransactionalObjects() {
           functionClass: 'DoubleFunction',
           isReference: true,
           isNumber: true,
-          predicateClass: "DoublePredicate")
+          predicateClass: "DoublePredicate",
+          incFunctionMethod: '')
   result.add new TransactionalObject(
           name: 'BetaLongRef',
           tranlocal: 'LongRefTranlocal',
@@ -243,7 +248,8 @@ List<TransactionalObject> createTransactionalObjects() {
           functionClass: 'LongFunction',
           isReference: true,
           isNumber: true,
-          predicateClass: "LongPredicate")
+          predicateClass: "LongPredicate",
+          incFunctionMethod: 'newIncLongFunction')
   result.add new TransactionalObject(
           name: 'BetaTransactionalObject',
           tranlocal: 'Tranlocal',
@@ -257,7 +263,8 @@ List<TransactionalObject> createTransactionalObjects() {
           referenceInterface: '',
           isReference: false,
           isNumber: false,
-          predicateClass: "")
+          predicateClass: "",
+          incFunctionMethod: '')
   result
 }
 

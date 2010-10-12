@@ -420,6 +420,40 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         return write.value;
     }
 
+#if(${transactionalObject.incFunctionMethod} ne '')
+
+    public final void increment(){
+        commute(Functions.${transactionalObject.incFunctionMethod}());
+    }
+
+    public final void increment(Transaction tx){
+        commute(tx, Functions.${transactionalObject.incFunctionMethod}());
+    }
+
+    public final void increment(${transactionalObject.type} amount){
+        commute(Functions.${transactionalObject.incFunctionMethod}(amount));
+    }
+
+    public final void increment(Transaction tx, ${transactionalObject.type} amount){
+        commute(tx, Functions.${transactionalObject.incFunctionMethod}(amount));
+    }
+
+    public final void decrement(){
+        commute(Functions.${transactionalObject.incFunctionMethod}(-1));
+    }
+
+    public final void decrement(Transaction tx){
+        commute(tx, Functions.${transactionalObject.incFunctionMethod}(-1));
+    }
+
+    public final void decrement(${transactionalObject.type} amount){
+        commute(Functions.${transactionalObject.incFunctionMethod}(-amount));
+    }
+
+    public final void decrement(Transaction tx, ${transactionalObject.type} amount){
+        commute(tx, Functions.${transactionalObject.incFunctionMethod}(-amount));
+    }
+#end
 #elseif(${transactionalObject.name} eq "BetaRef")
     @Override
     public final boolean isNull(){

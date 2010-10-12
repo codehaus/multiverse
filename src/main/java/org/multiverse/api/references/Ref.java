@@ -333,6 +333,7 @@ public interface Ref<E> extends TransactionalObject {
      * this call returns the stored value. If the value is null, a retry is done.
      *
      * @param tx the transaction this method lifts on.
+     * @return the stored value.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
@@ -384,6 +385,4 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx,E value);
-
-    //todo: atomicAwait.
 }

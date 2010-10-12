@@ -349,7 +349,23 @@ public interface IntRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
-    int incrementAndGet(Transaction tx,int amount);
+    int incrementAndGet(Transaction tx, int amount);
+
+    void increment();
+
+    void increment(Transaction tx);
+
+    void increment(int amount);
+
+    void increment(Transaction tx, int amount);
+
+    void decrement();
+
+    void decrement(Transaction tx);
+
+    void decrement(int amount);
+
+    void decrement(Transaction tx, int amount);
 
     /**
      * Awaits for the value to become the given value. If the value already has the
@@ -374,6 +390,4 @@ public interface IntRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx,int value);
-
-    //todo: atomicAwait.
 }
