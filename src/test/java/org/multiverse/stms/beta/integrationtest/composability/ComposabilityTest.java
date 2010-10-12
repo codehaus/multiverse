@@ -226,6 +226,31 @@ public class ComposabilityTest {
         assertEquals(initialValue + 1, ref.atomicGet());
     }
 
+    @Test
+    public void whenInnerAndOuterChanges_thenWillCommitAsOne() {
+        final int initialValue = 10;
+        final IntRef ref = newIntRef(initialValue);
+
+        StmUtils.execute(new AtomicVoidClosure() {
+            @Override
+            public void execute(Transaction tx) throws Exception {
+                ref.increment();
+
+                StmUtils.execute(new AtomicVoidClosure() {
+                    @Override
+                    public void execute(Transaction tx) throws Exception {
+                        ref.increment();
+                    }
+                });
+
+                ref.increment();
+
+            }
+        });
+
+        assertEquals(initialValue + 3, ref.atomicGet());
+    }
+
     class MyException extends RuntimeException {
     }
 }
