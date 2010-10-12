@@ -351,20 +351,113 @@ public interface LongRef extends TransactionalObject {
      */
     long incrementAndGet(Transaction tx, long amount);
 
+
+    /**
+     * Increments the value by one.
+     *
+     * This call is able to commute if there are no dependencies on the value in the
+     * transaction. This is why this method doesn't have a return value.
+     *
+     * This call lifts on the Transaction in the ThreadLocalTransaction.
+     *
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
     void increment();
 
+    /**
+     * Increments the value by one.
+     *
+     * This call is able to commute if there are no dependencies on the value in the
+     * transaction. This is why this method doesn't have a return value.
+     *
+     * @param tx the transaction this method lifts on.
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
     void increment(Transaction tx);
 
+    /**
+     * Increments the value by the given amount.
+     *
+     * This call is able to commute if there are no dependencies on the value in the
+     * transaction. This is why this method doesn't have a return value.
+     *
+     * This call lifts on the Transaction in the ThreadLocalTransaction.
+     *
+     * @param amount the amount to increase with
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
     void increment(long amount);
 
+    /**
+     * Increments the value by the given amount.
+     *
+     * This call is able to commute if there are no dependencies on the value in the
+     * transaction. This is why this method doesn't have a return value.
+     *
+     * @param tx the Transaction this method lifts on
+     * @param amount the amount to increment with
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
     void increment(Transaction tx, long amount);
 
+    /**
+     * Decrements the value by one.
+     *
+     * This call is able to commute if there are no dependencies on the value in the
+     * transaction. This is why this method doesn't have a return value.
+     *
+     * This call lifts on the Transaction in the ThreadLocalTransaction.
+     *
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
     void decrement();
 
+    /**
+     * Decrements the value by one.
+     *
+     * This call is able to commute if there are no dependencies on the value in the
+     * transaction. This is why this method doesn't have a return value.
+     *
+     * @param tx the transaction this method lifts on.
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
     void decrement(Transaction tx);
 
+    /**
+     * Decrements the value by the given amount.
+     *
+     * This call is able to commute if there are no dependencies on the value in the
+     * transaction. This is why this method doesn't have a return value.
+     *
+     * This call lifts on the Transaction in the ThreadLocalTransaction.
+     *
+     * @param amount the amount to decrement with
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
     void decrement(long amount);
 
+    /**
+     * Decrements the value by the given amount.
+     *
+     * This call is able to commute if there are no dependencies on the value in the
+     * transaction. This is why this method doesn't have a return value.
+     *
+     * @param tx the Transaction this method lifts on
+     * @param amount the amount to decrement with
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
     void decrement(Transaction tx, long amount);
 
     /**

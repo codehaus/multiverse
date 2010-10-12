@@ -409,35 +409,74 @@ public final class BetaIntRef
 
 
     public final void increment(){
-        commute(Functions.newIncIntFunction());
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx == null){
+            throw new TransactionRequiredException(getClass(),"increment");
+        }
+
+        increment(tx);
     }
 
-    public final void increment(Transaction tx){
-        commute(tx, Functions.newIncIntFunction());
+    public final void increment(final Transaction tx){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+        ((BetaTransaction)tx).commute(this,Functions.newIncIntFunction());
     }
 
-    public final void increment(int amount){
-        commute(Functions.newIncIntFunction(amount));
+    public final void increment(final int amount){
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx == null){
+            throw new TransactionRequiredException(getClass(),"increment");
+        }
+
+        increment(tx, amount);
     }
 
-    public final void increment(Transaction tx, int amount){
-        commute(tx, Functions.newIncIntFunction(amount));
+    public final void increment(final Transaction tx, final int amount){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        ((BetaTransaction)tx).commute(this,Functions.newIncIntFunction(amount));
     }
 
     public final void decrement(){
-        commute(Functions.newIncIntFunction(-1));
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx == null){
+            throw new TransactionRequiredException(getClass(),"decrement");
+        }
+
+        decrement(tx);
     }
 
-    public final void decrement(Transaction tx){
-        commute(tx, Functions.newIncIntFunction(-1));
+    public final void decrement(final Transaction tx){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        ((BetaTransaction)tx).commute(this,Functions.newIncIntFunction(-1));
     }
 
-    public final void decrement(int amount){
-        commute(Functions.newIncIntFunction(-amount));
+    public final void decrement(final int amount){
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx == null){
+            throw new TransactionRequiredException(getClass(),"decrement");
+        }
+
+        decrement(tx, amount);
     }
 
-    public final void decrement(Transaction tx, int amount){
-        commute(tx, Functions.newIncIntFunction(-amount));
+    public final void decrement(final Transaction tx, final int amount){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        ((BetaTransaction)tx).commute(this,Functions.newIncIntFunction(-amount));
     }
     @Override
     public final void ensure(){
