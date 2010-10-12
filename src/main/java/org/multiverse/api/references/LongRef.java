@@ -356,7 +356,7 @@ public interface LongRef extends TransactionalObject {
      * Increments the value by one.
      *
      * This call is able to commute if there are no dependencies on the value in the
-     * transaction. This is why this method doesn't have a return value.
+     * transaction. That is why this method doesn't have a return value.
      *
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
@@ -369,7 +369,7 @@ public interface LongRef extends TransactionalObject {
      * Increments the value by one.
      *
      * This call is able to commute if there are no dependencies on the value in the
-     * transaction. This is why this method doesn't have a return value.
+     * transaction. That is why this method doesn't have a return value.
      *
      * @param tx the transaction this method lifts on.
      * @throws NullPointerException if tx is null.
@@ -382,7 +382,7 @@ public interface LongRef extends TransactionalObject {
      * Increments the value by the given amount.
      *
      * This call is able to commute if there are no dependencies on the value in the
-     * transaction. This is why this method doesn't have a return value.
+     * transaction. That is why this method doesn't have a return value.
      *
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
@@ -396,7 +396,7 @@ public interface LongRef extends TransactionalObject {
      * Increments the value by the given amount.
      *
      * This call is able to commute if there are no dependencies on the value in the
-     * transaction. This is why this method doesn't have a return value.
+     * transaction. That is why this method doesn't have a return value.
      *
      * @param tx the Transaction this method lifts on
      * @param amount the amount to increment with
@@ -410,7 +410,7 @@ public interface LongRef extends TransactionalObject {
      * Decrements the value by one.
      *
      * This call is able to commute if there are no dependencies on the value in the
-     * transaction. This is why this method doesn't have a return value.
+     * transaction. That is why this method doesn't have a return value.
      *
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
@@ -423,7 +423,7 @@ public interface LongRef extends TransactionalObject {
      * Decrements the value by one.
      *
      * This call is able to commute if there are no dependencies on the value in the
-     * transaction. This is why this method doesn't have a return value.
+     * transaction. That is why this method doesn't have a return value.
      *
      * @param tx the transaction this method lifts on.
      * @throws NullPointerException if tx is null.
@@ -436,7 +436,7 @@ public interface LongRef extends TransactionalObject {
      * Decrements the value by the given amount.
      *
      * This call is able to commute if there are no dependencies on the value in the
-     * transaction. This is why this method doesn't have a return value.
+     * transaction. That is why this method doesn't have a return value.
      *
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
@@ -450,7 +450,7 @@ public interface LongRef extends TransactionalObject {
      * Decrements the value by the given amount.
      *
      * This call is able to commute if there are no dependencies on the value in the
-     * transaction. This is why this method doesn't have a return value.
+     * transaction. That is why this method doesn't have a return value.
      *
      * @param tx the Transaction this method lifts on
      * @param amount the amount to decrement with
