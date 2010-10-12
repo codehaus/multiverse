@@ -351,7 +351,6 @@ public interface IntRef extends TransactionalObject {
      */
     int incrementAndGet(Transaction tx, int amount);
 
-
     /**
      * Increments the value by one.
      *

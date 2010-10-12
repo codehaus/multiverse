@@ -351,7 +351,6 @@ public interface LongRef extends TransactionalObject {
      */
     long incrementAndGet(Transaction tx, long amount);
 
-
     /**
      * Increments the value by one.
      *

@@ -355,7 +355,6 @@ public interface ${transactionalObject.referenceInterface}${transactionalObject.
     ${transactionalObject.type} incrementAndGet(Transaction tx, ${transactionalObject.type} amount);
 
 #if(${transactionalObject.incFunctionMethod} ne '')
-
     /**
      * Increments the value by one.
      *
