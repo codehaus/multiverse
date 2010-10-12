@@ -408,6 +408,7 @@ public final class BetaIntRef
     }
 
 
+    @Override
     public final void increment(){
         final Transaction tx = getThreadLocalTransaction();
 
@@ -418,6 +419,7 @@ public final class BetaIntRef
         increment(tx);
     }
 
+    @Override
     public final void increment(final Transaction tx){
         if(tx == null){
             throw new NullPointerException();
@@ -425,6 +427,7 @@ public final class BetaIntRef
         ((BetaTransaction)tx).commute(this,Functions.newIncIntFunction());
     }
 
+    @Override
     public final void increment(final int amount){
         final Transaction tx = getThreadLocalTransaction();
 
@@ -435,6 +438,7 @@ public final class BetaIntRef
         increment(tx, amount);
     }
 
+    @Override
     public final void increment(final Transaction tx, final int amount){
         if(tx == null){
             throw new NullPointerException();
@@ -443,6 +447,7 @@ public final class BetaIntRef
         ((BetaTransaction)tx).commute(this,Functions.newIncIntFunction(amount));
     }
 
+    @Override
     public final void decrement(){
         final Transaction tx = getThreadLocalTransaction();
 
@@ -453,6 +458,7 @@ public final class BetaIntRef
         decrement(tx);
     }
 
+    @Override
     public final void decrement(final Transaction tx){
         if(tx == null){
             throw new NullPointerException();
@@ -461,6 +467,7 @@ public final class BetaIntRef
         ((BetaTransaction)tx).commute(this,Functions.newIncIntFunction(-1));
     }
 
+    @Override
     public final void decrement(final int amount){
         final Transaction tx = getThreadLocalTransaction();
 
@@ -471,6 +478,7 @@ public final class BetaIntRef
         decrement(tx, amount);
     }
 
+    @Override
     public final void decrement(final Transaction tx, final int amount){
         if(tx == null){
             throw new NullPointerException();

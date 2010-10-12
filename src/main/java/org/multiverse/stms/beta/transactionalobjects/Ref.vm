@@ -421,7 +421,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
 #if(${transactionalObject.incFunctionMethod} ne '')
-
+    @Override
     public final void increment(){
         final Transaction tx = getThreadLocalTransaction();
 
@@ -432,6 +432,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         increment(tx);
     }
 
+    @Override
     public final void increment(final Transaction tx){
         if(tx == null){
             throw new NullPointerException();
@@ -439,6 +440,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         ((BetaTransaction)tx).commute(this,Functions.${transactionalObject.incFunctionMethod}());
     }
 
+    @Override
     public final void increment(final ${transactionalObject.type} amount){
         final Transaction tx = getThreadLocalTransaction();
 
@@ -449,6 +451,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         increment(tx, amount);
     }
 
+    @Override
     public final void increment(final Transaction tx, final ${transactionalObject.type} amount){
         if(tx == null){
             throw new NullPointerException();
@@ -457,6 +460,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         ((BetaTransaction)tx).commute(this,Functions.${transactionalObject.incFunctionMethod}(amount));
     }
 
+    @Override
     public final void decrement(){
         final Transaction tx = getThreadLocalTransaction();
 
@@ -467,6 +471,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         decrement(tx);
     }
 
+    @Override
     public final void decrement(final Transaction tx){
         if(tx == null){
             throw new NullPointerException();
@@ -475,6 +480,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         ((BetaTransaction)tx).commute(this,Functions.${transactionalObject.incFunctionMethod}(-1));
     }
 
+    @Override
     public final void decrement(final ${transactionalObject.type} amount){
         final Transaction tx = getThreadLocalTransaction();
 
@@ -485,6 +491,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         decrement(tx, amount);
     }
 
+    @Override
     public final void decrement(final Transaction tx, final ${transactionalObject.type} amount){
         if(tx == null){
             throw new NullPointerException();
@@ -492,6 +499,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
         ((BetaTransaction)tx).commute(this,Functions.${transactionalObject.incFunctionMethod}(-amount));
     }
+    
 #end
 #elseif(${transactionalObject.name} eq "BetaRef")
     @Override
