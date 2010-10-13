@@ -139,7 +139,7 @@ public class ComposabilityTest {
     }
 
     @Test
-    public void whenSiblingFails_thenAllFail() {
+    public void whenSiblingFails_thenAllRollback() {
         int initialValue = 10;
         final IntRef ref = newIntRef(initialValue);
 
@@ -147,6 +147,8 @@ public class ComposabilityTest {
             StmUtils.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
+                    ref.increment();
+
                     StmUtils.execute(new AtomicVoidClosure() {
                         @Override
                         public void execute(Transaction tx) throws Exception {

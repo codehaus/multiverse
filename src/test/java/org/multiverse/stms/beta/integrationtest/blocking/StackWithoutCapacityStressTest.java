@@ -119,8 +119,10 @@ public class StackWithoutCapacityStressTest implements BetaStmConstants {
 
     class Stack<E> {
         private final BetaRef<Node<E>> head = newRef(stm);
-        private final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
-        private final AtomicBlock popBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
+        private final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder()
+                .buildAtomicBlock();
+        private final AtomicBlock popBlock = stm.createTransactionFactoryBuilder()
+                .buildAtomicBlock();
 
         public void push(final E item) {
             pushBlock.execute(new AtomicVoidClosure() {
