@@ -19,8 +19,10 @@ public enum PropagationLevel {
      * transaction. This is the default propagation level.
      */
     Requires,
+
     /**
-     * Indicates that a transaction should always be available.
+     * Indicates that a transaction should always be available. If not, a
+     * {@link org.multiverse.api.exceptions.TransactionRequiredException} is thrown.
      */
     Mandatory,
 
@@ -30,7 +32,8 @@ public enum PropagationLevel {
     Supports,
 
     /**
-     * Indicates that no active transaction should be available.
+     * Indicates that no active transaction should be available. If a transaction is found,
+     * a {@link org.multiverse.api.exceptions.NoTransactionAllowedException} is thrown.
      */
     Never
 }

@@ -16,7 +16,7 @@ import static java.lang.reflect.Modifier.isStatic;
  * the stm reference yourself and just ignore this GlobalStmInstance.
  * <p/>
  * The default implementation is the AlphaStm for now. It can be configured through setting the System property:
- * org.multiverse api GlobalStmInstance.factorymethod. This method should be a no arg static method that returns a
+ * org.multiverse api GlobalStmInstance.factoryMethod. This method should be a no arg static method that returns a
  * {@link Stm} instance.
  *
  * @author Peter Veentjer

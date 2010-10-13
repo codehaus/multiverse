@@ -116,7 +116,15 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
-                
+
+        if(ref == null){
+           throw abortOpenOnNull();
+        }
+            
+        if(ref.getStm() != config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+
         if(attached!=null && attached.owner == ref){
             return (${ref.tranlocal}${ref.typeParameter})attached;
         }

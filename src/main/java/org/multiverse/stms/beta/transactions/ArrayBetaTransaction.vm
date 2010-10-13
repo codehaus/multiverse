@@ -97,7 +97,15 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
-        
+
+        if(ref == null){
+            throw abortOpenOnNull();
+        }
+            
+        if(ref.getStm()!=config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+                        
         final int index = indexOf(ref);
         if(index != -1){
             return (${ref.tranlocal}${ref.typeParameter})array[index];

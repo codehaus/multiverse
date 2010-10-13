@@ -215,11 +215,25 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
         }
     }
 
+    public final StmMismatchException abortOnStmMismatch(final BetaTransactionalObject ref){
+        abort();
+        return new StmMismatchException(
+            format("[%s] The transaction belongs to a different stm than the stm that created ref '%s'",
+                config.familyName, toDebugString(ref)));
+    }
+
+    public final NullPointerException abortOpenOnNull(){
+        abort();
+        return new NullPointerException(
+            format("[%s] Can't open a TransactionalObject with a null reference",
+                config.familyName));
+    }
+
     public final RuntimeException abortOnOpenForReadWhileEvaluatingCommute(
         final BetaTransactionalObject ref){
 
         abort();
-        throw new IllegalTransactionStateException(
+        return new IllegalTransactionStateException(
             format("[%s] Can't openForRead '%s' while evaluating a commuting function",
                 config.familyName, toDebugString(ref)));
     }
@@ -228,7 +242,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
         final BetaTransactionalObject ref){
 
         abort();
-        throw new IllegalTransactionStateException(
+        return new IllegalTransactionStateException(
             format("[%s] Can't openForWrite '%s' while evaluating a commuting function",
                 config.familyName, toDebugString(ref)));
     }
@@ -258,7 +272,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
         final BetaTransactionalObject ref){
 
         abort();
-        throw new IllegalTransactionStateException(
+        return new IllegalTransactionStateException(
             format("[%s] Can't openForConstruction '%s' while evaluating a commuting function",
             config.familyName, toDebugString(ref)));
     }
@@ -267,7 +281,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
         BetaTransactionalObject ref){
 
         abort();
-        throw new IllegalTransactionStateException(
+        return new IllegalTransactionStateException(
             format("[%s] Can't add a commuting function to '%s' while evaluating a commuting function",
                 config.familyName, toDebugString(ref)));
     }

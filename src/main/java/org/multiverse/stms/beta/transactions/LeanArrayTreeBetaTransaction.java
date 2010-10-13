@@ -91,6 +91,14 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOpen(ref);
         }
 
+        if(ref == null){
+            throw abortOpenOnNull();
+        }
+
+        if(ref.getStm()!=config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+                    
         final int identityHashCode = ref.___identityHashCode();
         final int index = indexOf(ref, identityHashCode);
         if(index != -1){
@@ -308,6 +316,14 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOpen(ref);
         }
 
+        if(ref == null){
+            throw abortOpenOnNull();
+        }
+
+        if(ref.getStm()!=config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+                    
         final int identityHashCode = ref.___identityHashCode();
         final int index = indexOf(ref, identityHashCode);
         if(index != -1){
@@ -525,6 +541,14 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOpen(ref);
         }
 
+        if(ref == null){
+            throw abortOpenOnNull();
+        }
+
+        if(ref.getStm()!=config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+                    
         final int identityHashCode = ref.___identityHashCode();
         final int index = indexOf(ref, identityHashCode);
         if(index != -1){
@@ -742,6 +766,14 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOpen(ref);
         }
 
+        if(ref == null){
+            throw abortOpenOnNull();
+        }
+
+        if(ref.getStm()!=config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+                    
         final int identityHashCode = ref.___identityHashCode();
         final int index = indexOf(ref, identityHashCode);
         if(index != -1){
@@ -959,6 +991,14 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOpen(ref);
         }
 
+        if(ref == null){
+            throw abortOpenOnNull();
+        }
+
+        if(ref.getStm()!=config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+                    
         final int identityHashCode = ref.___identityHashCode();
         final int index = indexOf(ref, identityHashCode);
         if(index != -1){
@@ -1172,6 +1212,14 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOpen(ref);
         }
 
+        if(ref == null){
+            throw abortOpenOnNull();
+        }
+
+        if(ref.getStm()!=config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+                    
         final int identityHashCode = ref.___identityHashCode();
         final int index = indexOf(ref, identityHashCode);
         if(index != -1){

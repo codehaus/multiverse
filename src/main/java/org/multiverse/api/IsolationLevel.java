@@ -5,7 +5,7 @@ package org.multiverse.api;
  * The transaction is free to provide a higher isolation than the one specified.
  * <p/>
  * The dirty read isn't added since atm we already have an extremely cheap read using the atomicWeakGet on the
- * refs.
+ * refs. Using the atomicWeakGet you have extremely cheap access to committed data.
  *
  * @author Peter Veentjer.
  */

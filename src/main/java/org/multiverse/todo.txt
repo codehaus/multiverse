@@ -127,19 +127,7 @@ performance.
 
 - cram all logic of the tranlocal in a long
 
-- testing: ref.awaitNull
-
-- testing: ref.awaitNotNull
-
 todo
-
-- awaitNotNull -> awaitNotNullAndGet
-
-- improved javadoc on ref.awaitNull
-
-- added ref.awaitNull
-
-- added ref.awaitNotNull
 
 - mono transaction: support for orelse
 
@@ -204,8 +192,6 @@ and not allowed. So not throw the retry error immediately..
 
 - atomic change methods on ref should deal with listeners
 
-- detection of ref.stm & transaction.stm mismatch
-
 - Collection: map
 
 - Collection: filter
@@ -268,6 +254,11 @@ and not allowed. So not throw the retry error immediately..
 
 - logic needs to be moved to concrete threadlocal classes.
 
+- testing: ref.awaitNull
+
+- testing: ref.awaitNotNull
+
+
 done
 
 - tranlocal needs to have access to transaction.
@@ -323,4 +314,14 @@ by another or by itself and either are committed or not).
 - array transaction has index optimization for repeated access of the same ref.
 
 - doPrepareWithWriteSkewPrevention needs to be moved to the tranlocal.
+
+- detection of ref.stm & transaction.stm mismatch
+
+- awaitNotNull -> awaitNotNullAndGet
+
+- improved javadoc on ref.awaitNull
+
+- added ref.awaitNull
+
+- added ref.awaitNotNull
 

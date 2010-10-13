@@ -103,7 +103,15 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
-                
+
+        if(ref == null){
+           throw abortOpenOnNull();
+        }
+            
+        if(ref.getStm() != config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+
         if(attached!=null && attached.owner == ref){
             return (RefTranlocal<E>)attached;
         }
@@ -445,7 +453,15 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
-                
+
+        if(ref == null){
+           throw abortOpenOnNull();
+        }
+            
+        if(ref.getStm() != config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+
         if(attached!=null && attached.owner == ref){
             return (IntRefTranlocal)attached;
         }
@@ -787,7 +803,15 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
-                
+
+        if(ref == null){
+           throw abortOpenOnNull();
+        }
+            
+        if(ref.getStm() != config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+
         if(attached!=null && attached.owner == ref){
             return (BooleanRefTranlocal)attached;
         }
@@ -1129,7 +1153,15 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
-                
+
+        if(ref == null){
+           throw abortOpenOnNull();
+        }
+            
+        if(ref.getStm() != config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+
         if(attached!=null && attached.owner == ref){
             return (DoubleRefTranlocal)attached;
         }
@@ -1471,7 +1503,15 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
-                
+
+        if(ref == null){
+           throw abortOpenOnNull();
+        }
+            
+        if(ref.getStm() != config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+
         if(attached!=null && attached.owner == ref){
             return (LongRefTranlocal)attached;
         }
@@ -1809,7 +1849,15 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
-                
+
+        if(ref == null){
+           throw abortOpenOnNull();
+        }
+            
+        if(ref.getStm() != config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+
         if(attached!=null && attached.owner == ref){
             return (Tranlocal)attached;
         }

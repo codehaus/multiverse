@@ -2,7 +2,6 @@ package org.multiverse.stms.beta.integrationtest.lifecycle;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.StmUtils;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.DeadTransactionException;
@@ -21,7 +20,6 @@ public class LifecycleTest {
         stm = new BetaStm();
         clearThreadLocalTransaction();
     }
-
 
     @Test
     public void whenTransactionCommit_thenCompensatingOrDeferredTaskExecuted() {
@@ -57,7 +55,6 @@ public class LifecycleTest {
 
         verify(task).run();
     }
-
 
     @Test
     public void whenTransactionCommit_thenDeferredOperationCalled() {
@@ -117,7 +114,7 @@ public class LifecycleTest {
             execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    StmUtils.scheduleCompensatingTask(task);
+                    scheduleCompensatingTask(task);
                     tx.abort();
                 }
             });

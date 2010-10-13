@@ -93,7 +93,15 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
-        
+
+        if(ref == null){
+            throw abortOpenOnNull();
+        }
+            
+        if(ref.getStm()!=config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+                        
         final int index = indexOf(ref);
         if(index != -1){
             return (RefTranlocal<E>)array[index];
@@ -440,7 +448,15 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
-        
+
+        if(ref == null){
+            throw abortOpenOnNull();
+        }
+            
+        if(ref.getStm()!=config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+                        
         final int index = indexOf(ref);
         if(index != -1){
             return (IntRefTranlocal)array[index];
@@ -787,7 +803,15 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
-        
+
+        if(ref == null){
+            throw abortOpenOnNull();
+        }
+            
+        if(ref.getStm()!=config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+                        
         final int index = indexOf(ref);
         if(index != -1){
             return (BooleanRefTranlocal)array[index];
@@ -1134,7 +1158,15 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
-        
+
+        if(ref == null){
+            throw abortOpenOnNull();
+        }
+            
+        if(ref.getStm()!=config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+                        
         final int index = indexOf(ref);
         if(index != -1){
             return (DoubleRefTranlocal)array[index];
@@ -1481,7 +1513,15 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
-        
+
+        if(ref == null){
+            throw abortOpenOnNull();
+        }
+            
+        if(ref.getStm()!=config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+                        
         final int index = indexOf(ref);
         if(index != -1){
             return (LongRefTranlocal)array[index];
@@ -1825,7 +1865,15 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
-        
+
+        if(ref == null){
+            throw abortOpenOnNull();
+        }
+            
+        if(ref.getStm()!=config.stm){
+            throw abortOnStmMismatch(ref);
+        }
+                        
         final int index = indexOf(ref);
         if(index != -1){
             return (Tranlocal)array[index];

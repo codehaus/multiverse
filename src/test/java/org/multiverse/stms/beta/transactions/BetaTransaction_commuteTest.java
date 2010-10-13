@@ -177,7 +177,6 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
 
 
     @Test
-    @Ignore
     public void whenOverflow() {
         assumeTrue(isTransactionSupportingCommute());
 
