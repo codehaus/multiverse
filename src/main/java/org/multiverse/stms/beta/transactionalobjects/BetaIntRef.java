@@ -407,7 +407,6 @@ public final class BetaIntRef
         return write.value;
     }
 
-
     @Override
     public final void increment(){
         final Transaction tx = getThreadLocalTransaction();
@@ -486,6 +485,7 @@ public final class BetaIntRef
 
         ((BetaTransaction)tx).commute(this,Functions.newIncIntFunction(-amount));
     }
+    
     @Override
     public final void ensure(){
         Transaction tx = getThreadLocalTransaction();

@@ -188,9 +188,9 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
                 config.familyName));
     }
 
-    public final NoRetryPossibleException abortOnNoBlockingAllowed(){
+    public final NoBlockingRetryAllowedException abortOnNoBlockingAllowed(){
         abort();
-        return new NoRetryPossibleException(
+        return new NoBlockingRetryAllowedException(
             format("[%s] Can't block transaction since it doesn't allow blocking",
                 config.familyName));
     }

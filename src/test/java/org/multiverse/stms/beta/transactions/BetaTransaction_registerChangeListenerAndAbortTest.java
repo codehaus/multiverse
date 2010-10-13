@@ -6,6 +6,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.api.blocking.Latch;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.NoBlockingRetryAllowedException;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.functions.LongFunction;
@@ -123,7 +124,7 @@ public abstract class BetaTransaction_registerChangeListenerAndAbortTest impleme
         try {
             tx.registerChangeListenerAndAbort(latch);
             fail();
-        } catch (NoRetryPossibleException expected) {
+        } catch (NoBlockingRetryAllowedException expected) {
         }
 
         assertIsAborted(tx);

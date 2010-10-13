@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
+import org.multiverse.api.exceptions.NoBlockingRetryAllowedException;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.references.LongRef;
@@ -71,9 +72,8 @@ public class NoBlockingTest {
         }
     }
 
-
     @Test
-    public void whenBlockingNotAllowed_thenNoRetryPossibleException() {
+    public void whenBlockingNotAllowed_thenNoBlockingRetryAllowedException() {
         final LongRef ref = newLongRef();
 
         AtomicBlock block = getGlobalStmInstance()
@@ -90,7 +90,7 @@ public class NoBlockingTest {
                 }
             });
             fail();
-        } catch (NoRetryPossibleException expected) {
+        } catch (NoBlockingRetryAllowedException expected) {
         }
 
         assertEquals(0, ref.atomicGet());
