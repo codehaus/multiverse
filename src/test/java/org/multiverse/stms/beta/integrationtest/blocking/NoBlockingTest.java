@@ -6,7 +6,10 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.NoRetryPossibleException;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.api.references.LongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
+import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -21,7 +24,7 @@ public class NoBlockingTest {
     }
 
     @Test
-    public void whenNothingRead_thenNoRetryPossibleException(){
+    public void whenNothingRead_thenNoRetryPossibleException() {
         try {
             execute(new AtomicVoidClosure() {
                 @Override
@@ -30,9 +33,44 @@ public class NoBlockingTest {
                 }
             });
             fail();
-        } catch (NoRetryPossibleException expected){
+        } catch (NoRetryPossibleException expected) {
         }
     }
+
+    @Test
+    public void whenContainsCommute_thenNoRetryPossibleException() {
+        final LongRef ref = newLongRef();
+
+        try {
+            execute(new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    ref.commute(Functions.newIncLongFunction());
+                    retry();
+                }
+            });
+            fail();
+        } catch (NoRetryPossibleException expected) {
+        }
+    }
+
+    @Test
+    public void whenContainsConstructing_thenNoRetryPossibleException() {
+        try {
+            execute(new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    BetaTransaction btx = (BetaTransaction) tx;
+                    BetaLongRef ref = new BetaLongRef(btx);
+                    btx.openForConstruction(ref);
+                    retry();
+                }
+            });
+            fail();
+        } catch (NoRetryPossibleException expected) {
+        }
+    }
+
 
     @Test
     public void whenBlockingNotAllowed_thenNoRetryPossibleException() {
@@ -52,7 +90,7 @@ public class NoBlockingTest {
                 }
             });
             fail();
-        } catch (NoRetryPossibleException expected){
+        } catch (NoRetryPossibleException expected) {
         }
 
         assertEquals(0, ref.atomicGet());
