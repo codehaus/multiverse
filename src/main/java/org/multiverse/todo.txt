@@ -127,6 +127,15 @@ performance.
 
 - cram all logic of the tranlocal in a long
 
+- tryEnsure
+
+- tryPrivatize
+
+- tryEnsureWhen
+
+- tryPrivatizeWhen
+
+
 todo
 
 - mono transaction: support for orelse
@@ -205,14 +214,6 @@ and not allowed. So not throw the retry error immediately..
 - Collection: foreach
 
 - reading and backoff? Atm only spinning is used.
-
-- tryEnsure
-
-- tryPrivatize
-
-- tryEnsureWhen
-
-- tryPrivatizeWhen
 
 - read uncommitted isolation level
 
