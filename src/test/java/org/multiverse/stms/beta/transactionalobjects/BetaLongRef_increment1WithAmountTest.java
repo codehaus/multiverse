@@ -13,9 +13,9 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
-public class BetaLongRef_decrementWithAmountTest {
-    
-     private BetaStm stm;
+public class BetaLongRef_increment1WithAmountTest {
+
+    private BetaStm stm;
 
     @Before
     public void setUp() {
@@ -32,12 +32,12 @@ public class BetaLongRef_decrementWithAmountTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.decrement(5);
+        ref.increment(5);
 
         tx.commit();
 
         assertIsCommitted(tx);
-        assertVersionAndValue(ref, initialVersion + 1, initialValue - 5);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 5);
     }
 
     @Test
@@ -54,7 +54,7 @@ public class BetaLongRef_decrementWithAmountTest {
         setThreadLocalTransaction(tx);
 
         try {
-            ref.decrement(5);
+            ref.increment(5);
             fail();
         } catch (ReadonlyException expected) {
         }
@@ -64,7 +64,7 @@ public class BetaLongRef_decrementWithAmountTest {
     }
 
     @Test
-    public void whenEnsuredByOther_thenDecrementSucceedsButCommitFails() {
+    public void whenEnsuredByOther_thenIncrementSucceedsButCommitFails() {
         long initialValue = 10;
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -75,7 +75,7 @@ public class BetaLongRef_decrementWithAmountTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.decrement(5);
+        ref.increment(5);
 
         try {
             tx.commit();
@@ -89,7 +89,7 @@ public class BetaLongRef_decrementWithAmountTest {
     }
 
     @Test
-    public void whenPrivatizedByOther_thenDecrementSucceedsButCommitFails() {
+    public void whenPrivatizedByOther_thenIncrementSucceedsButCommitFails() {
         long initialValue = 10;
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -100,7 +100,7 @@ public class BetaLongRef_decrementWithAmountTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.decrement(5);
+        ref.increment(5);
 
         try {
             tx.commit();
@@ -124,7 +124,7 @@ public class BetaLongRef_decrementWithAmountTest {
         tx.commit();
 
         try {
-            ref.decrement(5);
+            ref.increment(5);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -144,7 +144,7 @@ public class BetaLongRef_decrementWithAmountTest {
         tx.abort();
 
         try {
-            ref.decrement(5);
+            ref.increment(5);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -164,7 +164,7 @@ public class BetaLongRef_decrementWithAmountTest {
         tx.prepare();
 
         try {
-            ref.decrement(5);
+            ref.increment(5);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -180,7 +180,7 @@ public class BetaLongRef_decrementWithAmountTest {
         long initialVersion = ref.getVersion();
 
         try {
-            ref.decrement(5);
+            ref.increment(5);
             fail();
         } catch (TransactionRequiredException expected) {
         }

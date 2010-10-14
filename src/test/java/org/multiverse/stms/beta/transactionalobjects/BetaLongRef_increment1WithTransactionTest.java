@@ -2,7 +2,10 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.exceptions.*;
+import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.exceptions.ReadWriteConflict;
+import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -10,10 +13,9 @@ import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
-public class BetaLongRef_incrementWithAmountTest {
+public class BetaLongRef_increment1WithTransactionTest {
 
     private BetaStm stm;
 
@@ -30,14 +32,13 @@ public class BetaLongRef_incrementWithAmountTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        setThreadLocalTransaction(tx);
 
-        ref.increment(5);
+        ref.increment(tx);
 
         tx.commit();
 
         assertIsCommitted(tx);
-        assertVersionAndValue(ref, initialVersion + 1, initialValue + 5);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
     }
 
     @Test
@@ -51,10 +52,9 @@ public class BetaLongRef_incrementWithAmountTest {
                 .setSpeculativeConfigurationEnabled(false)
                 .build()
                 .newTransaction();
-        setThreadLocalTransaction(tx);
 
         try {
-            ref.increment(5);
+            ref.increment(tx);
             fail();
         } catch (ReadonlyException expected) {
         }
@@ -73,9 +73,8 @@ public class BetaLongRef_incrementWithAmountTest {
         ref.ensure(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        setThreadLocalTransaction(tx);
 
-        ref.increment(5);
+        ref.increment(tx);
 
         try {
             tx.commit();
@@ -98,9 +97,8 @@ public class BetaLongRef_incrementWithAmountTest {
         ref.privatize(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        setThreadLocalTransaction(tx);
 
-        ref.increment(5);
+        ref.increment(tx);
 
         try {
             tx.commit();
@@ -120,11 +118,10 @@ public class BetaLongRef_incrementWithAmountTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        setThreadLocalTransaction(tx);
         tx.commit();
 
         try {
-            ref.increment(5);
+            ref.increment(tx);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -140,11 +137,10 @@ public class BetaLongRef_incrementWithAmountTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        setThreadLocalTransaction(tx);
         tx.abort();
 
         try {
-            ref.increment(5);
+            ref.increment(tx);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -160,11 +156,10 @@ public class BetaLongRef_incrementWithAmountTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        setThreadLocalTransaction(tx);
         tx.prepare();
 
         try {
-            ref.increment(5);
+            ref.increment(tx);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -180,9 +175,9 @@ public class BetaLongRef_incrementWithAmountTest {
         long initialVersion = ref.getVersion();
 
         try {
-            ref.increment(5);
+            ref.increment(null);
             fail();
-        } catch (TransactionRequiredException expected) {
+        } catch (NullPointerException expected) {
         }
 
         assertVersionAndValue(ref, initialVersion, initialValue);
