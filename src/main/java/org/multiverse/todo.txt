@@ -267,6 +267,8 @@ and not allowed. So not throw the retry error immediately..
 
 done
 
+- improved testing on all the increment and decrement methods
+
 - tranlocal needs to have access to transaction.
 
 - drop doPrepareWithWriteSkewPrevention

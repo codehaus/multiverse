@@ -9,8 +9,7 @@ import org.multiverse.api.exceptions.Retry;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
@@ -34,6 +33,7 @@ public class BetaRef_awaitNotNullAndGet1Test {
         BetaTransaction tx = stm.startDefaultTransaction();
         String result = ref.awaitNotNullAndGet(tx);
 
+        assertSame(initialValue, result);
         RefTranlocal tranlocal = (RefTranlocal) tx.get(ref);
         assertTrue(tranlocal.isReadonly());
         assertTranlocalHasNoLock(tranlocal);
@@ -69,7 +69,7 @@ public class BetaRef_awaitNotNullAndGet1Test {
 
     @Test
     public void whenEnsuredByOther_thenSuccess() {
-      String initialValue = "foo";
+        String initialValue = "foo";
         BetaRef<String> ref = newRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
@@ -79,6 +79,7 @@ public class BetaRef_awaitNotNullAndGet1Test {
         BetaTransaction tx = stm.startDefaultTransaction();
         String result = ref.awaitNotNullAndGet(tx);
 
+        assertSame(initialValue, result);
         RefTranlocal tranlocal = (RefTranlocal) tx.get(ref);
         assertTrue(tranlocal.isReadonly());
         assertTranlocalHasNoLock(tranlocal);
