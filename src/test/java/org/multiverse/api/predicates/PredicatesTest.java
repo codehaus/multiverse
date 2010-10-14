@@ -10,6 +10,23 @@ import static org.multiverse.api.predicates.Predicates.newIsNullPredicate;
 public class PredicatesTest {
 
     @Test
+    public void not_whenNullPredicate_thenNull(){
+        //Predicates.
+    }
+
+    @Test
+    public void not_whenSuccess(){
+
+    }
+
+    @Test
+    public void and_(){
+
+    }
+
+    public void or_(){}
+
+    @Test
     public void testIsNullPredicate() {
         Predicate predicate = newIsNullPredicate();
 

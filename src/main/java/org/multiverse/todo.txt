@@ -259,6 +259,11 @@ and not allowed. So not throw the retry error immediately..
 
 - testing: ref.awaitNotNull
 
+- test Predicates.and
+
+- test Predicates.or
+
+- test Predicates.not
 
 done
 
