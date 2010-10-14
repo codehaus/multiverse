@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -46,7 +47,23 @@ public class BetaRef_awaitNull1Test {
 
     @Test
     public void whenPrivatizedByOther_thenReadWriteConflict() {
+        BetaRef ref = newRef(stm);
+        long initialVersion = ref.getVersion();
 
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.privatize(otherTx);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        try {
+            ref.awaitNull(tx);
+            fail();
+        } catch (ReadWriteConflict expected) {
+
+        }
+
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, null);
+        assertRefHasCommitLock(ref, otherTx);
     }
 
     @Test
