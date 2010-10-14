@@ -45,6 +45,34 @@ public class BetaRef_awaitNull1Test {
     }
 
     @Test
+    public void whenPrivatizedByOther_thenReadWriteConflict() {
+
+    }
+
+    @Test
+    public void whenEnsuredByOther_thenSuccess() {
+        BetaRef ref = newRef(stm);
+        long initialVersion = ref.getVersion();
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.ensure(otherTx);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.awaitNull(tx);
+
+        RefTranlocal tranlocal = (RefTranlocal) tx.get(ref);
+        assertTrue(tranlocal.isReadonly());
+        assertTranlocalHasNoLock(tranlocal);
+        assertRefHasUpdateLock(ref, otherTx);
+
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertVersionAndValue(ref, initialVersion, null);
+        assertRefHasUpdateLock(ref, otherTx);
+    }
+
+    @Test
     public void whenNotNull_thenRetryError() {
         String initialValue = "foo";
         BetaRef ref = newRef(stm, initialValue);
