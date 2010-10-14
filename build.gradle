@@ -56,26 +56,27 @@ allprojects {
     deployerJars group: 'org.apache.maven.wagon', name: 'wagon-webdav-jackrabbit', version: '1.0-beta-6'
   }
 
-//  uploadArchives {
-//   repositories.mavenDeployer {
-//      configuration = configurations.deployerJars
-//      repository(id: 'multiverse-releases', url: 'dav:https://dav.codehaus.org/repository/multiverse/') {
-//        authentication(userName: releaseRepoUsername, password: releaseRepoPassword)
-//      }
-//      snapshotRepository(id: 'multiverse-snapshots', url: 'dav:https://dav.codehaus.org/snapshots.repository/multiverse/') {
-//        authentication(userName: snapshotRepoUsername, password: snapshotRepoPassword)
-//      }
-//    }
-//  }
+  dependencies {
+    deployerJars "org.apache.maven.wagon:wagon-ssh:1.0-beta-2"
+  }
 
-//  gradle.taskGraph.whenReady {graph ->
-//    if (graph.hasTask(uploadArchives)) {
-//      snapshotRepoUsername
-//      snapshotRepoPassword
-//      releaseRepoUsername
-//      releaseRepoPassword
-//    }
-//  }
+  uploadArchives {  
+    repositories.mavenDeployer {
+      name = 'sshDeployer' 
+      uniqueVersion = false
+      configuration = configurations.deployerJars
+      repository(
+              id: 'multiverse-releases',
+              url: 'dav:https://dav.codehaus.org/repository/multiverse/') {
+          authentication( userName: "$codehaus_loginname", password: "$codehaus_password")
+      }
+      snapshotRepository(
+              id: 'multiverse-snapshots',
+              url: 'dav:https://dav.codehaus.org/snapshots.repository/multiverse/') {
+          authentication( userName: "$codehaus_loginname", password: "$codehaus_password")
+      }
+    }
+  }
 }
 
 project(':multiverse') {

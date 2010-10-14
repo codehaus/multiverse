@@ -263,6 +263,8 @@ and not allowed. So not throw the retry error immediately..
 
 done
 
+- gradle deploy snapshot to maven
+
 - ref.debugString
 
 - testing: ref.awaitNull
