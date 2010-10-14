@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
+import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -15,8 +16,8 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
 public class BetaLongRef_decrement1Test {
-    
-     private BetaStm stm;
+
+    private BetaStm stm;
 
     @Before
     public void setUp() {
@@ -37,7 +38,29 @@ public class BetaLongRef_decrement1Test {
         tx.commit();
 
         assertIsCommitted(tx);
-        assertVersionAndValue(ref, initialVersion + 1, initialValue -1);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue - 1);
+    }
+
+    @Test
+    public void whenReadonlyTransaction_thenReadonlyException() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+                .setReadonly(true)
+                .setSpeculativeConfigurationEnabled(false)
+                .build()
+                .newTransaction();
+
+        try {
+            ref.decrement(tx);
+            fail();
+        } catch (ReadonlyException expected) {
+        }
+
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
