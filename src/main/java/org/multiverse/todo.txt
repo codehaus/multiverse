@@ -255,10 +255,6 @@ and not allowed. So not throw the retry error immediately..
 
 - logic needs to be moved to concrete threadlocal classes.
 
-- testing: ref.awaitNull
-
-- testing: ref.awaitNotNull
-
 - test Predicates.and
 
 - test Predicates.or
@@ -266,6 +262,12 @@ and not allowed. So not throw the retry error immediately..
 - test Predicates.not
 
 done
+
+- ref.debugString
+
+- testing: ref.awaitNull
+
+- testing: ref.awaitNotNull
 
 - improved testing on all the increment and decrement methods
 

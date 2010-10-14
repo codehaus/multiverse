@@ -176,6 +176,10 @@ public class LinkedList<E> extends AbstractBetaTransactionalObject {
         }
     }
 
+    @Override
+    public String toDebugString() {
+        throw new RuntimeException();
+    }
 }
 
 class LinkedListTranlocal<E> extends Tranlocal {
@@ -325,6 +329,11 @@ class LinkedListNode<E> extends AbstractBetaTransactionalObject {
     @Override
     public void deferredEnsure(Transaction tx) {
         throw new TodoException();
+    }
+
+    @Override
+    public String toDebugString() {
+        throw new RuntimeException();
     }
 }
 

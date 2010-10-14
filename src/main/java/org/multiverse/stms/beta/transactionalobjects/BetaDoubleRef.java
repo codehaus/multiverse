@@ -852,4 +852,10 @@ public  class BetaDoubleRef
             StmUtils.retry();
         }
     }
+
+    @Override
+    public String toDebugString(){
+        return String.format("Ref{orec=%s, version=%s, value=%s, hasListeners=%s)",
+            ___toOrecString(),___version,___value, ___listeners!=null);
+    }
 }

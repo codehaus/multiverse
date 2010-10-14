@@ -374,4 +374,12 @@ public interface TransactionalObject {
      *
      */
     void deferredEnsure(Transaction self);
+
+    /**
+     * Returns a debug representation of the TransactionalObject. The data used doesn't have to be consistent,
+     * it is a best effort. This method doesn't rely on a running transaction.
+     *
+     * @return the debug representation of the TransactionalObject.
+     */
+    String toDebugString();
 }
