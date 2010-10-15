@@ -7,6 +7,61 @@ package org.multiverse.api.predicates;
  */
 public abstract class IntPredicate implements Predicate<Integer>{
 
+
+     public static IntPredicate newEqualsPredicate(final int value) {
+        return new IntPredicate() {
+            @Override
+            public boolean evaluate(int current) {
+                return current == value;
+            }
+        };
+    }
+
+    public static IntPredicate newNotEqualsPredicate(final int value) {
+        return new IntPredicate() {
+            @Override
+            public boolean evaluate(final int current) {
+                return current != value;
+            }
+        };
+    }
+
+    public static IntPredicate newLargerThanPredicate(final int value) {
+        return new IntPredicate() {
+            @Override
+            public boolean evaluate(final int current) {
+                return current > value;
+            }
+        };
+    }
+
+    public static IntPredicate newLargerThanOrEqualsPredicate(final int value) {
+        return new IntPredicate() {
+            @Override
+            public boolean evaluate(final int current) {
+                return current >= value;
+            }
+        };
+    }
+
+    public static IntPredicate newSmallerThanPredicate(final int value) {
+        return new IntPredicate() {
+            @Override
+            public boolean evaluate(final int current) {
+                return current < value;
+            }
+        };
+    }
+
+    public static IntPredicate newSmallerThanOrEqualsPredicate(final int value) {
+        return new IntPredicate() {
+            @Override
+            public boolean evaluate(final int current) {
+                return current <= value;
+            }
+        };
+    }
+
     /**
      * Evaluates the predicate
      *

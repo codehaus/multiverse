@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
@@ -16,7 +17,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.api.predicates.Predicates.newEqualsLongPredicate;
+import static org.multiverse.api.predicates.LongPredicate.newEqualsPredicate;
 import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
@@ -40,7 +41,7 @@ public class BetaLongRef_await1WithPredicateTest {
         setThreadLocalTransaction(tx);
 
         try {
-            ref.await(newEqualsLongPredicate(initialValue+1));
+            ref.await(newEqualsPredicate(initialValue+1));
             fail();
         } catch (Retry expected) {
 
@@ -59,13 +60,14 @@ public class BetaLongRef_await1WithPredicateTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.await(newEqualsLongPredicate(initialValue));
+        ref.await(newEqualsPredicate(initialValue));
 
         assertIsActive(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
+    @Ignore
     public void whenPredicateThrowsException() {
 
     }
