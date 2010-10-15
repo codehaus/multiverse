@@ -1,9 +1,8 @@
 package org.multiverse.api.references;
 
-import org.multiverse.api.Transaction;
-import org.multiverse.api.TransactionalObject;
-import org.multiverse.api.functions.IntFunction;
-import org.multiverse.api.predicates.IntPredicate;
+import org.multiverse.api.*;
+import org.multiverse.api.functions.*;
+import org.multiverse.api.predicates.*;
 
 /**
  * A Transactional Reference comparable to the <a href="http://clojure.org/refs">Clojure Ref</a>.
@@ -483,7 +482,23 @@ public interface IntRef extends TransactionalObject {
      */
     void await(Transaction tx,int value);
 
+    /**
+     * Awaits until the predicate holds.
+     *
+     * @throws NullPointerException if predicate is null. When there is a non dead transaction,
+     *                              it will be aborted.
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
     void await(IntPredicate predicate);
 
+    /**
+     * Awaits until the predicate holds.
+     *
+     * @throws NullPointerException if predicate is null or tx is null. When there is a non dead transaction,
+     *                              it will be aborted.
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
     void await(Transaction tx, IntPredicate predicate);
 }

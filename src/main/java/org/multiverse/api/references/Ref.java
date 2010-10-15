@@ -386,7 +386,23 @@ public interface Ref<E> extends TransactionalObject {
      */
     void await(Transaction tx,E value);
 
+    /**
+     * Awaits until the predicate holds.
+     *
+     * @throws NullPointerException if predicate is null. When there is a non dead transaction,
+     *                              it will be aborted.
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
     void await(Predicate predicate);
 
+    /**
+     * Awaits until the predicate holds.
+     *
+     * @throws NullPointerException if predicate is null or tx is null. When there is a non dead transaction,
+     *                              it will be aborted.
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
     void await(Transaction tx, Predicate predicate);
 }

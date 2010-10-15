@@ -564,7 +564,23 @@ public interface ${transactionalObject.referenceInterface}${transactionalObject.
      */
     void await(Transaction tx,${transactionalObject.type} value);
 
+    /**
+     * Awaits until the predicate holds.
+     *
+     * @throws NullPointerException if predicate is null. When there is a non dead transaction,
+     *                              it will be aborted.
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
     void await(${transactionalObject.predicateClass} predicate);
 
+    /**
+     * Awaits until the predicate holds.
+     *
+     * @throws NullPointerException if predicate is null or tx is null. When there is a non dead transaction,
+     *                              it will be aborted.
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     */
     void await(Transaction tx, ${transactionalObject.predicateClass} predicate);
 }
