@@ -14,7 +14,7 @@ import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
-public class BetaLongRef_awaitTest {
+public class BetaLongRef_await2WithValueTest {
     private BetaStm stm;
 
     @Before

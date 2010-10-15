@@ -385,4 +385,8 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx,E value);
+
+    void await(Predicate predicate);
+
+    void await(Transaction tx, Predicate predicate);
 }

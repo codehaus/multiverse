@@ -563,4 +563,8 @@ public interface ${transactionalObject.referenceInterface}${transactionalObject.
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx,${transactionalObject.type} value);
+
+    void await(${transactionalObject.predicateClass} predicate);
+
+    void await(Transaction tx, ${transactionalObject.predicateClass} predicate);
 }

@@ -19,6 +19,60 @@ public class Predicates {
         }
     };
 
+    public static LongPredicate newEqualsLongPredicate(final long value) {
+        return new LongPredicate() {
+            @Override
+            public boolean evaluate(long current) {
+                return current == value;
+            }
+        };
+    }
+
+    public static LongPredicate newNotEqualsLongPredicate(final long value) {
+        return new LongPredicate() {
+            @Override
+            public boolean evaluate(long current) {
+                return current != value;
+            }
+        };
+    }
+
+    public static LongPredicate newLargerThanLongPredicate(final long value) {
+        return new LongPredicate() {
+            @Override
+            public boolean evaluate(long current) {
+                return current > value;
+            }
+        };
+    }
+
+    public static LongPredicate newLargerThanOrEqualsLongPredicate(final long value) {
+        return new LongPredicate() {
+            @Override
+            public boolean evaluate(long current) {
+                return current >= value;
+            }
+        };
+    }
+
+    public static LongPredicate newSmallerThanLongPredicate(final long value) {
+        return new LongPredicate() {
+            @Override
+            public boolean evaluate(long current) {
+                return current < value;
+            }
+        };
+    }
+
+    public static LongPredicate newSmallerThanOrEqualsLongPredicate(final long value) {
+        return new LongPredicate() {
+            @Override
+            public boolean evaluate(long current) {
+                return current <= value;
+            }
+        };
+    }
+
     /**
      * Creates a Predicate that checks if the passed object is null. You will get an existing instance.
      *

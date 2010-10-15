@@ -482,4 +482,8 @@ public interface LongRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx,long value);
+
+    void await(LongPredicate predicate);
+
+    void await(Transaction tx, LongPredicate predicate);
 }

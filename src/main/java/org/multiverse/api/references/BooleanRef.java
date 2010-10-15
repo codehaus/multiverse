@@ -310,4 +310,8 @@ public interface BooleanRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx,boolean value);
+
+    void await(BooleanPredicate predicate);
+
+    void await(Transaction tx, BooleanPredicate predicate);
 }

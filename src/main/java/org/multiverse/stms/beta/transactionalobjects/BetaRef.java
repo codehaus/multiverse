@@ -840,6 +840,47 @@ public final class BetaRef<E>
     }
 
     @Override
+    public final void await(final Predicate predicate){
+        final Transaction tx = getThreadLocalTransaction();
+
+        if(tx == null){
+            throw new TransactionRequiredException(getClass(),"await");
+        }
+
+        await((BetaTransaction)tx, predicate);
+    }
+
+    @Override
+    public final void await(final Transaction tx, Predicate predicate){
+        await((BetaTransaction)tx, predicate);
+    }
+
+    public final void await(final BetaTransaction tx, Predicate predicate){
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        if(predicate == null){
+            tx.abort();
+            throw new NullPointerException();
+        }
+
+        boolean abort = true;
+        try{
+            final E value = tx.openForRead(this, LOCKMODE_NONE).value;
+            boolean result = predicate.evaluate(value);
+            abort = false;
+            if(!result){
+                StmUtils.retry();
+            }
+        }finally{
+            if(abort){
+                tx.abort();
+            }
+        }
+    }
+
+    @Override
     public String toDebugString(){
         return String.format("Ref{orec=%s, version=%s, value=%s, hasListeners=%s)",
             ___toOrecString(),___version,___value, ___listeners!=null);

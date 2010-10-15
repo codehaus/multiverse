@@ -482,4 +482,8 @@ public interface IntRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx,int value);
+
+    void await(IntPredicate predicate);
+
+    void await(Transaction tx, IntPredicate predicate);
 }

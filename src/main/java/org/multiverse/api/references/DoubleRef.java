@@ -374,4 +374,8 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx,double value);
+
+    void await(DoublePredicate predicate);
+
+    void await(Transaction tx, DoublePredicate predicate);
 }
