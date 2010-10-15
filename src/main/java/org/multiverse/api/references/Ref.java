@@ -387,8 +387,11 @@ public interface Ref<E> extends TransactionalObject {
     void await(Transaction tx,E value);
 
     /**
-     * Awaits until the predicate holds.
+     * Awaits until the predicate holds.  If the value already evaluates to true, the call continues
+     * else a retry is done. If the predicate throws an exception, the transaction is aborted and the
+     * throwable is propagated.
      *
+     * @param predicate the predicate to evaluate.
      * @throws NullPointerException if predicate is null. When there is a non dead transaction,
      *                              it will be aborted.
      * @throws org.multiverse.api.exceptions.TransactionalExecutionException
@@ -397,8 +400,12 @@ public interface Ref<E> extends TransactionalObject {
     void await(Predicate predicate);
 
     /**
-     * Awaits until the predicate holds.
+     * Awaits until the predicate holds.  If the value already evaluates to true, the call continues
+     * else a retry is done. If the predicate throws an exception, the transaction is aborted and the
+     * throwable is propagated.
      *
+     * @param tx the transaction used.
+     * @param predicate the predicate to evaluate.
      * @throws NullPointerException if predicate is null or tx is null. When there is a non dead transaction,
      *                              it will be aborted.
      * @throws org.multiverse.api.exceptions.TransactionalExecutionException

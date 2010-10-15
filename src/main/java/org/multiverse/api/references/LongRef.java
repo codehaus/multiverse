@@ -1,8 +1,9 @@
 package org.multiverse.api.references;
 
-import org.multiverse.api.*;
-import org.multiverse.api.functions.*;
-import org.multiverse.api.predicates.*;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionalObject;
+import org.multiverse.api.functions.LongFunction;
+import org.multiverse.api.predicates.LongPredicate;
 
 /**
  * A Transactional Reference comparable to the <a href="http://clojure.org/refs">Clojure Ref</a>.
@@ -483,8 +484,11 @@ public interface LongRef extends TransactionalObject {
     void await(Transaction tx,long value);
 
     /**
-     * Awaits until the predicate holds.
+     * Awaits until the predicate holds.  If the value already evaluates to true, the call continues
+     * else a retry is done. If the predicate throws an exception, the transaction is aborted and the
+     * throwable is propagated.
      *
+     * @param predicate the predicate to evaluate.
      * @throws NullPointerException if predicate is null. When there is a non dead transaction,
      *                              it will be aborted.
      * @throws org.multiverse.api.exceptions.TransactionalExecutionException
@@ -493,8 +497,12 @@ public interface LongRef extends TransactionalObject {
     void await(LongPredicate predicate);
 
     /**
-     * Awaits until the predicate holds.
+     * Awaits until the predicate holds.  If the value already evaluates to true, the call continues
+     * else a retry is done. If the predicate throws an exception, the transaction is aborted and the
+     * throwable is propagated.
      *
+     * @param tx the transaction used.
+     * @param predicate the predicate to evaluate.
      * @throws NullPointerException if predicate is null or tx is null. When there is a non dead transaction,
      *                              it will be aborted.
      * @throws org.multiverse.api.exceptions.TransactionalExecutionException

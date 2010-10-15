@@ -270,6 +270,8 @@ and not allowed. So not throw the retry error immediately..
 
 done
 
+- ref.await with predicate
+
 - logic needs to be moved to concrete threadlocal classes.
 
 - gradle deploy snapshot to maven
