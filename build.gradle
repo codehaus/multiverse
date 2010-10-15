@@ -9,7 +9,6 @@ allprojects {
 
   sourceCompatibility = 1.6
   version = '0.7-SNAPSHOT'
-  asmversion = '3.3'
   group = 'org.multiverse'
 
   def localMavenRepo = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
@@ -60,7 +59,7 @@ allprojects {
     deployerJars "org.apache.maven.wagon:wagon-ssh:1.0-beta-2"
   }
 
-  uploadArchives {  
+  uploadArchives {
     repositories.mavenDeployer {
       name = 'sshDeployer' 
       uniqueVersion = false
