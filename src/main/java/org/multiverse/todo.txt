@@ -256,12 +256,6 @@ and not allowed. So not throw the retry error immediately..
 
     - testing on checkConflict on openForWrite.
 
-    - test Predicates.and
-
-    - test Predicates.or
-
-    - test Predicates.not
-
     - unshared atomicget, with periodic atomicset.
 
     - testing: atomic block & propagation and committed/aborted/prepared/new transaction on threadlocal

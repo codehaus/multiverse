@@ -1,5 +1,7 @@
 package org.multiverse.api.collections;
 
+import org.multiverse.api.Transaction;
+
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.TimeUnit;
 
@@ -19,10 +21,14 @@ public interface TransactionalBlockingDeque<E> extends TransactionalBlockingQueu
     boolean offerLast(E e);
 
     @Override
-    void putFirst(E e) throws InterruptedException;
+    void putFirst(E e) ;
 
     @Override
-    void putLast(E e) throws InterruptedException;
+    void putLast(E e);
+
+    void putLast(Transaction tx, E e);
+
+    void atomicPutLast(E e);
 
     @Override
     boolean offerFirst(E e, long timeout, TimeUnit unit) throws InterruptedException;
@@ -31,10 +37,18 @@ public interface TransactionalBlockingDeque<E> extends TransactionalBlockingQueu
     boolean offerLast(E e, long timeout, TimeUnit unit) throws InterruptedException;
 
     @Override
-    E takeFirst() throws InterruptedException;
+    E takeFirst();
+
+    E takeFirst(Transaction tx);
+
+    E atomicTakeFirst() throws InterruptedException;
 
     @Override
-    E takeLast() throws InterruptedException;
+    E takeLast();
+
+    E takeLast(Transaction tx);
+
+    E atomicTakeLast()throws InterruptedException;
 
     @Override
     E pollFirst(long timeout, TimeUnit unit) throws InterruptedException;

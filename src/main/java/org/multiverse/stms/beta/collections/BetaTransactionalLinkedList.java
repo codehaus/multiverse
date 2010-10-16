@@ -1,29 +1,55 @@
 package org.multiverse.stms.beta.collections;
 
-import org.multiverse.api.ThreadLocalTransaction;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.collections.TransactionalBlockingDeque;
 import org.multiverse.api.collections.TransactionalList;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.exceptions.TransactionRequiredException;
+import org.multiverse.api.references.Ref;
+import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactionContainer;
+import static org.multiverse.api.StmUtils.newRef;
+import static org.multiverse.api.StmUtils.retry;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDeque<E>, TransactionalList<E> {
+public class BetaTransactionalLinkedList<E> implements
+        TransactionalBlockingDeque<E>, TransactionalList<E>, BetaStmConstants {
 
     // ================= addFirst ============
 
+    private final BetaRef<Node<E>> headRef;
+    private final BetaRef<Node<E>> tailRef;
+    private final BetaStm stm;
+    private final BetaIntRef sizeRef;
+    private final int capacity;
+
+    public BetaTransactionalLinkedList(BetaStm stm, int capacity) {
+        if (capacity <= 0) {
+            throw new IllegalArgumentException();
+        }
+        headRef = new BetaRef<Node<E>>(stm);
+        tailRef = new BetaRef<Node<E>>(stm);
+        sizeRef = new BetaIntRef(stm);
+
+        this.capacity = capacity;
+        this.stm = stm;
+    }
+
+    @Override
+    public BetaStm getStm() {
+        return stm;
+    }
+
     @Override
     public void addFirst(final E e) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -32,12 +58,45 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
     }
 
     @Override
-    public void putFirst(E e) throws InterruptedException {
+    public void addFirst(final Transaction tx, final E e) {
+        addFirst((BetaTransaction) tx, e);
+    }
+
+    public void addFirst(final BetaTransaction tx, final E e) {
         throw new TodoException();
     }
 
     @Override
-    public void putLast(E e) throws InterruptedException {
+    public void atomicAddFirst(final E e) {
+        throw new TodoException();
+    }
+
+    @Override
+    public void putFirst(E e) {
+        throw new TodoException();
+    }
+
+    @Override
+    public void putLast(E e) {
+        Transaction tx = getThreadLocalTransaction();
+        if (tx == null) {
+            throw new TransactionRequiredException();
+        }
+        putLast((BetaTransaction) tx, e);
+    }
+
+
+    @Override
+    public void putLast(Transaction tx, E e) {
+        putLast((BetaTransaction) tx, e);
+    }
+
+    public void putLast(BetaTransaction tx, E e) {
+        throw new TodoException();
+    }
+
+    @Override
+    public void atomicPutLast(E e) {
         throw new TodoException();
     }
 
@@ -52,12 +111,59 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
     }
 
     @Override
-    public E takeFirst() throws InterruptedException {
+    public E takeFirst() {
+        Transaction tx = getThreadLocalTransaction();
+        if (tx == null) {
+            throw new TransactionRequiredException();
+        }
+        return takeFirst(tx);
+    }
+
+    @Override
+    public E takeFirst(Transaction tx) {
+        return takeFirst((BetaTransaction) tx);
+    }
+
+    public E takeFirst(BetaTransaction tx) {
+        E item = pollFirst(tx);
+
+        if (item == null) {
+            retry();
+        }
+
+        return item;
+    }
+
+    @Override
+    public E atomicTakeFirst() throws InterruptedException {
         throw new TodoException();
     }
 
     @Override
-    public E takeLast() throws InterruptedException {
+    public E takeLast() {
+        Transaction tx = getThreadLocalTransaction();
+        if (tx == null) {
+            throw new TransactionRequiredException();
+        }
+        return takeLast(tx);
+    }
+
+    @Override
+    public E takeLast(Transaction tx) {
+        return takeLast((BetaTransaction) tx);
+    }
+
+    public E takeLast(BetaTransaction tx) {
+        E item = pollLast(tx);
+        if (item == null) {
+            retry();
+        }
+
+        return item;
+    }
+
+    @Override
+    public E atomicTakeLast() throws InterruptedException {
         throw new TodoException();
     }
 
@@ -72,13 +178,17 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
     }
 
     @Override
-    public void put(E e) throws InterruptedException {
-        throw new TodoException();
+    public void put(E e) {
+        putLast(e);
     }
 
     @Override
     public void put(Transaction tx, E e) {
-        throw new TodoException();
+        putLast(tx, e);
+    }
+
+    public void put(BetaTransaction tx, E e) {
+        putLast(tx, e);
     }
 
     @Override
@@ -92,8 +202,22 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
     }
 
     @Override
-    public E take() throws InterruptedException {
-        throw new TodoException();
+    public E take() {
+        return takeFirst();
+    }
+
+    @Override
+    public E take(Transaction tx) {
+        return takeFirst(tx);
+    }
+
+    public E take(BetaTransaction tx) {
+        return takeFirst(tx);
+    }
+
+    @Override
+    public E atomicTake() throws InterruptedException {
+        return atomicTakeFirst();
     }
 
     @Override
@@ -116,26 +240,12 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
         throw new TodoException();
     }
 
-    @Override
-    public void addFirst(final Transaction tx, final E e) {
-        addFirst((BetaTransaction) tx, e);
-    }
-
-    public void addFirst(final BetaTransaction tx, final E e) {
-        throw new TodoException();
-    }
-
-    @Override
-    public void atomicAddFirst(final E e) {
-        throw new TodoException();
-    }
 
     // ============== addList ==================
 
     @Override
     public void addLast(final E e) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
 
         if (tx == null) {
             throw new TransactionRequiredException();
@@ -162,8 +272,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public boolean offerFirst(final E e) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -189,14 +298,12 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public boolean offerLast(final E e) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
 
         return offerLast((BetaTransaction) tx, e);
-
     }
 
     @Override
@@ -217,11 +324,11 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public E removeFirst() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
+
         return removeFirst((BetaTransaction) tx);
     }
 
@@ -231,20 +338,27 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
     }
 
     public E removeFirst(final BetaTransaction tx) {
-        throw new TodoException();
+        E item = pollFirst(tx);
+        if (item == null) {
+            throw new NoSuchElementException();
+        }
+        return item;
     }
 
     @Override
     public E atomicRemoveFirst() {
-        throw new TodoException();
+        E item = atomicPollFirst();
+        if (item == null) {
+            throw new NoSuchElementException();
+        }
+        return item;
     }
 
     // ============= removeLast ================
 
     @Override
     public E removeLast() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -257,20 +371,27 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
     }
 
     public E removeLast(final BetaTransaction tx) {
-        throw new TodoException();
+        E item = atomicPollLast();
+        if (item == null) {
+            throw new NoSuchElementException();
+        }
+        return item;
     }
 
     @Override
     public E atomicRemoveLast() {
-        throw new TodoException();
+        E item = atomicPollLast();
+        if (item == null) {
+            throw new NoSuchElementException();
+        }
+        return item;
     }
 
     // ============= pollFirst ================
 
     @Override
     public E pollFirst() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -283,7 +404,12 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
     }
 
     public E pollFirst(final BetaTransaction tx) {
-        throw new TodoException();
+        Node<E> head = tx.openForRead(headRef, LOCKMODE_NONE).value;
+        if (head == null) {
+            return null;
+        }
+
+        throw new NullPointerException();
     }
 
     @Override
@@ -295,8 +421,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public E pollLast() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -309,6 +434,11 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
     }
 
     public E pollLast(final BetaTransaction tx) {
+        Node<E> tail = tx.openForRead(tailRef, LOCKMODE_NONE).value;
+        if (tail == null) {
+            return null;
+        }
+
         throw new TodoException();
     }
 
@@ -321,8 +451,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public E getFirst() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -335,7 +464,11 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
     }
 
     public E getFirst(final BetaTransaction tx) {
-        throw new TodoException();
+        E item = peekFirst(tx);
+        if (item == null) {
+            throw new NoSuchElementException();
+        }
+        return item;
     }
 
     @Override
@@ -347,8 +480,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public E getLast() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -361,7 +493,11 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
     }
 
     public E getLast(final BetaTransaction tx) {
-        throw new TodoException();
+        final E item = peekLast(tx);
+        if (item == null) {
+            throw new NoSuchElementException();
+        }
+        return item;
     }
 
     @Override
@@ -373,8 +509,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public E peekFirst() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -399,8 +534,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public E peekLast() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -425,8 +559,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public boolean removeFirstOccurrence(final Object o) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -451,8 +584,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public boolean removeLastOccurrence(Object o) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -477,8 +609,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public void push(final E e) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -503,8 +634,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public E pop() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -529,8 +659,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public Iterator<E> descendingIterator() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -555,8 +684,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public boolean addAll(final int index, final Collection<? extends E> c) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -583,8 +711,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public E get(final int index) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -609,8 +736,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public E set(final int index, final E element) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -635,8 +761,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public void add(final int index, final E element) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -661,8 +786,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public E remove(final int index) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -687,8 +811,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public int indexOf(final Object o) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -713,8 +836,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public int lastIndexOf(final Object o) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -739,8 +861,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public ListIterator<E> listIterator() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -763,8 +884,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public ListIterator<E> listIterator(final int index) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -789,8 +909,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public List<E> subList(final int fromIndex, final int toIndex) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -815,8 +934,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public boolean offer(final E e) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -841,8 +959,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public E remove() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -868,8 +985,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public E poll() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -894,8 +1010,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public E element() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -920,8 +1035,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public E peek() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -947,8 +1061,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public int size() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -961,20 +1074,19 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
     }
 
     public int size(BetaTransaction tx) {
-        throw new TodoException();
+        return sizeRef.get(tx);
     }
 
     @Override
     public int atomicSize() {
-        throw new TodoException();
+        return sizeRef.atomicGet();
     }
 
     // ============= isEmpty ================
 
     @Override
     public boolean isEmpty() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -987,21 +1099,19 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
     }
 
     public boolean isEmpty(final BetaTransaction tx) {
-        throw new TodoException();
+        return tx.openForRead(headRef, LOCKMODE_NONE).value == null;
     }
 
     @Override
     public boolean atomicIsEmpty() {
-        return atomicSize() == 0;
+        return sizeRef.atomicGet() == 0;
     }
-
 
     // ============= contains ================
 
     @Override
     public boolean contains(final Object o) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -1014,20 +1124,19 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
     }
 
     public boolean contains(final BetaTransaction tx, Object o) {
-        throw new TodoException();
+        return indexOf(tx, o) > -1;
     }
 
     @Override
     public boolean atomicContains(Object o) {
-        throw new TodoException();
+        return atomicIndexOf(o) > -1;
     }
 
     // ============= iterator ================
 
     @Override
     public Iterator<E> iterator() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -1052,8 +1161,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public Object[] toArray() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -1076,8 +1184,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public <T> T[] toArray(final T[] a) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -1103,8 +1210,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public boolean add(final E e) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -1129,8 +1235,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public boolean remove(final Object o) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -1156,8 +1261,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public boolean containsAll(final Collection<?> c) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -1183,8 +1287,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public boolean addAll(final Collection<? extends E> c) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -1210,8 +1313,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -1236,8 +1338,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public boolean retainAll(final Collection<?> c) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -1262,8 +1363,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public void clear() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -1276,7 +1376,9 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
     }
 
     public void clear(final BetaTransaction tx) {
-        throw new TodoException();
+        tx.openForWrite(headRef, LOCKMODE_NONE).value = null;
+        tx.openForWrite(tailRef, LOCKMODE_NONE).value = null;
+        tx.openForWrite(sizeRef, LOCKMODE_NONE).value = 0;
     }
 
     @Override
@@ -1288,8 +1390,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public boolean equals(final Object o) {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -1314,8 +1415,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
 
     @Override
     public int hashCode() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -1339,8 +1439,7 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
     // ============= toString ================
 
     public String toString() {
-        final ThreadLocalTransaction.Container container = getThreadLocalTransactionContainer();
-        final Transaction tx = container.transaction;
+        final Transaction tx = getThreadLocalTransaction();
         if (tx == null) {
             throw new TransactionRequiredException();
         }
@@ -1361,4 +1460,9 @@ public class BetaTransactionalLinkedList<E> implements TransactionalBlockingDequ
         throw new TodoException();
     }
 
+    static class Node<E> {
+        Ref<Node<E>> prev = newRef();
+        Ref<Node<E>> next = newRef();
+        Ref<E> value = newRef();
+    }
 }

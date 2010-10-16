@@ -19,8 +19,6 @@ public class Predicates {
         }
     };
 
-
-
     /**
      * Creates a Predicate that checks if the passed object is null. You will get an existing instance.
      *

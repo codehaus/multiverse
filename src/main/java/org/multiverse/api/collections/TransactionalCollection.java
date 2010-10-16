@@ -1,11 +1,14 @@
 package org.multiverse.api.collections;
 
+import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 
 import java.util.Collection;
 import java.util.Iterator;
 
 public interface TransactionalCollection<E> extends Collection<E> {
+
+    Stm getStm();
 
     @Override
     int size();

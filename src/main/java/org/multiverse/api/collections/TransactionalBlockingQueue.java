@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 public interface TransactionalBlockingQueue<E> extends TransactionalQueue<E>, BlockingQueue<E> {
 
     @Override
-    void put(E e) throws InterruptedException;
+    void put(E e);
 
     void put(Transaction tx, E e);
 
@@ -21,7 +21,11 @@ public interface TransactionalBlockingQueue<E> extends TransactionalQueue<E>, Bl
     boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException;
 
     @Override
-    E take() throws InterruptedException;
+    E take();
+
+    E take(Transaction tx);
+
+    E atomicTake()throws InterruptedException;
 
     @Override
     E poll(long timeout, TimeUnit unit) throws InterruptedException;
