@@ -10,8 +10,7 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.fail;
-import static org.multiverse.TestUtils.assertIsAborted;
-import static org.multiverse.TestUtils.assertIsCommitted;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
@@ -181,5 +180,25 @@ public class BetaLongRef_decrement1Test {
         }
 
         assertVersionAndValue(ref, initialVersion, initialValue);
+    }
+
+    @Test
+    public void whenListenersAvailable() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        LongRefAwaitThread thread = new LongRefAwaitThread(ref, initialValue - 1);
+        thread.start();
+
+        sleepMs(500);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.decrement(tx);
+        tx.commit();
+
+        joinAll(thread);
+
+        assertVersionAndValue(ref, initialVersion + 1, initialValue - 1);
     }
 }

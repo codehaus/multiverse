@@ -133,6 +133,12 @@ public class BetaLongRef_getAndAlter2Test {
     }
 
     @Test
+    @Ignore
+    public void whenListenersAvailable(){
+
+    }
+
+    @Test
     public void whenSuccess() {
         LongFunction function = new LongFunction() {
             @Override

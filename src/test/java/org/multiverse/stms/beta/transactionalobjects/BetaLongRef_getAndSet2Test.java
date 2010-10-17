@@ -10,12 +10,10 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.assertIsAborted;
-import static org.multiverse.TestUtils.assertIsCommitted;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 
 /**
@@ -140,5 +138,28 @@ public class BetaLongRef_getAndSet2Test {
         assertNull(getThreadLocalTransaction());
         assertSurplus(0, ref);
         assertVersionAndValue(ref, version, 10);
+    }
+
+    @Test
+    public void whenListenersAvailable() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        long newValue = 20;
+        LongRefAwaitThread thread = new LongRefAwaitThread(ref, newValue);
+        thread.start();
+
+        sleepMs(500);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        long result = ref.getAndSet(tx, newValue);
+        tx.commit();
+
+        joinAll(thread);
+
+        assertEquals(initialValue, result);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion + 1, newValue);
     }
 }

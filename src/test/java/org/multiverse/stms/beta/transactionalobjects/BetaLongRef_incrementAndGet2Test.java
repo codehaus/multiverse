@@ -9,11 +9,9 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.multiverse.TestUtils.assertIsAborted;
-import static org.multiverse.TestUtils.assertIsCommitted;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
 public class BetaLongRef_incrementAndGet2Test {
 
@@ -116,5 +114,28 @@ public class BetaLongRef_incrementAndGet2Test {
         assertIsCommitted(tx);
         assertEquals(30, result);
         assertVersionAndValue(ref, version + 1, 30);
+    }
+
+     @Test
+    public void whenListenersAvailable() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        long amount = 4;
+        LongRefAwaitThread thread = new LongRefAwaitThread(ref, initialValue + amount);
+        thread.start();
+
+        sleepMs(500);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        long result = ref.incrementAndGet(tx,amount);
+        tx.commit();
+
+        joinAll(thread);
+
+        assertEquals(initialValue+amount, result);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + amount);
     }
 }
