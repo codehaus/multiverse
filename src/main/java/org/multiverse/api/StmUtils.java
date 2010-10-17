@@ -294,6 +294,14 @@ public class StmUtils {
         return refFactory.newIntRef(value);
     }
 
+    public static IntRef[] newIntRefArray(int size){
+        IntRef[] refs = new IntRef[size];
+        for(int k=0;k<refs.length;k++){
+            refs[k]=newIntRef();
+        }
+        return refs;
+    }
+
     /**
      * Creates a committed IntRef with 0 as initial value using the GlobalStmInstance.
      *

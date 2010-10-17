@@ -29,9 +29,9 @@ import static java.lang.String.format;
  * <p/>
  * Layout:
  * In total 64 bits
- * bit 0      : contains lock
+ * bit 0      : contains commit lock
  * bit 1      : contains readbiased.
- * bit 2      : contains protected against update
+ * bit 2      : contains update lock
  * bit 3-53   : contains surplus
  * bit 54-63  : contains readonly count
  * <p/>

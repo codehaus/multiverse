@@ -20,6 +20,9 @@ import static org.multiverse.api.StmUtils.newIntRef;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
+/**
+ * http://en.wikipedia.org/wiki/Readers-writers_problem
+ */
 public class ReadersWritersProblemStressTest {
 
     private long count = 3000;

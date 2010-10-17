@@ -1,7 +1,6 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
@@ -14,8 +13,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
-import static org.multiverse.TestUtils.assertIsAborted;
-import static org.multiverse.TestUtils.assertIsCommitted;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.api.functions.Functions.newIdentityLongFunction;
 import static org.multiverse.api.functions.Functions.newIncLongFunction;
@@ -204,9 +202,24 @@ public class BetaLongRef_alterAndGet1Test {
     }
 
     @Test
-    @Ignore
-    public void whenListenersAvailable() {
+    public void whenListenersAvailable_thenTheyAreNotified() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
+        LongRefAwaitThread thread = new LongRefAwaitThread(ref, initialValue + 1);
+        thread.start();
+
+        sleepMs(500);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+        ref.alterAndGet(newIncLongFunction());
+        tx.commit();
+
+        joinAll(thread);
+
+        assertVersionAndValue(ref, initialVersion+1,initialValue+1);
     }
 
 }

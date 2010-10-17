@@ -1,7 +1,6 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.functions.Functions;
@@ -13,10 +12,13 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
-import static org.multiverse.TestUtils.assertIsActive;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.api.functions.Functions.newIdentityLongFunction;
+import static org.multiverse.api.functions.Functions.newIncLongFunction;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasNoLocks;
 import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_atomicAlterAndGetTest {
@@ -32,7 +34,9 @@ public class BetaLongRef_atomicAlterAndGetTest {
 
     @Test
     public void whenFunctionCausesException() {
-        BetaLongRef ref = newLongRef(stm);
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         LongFunction function = mock(LongFunction.class);
         RuntimeException ex = new RuntimeException();
@@ -45,16 +49,17 @@ public class BetaLongRef_atomicAlterAndGetTest {
             assertSame(ex, found);
         }
 
-        assertEquals(0, ref.atomicGet());
-        assertHasNoCommitLock(ref);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertNull(getThreadLocalTransaction());
     }
 
     @Test
     public void whenNullFunction_thenNullPointerException() {
-        BetaLongRef ref = newLongRef(stm, 5);
-        long version = ref.getVersion();
+        int initialValue = 5;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         try {
             ref.atomicAlterAndGet(null);
@@ -62,67 +67,70 @@ public class BetaLongRef_atomicAlterAndGetTest {
         } catch (NullPointerException expected) {
         }
 
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
-        assertEquals(5, ref.atomicGet());
-        assertVersionAndValue(ref, version, 5);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
     public void whenSuccess() {
-        BetaLongRef ref = newLongRef(stm, 5);
+        int initialValue = 5;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
         LongFunction function = Functions.newIncLongFunction(1);
 
         long result = ref.atomicAlterAndGet(function);
 
-        assertEquals(6, result);
-        assertHasNoCommitLock(ref);
+        assertEquals(initialValue+1, result);
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
-        assertNull(ref.___getLockOwner());
-        assertEquals(6, ref.atomicGet());
+        assertVersionAndValue(ref, initialVersion+1, initialValue+1);
     }
 
     @Test
     public void whenNoChange() {
-        BetaLongRef ref = newLongRef(stm, 5);
+        int initialValue = 5;
+        BetaLongRef ref = newLongRef(stm, initialValue);
         long version = ref.getVersion();
 
-        LongFunction function = Functions.newIdentityLongFunction();
+        LongFunction function = newIdentityLongFunction();
 
         long result = ref.atomicAlterAndGet(function);
 
-        assertEquals(5, result);
-        assertHasNoCommitLock(ref);
+        assertEquals(initialValue, result);
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
-        assertNull(ref.___getLockOwner());
-        assertEquals(5, ref.atomicGet());
-        assertVersionAndValue(ref, version, 5);
+        assertVersionAndValue(ref, version, initialValue);
     }
 
     @Test
     public void whenActiveTransactionAvailable_thenIgnored() {
-        BetaLongRef ref = newLongRef(stm, 5);
+        long initialValue = 5;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         ref.set(tx, 100);
 
-        LongFunction function = Functions.newIncLongFunction(1);
+        LongFunction function = newIncLongFunction(1);
 
         long result = ref.atomicAlterAndGet(function);
 
-        assertEquals(6, result);
+        assertEquals(initialValue + 1, result);
         assertHasNoCommitLock(ref);
         assertSurplus(1, ref);
-        assertNull(ref.___getLockOwner());
-        assertEquals(6, ref.atomicGet());
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
     }
 
     @Test
     public void whenEnsuredByOther_thenLockedException() {
-        BetaLongRef ref = newLongRef(stm, 5);
-        long version = ref.getVersion();
+        int initialValue = 5;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.ensure(otherTx);
@@ -136,16 +144,16 @@ public class BetaLongRef_atomicAlterAndGetTest {
 
         verifyZeroInteractions(function);
         assertSurplus(1, ref);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasUpdateLock(ref, otherTx);
         assertUpdateBiased(ref);
-        assertVersionAndValue(ref, version, 5);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
     public void whenPrivatizedByOther() {
-        BetaLongRef ref = newLongRef(stm, 5);
-        long version = ref.getVersion();
+        int initialValue = 5;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.privatize(otherTx);
@@ -159,17 +167,26 @@ public class BetaLongRef_atomicAlterAndGetTest {
 
         verifyZeroInteractions(function);
         assertSurplus(1, ref);
-        assertHasNoUpdateLock(ref);
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref, otherTx);
         assertUpdateBiased(ref);
-        assertVersionAndValue(ref, version, 5);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
-    @Ignore
     public void whenListenersAvailable() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
+        LongRefAwaitThread thread = new LongRefAwaitThread(ref, initialValue + 1);
+        thread.start();
+
+        sleepMs(500);
+
+        ref.atomicAlterAndGet(newIncLongFunction());
+
+        joinAll(thread);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
     }
-
-
 }

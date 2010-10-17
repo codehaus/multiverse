@@ -20,7 +20,7 @@ import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
 
 
 /**
- * todo: improvement: print how many times each philosopher eat.
+ * http://en.wikipedia.org/wiki/Dining_philosophers_problem
  */
 public class DiningPhilosophersStressTest implements BetaStmConstants {
 
