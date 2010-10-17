@@ -14,12 +14,12 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
+import static org.multiverse.TestUtils.LOCKMODE_NONE;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 import static org.multiverse.api.functions.Functions.newIncLongFunction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 
@@ -305,5 +305,26 @@ public class BetaLongRef_commute2Test {
         assertIsCommitted(tx1);
         assertEquals(11, ref1.atomicGet());
         assertEquals(12, ref2.atomicGet());
+    }
+
+     @Test
+    public void whenListenersAvailable() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        LongRefAwaitThread thread = new LongRefAwaitThread(ref, initialValue + 1);
+        thread.start();
+
+        sleepMs(500);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.commute(tx, newIncLongFunction());
+        tx.commit();
+
+        joinAll(thread);
+
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
     }
 }

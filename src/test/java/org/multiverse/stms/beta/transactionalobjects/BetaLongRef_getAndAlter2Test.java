@@ -13,11 +13,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.multiverse.TestUtils.assertIsAborted;
-import static org.multiverse.TestUtils.assertIsCommitted;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.api.functions.Functions.newIncLongFunction;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
 
 /**
@@ -133,9 +132,25 @@ public class BetaLongRef_getAndAlter2Test {
     }
 
     @Test
-    @Ignore
-    public void whenListenersAvailable(){
+    public void whenListenersAvailable() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
+        LongRefAwaitThread thread = new LongRefAwaitThread(ref, initialValue + 1);
+        thread.start();
+
+        sleepMs(500);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        long result = ref.getAndAlter(tx, newIncLongFunction());
+        tx.commit();
+
+        joinAll(thread);
+
+        assertEquals(result, initialValue);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
     }
 
     @Test
