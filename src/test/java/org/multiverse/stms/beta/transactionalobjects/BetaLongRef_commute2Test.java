@@ -1,11 +1,11 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
@@ -54,9 +54,51 @@ public class BetaLongRef_commute2Test {
     }
 
     @Test
-    @Ignore
-    public void whenLocked() {
+    public void whenPrivatized_thenCommuteSucceedsButCommitFails() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.privatize(otherTx);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.commute(tx, newIncLongFunction());
+
+        try {
+            tx.commit();
+            fail();
+        } catch (ReadWriteConflict expected) {
+        }
+
+        assertSurplus(1, ref);
+        assertIsAborted(tx);
+        assertRefHasCommitLock(ref, otherTx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
+
+    @Test
+    public void whenEnsured_thenCommuteSucceedsButCommitFails() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.ensure(otherTx);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.commute(tx, newIncLongFunction());
+
+        try {
+            tx.commit();
+            fail();
+        } catch (ReadWriteConflict expected) {
+        }
+
+        assertIsAborted(tx);
+        assertSurplus(1, ref);
+        assertRefHasUpdateLock(ref, otherTx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
@@ -307,7 +349,7 @@ public class BetaLongRef_commute2Test {
         assertEquals(12, ref2.atomicGet());
     }
 
-     @Test
+    @Test
     public void whenListenersAvailable() {
         long initialValue = 10;
         BetaLongRef ref = newLongRef(stm, initialValue);

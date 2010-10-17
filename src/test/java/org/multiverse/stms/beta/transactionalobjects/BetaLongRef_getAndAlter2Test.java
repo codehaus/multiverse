@@ -1,7 +1,6 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
@@ -11,8 +10,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.functions.Functions.newIncLongFunction;
@@ -126,9 +124,28 @@ public class BetaLongRef_getAndAlter2Test {
     }
 
     @Test
-    @Ignore
-    public void whenAlterFunctionCausesProblems() {
+    public void whenAlterFunctionCausesProblems_thenTransactionAborted() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
+        LongFunction function = mock(LongFunction.class);
+        when(function.call(initialValue)).thenThrow(new MyException());
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        try {
+            ref.getAndAlter(tx, function);
+            fail();
+        } catch (MyException expected) {
+
+        }
+
+        assertIsAborted(tx);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
+
+    class MyException extends RuntimeException{
     }
 
     @Test
