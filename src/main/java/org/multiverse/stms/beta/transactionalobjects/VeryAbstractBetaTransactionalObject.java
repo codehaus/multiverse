@@ -33,7 +33,7 @@ public abstract class VeryAbstractBetaTransactionalObject
 
     protected volatile Listeners ___listeners;
 
-    protected  long ___version;
+    protected long ___version;
 
     //This field has a controlled JMM problem (just like the hashcode of String).
     protected int ___identityHashCode;
@@ -106,29 +106,32 @@ public abstract class VeryAbstractBetaTransactionalObject
             if (!___unsafe.compareAndSwapObject(this, listenersOffset, oldListeners, newListeners)) {
                 //so we are contending with another register thread, so lets try it again. Since the compareAndSwap
                 //didn't succeed, we know that the current thread still has exclusive ownership on the Listeners object.
+
                 continue;
             }
 
-            //the registration was a success. We need to make sure that the active hasn't changed.
-            //JMM: the volatile read can't jump in front of the unsafe.compareAndSwap.
-            if (tranlocal.version == ___version) {
-                //we are lucky, the registration was done successfully and we managed to cas the listener
-                //before the update (since the update hasn't happened yet). This means that the updating thread
-                //is now responsible for notifying the listeners.
-                return REGISTRATION_DONE;
+            //the registration was a success. We need to make sure that the ___version hasn't changed.
+            //JMM: the volatile read of ___version can't jump in front of the unsafe.compareAndSwap.
+            if (tranlocal.version != ___version) {
+                //the version has changed, so an interesting write has happened. No registration is needed.
+
+                //JMM: the unsafe.compareAndSwap can't jump over the volatile read this.___version.
+                //the update has taken place, we need to check if our listeners still is in place.
+                //if it is, it should be removed and the listeners notified. If the listeners already has changed,
+                //it is the task for the other to do the listener cleanup and notify them
+                if (___unsafe.compareAndSwapObject(this, listenersOffset, newListeners, null)) {
+                    newListeners.openAll(pool);
+                } else {
+                    latch.open(listenerEra);
+                }
+
+                return REGISTRATION_NOT_NEEDED;
             }
 
-            //JMM: the unsafe.compareAndSwap can't jump over the volatile read this.___version.
-            //the update has taken place, we need to check if our listeners still is in place.
-            //if it is, it should be removed and the listeners notified. If the listeners already has changed,
-            //it is the task for the other to do the listener cleanup and notify them
-            if (___unsafe.compareAndSwapObject(this, listenersOffset, newListeners, null)) {
-                newListeners.openAll(pool);
-            } else {
-                latch.open(listenerEra);
-            }
-
-            return REGISTRATION_NOT_NEEDED;
+            //we are lucky, the registration was done successfully and we managed to cas the listener
+            //before the update (since the update hasn't happened yet). This means that the updating thread
+            //is now responsible for notifying the listeners.
+            return REGISTRATION_DONE;
         }
     }
 

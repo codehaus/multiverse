@@ -1,23 +1,22 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.*;
-import org.multiverse.api.*;
-import org.multiverse.api.blocking.*;
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.functions.*;
-import org.multiverse.api.predicates.*;
-import org.multiverse.api.references.*;
-import org.multiverse.stms.beta.*;
-import org.multiverse.stms.beta.conflictcounters.*;
-import org.multiverse.stms.beta.orec.*;
-import org.multiverse.stms.beta.transactions.*;
+import org.multiverse.api.StmUtils;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.exceptions.LockedException;
+import org.multiverse.api.exceptions.PanicError;
+import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.exceptions.TransactionRequiredException;
+import org.multiverse.api.functions.Functions;
+import org.multiverse.api.functions.LongFunction;
+import org.multiverse.api.predicates.LongPredicate;
+import org.multiverse.api.references.LongRef;
+import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.Listeners;
+import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-
-import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.*;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
+import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
  * The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
@@ -195,12 +194,21 @@ public final class BetaLongRef
 
         ___value = specializedTranlocal.value;
         ___version = specializedTranlocal.version+1;
-        ___lockOwner = null;
+
+        if(___version == -1){
+            System.out.println("hello");
+        }
+
+        //todo: JMM problem here, the volatile read of ___listeners could jump in front of the volatile write of
+        //version, meaning that it could lead to not picking up the listeners that is done after the write. And
+        //this could lead to a deadlock.
         Listeners listenersAfterWrite = ___listeners;
 
         if(listenersAfterWrite != null){
            listenersAfterWrite = ___removeListenersAfterWrite();
         }
+
+        ___lockOwner = null;
 
         ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
         pool.put(specializedTranlocal);
@@ -238,6 +246,10 @@ public final class BetaLongRef
         ___value = specializedTranlocal.value;
         ___version = specializedTranlocal.version+1;
         ___lockOwner = null;
+
+        //todo: JMM problem here, the volatile read could jump in front of the volatile write of version, meaning
+        //that it could lead to not picking up the listeners that is done after the write. And this could lead to
+        //a deadlock.
         Listeners listenersAfterWrite = ___listeners;
 
         if(listenersAfterWrite != null){

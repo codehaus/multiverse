@@ -154,14 +154,6 @@ public class StmUtils {
         return refFactory.newIntRef(0);
     }
 
-    public static IntRef[] newIntRefArray(int size){
-        IntRef[] refs = new IntRef[size];
-        for(int k=0;k<refs.length;k++){
-            refs[k]=newIntRef();
-        }
-        return refs;
-    }
-
     /**
      * Creates a committed LongRef with 0 as initial value using the GlobalStmInstance.
      *
@@ -179,14 +171,6 @@ public class StmUtils {
      */
     public static LongRef newLongRef(long value) {
         return refFactory.newLongRef(value);
-    }
-
-    public static LongRef[] newLongRefArray(int size){
-        LongRef[] refs = new LongRef[size];
-        for(int k=0;k<refs.length;k++){
-            refs[k]=newLongRef();
-        }
-        return refs;
     }
 
     /**
@@ -208,14 +192,6 @@ public class StmUtils {
         return refFactory.newDoubleRef(value);
     }
 
-    public static DoubleRef[] newDoubleRefArray(int size){
-        DoubleRef[] refs = new DoubleRef[size];
-        for(int k=0;k<refs.length;k++){
-            refs[k]=newDoubleRef();
-        }
-        return refs;
-    }
-
     /**
      * Creates a committed BooleanRef with false as initial value using the GlobalStmInstance.
      *
@@ -233,14 +209,6 @@ public class StmUtils {
      */
     public static BooleanRef newBooleanRef(boolean value) {
         return refFactory.newBooleanRef(value);
-    }
-
-    public static BooleanRef[] newBooleanRefArray(int size){
-        BooleanRef[] refs = new BooleanRef[size];
-        for(int k=0;k<refs.length;k++){
-            refs[k]=newBooleanRef();
-        }
-        return refs;
     }
 
     /**
@@ -263,15 +231,6 @@ public class StmUtils {
     public static <E> Ref<E> newRef(E value) {
         return refFactory.newRef(value);
     }
-
-    public static <E> Ref<E>[] newRefArray(int size){
-        Ref<E>[] refs = new Ref[size];
-        for(int k=0;k<refs.length;k++){
-            refs[k]=newRef<E>();
-        }
-        return refs;
-    }
-
 
     /**
      * Does a retry. This behavior is needed for blocking transactions; transaction that wait for a state change

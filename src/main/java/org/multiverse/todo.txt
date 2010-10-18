@@ -262,6 +262,9 @@ and not allowed. So not throw the retry error immediately..
 
 - publication of javadoc on codehaus
 
+- jmm issue with commit and listeners, it could happen that a write is done after a check is done if a listeners
+  is available. This could lead to a deadlock since the listener that is set after the write
+
 done
 
 - ref.await with predicate

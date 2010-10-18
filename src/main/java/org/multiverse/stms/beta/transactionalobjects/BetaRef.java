@@ -193,12 +193,21 @@ public final class BetaRef<E>
 
         ___value = specializedTranlocal.value;
         ___version = specializedTranlocal.version+1;
-        ___lockOwner = null;
+
+        if(___version == -1){
+            System.out.println("hello");
+        }
+
+        //todo: JMM problem here, the volatile read of ___listeners could jump in front of the volatile write of
+        //version, meaning that it could lead to not picking up the listeners that is done after the write. And
+        //this could lead to a deadlock.
         Listeners listenersAfterWrite = ___listeners;
 
         if(listenersAfterWrite != null){
            listenersAfterWrite = ___removeListenersAfterWrite();
         }
+
+        ___lockOwner = null;
 
         ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
         pool.put(specializedTranlocal);
@@ -236,6 +245,10 @@ public final class BetaRef<E>
         ___value = specializedTranlocal.value;
         ___version = specializedTranlocal.version+1;
         ___lockOwner = null;
+
+        //todo: JMM problem here, the volatile read could jump in front of the volatile write of version, meaning
+        //that it could lead to not picking up the listeners that is done after the write. And this could lead to
+        //a deadlock.
         Listeners listenersAfterWrite = ___listeners;
 
         if(listenersAfterWrite != null){

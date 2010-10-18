@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
+import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicBooleanClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
@@ -11,6 +13,7 @@ import org.multiverse.api.references.BooleanRef;
 import org.multiverse.api.references.Ref;
 
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
@@ -28,6 +31,7 @@ public class CigaretteSmokersProblemTest {
     private MatchProviderThread matchProvider;
     private TobaccoProviderThread tobaccoProvider;
     private volatile boolean stop;
+    private AtomicBlock block;
 
     @Before
     public void setUp() {
@@ -41,12 +45,19 @@ public class CigaretteSmokersProblemTest {
         matchProvider = new MatchProviderThread();
         tobaccoProvider = new TobaccoProviderThread();
         stop = false;
+
+        block = getGlobalStmInstance()
+            .createTransactionFactoryBuilder()
+            //.setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
+            .setIsolationLevel(IsolationLevel.Serializable)
+            .buildAtomicBlock();
     }
 
     @Test
     public void test() {
         startAll(arbiterThread, paperProvider, matchProvider, tobaccoProvider);
-        sleepMs(60000);
+        sleepMs(560000);
+        System.out.println("Stopping threads");
         stop = true;
         joinAll(arbiterThread, paperProvider, matchProvider, tobaccoProvider);
     }
@@ -61,7 +72,7 @@ public class CigaretteSmokersProblemTest {
             while (!stop) {
                 switch (TestUtils.randomInt(3)) {
                     case 0:
-                        execute(new AtomicVoidClosure() {
+                        block.execute(new AtomicVoidClosure() {
                             @Override
                             public void execute(Transaction tx) {
                                 if (notifiedThread.get() != null) {
@@ -75,7 +86,7 @@ public class CigaretteSmokersProblemTest {
                         });
                         break;
                     case 1:
-                        execute(new AtomicVoidClosure() {
+                        block.execute(new AtomicVoidClosure() {
                             @Override
                             public void execute(Transaction tx) {
                                 if (notifiedThread.get() != null) {
@@ -89,7 +100,7 @@ public class CigaretteSmokersProblemTest {
                         });
                         break;
                     case 2:
-                        execute(new AtomicVoidClosure() {
+                        block.execute(new AtomicVoidClosure() {
                             @Override
                             public void execute(Transaction tx) {
                                 if (notifiedThread.get() != null) {
@@ -128,7 +139,7 @@ public class CigaretteSmokersProblemTest {
         }
 
         private boolean makeCigarette() {
-            return execute(new AtomicBooleanClosure() {
+            return block.execute(new AtomicBooleanClosure() {
                 @Override
                 public boolean execute(Transaction tx) throws Exception {
                     if (notifiedThread.get() == arbiterThread) {
@@ -166,7 +177,7 @@ public class CigaretteSmokersProblemTest {
         }
 
         private boolean makeCigarette() {
-            return execute(new AtomicBooleanClosure() {
+            return block.execute(new AtomicBooleanClosure() {
                 @Override
                 public boolean execute(Transaction tx) throws Exception {
                     if (notifiedThread.get() == arbiterThread) {
@@ -205,7 +216,7 @@ public class CigaretteSmokersProblemTest {
         }
 
         private boolean makeCigarette() {
-            return execute(new AtomicBooleanClosure() {
+            return block.execute(new AtomicBooleanClosure() {
                 @Override
                 public boolean execute(Transaction tx) throws Exception {
                     if (notifiedThread.get() == arbiterThread) {
