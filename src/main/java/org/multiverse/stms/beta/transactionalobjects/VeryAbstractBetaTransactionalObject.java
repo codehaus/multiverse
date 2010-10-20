@@ -33,7 +33,7 @@ public abstract class VeryAbstractBetaTransactionalObject
 
     protected volatile Listeners ___listeners;
 
-    protected long ___version;
+    protected volatile long ___version;
 
     //This field has a controlled JMM problem (just like the hashcode of String).
     protected int ___identityHashCode;
@@ -91,7 +91,9 @@ public abstract class VeryAbstractBetaTransactionalObject
             return REGISTRATION_NONE;
         }
 
-        if (tranlocal.version != ___version) {
+        final long version = tranlocal.version;
+
+        if (version != ___version) {
             //if it currently already contains a different version, we are done.
             latch.open(listenerEra);
             return REGISTRATION_NOT_NEEDED;
@@ -100,56 +102,66 @@ public abstract class VeryAbstractBetaTransactionalObject
         //we are going to register the listener since the current value still matches with is active.
         //But it could be that the registration completes after the write has happened.
 
-        Listeners newListeners = pool.takeListeners();
-        if (newListeners == null) {
-            newListeners = new Listeners();
+        Listeners update = pool.takeListeners();
+        if (update == null) {
+            update = new Listeners();
         }
-        newListeners.threadName = Thread.currentThread().getName();
-        newListeners.listener = latch;
-        newListeners.listenerEra = listenerEra;
+        update.threadName = Thread.currentThread().getName();
+        update.listener = latch;
+        update.listenerEra = listenerEra;
 
         //we need to do this in a loop because other register thread could be contending for the same
         //listeners field.
         while (true) {
+            if (version != ___version) {
+                //if it currently already contains a different version, we are done.
+                latch.open(listenerEra);
+                return REGISTRATION_NOT_NEEDED;
+            }
+
             //the listeners object is mutable, but as long as it isn't yet registered, this calling
             //thread has full ownership of it.
-            final Listeners oldListeners = ___listeners;
-
-            newListeners.next = oldListeners;
+            final Listeners current = ___listeners;
+            update.next = current;
 
             //lets try to register our listeners.
-            if (!___unsafe.compareAndSwapObject(this, listenersOffset, oldListeners, newListeners)) {
+            final boolean registered = ___unsafe.compareAndSwapObject(this, listenersOffset, current, update);
+            if (!registered) {
                 //so we are contending with another register thread, so lets try it again. Since the compareAndSwap
-                //didn't succeed, we know that the current thread still has exclusive ownership on the Listeners object.
-
+                //didn't succeed, we know that the current thread still has exclusive ownership on the Listeners object
+                //so we can try to register it again, but now with the newly found listeners
                 continue;
             }
 
             //the registration was a success. We need to make sure that the ___version hasn't changed.
             //JMM: the volatile read of ___version can't jump in front of the unsafe.compareAndSwap.
-            if (tranlocal.version != ___version) {
-                //the version has changed, so an interesting write has happened. No registration is needed.
-
-                //JMM: the unsafe.compareAndSwap can't jump over the volatile read this.___version.
-                //the update has taken place, we need to check if our listeners still is in place.
-                //if it is, it should be removed and the listeners notified. If the listeners already has changed,
-                //it is the task for the other to do the listener cleanup and notify them
-                if (___unsafe.compareAndSwapObject(this, listenersOffset, newListeners, null)) {
-                    //we managed to successfully remove the listeners, so we have complete ownership.
-                    //so lets open them.
-                    newListeners.openAll(pool);
-                } else {
-                    //we didn't manage to
-                    latch.open(listenerEra);
-                }
-
-                return REGISTRATION_NOT_NEEDED;
+            if (version == ___version) {
+                //we are lucky, the registration was done successfully and we managed to cas the listener
+                //before the update (since the update we are interested in, hasn't happened yet). This means that
+                //the updating thread is now responsible for notifying the listeners. Retrieval of the most recently
+                //published listener, always happens after the version is updated
+                return REGISTRATION_DONE;
             }
 
-            //we are lucky, the registration was done successfully and we managed to cas the listener
-            //before the update (since the update hasn't happened yet). This means that the updating thread
-            //is now responsible for notifying the listeners.
-            return REGISTRATION_DONE;
+            //the version has changed, so an interesting write has happened. No registration is needed.
+            //JMM: the unsafe.compareAndSwap can't jump over the volatile read this.___version.
+            //the update has taken place, we need to check if our listeners still is in place.
+            //if it is, it should be removed and the listeners notified. If the listeners already has changed,
+            //it is the task for the other to do the listener cleanup and notify them
+            while (true) {
+                update = ___listeners;
+                final boolean removed = ___unsafe.compareAndSwapObject(this, listenersOffset, update, null);
+
+                if (!removed) {
+                    continue;
+                }
+
+                if (update != null) {
+                    //we have complete ownership of the listeners that are removed, so lets open them.
+                    update.openAll(pool);
+                }
+                return REGISTRATION_NOT_NEEDED;
+            }
         }
     }
 

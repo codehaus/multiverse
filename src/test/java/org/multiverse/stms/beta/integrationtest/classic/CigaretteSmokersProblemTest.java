@@ -22,11 +22,10 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 public class CigaretteSmokersProblemTest {
     private static final int SMOKE_TIME_SECONDS = 10;
 
-
     private BooleanRef tobaccoAvailable;
     private BooleanRef paperAvailable;
     private BooleanRef matchesAvailable;
-    private Ref<Thread> notifiedThread;
+    private Ref<Thread> notifier;
     private ArbiterThread arbiterThread;
     private PaperProviderThread paperProvider;
     private MatchProviderThread matchProvider;
@@ -40,7 +39,7 @@ public class CigaretteSmokersProblemTest {
         tobaccoAvailable = newBooleanRef(false);
         paperAvailable = newBooleanRef(false);
         matchesAvailable = newBooleanRef(false);
-        notifiedThread = newRef();
+        notifier = newRef();
         arbiterThread = new ArbiterThread();
         paperProvider = new PaperProviderThread();
         matchProvider = new MatchProviderThread();
@@ -57,7 +56,7 @@ public class CigaretteSmokersProblemTest {
     @Test
     public void test() {
         startAll(arbiterThread, paperProvider, matchProvider, tobaccoProvider);
-        sleepMs(120000);
+        sleepMs(600000);
         System.out.println("Stopping threads");
         stop = true;
         joinAll(arbiterThread, paperProvider, matchProvider, tobaccoProvider);
@@ -76,13 +75,13 @@ public class CigaretteSmokersProblemTest {
                         block.execute(new AtomicVoidClosure() {
                             @Override
                             public void execute(Transaction tx) {
-                                if (notifiedThread.get() != null) {
+                                if (notifier.get() != null) {
                                     retry();
                                 }
 
                                 tobaccoAvailable.set(true);
                                 paperAvailable.set(true);
-                                notifiedThread.set(matchProvider);
+                                notifier.set(matchProvider);
                             }
                         });
                         break;
@@ -90,13 +89,13 @@ public class CigaretteSmokersProblemTest {
                         block.execute(new AtomicVoidClosure() {
                             @Override
                             public void execute(Transaction tx) {
-                                if (notifiedThread.get() != null) {
+                                if (notifier.get() != null) {
                                     retry();
                                 }
 
                                 tobaccoAvailable.set(true);
                                 matchesAvailable.set(true);
-                                notifiedThread.set(paperProvider);
+                                notifier.set(paperProvider);
                             }
                         });
                         break;
@@ -104,13 +103,13 @@ public class CigaretteSmokersProblemTest {
                         block.execute(new AtomicVoidClosure() {
                             @Override
                             public void execute(Transaction tx) {
-                                if (notifiedThread.get() != null) {
+                                if (notifier.get() != null) {
                                     retry();
                                 }
 
                                 matchesAvailable.set(true);
                                 paperAvailable.set(true);
-                                notifiedThread.set(tobaccoProvider);
+                                notifier.set(tobaccoProvider);
                             }
                         });
                         break;
@@ -118,7 +117,7 @@ public class CigaretteSmokersProblemTest {
                         throw new RuntimeException();
                 }
             }
-            notifiedThread.atomicSet(arbiterThread);
+            notifier.atomicSet(arbiterThread);
         }
     }
 
@@ -143,17 +142,17 @@ public class CigaretteSmokersProblemTest {
             return block.execute(new AtomicBooleanClosure() {
                 @Override
                 public boolean execute(Transaction tx) throws Exception {
-                    if (notifiedThread.get() == arbiterThread) {
+                    if (notifier.get() == arbiterThread) {
                         return false;
                     }
 
-                    if (notifiedThread.get() != PaperProviderThread.this) {
+                    if (notifier.get() != PaperProviderThread.this) {
                         retry();
                     }
 
                     matchesAvailable.set(false);
                     tobaccoAvailable.set(false);
-                    notifiedThread.set(null);
+                    notifier.set(null);
                     return true;
                 }
             });
@@ -181,17 +180,17 @@ public class CigaretteSmokersProblemTest {
             return block.execute(new AtomicBooleanClosure() {
                 @Override
                 public boolean execute(Transaction tx) throws Exception {
-                    if (notifiedThread.get() == arbiterThread) {
+                    if (notifier.get() == arbiterThread) {
                         return false;
                     }
 
-                    if (notifiedThread.get() != MatchProviderThread.this) {
+                    if (notifier.get() != MatchProviderThread.this) {
                         retry();
                     }
 
                     paperAvailable.set(false);
                     tobaccoAvailable.set(false);
-                    notifiedThread.set(null);
+                    notifier.set(null);
                     return true;
                 }
             });
@@ -220,17 +219,17 @@ public class CigaretteSmokersProblemTest {
             return block.execute(new AtomicBooleanClosure() {
                 @Override
                 public boolean execute(Transaction tx) throws Exception {
-                    if (notifiedThread.get() == arbiterThread) {
+                    if (notifier.get() == arbiterThread) {
                         return false;
                     }
 
-                    if (notifiedThread.get() != TobaccoProviderThread.this) {
+                    if (notifier.get() != TobaccoProviderThread.this) {
                         retry();
                     }
 
                     paperAvailable.set(false);
                     matchesAvailable.set(false);
-                    notifiedThread.set(null);
+                    notifier.set(null);
                     return true;
                 }
             });

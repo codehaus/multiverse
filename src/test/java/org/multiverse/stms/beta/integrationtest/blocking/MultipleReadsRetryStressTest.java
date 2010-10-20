@@ -142,7 +142,7 @@ public class MultipleReadsRetryStressTest implements BetaStmConstants {
             };
 
             while (!stop) {
-                if (count % (10000) == 0) {
+                if (count % (1000) == 0) {
                     System.out.println(getName() + " " + count);
                 }
 

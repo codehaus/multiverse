@@ -87,8 +87,8 @@ public final class BetaObjectPool {
         arrayListPoolingEnabled = ARRAYLIST_POOLING_ENABLED;
         tranlocalArrayPoolingEnabled = TRANLOCALARRAY_POOLING_ENABLED;
         tranlocalPoolingEnabled = TRANLOCAL_POOLING_ENABLED;
-        latchPoolingEnabled = LATCH_POOLING_ENABLED;
-        listenersPoolingEnabled = LISTENER_POOLING_ENABLED;
+        latchPoolingEnabled = false;//LATCH_POOLING_ENABLED;
+        listenersPoolingEnabled = false;//LISTENER_POOLING_ENABLED;
         listenersArrayPoolingEnabled = LISTENERSARRAY_POOLING_ENABLED;
         callableNodePoolingEnabled = CALLABLENODE_POOLING_ENABLED;
     }
