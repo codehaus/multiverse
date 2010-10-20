@@ -20,13 +20,13 @@ public final class Listeners {
     public Listeners next;
     public Latch listener;
     public long listenerEra;
+    public String threadName;
 
     /**
      * Prepares this Listeners object for pooling. This is done by:
      * <ol>
      * <li>setting the next to null</li>
      * <li>setting the listener to null</li>
-     * <li>setting the read to null</li>
      * <li>setting the listenerEra to Long.MIN_VALUE</li>
      * </ol>
      * <p/>

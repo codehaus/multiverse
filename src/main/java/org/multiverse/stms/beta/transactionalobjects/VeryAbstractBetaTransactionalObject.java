@@ -66,6 +66,20 @@ public abstract class VeryAbstractBetaTransactionalObject
         return this;
     }
 
+    protected final Listeners ___removeListenersAfterWrite() {
+        if (___listeners == null) {
+            return null;
+        }
+
+        Listeners removedListeners;
+        while (true) {
+            removedListeners = ___listeners;
+            if (___unsafe.compareAndSwapObject(this, listenersOffset, removedListeners, null)) {
+                return removedListeners;
+            }
+        }
+    }
+
     @Override
     public final int ___registerChangeListener(
             final Latch latch,
@@ -90,6 +104,7 @@ public abstract class VeryAbstractBetaTransactionalObject
         if (newListeners == null) {
             newListeners = new Listeners();
         }
+        newListeners.threadName = Thread.currentThread().getName();
         newListeners.listener = latch;
         newListeners.listenerEra = listenerEra;
 
@@ -120,8 +135,11 @@ public abstract class VeryAbstractBetaTransactionalObject
                 //if it is, it should be removed and the listeners notified. If the listeners already has changed,
                 //it is the task for the other to do the listener cleanup and notify them
                 if (___unsafe.compareAndSwapObject(this, listenersOffset, newListeners, null)) {
+                    //we managed to successfully remove the listeners, so we have complete ownership.
+                    //so lets open them.
                     newListeners.openAll(pool);
                 } else {
+                    //we didn't manage to
                     latch.open(listenerEra);
                 }
 
@@ -178,21 +196,6 @@ public abstract class VeryAbstractBetaTransactionalObject
         ___lockOwner = newLockOwner;
         tranlocal.setLockMode(commitLock ? LOCKMODE_COMMIT : LOCKMODE_UPDATE);
         return expectedVersion == ___version;
-    }
-
-    protected final Listeners ___removeListenersAfterWrite() {
-        if (___listeners == null) {
-            return null;
-        }
-
-        //at this point it could have happened that the listener has changed.. it could also
-        Listeners result;
-        while (true) {
-            result = ___listeners;
-            if (___unsafe.compareAndSwapObject(this, listenersOffset, result, null)) {
-                return result;
-            }
-        }
     }
 
     @Override

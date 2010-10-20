@@ -199,7 +199,7 @@ public class ReadersWritersProblemStressTest {
                         retry();
                     }
 
-                    readerCount.incrementAndGet(1);
+                    readerCount.increment();
                 }
             });
         }
@@ -212,7 +212,7 @@ public class ReadersWritersProblemStressTest {
                         retry();
                     }
 
-                    readerCount.incrementAndGet(-1);
+                    readerCount.decrement();
                 }
             });
         }

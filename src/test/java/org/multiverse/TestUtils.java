@@ -324,7 +324,7 @@ public class TestUtils implements MultiverseConstants {
                 try {
                     if (System.currentTimeMillis() > maxTimeMs) {
                         fail(String.format(
-                                "Failed to join all threads in %s ms, remaining threads %s",
+                                "Failed to join all threads in %s seconds, remaining threads %s",
                                 timeoutSec, uncompleted));
                     }
                     thread.join(100);

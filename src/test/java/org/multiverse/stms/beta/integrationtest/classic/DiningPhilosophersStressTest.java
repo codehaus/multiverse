@@ -5,18 +5,19 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.PessimisticLockLevel;
+import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
+import org.multiverse.api.references.BooleanRef;
+import org.multiverse.api.references.RefFactory;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConfiguration;
 import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
 
 
 /**
@@ -27,14 +28,18 @@ public class DiningPhilosophersStressTest implements BetaStmConstants {
     private int philosopherCount = 10;
     private volatile boolean stop;
 
-    private BetaIntRef[] forks;
-    private BetaStm stm;
+    private BooleanRef[] forks;
     private PessimisticLockLevel pessimisticLockLevel;
+    private Stm stm;
+    private RefFactory refFactory;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = new BetaStm();
+        BetaStmConfiguration config = new BetaStmConfiguration();
+        //config.backoffPolicy = new SpinningBackoffPolicy();
+        stm = new BetaStm(config);
+        refFactory = stm.getReferenceFactoryBuilder().build();
         stop = false;
     }
 
@@ -76,34 +81,40 @@ public class DiningPhilosophersStressTest implements BetaStmConstants {
         joinAll(philosopherThreads);
 
         assertAllForksHaveReturned();
+
+        for (PhilosopherThread philosopherThread : philosopherThreads) {
+            System.out.printf("%s ate %s times\n",
+                    philosopherThread.getName(), philosopherThread.eatCount);
+        }
     }
 
     public void assertAllForksHaveReturned() {
-        for (BetaIntRef fork : forks) {
-            assertEquals(0, fork.atomicGet());
+        for (BooleanRef fork : forks) {
+            assertFalse(fork.atomicGet());
         }
     }
 
     public PhilosopherThread[] createPhilosopherThreads() {
         PhilosopherThread[] threads = new PhilosopherThread[philosopherCount];
         for (int k = 0; k < philosopherCount; k++) {
-            BetaIntRef leftFork = forks[k];
-            BetaIntRef rightFork = k == philosopherCount - 1 ? forks[0] : forks[k + 1];
+            BooleanRef leftFork = forks[k];
+            BooleanRef rightFork = k == philosopherCount - 1 ? forks[0] : forks[k + 1];
             threads[k] = new PhilosopherThread(k, leftFork, rightFork);
         }
         return threads;
     }
 
     public void createForks() {
-        forks = new BetaIntRef[philosopherCount];
+        forks = new BooleanRef[philosopherCount];
         for (int k = 0; k < forks.length; k++) {
-            forks[k] = newIntRef(stm);
+            forks[k] = refFactory.newBooleanRef(false);
         }
     }
 
     class PhilosopherThread extends TestThread {
-        private final BetaIntRef leftFork;
-        private final BetaIntRef rightFork;
+        private int eatCount = 0;
+        private final BooleanRef leftFork;
+        private final BooleanRef rightFork;
         private final AtomicBlock releaseForksBlock = stm.createTransactionFactoryBuilder()
                 .setPessimisticLockLevel(pessimisticLockLevel)
                 .buildAtomicBlock();
@@ -112,7 +123,7 @@ public class DiningPhilosophersStressTest implements BetaStmConstants {
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
 
-        PhilosopherThread(int id, BetaIntRef leftFork, BetaIntRef rightFork) {
+        PhilosopherThread(int id, BooleanRef leftFork, BooleanRef rightFork) {
             super("PhilosopherThread-" + id);
             this.leftFork = leftFork;
             this.rightFork = rightFork;
@@ -120,13 +131,13 @@ public class DiningPhilosophersStressTest implements BetaStmConstants {
 
         @Override
         public void doRun() {
-            int k = 0;
             while (!stop) {
-                if (k % 100 == 0) {
-                    System.out.printf("%s at %s\n", getName(), k);
+                eatCount++;
+                if (eatCount % 100 == 0) {
+                    System.out.printf("%s at %s\n", getName(), eatCount);
                 }
                 eat();
-                k++;
+                //   sleepMs(5);
             }
         }
 
@@ -145,9 +156,9 @@ public class DiningPhilosophersStressTest implements BetaStmConstants {
             releaseForksBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-                    leftFork.getAndSet(btx, leftFork.get(btx) - 1);
-                    rightFork.getAndSet(btx, rightFork.get(btx) - 1);
+                    leftFork.set(false);
+                    rightFork.set(false);
+
                 }
             });
         }
@@ -156,19 +167,12 @@ public class DiningPhilosophersStressTest implements BetaStmConstants {
             takeForksBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-
-                    if (leftFork.get(btx) == 1) {
+                    if (leftFork.get() || rightFork.get()) {
                         retry();
-                    } else {
-                        leftFork.getAndSet(btx, leftFork.get(btx) + 1);
                     }
 
-                    if (rightFork.get(btx) == 1) {
-                        retry();
-                    } else {
-                        rightFork.getAndSet(btx, rightFork.get(btx) + 1);
-                    }
+                    leftFork.set(true);
+                    rightFork.set(true);
                 }
             });
         }

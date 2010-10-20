@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicBooleanClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
@@ -21,6 +20,8 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  * http://en.wikipedia.org/wiki/Cigarette_smokers_problem
  */
 public class CigaretteSmokersProblemTest {
+    private static final int SMOKE_TIME_SECONDS = 10;
+
 
     private BooleanRef tobaccoAvailable;
     private BooleanRef paperAvailable;
@@ -49,14 +50,14 @@ public class CigaretteSmokersProblemTest {
         block = getGlobalStmInstance()
             .createTransactionFactoryBuilder()
             //.setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
-            .setIsolationLevel(IsolationLevel.Serializable)
+            //.setIsolationLevel(IsolationLevel.Serializable)
             .buildAtomicBlock();
     }
 
     @Test
     public void test() {
         startAll(arbiterThread, paperProvider, matchProvider, tobaccoProvider);
-        sleepMs(560000);
+        sleepMs(120000);
         System.out.println("Stopping threads");
         stop = true;
         joinAll(arbiterThread, paperProvider, matchProvider, tobaccoProvider);
@@ -130,7 +131,7 @@ public class CigaretteSmokersProblemTest {
         public void doRun() throws Exception {
             int k = 0;
             while (makeCigarette()) {
-                sleepRandomMs(10);
+                sleepRandomMs(SMOKE_TIME_SECONDS);
                 k++;
                 if (k % 100 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
@@ -168,7 +169,7 @@ public class CigaretteSmokersProblemTest {
         public void doRun() throws Exception {
             int k = 0;
             while (makeCigarette()) {
-                sleepRandomMs(10);
+                sleepRandomMs(SMOKE_TIME_SECONDS);
                 k++;
                 if (k % 100 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
@@ -206,7 +207,7 @@ public class CigaretteSmokersProblemTest {
         public void doRun() throws Exception {
             int k = 0;
             while (makeCigarette()) {
-                sleepRandomMs(10);
+                sleepRandomMs(SMOKE_TIME_SECONDS);
 
                 k++;
                 if (k % 100 == 0) {
