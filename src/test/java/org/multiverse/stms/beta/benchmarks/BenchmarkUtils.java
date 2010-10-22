@@ -82,14 +82,13 @@ public class BenchmarkUtils {
     }
 
     public static double transactionsPerSecondPerThread(long transactionsPerThread, long totalTimeMs, int threads) {
-        long transactionCount = transactionsPerThread * threads;
-        return (1000d * transactionCount) / totalTimeMs;
+        long totalTransactions = transactionsPerThread * threads;
+
+        return (1000d * totalTransactions) / totalTimeMs;
     }
 
     public static double transactionsPerSecond(long transactionsPerThread, long totalTimeMs, int threads) {
-        long transactionCount = transactionsPerThread * threads;
-
-        return (threads * 1000d * transactionCount) / totalTimeMs;
+        return threads * transactionsPerSecondPerThread(transactionsPerThread, totalTimeMs, threads);
     }
 
     public static String transactionsPerSecondAsString(long transactionsPerThread, long totalTimeMs, int threads) {

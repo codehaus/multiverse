@@ -194,6 +194,13 @@ the task not being executed at all.
 - should the retry by added to the transaction? Makes it easier to figure out when a retry is done when
 and not allowed. So not throw the retry error immediately..
 
+    - when a transaction is interrupted, the interrupted exception should contain some information
+    about the transaction, e.g. the name
+
+    - all retry tests should be re-enabled
+
+- producer consumer test contains a bug (items remain on the stack when the test exits).
+
 - Collections
 
     - transactional linked list

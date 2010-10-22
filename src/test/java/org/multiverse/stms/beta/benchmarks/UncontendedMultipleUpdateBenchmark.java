@@ -82,19 +82,17 @@ public class UncontendedMultipleUpdateBenchmark implements BetaStmConstants {
             totalDurationMs += t.durationMs;
         }
 
-        double readsPerSecondPerThread = BenchmarkUtils.transactionsPerSecondPerThread(
-                transactionsPerThread * refCount, totalDurationMs, threadCount);
         System.out.printf("Multiverse> Performance %s transactions/second with %s threads\n",
                 transactionsPerSecondAsString(transactionsPerThread, totalDurationMs, threadCount), threadCount);
         System.out.printf("Multiverse> Performance %s transactions/second/thread with %s threads\n",
                 transactionsPerSecondPerThreadAsString(transactionsPerThread, totalDurationMs, threadCount), threadCount);
-        System.out.printf("Multiverse> Performance %s writes/second/thread with %s threads\n",
-                format(readsPerSecondPerThread), threadCount);
-        System.out.printf("Multiverse> Performance %s writes/second with %s threads\n",
-                transactionsPerSecondAsString(transactionsPerThread * refCount, totalDurationMs, threadCount),
-                threadCount);
+        System.out.printf("Multiverse> Performance %s writes/second with %s threads and %s refs\n",
+                transactionsPerSecondAsString(transactionsPerThread * refCount, totalDurationMs, threadCount), threadCount, refCount);
+        System.out.printf("Multiverse> Performance %s writes/second/thread with %s threads and %s refs\n",
+                transactionsPerSecondPerThreadAsString(transactionsPerThread * refCount, totalDurationMs, threadCount), threadCount, refCount);
 
-        return readsPerSecondPerThread;
+        return BenchmarkUtils.transactionsPerSecondPerThread(
+                transactionsPerThread * refCount, totalDurationMs, threadCount);
     }
 
     class ReadThread extends TestThread {
