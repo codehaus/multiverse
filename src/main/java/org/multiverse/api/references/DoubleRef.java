@@ -15,9 +15,9 @@ import org.multiverse.api.predicates.DoublePredicate;
  * <h1>ControlFlowError</h1>
  * All non atomic methods are able to throw a (subclass) of the ControlFlowError. This error should
  * not be caught, it is task of the AtomicTemplate to do this.
- *
+ * 
  * <h1>TransactionalExecutionException</h1>
- * Most of the methods can throw a {@link org.multiverse.api.exceptions.TransactionExecutionException}.
+ * Most of the methods can throw a {@link org.multiverse.api.exceptions.TransactionalExecutionException}.
  * This exception can be caught, but in most cases you want to figure out what the cause is (e.g. because
  * there are too many retries) and solve that problem.
  *
@@ -31,7 +31,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param value the new value.
      * @return the old value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      */
     double getAndSet(double value);
 
@@ -41,7 +41,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param value the new value.
      * @return the new value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      */
     double set(double value);
 
@@ -52,7 +52,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param value the new value
      * @return the old value
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double set(Transaction tx, double value);
@@ -61,7 +61,7 @@ public interface DoubleRef extends TransactionalObject {
      * Gets the value using the provided transaction.
      *
      * @return the current value.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      * @see #atomicGet()
      */
@@ -73,7 +73,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param tx the Transaction to lift on.
      * @return the value stored in the ref.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double get(Transaction tx);
@@ -85,7 +85,7 @@ public interface DoubleRef extends TransactionalObject {
      * {@link #atomicWeakGet()}.
      *
      * @return the current value.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      */
     double atomicGet();
 
@@ -105,7 +105,7 @@ public interface DoubleRef extends TransactionalObject {
      *
      * @param newValue the new value.
      * @return the new value.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      */
     double atomicSet(double newValue);
 
@@ -115,7 +115,7 @@ public interface DoubleRef extends TransactionalObject {
      *
      * @param newValue the new value.
      * @return the old value.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      */
     double atomicGetAndSet(double newValue);
 
@@ -126,7 +126,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param tx    the transaction used to do the getAndSet.
      * @return the old value.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double getAndSet(Transaction tx, double value);
@@ -145,7 +145,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param function the function to apply to this reference.
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      */
     void commute(DoubleFunction function);
 
@@ -163,7 +163,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param tx       the transaction used for this operation.
      * @param function the function to apply to this reference.
      * @throws NullPointerException  if function is null. If there is an active transaction, it will be aborted.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void commute(Transaction tx,DoubleFunction function);
@@ -185,7 +185,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param function the function that alters the value stored in this Ref.
      * @return the new value.
      * @throws NullPointerException if function is null. The Transaction will also be aborted.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double alterAndGet(DoubleFunction function);
@@ -197,7 +197,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param tx       the Transaction used by this operation.
      * @return the new value.
      * @throws NullPointerException if function or transaction is null.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double alterAndGet(Transaction tx,DoubleFunction function);
@@ -209,7 +209,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param function the Function responsible to alterAndGet the function.
      * @return the old value.
      * @throws NullPointerException if function is null.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      */
     double atomicGetAndAlter(DoubleFunction function);
 
@@ -220,7 +220,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param function the function that alters the value stored in this Ref.
      * @return the old value.
      * @throws NullPointerException if function is null. The transaction will be aborted as well.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double getAndAlter(DoubleFunction function);
@@ -232,7 +232,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param tx       the Transaction used by this operation.
      * @return the old value
      * @throws NullPointerException if function or transaction is null. The transaction will be aborted as well.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double getAndAlter(Transaction tx, DoubleFunction function);
@@ -243,7 +243,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param expectedValue the expected value.
      * @param newValue the new value.
      * @return true if the compareAndSwap was a success, false otherwise.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      */
     boolean atomicCompareAndSet(double expectedValue, double newValue);
 
@@ -256,7 +256,7 @@ public interface DoubleRef extends TransactionalObject {
      *
      * @param validator the DoublePredicate to add.
      * @throws NullPointerException if validator or tx is null. If validator is null the transaction will be aborted.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void addDeferredValidator(DoublePredicate validator);
@@ -271,7 +271,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param tx the Transaction this call lifts on
      * @param validator the DoublePredicate to add.
      * @throws NullPointerException if validator or tx is null. If validator is null the transaction is aborted.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void addDeferredValidator(Transaction tx, DoublePredicate validator);
@@ -283,7 +283,7 @@ public interface DoubleRef extends TransactionalObject {
      *
      * @param validator the DoublePredicate to add.
      * @throws NullPointerException if validator is null.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      */
     void atomicAddDeferredValidator(DoublePredicate validator);
 
@@ -293,7 +293,7 @@ public interface DoubleRef extends TransactionalObject {
      *
      * @param amount the amount to increase with.
      * @return the old value.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      */
     double atomicGetAndIncrement(double amount);
 
@@ -302,7 +302,7 @@ public interface DoubleRef extends TransactionalObject {
      *
      * @param amount the amount to increment with.
      * @return the old value.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double getAndIncrement(double amount);
@@ -314,7 +314,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param amount the amount to increment with.
      * @return the old value.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double getAndIncrement(Transaction tx, double amount);
@@ -325,7 +325,7 @@ public interface DoubleRef extends TransactionalObject {
      *
      * @param amount the amount to increment with.
      * @return the new value.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      */
     double atomicIncrementAndGet(double amount);
 
@@ -334,7 +334,7 @@ public interface DoubleRef extends TransactionalObject {
      *
      * @param amount the amount to increment with.
      * @return the new value.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double incrementAndGet(double amount);
@@ -346,7 +346,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param amount the amount to increment with.
      * @return the new value.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double incrementAndGet(Transaction tx, double amount);
@@ -358,7 +358,7 @@ public interface DoubleRef extends TransactionalObject {
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
      * @param value the value to wait for.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(double value);
@@ -370,7 +370,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param tx the transaction this method lifts on
      * @param value the value to wait for.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx,double value);
@@ -383,7 +383,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param predicate the predicate to evaluate.
      * @throws NullPointerException if predicate is null. When there is a non dead transaction,
      *                              it will be aborted.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(DoublePredicate predicate);
@@ -397,7 +397,7 @@ public interface DoubleRef extends TransactionalObject {
      * @param predicate the predicate to evaluate.
      * @throws NullPointerException if predicate is null or tx is null. When there is a non dead transaction,
      *                              it will be aborted.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx, DoublePredicate predicate);

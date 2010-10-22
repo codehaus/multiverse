@@ -7,6 +7,8 @@ package org.multiverse.api.exceptions;
  */
 public class AtomicOperationException extends TransactionExecutionException {
 
+    private static final long serialVersionUID = 0;
+
     /**
      * Creates a new AtomicOperationException.
      */
@@ -25,8 +27,8 @@ public class AtomicOperationException extends TransactionExecutionException {
     /**
      * Creates a new AtomicOperationException with the provided message and cause.
      *
-     * @param message  the message
-     * @param cause the cause of the message
+     * @param message the message
+     * @param cause   the cause of the message
      */
     public AtomicOperationException(String message, Throwable cause) {
         super(message, cause);

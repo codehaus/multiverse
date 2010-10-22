@@ -9,7 +9,7 @@ package org.multiverse.api.exceptions;
  */
 public class InvisibleCheckedException extends RuntimeException {
 
-    static final long serialVersionUID = 0;
+    private static final long serialVersionUID = 0;
 
     /**
      * Creates a new InvisibleCheckedException with the given cause.

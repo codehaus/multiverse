@@ -13,6 +13,8 @@ package org.multiverse.api.exceptions;
  */
 public class Retry extends ControlFlowError {
 
+    private static final long serialVersionUID = 0;
+
     public final static Retry INSTANCE = new Retry();
 
     public Retry() {

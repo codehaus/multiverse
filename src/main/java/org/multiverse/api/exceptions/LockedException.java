@@ -8,6 +8,8 @@ package org.multiverse.api.exceptions;
  */
 public class LockedException extends AtomicOperationException {
 
+    private static final long serialVersionUID = 0;
+
     /**
      * Creates a new LockedException.
      */

@@ -11,6 +11,8 @@ package org.multiverse.api.exceptions;
  */
 public class SpeculativeConfigurationError extends ControlFlowError {
 
+    private static final long serialVersionUID = 0;
+        
     public final static SpeculativeConfigurationError INSTANCE = new SpeculativeConfigurationError();
 
     /**

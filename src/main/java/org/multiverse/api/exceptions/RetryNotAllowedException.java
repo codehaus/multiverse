@@ -11,6 +11,8 @@ package org.multiverse.api.exceptions;
  */
 public class RetryNotAllowedException extends RetryException{
 
+    private static final long serialVersionUID = 0;
+
     /**
      * Creates a new RetryNotAllowedException with the provided message.
      *

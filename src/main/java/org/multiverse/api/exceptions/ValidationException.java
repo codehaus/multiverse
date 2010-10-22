@@ -7,6 +7,8 @@ package org.multiverse.api.exceptions;
  */
 public class ValidationException extends TransactionExecutionException {
 
+    private static final long serialVersionUID = 0;
+        
     /**
      * Creates a new ValidationException.
      */

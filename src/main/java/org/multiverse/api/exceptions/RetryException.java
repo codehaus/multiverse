@@ -9,6 +9,8 @@ package org.multiverse.api.exceptions;
  */
 public abstract class RetryException extends TransactionExecutionException {
 
+    private static final long serialVersionUID = 0;
+
     /**
      * Creates a new RetryException.
      */

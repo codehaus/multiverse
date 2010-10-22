@@ -1647,7 +1647,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         throw SpeculativeConfigurationError.INSTANCE;
   }
 
-
+ 
     @Override
     public Tranlocal get(BetaTransactionalObject owner){
         int indexOf = indexOf(owner);

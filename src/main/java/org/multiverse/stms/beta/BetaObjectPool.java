@@ -67,8 +67,8 @@ public final class BetaObjectPool {
     private int lastUsedBetaLongRef = -1;
     private TranlocalPool[] pools = new TranlocalPool[100];
 
-    private DefaultRetryLatch[] cheapLatchPool = new DefaultRetryLatch[10];
-    private int cheapLatchPoolIndex = -1;
+    private DefaultRetryLatch[] defaultRetryLatchPool = new DefaultRetryLatch[10];
+    private int defaultRetryLatchPoolIndex = -1;
 
     private Listeners[] listenersPool = new Listeners[100];
     private int listenersPoolIndex = -1;
@@ -536,18 +536,18 @@ public final class BetaObjectPool {
     }
 
     /**
-     * Takes a CheapLatch from the pool, or null if none is available.
+     * Takes a DefaultRetryLatch from the pool, or null if none is available.
      *
-     * @return the CheapLatch from the pool, or null if none available.
+     * @return the DefaultRetryLatch from the pool, or null if none available.
      */
     public DefaultRetryLatch takeDefaultRetryLatch(){
-        if(!latchPoolingEnabled || cheapLatchPoolIndex == -1){
+        if(!latchPoolingEnabled || defaultRetryLatchPoolIndex == -1){
             return null;
         }
 
-        DefaultRetryLatch latch = cheapLatchPool[cheapLatchPoolIndex];
-        cheapLatchPool[cheapLatchPoolIndex]=null;
-        cheapLatchPoolIndex--;
+        DefaultRetryLatch latch = defaultRetryLatchPool[defaultRetryLatchPoolIndex];
+        defaultRetryLatchPool[defaultRetryLatchPoolIndex]=null;
+        defaultRetryLatchPoolIndex--;
         return latch;
     }
 
@@ -562,13 +562,13 @@ public final class BetaObjectPool {
             throw new NullPointerException();
         }
 
-        if(!latchPoolingEnabled || cheapLatchPoolIndex == cheapLatchPool.length-1){
+        if(!latchPoolingEnabled || defaultRetryLatchPoolIndex == defaultRetryLatchPool.length-1){
             return;
         }
 
         latch.prepareForPooling();
-        cheapLatchPoolIndex++;
-        cheapLatchPool[cheapLatchPoolIndex]=latch;
+        defaultRetryLatchPoolIndex++;
+        defaultRetryLatchPool[defaultRetryLatchPoolIndex]=latch;
     }
 
     // ====================== array list ===================================

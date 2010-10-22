@@ -1428,7 +1428,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
-
+ 
     @Override
     public Tranlocal get(BetaTransactionalObject ref){
         final int indexOf = indexOf(ref, ref.___identityHashCode());

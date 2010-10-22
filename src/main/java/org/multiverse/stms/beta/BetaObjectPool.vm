@@ -338,7 +338,7 @@ public final class BetaObjectPool {
      * @return the DefaultRetryLatch from the pool, or null if none available.
      */
     public DefaultRetryLatch takeDefaultRetryLatch(){
-        if(!latchPoolingEnabled || cheapLatchPoolIndex == -1){
+        if(!latchPoolingEnabled || defaultRetryLatchPoolIndex == -1){
             return null;
         }
 

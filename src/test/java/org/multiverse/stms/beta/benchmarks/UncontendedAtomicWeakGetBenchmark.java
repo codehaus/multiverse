@@ -13,12 +13,12 @@ import static org.multiverse.stms.beta.BetaStmTestUtils.newReadBiasedLongRef;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
-public class UncontendedWeakGetBenchmark {
+public class UncontendedAtomicWeakGetBenchmark {
 
     private BetaStm stm;
 
     public static void main(String[] args) {
-        UncontendedWeakGetBenchmark test = new UncontendedWeakGetBenchmark();
+        UncontendedAtomicWeakGetBenchmark test = new UncontendedAtomicWeakGetBenchmark();
         test.start(Long.parseLong(args[0]));
     }
 

@@ -10,6 +10,8 @@ package org.multiverse.api.exceptions;
  */
 public class ReadWriteConflict extends ControlFlowError {
 
+    private static final long serialVersionUID = 0;
+
     public final static ReadWriteConflict INSTANCE = new ReadWriteConflict();
 
     /**

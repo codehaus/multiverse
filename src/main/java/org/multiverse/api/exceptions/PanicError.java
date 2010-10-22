@@ -9,6 +9,8 @@ package org.multiverse.api.exceptions;
  */
 public class PanicError extends Error {
 
+    private static final long serialVersionUID = 0;
+
     /**
      * Creates a new PanicError.
      */

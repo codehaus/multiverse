@@ -8,6 +8,8 @@ package org.multiverse.api.exceptions;
  */
 public class IllegalTransactionFactoryException extends IllegalStateException {
 
+    private static final long serialVersionUID = 0;
+
     /**
      * Creates a new IllegalTransactionFactoryException.
      *

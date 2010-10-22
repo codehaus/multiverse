@@ -9,6 +9,8 @@ package org.multiverse.api.exceptions;
  */
 public class TransactionExecutionException extends RuntimeException {
 
+    private static final long serialVersionUID = 0;
+        
     /**
      * Creates a new TransactionalExecutionException.
      */

@@ -13,6 +13,8 @@ package org.multiverse.api.exceptions;
  */
 public class RetryInterruptedException extends RetryException{
 
+    private static final long serialVersionUID = 0;
+
     /**
      * Creates a new RetryInterruptedException
      */

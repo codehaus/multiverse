@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.benchmarks;
 
 import org.multiverse.TestThread;
+import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -65,9 +66,9 @@ public class UncontendedMultipleUpdateBenchmark implements BetaStmConstants {
 
         ReadThread[] threads = new ReadThread[threadCount];
 
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);
-        //.setDirtyCheckEnabled(true)
-        //.setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+            .setDirtyCheckEnabled(false)
+            .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
         config.maxArrayTransactionSize = refCount;
 
         for (int k = 0; k < threads.length; k++) {

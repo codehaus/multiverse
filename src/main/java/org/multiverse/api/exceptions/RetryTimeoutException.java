@@ -18,6 +18,8 @@ package org.multiverse.api.exceptions;
  */
 public class RetryTimeoutException extends RetryException {
 
+    private static final long serialVersionUID = 0;
+        
     /**
      * Creates a new RetryTimeoutException.
      *

@@ -9,6 +9,8 @@ package org.multiverse.api.exceptions;
  */
 public class TransactionNotAllowedException extends PropagationException {
 
+    private static final long serialVersionUID = 0;
+        
     /**
      * Creates a new NoTransactionAllowedException.
      */

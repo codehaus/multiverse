@@ -2211,7 +2211,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         hasUpdates = true;
   }
 
-
+ 
     @Override
     public Tranlocal get(BetaTransactionalObject owner){
         int indexOf = indexOf(owner);

@@ -1957,7 +1957,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
          throw new TodoException();
      }
 
-
+ 
     @Override
     public Tranlocal get(BetaTransactionalObject ref){
         final int indexOf = indexOf(ref, ref.___identityHashCode());

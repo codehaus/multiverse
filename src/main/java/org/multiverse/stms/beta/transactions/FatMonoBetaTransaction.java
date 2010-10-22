@@ -2161,7 +2161,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
      }
 
-
+ 
     @Override
     public Tranlocal get(BetaTransactionalObject object){
         return attached == null || attached.owner!= object? null: attached;

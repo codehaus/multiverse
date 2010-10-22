@@ -178,16 +178,16 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
                 config.familyName));
     }
 
-    public final NoRetryPossibleException abortOnNoRetryPossible(){
+    public final RetryNotPossibleException abortOnNoRetryPossible(){
         abort();
-        throw new NoRetryPossibleException(
+        throw new RetryNotPossibleException(
             format("[%s] Can't block transaction since there are no tracked reads",
                 config.familyName));
     }
 
-    public final NoBlockingRetryAllowedException abortOnNoBlockingAllowed(){
+    public final RetryNotAllowedException abortOnNoBlockingAllowed(){
         abort();
-        return new NoBlockingRetryAllowedException(
+        return new RetryNotAllowedException(
             format("[%s] Can't block transaction since it doesn't allow blocking",
                 config.familyName));
     }
@@ -493,10 +493,10 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
                 }
             }else{
                 if (config.isInterruptible()) {
-                    remainingTimeoutNs = latch.tryAwait(
+                    remainingTimeoutNs = latch.awaitNanos(
                         lockEra, remainingTimeoutNs);
                 } else {
-                    remainingTimeoutNs = latch.tryAwaitUninterruptible(
+                    remainingTimeoutNs = latch.awaitNanosUninterruptible(
                         lockEra, remainingTimeoutNs);
                 }
 
