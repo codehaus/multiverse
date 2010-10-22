@@ -12,9 +12,10 @@ import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasNoLocks;
 
 public class BetaLongRef_decrement1WithAmountTest {
-    
+
      private BetaStm stm;
 
     @Before
@@ -37,6 +38,7 @@ public class BetaLongRef_decrement1WithAmountTest {
         tx.commit();
 
         assertIsCommitted(tx);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue - 5);
     }
 
@@ -60,6 +62,7 @@ public class BetaLongRef_decrement1WithAmountTest {
         }
 
         assertIsAborted(tx);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -129,6 +132,7 @@ public class BetaLongRef_decrement1WithAmountTest {
         } catch (DeadTransactionException expected) {
         }
 
+        assertRefHasNoLocks(ref);
         assertIsCommitted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -149,6 +153,7 @@ public class BetaLongRef_decrement1WithAmountTest {
         } catch (DeadTransactionException expected) {
         }
 
+        assertRefHasNoLocks(ref);
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -170,6 +175,7 @@ public class BetaLongRef_decrement1WithAmountTest {
         }
 
         assertIsAborted(tx);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -185,6 +191,7 @@ public class BetaLongRef_decrement1WithAmountTest {
         } catch (TransactionRequiredException expected) {
         }
 
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 }

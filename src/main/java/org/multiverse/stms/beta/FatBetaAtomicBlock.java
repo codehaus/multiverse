@@ -119,7 +119,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        throw new NoTransactionAllowedException(
+                        throw new TransactionNotAllowedException(
                             format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
                                 ", but transaction '%s' was found",
                                 transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
@@ -215,7 +215,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                                     format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
                             }
-                        }                        
+                        }
                     } catch (SpeculativeConfigurationError e) {
                         abort = false;
                         if(___TracingEnabled){
@@ -359,7 +359,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        throw new NoTransactionAllowedException(
+                        throw new TransactionNotAllowedException(
                             format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
                                 ", but transaction '%s' was found",
                                 transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
@@ -455,7 +455,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                                     format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
                             }
-                        }                        
+                        }
                     } catch (SpeculativeConfigurationError e) {
                         abort = false;
                         if(___TracingEnabled){
@@ -599,7 +599,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        throw new NoTransactionAllowedException(
+                        throw new TransactionNotAllowedException(
                             format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
                                 ", but transaction '%s' was found",
                                 transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
@@ -695,7 +695,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                                     format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
                             }
-                        }                        
+                        }
                     } catch (SpeculativeConfigurationError e) {
                         abort = false;
                         if(___TracingEnabled){
@@ -839,7 +839,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        throw new NoTransactionAllowedException(
+                        throw new TransactionNotAllowedException(
                             format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
                                 ", but transaction '%s' was found",
                                 transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
@@ -935,7 +935,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                                     format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
                             }
-                        }                        
+                        }
                     } catch (SpeculativeConfigurationError e) {
                         abort = false;
                         if(___TracingEnabled){
@@ -1079,7 +1079,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        throw new NoTransactionAllowedException(
+                        throw new TransactionNotAllowedException(
                             format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
                                 ", but transaction '%s' was found",
                                 transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
@@ -1175,7 +1175,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                                     format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
                             }
-                        }                        
+                        }
                     } catch (SpeculativeConfigurationError e) {
                         abort = false;
                         if(___TracingEnabled){
@@ -1322,7 +1322,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                             }
                         }
 
-                        throw new NoTransactionAllowedException(
+                        throw new TransactionNotAllowedException(
                             format("No transaction is allowed for atomicblock '%s' with propagation level 'Never'"+
                                 ", but transaction '%s' was found",
                                 transactionConfiguration.familyName, tx.getConfiguration().getFamilyName())
@@ -1422,7 +1422,7 @@ public final class FatBetaAtomicBlock extends AbstractBetaAtomicBlock{
                                     format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
                             }
-                        }                        
+                        }
                     } catch (SpeculativeConfigurationError e) {
                         abort = false;
                         if(___TracingEnabled){

@@ -1,20 +1,26 @@
 package org.multiverse.api.blocking;
 
-import org.multiverse.api.exceptions.TransactionInterruptedException;
-
-import java.util.concurrent.TimeUnit;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionConfiguration;
+import org.multiverse.api.exceptions.RetryInterruptedException;
 
 import static java.lang.String.format;
 
 /**
- * A Cheap {@link Latch} implementation based on the intrinsic lock.
+ * A Cheap {@link RetryLatch} implementation based on the intrinsic lock.
  *
  * @author Peter Veentjer
  */
-public final class CheapLatch implements Latch {
+public final class DefaultRetryLatch implements RetryLatch {
 
     private volatile long era = Long.MIN_VALUE;
     private volatile boolean isOpen = false;
+
+    @Override
+    public void await(Transaction tx) {
+        TransactionConfiguration config = tx.getConfiguration();
+        //if(config.is)
+    }
 
     @Override
     public void open(final long expectedEra) {
@@ -46,7 +52,7 @@ public final class CheapLatch implements Latch {
             }
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
-            throw new TransactionInterruptedException(exception);
+            throw new RetryInterruptedException(exception);
         }
     }
 
@@ -74,14 +80,9 @@ public final class CheapLatch implements Latch {
     }
 
     @Override
-    public long tryAwaitUninterruptible(long expectedEra, long timeout, TimeUnit unit) {
-        return tryAwaitUninterruptible(expectedEra, unit.toNanos(timeout));
-    }
-
-    @Override
-    public long tryAwaitUninterruptible(long expectedEra, long timeoutNs) {
-        if (isOpen || expectedEra != era) {
-            return timeoutNs;
+    public long awaitNanosUninterruptible(final long expectedEra, long nanosTimeout) {
+        if (isOpen || expectedEra != era || nanosTimeout <= 0) {
+            return nanosTimeout;
         }
 
         boolean restoreInterrupt = false;
@@ -91,21 +92,21 @@ public final class CheapLatch implements Latch {
                 try {
                     synchronized (this) {
                         while (!isOpen && expectedEra == era) {
-                            if (timeoutNs <= 0) {
+                            if (nanosTimeout <= 0) {
                                 return -1;
                             }
 
-                            long ms = timeoutNs / 1000000;
-                            int ns = (int) (timeoutNs % 1000000);
+                            long ms = nanosTimeout / 1000000;
+                            int ns = (int) (nanosTimeout % 1000000);
                             wait(ms, ns);
-                            timeoutNs -= System.nanoTime() - startNs;
+                            nanosTimeout -= System.nanoTime() - startNs;
                         }
 
-                        return timeoutNs;
+                        return nanosTimeout;
                     }
                 } catch (InterruptedException ex) {
                     restoreInterrupt = true;
-                    timeoutNs -= System.nanoTime() - startNs;
+                    nanosTimeout -= System.nanoTime() - startNs;
                 }
             }
         } finally {
@@ -116,35 +117,30 @@ public final class CheapLatch implements Latch {
     }
 
     @Override
-    public long tryAwait(long expectedEra, long timeout, TimeUnit unit) {
-        return tryAwait(expectedEra, unit.toNanos(timeout));
-    }
-
-    @Override
-    public long tryAwait(long expectedEra, long timeoutNs) {
-        if (isOpen || expectedEra != era) {
-            return timeoutNs;
+    public long awaitNanos(final long expectedEra, long nanosTimeout) {
+        if (isOpen || expectedEra != era || nanosTimeout <= 0) {
+            return nanosTimeout;
         }
 
         try {
             synchronized (this) {
                 while (!isOpen && expectedEra == era) {
-                    if (timeoutNs <= 0) {
+                    if (nanosTimeout <= 0) {
                         return -1;
                     }
 
-                    long ms = timeoutNs / 1000000;
-                    int ns = (int) (timeoutNs % 1000000);
+                    long ms = nanosTimeout / 1000000;
+                    int ns = (int) (nanosTimeout % 1000000);
                     long startNs = System.nanoTime();
                     wait(ms, ns);
-                    timeoutNs -= System.nanoTime() - startNs;
+                    nanosTimeout -= System.nanoTime() - startNs;
                 }
 
-                return timeoutNs;
+                return nanosTimeout;
             }
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            throw new TransactionInterruptedException(ex);
+            throw new RetryInterruptedException(ex);
         }
     }
 
@@ -172,6 +168,6 @@ public final class CheapLatch implements Latch {
 
     @Override
     public String toString() {
-        return format("CheapLatch(open=%s)", isOpen);
+        return format("DefaultRetryLatch(open=%s, era=%s)", isOpen, era);
     }
 }

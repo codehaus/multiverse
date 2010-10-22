@@ -481,7 +481,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract void hardReset();
 
-    protected final void awaitUpdate(final CheapLatch latch){
+    protected final void awaitUpdate(final DefaultRetryLatch latch){
        final long lockEra = latch.getEra();
 
        try {
@@ -508,7 +508,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
                 }
             }
        } finally {
-           pool.putCheapLatch(latch);
+           pool.putDefaultRetryLatch(latch);
        }
    }
 
@@ -531,7 +531,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 #end
 
     public abstract ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} open(${ref.name}${ref.typeParameter} ref);
-    
+
     public abstract ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForRead(${ref.name}${ref.typeParameter} ref, int lockMode);
 
     public abstract ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForWrite(${ref.name}${ref.typeParameter} ref, int lockMode);

@@ -2,7 +2,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.blocking.CheapLatch;
+import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
@@ -39,7 +39,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        CheapLatch latch = new CheapLatch();
+        DefaultRetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
         LongRefTranlocal load = ref.___newTranlocal();
         ref.___load(1, null, LOCKMODE_NONE, load);

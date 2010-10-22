@@ -2,7 +2,7 @@ package org.multiverse.stms.beta;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.blocking.CheapLatch;
+import org.multiverse.api.blocking.DefaultRetryLatch;
 
 import static org.junit.Assert.*;
 
@@ -21,7 +21,7 @@ public class BetaObjectPool_listenersTest {
 
     @Test
     public void whenPutInPool_thenPreparedForPooling() {
-        CheapLatch latch = new CheapLatch();
+        DefaultRetryLatch latch = new DefaultRetryLatch();
         latch.prepareForPooling();
 
         Listeners next = new Listeners();

@@ -2,8 +2,31 @@ package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Test;
+import org.multiverse.TestThread;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.blocking.RetryLatch;
+import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.RetryNotAllowedException;
+import org.multiverse.api.exceptions.RetryNotPossibleException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.functions.LongFunction;
+import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
+import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
+import static org.mockito.Mockito.mock;
+import static org.multiverse.TestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 @Ignore
 public abstract class BetaTransaction_retryTest implements BetaStmConstants {
@@ -24,7 +47,6 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
 
     public abstract int getTransactionMaxCapacity();
 
-    /*
     @Test
     public void whenMultipleReads_thenMultipleRegisters() {
         assumeTrue(getTransactionMaxCapacity() >= 3);
@@ -38,14 +60,31 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         tx.openForRead(ref2, LOCKMODE_NONE);
         tx.openForRead(ref3, LOCKMODE_NONE);
 
-        Latch latch = new CheapLatch();
-        tx.retry(latch);
+        RetryThread thread = new RetryThread(tx);
+        thread.start();
+
+        sleepMs(500);
 
         assertIsAborted(tx);
+        RetryLatch latch = getFirstListener(ref1);
+
         assertFalse(latch.isOpen());
         assertHasListeners(ref1, latch);
         assertHasListeners(ref2, latch);
         assertHasListeners(ref3, latch);
+    }
+
+    class RetryThread extends TestThread {
+        final Transaction tx;
+
+        RetryThread(Transaction tx) {
+            this.tx = tx;
+        }
+
+        @Override
+        public void doRun() throws Exception {
+            tx.retry();
+        }
     }
 
     @Test
@@ -59,11 +98,10 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaTransaction tx = newTransaction();
         tx.commute(ref, function);
 
-        Latch listener = new CheapLatch();
         try {
-            tx.retry(listener);
+            tx.retry();
             fail();
-        } catch (NoRetryPossibleException expected) {
+        } catch (RetryNotPossibleException expected) {
         }
 
         assertIsAborted(tx);
@@ -76,12 +114,11 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
     @Test
     public void whenNoReads_thenNoRetryPossibleException() {
         BetaTransaction tx = newTransaction();
-        Latch latch = new CheapLatch();
 
         try {
-            tx.retry(latch);
+            tx.retry();
             fail();
-        } catch (NoRetryPossibleException expected) {
+        } catch (RetryNotPossibleException expected) {
         }
 
         assertIsAborted(tx);
@@ -97,12 +134,10 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaTransaction tx = newTransaction(config);
         tx.openForRead(ref, LOCKMODE_NONE);
 
-        Latch latch = new CheapLatch();
-
         try {
-            tx.retry(latch);
+            tx.retry();
             fail();
-        } catch (NoBlockingRetryAllowedException expected) {
+        } catch (RetryNotAllowedException expected) {
         }
 
         assertIsAborted(tx);
@@ -115,8 +150,12 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaTransaction tx = newTransaction();
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
-        Latch latch = new CheapLatch();
-        tx.retry(latch);
+        RetryThread thread = new RetryThread(tx);
+        thread.start();
+
+        sleepMs(500);
+
+        RetryLatch latch = getFirstListener(ref);
 
         assertFalse(latch.isOpen());
         assertSurplus(0, ref);
@@ -132,8 +171,12 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaTransaction tx = newTransaction();
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_COMMIT);
 
-        Latch latch = new CheapLatch();
-        tx.retry(latch);
+        RetryThread thread = new RetryThread(tx);
+        thread.start();
+
+        sleepMs(500);
+
+        RetryLatch latch = getFirstListener(ref);
 
         assertSurplus(0, ref);
         assertFalse(latch.isOpen());
@@ -149,8 +192,12 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaTransaction tx = newTransaction();
         LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
-        Latch latch = new CheapLatch();
-        tx.retry(latch);
+        RetryThread thread = new RetryThread(tx);
+        thread.start();
+
+        sleepMs(500);
+
+        RetryLatch latch = getFirstListener(ref);
 
         assertFalse(latch.isOpen());
         assertIsAborted(tx);
@@ -164,10 +211,14 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        tx.openForWrite(ref, LOCKMODE_COMMIT);
 
-        Latch latch = new CheapLatch();
-        tx.retry(latch);
+        RetryThread thread = new RetryThread(tx);
+        thread.start();
+
+        sleepMs(500);
+
+        RetryLatch latch = getFirstListener(ref);
 
         assertFalse(latch.isOpen());
         assertIsAborted(tx);
@@ -182,11 +233,10 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaLongRef ref = new BetaLongRef(tx);
         tx.openForConstruction(ref);
 
-        Latch listener = new CheapLatch();
         try {
-            tx.retry(listener);
+            tx.retry();
             fail();
-        } catch (NoRetryPossibleException expected) {
+        } catch (RetryNotPossibleException expected) {
         }
 
         assertIsAborted(tx);
@@ -205,14 +255,17 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 
-        Latch latch = new CheapLatch();
-
         BetaTransaction tx = newTransaction();
         BetaLongRef ref3 = new BetaLongRef(tx);
         tx.openForRead(ref1, LOCKMODE_NONE);
         LongRefTranlocal write3 = tx.openForConstruction(ref3);
         tx.openForWrite(ref2, LOCKMODE_NONE);
-        tx.retry(latch);
+        RetryThread thread = new RetryThread(tx);
+        thread.start();
+
+        sleepMs(500);
+
+        RetryLatch latch = getFirstListener(ref1);
 
         assertIsAborted(tx);
         assertHasNoListeners(ref3);
@@ -228,11 +281,16 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
 
         TransactionLifecycleListenerMock listenerMock = new TransactionLifecycleListenerMock();
         BetaTransaction tx = newTransaction();
-        Latch latch = new CheapLatch();
+
         tx.register(listenerMock);
         tx.openForRead(ref, LOCKMODE_NONE);
 
-        tx.retry(latch);
+        RetryThread thread = new RetryThread(tx);
+        thread.start();
+
+        sleepMs(500);
+
+        RetryLatch latch = getFirstListener(ref);
 
         assertEquals(1, listenerMock.events.size());
         assertEquals(TransactionLifecycleEvent.PostAbort, listenerMock.events.get(0));
@@ -248,13 +306,60 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .addPermanentListener(listenerMock);
         BetaTransaction tx = newTransaction(config);
-        Latch latch = new CheapLatch();
         tx.openForRead(ref, LOCKMODE_NONE);
 
-        tx.retry(latch);
+        RetryThread thread = new RetryThread(tx);
+        thread.start();
+
+        sleepMs(500);
 
         assertEquals(1, listenerMock.events.size());
         assertEquals(TransactionLifecycleEvent.PostAbort, listenerMock.events.get(0));
+    }
+
+    @Test
+    public void whenAlreadyPrepared_thenPreparedTransactionException() {
+        RetryLatch latch = mock(RetryLatch.class);
+        BetaTransaction tx = newTransaction();
+        tx.prepare();
+
+        try {
+            tx.retry();
+            fail();
+        } catch (PreparedTransactionException expected) {
+        }
+
+        assertIsAborted(tx);
+    }
+
+    @Test
+    public void whenCommitted_thenDeadTransactionException() {
+        RetryLatch latch = mock(RetryLatch.class);
+        BetaTransaction tx = newTransaction();
+        tx.commit();
+
+        try {
+            tx.retry();
+            fail();
+        } catch (DeadTransactionException expected) {
+        }
+
+        assertIsCommitted(tx);
+    }
+
+    @Test
+    public void whenAborted_thenDeadTransactionException() {
+        RetryLatch latch = mock(RetryLatch.class);
+        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
+        tx.abort();
+
+        try {
+            tx.retry();
+            fail();
+        } catch (DeadTransactionException expected) {
+        }
+
+        assertIsAborted(tx);
     }
 
     class TransactionLifecycleListenerMock implements TransactionLifecycleListener {
@@ -268,51 +373,4 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         }
     }
 
-    @Test
-    public void whenAlreadyPrepared_thenPreparedTransactionException() {
-        Latch latch = mock(Latch.class);
-        BetaTransaction tx = newTransaction();
-        tx.prepare();
-
-        try {
-            tx.retry(latch);
-            fail();
-        } catch (PreparedTransactionException expected) {
-        }
-
-        assertIsAborted(tx);
-        verifyZeroInteractions(latch);
-    }
-
-    @Test
-    public void whenCommitted_thenDeadTransactionException() {
-        Latch latch = mock(Latch.class);
-        BetaTransaction tx = newTransaction();
-        tx.commit();
-
-        try {
-            tx.retry(latch);
-            fail();
-        } catch (DeadTransactionException expected) {
-        }
-
-        assertIsCommitted(tx);
-        verifyZeroInteractions(latch);
-    }
-
-    @Test
-    public void whenAborted_thenDeadTransactionException() {
-        Latch latch = mock(Latch.class);
-        FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.abort();
-
-        try {
-            tx.retry(latch);
-            fail();
-        } catch (DeadTransactionException expected) {
-        }
-
-        assertIsAborted(tx);
-        verifyZeroInteractions(latch);
-    } */
 }

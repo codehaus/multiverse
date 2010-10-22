@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.Watch;
-import org.multiverse.api.blocking.CheapLatch;
+import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
@@ -23,7 +23,7 @@ import static java.lang.String.format;
  */
 public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
-    private Tranlocal attached;  
+    private Tranlocal attached;
 
     public LeanMonoBetaTransaction(final BetaStm stm){
         this(new BetaTransactionConfiguration(stm).init());
@@ -72,7 +72,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(ref == null){
            throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm() != config.stm){
             throw abortOnStmMismatch(ref);
         }
@@ -297,7 +297,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(ref == null){
            throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm() != config.stm){
             throw abortOnStmMismatch(ref);
         }
@@ -522,7 +522,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(ref == null){
            throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm() != config.stm){
             throw abortOnStmMismatch(ref);
         }
@@ -747,7 +747,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(ref == null){
            throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm() != config.stm){
             throw abortOnStmMismatch(ref);
         }
@@ -972,7 +972,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(ref == null){
            throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm() != config.stm){
             throw abortOnStmMismatch(ref);
         }
@@ -1193,7 +1193,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         if(ref == null){
            throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm() != config.stm){
             throw abortOnStmMismatch(ref);
         }
@@ -1406,7 +1406,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         throw SpeculativeConfigurationError.INSTANCE;
      }
 
- 
+
     @Override
     public Tranlocal get(BetaTransactionalObject object){
         return attached == null || attached.owner!= object? null: attached;
@@ -1552,9 +1552,9 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOnNoRetryPossible();
         }
 
-        CheapLatch listener = pool.takeCheapLatch();
+        DefaultRetryLatch listener = pool.takeDefaultRetryLatch();
         if(listener == null){
-            listener = new CheapLatch();
+            listener = new DefaultRetryLatch();
         }
 
         try{
@@ -1574,7 +1574,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             awaitUpdate(listener);
             throw Retry.INSTANCE;
         }finally{
-            pool.putCheapLatch(listener);
+            pool.putDefaultRetryLatch(listener);
         }
     }
 

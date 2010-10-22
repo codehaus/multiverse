@@ -33,7 +33,7 @@ public enum PropagationLevel {
 
     /**
      * Indicates that no active transaction should be available. If a transaction is found,
-     * a {@link org.multiverse.api.exceptions.NoTransactionAllowedException} is thrown.
+     * a {@link org.multiverse.api.exceptions.TransactionNotAllowedException} is thrown.
      */
     Never
 }

@@ -2,8 +2,8 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.blocking.CheapLatch;
-import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.blocking.DefaultRetryLatch;
+import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
@@ -40,7 +40,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         tx.commute(ref, function);
 
-        Latch latch = new CheapLatch();
+        RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
         int result = ref.___registerChangeListener(latch, tranlocal, pool, listenerEra);
@@ -63,7 +63,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         write.value++;
         otherTx.commit();
 
-        Latch latch = new CheapLatch();
+        RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
         int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
 
@@ -83,7 +83,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.privatize(otherTx);
 
-        Latch latch = new CheapLatch();
+        RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
         int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
 
@@ -108,7 +108,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.ensure(otherTx);
 
-        Latch latch = new CheapLatch();
+        RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
         int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
 
@@ -135,7 +135,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.privatize(otherTx);
 
-        Latch latch = new CheapLatch();
+        RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
         int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
 
@@ -163,7 +163,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         BetaTransaction otherTx = stm.startDefaultTransaction();
         ref.ensure(otherTx);
 
-        Latch latch = new CheapLatch();
+        RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
         int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
 
@@ -184,7 +184,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         BetaLongRef ref = new BetaLongRef(tx);
         LongRefTranlocal read = tx.openForConstruction(ref);
 
-        Latch latch = new CheapLatch();
+        RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
         int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
 
@@ -200,7 +200,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         BetaTransaction tx = stm.startDefaultTransaction();
         LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
-        Latch latch = new CheapLatch();
+        RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
         int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
 
@@ -220,14 +220,14 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         BetaTransaction tx1 = stm.startDefaultTransaction();
         LongRefTranlocal read1 = tx1.openForRead(ref, LOCKMODE_NONE);
 
-        Latch latch1 = new CheapLatch();
+        RetryLatch latch1 = new DefaultRetryLatch();
         long listenerEra1 = latch1.getEra();
         ref.___registerChangeListener(latch1, read1, pool, listenerEra1);
 
         BetaTransaction tx2 = stm.startDefaultTransaction();
         LongRefTranlocal read2 = tx2.openForRead(ref, LOCKMODE_NONE);
 
-        Latch latch2 = new CheapLatch();
+        RetryLatch latch2 = new DefaultRetryLatch();
         long listenerEra2 = latch2.getEra();
         int result = ref.___registerChangeListener(latch2, read2, pool, listenerEra2);
 

@@ -2,7 +2,7 @@ package org.multiverse.stms.beta;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.blocking.RetryLatch;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -17,8 +17,8 @@ public class Listeners_openAllTest {
 
     @Test
     public void test() {
-        Latch latch1 = mock(Latch.class);
-        Latch latch2 = mock(Latch.class);
+        RetryLatch latch1 = mock(RetryLatch.class);
+        RetryLatch latch2 = mock(RetryLatch.class);
 
         Listeners listeners = new Listeners();
         listeners.listener = latch1;

@@ -5,8 +5,8 @@ import org.junit.Test;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.api.exceptions.NoBlockingRetryAllowedException;
-import org.multiverse.api.exceptions.NoRetryPossibleException;
+import org.multiverse.api.exceptions.RetryNotAllowedException;
+import org.multiverse.api.exceptions.RetryNotPossibleException;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.references.LongRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -34,7 +34,7 @@ public class NoBlockingTest {
                 }
             });
             fail();
-        } catch (NoRetryPossibleException expected) {
+        } catch (RetryNotPossibleException expected) {
         }
     }
 
@@ -51,7 +51,7 @@ public class NoBlockingTest {
                 }
             });
             fail();
-        } catch (NoRetryPossibleException expected) {
+        } catch (RetryNotPossibleException expected) {
         }
     }
 
@@ -68,7 +68,7 @@ public class NoBlockingTest {
                 }
             });
             fail();
-        } catch (NoRetryPossibleException expected) {
+        } catch (RetryNotPossibleException expected) {
         }
     }
 
@@ -90,7 +90,7 @@ public class NoBlockingTest {
                 }
             });
             fail();
-        } catch (NoBlockingRetryAllowedException expected) {
+        } catch (RetryNotAllowedException expected) {
         }
 
         assertEquals(0, ref.atomicGet());

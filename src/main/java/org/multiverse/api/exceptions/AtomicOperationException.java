@@ -1,11 +1,11 @@
 package org.multiverse.api.exceptions;
 
 /**
- * An {@link TransactionalExecutionException} that indicates that an atomic operation so one with
+ * An {@link TransactionExecutionException} that indicates that an atomic operation so one with
  *
  * @author Peter Veentjer.
  */
-public class AtomicOperationException extends TransactionalExecutionException {
+public class AtomicOperationException extends TransactionExecutionException {
 
     /**
      * Creates a new AtomicOperationException.
@@ -23,15 +23,20 @@ public class AtomicOperationException extends TransactionalExecutionException {
     }
 
     /**
-     * Creates a new Atomic
+     * Creates a new AtomicOperationException with the provided message and cause.
      *
-     * @param message
-     * @param cause
+     * @param message  the message
+     * @param cause the cause of the message
      */
     public AtomicOperationException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Creates a new AtomicOperationException with the provided message and cause.
+     *
+     * @param cause the cause of the exception.
+     */
     public AtomicOperationException(Throwable cause) {
         super(cause);
     }

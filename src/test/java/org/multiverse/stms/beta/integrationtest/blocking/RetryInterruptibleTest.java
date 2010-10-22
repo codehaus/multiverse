@@ -6,7 +6,7 @@ import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.api.exceptions.TransactionInterruptedException;
+import org.multiverse.api.exceptions.RetryInterruptedException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -51,7 +51,7 @@ public class RetryInterruptibleTest {
         public void doRun() throws Exception {
             try {
                 await();
-            } catch (TransactionInterruptedException e) {
+            } catch (RetryInterruptedException e) {
                 wasInterrupted = true;
             }
         }

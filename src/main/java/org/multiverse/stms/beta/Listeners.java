@@ -1,6 +1,6 @@
 package org.multiverse.stms.beta;
 
-import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.blocking.RetryLatch;
 
 /**
  * A Listeners object contains all the Latches of blockingAllowed transactions that listen to a write on a
@@ -18,7 +18,7 @@ import org.multiverse.api.blocking.Latch;
 public final class Listeners {
 
     public Listeners next;
-    public Latch listener;
+    public RetryLatch listener;
     public long listenerEra;
     public String threadName;
 

@@ -1,20 +1,17 @@
 package org.multiverse.api.exceptions;
 
 /**
- * An {@link RetryException} that indicates that a retry is done, without the
- * possibility of progress, for example when the readset is empty.
- * <p/>
- * No reason to createReference a singleton for performance reasons since this exception should not
- * occur. So if it does, we want a complete stacktrace.
+ * A {@link RetryException} that indicates that a retry is done, without the possibility of progress, for
+ * example when the readset of a transaction is empty.
  *
  * @author Peter Veentjer.
  */
-public class NoRetryPossibleException extends RetryException {
+public class RetryNotPossibleException extends RetryException {
 
     /**
      * Creates a new NoRetryPossibleException.
      */
-    public NoRetryPossibleException() {
+    public RetryNotPossibleException() {
     }
 
     /**
@@ -22,7 +19,7 @@ public class NoRetryPossibleException extends RetryException {
      *
      * @param message the message of the exception.
      */
-    public NoRetryPossibleException(String message) {
+    public RetryNotPossibleException(String message) {
         super(message);
     }
 
@@ -32,7 +29,7 @@ public class NoRetryPossibleException extends RetryException {
      * @param message the message of the exception.
      * @param cause   the cause of the exception.
      */
-    public NoRetryPossibleException(String message, Throwable cause) {
+    public RetryNotPossibleException(String message, Throwable cause) {
         super(message, cause);
     }
 }

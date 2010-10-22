@@ -2,7 +2,7 @@ package org.multiverse;
 
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionStatus;
-import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.functions.Function;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
@@ -90,15 +90,15 @@ public class TestUtils implements MultiverseConstants {
         assertEquals(Arrays.asList(listeners), l);
     }
 
-    public static void assertEra(Latch latch, long era) {
+    public static void assertEra(RetryLatch latch, long era) {
         assertEquals(era, latch.getEra());
     }
 
-    public static void assertOpen(Latch latch) {
+    public static void assertOpen(RetryLatch latch) {
         assertTrue(latch.isOpen());
     }
 
-    public static void assertClosed(Latch latch) {
+    public static void assertClosed(RetryLatch latch) {
         assertFalse(latch.isOpen());
     }
 
@@ -126,10 +126,10 @@ public class TestUtils implements MultiverseConstants {
         }
     }
 
-    public static void assertHasListeners(BetaTransactionalObject ref, Latch... listeners) {
-        Set<Latch> expected = new HashSet<Latch>(Arrays.asList(listeners));
+    public static void assertHasListeners(BetaTransactionalObject ref, RetryLatch... listeners) {
+        Set<RetryLatch> expected = new HashSet<RetryLatch>(Arrays.asList(listeners));
 
-        Set<Latch> found = new HashSet<Latch>();
+        Set<RetryLatch> found = new HashSet<RetryLatch>();
         Listeners l = (Listeners) getField(ref, "___listeners");
         while (l != null) {
             found.add(l.listener);

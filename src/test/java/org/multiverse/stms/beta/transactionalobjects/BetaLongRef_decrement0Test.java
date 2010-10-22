@@ -34,6 +34,7 @@ public class BetaLongRef_decrement0Test {
 
         tx.commit();
 
+        assertRefHasNoLocks(ref);
         assertIsCommitted(tx);
         assertVersionAndValue(ref, initialVersion + 1, initialValue - 1);
     }
@@ -57,6 +58,7 @@ public class BetaLongRef_decrement0Test {
         } catch (ReadonlyException expected) {
         }
 
+        assertRefHasNoLocks(ref);
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -127,6 +129,7 @@ public class BetaLongRef_decrement0Test {
         } catch (DeadTransactionException expected) {
         }
 
+        assertRefHasNoLocks(ref);
         assertIsCommitted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -147,6 +150,7 @@ public class BetaLongRef_decrement0Test {
         } catch (DeadTransactionException expected) {
         }
 
+        assertRefHasNoLocks(ref);
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -167,6 +171,7 @@ public class BetaLongRef_decrement0Test {
         } catch (PreparedTransactionException expected) {
         }
 
+        assertRefHasNoLocks(ref);
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -183,6 +188,7 @@ public class BetaLongRef_decrement0Test {
         } catch (TransactionRequiredException expected) {
         }
 
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -204,6 +210,7 @@ public class BetaLongRef_decrement0Test {
 
         joinAll(thread);
 
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue - 1);
     }
 }

@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.Watch;
-import org.multiverse.api.blocking.CheapLatch;
+import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
@@ -97,11 +97,11 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(ref == null){
             throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm()!=config.stm){
             throw abortOnStmMismatch(ref);
         }
-                        
+
         final int index = indexOf(ref);
         if(index != -1){
             return (RefTranlocal<E>)array[index];
@@ -358,11 +358,11 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(ref == null){
             throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm()!=config.stm){
             throw abortOnStmMismatch(ref);
         }
-                        
+
         final int index = indexOf(ref);
         if(index != -1){
             return (IntRefTranlocal)array[index];
@@ -619,11 +619,11 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(ref == null){
             throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm()!=config.stm){
             throw abortOnStmMismatch(ref);
         }
-                        
+
         final int index = indexOf(ref);
         if(index != -1){
             return (BooleanRefTranlocal)array[index];
@@ -880,11 +880,11 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(ref == null){
             throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm()!=config.stm){
             throw abortOnStmMismatch(ref);
         }
-                        
+
         final int index = indexOf(ref);
         if(index != -1){
             return (DoubleRefTranlocal)array[index];
@@ -1141,11 +1141,11 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(ref == null){
             throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm()!=config.stm){
             throw abortOnStmMismatch(ref);
         }
-                        
+
         final int index = indexOf(ref);
         if(index != -1){
             return (LongRefTranlocal)array[index];
@@ -1399,11 +1399,11 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         if(ref == null){
             throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm()!=config.stm){
             throw abortOnStmMismatch(ref);
         }
-                        
+
         final int index = indexOf(ref);
         if(index != -1){
             return (Tranlocal)array[index];
@@ -1647,7 +1647,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         throw SpeculativeConfigurationError.INSTANCE;
   }
 
- 
+
     @Override
     public Tranlocal get(BetaTransactionalObject owner){
         int indexOf = indexOf(owner);
@@ -1918,9 +1918,9 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnNoRetryPossible();
         }
 
-        CheapLatch listener = pool.takeCheapLatch();
+        DefaultRetryLatch listener = pool.takeDefaultRetryLatch();
         if(listener == null){
-            listener = new CheapLatch();
+            listener = new DefaultRetryLatch();
         }
 
         try{
@@ -1963,7 +1963,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             awaitUpdate(listener);
             throw Retry.INSTANCE;
         }finally{
-            pool.putCheapLatch(listener);
+            pool.putDefaultRetryLatch(listener);
         }
     }
 

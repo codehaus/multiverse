@@ -1,6 +1,6 @@
 package org.multiverse.stms.beta;
 
-import org.multiverse.api.blocking.CheapLatch;
+import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
 import java.util.ArrayList;
@@ -67,7 +67,7 @@ public final class BetaObjectPool {
     private int lastUsedBetaLongRef = -1;
     private TranlocalPool[] pools = new TranlocalPool[100];
 
-    private CheapLatch[] cheapLatchPool = new CheapLatch[10];
+    private DefaultRetryLatch[] cheapLatchPool = new DefaultRetryLatch[10];
     private int cheapLatchPoolIndex = -1;
 
     private Listeners[] listenersPool = new Listeners[100];
@@ -540,12 +540,12 @@ public final class BetaObjectPool {
      *
      * @return the CheapLatch from the pool, or null if none available.
      */
-    public CheapLatch takeCheapLatch(){
+    public DefaultRetryLatch takeDefaultRetryLatch(){
         if(!latchPoolingEnabled || cheapLatchPoolIndex == -1){
             return null;
         }
 
-        CheapLatch latch = cheapLatchPool[cheapLatchPoolIndex];
+        DefaultRetryLatch latch = cheapLatchPool[cheapLatchPoolIndex];
         cheapLatchPool[cheapLatchPoolIndex]=null;
         cheapLatchPoolIndex--;
         return latch;
@@ -557,7 +557,7 @@ public final class BetaObjectPool {
      * @param latch the CheapLatch to pool.
      * @throws NullPointerException if latch is null.
      */
-    public void putCheapLatch(CheapLatch latch){
+    public void putDefaultRetryLatch(DefaultRetryLatch latch){
         if(latch == null){
             throw new NullPointerException();
         }

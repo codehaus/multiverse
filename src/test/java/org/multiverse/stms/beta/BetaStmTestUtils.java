@@ -1,5 +1,6 @@
 package org.multiverse.stms.beta;
 
+import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.stms.beta.transactionalobjects.*;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
@@ -7,12 +8,21 @@ import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertEqualsDouble;
+import static org.multiverse.TestUtils.getField;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
  * @author Peter Veentjer
  */
 public class BetaStmTestUtils implements BetaStmConstants {
+
+    public static RetryLatch getFirstListener(BetaLongRef ref) {
+        Listeners listeners = (Listeners) getField(ref, "___listeners");
+        assertNotNull(listeners);
+        RetryLatch latch = listeners.listener;
+        assertNotNull(latch);
+        return latch;
+    }
 
     public static void assertRefHasNoLocks(VeryAbstractBetaTransactionalObject ref) {
         assertNull(ref.___getLockOwner());

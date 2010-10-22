@@ -19,6 +19,7 @@ import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
+
 public class PingPongStressTest {
 
     private volatile boolean stop = false;

@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.TransactionalObject;
-import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.durability.DurableObject;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.Listeners;
@@ -124,7 +124,7 @@ public interface BetaTransactionalObject extends DurableObject, TransactionalObj
      * @param lockEra   the era of the lock when it when it 'started'. LockEra is needed for lock pooling.
      * @return true if there already is write has happened an no further registration is needed.
      */
-    int ___registerChangeListener(Latch latch, Tranlocal tranlocal, BetaObjectPool pool, long lockEra);
+    int ___registerChangeListener(RetryLatch latch, Tranlocal tranlocal, BetaObjectPool pool, long lockEra);
 
     /**
      * Returns the identity hash of this object. Once calculated it should be cached so that it

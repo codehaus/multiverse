@@ -22,6 +22,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 import static org.multiverse.api.predicates.LongPredicate.newEqualsPredicate;
 import static org.multiverse.api.predicates.LongPredicate.newLargerThanOrEqualsPredicate;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasNoLocks;
 import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
@@ -52,6 +53,7 @@ public class BetaLongRef_await1WithPredicateTest {
         }
 
         assertIsActive(tx);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -67,6 +69,7 @@ public class BetaLongRef_await1WithPredicateTest {
         ref.await(newEqualsPredicate(initialValue));
 
         assertIsActive(tx);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -90,6 +93,7 @@ public class BetaLongRef_await1WithPredicateTest {
         }
 
         assertIsAborted(tx);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -112,6 +116,7 @@ public class BetaLongRef_await1WithPredicateTest {
         }
 
         assertIsAborted(tx);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -130,6 +135,7 @@ public class BetaLongRef_await1WithPredicateTest {
         }
 
         verifyZeroInteractions(predicate);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -152,6 +158,7 @@ public class BetaLongRef_await1WithPredicateTest {
 
         assertIsAborted(tx);
         verifyZeroInteractions(predicate);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -173,6 +180,7 @@ public class BetaLongRef_await1WithPredicateTest {
         }
 
         assertIsAborted(tx);
+        assertRefHasNoLocks(ref);
         verifyZeroInteractions(predicate);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -195,6 +203,7 @@ public class BetaLongRef_await1WithPredicateTest {
         }
 
         assertIsCommitted(tx);
+        assertRefHasNoLocks(ref);
         verifyZeroInteractions(predicate);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -205,8 +214,8 @@ public class BetaLongRef_await1WithPredicateTest {
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        AwaitThread thread1 = new AwaitThread(0, 10, ref);
-        AwaitThread thread2 = new AwaitThread(1, 20, ref);
+        LongRefAwaitThread thread1 = new LongRefAwaitThread(ref, 10);
+        LongRefAwaitThread thread2 = new LongRefAwaitThread(ref, 20);
         thread1.start();
         thread2.start();
 
@@ -227,27 +236,9 @@ public class BetaLongRef_await1WithPredicateTest {
         assertNotAlive(thread2);
         thread2.assertNothingThrown();
 
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 2, 20);
     }
 
-    public class AwaitThread extends TestThread {
-        private long minimumValue;
-        private LongRef ref;
 
-        public AwaitThread(int id, long minimumValue, LongRef ref) {
-            super("AwaitThread-" + id);
-            this.minimumValue = minimumValue;
-            this.ref = ref;
-        }
-
-        @Override
-        public void doRun() throws Exception {
-            execute(new AtomicVoidClosure() {
-                @Override
-                public void execute(Transaction tx) throws Exception {
-                    ref.await(newLargerThanOrEqualsPredicate(minimumValue));
-                }
-            });
-        }
-    }
 }

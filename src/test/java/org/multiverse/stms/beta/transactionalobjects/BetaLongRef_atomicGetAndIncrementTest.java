@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 
 public class BetaLongRef_atomicGetAndIncrementTest {
     private BetaStm stm;
@@ -26,35 +26,39 @@ public class BetaLongRef_atomicGetAndIncrementTest {
 
     @Test
     public void whenSuccess() {
-        BetaLongRef ref = newLongRef(stm, 2);
+        int initialValue = 2;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         long result = ref.atomicGetAndIncrement(1);
-        assertEquals(2, result);
-        assertEquals(3, ref.atomicGet());
-        assertHasNoCommitLock(ref);
+
+        assertEquals(initialValue , result);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertNull(getThreadLocalTransaction());
     }
 
     @Test
     public void whenNoChange() {
-        BetaLongRef ref = newLongRef(stm, 2);
-        long version = ref.getVersion();
+        int initialValue = 2;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         long result = ref.atomicGetAndIncrement(0);
 
-        assertEquals(2, result);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertEquals(initialValue, result);
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertNull(getThreadLocalTransaction());
-        assertVersionAndValue(ref, version, 2);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
     public void whenActiveTransactionAvailable_thenIgnored() {
         int initialValue = 2;
         BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -62,9 +66,8 @@ public class BetaLongRef_atomicGetAndIncrementTest {
 
         long result = ref.atomicGetAndIncrement(1);
 
-        assertEquals(2, result);
-        assertEquals(3, ref.atomicGet());
-        assertHasNoCommitLock(ref);
+        assertEquals(initialValue, result);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
         assertSurplus(1, ref);
         assertSame(tx, getThreadLocalTransaction());
         assertIsActive(tx);
@@ -129,6 +132,4 @@ public class BetaLongRef_atomicGetAndIncrementTest {
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + amount);
     }
-
-
 }

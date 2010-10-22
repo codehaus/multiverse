@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.*;
-import org.multiverse.api.blocking.CheapLatch;
+import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.*;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
@@ -181,16 +181,16 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
                 config.familyName));
     }
 
-    public final NoRetryPossibleException abortOnNoRetryPossible(){
+    public final RetryNotPossibleException abortOnNoRetryPossible(){
         abort();
-        throw new NoRetryPossibleException(
+        throw new RetryNotPossibleException(
             format("[%s] Can't block transaction since there are no tracked reads",
                 config.familyName));
     }
 
-    public final NoBlockingRetryAllowedException abortOnNoBlockingAllowed(){
+    public final RetryNotAllowedException abortOnNoBlockingAllowed(){
         abort();
-        return new NoBlockingRetryAllowedException(
+        return new RetryNotAllowedException(
             format("[%s] Can't block transaction since it doesn't allow blocking",
                 config.familyName));
     }
@@ -484,7 +484,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract void hardReset();
 
-    protected final void awaitUpdate(final CheapLatch latch){
+    protected final void awaitUpdate(final DefaultRetryLatch latch){
        final long lockEra = latch.getEra();
 
        try {
@@ -496,10 +496,10 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
                 }
             }else{
                 if (config.isInterruptible()) {
-                    remainingTimeoutNs = latch.tryAwait(
+                    remainingTimeoutNs = latch.awaitNanos(
                         lockEra, remainingTimeoutNs);
                 } else {
-                    remainingTimeoutNs = latch.tryAwaitUninterruptible(
+                    remainingTimeoutNs = latch.awaitNanosUninterruptible(
                         lockEra, remainingTimeoutNs);
                 }
 
@@ -511,7 +511,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
                 }
             }
        } finally {
-           pool.putCheapLatch(latch);
+           pool.putDefaultRetryLatch(latch);
        }
    }
 
@@ -531,7 +531,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
 
     public abstract <E> RefTranlocal<E> open(BetaRef<E> ref);
-    
+
     public abstract <E> RefTranlocal<E> openForRead(BetaRef<E> ref, int lockMode);
 
     public abstract <E> RefTranlocal<E> openForWrite(BetaRef<E> ref, int lockMode);
@@ -544,7 +544,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
 
     public abstract  IntRefTranlocal open(BetaIntRef ref);
-    
+
     public abstract  IntRefTranlocal openForRead(BetaIntRef ref, int lockMode);
 
     public abstract  IntRefTranlocal openForWrite(BetaIntRef ref, int lockMode);
@@ -557,7 +557,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
 
     public abstract  BooleanRefTranlocal open(BetaBooleanRef ref);
-    
+
     public abstract  BooleanRefTranlocal openForRead(BetaBooleanRef ref, int lockMode);
 
     public abstract  BooleanRefTranlocal openForWrite(BetaBooleanRef ref, int lockMode);
@@ -570,7 +570,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
 
     public abstract  DoubleRefTranlocal open(BetaDoubleRef ref);
-    
+
     public abstract  DoubleRefTranlocal openForRead(BetaDoubleRef ref, int lockMode);
 
     public abstract  DoubleRefTranlocal openForWrite(BetaDoubleRef ref, int lockMode);
@@ -583,7 +583,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
 
     public abstract  LongRefTranlocal open(BetaLongRef ref);
-    
+
     public abstract  LongRefTranlocal openForRead(BetaLongRef ref, int lockMode);
 
     public abstract  LongRefTranlocal openForWrite(BetaLongRef ref, int lockMode);
@@ -594,7 +594,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
 
     public abstract  Tranlocal open(BetaTransactionalObject ref);
-    
+
     public abstract  Tranlocal openForRead(BetaTransactionalObject ref, int lockMode);
 
     public abstract  Tranlocal openForWrite(BetaTransactionalObject ref, int lockMode);

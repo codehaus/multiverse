@@ -8,8 +8,6 @@ import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.IntRef;
 
-import javax.xml.transform.Templates;
-
 import static junit.framework.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.*;
@@ -36,35 +34,41 @@ public class ProducerConsumerStressTest {
         ProducerThread producerThread = new ProducerThread();
         ConsumerThread consumerThread = new ConsumerThread();
 
-        startAll(producerThread,consumerThread);
+        startAll(producerThread, consumerThread);
         sleepMs(30 * 1000);
         stop = true;
-        joinAll(producerThread,consumerThread);
+        joinAll(producerThread, consumerThread);
 
-        assertEquals(0,buffer.size.atomicGet());
+        assertEquals(producerThread.produced, buffer.size.atomicGet()+consumerThread.consumed);
     }
 
     public class ProducerThread extends TestThread {
+        private int produced;
+
         public ProducerThread() {
             super("ProducerThread");
         }
 
         @Override
         public void doRun() {
-            int k = 0;
+            produced = 0;
             while (!stop) {
-                k++;
-                buffer.put(k);
+                buffer.put(produced);
+                produced++;
 
-                if(k % 100000 == 0){
-                    System.out.printf("%s is at %d\n", getName(),k);
+                if (produced % 1000000 == 0) {
+                    System.out.printf("%s is at %d\n", getName(), produced);
                 }
             }
+
             buffer.put(-1);
+            produced++;
         }
     }
 
     public class ConsumerThread extends TestThread {
+        public int consumed;
+
         public ConsumerThread() {
             super("ConsumerThread");
         }
@@ -72,12 +76,11 @@ public class ProducerConsumerStressTest {
         @Override
         public void doRun() {
             int item;
-            int k = 0;
             do {
                 item = buffer.take();
-                k++;
-                if(k % 100000 == 0){
-                    System.out.printf("%s is at %d\n", getName(),k);
+                consumed++;
+                if (consumed % 1000000 == 0) {
+                    System.out.printf("%s is at %d\n", getName(), consumed);
                 }
             } while (item != -1);
         }

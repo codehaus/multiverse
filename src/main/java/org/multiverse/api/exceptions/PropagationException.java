@@ -6,7 +6,7 @@ package org.multiverse.api.exceptions;
  *
  * @author Peter Veentjer.
  */
-public class PropagationException extends TransactionalExecutionException {
+public class PropagationException extends TransactionExecutionException {
 
     /**
      * Creates a new PropagationException.

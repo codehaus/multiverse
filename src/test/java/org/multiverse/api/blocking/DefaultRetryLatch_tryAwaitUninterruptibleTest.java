@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 
-public class CheapLatch_tryAwaitUninterruptibleTest {
+public class DefaultRetryLatch_tryAwaitUninterruptibleTest {
 
     @Before
     public void setUp() {
@@ -17,27 +17,12 @@ public class CheapLatch_tryAwaitUninterruptibleTest {
     }
 
     @Test
-    public void whenNullTimeUnit_thenNullPointerException() {
-        CheapLatch latch = new CheapLatch();
-        long era = latch.getEra();
-
-        try {
-            latch.tryAwaitUninterruptible(era, 10, null);
-            fail();
-        } catch (NullPointerException expected) {
-        }
-
-        assertEquals(era, latch.getEra());
-        assertClosed(latch);
-    }
-
-    @Test
     public void whenAlreadyOpenAndSameEra() {
-        CheapLatch latch = new CheapLatch();
+        DefaultRetryLatch latch = new DefaultRetryLatch();
         long era = latch.getEra();
         latch.open(era);
 
-        long result = latch.tryAwaitUninterruptible(era, 10, TimeUnit.NANOSECONDS);
+        long result = latch.awaitNanosUninterruptible(era, 10);
 
         assertEquals(10, result);
         assertOpen(latch);
@@ -46,13 +31,13 @@ public class CheapLatch_tryAwaitUninterruptibleTest {
 
     @Test
     public void whenAlreadyOpenAndDifferentEra() {
-        CheapLatch latch = new CheapLatch();
+        DefaultRetryLatch latch = new DefaultRetryLatch();
         long oldEra = latch.getEra();
         latch.prepareForPooling();
         long era = latch.getEra();
         latch.open(era);
 
-        long result = latch.tryAwaitUninterruptible(oldEra, 10, TimeUnit.NANOSECONDS);
+        long result = latch.awaitNanosUninterruptible(oldEra, 10);
 
         assertEquals(10, result);
         assertOpen(latch);
@@ -61,12 +46,12 @@ public class CheapLatch_tryAwaitUninterruptibleTest {
 
     @Test
     public void whenClosedButDifferentEra() {
-        CheapLatch latch = new CheapLatch();
+        DefaultRetryLatch latch = new DefaultRetryLatch();
         long era = latch.getEra();
         latch.prepareForPooling();
 
         long expectedEra = latch.getEra();
-        long result = latch.tryAwaitUninterruptible(era, 10, TimeUnit.NANOSECONDS);
+        long result = latch.awaitNanosUninterruptible(era, 10);
 
         assertEquals(10, result);
         assertEquals(expectedEra, latch.getEra());
@@ -75,7 +60,7 @@ public class CheapLatch_tryAwaitUninterruptibleTest {
 
     @Test
     public void whenSomeWaitingIsNeeded() {
-        CheapLatch latch = new CheapLatch();
+        DefaultRetryLatch latch = new DefaultRetryLatch();
         long era = latch.getEra();
 
         AwaitThread t = new AwaitThread(latch, era, 10, TimeUnit.SECONDS);
@@ -92,7 +77,7 @@ public class CheapLatch_tryAwaitUninterruptibleTest {
 
     @Test
     public void whenTimeout() {
-        CheapLatch latch = new CheapLatch();
+        DefaultRetryLatch latch = new DefaultRetryLatch();
         long era = latch.getEra();
 
         AwaitThread t = new AwaitThread(latch, era, 1, TimeUnit.SECONDS);
@@ -107,11 +92,11 @@ public class CheapLatch_tryAwaitUninterruptibleTest {
 
     @Test
     public void testAlreadyOpenAndNulTimeout() {
-        CheapLatch latch = new CheapLatch();
+        DefaultRetryLatch latch = new DefaultRetryLatch();
         long era = latch.getEra();
         latch.open(era);
 
-        long remaining = latch.tryAwaitUninterruptible(era, 0, TimeUnit.NANOSECONDS);
+        long remaining = latch.awaitNanosUninterruptible(era, 0);
 
         assertEquals(0, remaining);
         assertOpen(latch);
@@ -120,10 +105,10 @@ public class CheapLatch_tryAwaitUninterruptibleTest {
 
     @Test
     public void whenStillClosedAndNulTimeout() {
-        CheapLatch latch = new CheapLatch();
+        DefaultRetryLatch latch = new DefaultRetryLatch();
         long era = latch.getEra();
 
-        long remaining = latch.tryAwaitUninterruptible(era, 0, TimeUnit.NANOSECONDS);
+        long remaining = latch.awaitNanosUninterruptible(era, 0);
 
         assertTrue(remaining < 0);
         assertClosed(latch);
@@ -132,11 +117,11 @@ public class CheapLatch_tryAwaitUninterruptibleTest {
 
     @Test
     public void whenAlreadyOpenAndNegativeTimeout() {
-        CheapLatch latch = new CheapLatch();
+        DefaultRetryLatch latch = new DefaultRetryLatch();
         long era = latch.getEra();
         latch.open(era);
 
-        long remaining = latch.tryAwaitUninterruptible(era, -10, TimeUnit.NANOSECONDS);
+        long remaining = latch.awaitNanosUninterruptible(era, -10);
 
         assertTrue(remaining < 0);
         assertOpen(latch);
@@ -145,10 +130,10 @@ public class CheapLatch_tryAwaitUninterruptibleTest {
 
     @Test
     public void whenStillClosedAndNegativeTimeout() {
-        CheapLatch latch = new CheapLatch();
+        DefaultRetryLatch latch = new DefaultRetryLatch();
         long era = latch.getEra();
 
-        long remaining = latch.tryAwaitUninterruptible(era, -10, TimeUnit.NANOSECONDS);
+        long remaining = latch.awaitNanosUninterruptible(era, -10);
 
         assertTrue(remaining < 0);
         assertClosed(latch);
@@ -158,7 +143,7 @@ public class CheapLatch_tryAwaitUninterruptibleTest {
 
     @Test
     public void whenStartingInterrupted() {
-        CheapLatch latch = new CheapLatch();
+        DefaultRetryLatch latch = new DefaultRetryLatch();
         long era = latch.getEra();
 
         AwaitThread t = new AwaitThread(latch, era, 10, TimeUnit.SECONDS);
@@ -186,7 +171,7 @@ public class CheapLatch_tryAwaitUninterruptibleTest {
 
     @Test
     public void whenInterruptedWhileWaiting() {
-        CheapLatch latch = new CheapLatch();
+        DefaultRetryLatch latch = new DefaultRetryLatch();
         long era = latch.getEra();
 
         AwaitThread t = new AwaitThread(latch, era, 10, TimeUnit.SECONDS);
@@ -215,7 +200,7 @@ public class CheapLatch_tryAwaitUninterruptibleTest {
 
     @Test
     public void whenResetWhileWaiting_thenSleepingThreadsNotified() {
-        CheapLatch latch = new CheapLatch();
+        DefaultRetryLatch latch = new DefaultRetryLatch();
         long era = latch.getEra();
         AwaitThread t = new AwaitThread(latch, era, 10, TimeUnit.SECONDS);
         t.start();
@@ -233,13 +218,13 @@ public class CheapLatch_tryAwaitUninterruptibleTest {
     }
 
     class AwaitThread extends TestThread {
-        private final Latch latch;
+        private final RetryLatch latch;
         private final long expectedEra;
         private long timeout;
         private TimeUnit unit;
         private long result;
 
-        AwaitThread(Latch latch, long expectedEra, long timeout, TimeUnit unit) {
+        AwaitThread(RetryLatch latch, long expectedEra, long timeout, TimeUnit unit) {
             this.latch = latch;
             this.expectedEra = expectedEra;
             this.timeout = timeout;
@@ -248,7 +233,7 @@ public class CheapLatch_tryAwaitUninterruptibleTest {
 
         @Override
         public void doRun() throws Exception {
-            result = latch.tryAwaitUninterruptible(expectedEra, timeout, unit);
+            result = latch.awaitNanosUninterruptible(expectedEra, unit.toNanos(timeout));
         }
     }
 }

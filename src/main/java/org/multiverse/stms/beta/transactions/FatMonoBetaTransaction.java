@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.Watch;
-import org.multiverse.api.blocking.CheapLatch;
+import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.TodoException;
@@ -23,7 +23,7 @@ import static java.lang.String.format;
  */
 public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
-    private Tranlocal attached;  
+    private Tranlocal attached;
     private boolean hasReads;
     private boolean hasUntrackedReads;
     private LocalConflictCounter localConflictCounter;
@@ -108,7 +108,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(ref == null){
            throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm() != config.stm){
             throw abortOnStmMismatch(ref);
         }
@@ -458,7 +458,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(ref == null){
            throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm() != config.stm){
             throw abortOnStmMismatch(ref);
         }
@@ -808,7 +808,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(ref == null){
            throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm() != config.stm){
             throw abortOnStmMismatch(ref);
         }
@@ -1158,7 +1158,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(ref == null){
            throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm() != config.stm){
             throw abortOnStmMismatch(ref);
         }
@@ -1508,7 +1508,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(ref == null){
            throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm() != config.stm){
             throw abortOnStmMismatch(ref);
         }
@@ -1854,7 +1854,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(ref == null){
            throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm() != config.stm){
             throw abortOnStmMismatch(ref);
         }
@@ -2161,7 +2161,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
      }
 
- 
+
     @Override
     public Tranlocal get(BetaTransactionalObject object){
         return attached == null || attached.owner!= object? null: attached;
@@ -2334,9 +2334,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnNoRetryPossible();
         }
 
-        CheapLatch listener = pool.takeCheapLatch();
+        DefaultRetryLatch listener = pool.takeDefaultRetryLatch();
         if(listener == null){
-            listener = new CheapLatch();
+            listener = new DefaultRetryLatch();
         }
 
         try{
@@ -2364,7 +2364,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             awaitUpdate(listener);
             throw Retry.INSTANCE;
         }finally{
-            pool.putCheapLatch(listener);
+            pool.putDefaultRetryLatch(listener);
         }
     }
 

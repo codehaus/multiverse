@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.Watch;
-import org.multiverse.api.blocking.CheapLatch;
+import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.TodoException;
@@ -98,11 +98,11 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(ref == null){
             throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm()!=config.stm){
             throw abortOnStmMismatch(ref);
         }
-                        
+
         final int index = indexOf(ref);
         if(index != -1){
             return (RefTranlocal<E>)array[index];
@@ -432,7 +432,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(tranlocal == null){
             tranlocal = new RefTranlocal<E>(ref);
         }
-        tranlocal.setStatus(STATUS_COMMUTING);        
+        tranlocal.setStatus(STATUS_COMMUTING);
         tranlocal.addCommutingFunction(function, pool);
 
         array[firstFreeIndex] = tranlocal;
@@ -453,11 +453,11 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(ref == null){
             throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm()!=config.stm){
             throw abortOnStmMismatch(ref);
         }
-                        
+
         final int index = indexOf(ref);
         if(index != -1){
             return (IntRefTranlocal)array[index];
@@ -787,7 +787,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(tranlocal == null){
             tranlocal = new IntRefTranlocal(ref);
         }
-        tranlocal.setStatus(STATUS_COMMUTING);        
+        tranlocal.setStatus(STATUS_COMMUTING);
         tranlocal.addCommutingFunction(function, pool);
 
         array[firstFreeIndex] = tranlocal;
@@ -808,11 +808,11 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(ref == null){
             throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm()!=config.stm){
             throw abortOnStmMismatch(ref);
         }
-                        
+
         final int index = indexOf(ref);
         if(index != -1){
             return (BooleanRefTranlocal)array[index];
@@ -1142,7 +1142,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(tranlocal == null){
             tranlocal = new BooleanRefTranlocal(ref);
         }
-        tranlocal.setStatus(STATUS_COMMUTING);        
+        tranlocal.setStatus(STATUS_COMMUTING);
         tranlocal.addCommutingFunction(function, pool);
 
         array[firstFreeIndex] = tranlocal;
@@ -1163,11 +1163,11 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(ref == null){
             throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm()!=config.stm){
             throw abortOnStmMismatch(ref);
         }
-                        
+
         final int index = indexOf(ref);
         if(index != -1){
             return (DoubleRefTranlocal)array[index];
@@ -1497,7 +1497,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(tranlocal == null){
             tranlocal = new DoubleRefTranlocal(ref);
         }
-        tranlocal.setStatus(STATUS_COMMUTING);        
+        tranlocal.setStatus(STATUS_COMMUTING);
         tranlocal.addCommutingFunction(function, pool);
 
         array[firstFreeIndex] = tranlocal;
@@ -1518,11 +1518,11 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(ref == null){
             throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm()!=config.stm){
             throw abortOnStmMismatch(ref);
         }
-                        
+
         final int index = indexOf(ref);
         if(index != -1){
             return (LongRefTranlocal)array[index];
@@ -1852,7 +1852,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(tranlocal == null){
             tranlocal = new LongRefTranlocal(ref);
         }
-        tranlocal.setStatus(STATUS_COMMUTING);        
+        tranlocal.setStatus(STATUS_COMMUTING);
         tranlocal.addCommutingFunction(function, pool);
 
         array[firstFreeIndex] = tranlocal;
@@ -1870,11 +1870,11 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(ref == null){
             throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm()!=config.stm){
             throw abortOnStmMismatch(ref);
         }
-                        
+
         final int index = indexOf(ref);
         if(index != -1){
             return (Tranlocal)array[index];
@@ -2203,7 +2203,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         if(tranlocal == null){
             tranlocal = ref.___newTranlocal();
         }
-        tranlocal.setStatus(STATUS_COMMUTING);        
+        tranlocal.setStatus(STATUS_COMMUTING);
         tranlocal.addCommutingFunction(function, pool);
 
         array[firstFreeIndex] = tranlocal;
@@ -2211,7 +2211,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         hasUpdates = true;
   }
 
- 
+
     @Override
     public Tranlocal get(BetaTransactionalObject owner){
         int indexOf = indexOf(owner);
@@ -2433,7 +2433,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                     throw abortOnWriteConflict();
                 }
             }
-            
+
             status = PREPARED;
             abort = false;
         }finally{
@@ -2487,9 +2487,9 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnNoRetryPossible();
         }
 
-        CheapLatch listener = pool.takeCheapLatch();
+        DefaultRetryLatch listener = pool.takeDefaultRetryLatch();
         if(listener == null){
-            listener = new CheapLatch();
+            listener = new DefaultRetryLatch();
         }
 
         try{
@@ -2539,7 +2539,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             awaitUpdate(listener);
             throw Retry.INSTANCE;
         }finally{
-            pool.putCheapLatch(listener);
+            pool.putDefaultRetryLatch(listener);
         }
     }
 

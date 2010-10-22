@@ -20,7 +20,7 @@ import static java.lang.String.format;
  */
 public final class ${transaction.name} extends ${transaction.superClass} {
 
-    private Tranlocal attached;  
+    private Tranlocal attached;
 #if(!${transaction.lean})
     private boolean hasReads;
     private boolean hasUntrackedReads;
@@ -120,7 +120,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         if(ref == null){
            throw abortOpenOnNull();
         }
-            
+
         if(ref.getStm() != config.stm){
             throw abortOnStmMismatch(ref);
         }
@@ -760,9 +760,9 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOnNoRetryPossible();
         }
 
-        CheapLatch listener = pool.takeCheapLatch();
+        DefaultRetryLatch listener = pool.takeDefaultRetryLatch();
         if(listener == null){
-            listener = new CheapLatch();
+            listener = new DefaultRetryLatch();
         }
 
         try{
@@ -792,7 +792,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             awaitUpdate(listener);
             throw Retry.INSTANCE;
         }finally{
-            pool.putCheapLatch(listener);
+            pool.putDefaultRetryLatch(listener);
         }
     }
 

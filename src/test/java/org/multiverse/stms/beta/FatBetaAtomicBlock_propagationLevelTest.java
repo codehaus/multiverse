@@ -7,7 +7,7 @@ import org.multiverse.api.PropagationLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicIntClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.api.exceptions.NoTransactionAllowedException;
+import org.multiverse.api.exceptions.TransactionNotAllowedException;
 import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -43,7 +43,7 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
         try {
             block.execute(closure);
             fail();
-        } catch (NoTransactionAllowedException expected) {
+        } catch (TransactionNotAllowedException expected) {
         }
 
         verifyZeroInteractions(closure);

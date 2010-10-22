@@ -1,13 +1,13 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link TransactionalExecutionException} that is thrown when the retry fails. The {@link Retry} is thrown when
- * a retry happens, but when a transaction is not allowed to block, or too many retries have happened, this exceptions
- * is thrown. This one is not caught by the AtomicBlock.
+ * A {@link TransactionExecutionException} that is thrown when the retry fails. The {@link Retry} is thrown
+ * when a retry happens, but when a transaction is not allowed to block, or too many retries have happened,
+ * subclasses of this exception are thrown.
  *
  * @author Peter Veentjer.
  */
-public abstract class RetryException extends TransactionalExecutionException {
+public abstract class RetryException extends TransactionExecutionException {
 
     /**
      * Creates a new RetryException.

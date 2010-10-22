@@ -27,6 +27,12 @@ public class TransactionRequiredException extends PropagationException {
         super(message);
     }
 
+    /**
+     * Creates a new TransactionRequiredException
+     *
+     * @param clazz the class of the method where the transaction was required
+     * @param method the name of the method where the transaction was required.
+     */
     public TransactionRequiredException(Class clazz, String method){
         super(format("%s.%s is missing a required transaction", clazz.getName(),method));
     }

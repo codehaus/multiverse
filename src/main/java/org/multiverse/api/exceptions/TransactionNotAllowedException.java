@@ -7,12 +7,12 @@ package org.multiverse.api.exceptions;
  *
  * @author Peter Veentjer.
  */
-public class NoTransactionAllowedException extends PropagationException {
+public class TransactionNotAllowedException extends PropagationException {
 
     /**
      * Creates a new NoTransactionAllowedException.
      */
-    public NoTransactionAllowedException() {
+    public TransactionNotAllowedException() {
     }
 
     /**
@@ -20,7 +20,7 @@ public class NoTransactionAllowedException extends PropagationException {
      *
      * @param message the message for the exception.
      */
-    public NoTransactionAllowedException(String message) {
+    public TransactionNotAllowedException(String message) {
         super(message);
     }
 
@@ -30,7 +30,7 @@ public class NoTransactionAllowedException extends PropagationException {
      * @param message the message of the exception.
      * @param cause   the cause of the Exception.
      */
-    public NoTransactionAllowedException(String message, Throwable cause) {
+    public TransactionNotAllowedException(String message, Throwable cause) {
         super(message, cause);
     }
 }

@@ -4,7 +4,7 @@ package org.multiverse.api;
  * The interface each transactional object needs to implement.
  *
  * <h1>Ensure</h1>
- * 
+ *
  * <h1>Privatize</h1>
  *
  * @author Peter Veentjer.
@@ -39,7 +39,7 @@ public interface TransactionalObject {
      * The lock acquired will automatically be acquired for the duration of the transaction and automatically
      * released when the transaction commits or aborts.
      *
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
@@ -59,7 +59,7 @@ public interface TransactionalObject {
      *
      * @param self the transaction used to privatize the transactional object.
      * @throws NullPointerException if tx is null
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
@@ -75,7 +75,7 @@ public interface TransactionalObject {
      * automatically released when the transaction commits or aborts.
      *
      * @return true if the privatization was a success, false otherwise.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
@@ -95,7 +95,7 @@ public interface TransactionalObject {
      * @param self the Transaction this method lifts on.
      * @return true if the privatization is a success, false otherwise.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
@@ -111,7 +111,7 @@ public interface TransactionalObject {
      * This method lifts on the Transaction stored in the ThreadLocalTransaction.
      *
      * @return true if privatized, false otherwise.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
@@ -127,7 +127,7 @@ public interface TransactionalObject {
      *
      * @return true if the TransactionalObject has been privatized by another transaction than the
      *         active transaction.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
@@ -142,7 +142,7 @@ public interface TransactionalObject {
      *
      * @param self the transaction to compare with.
      * @return true if the TransactionalObject is privatized by another transaction.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws NullPointerException if tx is null.
      */
@@ -156,7 +156,7 @@ public interface TransactionalObject {
      * This call lifts on the Transaction stored in the ThreadLocalTransaction.
      *
      * @return true if the TransactionalObject is privatized by the active transaction.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
@@ -171,7 +171,7 @@ public interface TransactionalObject {
      * @param self the transaction to check with.
      * @return true if the TransactionalObject it privatized by the provided transaction, false otherwise.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
@@ -195,7 +195,7 @@ public interface TransactionalObject {
      * This call lifts on the Transaction stored in the ThreadLocalTransaction.
      *
      * @return true if ensured by itself, false otherwise.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
@@ -210,7 +210,7 @@ public interface TransactionalObject {
      * @param self the transaction to check with.
      * @return true if ensured by self, false otherwise.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
@@ -225,7 +225,7 @@ public interface TransactionalObject {
      * This call lifts on the Transaction stored in the ThreadLocalTransaction.
      *
      * @return true if the TransactionalObject is ensured by another, false otherwise.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
@@ -241,7 +241,7 @@ public interface TransactionalObject {
      * @param self the Transaction to check with.
      * @return true if privatized by another Transaction, false otherwise.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
@@ -258,7 +258,7 @@ public interface TransactionalObject {
      * <p/>
      * This call lifts on the Transaction stored in the ThreadLocalTransaction.
      *
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
@@ -277,7 +277,7 @@ public interface TransactionalObject {
      *
      * @param self the Transaction used for this operation.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
@@ -301,7 +301,7 @@ public interface TransactionalObject {
      * This method lifts on the Transaction stored in the ThreadLocalTransaction.
      *
      * @return true if the ensure was a success, false otherwise.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *          *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
@@ -325,7 +325,7 @@ public interface TransactionalObject {
      * @param self the transaction used for doing to ensure.
      * @return true if the ensure was a success, false otherwise.
      * @throws NullPointerException if tx is null
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
@@ -346,7 +346,7 @@ public interface TransactionalObject {
      * <p/>
      * This call lifts on the Transaction stored in the ThreadLocalTransaction.
      *
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *
@@ -368,7 +368,7 @@ public interface TransactionalObject {
      *
      * @param self the Transaction this call lifts on.
      * @throws NullPointerException if self is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
      *

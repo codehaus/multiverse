@@ -1,11 +1,11 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link TransactionalExecutionException} thrown when the validation to a transactional object fails.
+ * A {@link TransactionExecutionException} thrown when the validation to a transactional object fails.
  *
  * @author Peter Veentjer.
  */
-public class ValidationException extends TransactionalExecutionException {
+public class ValidationException extends TransactionExecutionException {
 
     /**
      * Creates a new ValidationException.

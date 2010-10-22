@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.Watch;
-import org.multiverse.api.blocking.CheapLatch;
+import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.TodoException;
@@ -26,7 +26,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
     private LocalConflictCounter localConflictCounter;
     private int size;
     private boolean hasReads;
-    private boolean hasUntrackedReads;  
+    private boolean hasUntrackedReads;
     private boolean evaluatingCommute;
 
     public FatArrayTreeBetaTransaction(BetaStm stm) {
@@ -131,7 +131,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         if(ref.getStm()!=config.stm){
             throw abortOnStmMismatch(ref);
         }
-                    
+
         final int identityHashCode = ref.___identityHashCode();
         final int index = indexOf(ref, identityHashCode);
         if(index != -1){
@@ -444,7 +444,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         if(ref.getStm()!=config.stm){
             throw abortOnStmMismatch(ref);
         }
-                    
+
         final int identityHashCode = ref.___identityHashCode();
         final int index = indexOf(ref, identityHashCode);
         if(index != -1){
@@ -757,7 +757,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         if(ref.getStm()!=config.stm){
             throw abortOnStmMismatch(ref);
         }
-                    
+
         final int identityHashCode = ref.___identityHashCode();
         final int index = indexOf(ref, identityHashCode);
         if(index != -1){
@@ -1070,7 +1070,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         if(ref.getStm()!=config.stm){
             throw abortOnStmMismatch(ref);
         }
-                    
+
         final int identityHashCode = ref.___identityHashCode();
         final int index = indexOf(ref, identityHashCode);
         if(index != -1){
@@ -1383,7 +1383,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         if(ref.getStm()!=config.stm){
             throw abortOnStmMismatch(ref);
         }
-                    
+
         final int identityHashCode = ref.___identityHashCode();
         final int index = indexOf(ref, identityHashCode);
         if(index != -1){
@@ -1692,7 +1692,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         if(ref.getStm()!=config.stm){
             throw abortOnStmMismatch(ref);
         }
-                    
+
         final int identityHashCode = ref.___identityHashCode();
         final int index = indexOf(ref, identityHashCode);
         if(index != -1){
@@ -1957,7 +1957,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
          throw new TodoException();
      }
 
- 
+
     @Override
     public Tranlocal get(BetaTransactionalObject ref){
         final int indexOf = indexOf(ref, ref.___identityHashCode());
@@ -2081,7 +2081,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                     for (int k = 0; k < array.length; k++) {
                         final Tranlocal tranlocal = array[k];
                         if(tranlocal != null){
-                            array[k] = null;                            
+                            array[k] = null;
                             tranlocal.owner.___abort(this, tranlocal, pool);
                         }
                     }
@@ -2303,9 +2303,9 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
             throw abortOnNoRetryPossible();
         }
 
-        CheapLatch listener = pool.takeCheapLatch();
+        DefaultRetryLatch listener = pool.takeDefaultRetryLatch();
         if(listener == null){
-            listener = new CheapLatch();
+            listener = new DefaultRetryLatch();
         }
 
         try{
@@ -2354,10 +2354,10 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 throw abortOnNoRetryPossible();
             }
 
-            awaitUpdate(listener);                        
+            awaitUpdate(listener);
             throw Retry.INSTANCE;
         }finally{
-            pool.putCheapLatch(listener);
+            pool.putDefaultRetryLatch(listener);
         }
     }
 

@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.Transaction;
-import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
@@ -82,7 +82,7 @@ public abstract class VeryAbstractBetaTransactionalObject
 
     @Override
     public final int ___registerChangeListener(
-            final Latch latch,
+            final RetryLatch latch,
             final Tranlocal tranlocal,
             final BetaObjectPool pool,
             final long listenerEra) {

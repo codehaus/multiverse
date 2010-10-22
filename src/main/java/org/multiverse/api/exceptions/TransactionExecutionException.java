@@ -1,14 +1,18 @@
 package org.multiverse.api.exceptions;
 
 /**
+ * A {@link RuntimeException} thrown by the STM when something fails while executing transactions.
+ *
+ * This exception is not caught by the {@link org.multiverse.api.AtomicBlock}.
+ *
  * @author Peter Veentjer.
  */
-public class TransactionalExecutionException extends RuntimeException {
+public class TransactionExecutionException extends RuntimeException {
 
     /**
      * Creates a new TransactionalExecutionException.
      */
-    public TransactionalExecutionException() {
+    public TransactionExecutionException() {
         super();
     }
 
@@ -17,7 +21,7 @@ public class TransactionalExecutionException extends RuntimeException {
      *
      * @param message message of the exception.
      */
-    public TransactionalExecutionException(String message) {
+    public TransactionExecutionException(String message) {
         super(message);
     }
 
@@ -27,7 +31,7 @@ public class TransactionalExecutionException extends RuntimeException {
      * @param message the message of the exception.
      * @param cause   the Throwable that caused the exception.
      */
-    public TransactionalExecutionException(String message, Throwable cause) {
+    public TransactionExecutionException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -36,7 +40,7 @@ public class TransactionalExecutionException extends RuntimeException {
      *
      * @param cause the Throwable that was the cause of this TransactionalExecutionException.
      */
-    public TransactionalExecutionException(Throwable cause) {
+    public TransactionExecutionException(Throwable cause) {
         super(cause);
     }
 }

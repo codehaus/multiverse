@@ -5,11 +5,11 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.assertClosed;
 
-public class CheapLatch_prepareForPoolingTest {
+public class DefaultRetryLatch_prepareForPoolingTest {
 
     @Test
     public void whenClosed() {
-        CheapLatch latch = new CheapLatch();
+        DefaultRetryLatch latch = new DefaultRetryLatch();
         long era = latch.getEra();
         latch.prepareForPooling();
 
@@ -19,7 +19,7 @@ public class CheapLatch_prepareForPoolingTest {
 
     @Test
     public void whenOpen() {
-        CheapLatch latch = new CheapLatch();
+        DefaultRetryLatch latch = new DefaultRetryLatch();
         long era = latch.getEra();
         latch.open(era);
 
