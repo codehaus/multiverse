@@ -113,10 +113,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         RefTranlocal<E> tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new RefTranlocal<E>(ref);
-        }
-
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         tranlocal.tx = this;
         array[firstFreeIndex] = tranlocal;
@@ -169,10 +165,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         RefTranlocal<E> tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new RefTranlocal<E>(ref);
-        }
-
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
             pool.put(tranlocal);
             throw abortOnReadConflict();
@@ -251,10 +243,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         RefTranlocal<E> tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new RefTranlocal<E>(ref);
-        }
-
         if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
            pool.put(tranlocal);
            throw abortOnReadConflict();
@@ -319,9 +307,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //open the tranlocal for writing.
         RefTranlocal<E> tranlocal =  pool.take(ref);
-        if(tranlocal == null){
-                tranlocal = new RefTranlocal<E>(ref);
-        }
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
@@ -374,10 +359,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         IntRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new IntRefTranlocal(ref);
-        }
-
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         tranlocal.tx = this;
         array[firstFreeIndex] = tranlocal;
@@ -430,10 +411,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         IntRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new IntRefTranlocal(ref);
-        }
-
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
             pool.put(tranlocal);
             throw abortOnReadConflict();
@@ -512,10 +489,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         IntRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new IntRefTranlocal(ref);
-        }
-
         if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
            pool.put(tranlocal);
            throw abortOnReadConflict();
@@ -580,9 +553,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //open the tranlocal for writing.
         IntRefTranlocal tranlocal =  pool.take(ref);
-        if(tranlocal == null){
-                tranlocal = new IntRefTranlocal(ref);
-        }
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
@@ -635,10 +605,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         BooleanRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new BooleanRefTranlocal(ref);
-        }
-
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         tranlocal.tx = this;
         array[firstFreeIndex] = tranlocal;
@@ -691,10 +657,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         BooleanRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new BooleanRefTranlocal(ref);
-        }
-
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
             pool.put(tranlocal);
             throw abortOnReadConflict();
@@ -773,10 +735,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         BooleanRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new BooleanRefTranlocal(ref);
-        }
-
         if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
            pool.put(tranlocal);
            throw abortOnReadConflict();
@@ -841,9 +799,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //open the tranlocal for writing.
         BooleanRefTranlocal tranlocal =  pool.take(ref);
-        if(tranlocal == null){
-                tranlocal = new BooleanRefTranlocal(ref);
-        }
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
@@ -896,10 +851,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         DoubleRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new DoubleRefTranlocal(ref);
-        }
-
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         tranlocal.tx = this;
         array[firstFreeIndex] = tranlocal;
@@ -952,10 +903,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         DoubleRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new DoubleRefTranlocal(ref);
-        }
-
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
             pool.put(tranlocal);
             throw abortOnReadConflict();
@@ -1034,10 +981,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         DoubleRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new DoubleRefTranlocal(ref);
-        }
-
         if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
            pool.put(tranlocal);
            throw abortOnReadConflict();
@@ -1102,9 +1045,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //open the tranlocal for writing.
         DoubleRefTranlocal tranlocal =  pool.take(ref);
-        if(tranlocal == null){
-                tranlocal = new DoubleRefTranlocal(ref);
-        }
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
@@ -1157,10 +1097,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         LongRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new LongRefTranlocal(ref);
-        }
-
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         tranlocal.tx = this;
         array[firstFreeIndex] = tranlocal;
@@ -1213,10 +1149,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         LongRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new LongRefTranlocal(ref);
-        }
-
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
             pool.put(tranlocal);
             throw abortOnReadConflict();
@@ -1295,10 +1227,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         LongRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new LongRefTranlocal(ref);
-        }
-
         if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
            pool.put(tranlocal);
            throw abortOnReadConflict();
@@ -1363,9 +1291,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //open the tranlocal for writing.
         LongRefTranlocal tranlocal =  pool.take(ref);
-        if(tranlocal == null){
-                tranlocal = new LongRefTranlocal(ref);
-        }
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
@@ -1415,10 +1340,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         Tranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = ref.___newTranlocal();
-        }
-
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         tranlocal.tx = this;
         array[firstFreeIndex] = tranlocal;
@@ -1471,10 +1392,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         Tranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = ref.___newTranlocal();
-        }
-
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
             pool.put(tranlocal);
             throw abortOnReadConflict();
@@ -1553,10 +1470,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         }
 
         Tranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = ref.___newTranlocal();
-        }
-
         if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
            pool.put(tranlocal);
            throw abortOnReadConflict();
@@ -1621,9 +1534,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
 
         //open the tranlocal for writing.
         Tranlocal tranlocal =  pool.take(ref);
-        if(tranlocal == null){
-                tranlocal = ref.___newTranlocal();
-        }
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
@@ -1795,9 +1705,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 if(listenersArray == null){
                     final int length = firstFreeIndex - k;
                     listenersArray = pool.takeListenersArray(length);
-                    if(listenersArray == null){
-                        listenersArray = new Listeners[length];
-                    }
                 }
                 listenersArray[listenersArrayIndex]=listeners;
                 listenersArrayIndex++;
@@ -1827,9 +1734,6 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 if(listenersArray == null){
                     final int length = firstFreeIndex - k;
                     listenersArray = pool.takeListenersArray(length);
-                    if(listenersArray == null){
-                        listenersArray = new Listeners[length];
-                    }
                 }
                 listenersArray[listenersArrayIndex]=listeners;
                 listenersArrayIndex++;

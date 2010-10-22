@@ -82,10 +82,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         RefTranlocal<E> tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new RefTranlocal<E>(ref);
-        }
-
         tranlocal.tx = this;
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         attached = tranlocal;
@@ -109,10 +105,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             //the transaction has no previous attached references.
 
             RefTranlocal<E> tranlocal = pool.take(ref);
-            if(tranlocal == null){
-                tranlocal = new RefTranlocal<E>(ref);
-            }
-
             if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -148,10 +140,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         RefTranlocal<E> tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new RefTranlocal<E>(ref);
-        }
-
         tranlocal.setStatus(STATUS_READONLY);
 
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
@@ -185,10 +173,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
 
             RefTranlocal<E> tranlocal = pool.take(ref);
-            if(tranlocal == null){
-                tranlocal = new RefTranlocal<E>(ref);
-            }
-
             if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -259,10 +243,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
-        tranlocal =  pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new RefTranlocal<E>(ref);
-        }
+        tranlocal = pool.take(ref);
         tranlocal.setDirty(true);
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
@@ -307,10 +288,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         IntRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new IntRefTranlocal(ref);
-        }
-
         tranlocal.tx = this;
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         attached = tranlocal;
@@ -334,10 +311,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             //the transaction has no previous attached references.
 
             IntRefTranlocal tranlocal = pool.take(ref);
-            if(tranlocal == null){
-                tranlocal = new IntRefTranlocal(ref);
-            }
-
             if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -373,10 +346,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         IntRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new IntRefTranlocal(ref);
-        }
-
         tranlocal.setStatus(STATUS_READONLY);
 
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
@@ -410,10 +379,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
 
             IntRefTranlocal tranlocal = pool.take(ref);
-            if(tranlocal == null){
-                tranlocal = new IntRefTranlocal(ref);
-            }
-
             if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -484,10 +449,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
-        tranlocal =  pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new IntRefTranlocal(ref);
-        }
+        tranlocal = pool.take(ref);
         tranlocal.setDirty(true);
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
@@ -532,10 +494,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         BooleanRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new BooleanRefTranlocal(ref);
-        }
-
         tranlocal.tx = this;
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         attached = tranlocal;
@@ -559,10 +517,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             //the transaction has no previous attached references.
 
             BooleanRefTranlocal tranlocal = pool.take(ref);
-            if(tranlocal == null){
-                tranlocal = new BooleanRefTranlocal(ref);
-            }
-
             if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -598,10 +552,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         BooleanRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new BooleanRefTranlocal(ref);
-        }
-
         tranlocal.setStatus(STATUS_READONLY);
 
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
@@ -635,10 +585,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
 
             BooleanRefTranlocal tranlocal = pool.take(ref);
-            if(tranlocal == null){
-                tranlocal = new BooleanRefTranlocal(ref);
-            }
-
             if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -709,10 +655,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
-        tranlocal =  pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new BooleanRefTranlocal(ref);
-        }
+        tranlocal = pool.take(ref);
         tranlocal.setDirty(true);
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
@@ -757,10 +700,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         DoubleRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new DoubleRefTranlocal(ref);
-        }
-
         tranlocal.tx = this;
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         attached = tranlocal;
@@ -784,10 +723,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             //the transaction has no previous attached references.
 
             DoubleRefTranlocal tranlocal = pool.take(ref);
-            if(tranlocal == null){
-                tranlocal = new DoubleRefTranlocal(ref);
-            }
-
             if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -823,10 +758,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         DoubleRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new DoubleRefTranlocal(ref);
-        }
-
         tranlocal.setStatus(STATUS_READONLY);
 
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
@@ -860,10 +791,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
 
             DoubleRefTranlocal tranlocal = pool.take(ref);
-            if(tranlocal == null){
-                tranlocal = new DoubleRefTranlocal(ref);
-            }
-
             if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -934,10 +861,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
-        tranlocal =  pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new DoubleRefTranlocal(ref);
-        }
+        tranlocal = pool.take(ref);
         tranlocal.setDirty(true);
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
@@ -982,10 +906,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         LongRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new LongRefTranlocal(ref);
-        }
-
         tranlocal.tx = this;
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         attached = tranlocal;
@@ -1009,10 +929,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             //the transaction has no previous attached references.
 
             LongRefTranlocal tranlocal = pool.take(ref);
-            if(tranlocal == null){
-                tranlocal = new LongRefTranlocal(ref);
-            }
-
             if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -1048,10 +964,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         LongRefTranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new LongRefTranlocal(ref);
-        }
-
         tranlocal.setStatus(STATUS_READONLY);
 
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
@@ -1085,10 +997,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
 
             LongRefTranlocal tranlocal = pool.take(ref);
-            if(tranlocal == null){
-                tranlocal = new LongRefTranlocal(ref);
-            }
-
             if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -1159,10 +1067,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
-        tranlocal =  pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = new LongRefTranlocal(ref);
-        }
+        tranlocal = pool.take(ref);
         tranlocal.setDirty(true);
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
@@ -1203,10 +1108,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         Tranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = ref.___newTranlocal();
-        }
-
         tranlocal.tx = this;
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         attached = tranlocal;
@@ -1230,10 +1131,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             //the transaction has no previous attached references.
 
             Tranlocal tranlocal = pool.take(ref);
-            if(tranlocal == null){
-                tranlocal = ref.___newTranlocal();
-            }
-
             if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -1269,10 +1166,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         Tranlocal tranlocal = pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = ref.___newTranlocal();
-        }
-
         tranlocal.setStatus(STATUS_READONLY);
 
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
@@ -1306,10 +1199,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
 
             Tranlocal tranlocal = pool.take(ref);
-            if(tranlocal == null){
-                tranlocal = ref.___newTranlocal();
-            }
-
             if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -1380,10 +1269,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
-        tranlocal =  pool.take(ref);
-        if(tranlocal == null){
-            tranlocal = ref.___newTranlocal();
-        }
+        tranlocal = pool.take(ref);
         tranlocal.setDirty(true);
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
@@ -1553,9 +1439,6 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         }
 
         DefaultRetryLatch listener = pool.takeDefaultRetryLatch();
-        if(listener == null){
-            listener = new DefaultRetryLatch();
-        }
 
         try{
             final long listenerEra = listener.getEra();

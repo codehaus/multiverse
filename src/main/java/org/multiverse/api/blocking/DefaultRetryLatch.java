@@ -1,7 +1,5 @@
 package org.multiverse.api.blocking;
 
-import org.multiverse.api.Transaction;
-import org.multiverse.api.TransactionConfiguration;
 import org.multiverse.api.exceptions.RetryInterruptedException;
 
 import static java.lang.String.format;
@@ -15,12 +13,6 @@ public final class DefaultRetryLatch implements RetryLatch {
 
     private volatile long era = Long.MIN_VALUE;
     private volatile boolean isOpen = false;
-
-    @Override
-    public void await(Transaction tx) {
-        TransactionConfiguration config = tx.getConfiguration();
-        //if(config.is)
-    }
 
     @Override
     public void open(final long expectedEra) {
@@ -39,7 +31,7 @@ public final class DefaultRetryLatch implements RetryLatch {
     }
 
     @Override
-    public void await(long expectedEra) {
+    public void await(long expectedEra, String transactionFamilyName) {
         if (isOpen || expectedEra != era) {
             return;
         }
@@ -50,9 +42,10 @@ public final class DefaultRetryLatch implements RetryLatch {
                     wait();
                 }
             }
-        } catch (InterruptedException exception) {
+        } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            throw new RetryInterruptedException(exception);
+            throw new RetryInterruptedException(
+                    format("[%s] Was interrupted while waiting on the retry", transactionFamilyName), ex);
         }
     }
 
@@ -81,8 +74,12 @@ public final class DefaultRetryLatch implements RetryLatch {
 
     @Override
     public long awaitNanosUninterruptible(final long expectedEra, long nanosTimeout) {
-        if (isOpen || expectedEra != era || nanosTimeout <= 0) {
+        if (isOpen || expectedEra != era) {
             return nanosTimeout;
+        }
+
+        if (nanosTimeout <= 0) {
+            return -1;
         }
 
         boolean restoreInterrupt = false;
@@ -117,9 +114,13 @@ public final class DefaultRetryLatch implements RetryLatch {
     }
 
     @Override
-    public long awaitNanos(final long expectedEra, long nanosTimeout) {
-        if (isOpen || expectedEra != era || nanosTimeout <= 0) {
+    public long awaitNanos(final long expectedEra, long nanosTimeout, String transactionFamilyName) {
+        if (isOpen || expectedEra != era) {
             return nanosTimeout;
+        }
+
+        if (nanosTimeout <= 0) {
+            return -1;
         }
 
         try {
@@ -140,7 +141,8 @@ public final class DefaultRetryLatch implements RetryLatch {
             }
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            throw new RetryInterruptedException(ex);
+            throw new RetryInterruptedException(
+                    format("[%s] Was interrupted while waiting on the retry", transactionFamilyName), ex);
         }
     }
 

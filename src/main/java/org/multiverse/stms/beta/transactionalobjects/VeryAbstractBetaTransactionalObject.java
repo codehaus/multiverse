@@ -103,9 +103,6 @@ public abstract class VeryAbstractBetaTransactionalObject
         //But it could be that the registration completes after the write has happened.
 
         Listeners update = pool.takeListeners();
-        if (update == null) {
-            update = new Listeners();
-        }
         update.threadName = Thread.currentThread().getName();
         update.listener = latch;
         update.listenerEra = listenerEra;

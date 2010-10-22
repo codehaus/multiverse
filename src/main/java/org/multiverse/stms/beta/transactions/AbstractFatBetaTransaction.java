@@ -53,9 +53,6 @@ public abstract class AbstractFatBetaTransaction extends BetaTransaction {
             case PREPARED:
                 if (normalListeners == null) {
                     normalListeners = pool.takeArrayList();
-                    if (normalListeners == null) {
-                        normalListeners = new ArrayList<TransactionLifecycleListener>();
-                    }
                 }
                 normalListeners.add(listener);
                 break;

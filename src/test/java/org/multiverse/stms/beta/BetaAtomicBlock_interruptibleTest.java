@@ -6,7 +6,7 @@ import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.api.exceptions.InvisibleCheckedException;
+import org.multiverse.api.exceptions.RetryInterruptedException;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -49,7 +49,7 @@ public class BetaAtomicBlock_interruptibleTest implements BetaStmConstants {
 
         t.join();
 
-        t.assertFailedWithException(InvisibleCheckedException.class);
+        t.assertFailedWithException(RetryInterruptedException.class);
         assertEquals(0, ref.atomicGet());
     }
 
@@ -73,7 +73,7 @@ public class BetaAtomicBlock_interruptibleTest implements BetaStmConstants {
 
         t.join();
 
-        t.assertFailedWithException(InvisibleCheckedException.class);
+        t.assertFailedWithException(RetryInterruptedException.class);
         assertEquals(0, ref.atomicGet());
     }
 

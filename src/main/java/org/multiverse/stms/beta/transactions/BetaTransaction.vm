@@ -487,14 +487,14 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
        try {
             if(config.timeoutNs == Long.MAX_VALUE){
                 if (config.isInterruptible()) {
-                    latch.await(lockEra);
+                    latch.await(lockEra, config.familyName);
                 } else {
                     latch.awaitUninterruptible(lockEra);
                 }
             }else{
                 if (config.isInterruptible()) {
                     remainingTimeoutNs = latch.awaitNanos(
-                        lockEra, remainingTimeoutNs);
+                        lockEra, remainingTimeoutNs, config.familyName);
                 } else {
                     remainingTimeoutNs = latch.awaitNanosUninterruptible(
                         lockEra, remainingTimeoutNs);

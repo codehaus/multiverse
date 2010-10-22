@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.blocking.DefaultRetryLatch;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.multiverse.TestUtils.assertClosed;
 import static org.multiverse.TestUtils.assertEra;
@@ -47,6 +47,6 @@ public class BetaObjectPool_cheapLatchTest {
         assertSame(latch3, pool.takeDefaultRetryLatch());
         assertSame(latch2, pool.takeDefaultRetryLatch());
         assertSame(latch1, pool.takeDefaultRetryLatch());
-        assertNull(pool.takeDefaultRetryLatch());
+        assertNotNull(pool.takeDefaultRetryLatch());
     }
 }

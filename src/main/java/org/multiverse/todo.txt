@@ -195,9 +195,6 @@ the task not being executed at all.
 
 - pooling for generic transactional object tranlocals.
 
-- when a transaction is interrupted, the interrupted exception should contain some information
-    about the transaction, e.g. the name
-
 - Collections
 
     - transactional linked list
@@ -268,8 +265,13 @@ the task not being executed at all.
 
 done
 
+- when pool returns null, it should return a value
+
 - testing betalongref_deferredEnsure0Test
 
 - testing betalongref_deferredEnsure1Test
+
+- when a transaction is interrupted, the interrupted exception should contain some information
+    about the transaction, e.g. the name
 
 

@@ -130,14 +130,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
-        if(tranlocal == null){
-#if(${ref.isReference})
-            tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
-#else
-            tranlocal = ref.___newTranlocal();
-#end
-        }
-
         tranlocal.tx = this;
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         attached = tranlocal;
@@ -173,14 +165,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             }
 #end
             ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
-            if(tranlocal == null){
-#if(${ref.isReference})
-                tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
-#else
-                tranlocal = ref.___newTranlocal();
-#end
-            }
-
             if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -240,14 +224,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #end
         ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
-        if(tranlocal == null){
-#if(${ref.isReference})
-            tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
-#else
-            tranlocal = ref.___newTranlocal();
-#end
-        }
-
         tranlocal.setStatus(STATUS_READONLY);
 
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
@@ -308,14 +284,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end
 
             ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
-            if(tranlocal == null){
-#if(${ref.isReference})
-                tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
-#else
-                tranlocal = ref.___newTranlocal();
-#end
-            }
-
             if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -406,14 +374,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
-        tranlocal =  pool.take(ref);
-        if(tranlocal == null){
-#if(${ref.isReference})
-            tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
-#else
-            tranlocal = ref.___newTranlocal();
-#end
-        }
+        tranlocal = pool.take(ref);
         tranlocal.setDirty(true);
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
@@ -456,14 +417,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
             //todo: call to 'openForCommute' can be inlined.
             ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
-            if(tranlocal == null){
-#if(${ref.isReference})
-                tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
-#else
-                tranlocal = ref.___newTranlocal();
-#end
-            }
-
             tranlocal.setStatus(STATUS_COMMUTING);
             tranlocal.addCommutingFunction(function, pool);
             attached = tranlocal;
@@ -761,9 +714,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         DefaultRetryLatch listener = pool.takeDefaultRetryLatch();
-        if(listener == null){
-            listener = new DefaultRetryLatch();
-        }
 
         try{
             final long listenerEra = listener.getEra();

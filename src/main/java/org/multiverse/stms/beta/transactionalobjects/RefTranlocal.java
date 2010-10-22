@@ -108,13 +108,9 @@ public final class RefTranlocal<E> extends Tranlocal{
         assert isCommuting();
 
         CallableNode node = pool.takeCallableNode();
-        if(node == null){
-            headCallable = new CallableNode(function, headCallable);
-        }else{
-            node.function = function;
-            node.next = headCallable;
-            headCallable = node;
-        }
+        node.function = function;
+        node.next = headCallable;
+        headCallable = node;
     }
 
     @Override

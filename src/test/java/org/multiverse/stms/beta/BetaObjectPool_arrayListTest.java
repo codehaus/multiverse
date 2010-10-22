@@ -45,6 +45,6 @@ public class BetaObjectPool_arrayListTest {
         assertSame(list3, pool.takeArrayList());
         assertSame(list2, pool.takeArrayList());
         assertSame(list1, pool.takeArrayList());
-        assertNull(pool.takeArrayList());
+        assertNotNull(pool.takeArrayList());
     }
 }

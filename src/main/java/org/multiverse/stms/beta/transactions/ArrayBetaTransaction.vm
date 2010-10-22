@@ -117,14 +117,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
-        if(tranlocal == null){
-#if(${ref.isReference})
-            tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
-#else
-            tranlocal = ref.___newTranlocal();
-#end
-        }
-
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         tranlocal.tx = this;
         array[firstFreeIndex] = tranlocal;
@@ -188,14 +180,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
-        if(tranlocal == null){
-#if(${ref.isReference})
-            tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
-#else
-            tranlocal = ref.___newTranlocal();
-#end
-        }
-
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
             pool.put(tranlocal);
             throw abortOnReadConflict();
@@ -317,14 +301,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
-        if(tranlocal == null){
-#if(${ref.isReference})
-            tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
-#else
-            tranlocal = ref.___newTranlocal();
-#end
-        }
-
         if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
            pool.put(tranlocal);
            throw abortOnReadConflict();
@@ -395,13 +371,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         //open the tranlocal for writing.
         ${ref.tranlocal}${ref.typeParameter} tranlocal =  pool.take(ref);
-        if(tranlocal == null){
-#if($ref.isReference)
-                tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
-#else
-                tranlocal = ref.___newTranlocal();
-#end
-        }
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
@@ -469,13 +438,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
-        if(tranlocal == null){
-#if(${ref.isReference})
-            tranlocal = new ${ref.tranlocal}${ref.typeParameter}(ref);
-#else
-            tranlocal = ref.___newTranlocal();
-#end
-        }
         tranlocal.setStatus(STATUS_COMMUTING);
         tranlocal.addCommutingFunction(function, pool);
 
@@ -674,9 +636,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 if(listenersArray == null){
                     final int length = firstFreeIndex - k;
                     listenersArray = pool.takeListenersArray(length);
-                    if(listenersArray == null){
-                        listenersArray = new Listeners[length];
-                    }
                 }
                 listenersArray[listenersArrayIndex]=listeners;
                 listenersArrayIndex++;
@@ -706,9 +665,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 if(listenersArray == null){
                     final int length = firstFreeIndex - k;
                     listenersArray = pool.takeListenersArray(length);
-                    if(listenersArray == null){
-                        listenersArray = new Listeners[length];
-                    }
                 }
                 listenersArray[listenersArrayIndex]=listeners;
                 listenersArrayIndex++;

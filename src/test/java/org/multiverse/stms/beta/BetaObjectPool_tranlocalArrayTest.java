@@ -4,8 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
 public class BetaObjectPool_tranlocalArrayTest {
@@ -63,7 +62,8 @@ public class BetaObjectPool_tranlocalArrayTest {
         assertSame(array, result);
 
         Tranlocal[] result2 = pool.takeTranlocalArray(array.length);
-        assertNull(result2);
+        assertNotNull(result2);
+        assertNotSame(result, result2);
     }
 
 }

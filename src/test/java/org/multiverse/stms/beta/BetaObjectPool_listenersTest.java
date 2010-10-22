@@ -51,6 +51,6 @@ public class BetaObjectPool_listenersTest {
         assertSame(listeners3, pool.takeListeners());
         assertSame(listeners2, pool.takeListeners());
         assertSame(listeners1, pool.takeListeners());
-        assertNull(pool.takeListeners());
+        assertNotNull(pool.takeListeners());
     }
 }

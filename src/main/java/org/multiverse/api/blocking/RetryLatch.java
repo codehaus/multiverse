@@ -1,7 +1,5 @@
 package org.multiverse.api.blocking;
 
-import org.multiverse.api.Transaction;
-
 /**
  * A blockingAllowed structure that can be used to create blocking transactions. When a transaction blocks, a
  * 'listener' is added to each read transactional object. This listener is the Latch. Each transactional object
@@ -37,8 +35,6 @@ public interface RetryLatch {
      */
     long getEra();
 
-    void await(Transaction tx);
-
     /**
      * Awaits for this latch to open. This call is not responsive to interrupts.
      *
@@ -55,11 +51,13 @@ public interface RetryLatch {
      * is thrown and the Thread.interrupt status is restored.</li>
      * </ol>
      *
-     * @param expectedEra the expected era.
+     * @param expectedEra           the expected era.
+     * @param transactionFamilyName the name of the transaction (only needed for creating
+     *                              a usable message in the RetryInterruptedException).
      * @throws org.multiverse.api.exceptions.RetryInterruptedException
      *
      */
-    void await(long expectedEra);
+    void await(long expectedEra, String transactionFamilyName);
 
     /**
      * Awaits for this latch to open with a timeout. This call is not responsive to interrupts.
@@ -67,8 +65,8 @@ public interface RetryLatch {
      * When the calling thread is interrupted, the Thread.interrupt status will not be eaten by
      * this method and safely be restored.
      *
-     * @param expectedEra the expected era.
-     * @param nanosTimeout   the timeout in nanoseconds
+     * @param expectedEra  the expected era.
+     * @param nanosTimeout the timeout in nanoseconds
      * @return the remaining timeout.  A negative value indicates that the Latch is not opened in time.
      */
     long awaitNanosUninterruptible(long expectedEra, long nanosTimeout);
@@ -79,12 +77,15 @@ public interface RetryLatch {
      * When the calling thread is interrupted, the Thread.interrupt status will not be eaten by
      * this method and safely be restored.
      *
-     * @param expectedEra the expected era
-     * @param nanosTimeout   the timeout in nanoseconds. Can safely be called with a zero or negative timeout
-     * @return the remaining timeout. A negative value indicates that the latch is not opened in time.
+     * @param expectedEra  the expected era
+     * @param nanosTimeout the timeout in nanoseconds. Can safely be called with a zero or negative timeout
+     * @param transactionFamilyName the name of the transaction (only needed for creating
+     *                              a usable message in the RetryInterruptedException).
+     * @return the remaining timeout. A 0 or negative value indicates that the latch is not opened in time.
      * @throws org.multiverse.api.exceptions.RetryInterruptedException
+     *
      */
-    long awaitNanos(long expectedEra, long nanosTimeout);
+    long awaitNanos(long expectedEra, long nanosTimeout, String transactionFamilyName);
 
     /**
      * Prepares the Latch for pooling. All waiting threads will be notified and the era is increased.

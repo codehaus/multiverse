@@ -5,8 +5,7 @@ import org.junit.Test;
 import org.multiverse.api.functions.Function;
 import org.multiverse.stms.beta.transactionalobjects.CallableNode;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 public class BetaObjectPool_callableNodeTest {
@@ -48,6 +47,6 @@ public class BetaObjectPool_callableNodeTest {
         assertSame(node3, pool.takeCallableNode());
         assertSame(node2, pool.takeCallableNode());
         assertSame(node1, pool.takeCallableNode());
-        assertNull(pool.takeCallableNode());
+        assertNotNull(pool.takeCallableNode());
     }
 }

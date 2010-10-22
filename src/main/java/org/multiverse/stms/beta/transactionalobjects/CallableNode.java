@@ -9,6 +9,8 @@ public class CallableNode {
     public CallableNode next;
     public Function function;
 
+    public CallableNode(){}
+
     public CallableNode(Function function, CallableNode next) {
         this.next = next;
         this.function = function;

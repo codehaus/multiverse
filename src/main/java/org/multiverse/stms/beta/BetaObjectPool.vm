@@ -100,12 +100,8 @@ public final class BetaObjectPool {
             throw new NullPointerException();
         }
 
-        if (!tranlocalPoolingEnabled) {
-            return null;
-        }
-
         if (lastUsed${transactionalObject.name} == -1) {
-            return null;
+            return new ${transactionalObject.tranlocal}(owner);
         }
 
         ${transactionalObject.tranlocal} tranlocal = tranlocals${transactionalObject.name}[lastUsed${transactionalObject.name}];
@@ -143,14 +139,10 @@ public final class BetaObjectPool {
             throw new NullPointerException();
         }
 
-        if(!tranlocalPoolingEnabled){
-            return null;
-        }
-
         int classIndex = owner.___getClassIndex();
 
         if(classIndex == -1){
-            return null;
+            return owner.___newTranlocal();
         }
 
         switch(classIndex){
@@ -163,12 +155,12 @@ public final class BetaObjectPool {
         }
 
         if(classIndex >= pools.length){
-            return null;
+            return owner.___newTranlocal();
         }
 
         TranlocalPool pool = pools[classIndex];
         if(pool.lastUsed == -1){
-            return null;
+            return owner.___newTranlocal();
         }
 
         Tranlocal tranlocal = pool.tranlocals[pool.lastUsed];
@@ -278,17 +270,17 @@ public final class BetaObjectPool {
         }
 
         if(!tranlocalArrayPoolingEnabled){
-            return null;
+            return new Tranlocal[size];
         }
 
         int index = size;
 
         if(index >= tranlocalArrayPool.length){
-            return null;
+            return new Tranlocal[size];
         }
 
         if(tranlocalArrayPool[index]==null){
-            return null;
+            return new Tranlocal[size];
         }
 
         Tranlocal[] array = tranlocalArrayPool[index];
@@ -303,7 +295,7 @@ public final class BetaObjectPool {
      */
     public CallableNode takeCallableNode(){
         if(!callableNodePoolingEnabled || callableNodePoolIndex == -1){
-            return null;
+            return new CallableNode();
         }
 
         CallableNode node = callableNodePool[callableNodePoolIndex];
@@ -339,7 +331,7 @@ public final class BetaObjectPool {
      */
     public DefaultRetryLatch takeDefaultRetryLatch(){
         if(!latchPoolingEnabled || defaultRetryLatchPoolIndex == -1){
-            return null;
+            return new DefaultRetryLatch();
         }
 
         DefaultRetryLatch latch = defaultRetryLatchPool[defaultRetryLatchPoolIndex];
@@ -377,7 +369,7 @@ public final class BetaObjectPool {
      */
     public ArrayList takeArrayList(){
         if(!arrayListPoolingEnabled || arrayListPoolIndex == -1){
-            return null;
+            return new ArrayList();
         }
 
         ArrayList list = arrayListPool[arrayListPoolIndex];
@@ -417,7 +409,7 @@ public final class BetaObjectPool {
      */
     public Listeners takeListeners(){
         if(!listenersPoolingEnabled || listenersPoolIndex == -1){
-            return null;
+            return new Listeners();
         }
 
         Listeners listeners = listenersPool[listenersPoolIndex];
@@ -464,11 +456,11 @@ public final class BetaObjectPool {
         }
 
         if(!listenersArrayPoolingEnabled){
-            return null;
+            return new Listeners[minimalSize];
         }
 
         if(listenersArray == null || listenersArray.length < minimalSize){
-            return null;
+            return new Listeners[minimalSize];
         }
 
         Listeners[] result = listenersArray;

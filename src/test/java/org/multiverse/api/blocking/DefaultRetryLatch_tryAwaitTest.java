@@ -23,7 +23,7 @@ public class DefaultRetryLatch_tryAwaitTest {
         long era = latch.getEra();
         latch.open(era);
 
-        long result = latch.awaitNanos(era, 10);
+        long result = latch.awaitNanos(era, 10,"sometransaction");
 
         assertEquals(10, result);
         assertOpen(latch);
@@ -38,7 +38,7 @@ public class DefaultRetryLatch_tryAwaitTest {
         long era = latch.getEra();
         latch.open(era);
 
-        long result = latch.awaitNanos(oldEra, 10);
+        long result = latch.awaitNanos(oldEra, 10,"sometransaction");
 
         assertEquals(10, result);
         assertOpen(latch);
@@ -52,7 +52,7 @@ public class DefaultRetryLatch_tryAwaitTest {
         latch.prepareForPooling();
 
         long expectedEra = latch.getEra();
-        long result = latch.awaitNanos(era, 10);
+        long result = latch.awaitNanos(era, 10,"sometransaction");
 
         assertEquals(10, result);
         assertEquals(expectedEra, latch.getEra());
@@ -83,7 +83,7 @@ public class DefaultRetryLatch_tryAwaitTest {
         long era = latch.getEra();
         latch.open(era);
 
-        long remaining = latch.awaitNanos(era, 0);
+        long remaining = latch.awaitNanos(era, 0,"sometransaction");
 
         assertEquals(0, remaining);
         assertOpen(latch);
@@ -95,9 +95,9 @@ public class DefaultRetryLatch_tryAwaitTest {
         DefaultRetryLatch latch = new DefaultRetryLatch();
         long era = latch.getEra();
 
-        long remaining = latch.awaitNanos(era, 0);
+        long remaining = latch.awaitNanos(era, 0,"sometransaction");
 
-        assertTrue(remaining < 0);
+        assertTrue(remaining <= 0);
         assertClosed(latch);
         assertEra(latch, era);
     }
@@ -108,9 +108,9 @@ public class DefaultRetryLatch_tryAwaitTest {
         long era = latch.getEra();
         latch.open(era);
 
-        long remaining = latch.awaitNanos(era, -10);
+        long remaining = latch.awaitNanos(era, -10,"sometransaction");
 
-        assertTrue(remaining < 0);
+        assertTrue(remaining <= 0);
         assertOpen(latch);
         assertEra(latch, era);
     }
@@ -120,7 +120,7 @@ public class DefaultRetryLatch_tryAwaitTest {
         DefaultRetryLatch latch = new DefaultRetryLatch();
         long era = latch.getEra();
 
-        long remaining = latch.awaitNanos(era, -10);
+        long remaining = latch.awaitNanos(era, -10,"sometransaction");
 
         assertTrue(remaining < 0);
         assertClosed(latch);
@@ -148,7 +148,7 @@ public class DefaultRetryLatch_tryAwaitTest {
 
         Thread.currentThread().interrupt();
         try {
-            latch.awaitNanos(era, 10);
+            latch.awaitNanos(era, 10,"sometransaction");
             fail();
         } catch (RetryInterruptedException expected) {
         }
@@ -214,7 +214,7 @@ public class DefaultRetryLatch_tryAwaitTest {
 
         @Override
         public void doRun() throws Exception {
-            result = latch.awaitNanos(expectedEra, unit.toNanos(timeout));
+            result = latch.awaitNanos(expectedEra, unit.toNanos(timeout),"sometransaction");
         }
     }
 }

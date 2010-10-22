@@ -21,7 +21,7 @@ public class DefaultRetryLatch_awaitTest {
         long era = latch.getEra();
         latch.open(era);
 
-        latch.await(era);
+        latch.await(era,"sometransaction");
 
         assertOpen(latch);
         assertEquals(era, latch.getEra());
@@ -35,7 +35,7 @@ public class DefaultRetryLatch_awaitTest {
         long era = latch.getEra();
         latch.open(era);
 
-        latch.await(oldEra);
+        latch.await(oldEra,"sometransaction");
 
         assertOpen(latch);
         assertEquals(era, latch.getEra());
@@ -48,7 +48,7 @@ public class DefaultRetryLatch_awaitTest {
         latch.prepareForPooling();
 
         long expectedEra = latch.getEra();
-        latch.await(era);
+        latch.await(era,"sometransaction");
 
         assertEquals(expectedEra, latch.getEra());
         assertClosed(latch);
@@ -78,7 +78,7 @@ public class DefaultRetryLatch_awaitTest {
 
         Thread.currentThread().interrupt();
         try {
-            latch.await(era);
+            latch.await(era,"sometransaction");
             fail();
         } catch (RetryInterruptedException expected) {
         }
@@ -137,7 +137,7 @@ public class DefaultRetryLatch_awaitTest {
 
         @Override
         public void doRun() throws Exception {
-            latch.await(expectedEra);
+            latch.await(expectedEra,"sometransaction");
         }
     }
 }

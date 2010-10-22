@@ -78,7 +78,7 @@ public class BetaObjectPool_tranlocalsTest implements BetaStmConstants{
         BetaLongRef ref = new BetaLongRef(stm.startDefaultTransaction());
 
         Tranlocal result = pool.take(ref);
-        assertNull(result);
+        assertNotNull(result);
     }
 
     @Test
@@ -104,6 +104,6 @@ public class BetaObjectPool_tranlocalsTest implements BetaStmConstants{
         assertSame(take2, put3);
         assertSame(take3, put2);
         assertSame(take4, put1);
-        assertNull(take5);
+        assertNotNull(take5);
     }
 }

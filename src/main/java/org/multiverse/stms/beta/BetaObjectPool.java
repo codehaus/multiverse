@@ -101,12 +101,8 @@ public final class BetaObjectPool {
             throw new NullPointerException();
         }
 
-        if (!tranlocalPoolingEnabled) {
-            return null;
-        }
-
         if (lastUsedBetaRef == -1) {
-            return null;
+            return new RefTranlocal(owner);
         }
 
         RefTranlocal tranlocal = tranlocalsBetaRef[lastUsedBetaRef];
@@ -149,12 +145,8 @@ public final class BetaObjectPool {
             throw new NullPointerException();
         }
 
-        if (!tranlocalPoolingEnabled) {
-            return null;
-        }
-
         if (lastUsedBetaIntRef == -1) {
-            return null;
+            return new IntRefTranlocal(owner);
         }
 
         IntRefTranlocal tranlocal = tranlocalsBetaIntRef[lastUsedBetaIntRef];
@@ -197,12 +189,8 @@ public final class BetaObjectPool {
             throw new NullPointerException();
         }
 
-        if (!tranlocalPoolingEnabled) {
-            return null;
-        }
-
         if (lastUsedBetaBooleanRef == -1) {
-            return null;
+            return new BooleanRefTranlocal(owner);
         }
 
         BooleanRefTranlocal tranlocal = tranlocalsBetaBooleanRef[lastUsedBetaBooleanRef];
@@ -245,12 +233,8 @@ public final class BetaObjectPool {
             throw new NullPointerException();
         }
 
-        if (!tranlocalPoolingEnabled) {
-            return null;
-        }
-
         if (lastUsedBetaDoubleRef == -1) {
-            return null;
+            return new DoubleRefTranlocal(owner);
         }
 
         DoubleRefTranlocal tranlocal = tranlocalsBetaDoubleRef[lastUsedBetaDoubleRef];
@@ -293,12 +277,8 @@ public final class BetaObjectPool {
             throw new NullPointerException();
         }
 
-        if (!tranlocalPoolingEnabled) {
-            return null;
-        }
-
         if (lastUsedBetaLongRef == -1) {
-            return null;
+            return new LongRefTranlocal(owner);
         }
 
         LongRefTranlocal tranlocal = tranlocalsBetaLongRef[lastUsedBetaLongRef];
@@ -334,14 +314,10 @@ public final class BetaObjectPool {
             throw new NullPointerException();
         }
 
-        if(!tranlocalPoolingEnabled){
-            return null;
-        }
-
         int classIndex = owner.___getClassIndex();
 
         if(classIndex == -1){
-            return null;
+            return owner.___newTranlocal();
         }
 
         switch(classIndex){
@@ -358,12 +334,12 @@ public final class BetaObjectPool {
         }
 
         if(classIndex >= pools.length){
-            return null;
+            return owner.___newTranlocal();
         }
 
         TranlocalPool pool = pools[classIndex];
         if(pool.lastUsed == -1){
-            return null;
+            return owner.___newTranlocal();
         }
 
         Tranlocal tranlocal = pool.tranlocals[pool.lastUsed];
@@ -481,17 +457,17 @@ public final class BetaObjectPool {
         }
 
         if(!tranlocalArrayPoolingEnabled){
-            return null;
+            return new Tranlocal[size];
         }
 
         int index = size;
 
         if(index >= tranlocalArrayPool.length){
-            return null;
+            return new Tranlocal[size];
         }
 
         if(tranlocalArrayPool[index]==null){
-            return null;
+            return new Tranlocal[size];
         }
 
         Tranlocal[] array = tranlocalArrayPool[index];
@@ -506,7 +482,7 @@ public final class BetaObjectPool {
      */
     public CallableNode takeCallableNode(){
         if(!callableNodePoolingEnabled || callableNodePoolIndex == -1){
-            return null;
+            return new CallableNode();
         }
 
         CallableNode node = callableNodePool[callableNodePoolIndex];
@@ -542,7 +518,7 @@ public final class BetaObjectPool {
      */
     public DefaultRetryLatch takeDefaultRetryLatch(){
         if(!latchPoolingEnabled || defaultRetryLatchPoolIndex == -1){
-            return null;
+            return new DefaultRetryLatch();
         }
 
         DefaultRetryLatch latch = defaultRetryLatchPool[defaultRetryLatchPoolIndex];
@@ -580,7 +556,7 @@ public final class BetaObjectPool {
      */
     public ArrayList takeArrayList(){
         if(!arrayListPoolingEnabled || arrayListPoolIndex == -1){
-            return null;
+            return new ArrayList();
         }
 
         ArrayList list = arrayListPool[arrayListPoolIndex];
@@ -620,7 +596,7 @@ public final class BetaObjectPool {
      */
     public Listeners takeListeners(){
         if(!listenersPoolingEnabled || listenersPoolIndex == -1){
-            return null;
+            return new Listeners();
         }
 
         Listeners listeners = listenersPool[listenersPoolIndex];
@@ -667,11 +643,11 @@ public final class BetaObjectPool {
         }
 
         if(!listenersArrayPoolingEnabled){
-            return null;
+            return new Listeners[minimalSize];
         }
 
         if(listenersArray == null || listenersArray.length < minimalSize){
-            return null;
+            return new Listeners[minimalSize];
         }
 
         Listeners[] result = listenersArray;
