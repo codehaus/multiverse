@@ -59,6 +59,10 @@ allprojects {
     deployerJars "org.apache.maven.wagon:wagon-ssh:1.0-beta-2"
   }
 
+  javadoc {
+    title = "Multiverse $version"
+  }
+
   uploadArchives {
     repositories.mavenDeployer {
       name = 'sshDeployer' 

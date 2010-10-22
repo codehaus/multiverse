@@ -301,8 +301,7 @@ public final class ${atomicBlock.name} extends AbstractBetaAtomicBlock{
                                     format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
                             }
-                        }
-                        waitForChange(tx);
+                        }                        
                     } catch (SpeculativeConfigurationError e) {
                         abort = false;
                         if(___TracingEnabled){

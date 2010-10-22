@@ -1,7 +1,6 @@
 package org.multiverse.stms.beta;
 
 import org.multiverse.api.blocking.CheapLatch;
-import org.multiverse.api.blocking.StandardLatch;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
 import java.util.ArrayList;
@@ -70,9 +69,6 @@ public final class BetaObjectPool {
 
     private CheapLatch[] cheapLatchPool = new CheapLatch[10];
     private int cheapLatchPoolIndex = -1;
-
-    private StandardLatch[] standardLatchPool = new StandardLatch[10];
-    private int standardLatchPoolIndex = -1;
 
     private Listeners[] listenersPool = new Listeners[100];
     private int listenersPoolIndex = -1;
@@ -573,42 +569,6 @@ public final class BetaObjectPool {
         latch.prepareForPooling();
         cheapLatchPoolIndex++;
         cheapLatchPool[cheapLatchPoolIndex]=latch;
-    }
-
-    /**
-     * Takes a StandardLatch from the pool.
-     *
-     * @return the taken StandardLatch is null if none is available.
-     */
-    public StandardLatch takeStandardLatch(){
-        if(!latchPoolingEnabled || standardLatchPoolIndex == -1){
-            return null;
-        }
-
-        StandardLatch latch = standardLatchPool[standardLatchPoolIndex];
-        standardLatchPool[standardLatchPoolIndex]=null;
-        standardLatchPoolIndex--;
-        return latch;
-    }
-
-    /**
-     * Puts a StandardLatch in the pool. The latch is prepared for pooling before being placed in the pool.
-     *
-     * @param latch the StandardLatch to pool.
-     * @throws NullPointerException if latch is null.
-     */
-    public void putStandardLatch(StandardLatch latch){
-        if(latch == null){
-            throw new NullPointerException();
-        }
-
-        if(!latchPoolingEnabled || standardLatchPoolIndex == standardLatchPool.length-1){
-            return;
-        }
-
-        latch.prepareForPooling();
-        standardLatchPoolIndex++;
-        standardLatchPool[standardLatchPoolIndex]=latch;
     }
 
     // ====================== array list ===================================

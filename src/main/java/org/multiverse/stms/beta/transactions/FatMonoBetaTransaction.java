@@ -1,8 +1,9 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.Watch;
-import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.*;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
@@ -2317,12 +2318,12 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
     }
 
-    // ============================ registerChangeListenerAndAbort ===================
+    // ============================ retry ===================
 
     @Override
-    public final void registerChangeListenerAndAbort(final Latch listener) {
+    public final void retry() {
         if (status != ACTIVE) {
-            throw abortOnFaultyStatusOfRegisterChangeListenerAndAbort();
+            throw abortOnFaultyStatusOfRetry();
         }
 
         if(!config.blockingAllowed){
@@ -2333,25 +2334,37 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnNoRetryPossible();
         }
 
-        final long listenerEra = listener.getEra();
-        final BetaTransactionalObject owner = attached.owner;
-
-        final boolean noRegistration =
-            owner.___registerChangeListener(listener, attached, pool, listenerEra) == REGISTRATION_NONE;
-        owner.___abort(this, attached, pool);
-        attached = null;
-        status = ABORTED;
-
-        if(config.permanentListeners != null){
-            notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
+        CheapLatch listener = pool.takeCheapLatch();
+        if(listener == null){
+            listener = new CheapLatch();
         }
 
-        if(normalListeners != null){
-            notifyListeners(normalListeners, TransactionLifecycleEvent.PostAbort);
-        }
+        try{
+            final long listenerEra = listener.getEra();
+            final BetaTransactionalObject owner = attached.owner;
 
-        if(noRegistration){
-            throw abortOnNoRetryPossible();
+            final boolean noRegistration =
+                owner.___registerChangeListener(listener, attached, pool, listenerEra) == REGISTRATION_NONE;
+            owner.___abort(this, attached, pool);
+            attached = null;
+            status = ABORTED;
+
+            if(config.permanentListeners != null){
+                notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
+            }
+
+            if(normalListeners != null){
+                notifyListeners(normalListeners, TransactionLifecycleEvent.PostAbort);
+            }
+
+            if(noRegistration){
+                throw abortOnNoRetryPossible();
+            }
+
+            awaitUpdate(listener);
+            throw Retry.INSTANCE;
+        }finally{
+            pool.putCheapLatch(listener);
         }
     }
 

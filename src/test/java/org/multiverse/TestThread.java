@@ -82,7 +82,7 @@ public abstract class TestThread extends Thread {
     }
 
     public void assertEndedWithInterruptStatus(boolean interrupt) {
-        assertEquals(endedWithInterruptStatus, interrupt);
+        assertEquals(interrupt,endedWithInterruptStatus);
     }
 
     public void assertFailedWithException(Class expected) {

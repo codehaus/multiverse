@@ -31,9 +31,9 @@ public interface Latch {
      * </ol>
      *
      * @param expectedEra the expected era.
-     * @throws InterruptedException if the thread is interrupted while waiting
+     * @throws org.multiverse.api.exceptions.TransactionInterruptedException
      */
-    void await(long expectedEra) throws InterruptedException;
+    void await(long expectedEra);
 
     /**
      * Awaits for this latch to open with a timeout. This call is not responsive to interrupts.
@@ -43,9 +43,10 @@ public interface Latch {
      * @param unit        the TimeUnit for the timeout
      * @return the remaining timeout.  A negative value indicates that the Latch is not opened in time.
      * @throws NullPointerException          if unit is null
-     * @throws UnsupportedOperationException if the Latch implementation doesn't implement this method.
      */
     long tryAwaitUninterruptible(long expectedEra, long timeout, TimeUnit unit);
+
+    long tryAwaitUninterruptible(long expectedEra, long timeoutNs);
 
     /**
      * Awaits for this latch to open with a timeout. This call is responsive to interrupts.
@@ -54,11 +55,12 @@ public interface Latch {
      * @param timeout     the timeout
      * @param unit        the TimeUnit for the timeout
      * @return the remaining timeout. A negative value indicates that the latch is not opened in time.
-     * @throws InterruptedException          if the thread is interrupted while waiting
+     * @throws org.multiverse.api.exceptions.TransactionInterruptedException
      * @throws NullPointerException          if unit is null
-     * @throws UnsupportedOperationException if the Latch implementation doesn't implement this method.
      */
-    long tryAwait(long expectedEra, long timeout, TimeUnit unit) throws InterruptedException;
+    long tryAwait(long expectedEra, long timeout, TimeUnit unit);
+
+    long tryAwait(long expectedEra, long timeoutNs);
 
     /**
      * Checks if the Latch is open.

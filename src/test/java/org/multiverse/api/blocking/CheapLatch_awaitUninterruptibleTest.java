@@ -1,5 +1,6 @@
 package org.multiverse.api.blocking;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 
@@ -7,7 +8,11 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 
 public class CheapLatch_awaitUninterruptibleTest {
-
+    @Before
+       public void setUp(){
+           clearCurrentThreadInterruptedStatus();
+       }
+   
     @Test
     public void whenAlreadyOpenAndSameEra() {
         CheapLatch latch = new CheapLatch();

@@ -4,7 +4,6 @@ import org.multiverse.api.closures.*;
 import org.multiverse.api.collections.*;
 import org.multiverse.api.exceptions.ControlFlowError;
 import org.multiverse.api.exceptions.IllegalTransactionStateException;
-import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
@@ -390,7 +389,8 @@ public class StmUtils {
      * of the cases.
      */
     public static void retry() {
-        throw Retry.INSTANCE;
+        Transaction tx = getRequiredThreadLocalTransaction();
+        tx.retry();
     }
 
     /**

@@ -170,6 +170,8 @@ public final class BetaIntRef
             final BetaTransaction expectedLockOwner,
             final BetaObjectPool pool) {
 
+        final IntRefTranlocal specializedTranlocal = (IntRefTranlocal)tranlocal;
+
         if(!tranlocal.isDirty()){
             if(tranlocal.getLockMode() != LOCKMODE_NONE){
                 ___lockOwner = null;
@@ -185,12 +187,11 @@ public final class BetaIntRef
                 }
             }
 
+            pool.put(specializedTranlocal);            
             return null;
         }
 
         //it is a full blown update (so locked).
-
-        final IntRefTranlocal specializedTranlocal = (IntRefTranlocal)tranlocal;
 
         ___value = specializedTranlocal.value;
         ___version = specializedTranlocal.version+1;
@@ -221,6 +222,8 @@ public final class BetaIntRef
             final BetaTransaction expectedLockOwner,
             final BetaObjectPool pool) {
 
+        final IntRefTranlocal specializedTranlocal = (IntRefTranlocal)tranlocal;
+
         if(tranlocal.isReadonly()){
             if(tranlocal.getLockMode() != LOCKMODE_NONE){
                 ___lockOwner = null;
@@ -236,12 +239,11 @@ public final class BetaIntRef
                 }
             }
 
+            pool.put(specializedTranlocal);
             return null;
         }
 
         //it is a full blown update (so locked).
-
-        final IntRefTranlocal specializedTranlocal = (IntRefTranlocal)tranlocal;
 
         ___value = specializedTranlocal.value;
         ___version = specializedTranlocal.version+1;

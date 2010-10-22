@@ -56,7 +56,7 @@ public class CigaretteSmokersProblemTest {
     @Test
     public void test() {
         startAll(arbiterThread, paperProvider, matchProvider, tobaccoProvider);
-        sleepMs(600000);
+        sleepMs(60000);
         System.out.println("Stopping threads");
         stop = true;
         joinAll(arbiterThread, paperProvider, matchProvider, tobaccoProvider);

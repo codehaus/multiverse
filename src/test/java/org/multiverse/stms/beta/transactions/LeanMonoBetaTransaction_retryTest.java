@@ -1,33 +1,30 @@
 package org.multiverse.stms.beta.transactions;
 
-/**
- * @author Peter Veentjer
- */
-public class FatArrayTreeBetaTransaction_registerChangeListenerAndAbortTest
-        extends BetaTransaction_registerChangeListenerAndAbortTest {
+public class LeanMonoBetaTransaction_retryTest
+        extends BetaTransaction_retryTest {
 
     @Override
     public boolean isSupportingListeners() {
-        return true;
+        return false;
     }
 
     @Override
     public int getTransactionMaxCapacity() {
-        return Integer.MAX_VALUE;
+        return 1;
     }
 
     @Override
     public boolean isSupportingCommute() {
-        return true;
+        return false;
     }
 
     @Override
     public BetaTransaction newTransaction() {
-        return new FatArrayTreeBetaTransaction(stm);
+        return new LeanMonoBetaTransaction(stm);
     }
 
     @Override
     public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
-        return new FatArrayTreeBetaTransaction(config);
+        return new LeanMonoBetaTransaction(config);
     }
 }

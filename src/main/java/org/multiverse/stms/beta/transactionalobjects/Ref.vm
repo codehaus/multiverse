@@ -180,6 +180,8 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             final BetaTransaction expectedLockOwner,
             final BetaObjectPool pool) {
 
+        final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} specializedTranlocal = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tranlocal;
+
         if(!tranlocal.isDirty()){
             if(tranlocal.getLockMode() != LOCKMODE_NONE){
                 ___lockOwner = null;
@@ -195,12 +197,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
                 }
             }
 
+            pool.put(specializedTranlocal);            
             return null;
         }
 
         //it is a full blown update (so locked).
-
-        final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} specializedTranlocal = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tranlocal;
 
         ___value = specializedTranlocal.value;
         ___version = specializedTranlocal.version+1;
@@ -231,6 +232,8 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             final BetaTransaction expectedLockOwner,
             final BetaObjectPool pool) {
 
+        final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} specializedTranlocal = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tranlocal;
+
         if(tranlocal.isReadonly()){
             if(tranlocal.getLockMode() != LOCKMODE_NONE){
                 ___lockOwner = null;
@@ -246,12 +249,11 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
                 }
             }
 
+            pool.put(specializedTranlocal);
             return null;
         }
 
         //it is a full blown update (so locked).
-
-        final ${transactionalObject.tranlocal}${transactionalObject.typeParameter} specializedTranlocal = (${transactionalObject.tranlocal}${transactionalObject.typeParameter})tranlocal;
 
         ___value = specializedTranlocal.value;
         ___version = specializedTranlocal.version+1;

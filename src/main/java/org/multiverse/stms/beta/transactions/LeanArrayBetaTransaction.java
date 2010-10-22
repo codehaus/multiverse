@@ -1,8 +1,9 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.Watch;
-import org.multiverse.api.blocking.Latch;
+import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.*;
@@ -1901,12 +1902,12 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
         return true;
     }
 
-    // ============================== registerChangeListenerAndAbort ========================
+    // ============================== retry ========================
 
     @Override
-    public void registerChangeListenerAndAbort(final Latch listener) {
+    public void retry() {
         if (status != ACTIVE) {
-            throw abortOnFaultyStatusOfRegisterChangeListenerAndAbort();
+            throw abortOnFaultyStatusOfRetry();
         }
 
         if(!config.blockingAllowed){
@@ -1917,40 +1918,52 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnNoRetryPossible();
         }
 
-        final long listenerEra = listener.getEra();
-
-        boolean furtherRegistrationNeeded = true;
-        boolean atLeastOneRegistration = false;
-
-        for(int k=0; k < firstFreeIndex; k++){
-
-            final Tranlocal tranlocal = array[k];
-            final BetaTransactionalObject owner = tranlocal.owner;
-
-            if(furtherRegistrationNeeded){
-                switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
-                    case REGISTRATION_DONE:
-                        atLeastOneRegistration = true;
-                        break;
-                    case REGISTRATION_NOT_NEEDED:
-                        furtherRegistrationNeeded = false;
-                        atLeastOneRegistration = true;
-                        break;
-                    case REGISTRATION_NONE:
-                        break;
-                    default:
-                        throw new IllegalStateException();
-                }
-            }
-
-            owner.___abort(this, tranlocal, pool);
-            array[k]=null;
+        CheapLatch listener = pool.takeCheapLatch();
+        if(listener == null){
+            listener = new CheapLatch();
         }
 
-        status = ABORTED;
+        try{
+            final long listenerEra = listener.getEra();
 
-        if(!atLeastOneRegistration){
-            throw abortOnNoRetryPossible();
+            boolean furtherRegistrationNeeded = true;
+            boolean atLeastOneRegistration = false;
+
+            for(int k=0; k < firstFreeIndex; k++){
+
+                final Tranlocal tranlocal = array[k];
+                final BetaTransactionalObject owner = tranlocal.owner;
+
+                if(furtherRegistrationNeeded){
+                    switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
+                        case REGISTRATION_DONE:
+                            atLeastOneRegistration = true;
+                            break;
+                        case REGISTRATION_NOT_NEEDED:
+                            furtherRegistrationNeeded = false;
+                            atLeastOneRegistration = true;
+                            break;
+                        case REGISTRATION_NONE:
+                            break;
+                        default:
+                            throw new IllegalStateException();
+                    }
+                }
+
+                owner.___abort(this, tranlocal, pool);
+                array[k]=null;
+            }
+
+            status = ABORTED;
+
+            if(!atLeastOneRegistration){
+                throw abortOnNoRetryPossible();
+            }
+
+            awaitUpdate(listener);
+            throw Retry.INSTANCE;
+        }finally{
+            pool.putCheapLatch(listener);
         }
     }
 

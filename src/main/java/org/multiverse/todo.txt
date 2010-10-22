@@ -214,6 +214,8 @@ and not allowed. So not throw the retry error immediately..
 
 - reading and backoff? Atm only spinning is used.
 
+- acquire commit lock. atm only some spinning is used
+
 - read uncommitted isolation level
 
 - improved testing in the transaction for the ensure functionality

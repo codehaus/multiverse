@@ -1,16 +1,14 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.multiverse.stms.beta.BetaStmConfiguration;
-
 /**
  * @author Peter Veentjer
  */
-public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest
-        extends BetaTransaction_registerChangeListenerAndAbortTest {
+public class FatMonoBetaTransaction_retryTest
+        extends BetaTransaction_retryTest {
 
     @Override
     public int getTransactionMaxCapacity() {
-        return new BetaStmConfiguration().maxArrayTransactionSize;
+        return 1;
     }
 
     @Override
@@ -25,11 +23,11 @@ public class FatArrayBetaTransaction_registerChangeListenerAndAbortTest
 
     @Override
     public BetaTransaction newTransaction() {
-        return new FatArrayBetaTransaction(stm);
+        return new FatMonoBetaTransaction(stm);
     }
 
     @Override
     public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
-        return new FatArrayBetaTransaction(config);
+        return new FatMonoBetaTransaction(config);
     }
 }

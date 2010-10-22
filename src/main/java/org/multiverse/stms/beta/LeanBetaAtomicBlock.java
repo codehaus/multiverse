@@ -81,8 +81,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                                     format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
                             }
-                        }
-                        waitForChange(tx);
+                        }                        
                     } catch (SpeculativeConfigurationError e) {
                         abort = false;
                         if(___TracingEnabled){
@@ -191,8 +190,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                                     format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
                             }
-                        }
-                        waitForChange(tx);
+                        }                        
                     } catch (SpeculativeConfigurationError e) {
                         abort = false;
                         if(___TracingEnabled){
@@ -301,8 +299,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                                     format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
                             }
-                        }
-                        waitForChange(tx);
+                        }                        
                     } catch (SpeculativeConfigurationError e) {
                         abort = false;
                         if(___TracingEnabled){
@@ -411,8 +408,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                                     format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
                             }
-                        }
-                        waitForChange(tx);
+                        }                        
                     } catch (SpeculativeConfigurationError e) {
                         abort = false;
                         if(___TracingEnabled){
@@ -521,8 +517,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                                     format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
                             }
-                        }
-                        waitForChange(tx);
+                        }                        
                     } catch (SpeculativeConfigurationError e) {
                         abort = false;
                         if(___TracingEnabled){
@@ -632,8 +627,7 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
                                     format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
                             }
-                        }
-                        waitForChange(tx);
+                        }                        
                     } catch (SpeculativeConfigurationError e) {
                         abort = false;
                         if(___TracingEnabled){

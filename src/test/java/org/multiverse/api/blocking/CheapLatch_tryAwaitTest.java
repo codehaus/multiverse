@@ -1,27 +1,235 @@
 package org.multiverse.api.blocking;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.TestThread;
+import org.multiverse.api.exceptions.TransactionInterruptedException;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.multiverse.TestUtils.assertClosed;
+import static org.junit.Assert.*;
+import static org.multiverse.TestUtils.*;
 
 public class CheapLatch_tryAwaitTest {
 
+    @Before
+    public void setUp(){
+        clearCurrentThreadInterruptedStatus();
+    }
+
     @Test
-    public void whenCalledThenUnsupportedOperationException() throws InterruptedException {
+    public void whenNullTimeUnit_thenNullPointerException(){
         CheapLatch latch = new CheapLatch();
         long era = latch.getEra();
 
         try {
-            latch.tryAwait(1, 1, TimeUnit.NANOSECONDS);
+            latch.tryAwait(era, 10, null);
             fail();
-        } catch (UnsupportedOperationException expected) {
+        } catch (NullPointerException expected) {
         }
 
         assertEquals(era, latch.getEra());
         assertClosed(latch);
+    }
+
+    @Test
+    public void whenAlreadyOpenAndSameEra(){
+        CheapLatch latch = new CheapLatch();
+        long era = latch.getEra();
+        latch.open(era);
+
+        long result = latch.tryAwait(era, 10, TimeUnit.NANOSECONDS);
+
+        assertEquals(10, result);
+        assertOpen(latch);
+        assertEquals(era, latch.getEra());
+    }
+
+    @Test
+    public void whenAlreadyOpenAndDifferentEra(){
+        CheapLatch latch = new CheapLatch();
+        long oldEra = latch.getEra();
+        latch.prepareForPooling();
+        long era = latch.getEra();
+        latch.open(era);
+
+        long result = latch.tryAwait(oldEra, 10, TimeUnit.NANOSECONDS);
+
+        assertEquals(10, result);
+        assertOpen(latch);
+        assertEquals(era, latch.getEra());
+    }
+
+    @Test
+    public void whenClosedButDifferentEra() {
+        CheapLatch latch = new CheapLatch();
+        long era = latch.getEra();
+        latch.prepareForPooling();
+
+        long expectedEra = latch.getEra();
+        long result = latch.tryAwait(era, 10, TimeUnit.NANOSECONDS);
+
+        assertEquals(10, result);
+        assertEquals(expectedEra, latch.getEra());
+        assertClosed(latch);
+    }
+
+    @Test
+    public void whenSomeWaitingIsNeeded() {
+        CheapLatch latch = new CheapLatch();
+        long era = latch.getEra();
+
+        AwaitThread t = new AwaitThread(latch, era, 10, TimeUnit.SECONDS);
+        t.start();
+
+        sleepMs(500);
+
+        assertAlive(t);
+        latch.open(era);
+
+        joinAll(t);
+        assertOpen(latch);
+        //assertTrue()
+    }
+
+    @Test
+    public void testAlreadyOpenAndNulTimeout(){
+        CheapLatch latch = new CheapLatch();
+        long era = latch.getEra();
+        latch.open(era);
+
+        long remaining = latch.tryAwait(era, 0, TimeUnit.NANOSECONDS);
+
+        assertEquals(0, remaining);
+        assertOpen(latch);
+        assertEra(latch, era);
+    }
+
+    @Test
+    public void whenStillClosedAndNulTimeout(){
+        CheapLatch latch = new CheapLatch();
+        long era = latch.getEra();
+
+        long remaining = latch.tryAwait(era, 0, TimeUnit.NANOSECONDS);
+
+        assertTrue(remaining < 0);
+        assertClosed(latch);
+        assertEra(latch, era);
+    }
+
+    @Test
+    public void whenAlreadyOpenAndNegativeTimeout(){
+        CheapLatch latch = new CheapLatch();
+        long era = latch.getEra();
+        latch.open(era);
+
+        long remaining = latch.tryAwait(era, -10, TimeUnit.NANOSECONDS);
+
+        assertTrue(remaining < 0);
+        assertOpen(latch);
+        assertEra(latch, era);
+    }
+
+    @Test
+    public void whenStillClosedAndNegativeTimeout()  {
+        CheapLatch latch = new CheapLatch();
+        long era = latch.getEra();
+
+        long remaining = latch.tryAwait(era, -10, TimeUnit.NANOSECONDS);
+
+        assertTrue(remaining < 0);
+        assertClosed(latch);
+        assertEra(latch, era);
+    }
+
+    @Test
+    public void whenTimeout() {
+        CheapLatch latch = new CheapLatch();
+        long era = latch.getEra();
+
+        AwaitThread t = new AwaitThread(latch, era, 1, TimeUnit.SECONDS);
+        t.start();
+        joinAll(t);
+
+        assertClosed(latch);
+        assertEra(latch, era);
+        assertTrue(t.result < 0);
+    }
+
+    @Test
+    public void whenStartingInterrupted_thenTransactionInterruptedExceptionAndInterruptedStatusRestored() {
+        CheapLatch latch = new CheapLatch();
+        long era = latch.getEra();
+
+        Thread.currentThread().interrupt();
+        try {
+            latch.tryAwait(era, 10);
+            fail();
+        } catch (TransactionInterruptedException expected) {
+        }
+
+        assertTrue(Thread.currentThread().isInterrupted());
+        assertEra(latch, era);
+        assertClosed(latch);
+    }
+
+    @Test
+    public void whenInterruptedWhileWaiting_thenTransactionInterruptedExceptionAndInterruptedStatusRestored() throws InterruptedException {
+        CheapLatch latch = new CheapLatch();
+        long era = latch.getEra();
+
+        AwaitThread t = new AwaitThread(latch, era, 10, TimeUnit.SECONDS);
+        t.setPrintStackTrace(false);
+        t.start();
+
+        sleepMs(500);
+
+        assertAlive(t);
+        t.interrupt();
+
+        t.join();
+        assertClosed(latch);
+        assertEra(latch, era);
+        t.assertFailedWithException(TransactionInterruptedException.class);
+        t.assertEndedWithInterruptStatus(true);
+    }
+
+    @Test
+    public void whenResetWhileWaiting_thenSleepingThreadsNotified() {
+        CheapLatch latch = new CheapLatch();
+        long era = latch.getEra();
+        AwaitThread t = new AwaitThread(latch, era, 10, TimeUnit.SECONDS);
+        t.start();
+
+        sleepMs(500);
+        assertAlive(t);
+
+        latch.prepareForPooling();
+        joinAll(t);
+
+        assertClosed(latch);
+        assertEra(latch, era + 1);
+        assertTrue(t.result > 0);
+        assertTrue(t.result < TimeUnit.SECONDS.toNanos(10));
+    }
+
+    class AwaitThread extends TestThread {
+        private final Latch latch;
+        private final long expectedEra;
+        private long timeout;
+        private TimeUnit unit;
+        private long result;
+
+        AwaitThread(Latch latch, long expectedEra, long timeout, TimeUnit unit) {
+            this.latch = latch;
+            this.expectedEra = expectedEra;
+            this.timeout = timeout;
+            this.unit = unit;
+        }
+
+        @Override
+        public void doRun() throws Exception {
+            result = latch.tryAwait(expectedEra, timeout, unit);
+        }
     }
 }

@@ -1,16 +1,22 @@
 package org.multiverse.api.blocking;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.api.exceptions.TransactionInterruptedException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 
 public class CheapLatch_awaitTest {
-
+    @Before
+       public void setUp(){
+           clearCurrentThreadInterruptedStatus();
+       }
+    
     @Test
-    public void whenAlreadyOpenAndSameEra() throws InterruptedException {
+    public void whenAlreadyOpenAndSameEra(){
         CheapLatch latch = new CheapLatch();
         long era = latch.getEra();
         latch.open(era);
@@ -22,7 +28,7 @@ public class CheapLatch_awaitTest {
     }
 
     @Test
-    public void whenAlreadyOpenAndDifferentEra() throws InterruptedException {
+    public void whenAlreadyOpenAndDifferentEra(){
         CheapLatch latch = new CheapLatch();
         long oldEra = latch.getEra();
         latch.prepareForPooling();
@@ -36,7 +42,7 @@ public class CheapLatch_awaitTest {
     }
 
     @Test
-    public void whenClosedButDifferentEra() throws InterruptedException {
+    public void whenClosedButDifferentEra(){
         CheapLatch latch = new CheapLatch();
         long era = latch.getEra();
         latch.prepareForPooling();
@@ -74,7 +80,7 @@ public class CheapLatch_awaitTest {
         try {
             latch.await(era);
             fail();
-        } catch (InterruptedException expected) {
+        } catch (TransactionInterruptedException expected) {
         }
 
         assertEra(latch, era);
@@ -98,7 +104,8 @@ public class CheapLatch_awaitTest {
         t.join();
         assertClosed(latch);
         assertEra(latch, era);
-        t.assertInterrupted();
+        t.assertEndedWithInterruptStatus(true);
+        t.assertFailedWithException(TransactionInterruptedException.class);
     }
 
     @Test

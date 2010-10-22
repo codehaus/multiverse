@@ -1,19 +1,19 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.*;
-import org.multiverse.api.blocking.*;
+import org.multiverse.api.blocking.CheapLatch;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.*;
-import org.multiverse.api.lifecycle.*;
-
-import org.multiverse.stms.beta.*;
-import org.multiverse.stms.beta.conflictcounters.*;
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStmConstants;
+import org.multiverse.stms.beta.conflictcounters.LocalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
-import java.util.*;
+import java.util.ArrayList;
 
+import static java.lang.String.format;
 import static org.multiverse.stms.beta.BetaStmUtils.toDebugString;
-import static java.lang.String.*;
 
 /**
  * @author Peter Veentjer
@@ -195,7 +195,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
                 config.familyName));
     }
 
-    public final IllegalTransactionStateException abortOnFaultyStatusOfRegisterChangeListenerAndAbort(){
+    public final IllegalTransactionStateException abortOnFaultyStatusOfRetry(){
         switch (status) {
             case PREPARED:
                 abort();
@@ -484,21 +484,36 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract void hardReset();
 
-   /**
-    * Registers the changeListener to all reads done by the transaction and aborts the transaction. This functionality
-    * is needed for creating blocking transactions; transactions that are able to wait for change. In the STM literature
-    * this is know as the 'retry' and 'orelse' functionality.
-    *
-    * @param changeListener the Latch the is notified when a change happens on one of the reads.
-    * @throws NullPointerException if changeListener is null (will also ___abort the transaction).
-    * @throws org.multiverse.api.exceptions.RetryException
-    *                              if the retry fails
-    * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-    *                              if the transaction isn't in the correct
-    *                              state for this transaction. When this exception happens, the transaction will also
-    *                              be aborted (if it isn't committed).
-    */
-    public abstract void registerChangeListenerAndAbort(Latch changeListener);
+    protected final void awaitUpdate(final CheapLatch latch){
+       final long lockEra = latch.getEra();
+
+       try {
+            if(config.timeoutNs == Long.MAX_VALUE){
+                if (config.isInterruptible()) {
+                    latch.await(lockEra);
+                } else {
+                    latch.awaitUninterruptible(lockEra);
+                }
+            }else{
+                if (config.isInterruptible()) {
+                    remainingTimeoutNs = latch.tryAwait(
+                        lockEra, remainingTimeoutNs);
+                } else {
+                    remainingTimeoutNs = latch.tryAwaitUninterruptible(
+                        lockEra, remainingTimeoutNs);
+                }
+
+                if (remainingTimeoutNs < 0) {
+                    throw new RetryTimeoutException(
+                       format("[%s] Transaction has timed with a total timeout of %s ns",
+                               config.getFamilyName(),
+                               config.getTimeoutNs()));
+                }
+            }
+       } finally {
+           pool.putCheapLatch(latch);
+       }
+   }
 
     public abstract void startEitherBranch();
 

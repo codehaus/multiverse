@@ -122,6 +122,8 @@ public interface Transaction {
      */
     void abort();
 
+    void retry();
+
     /**
      * Signals that the only possible outcome of the Transaction is one that aborts. When the transaction prepares or
      * commits it checks if the transaction is marked for abort. If so, it will automatically aborted. If the

@@ -241,7 +241,8 @@ public class StmUtils {
      * of the cases.
      */
     public static void retry() {
-        throw Retry.INSTANCE;
+        Transaction tx = getRequiredThreadLocalTransaction();
+        tx.retry();
     }
 
     /**

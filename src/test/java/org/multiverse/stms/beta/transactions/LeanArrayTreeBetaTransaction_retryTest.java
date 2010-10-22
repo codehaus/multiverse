@@ -1,13 +1,11 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.multiverse.stms.beta.BetaStmConfiguration;
-
-public class LeanArrayBetaTransaction_registerChangeListenerAndAbortTest
-        extends BetaTransaction_registerChangeListenerAndAbortTest {
+public class LeanArrayTreeBetaTransaction_retryTest
+        extends BetaTransaction_retryTest {
 
     @Override
     public int getTransactionMaxCapacity() {
-        return new BetaStmConfiguration().maxArrayTransactionSize;
+        return Integer.MAX_VALUE;
     }
 
     @Override
@@ -22,11 +20,11 @@ public class LeanArrayBetaTransaction_registerChangeListenerAndAbortTest
 
     @Override
     public BetaTransaction newTransaction() {
-        return new LeanArrayBetaTransaction(stm);
+        return new LeanArrayTreeBetaTransaction(stm);
     }
 
     @Override
     public BetaTransaction newTransaction(BetaTransactionConfiguration config) {
-        return new LeanArrayBetaTransaction(config);
+        return new LeanArrayTreeBetaTransaction(config);
     }
 }
