@@ -1,24 +1,21 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.assertIsAborted;
-import static org.multiverse.TestUtils.assertIsCommitted;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoUpdateLock;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
-public class BetaLongRef_deferredEnsure0Test {
+public class BetaLongRef_deferredEnsure0Test implements BetaStmConstants {
     private BetaStm stm;
 
     @Before
@@ -28,10 +25,122 @@ public class BetaLongRef_deferredEnsure0Test {
     }
 
     @Test
-    @Ignore
-    public void moreTesting() {
+    public void whenReadonlyAndConflictingWrite_thenCommitSucceeds(){
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+        ref.get();
+        ref.deferredEnsure();
+
+        ref.atomicIncrementAndGet(1);
+
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
+        assertSurplus(0, ref);
     }
 
+    @Test
+    public void whenEnsuredBySelf() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+        ref.set(initialValue + 1);
+        ref.ensure();
+        ref.deferredEnsure();
+
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        assertIsActive(tx);
+        assertTrue(tranlocal.isConflictCheckNeeded());
+        assertEquals(LOCKMODE_UPDATE, tranlocal.getLockMode());
+
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
+        assertSurplus(0, ref);
+    }
+
+    @Test
+    public void whenPrivatizedBySelf() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+        ref.set(initialValue + 1);
+        ref.privatize();
+        ref.deferredEnsure();
+
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        assertIsActive(tx);
+        assertTrue(tranlocal.isConflictCheckNeeded());
+        assertRefHasCommitLock(ref, tx);
+        assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
+
+        tx.commit();
+
+        assertRefHasNoLocks(ref);
+        assertIsCommitted(tx);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
+        assertSurplus(0, ref);
+    }
+
+    @Test
+    public void whenEnsuredByOther() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.ensure(otherTx);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+        ref.set(initialValue + 1);
+        ref.deferredEnsure();
+
+        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        assertIsActive(tx);
+        assertTrue(tranlocal.isConflictCheckNeeded());
+        assertRefHasUpdateLock(ref, otherTx);
+        assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
+
+    @Test
+    public void whenPrivatizedByOther_thenDeferredEnsureFails() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.privatize(otherTx);
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+        try {
+            ref.deferredEnsure();
+            fail();
+        } catch (ReadWriteConflict expected) {
+
+        }
+
+        assertIsAborted(tx);
+        assertRefHasCommitLock(ref, otherTx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
+   
     @Test
     public void whenCalled_thenNoLockingDuringTransaction() {
         long initialValue = 10;
@@ -50,12 +159,6 @@ public class BetaLongRef_deferredEnsure0Test {
         assertHasNoCommitLock(ref);
         assertNull(ref.___getLockOwner());
         assertVersionAndValue(ref, initialVersion, initialValue);
-    }
-
-    @Test
-    @Ignore
-    public void whenCalled_thenOnlySetDuringCommit(){
-
     }
 
     @Test
