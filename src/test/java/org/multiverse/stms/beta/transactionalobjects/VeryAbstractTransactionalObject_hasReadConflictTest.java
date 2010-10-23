@@ -8,10 +8,11 @@ import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 
 public class VeryAbstractTransactionalObject_hasReadConflictTest implements BetaStmConstants {
     private BetaStm stm;
@@ -33,9 +34,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
 
         assertFalse(hasReadConflict);
         assertSurplus(1, ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -49,9 +48,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
 
         assertFalse(hasReadConflict);
         assertSurplus(1, ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -65,9 +62,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
 
         assertFalse(hasConflict);
         assertSurplus(1, ref);
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, tx);
     }
 
     @Test
@@ -81,9 +76,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
 
         assertFalse(hasConflict);
         assertSurplus(1, ref);
-        assertHasNoCommitLock(ref);
-        assertHasUpdateLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref,tx);
     }
 
     @Test
@@ -99,9 +92,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
         boolean hasConflict = ref.___hasReadConflict(read);
         assertTrue(hasConflict);
         assertSurplus(1, ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -114,9 +105,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
 
         assertFalse(conflict);
         assertSurplus(1, ref);
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, tx);
     }
 
     @Test
@@ -137,9 +126,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
 
         assertTrue(hasConflict);
         assertSurplus(2, ref);
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref,otherTx);
     }
 
     @Test
@@ -160,9 +147,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
 
         assertTrue(hasConflict);
         assertSurplus(2, ref);
-        assertHasNoCommitLock(ref);
-        assertHasUpdateLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref,otherTx);
     }
 
     @Test
@@ -194,9 +179,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
 
         assertFalse(hasConflict);
         assertSurplus(2, ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -213,9 +196,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
 
         assertFalse(hasConflict);
         assertSurplus(2, ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
     }
 
     @Test

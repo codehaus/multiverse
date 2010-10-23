@@ -7,10 +7,10 @@ import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 /**
@@ -35,11 +35,9 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, write, true);
 
         assertTrue(result);
-        assertSame(tx, ref.___getLockOwner());
 
         assertSurplus(1, ref);
-        assertHasNoUpdateLock(ref);
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref, tx);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
     }
@@ -54,10 +52,8 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, write, false);
 
         assertTrue(result);
-        assertSame(tx, ref.___getLockOwner());
         assertReadonlyCount(0, ref);
-        assertHasNoCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertRefHasUpdateLock(ref,tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -73,10 +69,8 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, write, true);
 
         assertTrue(result);
-        assertSame(tx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref, tx);
         assertSurplus(1, ref);
-        assertHasNoUpdateLock(ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
     }
@@ -91,10 +85,8 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, write, false);
 
         assertTrue(result);
-        assertSame(tx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref, tx);
         assertSurplus(1, ref);
-        assertHasNoUpdateLock(ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
     }
@@ -109,10 +101,8 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, write, true);
 
         assertTrue(result);
-        assertSame(tx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref, tx);
         assertSurplus(1, ref);
-        assertHasNoUpdateLock(ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
     }
@@ -127,10 +117,8 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, write, false);
 
         assertTrue(result);
-        assertSame(tx, ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
         assertSurplus(1, ref);
-        assertHasUpdateLock(ref);
+        assertRefHasUpdateLock(ref,tx);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
     }
@@ -148,9 +136,7 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, write, false);
 
         assertFalse(result);
-        assertSame(otherTx, ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertRefHasUpdateLock(ref,otherTx);
         assertSurplus(2, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -169,9 +155,7 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, write, true);
 
         assertFalse(result);
-        assertSame(otherTx, ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertRefHasUpdateLock(ref,otherTx);
         assertSurplus(2, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -190,9 +174,7 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, write, false);
 
         assertFalse(result);
-        assertSame(otherTx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasCommitLock(ref, otherTx);
         assertSurplus(2, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -211,9 +193,7 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, write, true);
 
         assertFalse(result);
-        assertSame(otherTx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasCommitLock(ref, otherTx);
         assertSurplus(2, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -232,9 +212,7 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, read, true);
 
         assertFalse(result);
-        assertNull(ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertSurplus(1, ref);
@@ -256,10 +234,9 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, read2, true);
 
         assertFalse(result);
-        assertHasCommitLock(ref.___getOrec());
+        assertRefHasCommitLock(ref, otherTx);
         assertSurplus(2, ref.___getOrec());
         assertUpdateBiased(ref.___getOrec());
-        assertSame(otherTx, ref.___getLockOwner());
     }
 
 }

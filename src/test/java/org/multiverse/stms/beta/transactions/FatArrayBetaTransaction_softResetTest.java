@@ -72,7 +72,7 @@ public class FatArrayBetaTransaction_softResetTest {
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 0);
         assertHasNoUpdates(tx);
     }
@@ -92,7 +92,7 @@ public class FatArrayBetaTransaction_softResetTest {
         assertReadonlyCount(0, ref);
         assertReadBiased(ref);
         assertSurplus(1, ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 0);
         assertHasNoUpdates(tx);
     }
@@ -112,7 +112,7 @@ public class FatArrayBetaTransaction_softResetTest {
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 0);
         assertHasNoUpdates(tx);
     }
@@ -132,7 +132,7 @@ public class FatArrayBetaTransaction_softResetTest {
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 0);
         assertHasNoUpdates(tx);
     }
@@ -164,7 +164,7 @@ public class FatArrayBetaTransaction_softResetTest {
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 0);
         assertHasNoUpdates(tx);
     }

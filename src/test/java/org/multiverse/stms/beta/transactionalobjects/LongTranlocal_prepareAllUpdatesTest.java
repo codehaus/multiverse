@@ -8,10 +8,8 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import static org.junit.Assert.assertNull;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasNoLocks;
 import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoUpdateLock;
 
 public class LongTranlocal_prepareAllUpdatesTest implements BetaStmConstants {
     private BetaStm stm;
@@ -39,9 +37,7 @@ public class LongTranlocal_prepareAllUpdatesTest implements BetaStmConstants {
         BetaTransaction tx = stm.startDefaultTransaction();
         tranlocal.prepareAllUpdates(pool, tx, 0);
 
-        assertNull(ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 

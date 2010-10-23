@@ -17,9 +17,8 @@ import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.api.functions.Functions.newIdentityLongFunction;
 import static org.multiverse.api.functions.Functions.newIncLongFunction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasNoLocks;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUpdateBiased;
 
 public class BetaLongRef_atomicAlterAndGetTest {
     private BetaStm stm;
@@ -119,7 +118,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
         long result = ref.atomicAlterAndGet(function);
 
         assertEquals(initialValue + 1, result);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
         assertSurplus(1, ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
         assertIsActive(tx);

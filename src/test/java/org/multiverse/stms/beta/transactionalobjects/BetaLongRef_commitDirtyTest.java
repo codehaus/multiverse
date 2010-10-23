@@ -13,8 +13,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.getField;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
@@ -57,7 +56,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         assertSame(latch, listeners.listener);
         assertNull(getField(ref, "___listeners"));
         assertEquals(oldConflictCount, globalConflictCounter.count());
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertReadonlyCount(0, ref);
         assertFalse(latch.isOpen());
@@ -85,9 +84,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
 
         assertNull(listeners);
         assertEquals(oldConflictCount + 1, globalConflictCounter.count());
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(1, ref);
         assertReadonlyCount(0, ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
@@ -112,9 +109,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
 
         assertNull(listeners);
         assertEquals(oldConflictCount, globalConflictCounter.count());
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(1, ref);
         assertReadonlyCount(1, ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -138,9 +133,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
 
         assertNull(listeners);
         assertEquals(oldConflictCount, globalConflictCounter.count());
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(1, ref);
         assertReadonlyCount(1, ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -162,9 +155,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         assertNull(result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertReadonlyCount(1, ref);
     }
@@ -185,9 +176,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         assertNull(result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
         assertSurplus(1, ref);
         assertReadonlyCount(0, ref);
     }
@@ -211,9 +200,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         assertEquals(oldConflictCount, globalConflictCounter.count());
         assertVersionAndValue(ref, initialVersion + 1, updateValue);
 
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertReadonlyCount(0, ref);
     }
@@ -234,9 +221,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         assertNull(result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertReadonlyCount(1, ref);
     }
@@ -256,7 +241,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
 
         assertNull(listeners);
         assertEquals(oldConflictCount, globalConflictCounter.count());
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
         assertReadBiased(ref);
         assertSurplus(1, ref);
         assertVersionAndValue(ref, version, initialValue);
@@ -276,9 +261,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         Listeners listeners = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(listeners);
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertReadonlyCount(1, ref);
         assertUpdateBiased(ref);
@@ -300,9 +283,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         Listeners listeners = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(listeners);
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);
@@ -323,9 +304,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         Listeners listeners = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(listeners);
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertReadonlyCount(1, ref);
         assertUpdateBiased(ref);
@@ -346,9 +325,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         Listeners listeners = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(listeners);
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertReadonlyCount(1, ref);
         assertUpdateBiased(ref);
@@ -370,9 +347,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         Listeners listeners = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(listeners);
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);
@@ -393,9 +368,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         Listeners listeners = ref.___commitDirty(tranlocal, tx, pool);
 
         assertNull(listeners);
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertReadonlyCount(1, ref);
         assertUpdateBiased(ref);
@@ -419,9 +392,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         assertNull(result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
         assertVersionAndValue(ref, BetaLongRef.VERSION_UNCOMMITTED + 1, initialValue);
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertReadonlyCount(0, ref);
     }
@@ -440,9 +411,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         assertNull(result);
         assertEquals(oldConflictCount, globalConflictCounter.count());
         assertVersionAndValue(ref, BetaLongRef.VERSION_UNCOMMITTED + 1, 0);
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertReadonlyCount(0, ref);
     }

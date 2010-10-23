@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 
 public class BetaLongRef_deferredEnsure0Test implements BetaStmConstants {
     private BetaStm stm;
@@ -155,9 +155,7 @@ public class BetaLongRef_deferredEnsure0Test implements BetaStmConstants {
         LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
 
         assertTrue(tranlocal.isConflictCheckNeeded());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -175,9 +173,7 @@ public class BetaLongRef_deferredEnsure0Test implements BetaStmConstants {
 
         assertSame(null, getThreadLocalTransaction());
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -199,9 +195,7 @@ public class BetaLongRef_deferredEnsure0Test implements BetaStmConstants {
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -223,9 +217,7 @@ public class BetaLongRef_deferredEnsure0Test implements BetaStmConstants {
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -247,9 +239,7 @@ public class BetaLongRef_deferredEnsure0Test implements BetaStmConstants {
         assertIsCommitted(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
     }
 
     @Test

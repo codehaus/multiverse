@@ -66,11 +66,9 @@ public class BetaLongRef_atomicGetTest {
         } catch (LockedException ex) {
         }
 
-        assertSame(otherTx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertHasNoUpdateLock(ref);
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, version, 100);
     }
 
@@ -86,10 +84,8 @@ public class BetaLongRef_atomicGetTest {
 
         assertEquals(100, result);
         assertSurplus(1, ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref, otherTx);
         assertUpdateBiased(ref);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
         assertVersionAndValue(ref, version, 100);
     }
 
@@ -116,11 +112,9 @@ public class BetaLongRef_atomicGetTest {
         } catch (LockedException ex) {
         }
 
-        assertSame(otherTx, ref.___getLockOwner());
         assertSurplus(1, ref);
         assertReadBiased(ref);
-        assertHasNoUpdateLock(ref);
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, version, 100);
     }
 
@@ -136,10 +130,8 @@ public class BetaLongRef_atomicGetTest {
 
         assertEquals(100, result);
         assertSurplus(1, ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref, otherTx);
         assertReadBiased(ref);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
         assertVersionAndValue(ref, version, 100);
     }
 }

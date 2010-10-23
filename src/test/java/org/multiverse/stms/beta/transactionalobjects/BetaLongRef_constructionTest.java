@@ -6,9 +6,9 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_constructionTest implements BetaStmConstants {
@@ -31,9 +31,7 @@ public class BetaLongRef_constructionTest implements BetaStmConstants {
         BetaLongRef ref = new BetaLongRef(stm);
         assertEquals(exampleRef.___toOrecString(), ref.___toOrecString());
 
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, BetaTransactionalObject.VERSION_UNCOMMITTED + 1, 0);
     }
 
@@ -47,9 +45,7 @@ public class BetaLongRef_constructionTest implements BetaStmConstants {
         BetaLongRef ref = new BetaLongRef(stm, 10);
         assertEquals(exampleRef.___toOrecString(), ref.___toOrecString());
 
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, BetaTransactionalObject.VERSION_UNCOMMITTED + 1, 10);
     }
 
@@ -59,9 +55,7 @@ public class BetaLongRef_constructionTest implements BetaStmConstants {
         BetaLongRef ref = new BetaLongRef(tx);
 
         assertSurplus(1, ref);
-        assertHasNoUpdateLock(ref);
-        assertHasCommitLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, tx);
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);
         assertVersionAndValue(ref, 0, 0);

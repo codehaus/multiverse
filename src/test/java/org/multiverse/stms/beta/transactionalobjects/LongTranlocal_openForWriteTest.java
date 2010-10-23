@@ -8,9 +8,8 @@ import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasNoLocks;
 import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoUpdateLock;
 
 public class LongTranlocal_openForWriteTest implements BetaStmConstants {
 
@@ -42,9 +41,7 @@ public class LongTranlocal_openForWriteTest implements BetaStmConstants {
 
         }
 
-        assertNull(ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -69,9 +66,7 @@ public class LongTranlocal_openForWriteTest implements BetaStmConstants {
 
         }
 
-        assertNull(ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -90,9 +85,7 @@ public class LongTranlocal_openForWriteTest implements BetaStmConstants {
         assertEquals(initialVersion, tranlocal.version);
         assertEquals(initialValue, tranlocal.value);
         assertEquals(initialValue, tranlocal.oldValue);
-        assertNull(ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -112,9 +105,7 @@ public class LongTranlocal_openForWriteTest implements BetaStmConstants {
         assertEquals(initialVersion, tranlocal.version);
         assertEquals(initialValue, tranlocal.value);
         assertEquals(initialValue, tranlocal.oldValue);
-        assertNull(ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -134,9 +125,7 @@ public class LongTranlocal_openForWriteTest implements BetaStmConstants {
         assertEquals(initialVersion, tranlocal.version);
         assertEquals(initialValue, tranlocal.value);
         assertEquals(initialValue, tranlocal.oldValue);
-        assertNull(ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 }

@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 
 public class BetaLongRef_getAndIncrement1Test implements BetaStmConstants {
 
@@ -124,10 +124,9 @@ public class BetaLongRef_getAndIncrement1Test implements BetaStmConstants {
         }
 
         assertIsAborted(tx);
-        assertSame(otherTx, ref.___getLockOwner());
         assertVersionAndValue(ref, version, initialValue);
         assertSurplus(1, ref);
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref, otherTx);
     }
 
     @Test
@@ -144,7 +143,7 @@ public class BetaLongRef_getAndIncrement1Test implements BetaStmConstants {
         }
 
         assertSurplus(0, ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertNull(getThreadLocalTransaction());
     }
@@ -167,7 +166,7 @@ public class BetaLongRef_getAndIncrement1Test implements BetaStmConstants {
         }
 
         assertSurplus(0, ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertSame(tx, getThreadLocalTransaction());
         assertIsCommitted(tx);
@@ -190,7 +189,7 @@ public class BetaLongRef_getAndIncrement1Test implements BetaStmConstants {
         }
 
         assertSurplus(0, ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertSame(tx, getThreadLocalTransaction());
         assertIsAborted(tx);

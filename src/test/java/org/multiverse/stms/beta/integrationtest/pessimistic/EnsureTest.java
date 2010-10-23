@@ -7,11 +7,11 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
 public class EnsureTest {
 
@@ -39,9 +39,7 @@ public class EnsureTest {
         }
 
         assertIsAborted(tx);
-        assertHasNoUpdateLock(ref);
-        assertHasCommitLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, otherTx);
     }
 
     @Test
@@ -60,9 +58,7 @@ public class EnsureTest {
         }
 
         assertIsAborted(tx);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref, otherTx);
     }
 
     @Test
@@ -78,9 +74,7 @@ public class EnsureTest {
 
         assertEquals(5, result);
         assertIsActive(tx);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref,otherTx);
     }
 
     @Test
@@ -97,20 +91,18 @@ public class EnsureTest {
 
         assertEquals(10, result);
         assertIsActive(tx);
-        assertSame(otherTx, ref.___getLockOwner());
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasUpdateLock(ref,otherTx);        
     }
 
     @Test
-    public void whenPreviouslyReadByOtherThread_thenWriteSuccessButCommitFails() {
+    public void whenPreviouslyReadByOtherTransaction_thenWriteSuccessButCommitFails() {
         BetaLongRef ref = newLongRef(stm, 10);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.get(tx);
 
-        BetaTransaction ensureTx = stm.startDefaultTransaction();
-        ref.ensure(ensureTx);
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.ensure(otherTx);
 
         ref.set(tx, 100);
 
@@ -121,9 +113,7 @@ public class EnsureTest {
         }
 
         assertIsAborted(tx);
-        assertHasNoCommitLock(ref);
-        assertHasUpdateLock(ref);
-        assertSame(ensureTx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref, otherTx);
     }
 
     @Test
@@ -143,9 +133,7 @@ public class EnsureTest {
         }
 
         assertIsAborted(tx);
-        assertHasNoCommitLock(ref);
-        assertHasUpdateLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref, otherTx);
     }
 
     @Test
@@ -157,9 +145,7 @@ public class EnsureTest {
         ref.ensure(tx);
 
         assertIsActive(tx);
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, tx);
     }
 
     @Test
@@ -171,9 +157,7 @@ public class EnsureTest {
         tx.commit();
 
         assertIsCommitted(tx);
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -185,9 +169,7 @@ public class EnsureTest {
         tx.prepare();
 
         assertIsPrepared(tx);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref, tx);
     }
 
     @Test
@@ -199,9 +181,7 @@ public class EnsureTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -213,9 +193,7 @@ public class EnsureTest {
         ref.ensure(tx);
 
         assertIsActive(tx);
-        assertSame(tx, ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertRefHasUpdateLock(ref, tx);
     }
 
     @Test
@@ -233,9 +211,7 @@ public class EnsureTest {
         } catch (ReadWriteConflict expected) {
         }
 
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
         assertIsAborted(tx);
     }
 }

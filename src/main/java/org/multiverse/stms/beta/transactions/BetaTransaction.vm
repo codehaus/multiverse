@@ -153,15 +153,15 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
             case PREPARED:
                 abort();
                 return new PreparedTransactionException(
-                    format("[%s] Can't perform BetaTransaction.locate using an already prepared transaction",
+                    format("[%s] Failed to execute BetaTransaction.locate, reason: the transaction is prepared",
                         config.familyName));
             case ABORTED:
                 return new DeadTransactionException(
-                    format("[%s] Can't perform BetaTransaction.locate using an already aborted transaction",
+                    format("[%s] Failed to execute BetaTransaction.locate, reason: the transaction is aborted",
                         config.familyName));
             case COMMITTED:
                 return new DeadTransactionException(
-                    format("[%s] Can't perform BetaTransaction.locate using an already committed transaction",
+                    format("[%s] Failed to execute BetaTransaction.locate, reason: the transaction is committed",
                         config.familyName));
             default:
                 throw new IllegalStateException();
@@ -171,7 +171,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     public final NullPointerException abortLocateWhenNullReference(){
         abort();
         return new NullPointerException(
-            format("[%s] Can't locate a null reference",
+            format("[%s] Failed to execute BetaTransaction.locate, reason: the reference is null",
                 config.familyName));
     }
 
@@ -185,15 +185,15 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
                 break;
             case PREPARED:
                 throw new PreparedTransactionException(
-                    format("[%s] Can't perform BetaTransaction.setAbortOnly using an already prepared transaction",
+                    format("[%s] Failed to execute BetaTransaction.setAbortOnly, reason: the transaction is prepared",
                         config.familyName));
             case COMMITTED:
                 throw new DeadTransactionException(
-                    format("[%s] Can't perform BetaTransaction.setAbortOnly using an already committed transaction",
+                    format("[%s] Failed to execute BetaTransaction.setAbortOnly, reason: the transaction is committed",
                         config.familyName));
             case ABORTED:
                 throw new DeadTransactionException(
-                    format("[%s] Can't perform BetaTransaction.setAbortOnly using an already aborted transaction",
+                    format("[%s] Failed to execute BetaTransaction.setAbortOnly, reason: the transaction is aborted",
                         config.familyName));
             default:
                 throw new IllegalStateException();
@@ -203,21 +203,21 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     public final NullPointerException abortCommuteOnNullFunction(final TransactionalObject ref) {
         abort();
         throw new NullPointerException(
-            format("[%s] Commute function can't be null",
+            format("[%s] Failed to execute BetaTransaction.commute, reason: the function is null",
                 config.familyName));
     }
 
     public final RetryNotPossibleException abortOnNoRetryPossible(){
         abort();
         throw new RetryNotPossibleException(
-            format("[%s] Can't block transaction since there are no tracked reads",
+            format("[%s] Failed to execute BetaTransaction.retry, reason: there are no tracked reads",
                 config.familyName));
     }
 
     public final RetryNotAllowedException abortOnNoBlockingAllowed(){
         abort();
         return new RetryNotAllowedException(
-            format("[%s] Can't block transaction since it doesn't allow blocking",
+            format("[%s] Failed to execute BetaTransaction.retry, reason: the transaction doesn't allow blocking",
                 config.familyName));
     }
 
@@ -226,15 +226,15 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
             case PREPARED:
                 abort();
                 return new PreparedTransactionException(
-                    format("[%s] Can't block on an already prepared transaction",
+                    format("[%s] Failed to execute BetaTransaction.retry, reason: the transaction is prepared",
                         config.familyName));
             case ABORTED:
                 return new DeadTransactionException(
-                    format("[%s] Can't block on already aborted transaction",
+                    format("[%s] Failed to execute BetaTransaction.retry, reason: the transaction is aborted",
                         config.familyName));
             case COMMITTED:
                 return new DeadTransactionException(
-                    format("[%s] Can't block on already committed transaction",
+                    format("[%s] Failed to execute BetaTransaction.retry, reason: the transaction is committed",
                         config.familyName));
             default:
                 throw new IllegalStateException();
@@ -251,7 +251,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     public final NullPointerException abortOpenOnNull(){
         abort();
         return new NullPointerException(
-            format("[%s] Can't open a TransactionalObject with a null reference",
+            format("[%s] Failed to execute BetaTransaction.open, reason: the reference is null",
                 config.familyName));
     }
 
@@ -260,7 +260,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
         abort();
         return new IllegalTransactionStateException(
-            format("[%s] Can't openForRead '%s' while evaluating a commuting function",
+            format("[%s] Failed to execute BetaTransaction.openForRead '%s', reason: a commuting function is being evaluated",
                 config.familyName, toDebugString(ref)));
     }
 
@@ -269,7 +269,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
         abort();
         return new IllegalTransactionStateException(
-            format("[%s] Can't openForWrite '%s' while evaluating a commuting function",
+            format("[%s] Failed to execute BetaTransaction.openForWrite '%s', reason: a commuting function is being evaluated",
                 config.familyName, toDebugString(ref)));
     }
 
@@ -278,28 +278,27 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
             case PREPARED:
                 abort();
                 return new PreparedTransactionException(
-                    format("[%s] Can't open a transactional object on already prepared transaction",
-                        config.familyName));
+                    format("[%s] Failed to execute BetaTransaction.open '%s', reason: the transaction is prepared",
+                        config.familyName, toDebugString(ref)));
             case ABORTED:
                 return new DeadTransactionException(
-                    format("[%s] Can't open a transactional object on already aborted transaction",
-                        config.familyName));
+                    format("[%s] Failed to execute BetaTransaction.open '%s', reason: the transaction is aborted",
+                        config.familyName, toDebugString(ref)));
             case COMMITTED:
                 return new DeadTransactionException(
-                    format("[%s] Can't open a transactional object on already committed transaction",
-                        config.familyName));
+                    format("[%s] Failed to execute BetaTransaction.open '%s', reason: the transaction is committed",
+                        config.familyName, toDebugString(ref)));
             default:
                 throw new IllegalStateException();
         }
    }
-
 
     public final RuntimeException abortOnOpenForConstructionWhileEvaluatingCommute(
         final BetaTransactionalObject ref){
 
         abort();
         return new IllegalTransactionStateException(
-            format("[%s] Can't openForConstruction '%s' while evaluating a commuting function",
+            format("[%s] Failed to execute BetaTransaction.openForConstruction '%s', reason: a commuting function is being evaluated",
             config.familyName, toDebugString(ref)));
     }
 
@@ -308,7 +307,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
         abort();
         return new IllegalTransactionStateException(
-            format("[%s] Can't add a commuting function to '%s' while evaluating a commuting function",
+            format("[%s] Failed to execute BetaTransaction.commute '%s', reason: a commuting function is being evaluated",
                 config.familyName, toDebugString(ref)));
     }
 
@@ -317,7 +316,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
         abort();
         return new IllegalArgumentException(
-            format("[%s] Can't openForConstruction a previous committed object or an object '%s'",
+            format("[%s] Failed to execute BetaTransaction.openForConstruction '%s', reason: the object is not new and has previous commits",
                 config.familyName, toDebugString(ref)));
     }
 
@@ -326,28 +325,28 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
         abort();
         return new ReadonlyException(
-            format("[%s] Can't openForWrite '%s' on a readonly transaction",
+            format("[%s] Failed to execute BetaTransaction.openForWrite '%s', reason: the transaction is readonly",
                 config.familyName, toDebugString(object)));
     }
 
     public final NullPointerException abortOpenForWriteWhenNullReference(){
         abort();
         return new NullPointerException(
-            format("[%s] Can't openForWrite a null reference",
+            format("[%s] Failed to execute BetaTransaction BetaTransaction.openForWrite 'null', reason: the reference is null",
                 config.familyName));
     }
 
     public final NullPointerException abortOpenForConstructionWhenNullReference(){
         abort();
         return new NullPointerException(
-            format("[%s] Can't openForConstruction a null reference",
+            format("[%s] Failed to execute BetaTransaction.openForConstruction 'null', reason the reference is null",
                 config.familyName));
     }
 
     public final NullPointerException abortTryLockWhenNullReference(final TransactionalObject object){
         abort();
         return new NullPointerException(
-            format("[%s] Can't tryLock with a null reference",
+            format("[%s] Failed to execute BetaTransaction.tryLock 'null', reason: the reference is null",
                 config.familyName));
     }
 
@@ -356,7 +355,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
         abort();
         return new NullPointerException(
-            format("[%s] Can't commute with a null reference and function '%s'",
+            format("[%s] Failed to execute BetaTransaction.commute 'null' and function '%s', reason: the reference is null",
                 config.familyName, function));
     }
 
@@ -365,7 +364,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
         abort();
         return new ReadonlyException(
-            format("[%s] Can't openForConstruction '%s' using a readonly transaction",
+            format("[%s] Failed to execute BetaTransaction.openForConstruction '%s', reason: the transaction is readonly",
                 config.familyName, toDebugString(object)));
     }
 
@@ -374,7 +373,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
         abort();
         return new ReadonlyException(
-            format("[%s] Can't commute on '%s' with function '%s' and a readonly transaction ''",
+            format("[%s] Failed to execute BetaTransaction.commute '%s' with function '%s', reason: the transaction is readonly",
                  config.familyName, toDebugString(object), function));
     }
 
@@ -383,15 +382,15 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
             case PREPARED:
                 abort();
                 return new PreparedTransactionException(
-                    format("[%s] Can't ensureWrites using an already prepared transaction",
+                    format("[%s] Failed to execute BetaTransaction.ensureWrites, reason: the transaction is prepared",
                         config.familyName));
             case ABORTED:
                 return new DeadTransactionException(
-                    format("[%s] Can't ensureWrites using an already aborted transaction",
+                    format("[%s] Failed to execute BetaTransaction.ensureWrites, reason: the transaction is aborted",
                         config.familyName));
             case COMMITTED:
                 return new DeadTransactionException(
-                    format("[%s] Can't ensureWrites using already committed transaction",
+                    format("[%s] Failed to execute BetaTransaction.ensureWrites, reason: the transaction is committed",
                         config.familyName));
             default:
                 throw new IllegalStateException();
@@ -403,15 +402,15 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
            case PREPARED:
                abort();
                return new PreparedTransactionException(
-                   format("[%s] Can't tryLock '%s' using an already prepared transaction",
+                   format("[%s] Failed to execute BetaTransaction.tryLock '%s', reason: the transaction is prepared",
                        config.familyName, toDebugString(object)));
            case ABORTED:
                return new DeadTransactionException(
-                   format("[%s] Can't tryLock '%s' using an already aborted transaction",
+                   format("[%s] Failed to execute BetaTransaction.tryLock '%s', reason: the transaction is aborted",
                        config.familyName, toDebugString(object)));
            case COMMITTED:
                return new DeadTransactionException(
-                   format("[%s] Can't tryLock '%s' using already committed transaction",
+                   format("[%s] Failed to execute BetaTransaction.tryLock '%s', reason: the transaction is committed",
                        config.familyName, toDebugString(object)));
            default:
                throw new IllegalStateException();
@@ -423,15 +422,15 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
             case PREPARED:
                 abort();
                 return new PreparedTransactionException(
-                    format("[%s] Can't openForRead '%s' using an already prepared transaction",
+                    format("[%s] Failed to execute BetaTransaction.openForRead '%s', reason: the transaction is prepared",
                         config.familyName, toDebugString(object)));
             case ABORTED:
                 return new DeadTransactionException(
-                    format("[%s] Can't openForRead '%s' using an already aborted transaction",
+                    format("[%s] Failed to execute BetaTransaction.openForRead '%s', reason: the transaction is aborted",
                         config.familyName, toDebugString(object)));
             case COMMITTED:
                 return new DeadTransactionException(
-                    format("[%s] Can't openForRead '%s' using already committed transaction",
+                    format("[%s] Failed to execute BetaTransaction.openForRead '%s', reason: the transaction is committed",
                         config.familyName, toDebugString(object)));
             default:
                 throw new IllegalStateException();
@@ -445,15 +444,15 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
             case PREPARED:
                 abort();
                 return new PreparedTransactionException(
-                    format("[%s] Can't openForWrite '%s' using an already prepared transaction",
+                    format("[%s] Failed to execute BetaTransaction.openForWrite '%s', reason: the transaction is prepared",
                         config.familyName, toDebugString(object)));
             case ABORTED:
                 return new DeadTransactionException(
-                    format("[%s] Can't openForWrite '%s' using an already aborted transaction",
+                    format("[%s] Failed to execute BetaTransaction.openForWrite '%s', reason: the transaction is aborted",
                         config.familyName, toDebugString(object)));
             case COMMITTED:
                 return new DeadTransactionException(
-                    format("[%s] Can't openForWrite '%s' using an already committed transaction",
+                    format("[%s] Failed to execute BetaTransaction.openForWrite '%s', reason: the transaction is committed",
                         config.familyName, toDebugString(object)));
             default:
                 throw new IllegalStateException();
@@ -467,15 +466,15 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
             case PREPARED:
                 abort();
                 return new PreparedTransactionException(
-                    format("[%s] Can't openForConstruction '%s' using an already prepared transaction",
+                    format("[%s] Failed to execute BetaTransaction.openForConstruction '%s', reason: the transaction is prepared",
                         config.familyName, toDebugString(object)));
             case ABORTED:
                 return new DeadTransactionException(
-                    format("[%s] Can't openForConstruction '%s' using an already aborted transaction",
+                    format("[%s] Failed to execute BetaTransaction.openForConstruction '%s', reason: the transaction is aborted",
                         config.familyName, toDebugString(object)));
             case COMMITTED:
                 return new DeadTransactionException(
-                    format("[%s] Can't openForConstruction '%s' using an already committed transaction",
+                    format("[%s] Failed to execute BetaTransaction.openForConstruction '%s', reason: the transaction is committed",
                         config.familyName, toDebugString(object)));
             default:
                 throw new IllegalStateException();
@@ -489,15 +488,15 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
            case PREPARED:
                abort();
                return new PreparedTransactionException(
-                    format("[%s] Can't commuting '%s' with reference '%s' using an already prepared transaction",
+                    format("[%s] Failed to execute BetaTransaction.commute '%s' with reference '%s', reason: the transaction is prepared",
                         config.familyName, toDebugString(object), function));
            case ABORTED:
                return new DeadTransactionException(
-                    format("[%s] Can't commuting '%s' with reference '%s' using an already aborted transaction",
+                    format("[%s] Failed to execute BetaTransaction.commute '%s' with reference '%s', reason: the transaction is aborted",
                         config.familyName, toDebugString(object), function));
            case COMMITTED:
                return new DeadTransactionException(
-                    format("[%s] Can't commuting '%s' with reference '%s' using an already committed transaction",
+                    format("[%s] Failed to execute BetaTransaction.commute '%s' with reference '%s', reason: the transaction is prepared",
                         config.familyName, toDebugString(object), function));
            default:
                throw new IllegalStateException();

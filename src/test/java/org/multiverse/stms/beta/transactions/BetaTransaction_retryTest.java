@@ -7,9 +7,9 @@ import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.RetryNotAllowedException;
 import org.multiverse.api.exceptions.RetryNotPossibleException;
-import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
@@ -106,7 +106,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
 
         assertIsAborted(tx);
         assertHasNoListeners(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
         assertUpdateBiased(ref);
         assertVersionAndValue(ref, version, 0);
     }
@@ -159,8 +159,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
 
         assertFalse(latch.isOpen());
         assertSurplus(0, ref);
-        assertNull(ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
         assertIsAborted(tx);
     }
 
@@ -181,8 +180,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         assertSurplus(0, ref);
         assertFalse(latch.isOpen());
         assertIsAborted(tx);
-        assertNull(ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -202,8 +200,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         assertFalse(latch.isOpen());
         assertIsAborted(tx);
         assertSurplus(0, ref);
-        assertNull(ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -222,8 +219,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
 
         assertFalse(latch.isOpen());
         assertIsAborted(tx);
-        assertNull(ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
     }
 

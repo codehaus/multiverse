@@ -9,10 +9,9 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
 public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstants {
 
@@ -45,9 +44,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
         tx.ensureWrites();
 
         assertIsActive(tx);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref,tx);
     }
 
     @Test
@@ -59,9 +56,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
         tx.ensureWrites();
 
         assertIsActive(tx);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref,tx);
     }
 
     @Test
@@ -80,9 +75,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
         }
 
         assertIsAborted(tx);
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -102,9 +95,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
         }
 
         assertIsAborted(tx);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref,otherTx);        
     }
 
     @Test
@@ -124,9 +115,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
         }
 
         assertIsAborted(tx);
-        assertHasNoUpdateLock(ref);
-        assertHasCommitLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, otherTx);
     }
 
     @Test
@@ -138,9 +127,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
         tx.ensureWrites();
 
         assertIsActive(tx);
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -153,9 +140,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
         tx.ensureWrites();
 
         assertIsActive(tx);
-        assertHasNoUpdateLock(ref);
-        assertHasCommitLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, tx);
     }
 
     @Test
@@ -168,9 +153,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
         tx.ensureWrites();
 
         assertIsActive(tx);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref, tx);
     }
 
     @Test

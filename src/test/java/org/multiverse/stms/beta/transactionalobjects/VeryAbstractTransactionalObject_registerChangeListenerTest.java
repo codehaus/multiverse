@@ -17,9 +17,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 
 public class VeryAbstractTransactionalObject_registerChangeListenerTest implements BetaStmConstants {
     private BetaStm stm;
@@ -90,9 +89,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         assertEquals(REGISTRATION_DONE, result);
         assertSurplus(2, ref);
         assertHasListeners(ref, latch);
-        assertHasNoUpdateLock(ref);
-        assertHasCommitLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, version, 10);
         assertFalse(latch.isOpen());
     }
@@ -115,9 +112,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         assertEquals(REGISTRATION_DONE, result);
         assertSurplus(2, ref);
         assertHasListeners(ref, latch);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref, otherTx);
         assertVersionAndValue(ref, version, 10);
         assertFalse(latch.isOpen());
     }
@@ -144,9 +139,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         assertTrue(latch.isOpen());
         assertSurplus(2, ref);
         assertHasNoListeners(ref);
-        assertHasNoUpdateLock(ref);
-        assertHasCommitLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, version, 1);
     }
 
@@ -172,9 +165,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         assertTrue(latch.isOpen());
         assertSurplus(2, ref);
         assertHasNoListeners(ref);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref,otherTx);
         assertVersionAndValue(ref, version, 1);
     }
 

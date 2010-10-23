@@ -6,10 +6,11 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasNoLocks;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUpdateBiased;
 
 public class AtomicReadBiasedWithPeriodicUpdateTest {
 
@@ -37,8 +38,7 @@ public class AtomicReadBiasedWithPeriodicUpdateTest {
 
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
 
         System.out.println("orec: " + ref.___toOrecString());
     }

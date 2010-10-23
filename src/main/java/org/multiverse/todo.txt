@@ -198,8 +198,6 @@ the task not being executed at all.
 
 - when all reads/writes are pessimistic, cheap conflict detection and cheap prepare.
 
-- pooling for generic transactional object tranlocals.
-
 - Collections
 
     - transactional linked list
@@ -218,8 +216,6 @@ the task not being executed at all.
 
     - Collection: foreach
 
-- improved testing in the transaction for the ensure functionality
-
 - inconsistent read
     - read uncommitted isolation level
 
@@ -232,7 +228,11 @@ the task not being executed at all.
 
     - repeatable read isolation level
 
-- logic for full transactional objects needs to be fixed.
+- full transactional objects
+
+    - logic for full transactional objects needs to be fixed.
+
+    - pooling for generic transactional object tranlocals.
 
 - testing:
 
@@ -260,14 +260,28 @@ the task not being executed at all.
 
     - testing: atomic block & propagation and committed/aborted/prepared/new transaction on threadlocal
 
+    - improved testing in the transaction for the ensure functionality
+
 - publication of javadoc on codehaus
 
 - jmm issue with commit and listeners, it could happen that a write is done after a check is done if a listeners
   is available. This could lead to a deadlock since the listener that is set after the write
 
+done
+
+- improved error messages in monotransaction
+
+- improved error messages in arraytreetransaction
+
+- improved error messages in arraytransaction
+
+- exception messages have been improved in the beta transaction
+
+- test now use the assertRef locking stuff instead of accessing the orec methods.
+
 - tests for transactional refs need to be fixed with the build in retry stuff.
 
-done
+- replaced assertNull(ref.___getLockOwner()) with assertRefHasNoLocks(ref0;
 
 - when pool returns null, it should return a value
 

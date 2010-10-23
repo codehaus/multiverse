@@ -5,10 +5,9 @@ import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import static org.junit.Assert.*;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
 public class VeryAbstractBetaTransactionalObject_atomicIsPrivatizedTest {
 
@@ -29,9 +28,7 @@ public class VeryAbstractBetaTransactionalObject_atomicIsPrivatizedTest {
 
         assertFalse(result);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertNull(ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -47,9 +44,7 @@ public class VeryAbstractBetaTransactionalObject_atomicIsPrivatizedTest {
 
         assertFalse(result);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSame(tx, ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertRefHasUpdateLock(ref, tx);
     }
 
     @Test
@@ -65,8 +60,6 @@ public class VeryAbstractBetaTransactionalObject_atomicIsPrivatizedTest {
 
         assertTrue(result);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSame(tx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasCommitLock(ref, tx);
     }
 }

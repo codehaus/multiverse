@@ -7,11 +7,11 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
 public class PrivatizeTest {
     private BetaStm stm;
@@ -38,9 +38,7 @@ public class PrivatizeTest {
         }
 
         assertIsAborted(tx);
-        assertHasNoUpdateLock(ref);
-        assertHasCommitLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, otherTx);
     }
 
     @Test
@@ -59,9 +57,7 @@ public class PrivatizeTest {
         }
 
         assertIsAborted(tx);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref, otherTx);
     }
 
     @Test
@@ -112,9 +108,7 @@ public class PrivatizeTest {
         }
 
         assertIsAborted(tx);
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertSame(ensureTx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, tx);
     }
 
     @Test
@@ -132,9 +126,7 @@ public class PrivatizeTest {
         }
 
         assertIsAborted(tx);
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, otherTx);
     }
 
     @Test
@@ -146,9 +138,7 @@ public class PrivatizeTest {
         ref.privatize(tx);
 
         assertIsActive(tx);
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, tx);
     }
 
     @Test
@@ -160,9 +150,7 @@ public class PrivatizeTest {
         tx.commit();
 
         assertIsCommitted(tx);
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -174,9 +162,7 @@ public class PrivatizeTest {
         tx.prepare();
 
         assertIsPrepared(tx);
-        assertHasNoUpdateLock(ref);
-        assertHasCommitLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, tx);
     }
 
     @Test
@@ -188,9 +174,7 @@ public class PrivatizeTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -202,9 +186,7 @@ public class PrivatizeTest {
         ref.privatize(tx);
 
         assertIsActive(tx);
-        assertSame(tx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasCommitLock(ref,tx);
     }
 
     @Test
@@ -222,9 +204,7 @@ public class PrivatizeTest {
         } catch (ReadWriteConflict expected) {
         }
 
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
         assertIsAborted(tx);
     }
 }

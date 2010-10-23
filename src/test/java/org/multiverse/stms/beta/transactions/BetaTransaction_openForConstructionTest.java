@@ -15,8 +15,7 @@ import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public abstract class BetaTransaction_openForConstructionTest implements BetaStmConstants {
@@ -66,9 +65,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
 
         assertIsActive(tx);
         assertAttached(tx, write);
-        assertSame(tx, ref.___getLockOwner());
-
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref, tx);
         assertSurplus(1, ref);
     }
 
@@ -88,8 +85,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
 
         assertIsActive(tx);
         assertAttached(tx, construction1);
-        assertSame(tx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref, tx);
         assertSurplus(1, ref);
         assertTrue(construction1.isDirty());
     }
@@ -109,8 +105,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, version, 100);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -135,9 +130,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -159,9 +152,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -183,9 +174,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -208,9 +197,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSame(otherTx, ref.___getLockOwner());
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasUpdateLock(ref,otherTx);        
     }
 
     @Test
@@ -233,9 +220,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSame(otherTx, ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref, otherTx);
     }
 
     @Test
@@ -257,9 +242,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -278,8 +261,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, version, 100);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -301,8 +283,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, version, 100);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -327,9 +308,8 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
         }
 
         assertIsAborted(tx);
-        assertHasNoCommitLock(ref);
         assertVersionAndValue(ref, version, 0);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);

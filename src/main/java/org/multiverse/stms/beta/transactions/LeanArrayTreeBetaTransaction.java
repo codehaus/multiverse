@@ -1484,7 +1484,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                     break;
                 case ABORTED:
                     throw new DeadTransactionException(
-                        format("[%s] Can't commit an already aborted transaction",config.familyName));
+                        format("[%s] Failed to execute BetaTransaction.commit, reason: transaction already is aborted",
+                            config.familyName));
                 case COMMITTED:
                     return;
                 default:
@@ -1592,10 +1593,12 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
                      return;
                 case ABORTED:
                     throw new DeadTransactionException(
-                        format("[%s] Can't prepare an already aborted transaction",config.familyName));
+                        format("[%s] Failed to execute BetaTransaction.prepare, reason: the transaction already is aborted",
+                            config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                        format("[%s] Can't prepare already committed transaction",config.familyName));
+                        format("[%s] Failed to execute BetaTransaction. prepare, reason: the transaction already is committed",
+                            config.familyName));
                 default:
                     throw new IllegalStateException();
 

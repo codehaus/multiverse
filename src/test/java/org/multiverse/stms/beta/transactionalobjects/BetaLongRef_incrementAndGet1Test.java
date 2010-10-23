@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 
 public class BetaLongRef_incrementAndGet1Test {
 
@@ -167,9 +167,7 @@ public class BetaLongRef_incrementAndGet1Test {
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(1, ref);
-        assertHasNoUpdateLock(ref);
-        assertHasCommitLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, tx);
     }
 
     @Test
@@ -194,9 +192,7 @@ public class BetaLongRef_incrementAndGet1Test {
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(1, ref);
-        assertHasNoUpdateLock(ref);
-        assertHasCommitLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, version, 10);
     }
 
@@ -218,9 +214,7 @@ public class BetaLongRef_incrementAndGet1Test {
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(2, ref);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref,otherTx);
         assertSame(version, ref.getVersion());
         assertEquals(10, ref.___weakRead());
 
@@ -233,9 +227,7 @@ public class BetaLongRef_incrementAndGet1Test {
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(1, ref);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref,otherTx);
         assertSame(version, ref.getVersion());
         assertEquals(10, ref.___weakRead());
     }

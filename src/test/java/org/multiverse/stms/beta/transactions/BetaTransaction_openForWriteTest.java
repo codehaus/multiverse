@@ -22,8 +22,7 @@ import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public abstract class BetaTransaction_openForWriteTest implements BetaStmConstants {
@@ -79,9 +78,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertReadBiased(ref);
         assertSurplus(1, ref);
         assertReadonlyCount(oldReadonlyCount, ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSame(ref, write.owner);
         assertVersionAndValue(ref, version, 100);
     }
@@ -104,11 +101,10 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertAttached(tx, write);
         assertHasUpdates(tx);
 
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
         assertReadonlyCount(0, ref);
-        assertHasNoCommitLock(ref);
         assertVersionAndValue(ref, version, 100);
     }
 
@@ -140,8 +136,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertAttached(tx, write);
         assertHasUpdates(tx);
 
-        assertNull(ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -174,8 +169,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertEquals(100, constructed.value);
         assertFalse(constructed.isReadonly());
         assertFalse(constructed.hasDepartObligation());
-        assertHasCommitLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref,tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertVersionAndValue(ref, 0, 0);
@@ -201,11 +195,10 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertEquals(100, write.value);
 
         assertIsActive(tx);
-        assertSame(tx, ref.___getLockOwner());
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
         assertReadonlyCount(oldReadonlyCount, ref);
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref,tx);
         assertVersionAndValue(ref, version, 100);
         assertAttached(tx, write);
         assertHasUpdates(tx);
@@ -226,8 +219,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertSame(ref, write.owner);
         assertFalse(write.isReadonly());
         assertFalse(write.hasDepartObligation());
-        assertSame(tx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref,tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -252,12 +244,9 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertTrue(write.hasDepartObligation());
 
         assertIsActive(tx);
-        assertSame(tx, ref.___getLockOwner());
         assertAttached(tx, write);
         assertHasUpdates(tx);
-
-        assertHasNoCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertRefHasUpdateLock(ref,tx);
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
         assertReadonlyCount(oldReadonlyCount, ref);
@@ -284,11 +273,10 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertAttached(tx, write);
         assertHasUpdates(tx);
 
-        assertSame(tx, ref.___getLockOwner());
         assertReadBiased(ref);
         assertSurplus(1, ref);
         assertReadonlyCount(oldReadonlyCount, ref);
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref,tx);
         assertVersionAndValue(ref, version, 100);
     }
 
@@ -304,9 +292,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertFalse(write.isReadonly());
         assertTrue(write.hasDepartObligation());
         assertUpdateBiased(ref);
-        assertHasNoUpdateLock(ref);
-        assertHasCommitLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref,tx);
         assertSurplus(1, ref);
         assertReadonlyCount(0, ref);
         assertIsActive(tx);
@@ -326,9 +312,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertFalse(write.isReadonly());
         assertTrue(write.hasDepartObligation());
         assertUpdateBiased(ref);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref,tx);
         assertSurplus(1, ref);
         assertReadonlyCount(0, ref);
         assertIsActive(tx);
@@ -348,8 +332,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertSame(ref, write.owner);
         assertFalse(write.isReadonly());
         assertTrue(write.hasDepartObligation());
-        assertSame(tx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref,tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -371,8 +354,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertSame(ref, write2.owner);
         assertFalse(write2.isReadonly());
         assertTrue(write2.hasDepartObligation());
-        assertSame(tx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref,tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -395,8 +377,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertSame(ref, write.owner);
         assertFalse(write.isReadonly());
         assertTrue(write.hasDepartObligation());
-        assertSame(tx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref,tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -418,8 +399,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertSame(ref, write2.owner);
         assertFalse(write2.isReadonly());
         assertTrue(write2.hasDepartObligation());
-        assertSame(tx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref,tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -441,12 +421,10 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertEquals(100, constructed.value);
         assertFalse(constructed.isReadonly());
         assertFalse(constructed.hasDepartObligation());
-
         assertIsActive(tx);
         assertHasNoUpdates(tx);
         assertAttached(tx, write);
-
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref,tx);
         assertVersionAndValue(ref, 0, 0);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -466,8 +444,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertSame(ref, write2.owner);
         assertFalse(write2.isReadonly());
         assertTrue(write2.hasDepartObligation());
-        assertSame(tx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref,tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -489,9 +466,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertSame(ref, write2.owner);
         assertFalse(write2.isReadonly());
         assertTrue(write2.hasDepartObligation());
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref,tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -517,8 +492,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
         }
 
-        assertSame(otherTx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref,otherTx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -559,12 +533,9 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertTrue(write.hasDepartObligation());
         assertEquals(version, write.version);
         assertEquals(10, write.value);
-
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref,tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-
-        assertSame(tx, ref.___getLockOwner());
         assertIsActive(tx);
         assertAttached(tx, write);
         assertHasUpdates(tx);
@@ -585,10 +556,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertEquals(10, write.value);
         assertFalse(write.isReadonly());
         assertTrue(write.hasDepartObligation());
-
         assertVersionAndValue(ref, version, 10);
-        assertHasCommitLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref,tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertAttached(tx, write);
@@ -619,10 +588,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertFalse(write.isCommuting());
         assertFalse(write.isReadonly());
         assertEquals(11, write.value);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertHasNoCommutingFunctions(write);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertAttached(tx, write);
@@ -651,8 +618,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         }
 
         assertIsAborted(tx);
-        assertSame(otherTx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref,otherTx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertVersionAndValue(ref, initialVersion, 10);
@@ -711,13 +677,11 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         }
 
         assertIsAborted(tx);
-        assertNull(ref1.___getLockOwner());
-        assertHasNoCommitLock(ref1);
+        assertRefHasNoLocks(ref1);
         assertSurplus(0, ref1);
         assertUpdateBiased(ref1);
 
-        assertNull(ref2.___getLockOwner());
-        assertHasNoCommitLock(ref2);
+        assertRefHasNoLocks(ref2);
         assertSurplus(0, ref2);
         assertUpdateBiased(ref2);
     }
@@ -746,8 +710,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertIsAborted(tx);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, 10);
     }
 
@@ -776,8 +739,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertIsAborted(tx);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, 10);
     }
 
@@ -862,13 +824,11 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
         assertIsAborted(tx);
 
-        assertHasNoCommitLock(ref1);
-        assertNull(ref1.___getLockOwner());
+        assertRefHasNoLocks(ref1);
         assertSurplus(0, ref1);
         assertUpdateBiased(ref1);
 
-        assertHasNoCommitLock(ref2);
-        assertNull(ref2.___getLockOwner());
+        assertRefHasNoLocks(ref2);
         assertSurplus(0, ref2);
         assertUpdateBiased(ref2);
     }
@@ -896,8 +856,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         } catch (ReadWriteConflict expected) {
         }
 
-        assertSame(otherTx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref,otherTx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -996,11 +955,9 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
         assertIsAborted(tx);
         assertSurplus(1, ref1);
-        assertHasNoCommitLock(ref1);
-        assertNull(ref1.___getLockOwner());
+        assertRefHasNoLocks(ref1);
         assertSurplus(0, ref2);
-        assertHasNoCommitLock(ref2);
-        assertNull(ref2.___getLockOwner());
+        assertRefHasNoLocks(ref2);
     }
 
     @Test
@@ -1018,7 +975,6 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
         assertIsAborted(tx);
     }
-
 
     @Test
     public void consistency_whenPessimisticThenNoConflictDetectionNeeded() {

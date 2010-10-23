@@ -3,7 +3,6 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
@@ -11,12 +10,13 @@ import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUpdateBiased;
 
 public class VeryAbstractTransactionalObject_ensureTest {
     private BetaStm stm;
@@ -37,10 +37,8 @@ public class VeryAbstractTransactionalObject_ensureTest {
         ref.ensure(tx);
 
         assertUpdateBiased(ref);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasUpdateLock(ref,tx);
         assertSurplus(1, ref);
-        assertSame(tx, ref.___getLockOwner());
         assertVersionAndValue(ref, version, 10);
     }
 
@@ -59,8 +57,7 @@ public class VeryAbstractTransactionalObject_ensureTest {
         assertNull(getThreadLocalTransaction());
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 10);
     }
 
@@ -79,8 +76,7 @@ public class VeryAbstractTransactionalObject_ensureTest {
         assertNull(getThreadLocalTransaction());
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 10);
     }
 
@@ -100,9 +96,7 @@ public class VeryAbstractTransactionalObject_ensureTest {
         assertIsCommitted(tx);
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 10);
     }
 
@@ -122,9 +116,7 @@ public class VeryAbstractTransactionalObject_ensureTest {
 
         assertIsAborted(tx);
         assertUpdateBiased(ref);
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertVersionAndValue(ref, version, 10);
     }
@@ -147,9 +139,7 @@ public class VeryAbstractTransactionalObject_ensureTest {
         assertSurplus(0, ref);
         assertIsAborted(tx);
         assertVersionAndValue(ref, version, 10);
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -163,9 +153,7 @@ public class VeryAbstractTransactionalObject_ensureTest {
         ref.ensure();
 
         assertIsActive(tx);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref, tx);
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
         assertVersionAndValue(ref, version, 10);
@@ -182,10 +170,8 @@ public class VeryAbstractTransactionalObject_ensureTest {
         ref.ensure(tx);
 
         assertUpdateBiased(ref);
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasCommitLock(ref, tx);
         assertSurplus(1, ref);
-        assertSame(tx, ref.___getLockOwner());
         assertVersionAndValue(ref, version, 10);
     }
 
@@ -217,9 +203,7 @@ public class VeryAbstractTransactionalObject_ensureTest {
         assertIsActive(otherTx);
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
-        assertHasNoCommitLock(ref);
-        assertHasUpdateLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref,otherTx);
         assertVersionAndValue(ref, version, 10);
     }
 
@@ -242,10 +226,8 @@ public class VeryAbstractTransactionalObject_ensureTest {
 
         assertIsAborted(tx);
         assertUpdateBiased(ref);
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasCommitLock(ref, otherTx);
         assertSurplus(1, ref);
-        assertSame(otherTx, ref.___getLockOwner());
         assertIsActive(otherTx);
         assertVersionAndValue(ref, version, 10);
     }
@@ -270,10 +252,8 @@ public class VeryAbstractTransactionalObject_ensureTest {
 
         assertIsAborted(tx);
         assertUpdateBiased(ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
         assertSurplus(0, ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 100);
     }
 
@@ -281,15 +261,13 @@ public class VeryAbstractTransactionalObject_ensureTest {
     public void whenNormalTransactionUsed() {
         BetaLongRef ref = newLongRef(stm, 10);
         long version = ref.getVersion();
-        Transaction tx = stm.startDefaultTransaction();
+        BetaTransaction tx = stm.startDefaultTransaction();
 
         ref.ensure(tx);
 
         assertUpdateBiased(ref);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasUpdateLock(ref,tx);
         assertSurplus(1, ref);
-        assertSame(tx, ref.___getLockOwner());
         assertVersionAndValue(ref, version, 10);
     }
 }

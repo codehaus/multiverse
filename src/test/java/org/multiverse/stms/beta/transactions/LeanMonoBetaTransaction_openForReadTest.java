@@ -9,7 +9,9 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.createReadBiasedLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasNoLocks;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertReadBiased;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 
 public class LeanMonoBetaTransaction_openForReadTest
         extends BetaTransaction_openForReadTest {
@@ -65,6 +67,6 @@ public class LeanMonoBetaTransaction_openForReadTest
         assertIsAborted(tx);
         assertSurplus(1, ref);
         assertReadBiased(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
     }
 }

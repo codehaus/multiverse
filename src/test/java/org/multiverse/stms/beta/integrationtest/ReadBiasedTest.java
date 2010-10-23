@@ -8,11 +8,10 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
-import static org.junit.Assert.assertNull;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertReadBiased;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 
 public class ReadBiasedTest implements BetaStmConstants {
     private BetaStm stm;
@@ -36,8 +35,7 @@ public class ReadBiasedTest implements BetaStmConstants {
 
         assertSurplus(1, ref);
         assertReadBiased(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 100);
 
         System.out.println("orec: " + ref.___toOrecString());

@@ -1643,7 +1643,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                 break;
             case COMMITTED:
                 throw new DeadTransactionException(
-                    format("[%s] Can't abort an already committed transaction",config.familyName));
+                    format("[%s] Failed to execute BetaTransaction.abort, reason: the transaction already is committed",
+                        config.familyName));
             default:
                 throw new IllegalStateException();
         }
@@ -1657,7 +1658,8 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             switch (status) {
                 case ABORTED:
                     throw new DeadTransactionException(
-                        format("[%s] Can't commit an already aborted transaction",config.familyName));
+                        format("[%s] Failed to execute BetaTransaction.commit, reason:the transaction already is aborted",
+                            config.familyName));
                 case COMMITTED:
                     return;
                 default:
@@ -1762,10 +1764,12 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
                      return;
                 case ABORTED:
                     throw new DeadTransactionException(
-                        format("[%s] Can't prepare already aborted transaction", config.familyName));
+                        format("[%s] Failed to execute BetaTransaction.prepare, reason: the transaction already is aborted",
+                            config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                        format("[%s] Can't prepare already committed transaction", config.familyName));
+                        format("[%s] Failed to execute BetaTransaction.prepare, reason: the transaction already is committed",
+                            config.familyName));
                 default:
                     throw new IllegalStateException();
             }

@@ -14,9 +14,9 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUpdateBiased;
 
 public class VeryAbstractTransactionalObject_privatizeTest {
     private BetaStm stm;
@@ -40,9 +40,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertNull(getThreadLocalTransaction());
         assertVersionAndValue(ref, version, 0);
     }
@@ -66,9 +64,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertIsCommitted(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -93,9 +89,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -117,9 +111,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, version, 0);
@@ -138,9 +130,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertNull(getThreadLocalTransaction());
         assertVersionAndValue(ref, version, 0);
     }
@@ -156,9 +146,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertSame(tx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasCommitLock(ref, tx);
         assertSame(tx, getThreadLocalTransaction());
         assertIsActive(tx);
 
@@ -166,9 +154,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertIsCommitted(tx);
     }
 
@@ -184,9 +170,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertSame(tx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasCommitLock(ref, tx);
         assertSame(tx, getThreadLocalTransaction());
         assertIsActive(tx);
 
@@ -194,9 +178,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertIsCommitted(tx);
     }
 
@@ -221,9 +203,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertNull(ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasNoLocks(ref);
         assertSame(tx, getThreadLocalTransaction());
         assertIsAborted(tx);
         assertVersionAndValue(ref, version, 100);
@@ -243,9 +223,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertSame(tx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasCommitLock(ref,tx);
         assertSame(tx, getThreadLocalTransaction());
         assertIsActive(tx);
 
@@ -253,9 +231,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertIsCommitted(tx);
     }
 
@@ -271,9 +247,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertSame(tx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasCommitLock(ref, tx);
         assertSame(tx, getThreadLocalTransaction());
         assertIsActive(tx);
 
@@ -281,9 +255,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertIsCommitted(tx);
     }
 
@@ -305,9 +277,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertSame(tx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasCommitLock(ref, tx);
         assertSame(tx, getThreadLocalTransaction());
         assertIsActive(tx);
 
@@ -315,9 +285,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertIsCommitted(tx);
     }
 
@@ -340,9 +308,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertSame(otherTx, ref.___getLockOwner());
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
+        assertRefHasCommitLock(ref,otherTx);
         assertSame(tx, getThreadLocalTransaction());
         assertIsAborted(tx);
     }
@@ -366,9 +332,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertSame(otherTx, ref.___getLockOwner());
-        assertHasNoCommitLock(ref);
-        assertHasUpdateLock(ref);
+        assertRefHasUpdateLock(ref,otherTx);
         assertSame(tx, getThreadLocalTransaction());
         assertIsAborted(tx);
     }

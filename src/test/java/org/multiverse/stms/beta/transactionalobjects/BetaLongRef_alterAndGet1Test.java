@@ -17,9 +17,8 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.api.functions.Functions.newIdentityLongFunction;
 import static org.multiverse.api.functions.Functions.newIncLongFunction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 
 public class BetaLongRef_alterAndGet1Test {
     private BetaStm stm;
@@ -145,8 +144,7 @@ public class BetaLongRef_alterAndGet1Test {
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertNull(getThreadLocalTransaction());
         assertSurplus(0, ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -170,9 +168,7 @@ public class BetaLongRef_alterAndGet1Test {
         assertIsCommitted(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(0, ref);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -196,8 +192,7 @@ public class BetaLongRef_alterAndGet1Test {
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(0, ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 

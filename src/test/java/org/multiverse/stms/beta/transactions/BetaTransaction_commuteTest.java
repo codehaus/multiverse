@@ -19,9 +19,9 @@ import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUpdateBiased;
 
 public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
 
@@ -59,9 +59,8 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         }
 
         assertIsAborted(tx);
-        assertHasNoCommitLock(ref);
         assertSurplus(0, ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 0);
     }
 
@@ -86,8 +85,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         //todo:
         //assertNull(tranlocal.read);
         assertHasCommutingFunctions(tranlocal, function);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
     }
 
@@ -117,8 +115,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         //todo:
         //assertNull(tranlocal.read);
         assertHasCommutingFunctions(tranlocal, function);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
     }
 
@@ -147,8 +144,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         //todo:
         //assertNull(tranlocal.read);
         assertHasCommutingFunctions(tranlocal, function3, function2, function1);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
     }
 
@@ -203,11 +199,11 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
 
         verifyZeroInteractions(function1);
         assertSurplus(0, ref1);
-        assertHasNoCommitLock(ref1);
+        assertRefHasNoLocks(ref1);
 
         verifyZeroInteractions(function2);
         assertSurplus(0, ref2);
-        assertHasNoCommitLock(ref2);
+        assertRefHasNoLocks(ref2);
     }
 
 
@@ -235,8 +231,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         //todo:
         // assertNull(tranlocal.read);
         assertHasCommutingFunctions(tranlocal, function2, function1);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         verifyZeroInteractions(function1);
         verifyZeroInteractions(function2);
@@ -259,9 +254,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         //todo:
         //assertSame(read, tranlocal.read);
         assertEquals(101, tranlocal.value);
-        assertHasNoCommutingFunctions(tranlocal);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(1, ref);
     }
 
@@ -281,9 +274,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         assertFalse(tranlocal.isCommuting());
         assertFalse(tranlocal.isReadonly());
         assertEquals(101, tranlocal.value);
-        assertHasNoCommutingFunctions(tranlocal);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(1, ref);
         assertVersionAndValue(ref, version, 100);
     }
@@ -313,8 +304,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         //assertNull(tranlocal.read);
         assertEquals(1, tranlocal.value);
         assertHasNoCommutingFunctions(tranlocal);
-        assertHasCommitLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, tx);
         assertSurplus(1, ref);
     }
 
@@ -339,9 +329,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         //todo:
         // assertNull(commuting.read);
         assertHasCommutingFunctions(commuting, function);
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, otherTx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
     }
@@ -367,9 +355,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         //todo:
         //assertNull(commuting.read);
         assertHasCommutingFunctions(commuting, function);
-        assertHasNoCommitLock(ref);
-        assertHasUpdateLock(ref);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref,otherTx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
     }

@@ -15,7 +15,7 @@ import static org.multiverse.stms.beta.BetaStmTestUtils.LOCKMODE_COMMIT;
 import static org.multiverse.stms.beta.BetaStmTestUtils.LOCKMODE_NONE;
 import static org.multiverse.stms.beta.BetaStmTestUtils.LOCKMODE_UPDATE;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 
 public class BetaLongRef_deferredEnsure1Test {
 
@@ -153,9 +153,7 @@ public class BetaLongRef_deferredEnsure1Test {
 
         assertNull(getThreadLocalTransaction());
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -176,9 +174,7 @@ public class BetaLongRef_deferredEnsure1Test {
         assertIsAborted(tx);
         assertNull(getThreadLocalTransaction());
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -199,9 +195,7 @@ public class BetaLongRef_deferredEnsure1Test {
         assertIsAborted(tx);
         assertNull(getThreadLocalTransaction());
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -222,9 +216,7 @@ public class BetaLongRef_deferredEnsure1Test {
         assertIsCommitted(tx);
         assertNull(getThreadLocalTransaction());
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertNull(ref.___getLockOwner());
-        assertHasNoUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasNoLocks(ref);
     }
 
     @Test

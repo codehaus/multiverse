@@ -11,9 +11,8 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 
 public class BetaRef_atomicIsNullTest implements BetaStmConstants {
     private BetaStm stm;
@@ -55,8 +54,7 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
 
         assertTrue(result);
         assertSurplus(0, ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, null);
     }
 
@@ -74,8 +72,7 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
 
         assertFalse(result);
         assertSurplus(1, ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -89,8 +86,7 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
 
         assertFalse(result);
         assertSurplus(0, ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -108,9 +104,7 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
         }
 
         assertSurplus(1, ref);
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, tx);
         assertIsActive(tx);
     }
 
@@ -125,9 +119,7 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
 
         assertFalse(result);
         assertSurplus(1, ref);
-        assertHasNoCommitLock(ref);
-        assertHasUpdateLock(ref);
-        assertSame(tx, ref.___getLockOwner());
+        assertRefHasUpdateLock(ref,tx);
         assertIsActive(tx);
     }
 }

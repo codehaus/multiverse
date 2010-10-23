@@ -56,7 +56,6 @@ public class BetaLongRef_atomicIncrementAndGetTest {
 
         assertEquals(initialValue+amount, result);
         assertRefHasNoLocks(ref);
-        assertNull(ref.___getLockOwner());
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, initialVersion + 1, initialValue + amount);
     }

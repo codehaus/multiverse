@@ -2196,7 +2196,8 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                 break;
             case COMMITTED:
                 throw new DeadTransactionException(
-                    format("[%s] Can't abort an already committed transaction",config.familyName));
+                    format("[%s] Failed to execute BetaTransaction.abort, reason: the transaction already is committed",
+                        config.familyName));
             default:
                 throw new IllegalStateException();
         }
@@ -2297,10 +2298,12 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                      return;
                 case ABORTED:
                     throw new DeadTransactionException(
-                        format("[%s] Can't prepare an already aborted transaction'", config.familyName));
+                        format("[%s] Failed to execute BetaTransaction.prepare, reason: the transaction already is aborted",
+                            config.familyName));
                 case COMMITTED:
                     throw new DeadTransactionException(
-                        format("[%s] Can't prepare an already committed transaction", config.familyName));
+                        format("[%s] Failed to execute BetaTransaction.prepare, reason: the transaction already is committed",
+                            config.familyName));
                 default:
                     throw new IllegalStateException();
             }

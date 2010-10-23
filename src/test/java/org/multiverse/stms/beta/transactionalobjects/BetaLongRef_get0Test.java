@@ -13,9 +13,9 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUpdateBiased;
 
 public class BetaLongRef_get0Test {
     private BetaStm stm;
@@ -55,11 +55,9 @@ public class BetaLongRef_get0Test {
         long value = ref.get();
 
         assertEquals(100, value);
-        assertHasNoUpdateLock(ref);
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref, tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertSame(tx, ref.___getLockOwner());
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertEquals(version, ref.getVersion());
@@ -78,11 +76,9 @@ public class BetaLongRef_get0Test {
         long value = ref.get();
 
         assertEquals(100, value);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasUpdateLock(ref,tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertSame(tx, ref.___getLockOwner());
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, version, 100);
@@ -105,12 +101,9 @@ public class BetaLongRef_get0Test {
         } catch (ReadWriteConflict expected) {
         }
 
-
-        assertHasNoUpdateLock(ref);
-        assertHasCommitLock(ref);
+        assertRefHasCommitLock(ref, otherTx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertSame(otherTx, ref.___getLockOwner());
         assertIsActive(otherTx);
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
@@ -131,11 +124,9 @@ public class BetaLongRef_get0Test {
         long value = ref.get();
 
         assertEquals(100, value);
-        assertHasUpdateLock(ref);
-        assertHasNoCommitLock(ref);
+        assertRefHasUpdateLock(ref,otherTx);
         assertSurplus(2, ref);
         assertUpdateBiased(ref);
-        assertSame(otherTx, ref.___getLockOwner());
         assertIsActive(otherTx);
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());

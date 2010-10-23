@@ -17,8 +17,7 @@ import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 import static org.multiverse.MultiverseConstants.LOCKMODE_NONE;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public abstract class BetaTransaction_abortTest {
@@ -58,10 +57,9 @@ public abstract class BetaTransaction_abortTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertHasNoCommitLock(ref);
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 0);
     }
 
@@ -76,9 +74,8 @@ public abstract class BetaTransaction_abortTest {
 
         assertIsAborted(tx);
 
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 0);
-        assertHasNoCommitLock(ref);
         assertReadBiased(ref);
         assertReadonlyCount(0, ref);
         //once arrived, a depart will not be called on a readbiased tranlocal
@@ -95,9 +92,7 @@ public abstract class BetaTransaction_abortTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertUpdateBiased(ref);
         assertSurplus(0, ref);
         assertVersionAndValue(ref, version, 0);
@@ -113,9 +108,7 @@ public abstract class BetaTransaction_abortTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertReadBiased(ref);
         assertSurplus(1, ref);
         assertVersionAndValue(ref, version, 0);
@@ -182,9 +175,7 @@ public abstract class BetaTransaction_abortTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 0);
         assertSurplus(0, ref);
         assertReadonlyCount(oldReadonlyCount, ref);
@@ -203,9 +194,7 @@ public abstract class BetaTransaction_abortTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 0);
         assertSurplus(0, ref);
         assertReadonlyCount(oldReadonlyCount, ref);
@@ -224,9 +213,7 @@ public abstract class BetaTransaction_abortTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 0);
         assertSurplus(0, ref);
 
@@ -246,9 +233,7 @@ public abstract class BetaTransaction_abortTest {
         tx.abort();
 
         assertIsAborted(tx);
-        assertHasNoCommitLock(ref);
-        assertHasNoUpdateLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 0);
         assertSurplus(0, ref);
         assertReadonlyCount(oldReadonlyCount, ref);
