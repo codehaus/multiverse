@@ -1,4 +1,21 @@
 ideas:
+- Collections
+
+    - transactional linked list
+
+    - 'size' structure to help with an approximate size for collections
+
+    - Collection: map
+
+    - Collection: filter
+
+    - Collection: flatMap
+
+    - Collection: foldLeft
+
+    - Collection: foldRight
+
+    - Collection: foreach
 
 - lockowner should be removed from ref. Can be accessed through the transaction. Is a bit more expensive
  but reduces another volatile write in the commit. This is complicated since the openForConstruction
@@ -148,7 +165,6 @@ performance.
 - clojure: add watch. Basic functionality already is there, but atm it is done to all
      reads and not specific ones.
 
-
 todo
 
 - orelse
@@ -197,24 +213,6 @@ globalconflict counter.
 the task not being executed at all.
 
 - when all reads/writes are pessimistic, cheap conflict detection and cheap prepare.
-
-- Collections
-
-    - transactional linked list
-
-    - 'size' structure to help with an approximate size for collections
-
-    - Collection: map
-
-    - Collection: filter
-
-    - Collection: flatMap
-
-    - Collection: foldLeft
-
-    - Collection: foldRight
-
-    - Collection: foreach
 
 - inconsistent read
     - read uncommitted isolation level

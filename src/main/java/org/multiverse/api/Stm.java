@@ -1,6 +1,5 @@
 package org.multiverse.api;
 
-import org.multiverse.api.collections.TransactionalCollectionsFactory;
 import org.multiverse.api.references.RefFactory;
 import org.multiverse.api.references.RefFactoryBuilder;
 
@@ -62,13 +61,4 @@ public interface Stm {
      * @return the RefFactoryBuilder.
      */
     RefFactoryBuilder getReferenceFactoryBuilder();
-
-    /**
-     * Returns the {@link org.multiverse.api.collections.TransactionalCollectionsFactory} that is part of this Stm. Using a factory for creating
-     * collection provides a lot of freedom to the Stm implementation to return a stm specific implementation
-     * and reduces the need to provide instrumentation.
-     *
-     * @return the CollectionFactory.
-     */
-    TransactionalCollectionsFactory getCollectionsFactory();
 }
