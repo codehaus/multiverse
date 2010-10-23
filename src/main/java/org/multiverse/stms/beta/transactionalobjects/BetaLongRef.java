@@ -3,7 +3,6 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.PanicError;
-import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
@@ -284,49 +283,7 @@ public final class BetaLongRef
         pool.put((LongRefTranlocal)tranlocal);
     }
 
-    @Override
-    public void addDeferredValidator(LongPredicate validator){
-        final Transaction tx = getThreadLocalTransaction();
-
-        if(tx == null){
-            throw new TransactionRequiredException(getClass(),"addDeferredValidator");
-        }
-
-        addDeferredValidator((BetaTransaction)tx, validator);
-    }
-
-    @Override
-    public void addDeferredValidator(Transaction tx, LongPredicate validator){
-        addDeferredValidator((BetaTransaction)tx, validator);
-    }
-
-    public void addDeferredValidator(BetaTransaction tx, LongPredicate validator){
-        if(tx == null){
-            throw new NullPointerException();
-        }
-
-        if(validator == null){
-            tx.abort();
-            throw new NullPointerException();
-        }
-
-        LongRefTranlocal write= tx.openForWrite(this, LOCKMODE_NONE);
-        if(write.validators == null){
-            write.validators = new LongPredicate[1];
-            write.validators[0]=validator;
-        }else{
-            throw new TodoException();
-        }
-    }
-
-    @Override
-    public void atomicAddDeferredValidator(LongPredicate validator){
-        if(validator == null){
-            throw new NullPointerException();
-        }
-        throw new TodoException();
-    }
-
+   
     @Override
     public final long atomicGetAndIncrement(final long amount){
         long result = atomicIncrementAndGet(amount);

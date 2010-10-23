@@ -248,46 +248,6 @@ public interface BooleanRef extends TransactionalObject {
     boolean atomicCompareAndSet(boolean expectedValue, boolean newValue);
 
     /**
-     * Adds a deferred validator. A deferred validator is executed once the transaction commits, so it
-     * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
-     * validator is added multiple times, it will be called multiple times.
-     *
-     * This call lifts on the transaction stored in the ThreadLocalTransaction.
-     *
-     * @param validator the BooleanPredicate to add.
-     * @throws NullPointerException if validator or tx is null. If validator is null the transaction will be aborted.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     */
-    void addDeferredValidator(BooleanPredicate validator);
-
-    /**
-     * Adds a deferred validator. A deferred validator is executed once the transaction commits, so it
-     * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
-     * validator is added multiple times, it will be called multiple times.
-     *
-     * This call lifts on the provided transaction.
-     *
-     * @param tx the Transaction this call lifts on
-     * @param validator the BooleanPredicate to add.
-     * @throws NullPointerException if validator or tx is null. If validator is null the transaction is aborted.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     */
-    void addDeferredValidator(Transaction tx, BooleanPredicate validator);
-
-    /**
-     * Atomically adds a deferred validator. A deferred validator is executed once the transaction commits, so it
-     * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
-     * validator is added multiple times, it will be called multiple times.
-     *
-     * @param validator the BooleanPredicate to add.
-     * @throws NullPointerException if validator is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
-     */
-    void atomicAddDeferredValidator(BooleanPredicate validator);
-
-    /**
      * Awaits for the value to become the given value. If the value already has the
      * the specified value, the call continues, else a retry is done.
      *

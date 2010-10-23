@@ -248,46 +248,6 @@ public interface DoubleRef extends TransactionalObject {
     boolean atomicCompareAndSet(double expectedValue, double newValue);
 
     /**
-     * Adds a deferred validator. A deferred validator is executed once the transaction commits, so it
-     * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
-     * validator is added multiple times, it will be called multiple times.
-     *
-     * This call lifts on the transaction stored in the ThreadLocalTransaction.
-     *
-     * @param validator the DoublePredicate to add.
-     * @throws NullPointerException if validator or tx is null. If validator is null the transaction will be aborted.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     */
-    void addDeferredValidator(DoublePredicate validator);
-
-    /**
-     * Adds a deferred validator. A deferred validator is executed once the transaction commits, so it
-     * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
-     * validator is added multiple times, it will be called multiple times.
-     *
-     * This call lifts on the provided transaction.
-     *
-     * @param tx the Transaction this call lifts on
-     * @param validator the DoublePredicate to add.
-     * @throws NullPointerException if validator or tx is null. If validator is null the transaction is aborted.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     */
-    void addDeferredValidator(Transaction tx, DoublePredicate validator);
-
-    /**
-     * Atomically adds a deferred validator. A deferred validator is executed once the transaction commits, so it
-     * allows the value stored in the reference to be inconsistent during the execution of the transaction. If the same
-     * validator is added multiple times, it will be called multiple times.
-     *
-     * @param validator the DoublePredicate to add.
-     * @throws NullPointerException if validator is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
-     */
-    void atomicAddDeferredValidator(DoublePredicate validator);
-
-    /**
      * Atomically increments the value and returns the old value. This method doesn't care about
      * any running transactions.
      *

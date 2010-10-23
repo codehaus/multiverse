@@ -3,7 +3,6 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.PanicError;
-import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.api.functions.BooleanFunction;
 import org.multiverse.api.predicates.BooleanPredicate;
@@ -283,49 +282,7 @@ public final class BetaBooleanRef
         pool.put((BooleanRefTranlocal)tranlocal);
     }
 
-    @Override
-    public void addDeferredValidator(BooleanPredicate validator){
-        final Transaction tx = getThreadLocalTransaction();
-
-        if(tx == null){
-            throw new TransactionRequiredException(getClass(),"addDeferredValidator");
-        }
-
-        addDeferredValidator((BetaTransaction)tx, validator);
-    }
-
-    @Override
-    public void addDeferredValidator(Transaction tx, BooleanPredicate validator){
-        addDeferredValidator((BetaTransaction)tx, validator);
-    }
-
-    public void addDeferredValidator(BetaTransaction tx, BooleanPredicate validator){
-        if(tx == null){
-            throw new NullPointerException();
-        }
-
-        if(validator == null){
-            tx.abort();
-            throw new NullPointerException();
-        }
-
-        BooleanRefTranlocal write= tx.openForWrite(this, LOCKMODE_NONE);
-        if(write.validators == null){
-            write.validators = new BooleanPredicate[1];
-            write.validators[0]=validator;
-        }else{
-            throw new TodoException();
-        }
-    }
-
-    @Override
-    public void atomicAddDeferredValidator(BooleanPredicate validator){
-        if(validator == null){
-            throw new NullPointerException();
-        }
-        throw new TodoException();
-    }
-
+   
     @Override
     public final void ensure(){
         Transaction tx = getThreadLocalTransaction();
