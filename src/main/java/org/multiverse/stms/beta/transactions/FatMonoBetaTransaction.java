@@ -1,6 +1,5 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.multiverse.api.Watch;
 import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.Retry;
@@ -2064,12 +2063,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         return attached.owner.___hasReadConflict(attached);
     }
 
-    // ============================= addWatch ===================================
-
-    public void addWatch(BetaTransactionalObject object, Watch watch){
-        throw new TodoException();
-    }
-
+  
     // ======================= abort =======================================
 
     @Override

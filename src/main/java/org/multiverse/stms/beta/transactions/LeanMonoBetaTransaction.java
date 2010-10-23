@@ -1,6 +1,5 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.multiverse.api.Watch;
 import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.Retry;
@@ -1311,12 +1310,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         return attached == null || attached.owner!= owner? null: attached;
     }
      
-    // ============================= addWatch ===================================
-
-    public void addWatch(BetaTransactionalObject object, Watch watch){
-        throw new TodoException();
-    }
-
+  
     // ======================= abort =======================================
 
     @Override

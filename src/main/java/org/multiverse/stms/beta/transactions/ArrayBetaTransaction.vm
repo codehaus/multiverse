@@ -516,12 +516,6 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         return false;
     }
 
-    // ============================= addWatch ===================================
-
-    public void addWatch(BetaTransactionalObject object, Watch watch){
-        throw new TodoException();
-    }
-
     // ============================== abort ==================================
 
     @Override

@@ -1,6 +1,9 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.multiverse.api.*;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionConfiguration;
+import org.multiverse.api.TransactionStatus;
+import org.multiverse.api.TransactionalObject;
 import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.*;
@@ -553,8 +556,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     public abstract void init(BetaTransactionConfiguration transactionConfig);
 
     public abstract boolean tryLock(BetaTransactionalObject ref, int lockMode);
-
-    public abstract void addWatch(BetaTransactionalObject object, Watch watch);
+    
 
     public abstract <E> E read(BetaRef<E> ref);
 

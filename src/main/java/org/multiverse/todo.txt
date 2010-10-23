@@ -1,5 +1,9 @@
 ideas:
 
+- lockowner should be removed from ref. Can be accessed through the transaction. Is a bit more expensive
+ but reduces another volatile write in the commit. This is complicated since the openForConstruction
+ depends on it.
+
 - instead of going through the transaction to deal with tranlocals, one you have a reference to one,
 all operations like openForWrite/checkConflict/ensure etc.
 
@@ -141,6 +145,10 @@ performance.
 
 - acquire commit lock. atm only some spinning is used
 
+- clojure: add watch. Basic functionality already is there, but atm it is done to all
+     reads and not specific ones.
+
+
 todo
 
 - orelse
@@ -174,9 +182,6 @@ globalconflict counter.
 - blocking and speculative readtracking?
 
 - readonly transactions are getting slow, they were 100M and dropped to 40M. So need to be put back to 100M.
-
-- clojure: add watch. Basic functionality already is there, but atm it is done to all
-     reads and not specific ones.
 
 - commute
 
@@ -226,9 +231,6 @@ the task not being executed at all.
     - implement read on transaction.
 
     - repeatable read isolation level
-
-- lockowner should be removed from ref. Can be accessed through the transaction. Is a bit more expensive
- but reduces another volatile write in the commit.
 
 - logic for full transactional objects needs to be fixed.
 
