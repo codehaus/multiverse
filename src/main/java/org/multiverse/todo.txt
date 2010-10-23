@@ -165,6 +165,13 @@ performance.
 - clojure: add watch. Basic functionality already is there, but atm it is done to all
      reads and not specific ones.
 
+- commute: commuting functions are executed in reverse order.
+
+- blocking and speculative readtracking?
+
+- readonly transactions are getting slow, they were 100M and dropped to 40M. So need to be put back to 100M.
+
+
 todo
 
 - orelse
@@ -193,17 +200,9 @@ globalconflict counter.
 
     - listeners are not cleaned after abort/commit, so still a potential memory leak
 
-    - atomic change methods on ref should deal with listeners
-
-- blocking and speculative readtracking?
-
-- readonly transactions are getting slow, they were 100M and dropped to 40M. So need to be put back to 100M.
-
 - commute
 
     - testing of transaction access while commute
-
-    - commute: commuting functions are executed in reverse order.
 
 - rollbackfor/rollnotbackfor exception configuration
 
@@ -289,5 +288,7 @@ done
 
 - when a transaction is interrupted, the interrupted exception should contain some information
     about the transaction, e.g. the name
+
+- atomic change methods on ref should deal with listeners
 
 
