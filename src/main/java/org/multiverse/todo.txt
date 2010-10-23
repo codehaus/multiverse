@@ -171,6 +171,11 @@ performance.
 
 - readonly transactions are getting slow, they were 100M and dropped to 40M. So need to be put back to 100M.
 
+- lean mono should not upgrade to array when untracked read is done, but should just attach it to the transaction.
+
+- when all reads/writes are pessimistic, cheap conflict detection and cheap prepare.
+
+- rollbackfor/rollnotbackfor exception configuration
 
 todo
 
@@ -200,20 +205,11 @@ globalconflict counter.
 
     - listeners are not cleaned after abort/commit, so still a potential memory leak
 
-- commute
-
-    - testing of transaction access while commute
-
-- rollbackfor/rollnotbackfor exception configuration
-
-- lean mono should not upgrade to array when untracked read is done, but should just attach it to the transaction.
-
 - speculative + register doesn't combine because it can lead to transaction not accepting the task and therefor
 the task not being executed at all.
 
-- when all reads/writes are pessimistic, cheap conflict detection and cheap prepare.
-
 - inconsistent read
+
     - read uncommitted isolation level
 
     - when an inconsistent read is done, instead of going through the arrive and depart, do it faster.
@@ -232,6 +228,8 @@ the task not being executed at all.
     - pooling for generic transactional object tranlocals.
 
 - testing:
+
+    - testing of transaction access while commute
 
     - when pessimistic locking level used, dirty flag not set correctly.
 
