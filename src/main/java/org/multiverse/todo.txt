@@ -263,6 +263,8 @@ the task not being executed at all.
 - jmm issue with commit and listeners, it could happen that a write is done after a check is done if a listeners
   is available. This could lead to a deadlock since the listener that is set after the write
 
+- tests for transactional refs need to be fixed with the build in retry stuff.
+
 done
 
 - when pool returns null, it should return a value

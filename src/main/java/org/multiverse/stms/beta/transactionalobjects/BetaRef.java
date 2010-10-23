@@ -1,6 +1,5 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.api.StmUtils;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.PanicError;
@@ -375,7 +374,7 @@ public final class BetaRef<E>
 
         E value = get(tx);
         if(value == null){
-            StmUtils.retry();
+            tx.retry();
         }
 
         return value;
@@ -403,7 +402,7 @@ public final class BetaRef<E>
         }
 
         if(get(tx)!=null){
-            StmUtils.retry();
+            tx.retry();
         }
     }
 
@@ -850,7 +849,7 @@ public final class BetaRef<E>
     public final void await(final BetaTransaction tx,final E value){
         RefTranlocal<E> read = tx.openForRead(this,LOCKMODE_NONE);
         if(read.value != value){
-            StmUtils.retry();
+            tx.retry();
         }
     }
 
@@ -886,7 +885,7 @@ public final class BetaRef<E>
             boolean result = predicate.evaluate(value);
             abort = false;
             if(!result){
-                StmUtils.retry();
+                tx.retry();
             }
         }finally{
             if(abort){

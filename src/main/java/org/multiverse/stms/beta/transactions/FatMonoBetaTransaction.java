@@ -2029,6 +2029,19 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         return attached == null || attached.owner!= object? null: attached;
     }
 
+    @Override
+    public Tranlocal locate(BetaTransactionalObject owner){
+        if (status != ACTIVE) {
+            throw abortLocate(owner);
+        }
+
+        if(owner == null){
+            throw abortLocateWhenNullReference();
+        }
+
+        return attached == null || attached.owner!= owner? null: attached;
+    }
+     
     // ======================= read conflict =======================================
 
     private boolean hasReadConflict() {

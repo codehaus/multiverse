@@ -1,6 +1,5 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.api.StmUtils;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.PanicError;
@@ -770,7 +769,7 @@ public final class BetaBooleanRef
     public final void await(final BetaTransaction tx,final boolean value){
         BooleanRefTranlocal read = tx.openForRead(this,LOCKMODE_NONE);
         if(read.value != value){
-            StmUtils.retry();
+            tx.retry();
         }
     }
 
@@ -806,7 +805,7 @@ public final class BetaBooleanRef
             boolean result = predicate.evaluate(value);
             abort = false;
             if(!result){
-                StmUtils.retry();
+                tx.retry();
             }
         }finally{
             if(abort){

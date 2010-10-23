@@ -565,7 +565,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
         ${transactionalObject.type} value = get(tx);
         if(value == null){
-            StmUtils.retry();
+            tx.retry();
         }
 
         return value;
@@ -593,7 +593,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
         }
 
         if(get(tx)!=null){
-            StmUtils.retry();
+            tx.retry();
         }
     }
 
@@ -1041,7 +1041,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     public final void await(final BetaTransaction tx,final ${transactionalObject.type} value){
         ${transactionalObject.tranlocal}${transactionalObject.typeParameter} read = tx.openForRead(this,LOCKMODE_NONE);
         if(read.value != value){
-            StmUtils.retry();
+            tx.retry();
         }
     }
 
@@ -1077,7 +1077,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
             boolean result = predicate.evaluate(value);
             abort = false;
             if(!result){
-                StmUtils.retry();
+                tx.retry();
             }
         }finally{
             if(abort){

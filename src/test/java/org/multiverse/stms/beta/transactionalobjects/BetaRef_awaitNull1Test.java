@@ -5,13 +5,16 @@ import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.exceptions.RetryTimeoutException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
+import java.util.concurrent.TimeUnit;
+
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.multiverse.TestUtils.*;
+import static org.multiverse.TestUtils.assertIsAborted;
+import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
@@ -90,20 +93,23 @@ public class BetaRef_awaitNull1Test {
     }
 
     @Test
-    public void whenNotNull_thenRetryError() {
+    public void whenNotNull_thenWait() {
         String initialValue = "foo";
         BetaRef ref = newRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+                .setTimeoutNs(TimeUnit.SECONDS.toNanos(1))
+                .build()
+                .newTransaction();
 
         try {
             ref.awaitNull(tx);
             fail();
-        } catch (Retry expected) {
+        } catch (RetryTimeoutException expected) {
         }
 
-        assertIsActive(tx);
+        assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasNoLocks(ref);
     }

@@ -6,8 +6,11 @@ import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
+import java.util.concurrent.TimeUnit;
+
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.*;
+import static org.multiverse.TestUtils.assertIsAborted;
+import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
@@ -46,7 +49,7 @@ public class BetaRef_awaitNotNullAndGet0Test {
     }
 
     @Test
-    public void whenPrivatizedByOther_thenReadWriteConflict() {
+    public void whenPrivatizedByOtherBeforeReading_thenReadWriteConflict() {
         BetaRef ref = newRef(stm);
         long initialVersion = ref.getVersion();
 
@@ -68,7 +71,7 @@ public class BetaRef_awaitNotNullAndGet0Test {
     }
 
     @Test
-    public void whenEnsuredByOther_thenSuccess() {
+    public void whenEnsuredByOtherBeforeReading_thenSuccess() {
         String initialValue = "foo";
         BetaRef<String> ref = newRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -95,20 +98,24 @@ public class BetaRef_awaitNotNullAndGet0Test {
     }
 
     @Test
-    public void whenNull_thenRetryError() {
+    public void whenNull_thenWait() {
         BetaRef ref = newRef(stm);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+                .setTimeoutNs(TimeUnit.SECONDS.toNanos(1))
+                .build()
+                .newTransaction();
+
         setThreadLocalTransaction(tx);
 
         try {
             ref.awaitNotNullAndGet();
             fail();
-        } catch (Retry expected) {
+        } catch (RetryTimeoutException expected) {
         }
 
-        assertIsActive(tx);
+        assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, null);
         assertRefHasNoLocks(ref);
     }

@@ -236,23 +236,23 @@ public abstract class VeryAbstractBetaTransactionalObject
 
         if (tx == null) {
             throw new TransactionRequiredException("No transaction is found for the isPrivatizedBySelf operation");
-
         }
 
-        return isPrivatizedBySelf(tx);
+        return isPrivatizedBySelf((BetaTransaction) tx);
     }
 
     @Override
     public final boolean isPrivatizedBySelf(Transaction tx) {
+        return isPrivatizedBySelf((BetaTransaction) tx);
+    }
+
+    public final boolean isPrivatizedBySelf(BetaTransaction tx) {
         if (tx == null) {
             throw new NullPointerException();
         }
 
-        if (!___hasCommitLock()) {
-            return false;
-        }
-
-        return ___lockOwner == tx;
+        final Tranlocal tranlocal = tx.locate(this);
+        return tranlocal != null && tranlocal.getLockMode() == LOCKMODE_COMMIT;
     }
 
     @Override
@@ -263,20 +263,26 @@ public abstract class VeryAbstractBetaTransactionalObject
             throw new TransactionRequiredException("No transaction is found for the isPrivatizedByOther operation");
         }
 
-        return isPrivatizedByOther(tx);
+        return isPrivatizedByOther((BetaTransaction)tx);
     }
 
     @Override
     public final boolean isPrivatizedByOther(Transaction tx) {
+        return isPrivatizedByOther((BetaTransaction)tx);
+    }
+
+    public final boolean isPrivatizedByOther(BetaTransaction tx){
         if (tx == null) {
             throw new NullPointerException();
         }
+
+        final Tranlocal tranlocal = tx.locate(this);
 
         if (!___hasCommitLock()) {
             return false;
         }
 
-        return ___lockOwner != tx;
+        return tranlocal == null || tranlocal.getLockMode() == LOCKMODE_NONE;
     }
 
     @Override
@@ -292,20 +298,21 @@ public abstract class VeryAbstractBetaTransactionalObject
             throw new TransactionRequiredException("No transaction is found for the isEnsuredBySelf operation");
         }
 
-        return isEnsuredBySelf(tx);
+        return isEnsuredBySelf((BetaTransaction) tx);
     }
 
     @Override
     public final boolean isEnsuredBySelf(Transaction tx) {
+        return isEnsuredBySelf((BetaTransaction) tx);
+    }
+
+    public final boolean isEnsuredBySelf(BetaTransaction tx) {
         if (tx == null) {
             throw new NullPointerException();
         }
 
-        if (!___hasUpdateLock()) {
-            return false;
-        }
-
-        return ___lockOwner == tx;
+        final Tranlocal tranlocal = tx.locate(this);
+        return tranlocal != null && tranlocal.getLockMode() == LOCKMODE_UPDATE;
     }
 
     @Override
@@ -316,20 +323,26 @@ public abstract class VeryAbstractBetaTransactionalObject
             throw new TransactionRequiredException("No transaction is found for the isEnsuredByOther operation");
         }
 
-        return isEnsuredByOther(tx);
+        return isEnsuredByOther((BetaTransaction) tx);
     }
 
     @Override
     public final boolean isEnsuredByOther(Transaction tx) {
+        return isEnsuredByOther((BetaTransaction) tx);
+    }
+
+    public final boolean isEnsuredByOther(BetaTransaction tx) {
         if (tx == null) {
             throw new NullPointerException();
         }
+
+        final Tranlocal tranlocal = tx.locate(this);
 
         if (!___hasUpdateLock()) {
             return false;
         }
 
-        return ___lockOwner != tx;
+        return tranlocal == null || tranlocal.getLockMode() == LOCKMODE_NONE;
     }
 
     protected final int ___arriveAndLockOrBackoff() {

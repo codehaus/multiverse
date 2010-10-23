@@ -2110,6 +2110,20 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         return indexOf == -1 ? null: array[indexOf];
     }
 
+    @Override
+    public Tranlocal locate(BetaTransactionalObject owner){
+        if (status != ACTIVE) {
+           throw abortLocate(owner);
+        }
+
+        if(owner == null){
+            throw abortLocateWhenNullReference();
+        }
+
+        int indexOf = indexOf(owner);
+        return indexOf == -1 ? null: array[indexOf];
+    }
+
     /**
      * Finds the index of the tranlocal that has the ref as owner. Return -1 if not found.
      *

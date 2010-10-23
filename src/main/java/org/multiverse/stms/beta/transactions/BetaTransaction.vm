@@ -118,6 +118,8 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     */
     public abstract Tranlocal get(BetaTransactionalObject object);
 
+    public abstract Tranlocal locate(BetaTransactionalObject object);
+
     /**
     * Returns a list containing the normal TransactionLifecycleListeners. The returned list
     * can be null (essentially the same as an empty list).
@@ -146,6 +148,33 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
         tranlocal.setIsConflictCheckNeeded(true);
     }
 
+    public final IllegalTransactionStateException abortLocate(BetaTransactionalObject owner){
+         switch (status) {
+            case PREPARED:
+                abort();
+                return new PreparedTransactionException(
+                    format("[%s] Can't perform BetaTransaction.locate using an already prepared transaction",
+                        config.familyName));
+            case ABORTED:
+                return new DeadTransactionException(
+                    format("[%s] Can't perform BetaTransaction.locate using an already aborted transaction",
+                        config.familyName));
+            case COMMITTED:
+                return new DeadTransactionException(
+                    format("[%s] Can't perform BetaTransaction.locate using an already committed transaction",
+                        config.familyName));
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+    public final NullPointerException abortLocateWhenNullReference(){
+        abort();
+        return new NullPointerException(
+            format("[%s] Can't locate a null reference",
+                config.familyName));
+    }
+
     @Override
     public final void setAbortOnly() {
         switch (status) {
@@ -156,15 +185,15 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
                 break;
             case PREPARED:
                 throw new PreparedTransactionException(
-                    format("[%s] Can't setAbortOnly on an already prepared transaction",
+                    format("[%s] Can't perform BetaTransaction.setAbortOnly using an already prepared transaction",
                         config.familyName));
             case COMMITTED:
                 throw new DeadTransactionException(
-                    format("[%s] Can't setAbortOnly on an already committed transaction",
+                    format("[%s] Can't perform BetaTransaction.setAbortOnly using an already committed transaction",
                         config.familyName));
             case ABORTED:
                 throw new DeadTransactionException(
-                    format("[%s] Can't setAbortOnly on an already aborted transaction",
+                    format("[%s] Can't perform BetaTransaction.setAbortOnly using an already aborted transaction",
                         config.familyName));
             default:
                 throw new IllegalStateException();

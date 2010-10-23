@@ -2,13 +2,16 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.multiverse.TestUtils.assertIsAborted;
+import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
 public class VeryAbstractBetaTransactionalObject_isEnsuredByOther1Test {
     private BetaStm stm;
@@ -82,5 +85,59 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredByOther1Test {
         boolean result = ref.isEnsuredByOther(tx);
 
         assertTrue(result);
+    }
+
+    @Test
+    public void whenPreparedTransaction_thenPreparedTransactionException() {
+        BetaRef ref = newRef(stm);
+        long initialVersion = ref.getVersion();
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        tx.prepare();
+
+        try {
+            ref.isEnsuredByOther(tx);
+            fail();
+        } catch (PreparedTransactionException expected) {
+        }
+
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, null);
+    }
+
+    @Test
+    public void whenAbortedTransaction_thenDeadTransactionException() {
+        BetaRef ref = newRef(stm);
+        long initialVersion = ref.getVersion();
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        tx.abort();
+
+        try {
+            ref.isEnsuredByOther(tx);
+            fail();
+        } catch (DeadTransactionException expected) {
+        }
+
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, null);
+    }
+
+    @Test
+    public void whenCommittedTransaction_thenDeadTransactionException() {
+        BetaRef ref = newRef(stm);
+        long initialVersion = ref.getVersion();
+
+        BetaTransaction tx = stm.startDefaultTransaction();
+        tx.commit();
+
+        try {
+            ref.isEnsuredByOther(tx);
+            fail();
+        } catch (DeadTransactionException expected) {
+        }
+
+        assertIsCommitted(tx);
+        assertVersionAndValue(ref, initialVersion, null);
     }
 }

@@ -7,11 +7,13 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.exceptions.RetryTimeoutException;
 import org.multiverse.api.predicates.LongPredicate;
 import org.multiverse.api.references.LongRef;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
+
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
@@ -39,16 +41,20 @@ public class BetaLongRef_await2WithPredicateTest {
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+                .setTimeoutNs(TimeUnit.SECONDS.toNanos(2))
+                .build()
+                .newTransaction();
+
 
         try {
             ref.await(tx, newEqualsPredicate(initialValue + 1));
             fail();
-        } catch (Retry expected) {
+        } catch (RetryTimeoutException expected) {
 
         }
 
-        assertIsActive(tx);
+        assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 

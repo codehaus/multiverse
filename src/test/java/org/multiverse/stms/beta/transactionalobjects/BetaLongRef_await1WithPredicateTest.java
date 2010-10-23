@@ -2,29 +2,23 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.TestThread;
-import org.multiverse.api.Transaction;
-import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.exceptions.RetryTimeoutException;
 import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.api.predicates.LongPredicate;
-import org.multiverse.api.references.LongRef;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
+
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.StmUtils.execute;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 import static org.multiverse.api.predicates.LongPredicate.newEqualsPredicate;
-import static org.multiverse.api.predicates.LongPredicate.newLargerThanOrEqualsPredicate;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasNoLocks;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
 public class BetaLongRef_await1WithPredicateTest {
 
@@ -42,17 +36,19 @@ public class BetaLongRef_await1WithPredicateTest {
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+                .setTimeoutNs(TimeUnit.SECONDS.toNanos(2))
+                .build()
+                .newTransaction();
         setThreadLocalTransaction(tx);
 
         try {
             ref.await(newEqualsPredicate(initialValue + 1));
             fail();
-        } catch (Retry expected) {
-
+        } catch (RetryTimeoutException expected) {
         }
 
-        assertIsActive(tx);
+        assertIsAborted(tx);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }

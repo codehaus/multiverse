@@ -1298,6 +1298,19 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
         return attached == null || attached.owner!= object? null: attached;
     }
 
+    @Override
+    public Tranlocal locate(BetaTransactionalObject owner){
+        if (status != ACTIVE) {
+            throw abortLocate(owner);
+        }
+
+        if(owner == null){
+            throw abortLocateWhenNullReference();
+        }
+
+        return attached == null || attached.owner!= owner? null: attached;
+    }
+     
     // ============================= addWatch ===================================
 
     public void addWatch(BetaTransactionalObject object, Watch watch){

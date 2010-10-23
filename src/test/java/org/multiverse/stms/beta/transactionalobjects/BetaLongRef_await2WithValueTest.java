@@ -4,13 +4,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.exceptions.RetryNotAllowedException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
-import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
@@ -80,16 +79,20 @@ public class BetaLongRef_await2WithValueTest {
     }
 
     @Test
-    public void whenBlockingNotAllowed_thenNoRetryPossibleException() {
+    public void whenBlockingNotAllowed_thenRetryNotAllowedException() {
         BetaLongRef ref = newLongRef(stm);
-        BetaTransaction tx = stm.startDefaultTransaction();
+        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+                .setBlockingAllowed(false)
+                .setSpeculativeConfigurationEnabled(false)
+                .build()
+                .newTransaction();
 
         try {
             ref.await(tx, 10);
             fail();
-        } catch (Retry expected) {
+        } catch (RetryNotAllowedException expected) {
         }
 
-        assertIsActive(tx);
+        assertIsAborted(tx);
     }
 }

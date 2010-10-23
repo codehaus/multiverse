@@ -1842,11 +1842,21 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
     @Override
     public Tranlocal get(BetaTransactionalObject ref){
         final int indexOf = indexOf(ref, ref.___identityHashCode());
-        if(indexOf == -1){
-            return null;
+        return indexOf == -1? null: array[indexOf];
+    }
+
+    @Override
+    public Tranlocal locate(BetaTransactionalObject owner){
+        if (status != ACTIVE) {
+           throw abortLocate(owner);
         }
 
-        return array[indexOf];
+        if(owner == null){
+            throw abortLocateWhenNullReference();
+        }
+
+        final int indexOf = indexOf(owner, owner.___identityHashCode());
+        return indexOf == -1? null: array[indexOf];
     }
 
     public int indexOf(final BetaTransactionalObject ref, final int hash){
