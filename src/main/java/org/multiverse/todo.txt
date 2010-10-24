@@ -177,6 +177,9 @@ performance.
 
 - rollbackfor/rollnotbackfor exception configuration
 
+- automatic publication of javadoc on codehaus
+
+
 todo
 
 - orelse
@@ -257,12 +260,16 @@ the task not being executed at all.
 
     - improved testing in the transaction for the ensure functionality
 
-- publication of javadoc on codehaus
-
 - jmm issue with commit and listeners, it could happen that a write is done after a check is done if a listeners
   is available. This could lead to a deadlock since the listener that is set after the write
 
+- the retry should not block:
+    makes testing harder
+    resources are released too late.
+             
 done
+
+- cigarette smokers problem: assert count of cigarettes smoked
 
 - improved error messages in monotransaction
 

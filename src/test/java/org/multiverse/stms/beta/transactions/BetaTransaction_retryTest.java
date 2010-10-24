@@ -25,6 +25,7 @@ import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
@@ -39,6 +40,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
     @Before
     public void setUp() {
         stm = new BetaStm();
+        clearThreadLocalTransaction();
     }
 
     public abstract boolean isSupportingCommute();

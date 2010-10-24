@@ -96,8 +96,8 @@ public class PrivatizeTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.get(tx);
 
-        BetaTransaction ensureTx = stm.startDefaultTransaction();
-        ref.privatize(ensureTx);
+        BetaTransaction otherTx = stm.startDefaultTransaction();
+        ref.privatize(otherTx);
 
         ref.set(tx, 100);
 
@@ -108,7 +108,7 @@ public class PrivatizeTest {
         }
 
         assertIsAborted(tx);
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasCommitLock(ref, otherTx);
     }
 
     @Test

@@ -11,6 +11,7 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.BooleanRef;
 import org.multiverse.api.references.Ref;
 
+import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.*;
@@ -47,10 +48,10 @@ public class CigaretteSmokersProblemTest {
         stop = false;
 
         block = getGlobalStmInstance()
-            .createTransactionFactoryBuilder()
-            //.setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
-            //.setIsolationLevel(IsolationLevel.Serializable)
-            .buildAtomicBlock();
+                .createTransactionFactoryBuilder()
+                        //.setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
+                        //.setIsolationLevel(IsolationLevel.Serializable)
+                .buildAtomicBlock();
     }
 
     @Test
@@ -60,9 +61,14 @@ public class CigaretteSmokersProblemTest {
         System.out.println("Stopping threads");
         stop = true;
         joinAll(arbiterThread, paperProvider, matchProvider, tobaccoProvider);
+
+        assertEquals(arbiterThread.count,
+                paperProvider.count + matchProvider.count + tobaccoProvider.count);
     }
 
     class ArbiterThread extends TestThread {
+        private int count;
+
         public ArbiterThread() {
             super("Arbiter");
         }
@@ -70,6 +76,7 @@ public class CigaretteSmokersProblemTest {
         @Override
         public void doRun() throws Exception {
             while (!stop) {
+                count++;
                 switch (TestUtils.randomInt(3)) {
                     case 0:
                         block.execute(new AtomicVoidClosure() {
@@ -122,18 +129,19 @@ public class CigaretteSmokersProblemTest {
     }
 
     class PaperProviderThread extends TestThread {
+        private int count;
+
         public PaperProviderThread() {
             super("PaperProvidingSmoker");
         }
 
         @Override
         public void doRun() throws Exception {
-            int k = 0;
             while (makeCigarette()) {
                 sleepRandomMs(SMOKE_TIME_SECONDS);
-                k++;
-                if (k % 100 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
+                count++;
+                if (count % 100 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), count);
                 }
             }
         }
@@ -142,11 +150,11 @@ public class CigaretteSmokersProblemTest {
             return block.execute(new AtomicBooleanClosure() {
                 @Override
                 public boolean execute(Transaction tx) throws Exception {
-                    if (notifier.get() == arbiterThread) {
-                        return false;
-                    }
-
                     if (notifier.get() != PaperProviderThread.this) {
+                        if (notifier.get() == arbiterThread) {
+                            return false;
+                        }
+
                         retry();
                     }
 
@@ -160,18 +168,20 @@ public class CigaretteSmokersProblemTest {
     }
 
     class MatchProviderThread extends TestThread {
+        private int count;
+
         public MatchProviderThread() {
             super("MatchProvidingSmoker");
         }
 
         @Override
         public void doRun() throws Exception {
-            int k = 0;
+
             while (makeCigarette()) {
                 sleepRandomMs(SMOKE_TIME_SECONDS);
-                k++;
-                if (k % 100 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
+                count++;
+                if (count % 100 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), count);
                 }
             }
         }
@@ -180,11 +190,10 @@ public class CigaretteSmokersProblemTest {
             return block.execute(new AtomicBooleanClosure() {
                 @Override
                 public boolean execute(Transaction tx) throws Exception {
-                    if (notifier.get() == arbiterThread) {
-                        return false;
-                    }
-
                     if (notifier.get() != MatchProviderThread.this) {
+                        if (notifier.get() == arbiterThread) {
+                            return false;
+                        }
                         retry();
                     }
 
@@ -198,19 +207,21 @@ public class CigaretteSmokersProblemTest {
     }
 
     class TobaccoProviderThread extends TestThread {
+        private int count;
+
         public TobaccoProviderThread() {
             super("TobaccoProvidingSmoker");
         }
 
         @Override
         public void doRun() throws Exception {
-            int k = 0;
+
             while (makeCigarette()) {
                 sleepRandomMs(SMOKE_TIME_SECONDS);
 
-                k++;
-                if (k % 100 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), k);
+                count++;
+                if (count % 100 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), count);
                 }
             }
         }
@@ -219,11 +230,11 @@ public class CigaretteSmokersProblemTest {
             return block.execute(new AtomicBooleanClosure() {
                 @Override
                 public boolean execute(Transaction tx) throws Exception {
-                    if (notifier.get() == arbiterThread) {
-                        return false;
-                    }
-
                     if (notifier.get() != TobaccoProviderThread.this) {
+                        if (notifier.get() == arbiterThread) {
+                            return false;
+                        }
+
                         retry();
                     }
 
