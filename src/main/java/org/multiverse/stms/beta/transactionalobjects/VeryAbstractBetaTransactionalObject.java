@@ -10,8 +10,6 @@ import org.multiverse.stms.beta.orec.FastOrec;
 import org.multiverse.stms.beta.orec.Orec;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import java.util.UUID;
-
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 public abstract class VeryAbstractBetaTransactionalObject
@@ -370,30 +368,5 @@ public abstract class VeryAbstractBetaTransactionalObject
         tmp = System.identityHashCode(this);
         ___identityHashCode = tmp;
         return tmp;
-    }
-
-
-    private String storageId = UUID.randomUUID().toString();
-
-    private volatile boolean durable = false;
-
-    @Override
-    public final String ___getStorageId() {
-        return storageId;
-    }
-
-    @Override
-    public final void ___setStorageId(final String id) {
-        this.storageId = id;
-    }
-
-    @Override
-    public final void ___markAsDurable() {
-        durable = true;
-    }
-
-    @Override
-    public final boolean ___isDurable() {
-        return durable;
     }
 }

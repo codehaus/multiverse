@@ -2,8 +2,6 @@ package org.multiverse.stms.beta;
 
 import org.multiverse.api.*;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.durability.SimpleStorage;
-import org.multiverse.durability.Storage;
 import org.multiverse.sensors.Profiler;
 import org.multiverse.sensors.SimpleProfiler;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
@@ -25,7 +23,6 @@ public final class BetaStm implements Stm {
     public final GlobalConflictCounter globalConflictCounter;
     public final int spinCount;
     public final BetaTransactionConfiguration defaultConfig;
-    public final SimpleStorage storage;
     public final SimpleProfiler profiler = new SimpleProfiler();
     public final BackoffPolicy defaultBackoffPolicy;
     public final int defaultMaxRetries;
@@ -44,7 +41,6 @@ public final class BetaStm implements Stm {
         this.globalConflictCounter = new GlobalConflictCounter(1);
         this.defaultConfig = new BetaTransactionConfiguration(this, configuration)
                 .setSpinCount(spinCount);
-        this.storage = new SimpleStorage(this);
         this.defaultAtomicBlock = createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .buildAtomicBlock();
@@ -52,10 +48,6 @@ public final class BetaStm implements Stm {
 
     public Profiler getProfiler() {
         return profiler;
-    }
-
-    public Storage getStorage() {
-        return storage;
     }
 
     @Override

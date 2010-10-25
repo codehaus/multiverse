@@ -2,7 +2,6 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.TransactionalObject;
 import org.multiverse.api.blocking.RetryLatch;
-import org.multiverse.durability.DurableObject;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.orec.Orec;
@@ -17,7 +16,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
  *
  * @author Peter Veentjer
  */
-public interface BetaTransactionalObject extends DurableObject, TransactionalObject {
+public interface BetaTransactionalObject extends TransactionalObject {
 
     int VERSION_UNCOMMITTED = 0;
 

@@ -2,15 +2,10 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.functions.Function;
-import org.multiverse.durability.DurableObject;
-import org.multiverse.durability.DurableState;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
-
-import java.util.Iterator;
-import java.util.LinkedList;
 
 /**
  * The Tranlocal contains the transaction local state of a BetaTransactionalObject (so also the refs).
@@ -19,7 +14,7 @@ import java.util.LinkedList;
  *
  * @author Peter Veentjer
  */
-public abstract class Tranlocal implements DurableState, BetaStmConstants {
+public abstract class Tranlocal implements  BetaStmConstants {
 
     public long version;
     public BetaTransaction tx;
@@ -98,11 +93,6 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
 
     public void setIgnore(boolean value){
         this.ignore = value;
-    }
-
-    @Override
-    public final BetaTransactionalObject getOwner() {
-        return owner;
     }
 
     public final void openForCommute() {
@@ -341,9 +331,5 @@ public abstract class Tranlocal implements DurableState, BetaStmConstants {
         }
 
         return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
-    }
-
-    public Iterator<DurableObject> getReferences() {
-        return new LinkedList<DurableObject>().iterator();
     }
 }

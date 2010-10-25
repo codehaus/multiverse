@@ -179,6 +179,7 @@ performance.
 
 - automatic publication of javadoc on codehaus
 
+- introduce a debug setting that enabled exceptions 
 
 todo
 
