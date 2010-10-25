@@ -63,7 +63,10 @@ allprojects {
     title = "Multiverse $version"
   }
 
-  uploadArchives {
+  task foo(dependsOn: ['clean', 'install', 'uploadArchives'])<<{
+  }
+
+  uploadArchives (){
     repositories.mavenDeployer {
       name = 'sshDeployer' 
       uniqueVersion = false

@@ -20,7 +20,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 /**
  * http://en.wikipedia.org/wiki/Cigarette_smokers_problem
  */
-public class CigaretteSmokersProblemTest {
+public class CigaretteSmokersProblemStressTest {
     private static final int SMOKE_TIME_SECONDS = 10;
 
     private BooleanRef tobaccoAvailable;
