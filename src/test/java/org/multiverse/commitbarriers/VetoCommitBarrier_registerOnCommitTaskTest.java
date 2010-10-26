@@ -1,12 +1,19 @@
 package org.multiverse.commitbarriers;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class VetoCommitBarrier_registerOnCommitTaskTest {
+
+    @Before
+    public void setUp() {
+        clearThreadLocalTransaction();
+    }
 
     @Test
     public void whenNullTask_thenNullPointerException() {

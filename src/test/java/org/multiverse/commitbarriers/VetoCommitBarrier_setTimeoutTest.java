@@ -1,5 +1,6 @@
 package org.multiverse.commitbarriers;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -7,8 +8,14 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.sleepMs;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class VetoCommitBarrier_setTimeoutTest {
+
+    @Before
+    public void setUp() {
+        clearThreadLocalTransaction();
+    }
 
     @Test
     public void whenNullTimeUnit_thenNullPointerException() {

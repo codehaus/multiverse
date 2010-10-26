@@ -127,4 +127,8 @@ public final class VetoCommitBarrier extends CommitBarrier {
 
         executeTasks(postCommitTasks);
     }
+
+    public String toString(){
+        return format("VetoCommitBarrier(isClosed=%s)",isClosed());
+    }
 }

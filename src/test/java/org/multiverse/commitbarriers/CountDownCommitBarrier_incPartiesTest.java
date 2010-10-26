@@ -6,6 +6,7 @@ import org.multiverse.stms.beta.BetaStm;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class CountDownCommitBarrier_incPartiesTest {
     private BetaStm stm;
@@ -13,6 +14,7 @@ public class CountDownCommitBarrier_incPartiesTest {
     @Before
     public void setUp() {
         stm = new BetaStm();
+        clearThreadLocalTransaction();
     }
 
     @Test

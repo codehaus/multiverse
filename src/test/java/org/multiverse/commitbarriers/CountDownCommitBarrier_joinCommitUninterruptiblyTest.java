@@ -2,7 +2,6 @@ package org.multiverse.commitbarriers;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
@@ -71,7 +70,6 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyTest {
     }
 
     @Test
-    @Ignore
     public void whenOpenAndTransactionPrepared() {
         Transaction tx = stm.startDefaultTransaction();
         tx.prepare();

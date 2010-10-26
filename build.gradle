@@ -30,6 +30,7 @@ allprojects {
     exclude("**/*AbstractTest*")
     exclude("**/*Benchmark*")
     exclude("**/*StressTest*")
+    exclude("**/*stressTest*")	
     exclude("**/*LongTest*")
     exclude("**/*PerformanceTest*")
     exclude("**/*performanceTest*")
@@ -63,7 +64,7 @@ allprojects {
     title = "Multiverse $version"
   }
 
-  task foo(dependsOn: ['clean', 'install', 'uploadArchives'])<<{
+  task deploy(dependsOn: ['clean', 'install', 'uploadArchives'])<<{
   }
 
   uploadArchives (){

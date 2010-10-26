@@ -40,6 +40,7 @@ public class CountDownCommitBarrier_StressTest {
 
     @Before
     public void setUp() {
+        clearThreadLocalTransaction();
         stm = new BetaStm();
         commitInc = new AtomicLong();
         totalInc = new AtomicLong();

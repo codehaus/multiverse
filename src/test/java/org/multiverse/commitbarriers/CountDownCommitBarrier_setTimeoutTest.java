@@ -1,5 +1,6 @@
 package org.multiverse.commitbarriers;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -7,8 +8,14 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.sleepMs;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class CountDownCommitBarrier_setTimeoutTest {
+
+    @Before
+    public void setUp() {
+        clearThreadLocalTransaction();
+    }
 
     @Test
     public void whenNullTimeUnit_thenNullPointerException() {
@@ -27,8 +34,8 @@ public class CountDownCommitBarrier_setTimeoutTest {
     public void whenTimedOut() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
 
-        barrier.setTimeout(500, TimeUnit.MILLISECONDS);
-        sleepMs(1000);
+        barrier.setTimeout(1000, TimeUnit.MILLISECONDS);
+        sleepMs(3000);
 
         assertTrue(barrier.isAborted());
     }
@@ -37,10 +44,10 @@ public class CountDownCommitBarrier_setTimeoutTest {
     public void whenCommittedBeforeTimeout() throws InterruptedException {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
 
-        barrier.setTimeout(500, TimeUnit.MILLISECONDS);
+        barrier.setTimeout(1000, TimeUnit.MILLISECONDS);
         barrier.countDown();
 
-        sleepMs(1000);
+        sleepMs(2000);
         assertTrue(barrier.isCommitted());
     }
 
@@ -48,10 +55,10 @@ public class CountDownCommitBarrier_setTimeoutTest {
     public void whenAbortedBeforeTimeout() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
 
-        barrier.setTimeout(500, TimeUnit.MILLISECONDS);
+        barrier.setTimeout(1000, TimeUnit.MILLISECONDS);
         barrier.abort();
 
-        sleepMs(1000);
+        sleepMs(2000);
         assertTrue(barrier.isAborted());
     }
 

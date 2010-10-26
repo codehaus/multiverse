@@ -1,7 +1,6 @@
 package org.multiverse.commitbarriers;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
@@ -9,6 +8,7 @@ import org.multiverse.stms.beta.BetaStm;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class CountDownCommitBarrier_incPartiesWithTransactionTest {
     private BetaStm stm;
@@ -16,6 +16,7 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
     @Before
     public void setUp() {
         stm = new BetaStm();
+        clearThreadLocalTransaction();
     }
 
     @Test
@@ -188,12 +189,12 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
         assertTrue(barrier.isAborted());
     }
 
-    @Ignore
     @Test
     public void whenCommitted_thenCommitBarrierOpenException() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(0);
+        barrier.countDown();
+
         Transaction tx = stm.startDefaultTransaction();
-        tx.commit();
 
         try {
             barrier.incParties(tx, 1);
@@ -201,7 +202,7 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
         } catch (CommitBarrierOpenException expected) {
         }
 
-        assertIsNew(tx);
+        assertIsActive(tx);
         assertEquals(0, barrier.getParties());
         assertEquals(0, barrier.getNumberWaiting());
         assertTrue(barrier.isCommitted());

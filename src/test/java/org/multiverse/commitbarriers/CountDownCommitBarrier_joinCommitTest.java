@@ -82,7 +82,7 @@ public class CountDownCommitBarrier_joinCommitTest {
         t.setPrintStackTrace(false);
         t.start();
 
-        sleepMs(500);
+        sleepMs(1000);
         assertAlive(t);
         assertTrue(barrier.isClosed());
         barrier.abort();
