@@ -28,9 +28,9 @@ public class CigaretteSmokersProblemStressTest {
     private BooleanRef matchesAvailable;
     private Ref<Thread> notifier;
     private ArbiterThread arbiterThread;
-    private PaperProviderThread paperProvider;
-    private MatchProviderThread matchProvider;
-    private TobaccoProviderThread tobaccoProvider;
+    private SmokerThread paperProvider;
+    private SmokerThread matchProvider;
+    private SmokerThread tobaccoProvider;
     private volatile boolean stop;
     private AtomicBlock block;
 
@@ -42,9 +42,9 @@ public class CigaretteSmokersProblemStressTest {
         matchesAvailable = newBooleanRef(false);
         notifier = newRef();
         arbiterThread = new ArbiterThread();
-        paperProvider = new PaperProviderThread();
-        matchProvider = new MatchProviderThread();
-        tobaccoProvider = new TobaccoProviderThread();
+        paperProvider = new SmokerThread("PaperProviderThread", tobaccoAvailable, matchesAvailable);
+        matchProvider = new SmokerThread("MatchProvidedThread", tobaccoAvailable, paperAvailable);
+        tobaccoProvider = new SmokerThread("TobaccoProviderThread", paperAvailable, matchesAvailable);
         stop = false;
 
         block = getGlobalStmInstance()
@@ -61,6 +61,10 @@ public class CigaretteSmokersProblemStressTest {
         System.out.println("Stopping threads");
         stop = true;
         joinAll(arbiterThread, paperProvider, matchProvider, tobaccoProvider);
+
+        System.out.println("MatchesAvailable: " + matchesAvailable.atomicGet());
+        System.out.println("PaperAvailable: " + paperAvailable.atomicGet());
+        System.out.println("TobaccoAvailable: " + tobaccoAvailable.atomicGet());
 
         assertEquals(arbiterThread.count,
                 paperProvider.count + matchProvider.count + tobaccoProvider.count);
@@ -124,93 +128,26 @@ public class CigaretteSmokersProblemStressTest {
                         throw new RuntimeException();
                 }
             }
-            notifier.atomicSet(arbiterThread);
-        }
-    }
-
-    class PaperProviderThread extends TestThread {
-        private int count;
-
-        public PaperProviderThread() {
-            super("PaperProvidingSmoker");
-        }
-
-        @Override
-        public void doRun() throws Exception {
-            while (makeCigarette()) {
-                sleepRandomMs(SMOKE_TIME_SECONDS);
-                count++;
-                if (count % 100 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), count);
-                }
-            }
-        }
-
-        private boolean makeCigarette() {
-            return block.execute(new AtomicBooleanClosure() {
+            block.execute(new AtomicVoidClosure(){
                 @Override
-                public boolean execute(Transaction tx) throws Exception {
-                    if (notifier.get() != PaperProviderThread.this) {
-                        if (notifier.get() == arbiterThread) {
-                            return false;
-                        }
-
-                        retry();
-                    }
-
-                    matchesAvailable.set(false);
-                    tobaccoAvailable.set(false);
-                    notifier.set(null);
-                    return true;
+                public void execute(Transaction tx) throws Exception {
+                    notifier.awaitNull();
+                    notifier.set(arbiterThread);
                 }
             });
         }
     }
 
-    class MatchProviderThread extends TestThread {
+
+    class SmokerThread extends TestThread {
         private int count;
+        private BooleanRef item1;
+        private BooleanRef item2;
 
-        public MatchProviderThread() {
-            super("MatchProvidingSmoker");
-        }
-
-        @Override
-        public void doRun() throws Exception {
-
-            while (makeCigarette()) {
-                sleepRandomMs(SMOKE_TIME_SECONDS);
-                count++;
-                if (count % 100 == 0) {
-                    System.out.printf("%s is at %s\n", getName(), count);
-                }
-            }
-        }
-
-        private boolean makeCigarette() {
-            return block.execute(new AtomicBooleanClosure() {
-                @Override
-                public boolean execute(Transaction tx) throws Exception {
-                    if (notifier.get() != MatchProviderThread.this) {
-                        if (notifier.get() == arbiterThread) {
-                            return false;
-                        }
-                        retry();
-                    }
-
-                    paperAvailable.set(false);
-                    tobaccoAvailable.set(false);
-                    notifier.set(null);
-                    return true;
-                }
-            });
-        }
-    }
-
-    class TobaccoProviderThread extends TestThread {
-        private int count;
-
-        public TobaccoProviderThread() {
-            super("TobaccoProvidingSmoker");
+        public SmokerThread(String name, BooleanRef item1, BooleanRef item2) {
+            super(name);
+            this.item1 = item1;
+            this.item2 = item2;
         }
 
         @Override
@@ -230,7 +167,7 @@ public class CigaretteSmokersProblemStressTest {
             return block.execute(new AtomicBooleanClosure() {
                 @Override
                 public boolean execute(Transaction tx) throws Exception {
-                    if (notifier.get() != TobaccoProviderThread.this) {
+                    if (notifier.get() != SmokerThread.this) {
                         if (notifier.get() == arbiterThread) {
                             return false;
                         }
@@ -238,8 +175,8 @@ public class CigaretteSmokersProblemStressTest {
                         retry();
                     }
 
-                    paperAvailable.set(false);
-                    matchesAvailable.set(false);
+                    item1.set(false);
+                    item2.set(false);
                     notifier.set(null);
                     return true;
                 }

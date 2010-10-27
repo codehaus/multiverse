@@ -315,7 +315,6 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
 
     @Test
     public void whenAlreadyPrepared_thenPreparedTransactionException() {
-        RetryLatch latch = mock(RetryLatch.class);
         BetaTransaction tx = newTransaction();
         tx.prepare();
 
@@ -330,7 +329,6 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
 
     @Test
     public void whenCommitted_thenDeadTransactionException() {
-        RetryLatch latch = mock(RetryLatch.class);
         BetaTransaction tx = newTransaction();
         tx.commit();
 
@@ -345,7 +343,6 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
 
     @Test
     public void whenAborted_thenDeadTransactionException() {
-        RetryLatch latch = mock(RetryLatch.class);
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         tx.abort();
 
