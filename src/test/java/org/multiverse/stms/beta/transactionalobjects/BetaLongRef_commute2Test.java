@@ -43,7 +43,7 @@ public class BetaLongRef_commute2Test {
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.commute(tx, function);
 
-        assertHasCommutingFunctions((LongRefTranlocal) tx.get(ref), function);
+        assertHasCommutingFunctions((BetaLongRefTranlocal) tx.get(ref), function);
 
         assertIsActive(tx);
         assertEquals(0, ref.atomicGet());
@@ -110,7 +110,7 @@ public class BetaLongRef_commute2Test {
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.commute(tx, function);
 
-        LongRefTranlocal commute = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal commute = (BetaLongRefTranlocal) tx.get(ref);
         assertTrue(commute.isCommuting());
         assertFalse(commute.isReadonly());
         assertEquals(0, commute.value);
@@ -129,7 +129,7 @@ public class BetaLongRef_commute2Test {
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.commute(tx, function);
 
-        LongRefTranlocal commute = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal commute = (BetaLongRefTranlocal) tx.get(ref);
         assertTrue(commute.isCommuting());
         assertFalse(commute.isReadonly());
         assertEquals(0, commute.value);
@@ -163,7 +163,7 @@ public class BetaLongRef_commute2Test {
         ref.get(tx);
         ref.commute(tx, function);
 
-        LongRefTranlocal commute = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal commute = (BetaLongRefTranlocal) tx.get(ref);
         assertFalse(commute.isCommuting());
         assertFalse(commute.isReadonly());
         assertEquals(11, commute.value);
@@ -180,7 +180,7 @@ public class BetaLongRef_commute2Test {
         tx.openForConstruction(ref);
         ref.commute(tx, function);
 
-        LongRefTranlocal commute = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal commute = (BetaLongRefTranlocal) tx.get(ref);
         assertFalse(commute.isCommuting());
         assertFalse(commute.isReadonly());
         assertEquals(1, commute.value);
@@ -198,7 +198,7 @@ public class BetaLongRef_commute2Test {
         ref.set(tx, 11);
         ref.commute(tx, function);
 
-        LongRefTranlocal commute = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal commute = (BetaLongRefTranlocal) tx.get(ref);
         assertFalse(commute.isCommuting());
         assertFalse(commute.isReadonly());
         assertEquals(12, commute.value);
@@ -219,7 +219,7 @@ public class BetaLongRef_commute2Test {
         ref.commute(tx, function1);
         ref.commute(tx, function2);
 
-        LongRefTranlocal commute = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal commute = (BetaLongRefTranlocal) tx.get(ref);
         assertTrue(commute.isCommuting());
         assertFalse(commute.isReadonly());
         assertEquals(0, commute.value);

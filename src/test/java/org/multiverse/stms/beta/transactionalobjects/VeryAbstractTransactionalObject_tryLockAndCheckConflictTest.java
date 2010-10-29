@@ -30,7 +30,7 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal write = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaTranlocal write = tx.openForRead(ref, LOCKMODE_NONE);
 
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, write, true);
 
@@ -47,7 +47,7 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal write = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaTranlocal write = tx.openForRead(ref, LOCKMODE_NONE);
 
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, write, false);
 
@@ -64,7 +64,7 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal write = tx.openForRead(ref, LOCKMODE_COMMIT);
+        BetaTranlocal write = tx.openForRead(ref, LOCKMODE_COMMIT);
 
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, write, true);
 
@@ -80,7 +80,7 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal write = tx.openForRead(ref, LOCKMODE_COMMIT);
+        BetaTranlocal write = tx.openForRead(ref, LOCKMODE_COMMIT);
 
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, write, false);
 
@@ -96,7 +96,7 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal write = tx.openForRead(ref, LOCKMODE_UPDATE);
+        BetaTranlocal write = tx.openForRead(ref, LOCKMODE_UPDATE);
 
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, write, true);
 
@@ -112,7 +112,7 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal write = tx.openForRead(ref, LOCKMODE_UPDATE);
+        BetaTranlocal write = tx.openForRead(ref, LOCKMODE_UPDATE);
 
         boolean result = ref.___tryLockAndCheckConflict(tx, 1, write, false);
 
@@ -128,7 +128,7 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal write = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaTranlocal write = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, LOCKMODE_UPDATE);
@@ -147,7 +147,7 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal write = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaTranlocal write = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, LOCKMODE_UPDATE);
@@ -166,7 +166,7 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal write = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaTranlocal write = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, LOCKMODE_COMMIT);
@@ -185,7 +185,7 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal write = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaTranlocal write = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, LOCKMODE_COMMIT);
@@ -204,7 +204,7 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
         BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
-        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         ref.atomicSet(20);
         long version = ref.getVersion();
@@ -225,7 +225,7 @@ public class VeryAbstractTransactionalObject_tryLockAndCheckConflictTest impleme
 
         BetaTransaction tx = stm.startDefaultTransaction();
 
-        Tranlocal read2 = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaTranlocal read2 = tx.openForRead(ref, LOCKMODE_NONE);
 
         //lock it by another thread
         BetaTransaction otherTx = stm.startDefaultTransaction();

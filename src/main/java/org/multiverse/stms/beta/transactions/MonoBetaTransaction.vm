@@ -20,7 +20,7 @@ import static java.lang.String.format;
  */
 public final class ${transaction.name} extends ${transaction.superClass} {
 
-    private Tranlocal attached;
+    private BetaTranlocal attached;
 #if(!${transaction.lean})
     private boolean hasReads;
     private boolean hasUntrackedReads;
@@ -83,17 +83,26 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortReadOnNull();
         }
 
-        if(ref.getStm()!=config.stm){
+        if(ref.___stm != config.stm){
             throw abortReadOnStmMismatch(ref);
         }
 
-        if(attached!=null && attached.owner == ref){
+        if(attached != null && attached.owner == ref){
             ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})attached;
             tranlocal.openForRead(config.readLockMode);
             return tranlocal.value;
         }
 
-        throw new TodoException();
+        if(config.trackReads || config.isolationLevel!=IsolationLevel.ReadCommitted){
+            throw new TodoException();
+        }else{
+#if(${transaction.lean})
+            throw abortOnTooSmallSize(2);
+#else
+            hasUntrackedReads = true;
+            return ref.atomicWeakGet();
+#end
+        }
     }
 
 #end
@@ -139,7 +148,11 @@ public final class ${transaction.name} extends ${transaction.superClass} {
            throw abortOpenOnNull();
         }
 
+#if(${ref.isReference})
+        if(ref.___stm != config.stm){
+#else
         if(ref.getStm() != config.stm){
+#end
             throw abortOnStmMismatch(ref);
         }
 
@@ -469,12 +482,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end ##for loop for transactionalobjects
 
     @Override
-    public Tranlocal get(BetaTransactionalObject object){
+    public BetaTranlocal get(BetaTransactionalObject object){
         return attached == null || attached.owner!= object? null: attached;
     }
 
     @Override
-    public Tranlocal locate(BetaTransactionalObject owner){
+    public BetaTranlocal locate(BetaTransactionalObject owner){
         if (status != ACTIVE) {
             throw abortLocate(owner);
         }
@@ -528,7 +541,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             }
         }
 
-        final Tranlocal tranlocal = attached;
+        final BetaTranlocal tranlocal = attached;
         if (tranlocal != null) {
             tranlocal.owner.___abort(this, tranlocal, pool);
             attached = null;
@@ -568,7 +581,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOnWriteConflict();
         }
 
-        final Tranlocal tranlocal = attached;
+        final BetaTranlocal tranlocal = attached;
         Listeners listeners = null;
         if(tranlocal != null){
             if(tranlocal.ignore()){
@@ -613,7 +626,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         prepare();
 
         Listeners listeners = null;
-        final Tranlocal tranlocal = attached;
+        final BetaTranlocal tranlocal = attached;
         if (tranlocal != null) {
             if(config.dirtyCheck){
                 if(!tranlocal.isReadonly() && !tranlocal.isDirty()){

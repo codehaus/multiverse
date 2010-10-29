@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.api.exceptions.StmMismatchException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -32,7 +32,7 @@ public abstract class BetaTransaction_readTest {
 
         BetaTransaction tx = newTransaction();
 
-        LongRefTranlocal tranlocal = tx.open(ref);
+        BetaLongRefTranlocal tranlocal = tx.open(ref);
     }
 
     @Test

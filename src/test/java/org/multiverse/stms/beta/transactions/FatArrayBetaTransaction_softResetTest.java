@@ -6,7 +6,7 @@ import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -173,7 +173,7 @@ public class FatArrayBetaTransaction_softResetTest {
     public void whenContainsConstructed() {
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal constructed = tx.openForConstruction(ref);
+        BetaLongRefTranlocal constructed = tx.openForConstruction(ref);
 
         boolean result = tx.softReset();
 

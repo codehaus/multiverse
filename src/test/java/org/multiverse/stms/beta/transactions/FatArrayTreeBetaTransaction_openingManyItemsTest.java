@@ -5,8 +5,8 @@ import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
-import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaTranlocal;
 
 import static junit.framework.Assert.assertSame;
 import static org.junit.Assert.assertEquals;
@@ -36,7 +36,7 @@ public class FatArrayTreeBetaTransaction_openingManyItemsTest implements BetaStm
 
         int refCount = 10000;
         BetaLongRef[] refs = new BetaLongRef[refCount];
-        LongRefTranlocal[] tranlocals = new LongRefTranlocal[refCount];
+        BetaLongRefTranlocal[] tranlocals = new BetaLongRefTranlocal[refCount];
         for (int k = 0; k < refCount; k++) {
             BetaLongRef ref = newLongRef(stm);
             refs[k] = ref;
@@ -50,7 +50,7 @@ public class FatArrayTreeBetaTransaction_openingManyItemsTest implements BetaStm
 
         for (int k = 0; k < refCount; k++) {
             BetaLongRef ref = refs[k];
-            Tranlocal found = reading ? tx.openForRead(ref, LOCKMODE_NONE) : tx.openForWrite(ref, LOCKMODE_NONE);
+            BetaTranlocal found = reading ? tx.openForRead(ref, LOCKMODE_NONE) : tx.openForWrite(ref, LOCKMODE_NONE);
             assertSame(ref, found.owner);
             assertSame("tranlocal is incorrect at " + k, tranlocals[k], found);
         }

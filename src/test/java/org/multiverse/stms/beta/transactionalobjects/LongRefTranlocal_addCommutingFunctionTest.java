@@ -27,7 +27,7 @@ public class LongRefTranlocal_addCommutingFunctionTest implements BetaStmConstan
     @Test
     public void whenFirstAddition() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.setStatus(STATUS_COMMUTING);
         tranlocal.addCommutingFunction(Functions.newIncLongFunction(1), pool);
 
@@ -40,7 +40,7 @@ public class LongRefTranlocal_addCommutingFunctionTest implements BetaStmConstan
     @Test
     public void whenMultipleAdditions() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.setStatus(STATUS_COMMUTING);
 
         LongFunction function1 = mock(LongFunction.class);

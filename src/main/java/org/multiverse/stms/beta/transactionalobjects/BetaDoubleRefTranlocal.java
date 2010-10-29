@@ -1,27 +1,26 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.functions.*;
-import org.multiverse.api.predicates.*;
-import org.multiverse.stms.beta.*;
+import org.multiverse.api.exceptions.ReadWriteConflict;
+import org.multiverse.api.functions.DoubleFunction;
+import org.multiverse.api.functions.Function;
+import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 
 
 /**
- * The {@link Tranlocal} for the {@link BetaLongRef).
+ * The {@link BetaTranlocal} for the {@link BetaDoubleRef).
  *
  * This class is generated.
  *
  * @author Peter Veentjer
  */
-public final class LongRefTranlocal extends Tranlocal{
+public final class BetaDoubleRefTranlocal extends BetaTranlocal{
 
-    public long value;
-    public long oldValue;
-    public LongPredicate[] validators;
+    public double value;
+    public double oldValue;
 
-    public LongRefTranlocal(BetaLongRef ref){
+    public BetaDoubleRefTranlocal(BetaDoubleRef ref){
         super(ref);
     }
 
@@ -30,52 +29,52 @@ public final class LongRefTranlocal extends Tranlocal{
             throw tx.abortOpenForRead(owner);
         }
 
-        if (isConstructing()) {
-            return;
-        }
-
         final BetaTransactionConfiguration config = tx.config;
 
         desiredLockMode = desiredLockMode >= config.readLockMode
-                ? desiredLockMode
-                : config.readLockMode;
+             ? desiredLockMode
+             : config.readLockMode;
 
-        if (isNew()) {
-            BetaLongRef o = (BetaLongRef)owner;
+        switch(status){
+            case STATUS_CONSTRUCTING:
+                return;
+            case STATUS_NEW: {
+                 BetaDoubleRef o = (BetaDoubleRef)owner;
 
-            final boolean loadSuccess = o.___load(
-                config.spinCount, tx, desiredLockMode, this);
+                final boolean loadSuccess = o.___load(
+                    config.spinCount, tx, desiredLockMode, this);
 
-            if (!loadSuccess) {
-                tx.abort();
-                throw ReadWriteConflict.INSTANCE;
+                if (!loadSuccess) {
+                    tx.abort();
+                    throw ReadWriteConflict.INSTANCE;
+                }
+
+                setStatus(STATUS_READONLY);
+                setIgnore(desiredLockMode == LOCKMODE_NONE && !hasDepartObligation());
+                return;
             }
-
-            setStatus(STATUS_READONLY);
-            setIgnore(desiredLockMode == LOCKMODE_NONE && !hasDepartObligation());
-            return;
-        }
-
-        if (isCommuting()) {
-            final boolean loadSuccess = ((BetaLongRef)owner).___load(
+            case STATUS_COMMUTING: {
+                final boolean loadSuccess = ((BetaDoubleRef)owner).___load(
                 config.spinCount, tx, LOCKMODE_COMMIT, this);
 
-            if (!loadSuccess) {
-                tx.abort();
-                throw ReadWriteConflict.INSTANCE;
+                if (!loadSuccess) {
+                    tx.abort();
+                    throw ReadWriteConflict.INSTANCE;
+                }
+
+                evaluateCommutingFunctions(tx.pool);
+                return;
             }
+            default:{
+                if (getLockMode() < desiredLockMode) {
+                    boolean loadSuccess = owner.___tryLockAndCheckConflict(
+                        tx, config.spinCount, this, desiredLockMode == LOCKMODE_COMMIT);
 
-            evaluateCommutingFunctions(tx.pool);
-            return;
-        }
-
-        if (getLockMode() < desiredLockMode) {
-            boolean loadSuccess = owner.___tryLockAndCheckConflict(
-                    tx, config.spinCount, this, desiredLockMode == LOCKMODE_COMMIT);
-
-            if (!loadSuccess) {
-                tx.abort();
-                throw ReadWriteConflict.INSTANCE;
+                    if (!loadSuccess) {
+                        tx.abort();
+                        throw ReadWriteConflict.INSTANCE;
+                    }
+                }
             }
         }
     }
@@ -84,13 +83,13 @@ public final class LongRefTranlocal extends Tranlocal{
     public final void evaluateCommutingFunctions(final BetaObjectPool  pool){
         assert isCommuting();
 
-        long newValue = value;
+        double newValue = value;
 
         CallableNode current = headCallable;
         headCallable = null;
         do{
-            LongFunction function =
-                (LongFunction)current.function;
+            DoubleFunction function =
+                (DoubleFunction)current.function;
             newValue = function.call(newValue);
 
             CallableNode old = current;

@@ -11,9 +11,9 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRefTranlocal;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
-import org.multiverse.stms.beta.transactionalobjects.IntRefTranlocal;
-import org.multiverse.stms.beta.transactionalobjects.RefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -95,7 +95,7 @@ public class ConnectionPoolStressTest implements BetaStmConstants {
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
 
-                    RefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, lockMode);
+                    BetaRefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, lockMode);
 
                     for (int k = 0; k < poolsize; k++) {
                         headTranlocal.value = new Node(headTranlocal.value, new Connection());
@@ -111,14 +111,14 @@ public class ConnectionPoolStressTest implements BetaStmConstants {
                 public Connection execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
 
-                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, lockMode);
+                    BetaIntRefTranlocal sizeTranlocal = btx.openForWrite(size, lockMode);
                     if (sizeTranlocal.value == 0) {
                         retry();
                     }
 
                     sizeTranlocal.value--;
 
-                    RefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, lockMode);
+                    BetaRefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, lockMode);
                     Node<Connection> oldHead = headTranlocal.value;
                     headTranlocal.value = oldHead.next;
                     return oldHead.item;
@@ -134,7 +134,7 @@ public class ConnectionPoolStressTest implements BetaStmConstants {
 
                     btx.openForWrite(size, lockMode).value++;
 
-                    RefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, lockMode);
+                    BetaRefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, lockMode);
 
                     Node<Connection> oldHead = headTranlocal.value;
                     headTranlocal.value = new Node<Connection>(oldHead, c);

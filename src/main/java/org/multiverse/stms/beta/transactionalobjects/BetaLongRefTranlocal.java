@@ -1,27 +1,26 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.functions.*;
-import org.multiverse.api.predicates.*;
-import org.multiverse.stms.beta.*;
+import org.multiverse.api.exceptions.ReadWriteConflict;
+import org.multiverse.api.functions.Function;
+import org.multiverse.api.functions.LongFunction;
+import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 
 
 /**
- * The {@link Tranlocal} for the {@link ${transactionalObject.name}).
+ * The {@link BetaTranlocal} for the {@link BetaLongRef).
  *
  * This class is generated.
  *
  * @author Peter Veentjer
  */
-public final class ${transactionalObject.tranlocal}${transactionalObject.typeParameter} extends Tranlocal{
+public final class BetaLongRefTranlocal extends BetaTranlocal{
 
-    public ${transactionalObject.type} value;
-    public ${transactionalObject.type} oldValue;
-    public ${transactionalObject.predicateClass}${transactionalObject.typeParameter}[] validators;
+    public long value;
+    public long oldValue;
 
-    public ${transactionalObject.tranlocal}(${transactionalObject.name} ref){
+    public BetaLongRefTranlocal(BetaLongRef ref){
         super(ref);
     }
 
@@ -30,52 +29,52 @@ public final class ${transactionalObject.tranlocal}${transactionalObject.typePar
             throw tx.abortOpenForRead(owner);
         }
 
-        if (isConstructing()) {
-            return;
-        }
-
         final BetaTransactionConfiguration config = tx.config;
 
         desiredLockMode = desiredLockMode >= config.readLockMode
-                ? desiredLockMode
-                : config.readLockMode;
+             ? desiredLockMode
+             : config.readLockMode;
 
-        if (isNew()) {
-            ${transactionalObject.name} o = (${transactionalObject.name})owner;
+        switch(status){
+            case STATUS_CONSTRUCTING:
+                return;
+            case STATUS_NEW: {
+                 BetaLongRef o = (BetaLongRef)owner;
 
-            final boolean loadSuccess = o.___load(
-                config.spinCount, tx, desiredLockMode, this);
+                final boolean loadSuccess = o.___load(
+                    config.spinCount, tx, desiredLockMode, this);
 
-            if (!loadSuccess) {
-                tx.abort();
-                throw ReadWriteConflict.INSTANCE;
+                if (!loadSuccess) {
+                    tx.abort();
+                    throw ReadWriteConflict.INSTANCE;
+                }
+
+                setStatus(STATUS_READONLY);
+                setIgnore(desiredLockMode == LOCKMODE_NONE && !hasDepartObligation());
+                return;
             }
-
-            setStatus(STATUS_READONLY);
-            setIgnore(desiredLockMode == LOCKMODE_NONE && !hasDepartObligation());
-            return;
-        }
-
-        if (isCommuting()) {
-            final boolean loadSuccess = ((${transactionalObject.name})owner).___load(
+            case STATUS_COMMUTING: {
+                final boolean loadSuccess = ((BetaLongRef)owner).___load(
                 config.spinCount, tx, LOCKMODE_COMMIT, this);
 
-            if (!loadSuccess) {
-                tx.abort();
-                throw ReadWriteConflict.INSTANCE;
+                if (!loadSuccess) {
+                    tx.abort();
+                    throw ReadWriteConflict.INSTANCE;
+                }
+
+                evaluateCommutingFunctions(tx.pool);
+                return;
             }
+            default:{
+                if (getLockMode() < desiredLockMode) {
+                    boolean loadSuccess = owner.___tryLockAndCheckConflict(
+                        tx, config.spinCount, this, desiredLockMode == LOCKMODE_COMMIT);
 
-            evaluateCommutingFunctions(tx.pool);
-            return;
-        }
-
-        if (getLockMode() < desiredLockMode) {
-            boolean loadSuccess = owner.___tryLockAndCheckConflict(
-                    tx, config.spinCount, this, desiredLockMode == LOCKMODE_COMMIT);
-
-            if (!loadSuccess) {
-                tx.abort();
-                throw ReadWriteConflict.INSTANCE;
+                    if (!loadSuccess) {
+                        tx.abort();
+                        throw ReadWriteConflict.INSTANCE;
+                    }
+                }
             }
         }
     }
@@ -84,13 +83,13 @@ public final class ${transactionalObject.tranlocal}${transactionalObject.typePar
     public final void evaluateCommutingFunctions(final BetaObjectPool  pool){
         assert isCommuting();
 
-        ${transactionalObject.type} newValue = value;
+        long newValue = value;
 
         CallableNode current = headCallable;
         headCallable = null;
         do{
-            ${transactionalObject.functionClass}${transactionalObject.typeParameter} function =
-                (${transactionalObject.functionClass}${transactionalObject.typeParameter})current.function;
+            LongFunction function =
+                (LongFunction)current.function;
             newValue = function.call(newValue);
 
             CallableNode old = current;
@@ -116,8 +115,8 @@ public final class ${transactionalObject.tranlocal}${transactionalObject.typePar
     @Override
     public void prepareForPooling(final BetaObjectPool pool) {
         version = 0l;
-        value = ${transactionalObject.initialValue};
-        oldValue = ${transactionalObject.initialValue};
+        value = 0;
+        oldValue = 0;
         owner = null;
 
         setLockMode(LOCKMODE_NONE);

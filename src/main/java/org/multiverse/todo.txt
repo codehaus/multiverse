@@ -266,7 +266,15 @@ the task not being executed at all.
     makes testing harder
     resources are released too late.
 
+- the tranlocal.openForRead needs to have the conflict stuff added
+
+- the tranlocal.openForWrite needs to have the conflict stuff added
+
+- the Tranlocal.openForWrite needs to be moved to the tranlocal subclass.
+
 done
+
+- tranlocal names should be alligned with the ref names
 
 - generate script is now part of gradle script
 

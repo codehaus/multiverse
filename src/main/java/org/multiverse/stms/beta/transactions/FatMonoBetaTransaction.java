@@ -1,5 +1,6 @@
 package org.multiverse.stms.beta.transactions;
 
+import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.Retry;
@@ -22,7 +23,7 @@ import static java.lang.String.format;
  */
 public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
-    private Tranlocal attached;
+    private BetaTranlocal attached;
     private boolean hasReads;
     private boolean hasUntrackedReads;
     private LocalConflictCounter localConflictCounter;
@@ -73,22 +74,27 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortReadOnNull();
         }
 
-        if(ref.getStm()!=config.stm){
+        if(ref.___stm != config.stm){
             throw abortReadOnStmMismatch(ref);
         }
 
-        if(attached!=null && attached.owner == ref){
-            RefTranlocal<E> tranlocal = (RefTranlocal<E>)attached;
+        if(attached != null && attached.owner == ref){
+            BetaRefTranlocal<E> tranlocal = (BetaRefTranlocal<E>)attached;
             tranlocal.openForRead(config.readLockMode);
             return tranlocal.value;
         }
 
-        throw new TodoException();
+        if(config.trackReads || config.isolationLevel!=IsolationLevel.ReadCommitted){
+            throw new TodoException();
+        }else{
+            hasUntrackedReads = true;
+            return ref.atomicWeakGet();
+        }
     }
 
     private <E> void flattenCommute(
         final BetaRef<E> ref,
-        final RefTranlocal<E> tranlocal,
+        final BetaRefTranlocal<E> tranlocal,
         final int lockMode){
 
         if(!hasReads){
@@ -117,7 +123,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
     }
 
-    public final <E> RefTranlocal<E> open(BetaRef<E> ref){
+    public final <E> BetaRefTranlocal<E> open(BetaRef<E> ref){
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
@@ -126,15 +132,15 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
            throw abortOpenOnNull();
         }
 
-        if(ref.getStm() != config.stm){
+        if(ref.___stm != config.stm){
             throw abortOnStmMismatch(ref);
         }
 
         if(attached!=null && attached.owner == ref){
-            return (RefTranlocal<E>)attached;
+            return (BetaRefTranlocal<E>)attached;
         }
 
-        RefTranlocal<E> tranlocal = pool.take(ref);
+        BetaRefTranlocal<E> tranlocal = pool.take(ref);
         tranlocal.tx = this;
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         attached = tranlocal;
@@ -142,7 +148,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     @Override
-    public final <E> RefTranlocal<E> openForRead(final BetaRef<E> ref,int lockMode) {
+    public final <E> BetaRefTranlocal<E> openForRead(final BetaRef<E> ref,int lockMode) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(ref);
@@ -165,7 +171,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 localConflictCounter.reset();
                 hasReads = true;
             }
-            RefTranlocal<E> tranlocal = pool.take(ref);
+            BetaRefTranlocal<E> tranlocal = pool.take(ref);
             if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -192,7 +198,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(attached.owner == ref){
             //the reference is the one we are looking for.
 
-            final RefTranlocal<E> tranlocal = (RefTranlocal<E>)attached;
+            final BetaRefTranlocal<E> tranlocal = (BetaRefTranlocal<E>)attached;
 
             if(tranlocal.isCommuting()){
                 flattenCommute(ref, tranlocal, lockMode);
@@ -215,7 +221,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             hasReads = true;
         }
 
-        RefTranlocal<E> tranlocal = pool.take(ref);
+        BetaRefTranlocal<E> tranlocal = pool.take(ref);
         tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
 
@@ -238,7 +244,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     @Override
-    public final <E> RefTranlocal<E> openForWrite(
+    public final <E> BetaRefTranlocal<E> openForWrite(
         final BetaRef<E> ref, int lockMode) {
 
         if (status != ACTIVE) {
@@ -267,7 +273,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 hasReads = true;
             }
 
-            RefTranlocal<E> tranlocal = pool.take(ref);
+            BetaRefTranlocal<E> tranlocal = pool.take(ref);
             if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -292,7 +298,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         //the reference is the one we are looking for.
-        RefTranlocal<E> tranlocal = (RefTranlocal<E>)attached;
+        BetaRefTranlocal<E> tranlocal = (BetaRefTranlocal<E>)attached;
 
         if(tranlocal.isCommuting()){
             flattenCommute(ref, tranlocal, lockMode);
@@ -313,7 +319,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     @Override
-    public final <E> RefTranlocal<E> openForConstruction(
+    public final <E> BetaRefTranlocal<E> openForConstruction(
         final BetaRef<E> ref) {
 
         if (status != ACTIVE) {
@@ -332,9 +338,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOpenForConstructionWhenReadonly(ref);
         }
 
-        RefTranlocal<E> tranlocal = (attached == null || attached.owner != ref)
+        BetaRefTranlocal<E> tranlocal = (attached == null || attached.owner != ref)
             ? null
-            : (RefTranlocal<E>)attached;
+            : (BetaRefTranlocal<E>)attached;
 
         if(tranlocal != null){
             if(!tranlocal.isConstructing()){
@@ -391,7 +397,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             //todo: call to 'openForCommute' can be inlined.
-            RefTranlocal<E> tranlocal = pool.take(ref);
+            BetaRefTranlocal<E> tranlocal = pool.take(ref);
             tranlocal.tx = this;
             tranlocal.setStatus(STATUS_COMMUTING);
             tranlocal.addCommutingFunction(function, pool);
@@ -399,7 +405,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             hasUpdates = true;
             return;
         }
-        RefTranlocal<E> tranlocal = (RefTranlocal<E>)attached;
+        BetaRefTranlocal<E> tranlocal = (BetaRefTranlocal<E>)attached;
         if(tranlocal.isCommuting()){
             tranlocal.addCommutingFunction(function, pool);
             return;
@@ -423,22 +429,27 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortReadOnNull();
         }
 
-        if(ref.getStm()!=config.stm){
+        if(ref.___stm != config.stm){
             throw abortReadOnStmMismatch(ref);
         }
 
-        if(attached!=null && attached.owner == ref){
-            IntRefTranlocal tranlocal = (IntRefTranlocal)attached;
+        if(attached != null && attached.owner == ref){
+            BetaIntRefTranlocal tranlocal = (BetaIntRefTranlocal)attached;
             tranlocal.openForRead(config.readLockMode);
             return tranlocal.value;
         }
 
-        throw new TodoException();
+        if(config.trackReads || config.isolationLevel!=IsolationLevel.ReadCommitted){
+            throw new TodoException();
+        }else{
+            hasUntrackedReads = true;
+            return ref.atomicWeakGet();
+        }
     }
 
     private  void flattenCommute(
         final BetaIntRef ref,
-        final IntRefTranlocal tranlocal,
+        final BetaIntRefTranlocal tranlocal,
         final int lockMode){
 
         if(!hasReads){
@@ -467,7 +478,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
     }
 
-    public final  IntRefTranlocal open(BetaIntRef ref){
+    public final  BetaIntRefTranlocal open(BetaIntRef ref){
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
@@ -476,15 +487,15 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
            throw abortOpenOnNull();
         }
 
-        if(ref.getStm() != config.stm){
+        if(ref.___stm != config.stm){
             throw abortOnStmMismatch(ref);
         }
 
         if(attached!=null && attached.owner == ref){
-            return (IntRefTranlocal)attached;
+            return (BetaIntRefTranlocal)attached;
         }
 
-        IntRefTranlocal tranlocal = pool.take(ref);
+        BetaIntRefTranlocal tranlocal = pool.take(ref);
         tranlocal.tx = this;
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         attached = tranlocal;
@@ -492,7 +503,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     @Override
-    public final  IntRefTranlocal openForRead(final BetaIntRef ref,int lockMode) {
+    public final  BetaIntRefTranlocal openForRead(final BetaIntRef ref,int lockMode) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(ref);
@@ -515,7 +526,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 localConflictCounter.reset();
                 hasReads = true;
             }
-            IntRefTranlocal tranlocal = pool.take(ref);
+            BetaIntRefTranlocal tranlocal = pool.take(ref);
             if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -542,7 +553,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(attached.owner == ref){
             //the reference is the one we are looking for.
 
-            final IntRefTranlocal tranlocal = (IntRefTranlocal)attached;
+            final BetaIntRefTranlocal tranlocal = (BetaIntRefTranlocal)attached;
 
             if(tranlocal.isCommuting()){
                 flattenCommute(ref, tranlocal, lockMode);
@@ -565,7 +576,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             hasReads = true;
         }
 
-        IntRefTranlocal tranlocal = pool.take(ref);
+        BetaIntRefTranlocal tranlocal = pool.take(ref);
         tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
 
@@ -588,7 +599,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     @Override
-    public final  IntRefTranlocal openForWrite(
+    public final  BetaIntRefTranlocal openForWrite(
         final BetaIntRef ref, int lockMode) {
 
         if (status != ACTIVE) {
@@ -617,7 +628,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 hasReads = true;
             }
 
-            IntRefTranlocal tranlocal = pool.take(ref);
+            BetaIntRefTranlocal tranlocal = pool.take(ref);
             if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -642,7 +653,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         //the reference is the one we are looking for.
-        IntRefTranlocal tranlocal = (IntRefTranlocal)attached;
+        BetaIntRefTranlocal tranlocal = (BetaIntRefTranlocal)attached;
 
         if(tranlocal.isCommuting()){
             flattenCommute(ref, tranlocal, lockMode);
@@ -663,7 +674,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     @Override
-    public final  IntRefTranlocal openForConstruction(
+    public final  BetaIntRefTranlocal openForConstruction(
         final BetaIntRef ref) {
 
         if (status != ACTIVE) {
@@ -682,9 +693,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOpenForConstructionWhenReadonly(ref);
         }
 
-        IntRefTranlocal tranlocal = (attached == null || attached.owner != ref)
+        BetaIntRefTranlocal tranlocal = (attached == null || attached.owner != ref)
             ? null
-            : (IntRefTranlocal)attached;
+            : (BetaIntRefTranlocal)attached;
 
         if(tranlocal != null){
             if(!tranlocal.isConstructing()){
@@ -741,7 +752,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             //todo: call to 'openForCommute' can be inlined.
-            IntRefTranlocal tranlocal = pool.take(ref);
+            BetaIntRefTranlocal tranlocal = pool.take(ref);
             tranlocal.tx = this;
             tranlocal.setStatus(STATUS_COMMUTING);
             tranlocal.addCommutingFunction(function, pool);
@@ -749,7 +760,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             hasUpdates = true;
             return;
         }
-        IntRefTranlocal tranlocal = (IntRefTranlocal)attached;
+        BetaIntRefTranlocal tranlocal = (BetaIntRefTranlocal)attached;
         if(tranlocal.isCommuting()){
             tranlocal.addCommutingFunction(function, pool);
             return;
@@ -773,22 +784,27 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortReadOnNull();
         }
 
-        if(ref.getStm()!=config.stm){
+        if(ref.___stm != config.stm){
             throw abortReadOnStmMismatch(ref);
         }
 
-        if(attached!=null && attached.owner == ref){
-            BooleanRefTranlocal tranlocal = (BooleanRefTranlocal)attached;
+        if(attached != null && attached.owner == ref){
+            BetaBooleanRefTranlocal tranlocal = (BetaBooleanRefTranlocal)attached;
             tranlocal.openForRead(config.readLockMode);
             return tranlocal.value;
         }
 
-        throw new TodoException();
+        if(config.trackReads || config.isolationLevel!=IsolationLevel.ReadCommitted){
+            throw new TodoException();
+        }else{
+            hasUntrackedReads = true;
+            return ref.atomicWeakGet();
+        }
     }
 
     private  void flattenCommute(
         final BetaBooleanRef ref,
-        final BooleanRefTranlocal tranlocal,
+        final BetaBooleanRefTranlocal tranlocal,
         final int lockMode){
 
         if(!hasReads){
@@ -817,7 +833,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
     }
 
-    public final  BooleanRefTranlocal open(BetaBooleanRef ref){
+    public final  BetaBooleanRefTranlocal open(BetaBooleanRef ref){
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
@@ -826,15 +842,15 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
            throw abortOpenOnNull();
         }
 
-        if(ref.getStm() != config.stm){
+        if(ref.___stm != config.stm){
             throw abortOnStmMismatch(ref);
         }
 
         if(attached!=null && attached.owner == ref){
-            return (BooleanRefTranlocal)attached;
+            return (BetaBooleanRefTranlocal)attached;
         }
 
-        BooleanRefTranlocal tranlocal = pool.take(ref);
+        BetaBooleanRefTranlocal tranlocal = pool.take(ref);
         tranlocal.tx = this;
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         attached = tranlocal;
@@ -842,7 +858,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     @Override
-    public final  BooleanRefTranlocal openForRead(final BetaBooleanRef ref,int lockMode) {
+    public final  BetaBooleanRefTranlocal openForRead(final BetaBooleanRef ref,int lockMode) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(ref);
@@ -865,7 +881,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 localConflictCounter.reset();
                 hasReads = true;
             }
-            BooleanRefTranlocal tranlocal = pool.take(ref);
+            BetaBooleanRefTranlocal tranlocal = pool.take(ref);
             if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -892,7 +908,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(attached.owner == ref){
             //the reference is the one we are looking for.
 
-            final BooleanRefTranlocal tranlocal = (BooleanRefTranlocal)attached;
+            final BetaBooleanRefTranlocal tranlocal = (BetaBooleanRefTranlocal)attached;
 
             if(tranlocal.isCommuting()){
                 flattenCommute(ref, tranlocal, lockMode);
@@ -915,7 +931,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             hasReads = true;
         }
 
-        BooleanRefTranlocal tranlocal = pool.take(ref);
+        BetaBooleanRefTranlocal tranlocal = pool.take(ref);
         tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
 
@@ -938,7 +954,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     @Override
-    public final  BooleanRefTranlocal openForWrite(
+    public final  BetaBooleanRefTranlocal openForWrite(
         final BetaBooleanRef ref, int lockMode) {
 
         if (status != ACTIVE) {
@@ -967,7 +983,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 hasReads = true;
             }
 
-            BooleanRefTranlocal tranlocal = pool.take(ref);
+            BetaBooleanRefTranlocal tranlocal = pool.take(ref);
             if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -992,7 +1008,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         //the reference is the one we are looking for.
-        BooleanRefTranlocal tranlocal = (BooleanRefTranlocal)attached;
+        BetaBooleanRefTranlocal tranlocal = (BetaBooleanRefTranlocal)attached;
 
         if(tranlocal.isCommuting()){
             flattenCommute(ref, tranlocal, lockMode);
@@ -1013,7 +1029,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     @Override
-    public final  BooleanRefTranlocal openForConstruction(
+    public final  BetaBooleanRefTranlocal openForConstruction(
         final BetaBooleanRef ref) {
 
         if (status != ACTIVE) {
@@ -1032,9 +1048,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOpenForConstructionWhenReadonly(ref);
         }
 
-        BooleanRefTranlocal tranlocal = (attached == null || attached.owner != ref)
+        BetaBooleanRefTranlocal tranlocal = (attached == null || attached.owner != ref)
             ? null
-            : (BooleanRefTranlocal)attached;
+            : (BetaBooleanRefTranlocal)attached;
 
         if(tranlocal != null){
             if(!tranlocal.isConstructing()){
@@ -1091,7 +1107,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             //todo: call to 'openForCommute' can be inlined.
-            BooleanRefTranlocal tranlocal = pool.take(ref);
+            BetaBooleanRefTranlocal tranlocal = pool.take(ref);
             tranlocal.tx = this;
             tranlocal.setStatus(STATUS_COMMUTING);
             tranlocal.addCommutingFunction(function, pool);
@@ -1099,7 +1115,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             hasUpdates = true;
             return;
         }
-        BooleanRefTranlocal tranlocal = (BooleanRefTranlocal)attached;
+        BetaBooleanRefTranlocal tranlocal = (BetaBooleanRefTranlocal)attached;
         if(tranlocal.isCommuting()){
             tranlocal.addCommutingFunction(function, pool);
             return;
@@ -1123,22 +1139,27 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortReadOnNull();
         }
 
-        if(ref.getStm()!=config.stm){
+        if(ref.___stm != config.stm){
             throw abortReadOnStmMismatch(ref);
         }
 
-        if(attached!=null && attached.owner == ref){
-            DoubleRefTranlocal tranlocal = (DoubleRefTranlocal)attached;
+        if(attached != null && attached.owner == ref){
+            BetaDoubleRefTranlocal tranlocal = (BetaDoubleRefTranlocal)attached;
             tranlocal.openForRead(config.readLockMode);
             return tranlocal.value;
         }
 
-        throw new TodoException();
+        if(config.trackReads || config.isolationLevel!=IsolationLevel.ReadCommitted){
+            throw new TodoException();
+        }else{
+            hasUntrackedReads = true;
+            return ref.atomicWeakGet();
+        }
     }
 
     private  void flattenCommute(
         final BetaDoubleRef ref,
-        final DoubleRefTranlocal tranlocal,
+        final BetaDoubleRefTranlocal tranlocal,
         final int lockMode){
 
         if(!hasReads){
@@ -1167,7 +1188,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
     }
 
-    public final  DoubleRefTranlocal open(BetaDoubleRef ref){
+    public final  BetaDoubleRefTranlocal open(BetaDoubleRef ref){
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
@@ -1176,15 +1197,15 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
            throw abortOpenOnNull();
         }
 
-        if(ref.getStm() != config.stm){
+        if(ref.___stm != config.stm){
             throw abortOnStmMismatch(ref);
         }
 
         if(attached!=null && attached.owner == ref){
-            return (DoubleRefTranlocal)attached;
+            return (BetaDoubleRefTranlocal)attached;
         }
 
-        DoubleRefTranlocal tranlocal = pool.take(ref);
+        BetaDoubleRefTranlocal tranlocal = pool.take(ref);
         tranlocal.tx = this;
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         attached = tranlocal;
@@ -1192,7 +1213,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     @Override
-    public final  DoubleRefTranlocal openForRead(final BetaDoubleRef ref,int lockMode) {
+    public final  BetaDoubleRefTranlocal openForRead(final BetaDoubleRef ref,int lockMode) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(ref);
@@ -1215,7 +1236,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 localConflictCounter.reset();
                 hasReads = true;
             }
-            DoubleRefTranlocal tranlocal = pool.take(ref);
+            BetaDoubleRefTranlocal tranlocal = pool.take(ref);
             if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -1242,7 +1263,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(attached.owner == ref){
             //the reference is the one we are looking for.
 
-            final DoubleRefTranlocal tranlocal = (DoubleRefTranlocal)attached;
+            final BetaDoubleRefTranlocal tranlocal = (BetaDoubleRefTranlocal)attached;
 
             if(tranlocal.isCommuting()){
                 flattenCommute(ref, tranlocal, lockMode);
@@ -1265,7 +1286,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             hasReads = true;
         }
 
-        DoubleRefTranlocal tranlocal = pool.take(ref);
+        BetaDoubleRefTranlocal tranlocal = pool.take(ref);
         tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
 
@@ -1288,7 +1309,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     @Override
-    public final  DoubleRefTranlocal openForWrite(
+    public final  BetaDoubleRefTranlocal openForWrite(
         final BetaDoubleRef ref, int lockMode) {
 
         if (status != ACTIVE) {
@@ -1317,7 +1338,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 hasReads = true;
             }
 
-            DoubleRefTranlocal tranlocal = pool.take(ref);
+            BetaDoubleRefTranlocal tranlocal = pool.take(ref);
             if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -1342,7 +1363,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         //the reference is the one we are looking for.
-        DoubleRefTranlocal tranlocal = (DoubleRefTranlocal)attached;
+        BetaDoubleRefTranlocal tranlocal = (BetaDoubleRefTranlocal)attached;
 
         if(tranlocal.isCommuting()){
             flattenCommute(ref, tranlocal, lockMode);
@@ -1363,7 +1384,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     @Override
-    public final  DoubleRefTranlocal openForConstruction(
+    public final  BetaDoubleRefTranlocal openForConstruction(
         final BetaDoubleRef ref) {
 
         if (status != ACTIVE) {
@@ -1382,9 +1403,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOpenForConstructionWhenReadonly(ref);
         }
 
-        DoubleRefTranlocal tranlocal = (attached == null || attached.owner != ref)
+        BetaDoubleRefTranlocal tranlocal = (attached == null || attached.owner != ref)
             ? null
-            : (DoubleRefTranlocal)attached;
+            : (BetaDoubleRefTranlocal)attached;
 
         if(tranlocal != null){
             if(!tranlocal.isConstructing()){
@@ -1441,7 +1462,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             //todo: call to 'openForCommute' can be inlined.
-            DoubleRefTranlocal tranlocal = pool.take(ref);
+            BetaDoubleRefTranlocal tranlocal = pool.take(ref);
             tranlocal.tx = this;
             tranlocal.setStatus(STATUS_COMMUTING);
             tranlocal.addCommutingFunction(function, pool);
@@ -1449,7 +1470,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             hasUpdates = true;
             return;
         }
-        DoubleRefTranlocal tranlocal = (DoubleRefTranlocal)attached;
+        BetaDoubleRefTranlocal tranlocal = (BetaDoubleRefTranlocal)attached;
         if(tranlocal.isCommuting()){
             tranlocal.addCommutingFunction(function, pool);
             return;
@@ -1473,22 +1494,27 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortReadOnNull();
         }
 
-        if(ref.getStm()!=config.stm){
+        if(ref.___stm != config.stm){
             throw abortReadOnStmMismatch(ref);
         }
 
-        if(attached!=null && attached.owner == ref){
-            LongRefTranlocal tranlocal = (LongRefTranlocal)attached;
+        if(attached != null && attached.owner == ref){
+            BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal)attached;
             tranlocal.openForRead(config.readLockMode);
             return tranlocal.value;
         }
 
-        throw new TodoException();
+        if(config.trackReads || config.isolationLevel!=IsolationLevel.ReadCommitted){
+            throw new TodoException();
+        }else{
+            hasUntrackedReads = true;
+            return ref.atomicWeakGet();
+        }
     }
 
     private  void flattenCommute(
         final BetaLongRef ref,
-        final LongRefTranlocal tranlocal,
+        final BetaLongRefTranlocal tranlocal,
         final int lockMode){
 
         if(!hasReads){
@@ -1517,7 +1543,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
     }
 
-    public final  LongRefTranlocal open(BetaLongRef ref){
+    public final  BetaLongRefTranlocal open(BetaLongRef ref){
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
@@ -1526,15 +1552,15 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
            throw abortOpenOnNull();
         }
 
-        if(ref.getStm() != config.stm){
+        if(ref.___stm != config.stm){
             throw abortOnStmMismatch(ref);
         }
 
         if(attached!=null && attached.owner == ref){
-            return (LongRefTranlocal)attached;
+            return (BetaLongRefTranlocal)attached;
         }
 
-        LongRefTranlocal tranlocal = pool.take(ref);
+        BetaLongRefTranlocal tranlocal = pool.take(ref);
         tranlocal.tx = this;
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         attached = tranlocal;
@@ -1542,7 +1568,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     @Override
-    public final  LongRefTranlocal openForRead(final BetaLongRef ref,int lockMode) {
+    public final  BetaLongRefTranlocal openForRead(final BetaLongRef ref,int lockMode) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(ref);
@@ -1565,7 +1591,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 localConflictCounter.reset();
                 hasReads = true;
             }
-            LongRefTranlocal tranlocal = pool.take(ref);
+            BetaLongRefTranlocal tranlocal = pool.take(ref);
             if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -1592,7 +1618,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(attached.owner == ref){
             //the reference is the one we are looking for.
 
-            final LongRefTranlocal tranlocal = (LongRefTranlocal)attached;
+            final BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal)attached;
 
             if(tranlocal.isCommuting()){
                 flattenCommute(ref, tranlocal, lockMode);
@@ -1615,7 +1641,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             hasReads = true;
         }
 
-        LongRefTranlocal tranlocal = pool.take(ref);
+        BetaLongRefTranlocal tranlocal = pool.take(ref);
         tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
 
@@ -1638,7 +1664,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     @Override
-    public final  LongRefTranlocal openForWrite(
+    public final  BetaLongRefTranlocal openForWrite(
         final BetaLongRef ref, int lockMode) {
 
         if (status != ACTIVE) {
@@ -1667,7 +1693,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 hasReads = true;
             }
 
-            LongRefTranlocal tranlocal = pool.take(ref);
+            BetaLongRefTranlocal tranlocal = pool.take(ref);
             if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -1692,7 +1718,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         //the reference is the one we are looking for.
-        LongRefTranlocal tranlocal = (LongRefTranlocal)attached;
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal)attached;
 
         if(tranlocal.isCommuting()){
             flattenCommute(ref, tranlocal, lockMode);
@@ -1713,7 +1739,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     @Override
-    public final  LongRefTranlocal openForConstruction(
+    public final  BetaLongRefTranlocal openForConstruction(
         final BetaLongRef ref) {
 
         if (status != ACTIVE) {
@@ -1732,9 +1758,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOpenForConstructionWhenReadonly(ref);
         }
 
-        LongRefTranlocal tranlocal = (attached == null || attached.owner != ref)
+        BetaLongRefTranlocal tranlocal = (attached == null || attached.owner != ref)
             ? null
-            : (LongRefTranlocal)attached;
+            : (BetaLongRefTranlocal)attached;
 
         if(tranlocal != null){
             if(!tranlocal.isConstructing()){
@@ -1791,7 +1817,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             //todo: call to 'openForCommute' can be inlined.
-            LongRefTranlocal tranlocal = pool.take(ref);
+            BetaLongRefTranlocal tranlocal = pool.take(ref);
             tranlocal.tx = this;
             tranlocal.setStatus(STATUS_COMMUTING);
             tranlocal.addCommutingFunction(function, pool);
@@ -1799,7 +1825,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             hasUpdates = true;
             return;
         }
-        LongRefTranlocal tranlocal = (LongRefTranlocal)attached;
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal)attached;
         if(tranlocal.isCommuting()){
             tranlocal.addCommutingFunction(function, pool);
             return;
@@ -1816,7 +1842,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
     private  void flattenCommute(
         final BetaTransactionalObject ref,
-        final Tranlocal tranlocal,
+        final BetaTranlocal tranlocal,
         final int lockMode){
 
         if(!hasReads){
@@ -1845,7 +1871,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
     }
 
-    public final  Tranlocal open(BetaTransactionalObject ref){
+    public final  BetaTranlocal open(BetaTransactionalObject ref){
         if (status != ACTIVE) {
             throw abortOpen(ref);
         }
@@ -1859,10 +1885,10 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         if(attached!=null && attached.owner == ref){
-            return (Tranlocal)attached;
+            return (BetaTranlocal)attached;
         }
 
-        Tranlocal tranlocal = pool.take(ref);
+        BetaTranlocal tranlocal = pool.take(ref);
         tranlocal.tx = this;
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         attached = tranlocal;
@@ -1870,7 +1896,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     @Override
-    public final  Tranlocal openForRead(final BetaTransactionalObject ref,int lockMode) {
+    public final  BetaTranlocal openForRead(final BetaTransactionalObject ref,int lockMode) {
 
         if (status != ACTIVE) {
             throw abortOpenForRead(ref);
@@ -1893,7 +1919,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 localConflictCounter.reset();
                 hasReads = true;
             }
-            Tranlocal tranlocal = pool.take(ref);
+            BetaTranlocal tranlocal = pool.take(ref);
             if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -1920,7 +1946,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         if(attached.owner == ref){
             //the reference is the one we are looking for.
 
-            final Tranlocal tranlocal = (Tranlocal)attached;
+            final BetaTranlocal tranlocal = (BetaTranlocal)attached;
 
             if(tranlocal.isCommuting()){
                 flattenCommute(ref, tranlocal, lockMode);
@@ -1943,7 +1969,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             hasReads = true;
         }
 
-        Tranlocal tranlocal = pool.take(ref);
+        BetaTranlocal tranlocal = pool.take(ref);
         tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
 
@@ -1966,7 +1992,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     @Override
-    public final  Tranlocal openForWrite(
+    public final  BetaTranlocal openForWrite(
         final BetaTransactionalObject ref, int lockMode) {
 
         if (status != ACTIVE) {
@@ -1995,7 +2021,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 hasReads = true;
             }
 
-            Tranlocal tranlocal = pool.take(ref);
+            BetaTranlocal tranlocal = pool.take(ref);
             if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
                 pool.put(tranlocal);
                 throw abortOnReadConflict();
@@ -2020,7 +2046,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         //the reference is the one we are looking for.
-        Tranlocal tranlocal = (Tranlocal)attached;
+        BetaTranlocal tranlocal = (BetaTranlocal)attached;
 
         if(tranlocal.isCommuting()){
             flattenCommute(ref, tranlocal, lockMode);
@@ -2041,7 +2067,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     @Override
-    public final  Tranlocal openForConstruction(
+    public final  BetaTranlocal openForConstruction(
         final BetaTransactionalObject ref) {
 
         if (status != ACTIVE) {
@@ -2060,9 +2086,9 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOpenForConstructionWhenReadonly(ref);
         }
 
-        Tranlocal tranlocal = (attached == null || attached.owner != ref)
+        BetaTranlocal tranlocal = (attached == null || attached.owner != ref)
             ? null
-            : (Tranlocal)attached;
+            : (BetaTranlocal)attached;
 
         if(tranlocal != null){
             if(!tranlocal.isConstructing()){
@@ -2119,7 +2145,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
 
             //todo: call to 'openForCommute' can be inlined.
-            Tranlocal tranlocal = pool.take(ref);
+            BetaTranlocal tranlocal = pool.take(ref);
             tranlocal.tx = this;
             tranlocal.setStatus(STATUS_COMMUTING);
             tranlocal.addCommutingFunction(function, pool);
@@ -2127,7 +2153,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             hasUpdates = true;
             return;
         }
-        Tranlocal tranlocal = (Tranlocal)attached;
+        BetaTranlocal tranlocal = (BetaTranlocal)attached;
         if(tranlocal.isCommuting()){
             tranlocal.addCommutingFunction(function, pool);
             return;
@@ -2144,12 +2170,12 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
  
     @Override
-    public Tranlocal get(BetaTransactionalObject object){
+    public BetaTranlocal get(BetaTransactionalObject object){
         return attached == null || attached.owner!= object? null: attached;
     }
 
     @Override
-    public Tranlocal locate(BetaTransactionalObject owner){
+    public BetaTranlocal locate(BetaTransactionalObject owner){
         if (status != ACTIVE) {
             throw abortLocate(owner);
         }
@@ -2201,7 +2227,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
             }
         }
 
-        final Tranlocal tranlocal = attached;
+        final BetaTranlocal tranlocal = attached;
         if (tranlocal != null) {
             tranlocal.owner.___abort(this, tranlocal, pool);
             attached = null;
@@ -2229,7 +2255,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         prepare();
 
         Listeners listeners = null;
-        final Tranlocal tranlocal = attached;
+        final BetaTranlocal tranlocal = attached;
         if (tranlocal != null) {
             if(config.dirtyCheck){
                 if(!tranlocal.isReadonly() && !tranlocal.isDirty()){

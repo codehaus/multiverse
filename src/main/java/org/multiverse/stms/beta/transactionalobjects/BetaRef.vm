@@ -102,7 +102,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     }
 
     @Override
-    public final boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, Tranlocal tranlocal){
+    public final boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, BetaTranlocal tranlocal){
         return ___load(
             spinCount,
             newLockOwner,
@@ -176,7 +176,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 #if(${transactionalObject.isReference})
     @Override
     public final Listeners ___commitDirty(
-            final Tranlocal tranlocal,
+            final BetaTranlocal tranlocal,
             final BetaTransaction expectedLockOwner,
             final BetaObjectPool pool) {
 
@@ -228,7 +228,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
 
     @Override
     public final Listeners ___commitAll(
-            final Tranlocal tranlocal,
+            final BetaTranlocal tranlocal,
             final BetaTransaction expectedLockOwner,
             final BetaObjectPool pool) {
 
@@ -277,7 +277,7 @@ public ${transactionalObject.accessModifier} class ${transactionalObject.name}${
     @Override
     public final void ___abort(
         final BetaTransaction transaction,
-        final Tranlocal tranlocal,
+        final BetaTranlocal tranlocal,
         final BetaObjectPool pool) {
 
         if(tranlocal.getLockMode() != LOCKMODE_NONE){

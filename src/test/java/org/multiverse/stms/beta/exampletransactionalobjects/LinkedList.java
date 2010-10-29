@@ -6,8 +6,8 @@ import org.multiverse.api.functions.Function;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.transactionalobjects.AbstractBetaTransactionalObject;
+import org.multiverse.stms.beta.transactionalobjects.BetaTranlocal;
 import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
-import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 public class LinkedList<E> extends AbstractBetaTransactionalObject {
@@ -17,17 +17,17 @@ public class LinkedList<E> extends AbstractBetaTransactionalObject {
     }
 
     @Override
-    public Listeners ___commitAll(Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool) {
+    public Listeners ___commitAll(BetaTranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool) {
         throw new TodoException();
     }
 
     @Override
-    public Tranlocal ___newTranlocal() {
+    public BetaTranlocal ___newTranlocal() {
         throw new TodoException();
     }
 
     @Override
-    public boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, Tranlocal tranlocal) {
+    public boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, BetaTranlocal tranlocal) {
         throw new TodoException();
     }
 
@@ -82,7 +82,7 @@ public class LinkedList<E> extends AbstractBetaTransactionalObject {
     }
 
     @Override
-    public Listeners ___commitDirty(Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool) {
+    public Listeners ___commitDirty(BetaTranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool) {
         throw new TodoException();
     }
 
@@ -182,7 +182,7 @@ public class LinkedList<E> extends AbstractBetaTransactionalObject {
     }
 }
 
-class LinkedListTranlocal<E> extends Tranlocal {
+class LinkedListTranlocal<E> extends BetaTranlocal {
     public LinkedListNode<E> head;
     public LinkedListNode<E> tail;
 
@@ -262,22 +262,22 @@ class LinkedListNode<E> extends AbstractBetaTransactionalObject {
     }
 
     @Override
-    public Listeners ___commitAll(Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool) {
+    public Listeners ___commitAll(BetaTranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool) {
         throw new TodoException();
     }
 
     @Override
-    public Tranlocal ___newTranlocal() {
+    public BetaTranlocal ___newTranlocal() {
         throw new TodoException();
     }
 
     @Override
-    public boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, Tranlocal tranlocal) {
+    public boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, BetaTranlocal tranlocal) {
         throw new TodoException();
     }
 
     @Override
-    public Listeners ___commitDirty(Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool) {
+    public Listeners ___commitDirty(BetaTranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool) {
         throw new TodoException();
     }
 
@@ -337,7 +337,7 @@ class LinkedListNode<E> extends AbstractBetaTransactionalObject {
     }
 }
 
-class LinkedListNodeTranlocal<E> extends Tranlocal {
+class LinkedListNodeTranlocal<E> extends BetaTranlocal {
 
     LinkedListNode<E> next;
     LinkedListNode<E> prev;

@@ -1,23 +1,19 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.*;
-import org.multiverse.api.*;
-import org.multiverse.api.blocking.*;
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.functions.*;
-import org.multiverse.api.predicates.*;
-import org.multiverse.api.references.*;
-import org.multiverse.stms.beta.*;
-import org.multiverse.stms.beta.conflictcounters.*;
-import org.multiverse.stms.beta.orec.*;
-import org.multiverse.stms.beta.transactions.*;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.exceptions.LockedException;
+import org.multiverse.api.exceptions.PanicError;
+import org.multiverse.api.exceptions.TransactionRequiredException;
+import org.multiverse.api.functions.Function;
+import org.multiverse.api.predicates.Predicate;
+import org.multiverse.api.references.Ref;
+import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.Listeners;
+import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-
-import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.*;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
+import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
  * The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
@@ -90,20 +86,20 @@ public final class BetaRef<E>
     }
 
     @Override
-    public final RefTranlocal<E> ___newTranlocal(){
-        return new RefTranlocal<E>(this);
+    public final BetaRefTranlocal<E> ___newTranlocal(){
+        return new BetaRefTranlocal<E>(this);
     }
 
     @Override
-    public final boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, Tranlocal tranlocal){
+    public final boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, BetaTranlocal tranlocal){
         return ___load(
             spinCount,
             newLockOwner,
             lockMode,
-            (RefTranlocal<E>)tranlocal);
+            (BetaRefTranlocal<E>)tranlocal);
     }
 
-    public final boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, RefTranlocal<E> tranlocal){
+    public final boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, BetaRefTranlocal<E> tranlocal){
         if(lockMode == LOCKMODE_NONE){
             while (true) {
                 //JMM: nothing can jump behind the following statement
@@ -167,11 +163,11 @@ public final class BetaRef<E>
 
     @Override
     public final Listeners ___commitDirty(
-            final Tranlocal tranlocal,
+            final BetaTranlocal tranlocal,
             final BetaTransaction expectedLockOwner,
             final BetaObjectPool pool) {
 
-        final RefTranlocal<E> specializedTranlocal = (RefTranlocal<E>)tranlocal;
+        final BetaRefTranlocal<E> specializedTranlocal = (BetaRefTranlocal<E>)tranlocal;
 
         if(!tranlocal.isDirty()){
             if(tranlocal.getLockMode() != LOCKMODE_NONE){
@@ -219,11 +215,11 @@ public final class BetaRef<E>
 
     @Override
     public final Listeners ___commitAll(
-            final Tranlocal tranlocal,
+            final BetaTranlocal tranlocal,
             final BetaTransaction expectedLockOwner,
             final BetaObjectPool pool) {
 
-        final RefTranlocal<E> specializedTranlocal = (RefTranlocal<E>)tranlocal;
+        final BetaRefTranlocal<E> specializedTranlocal = (BetaRefTranlocal<E>)tranlocal;
 
         if(tranlocal.isReadonly()){
             if(tranlocal.getLockMode() != LOCKMODE_NONE){
@@ -267,7 +263,7 @@ public final class BetaRef<E>
     @Override
     public final void ___abort(
         final BetaTransaction transaction,
-        final Tranlocal tranlocal,
+        final BetaTranlocal tranlocal,
         final BetaObjectPool pool) {
 
         if(tranlocal.getLockMode() != LOCKMODE_NONE){
@@ -283,7 +279,7 @@ public final class BetaRef<E>
             }
         }
 
-        pool.put((RefTranlocal)tranlocal);
+        pool.put((BetaRefTranlocal)tranlocal);
     }
 
    
@@ -518,8 +514,8 @@ public final class BetaRef<E>
             throw new NullPointerException("Function can't be null");
         }
 
-        RefTranlocal<E> write
-            = (RefTranlocal<E>)tx.openForWrite(this, LOCKMODE_NONE);
+        BetaRefTranlocal<E> write
+            = (BetaRefTranlocal<E>)tx.openForWrite(this, LOCKMODE_NONE);
 
         boolean abort = true;
         try{
@@ -609,8 +605,8 @@ public final class BetaRef<E>
             throw new NullPointerException("Function can't be null");
         }
 
-        RefTranlocal<E> write
-            = (RefTranlocal<E>)tx.openForWrite(this, LOCKMODE_NONE);
+        BetaRefTranlocal<E> write
+            = (BetaRefTranlocal<E>)tx.openForWrite(this, LOCKMODE_NONE);
 
         final E oldValue = write.value;
         boolean abort = true;
@@ -785,7 +781,7 @@ public final class BetaRef<E>
     }
 
     public final E getAndSet(final BetaTransaction tx,final E value){
-        RefTranlocal<E> write = tx.openForWrite(this, LOCKMODE_NONE);
+        BetaRefTranlocal<E> write = tx.openForWrite(this, LOCKMODE_NONE);
         E oldValue = write.value;
         write.value = value;
         return oldValue;
@@ -808,7 +804,7 @@ public final class BetaRef<E>
     }
 
     public final void await(final BetaTransaction tx,final E value){
-        RefTranlocal<E> read = tx.openForRead(this,LOCKMODE_NONE);
+        BetaRefTranlocal<E> read = tx.openForRead(this,LOCKMODE_NONE);
         if(read.value != value){
             tx.retry();
         }

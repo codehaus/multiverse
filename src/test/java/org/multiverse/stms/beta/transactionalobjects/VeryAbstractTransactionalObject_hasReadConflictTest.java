@@ -28,7 +28,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         boolean hasReadConflict = ref.___hasReadConflict(read);
 
@@ -42,7 +42,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         boolean hasReadConflict = ref.___hasReadConflict(write);
 
@@ -56,7 +56,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal read = tx.openForRead(ref, LOCKMODE_COMMIT);
+        BetaTranlocal read = tx.openForRead(ref, LOCKMODE_COMMIT);
 
         boolean hasConflict = ref.___hasReadConflict(read);
 
@@ -70,7 +70,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal read = tx.openForRead(ref, LOCKMODE_UPDATE);
+        BetaTranlocal read = tx.openForRead(ref, LOCKMODE_UPDATE);
 
         boolean hasConflict = ref.___hasReadConflict(read);
 
@@ -84,7 +84,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         //conflicting update
         ref.atomicIncrementAndGet(1);
@@ -99,7 +99,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
     public void whenFresh() {
         BetaTransaction tx = stm.startDefaultTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal tranlocal = tx.openForConstruction(ref);
+        BetaLongRefTranlocal tranlocal = tx.openForConstruction(ref);
 
         boolean conflict = ref.___hasReadConflict(tranlocal);
 
@@ -113,7 +113,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         //do the conflicting update
         ref.atomicIncrementAndGet(1);
@@ -134,7 +134,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         //do the conflicting update
         ref.atomicIncrementAndGet(1);
@@ -155,7 +155,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, LOCKMODE_COMMIT);
@@ -173,7 +173,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
         ref.get(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        LongRefTranlocal read = otherTx.openForRead(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal read = otherTx.openForRead(ref, LOCKMODE_NONE);
 
         boolean hasConflict = ref.___hasReadConflict(read);
 
@@ -190,7 +190,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
         ref.set(tx, 200);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        LongRefTranlocal read = otherTx.openForRead(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal read = otherTx.openForRead(ref, LOCKMODE_NONE);
 
         boolean hasConflict = ref.___hasReadConflict(read);
 

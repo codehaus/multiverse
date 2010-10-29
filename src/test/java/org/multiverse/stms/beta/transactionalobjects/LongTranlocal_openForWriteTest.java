@@ -32,7 +32,7 @@ public class LongTranlocal_openForWriteTest implements BetaStmConstants {
                 .build()
                 .newTransaction();
 
-        LongRefTranlocal tranlocal = tx.open(ref);
+        BetaLongRefTranlocal tranlocal = tx.open(ref);
 
         try {
             tranlocal.openForWrite(LOCKMODE_NONE);
@@ -57,7 +57,7 @@ public class LongTranlocal_openForWriteTest implements BetaStmConstants {
                 .build()
                 .newTransaction();
 
-        LongRefTranlocal tranlocal = tx.open(ref);
+        BetaLongRefTranlocal tranlocal = tx.open(ref);
         tranlocal.openForRead(LOCKMODE_NONE);
         try {
             tranlocal.openForWrite(LOCKMODE_NONE);
@@ -77,7 +77,7 @@ public class LongTranlocal_openForWriteTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal tranlocal = tx.open(ref);
+        BetaLongRefTranlocal tranlocal = tx.open(ref);
 
         tranlocal.openForWrite(LOCKMODE_NONE);
 
@@ -96,7 +96,7 @@ public class LongTranlocal_openForWriteTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal tranlocal = tx.open(ref);
+        BetaLongRefTranlocal tranlocal = tx.open(ref);
 
         tranlocal.openForRead(LOCKMODE_NONE);
         tranlocal.openForWrite(LOCKMODE_NONE);
@@ -116,7 +116,7 @@ public class LongTranlocal_openForWriteTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal tranlocal = tx.open(ref);
+        BetaLongRefTranlocal tranlocal = tx.open(ref);
 
         tranlocal.openForWrite(LOCKMODE_NONE);
         tranlocal.openForWrite(LOCKMODE_NONE);

@@ -67,7 +67,7 @@ public class BetaStmTestUtils implements BetaStmConstants {
     public static <E> BetaRef<E> newRef(BetaStm stm, E value) {
         BetaTransaction tx = new LeanMonoBetaTransaction(stm);
         BetaRef<E> ref = new BetaRef<E>(tx);
-        RefTranlocal<E> tranlocal = tx.openForConstruction(ref);
+        BetaRefTranlocal<E> tranlocal = tx.openForConstruction(ref);
         tranlocal.value = value;
         tx.commit();
         return ref;
@@ -76,26 +76,26 @@ public class BetaStmTestUtils implements BetaStmConstants {
     public static BetaDoubleRef newDoubleRef(BetaStm stm, double value) {
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         BetaDoubleRef ref = new BetaDoubleRef(tx);
-        DoubleRefTranlocal tranlocal = tx.openForConstruction(ref);
+        BetaDoubleRefTranlocal tranlocal = tx.openForConstruction(ref);
         tranlocal.value = value;
         tx.commit();
         return ref;
     }
 
-    public static void assertHasVersionAndValue(LongRefTranlocal tranlocal, long expectedVersion, long expectedValue) {
+    public static void assertHasVersionAndValue(BetaLongRefTranlocal tranlocal, long expectedVersion, long expectedValue) {
         assertEquals(expectedVersion, tranlocal.version);
         assertEquals(expectedValue, tranlocal.value);
     }
 
-    public static void assertTranlocalHasNoLock(Tranlocal tranlocal) {
+    public static void assertTranlocalHasNoLock(BetaTranlocal tranlocal) {
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
     }
 
-    public static void assertTranlocalHasCommitLock(Tranlocal tranlocal) {
+    public static void assertTranlocalHasCommitLock(BetaTranlocal tranlocal) {
         assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
     }
 
-    public static void assertTranlocalHasUpdateLock(Tranlocal tranlocal) {
+    public static void assertTranlocalHasUpdateLock(BetaTranlocal tranlocal) {
         assertEquals(LOCKMODE_UPDATE, tranlocal.getLockMode());
     }
 
@@ -123,7 +123,7 @@ public class BetaStmTestUtils implements BetaStmConstants {
     public static BetaLongRef newLongRef(BetaStm stm, long value) {
         BetaTransaction tx = new FatMonoBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal tranlocal = tx.openForConstruction(ref);
+        BetaLongRefTranlocal tranlocal = tx.openForConstruction(ref);
         tranlocal.value = value;
         tx.commit();
         return ref;

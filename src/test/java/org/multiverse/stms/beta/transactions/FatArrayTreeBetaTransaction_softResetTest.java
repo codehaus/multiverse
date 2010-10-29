@@ -6,7 +6,7 @@ import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -103,7 +103,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         long version = ref.getVersion();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         boolean result = tx.softReset();
 
@@ -125,7 +125,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         long version = ref.getVersion();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         boolean result = tx.softReset();
 
@@ -177,7 +177,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
     public void whenContainsConstructed() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal constructed = tx.openForConstruction(ref);
+        BetaLongRefTranlocal constructed = tx.openForConstruction(ref);
 
         boolean result = tx.softReset();
 

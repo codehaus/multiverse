@@ -9,7 +9,7 @@ import org.multiverse.api.closures.AtomicBooleanClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.*;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static java.lang.Math.abs;
@@ -77,7 +77,7 @@ public class PingPongStressTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                LongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
+                BetaLongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
                 write.value = -abs(write.value);
             }
         });
@@ -123,7 +123,7 @@ public class PingPongStressTest {
                 @Override
                 public boolean execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    LongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
+                    BetaLongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
 
                     if (write.value < 0) {
                         return false;

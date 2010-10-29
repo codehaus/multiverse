@@ -12,9 +12,9 @@ import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaTranlocal;
 import org.multiverse.stms.beta.transactionalobjects.BetaTransactionalObject;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
-import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
 
 import static junit.framework.Assert.assertSame;
 import static org.junit.Assert.*;
@@ -64,7 +64,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertNotNull(write);
         assertEquals(100, write.value);
@@ -89,7 +89,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertNotNull(write);
         assertEquals(100, write.value);
@@ -109,7 +109,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     }
 
 
-    private void assertOpenedForWrite(BetaTransactionalObject ref, Tranlocal tranlocal) {
+    private void assertOpenedForWrite(BetaTransactionalObject ref, BetaTranlocal tranlocal) {
         assertNotNull(tranlocal);
         assertSame(ref, tranlocal.owner);
         //todo:
@@ -122,8 +122,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertNotNull(write);
         assertSame(read, write);
@@ -147,8 +147,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaTransactionalObject ref = newLongRef(stm);
 
         BetaTransaction tx = newTransaction();
-        Tranlocal write1 = tx.openForWrite(ref, LOCKMODE_NONE);
-        Tranlocal write2 = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaTranlocal write1 = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaTranlocal write2 = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertSame(write1, write2);
         assertIsActive(tx);
@@ -160,9 +160,9 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     public void whenAlreadyOpenedForConstruction() {
         BetaTransaction tx = newTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal constructed = tx.openForConstruction(ref);
+        BetaLongRefTranlocal constructed = tx.openForConstruction(ref);
         constructed.value = 100;
-        Tranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertSame(constructed, write);
@@ -186,7 +186,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         assertNotNull(write);
         assertSame(ref, write.owner);
@@ -208,10 +208,10 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     public void locking_whenConstructedAndLock() {
         BetaTransaction tx = newTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal constructed = tx.openForConstruction(ref);
+        BetaLongRefTranlocal constructed = tx.openForConstruction(ref);
         constructed.value = 100;
 
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         assertNotNull(write);
         assertSame(constructed, write);
@@ -235,7 +235,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_UPDATE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_UPDATE);
 
         assertNotNull(write);
         assertEquals(100, write.value);
@@ -260,7 +260,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         assertNotNull(write);
         assertEquals(100, write.value);
@@ -285,7 +285,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         assertEquals(100, write.value);
         assertSame(ref, write.owner);
@@ -305,7 +305,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_UPDATE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_UPDATE);
 
         assertEquals(100, write.value);
         assertSame(ref, write.owner);
@@ -325,8 +325,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_COMMIT);
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertEquals(100, write.value);
         assertSame(ref, write.owner);
@@ -346,8 +346,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write1 = tx.openForWrite(ref, LOCKMODE_COMMIT);
-        LongRefTranlocal write2 = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write1 = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal write2 = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertSame(write2, write1);
         assertEquals(100, write2.value);
@@ -368,8 +368,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         assertNotNull(write);
         assertSame(read, write);
@@ -391,8 +391,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write1 = tx.openForWrite(ref, LOCKMODE_NONE);
-        LongRefTranlocal write2 = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal write1 = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write2 = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         assertSame(write1, write2);
         assertEquals(100, write2.value);
@@ -412,9 +412,9 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
     public void whenAlreadyOpenedForConstructionAndPrivatize() {
         BetaTransaction tx = newTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal constructed = tx.openForConstruction(ref);
+        BetaLongRefTranlocal constructed = tx.openForConstruction(ref);
         constructed.value = 100;
-        Tranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        BetaTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         assertNotNull(write);
         assertSame(constructed, write);
@@ -436,8 +436,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write1 = tx.openForWrite(ref, LOCKMODE_COMMIT);
-        LongRefTranlocal write2 = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal write1 = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal write2 = tx.openForWrite(ref, LOCKMODE_COMMIT);
 
         assertSame(write1, write2);
         assertEquals(100, write2.value);
@@ -458,8 +458,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write1 = tx.openForWrite(ref, LOCKMODE_UPDATE);
-        LongRefTranlocal write2 = tx.openForWrite(ref, LOCKMODE_UPDATE);
+        BetaLongRefTranlocal write1 = tx.openForWrite(ref, LOCKMODE_UPDATE);
+        BetaLongRefTranlocal write2 = tx.openForWrite(ref, LOCKMODE_UPDATE);
 
         assertSame(write1, write2);
         assertEquals(100, write2.value);
@@ -527,7 +527,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
         BetaTransaction tx = newTransaction(config);
 
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertFalse(write.isReadonly());
         assertTrue(write.hasDepartObligation());
@@ -549,7 +549,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites);
         BetaTransaction tx = newTransaction(config);
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertEquals(version, write.version);
@@ -578,9 +578,9 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         LongFunction function = Functions.newIncLongFunction(1);
         tx.commute(ref, function);
 
-        LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal commuting = (BetaLongRefTranlocal) tx.get(ref);
 
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertSame(commuting, write);
@@ -638,13 +638,13 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
 
         BetaTransaction tx = newTransaction(config);
-        LongRefTranlocal write1 = tx.openForWrite(ref1, LOCKMODE_NONE);
+        BetaLongRefTranlocal write1 = tx.openForWrite(ref1, LOCKMODE_NONE);
 
         long oldLocalConflictCount = tx.getLocalConflictCounter().get();
 
         stm.getGlobalConflictCounter().signalConflict(newLongRef(stm));
 
-        LongRefTranlocal write2 = tx.openForWrite(ref2, LOCKMODE_NONE);
+        BetaLongRefTranlocal write2 = tx.openForWrite(ref2, LOCKMODE_NONE);
 
         assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());
         assertIsActive(tx);
@@ -785,11 +785,11 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = newTransaction();
-        Tranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         ref.atomicIncrementAndGet(1);
 
-        Tranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertNotNull(write);
@@ -809,7 +809,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref2 = newLongRef(stm);
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal read1 = tx.openForRead(ref1, LOCKMODE_NONE);
+        BetaLongRefTranlocal read1 = tx.openForRead(ref1, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForWrite(ref1, LOCKMODE_NONE).value++;
@@ -868,11 +868,11 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref = newLongRef(stm, 0);
 
         BetaTransaction tx = newTransaction();
-        Tranlocal write1 = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaTranlocal write1 = tx.openForWrite(ref, LOCKMODE_NONE);
 
         ref.atomicIncrementAndGet(1);
 
-        Tranlocal write2 = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaTranlocal write2 = tx.openForWrite(ref, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertSame(write2, write1);
@@ -988,13 +988,13 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
                 .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
 
         BetaTransaction tx = newTransaction(config);
-        LongRefTranlocal write1 = tx.openForWrite(ref1, LOCKMODE_NONE);
+        BetaLongRefTranlocal write1 = tx.openForWrite(ref1, LOCKMODE_NONE);
 
         long oldLocalConflictCount = tx.getLocalConflictCounter().get();
 
         stm.getGlobalConflictCounter().signalConflict(newLongRef(stm));
 
-        LongRefTranlocal write2 = tx.openForWrite(ref2, LOCKMODE_NONE);
+        BetaLongRefTranlocal write2 = tx.openForWrite(ref2, LOCKMODE_NONE);
 
         assertEquals(oldLocalConflictCount, tx.getLocalConflictCounter().get());
 
@@ -1029,7 +1029,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm).setReadonly(true);
         BetaTransaction tx = newTransaction(config);
-        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         try {
             tx.openForWrite(ref, LOCKMODE_NONE);
@@ -1051,9 +1051,9 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaTransactionalObject ref3 = newLongRef(stm);
 
         BetaTransaction tx = newTransaction();
-        Tranlocal write1 = tx.openForWrite(ref1, LOCKMODE_NONE);
-        Tranlocal write2 = tx.openForWrite(ref2, LOCKMODE_NONE);
-        Tranlocal write3 = tx.openForWrite(ref3, LOCKMODE_NONE);
+        BetaTranlocal write1 = tx.openForWrite(ref1, LOCKMODE_NONE);
+        BetaTranlocal write2 = tx.openForWrite(ref2, LOCKMODE_NONE);
+        BetaTranlocal write3 = tx.openForWrite(ref3, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertOpenedForWrite(ref1, write1);

@@ -1,9 +1,8 @@
 package org.multiverse.stms.beta;
 
-import org.multiverse.api.blocking.*;
-import org.multiverse.api.exceptions.*;
+import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.stms.beta.transactionalobjects.*;
-import org.multiverse.stms.beta.transactions.*;
+
 import java.util.ArrayList;
 
 /**
@@ -56,15 +55,15 @@ public final class BetaObjectPool {
     private final boolean arrayListPoolingEnabled;
     private final boolean callableNodePoolingEnabled;
 
-    private final RefTranlocal[] tranlocalsBetaRef = new RefTranlocal[100];
+    private final BetaRefTranlocal[] tranlocalsBetaRef = new BetaRefTranlocal[100];
     private int lastUsedBetaRef = -1;
-    private final IntRefTranlocal[] tranlocalsBetaIntRef = new IntRefTranlocal[100];
+    private final BetaIntRefTranlocal[] tranlocalsBetaIntRef = new BetaIntRefTranlocal[100];
     private int lastUsedBetaIntRef = -1;
-    private final BooleanRefTranlocal[] tranlocalsBetaBooleanRef = new BooleanRefTranlocal[100];
+    private final BetaBooleanRefTranlocal[] tranlocalsBetaBooleanRef = new BetaBooleanRefTranlocal[100];
     private int lastUsedBetaBooleanRef = -1;
-    private final DoubleRefTranlocal[] tranlocalsBetaDoubleRef = new DoubleRefTranlocal[100];
+    private final BetaDoubleRefTranlocal[] tranlocalsBetaDoubleRef = new BetaDoubleRefTranlocal[100];
     private int lastUsedBetaDoubleRef = -1;
-    private final LongRefTranlocal[] tranlocalsBetaLongRef = new LongRefTranlocal[100];
+    private final BetaLongRefTranlocal[] tranlocalsBetaLongRef = new BetaLongRefTranlocal[100];
     private int lastUsedBetaLongRef = -1;
     private TranlocalPool[] pools = new TranlocalPool[100];
 
@@ -91,22 +90,22 @@ public final class BetaObjectPool {
     }
 
     /**
-     * Takes a RefTranlocal from the pool for the specified BetaRef.
+     * Takes a BetaRefTranlocal from the pool for the specified BetaRef.
      *
-     * @param owner the BetaRef to get the RefTranlocal for.
+     * @param owner the BetaRef to get the BetaRefTranlocal for.
      * @return the pooled tranlocal, or null if none is found.
      * @throws NullPointerException if owner is null.
      */
-    public RefTranlocal take(final BetaRef owner) {
+    public BetaRefTranlocal take(final BetaRef owner) {
         if (owner == null) {
             throw new NullPointerException();
         }
 
         if (lastUsedBetaRef == -1) {
-            return new RefTranlocal(owner);
+            return new BetaRefTranlocal(owner);
         }
 
-        RefTranlocal tranlocal = tranlocalsBetaRef[lastUsedBetaRef];
+        BetaRefTranlocal tranlocal = tranlocalsBetaRef[lastUsedBetaRef];
         tranlocal.owner = owner;
         tranlocalsBetaRef[lastUsedBetaRef] = null;
         lastUsedBetaRef--;
@@ -114,13 +113,13 @@ public final class BetaObjectPool {
     }
 
     /**
-     * Puts an old RefTranlocal in this pool. If the tranlocal is allowed to be null,
+     * Puts an old BetaRefTranlocal in this pool. If the tranlocal is allowed to be null,
      * the call is ignored. The same goes for when the tranlocal is permanent, since you
      * can't now how many transactions are still using it.
      *
-     * @param tranlocal the RefTranlocal to pool.
+     * @param tranlocal the BetaRefTranlocal to pool.
      */
-    public void put(final RefTranlocal tranlocal) {
+    public void put(final BetaRefTranlocal tranlocal) {
         if (!tranlocalPoolingEnabled) {
             return;
         }
@@ -135,22 +134,22 @@ public final class BetaObjectPool {
     }
 
     /**
-     * Takes a IntRefTranlocal from the pool for the specified BetaIntRef.
+     * Takes a BetaIntRefTranlocal from the pool for the specified BetaIntRef.
      *
-     * @param owner the BetaIntRef to get the IntRefTranlocal for.
+     * @param owner the BetaIntRef to get the BetaIntRefTranlocal for.
      * @return the pooled tranlocal, or null if none is found.
      * @throws NullPointerException if owner is null.
      */
-    public IntRefTranlocal take(final BetaIntRef owner) {
+    public BetaIntRefTranlocal take(final BetaIntRef owner) {
         if (owner == null) {
             throw new NullPointerException();
         }
 
         if (lastUsedBetaIntRef == -1) {
-            return new IntRefTranlocal(owner);
+            return new BetaIntRefTranlocal(owner);
         }
 
-        IntRefTranlocal tranlocal = tranlocalsBetaIntRef[lastUsedBetaIntRef];
+        BetaIntRefTranlocal tranlocal = tranlocalsBetaIntRef[lastUsedBetaIntRef];
         tranlocal.owner = owner;
         tranlocalsBetaIntRef[lastUsedBetaIntRef] = null;
         lastUsedBetaIntRef--;
@@ -158,13 +157,13 @@ public final class BetaObjectPool {
     }
 
     /**
-     * Puts an old IntRefTranlocal in this pool. If the tranlocal is allowed to be null,
+     * Puts an old BetaIntRefTranlocal in this pool. If the tranlocal is allowed to be null,
      * the call is ignored. The same goes for when the tranlocal is permanent, since you
      * can't now how many transactions are still using it.
      *
-     * @param tranlocal the IntRefTranlocal to pool.
+     * @param tranlocal the BetaIntRefTranlocal to pool.
      */
-    public void put(final IntRefTranlocal tranlocal) {
+    public void put(final BetaIntRefTranlocal tranlocal) {
         if (!tranlocalPoolingEnabled) {
             return;
         }
@@ -179,22 +178,22 @@ public final class BetaObjectPool {
     }
 
     /**
-     * Takes a BooleanRefTranlocal from the pool for the specified BetaBooleanRef.
+     * Takes a BetaBooleanRefTranlocal from the pool for the specified BetaBooleanRef.
      *
-     * @param owner the BetaBooleanRef to get the BooleanRefTranlocal for.
+     * @param owner the BetaBooleanRef to get the BetaBooleanRefTranlocal for.
      * @return the pooled tranlocal, or null if none is found.
      * @throws NullPointerException if owner is null.
      */
-    public BooleanRefTranlocal take(final BetaBooleanRef owner) {
+    public BetaBooleanRefTranlocal take(final BetaBooleanRef owner) {
         if (owner == null) {
             throw new NullPointerException();
         }
 
         if (lastUsedBetaBooleanRef == -1) {
-            return new BooleanRefTranlocal(owner);
+            return new BetaBooleanRefTranlocal(owner);
         }
 
-        BooleanRefTranlocal tranlocal = tranlocalsBetaBooleanRef[lastUsedBetaBooleanRef];
+        BetaBooleanRefTranlocal tranlocal = tranlocalsBetaBooleanRef[lastUsedBetaBooleanRef];
         tranlocal.owner = owner;
         tranlocalsBetaBooleanRef[lastUsedBetaBooleanRef] = null;
         lastUsedBetaBooleanRef--;
@@ -202,13 +201,13 @@ public final class BetaObjectPool {
     }
 
     /**
-     * Puts an old BooleanRefTranlocal in this pool. If the tranlocal is allowed to be null,
+     * Puts an old BetaBooleanRefTranlocal in this pool. If the tranlocal is allowed to be null,
      * the call is ignored. The same goes for when the tranlocal is permanent, since you
      * can't now how many transactions are still using it.
      *
-     * @param tranlocal the BooleanRefTranlocal to pool.
+     * @param tranlocal the BetaBooleanRefTranlocal to pool.
      */
-    public void put(final BooleanRefTranlocal tranlocal) {
+    public void put(final BetaBooleanRefTranlocal tranlocal) {
         if (!tranlocalPoolingEnabled) {
             return;
         }
@@ -223,22 +222,22 @@ public final class BetaObjectPool {
     }
 
     /**
-     * Takes a DoubleRefTranlocal from the pool for the specified BetaDoubleRef.
+     * Takes a BetaDoubleRefTranlocal from the pool for the specified BetaDoubleRef.
      *
-     * @param owner the BetaDoubleRef to get the DoubleRefTranlocal for.
+     * @param owner the BetaDoubleRef to get the BetaDoubleRefTranlocal for.
      * @return the pooled tranlocal, or null if none is found.
      * @throws NullPointerException if owner is null.
      */
-    public DoubleRefTranlocal take(final BetaDoubleRef owner) {
+    public BetaDoubleRefTranlocal take(final BetaDoubleRef owner) {
         if (owner == null) {
             throw new NullPointerException();
         }
 
         if (lastUsedBetaDoubleRef == -1) {
-            return new DoubleRefTranlocal(owner);
+            return new BetaDoubleRefTranlocal(owner);
         }
 
-        DoubleRefTranlocal tranlocal = tranlocalsBetaDoubleRef[lastUsedBetaDoubleRef];
+        BetaDoubleRefTranlocal tranlocal = tranlocalsBetaDoubleRef[lastUsedBetaDoubleRef];
         tranlocal.owner = owner;
         tranlocalsBetaDoubleRef[lastUsedBetaDoubleRef] = null;
         lastUsedBetaDoubleRef--;
@@ -246,13 +245,13 @@ public final class BetaObjectPool {
     }
 
     /**
-     * Puts an old DoubleRefTranlocal in this pool. If the tranlocal is allowed to be null,
+     * Puts an old BetaDoubleRefTranlocal in this pool. If the tranlocal is allowed to be null,
      * the call is ignored. The same goes for when the tranlocal is permanent, since you
      * can't now how many transactions are still using it.
      *
-     * @param tranlocal the DoubleRefTranlocal to pool.
+     * @param tranlocal the BetaDoubleRefTranlocal to pool.
      */
-    public void put(final DoubleRefTranlocal tranlocal) {
+    public void put(final BetaDoubleRefTranlocal tranlocal) {
         if (!tranlocalPoolingEnabled) {
             return;
         }
@@ -267,22 +266,22 @@ public final class BetaObjectPool {
     }
 
     /**
-     * Takes a LongRefTranlocal from the pool for the specified BetaLongRef.
+     * Takes a BetaLongRefTranlocal from the pool for the specified BetaLongRef.
      *
-     * @param owner the BetaLongRef to get the LongRefTranlocal for.
+     * @param owner the BetaLongRef to get the BetaLongRefTranlocal for.
      * @return the pooled tranlocal, or null if none is found.
      * @throws NullPointerException if owner is null.
      */
-    public LongRefTranlocal take(final BetaLongRef owner) {
+    public BetaLongRefTranlocal take(final BetaLongRef owner) {
         if (owner == null) {
             throw new NullPointerException();
         }
 
         if (lastUsedBetaLongRef == -1) {
-            return new LongRefTranlocal(owner);
+            return new BetaLongRefTranlocal(owner);
         }
 
-        LongRefTranlocal tranlocal = tranlocalsBetaLongRef[lastUsedBetaLongRef];
+        BetaLongRefTranlocal tranlocal = tranlocalsBetaLongRef[lastUsedBetaLongRef];
         tranlocal.owner = owner;
         tranlocalsBetaLongRef[lastUsedBetaLongRef] = null;
         lastUsedBetaLongRef--;
@@ -290,13 +289,13 @@ public final class BetaObjectPool {
     }
 
     /**
-     * Puts an old LongRefTranlocal in this pool. If the tranlocal is allowed to be null,
+     * Puts an old BetaLongRefTranlocal in this pool. If the tranlocal is allowed to be null,
      * the call is ignored. The same goes for when the tranlocal is permanent, since you
      * can't now how many transactions are still using it.
      *
-     * @param tranlocal the LongRefTranlocal to pool.
+     * @param tranlocal the BetaLongRefTranlocal to pool.
      */
-    public void put(final LongRefTranlocal tranlocal) {
+    public void put(final BetaLongRefTranlocal tranlocal) {
         if (!tranlocalPoolingEnabled) {
             return;
         }
@@ -310,7 +309,7 @@ public final class BetaObjectPool {
         tranlocalsBetaLongRef[lastUsedBetaLongRef] = tranlocal;
     }
 
-    public Tranlocal take(final BetaTransactionalObject owner) {
+    public BetaTranlocal take(final BetaTransactionalObject owner) {
         if (owner == null) {
             throw new NullPointerException();
         }
@@ -343,7 +342,7 @@ public final class BetaObjectPool {
             return owner.___newTranlocal();
         }
 
-        Tranlocal tranlocal = pool.tranlocals[pool.lastUsed];
+        BetaTranlocal tranlocal = pool.tranlocals[pool.lastUsed];
         tranlocal.owner = owner;
         pool.tranlocals[pool.lastUsed] = null;
         pool.lastUsed--;
@@ -351,10 +350,10 @@ public final class BetaObjectPool {
     }
 
     /**
-     * Puts a Tranlocal in the pool.
+     * Puts a BetaTranlocal in the pool.
      *
      */
-    public void put(final Tranlocal tranlocal) {
+    public void put(final BetaTranlocal tranlocal) {
         if (!tranlocalPoolingEnabled || tranlocal == null) {
             return;
         }
@@ -368,19 +367,19 @@ public final class BetaObjectPool {
 
         switch(classIndex){
             case 0:
-                put((RefTranlocal)tranlocal);
+                put((BetaRefTranlocal)tranlocal);
                 return;
             case 1:
-                put((IntRefTranlocal)tranlocal);
+                put((BetaIntRefTranlocal)tranlocal);
                 return;
             case 2:
-                put((BooleanRefTranlocal)tranlocal);
+                put((BetaBooleanRefTranlocal)tranlocal);
                 return;
             case 3:
-                put((DoubleRefTranlocal)tranlocal);
+                put((BetaDoubleRefTranlocal)tranlocal);
                 return;
             case 4:
-                put((LongRefTranlocal)tranlocal);
+                put((BetaLongRefTranlocal)tranlocal);
                 return;
         }
 
@@ -407,18 +406,18 @@ public final class BetaObjectPool {
 
     static class TranlocalPool{
         int lastUsed = -1;
-        Tranlocal[] tranlocals = new Tranlocal[100];
+        BetaTranlocal[] tranlocals = new BetaTranlocal[100];
     }
 
-    private Tranlocal[][] tranlocalArrayPool = new Tranlocal[8193][];
+    private BetaTranlocal[][] tranlocalArrayPool = new BetaTranlocal[8193][];
 
     /**
-     * Puts a Tranlocal array in the pool.
+     * Puts a BetaTranlocal array in the pool.
      *
-     * @param array the Tranlocal array to put in the pool.
+     * @param array the BetaTranlocal array to put in the pool.
      * @throws NullPointerException is array is null.
      */
-    public void putTranlocalArray(final Tranlocal[] array){
+    public void putTranlocalArray(final BetaTranlocal[] array){
         if(array == null){
             throw new NullPointerException();
         }
@@ -449,29 +448,29 @@ public final class BetaObjectPool {
      * Takes a tranlocal array from the pool with the given size.
      *
      * @param size the size of the array to take
-     * @return the Tranlocal array taken from the pool, or null if none available.
+     * @return the BetaTranlocal array taken from the pool, or null if none available.
      * @throws IllegalArgumentException if size smaller than 0.
      */
-    public Tranlocal[] takeTranlocalArray(final int size){
+    public BetaTranlocal[] takeTranlocalArray(final int size){
         if(size<0){
             throw new IllegalArgumentException();
         }
 
         if(!tranlocalArrayPoolingEnabled){
-            return new Tranlocal[size];
+            return new BetaTranlocal[size];
         }
 
         int index = size;
 
         if(index >= tranlocalArrayPool.length){
-            return new Tranlocal[size];
+            return new BetaTranlocal[size];
         }
 
         if(tranlocalArrayPool[index]==null){
-            return new Tranlocal[size];
+            return new BetaTranlocal[size];
         }
 
-        Tranlocal[] array = tranlocalArrayPool[index];
+        BetaTranlocal[] array = tranlocalArrayPool[index];
         tranlocalArrayPool[index]=null;
         return array;
     }

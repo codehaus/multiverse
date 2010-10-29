@@ -1,23 +1,20 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.*;
-import org.multiverse.api.*;
-import org.multiverse.api.blocking.*;
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.functions.*;
-import org.multiverse.api.predicates.*;
-import org.multiverse.api.references.*;
-import org.multiverse.stms.beta.*;
-import org.multiverse.stms.beta.conflictcounters.*;
-import org.multiverse.stms.beta.orec.*;
-import org.multiverse.stms.beta.transactions.*;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.exceptions.LockedException;
+import org.multiverse.api.exceptions.PanicError;
+import org.multiverse.api.exceptions.TransactionRequiredException;
+import org.multiverse.api.functions.Functions;
+import org.multiverse.api.functions.LongFunction;
+import org.multiverse.api.predicates.LongPredicate;
+import org.multiverse.api.references.LongRef;
+import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.Listeners;
+import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-
-import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.*;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
+import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
 
 /**
  * The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
@@ -90,20 +87,20 @@ public final class BetaLongRef
     }
 
     @Override
-    public final LongRefTranlocal ___newTranlocal(){
-        return new LongRefTranlocal(this);
+    public final BetaLongRefTranlocal ___newTranlocal(){
+        return new BetaLongRefTranlocal(this);
     }
 
     @Override
-    public final boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, Tranlocal tranlocal){
+    public final boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, BetaTranlocal tranlocal){
         return ___load(
             spinCount,
             newLockOwner,
             lockMode,
-            (LongRefTranlocal)tranlocal);
+            (BetaLongRefTranlocal)tranlocal);
     }
 
-    public final boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, LongRefTranlocal tranlocal){
+    public final boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, BetaLongRefTranlocal tranlocal){
         if(lockMode == LOCKMODE_NONE){
             while (true) {
                 //JMM: nothing can jump behind the following statement
@@ -167,11 +164,11 @@ public final class BetaLongRef
 
     @Override
     public final Listeners ___commitDirty(
-            final Tranlocal tranlocal,
+            final BetaTranlocal tranlocal,
             final BetaTransaction expectedLockOwner,
             final BetaObjectPool pool) {
 
-        final LongRefTranlocal specializedTranlocal = (LongRefTranlocal)tranlocal;
+        final BetaLongRefTranlocal specializedTranlocal = (BetaLongRefTranlocal)tranlocal;
 
         if(!tranlocal.isDirty()){
             if(tranlocal.getLockMode() != LOCKMODE_NONE){
@@ -219,11 +216,11 @@ public final class BetaLongRef
 
     @Override
     public final Listeners ___commitAll(
-            final Tranlocal tranlocal,
+            final BetaTranlocal tranlocal,
             final BetaTransaction expectedLockOwner,
             final BetaObjectPool pool) {
 
-        final LongRefTranlocal specializedTranlocal = (LongRefTranlocal)tranlocal;
+        final BetaLongRefTranlocal specializedTranlocal = (BetaLongRefTranlocal)tranlocal;
 
         if(tranlocal.isReadonly()){
             if(tranlocal.getLockMode() != LOCKMODE_NONE){
@@ -267,7 +264,7 @@ public final class BetaLongRef
     @Override
     public final void ___abort(
         final BetaTransaction transaction,
-        final Tranlocal tranlocal,
+        final BetaTranlocal tranlocal,
         final BetaObjectPool pool) {
 
         if(tranlocal.getLockMode() != LOCKMODE_NONE){
@@ -283,7 +280,7 @@ public final class BetaLongRef
             }
         }
 
-        pool.put((LongRefTranlocal)tranlocal);
+        pool.put((BetaLongRefTranlocal)tranlocal);
     }
 
    
@@ -310,7 +307,7 @@ public final class BetaLongRef
     }
 
     public final long getAndIncrement(final BetaTransaction tx, final long amount){
-        LongRefTranlocal write= tx.openForWrite(this, LOCKMODE_NONE);
+        BetaLongRefTranlocal write= tx.openForWrite(this, LOCKMODE_NONE);
 
         long oldValue = write.value;
         write.value+=amount;
@@ -375,7 +372,7 @@ public final class BetaLongRef
         final BetaTransaction tx,
         final long amount){
 
-        LongRefTranlocal write= tx.openForWrite(this, LOCKMODE_NONE);
+        BetaLongRefTranlocal write= tx.openForWrite(this, LOCKMODE_NONE);
 
         write.value+=amount;
         return write.value;
@@ -611,8 +608,8 @@ public final class BetaLongRef
             throw new NullPointerException("Function can't be null");
         }
 
-        LongRefTranlocal write
-            = (LongRefTranlocal)tx.openForWrite(this, LOCKMODE_NONE);
+        BetaLongRefTranlocal write
+            = (BetaLongRefTranlocal)tx.openForWrite(this, LOCKMODE_NONE);
 
         boolean abort = true;
         try{
@@ -702,8 +699,8 @@ public final class BetaLongRef
             throw new NullPointerException("Function can't be null");
         }
 
-        LongRefTranlocal write
-            = (LongRefTranlocal)tx.openForWrite(this, LOCKMODE_NONE);
+        BetaLongRefTranlocal write
+            = (BetaLongRefTranlocal)tx.openForWrite(this, LOCKMODE_NONE);
 
         final long oldValue = write.value;
         boolean abort = true;
@@ -878,7 +875,7 @@ public final class BetaLongRef
     }
 
     public final long getAndSet(final BetaTransaction tx,final long value){
-        LongRefTranlocal write = tx.openForWrite(this, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(this, LOCKMODE_NONE);
         long oldValue = write.value;
         write.value = value;
         return oldValue;
@@ -901,7 +898,7 @@ public final class BetaLongRef
     }
 
     public final void await(final BetaTransaction tx,final long value){
-        LongRefTranlocal read = tx.openForRead(this,LOCKMODE_NONE);
+        BetaLongRefTranlocal read = tx.openForRead(this,LOCKMODE_NONE);
         if(read.value != value){
             tx.retry();
         }

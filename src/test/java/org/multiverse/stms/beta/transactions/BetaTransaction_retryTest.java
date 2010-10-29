@@ -15,7 +15,7 @@ import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -148,7 +148,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         RetryThread thread = new RetryThread(tx);
         thread.start();
@@ -168,7 +168,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_COMMIT);
 
         RetryThread thread = new RetryThread(tx);
         thread.start();
@@ -188,7 +188,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
         RetryThread thread = new RetryThread(tx);
         thread.start();
@@ -254,7 +254,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaTransaction tx = newTransaction();
         BetaLongRef ref3 = new BetaLongRef(tx);
         tx.openForRead(ref1, LOCKMODE_NONE);
-        LongRefTranlocal write3 = tx.openForConstruction(ref3);
+        BetaLongRefTranlocal write3 = tx.openForConstruction(ref3);
         tx.openForWrite(ref2, LOCKMODE_NONE);
         RetryThread thread = new RetryThread(tx);
         thread.start();

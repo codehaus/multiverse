@@ -57,7 +57,7 @@ public class BetaLongRef_deferredEnsure0Test implements BetaStmConstants {
         ref.ensure();
         ref.deferredEnsure();
 
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         assertIsActive(tx);
         assertTrue(tranlocal.isConflictCheckNeeded());
         assertEquals(LOCKMODE_UPDATE, tranlocal.getLockMode());
@@ -82,7 +82,7 @@ public class BetaLongRef_deferredEnsure0Test implements BetaStmConstants {
         ref.privatize();
         ref.deferredEnsure();
 
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         assertIsActive(tx);
         assertTrue(tranlocal.isConflictCheckNeeded());
         assertRefHasCommitLock(ref, tx);
@@ -110,7 +110,7 @@ public class BetaLongRef_deferredEnsure0Test implements BetaStmConstants {
         ref.set(initialValue + 1);
         ref.deferredEnsure();
 
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         assertIsActive(tx);
         assertTrue(tranlocal.isConflictCheckNeeded());
         assertRefHasUpdateLock(ref, otherTx);
@@ -152,7 +152,7 @@ public class BetaLongRef_deferredEnsure0Test implements BetaStmConstants {
 
         ref.deferredEnsure();
 
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
 
         assertTrue(tranlocal.isConflictCheckNeeded());
         assertRefHasNoLocks(ref);

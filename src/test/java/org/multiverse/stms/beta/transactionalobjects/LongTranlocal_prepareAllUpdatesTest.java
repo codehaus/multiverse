@@ -31,7 +31,7 @@ public class LongTranlocal_prepareAllUpdatesTest implements BetaStmConstants {
         BetaLongRef ref = new BetaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.setStatus(STATUS_READONLY);
 
         BetaTransaction tx = stm.startDefaultTransaction();

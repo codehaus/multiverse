@@ -30,7 +30,7 @@ public class BetaLongRef_loadTest implements BetaStmConstants {
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, LOCKMODE_UPDATE);
 
-        Tranlocal read = ref.___load(1, null, LOCKMODE_NONE, pool);
+        BetaTranlocal read = ref.___load(1, null, LOCKMODE_NONE, pool);
 
         assertHasUpdateLock(ref);
         assertHasNoCommitLock(ref);
@@ -48,7 +48,7 @@ public class BetaLongRef_loadTest implements BetaStmConstants {
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, LOCKMODE_COMMIT);
 
-        Tranlocal read = ref.___load(1, null, LOCKMODE_NONE, pool);
+        BetaTranlocal read = ref.___load(1, null, LOCKMODE_NONE, pool);
 
         assertNotNull(read);
         assertTrue(read.isLocked);
@@ -65,7 +65,7 @@ public class BetaLongRef_loadTest implements BetaStmConstants {
         BetaLongRef ref = newLongRef(stm);
         long version = ref.getVersion();
 
-        LongRefTranlocal tranlocal = ref.___load(1, null, LOCKMODE_NONE, pool);
+        BetaLongRefTranlocal tranlocal = ref.___load(1, null, LOCKMODE_NONE, pool);
 
         assertHasNoCommitLock(ref);
         assertHasNoUpdateLock(ref);
@@ -81,7 +81,7 @@ public class BetaLongRef_loadTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         ref.___load(1, null, LOCKMODE_NONE, pool);
-        LongRefTranlocal tranlocal = ref.___load(1, null, LOCKMODE_NONE, pool);
+        BetaLongRefTranlocal tranlocal = ref.___load(1, null, LOCKMODE_NONE, pool);
 
         assertEquals(version, tranlocal.version);
         assertHasNoCommitLock(ref);
@@ -97,7 +97,7 @@ public class BetaLongRef_loadTest implements BetaStmConstants {
         BetaLongRef ref = makeReadBiased(newLongRef(stm, 10));
         long version = ref.getVersion();
 
-        LongRefTranlocal tranlocal = ref.___load(1, null, LOCKMODE_NONE, pool);
+        BetaLongRefTranlocal tranlocal = ref.___load(1, null, LOCKMODE_NONE, pool);
 
         assertSame(ref, tranlocal.owner);
         assertTrue(tranlocal.isCommitted);
@@ -123,7 +123,7 @@ public class BetaLongRef_loadTest implements BetaStmConstants {
         otherTx.openForRead(ref, LOCKMODE_UPDATE);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal read = ref.___load(1, tx, LOCKMODE_UPDATE, pool);
+        BetaTranlocal read = ref.___load(1, tx, LOCKMODE_UPDATE, pool);
 
         assertNotNull(read);
         assertTrue(read.isLocked);
@@ -143,7 +143,7 @@ public class BetaLongRef_loadTest implements BetaStmConstants {
         otherTx.openForRead(ref, LOCKMODE_UPDATE);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal read = ref.___load(1, tx, LOCKMODE_COMMIT, pool);
+        BetaTranlocal read = ref.___load(1, tx, LOCKMODE_COMMIT, pool);
 
         assertNotNull(read);
         assertTrue(read.isLocked);
@@ -163,7 +163,7 @@ public class BetaLongRef_loadTest implements BetaStmConstants {
         otherTx.openForRead(ref, LOCKMODE_COMMIT);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal read = ref.___load(1, tx, LOCKMODE_UPDATE, pool);
+        BetaTranlocal read = ref.___load(1, tx, LOCKMODE_UPDATE, pool);
 
         assertNotNull(read);
         assertTrue(read.isLocked);
@@ -183,7 +183,7 @@ public class BetaLongRef_loadTest implements BetaStmConstants {
         otherTx.openForRead(ref, LOCKMODE_COMMIT);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal read = ref.___load(1, tx, LOCKMODE_COMMIT, pool);
+        BetaTranlocal read = ref.___load(1, tx, LOCKMODE_COMMIT, pool);
 
         assertNotNull(read);
         assertTrue(read.isLocked);

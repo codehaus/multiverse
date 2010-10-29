@@ -10,7 +10,7 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
-import org.multiverse.stms.beta.transactionalobjects.RefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.util.HashSet;
@@ -129,7 +129,7 @@ public class StackWithoutCapacityStressTest implements BetaStmConstants {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, lockMode);
+                    BetaRefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, lockMode);
                     headTranlocal.value = new Node<E>(item, headTranlocal.value);
                 }
             });
@@ -140,7 +140,7 @@ public class StackWithoutCapacityStressTest implements BetaStmConstants {
                 @Override
                 public E execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, lockMode);
+                    BetaRefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, lockMode);
                     if (headTranlocal.value == null) {
                         retry();
                     }

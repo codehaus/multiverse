@@ -22,7 +22,7 @@ import static java.lang.String.format;
  */
 public final class ${transaction.name} extends ${transaction.superClass} {
 
-    private Tranlocal[] array;
+    private BetaTranlocal[] array;
     private LocalConflictCounter localConflictCounter;
     private int size;
     private boolean hasReads;
@@ -38,7 +38,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     public ${transaction.name}(BetaTransactionConfiguration config) {
         super(${transaction.poolName}, config);
         this.localConflictCounter = config.globalConflictCounter.createLocalConflictCounter();
-        this.array = new Tranlocal[config.minimalArrayTreeSize];
+        this.array = new BetaTranlocal[config.minimalArrayTreeSize];
         this.remainingTimeoutNs = config.timeoutNs;
     }
 
@@ -74,7 +74,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         final int spinCount = config.spinCount;
         for(int k=0;k<array.length;k++){
-            final Tranlocal tranlocal = array[k];
+            final BetaTranlocal tranlocal = array[k];
 
             if(tranlocal==null || tranlocal.isReadonly()){
                 continue;
@@ -97,7 +97,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortReadOnNull();
         }
 
-        if(ref.getStm()!=config.stm){
+        if(ref.___stm != config.stm){
             throw abortReadOnStmMismatch(ref);
         }
 
@@ -110,7 +110,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             return tranlocal.value;
         }
 
-        throw new TodoException();
+        if(config.trackReads || config.isolationLevel!=IsolationLevel.ReadCommitted){
+            throw new TodoException();
+        }else{
+            hasUntrackedReads = true;
+            return ref.atomicWeakGet();
+        }
     }
 
 #end
@@ -156,7 +161,11 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOpenOnNull();
         }
 
-        if(ref.getStm()!=config.stm){
+#if(${ref.isReference})
+        if(ref.___stm != config.stm){
+#else
+        if(ref.getStm() != config.stm){
+#end
             throw abortOnStmMismatch(ref);
         }
 
@@ -432,13 +441,13 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end ##for loop of transactionalobjects.
 
     @Override
-    public Tranlocal get(BetaTransactionalObject ref){
+    public BetaTranlocal get(BetaTransactionalObject ref){
         final int indexOf = indexOf(ref, ref.___identityHashCode());
         return indexOf == -1? null: array[indexOf];
     }
 
     @Override
-    public Tranlocal locate(BetaTransactionalObject owner){
+    public BetaTranlocal locate(BetaTransactionalObject owner){
         if (status != ACTIVE) {
            throw abortLocate(owner);
         }
@@ -459,7 +468,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             final int offset = goLeft?-jump:jump;
             final int index = (hash + offset) % array.length;
 
-            final Tranlocal current = array[index];
+            final BetaTranlocal current = array[index];
             if(current == null){
                 return -1;
             }
@@ -476,7 +485,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         return -1;
     }
 
-    private void attach(final BetaTransactionalObject ref, final Tranlocal tranlocal, final int hash){
+    private void attach(final BetaTransactionalObject ref, final BetaTranlocal tranlocal, final int hash){
         int jump = 0;
         boolean goLeft = true;
 
@@ -484,7 +493,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             final int offset = goLeft?-jump:jump;
             final int index = (hash + offset) % array.length;
 
-            Tranlocal current = array[index];
+            BetaTranlocal current = array[index];
             if(current == null){
                 array[index] = tranlocal;
                 return;
@@ -500,12 +509,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 
     private void expand(){
-        Tranlocal[] oldArray = array;
+        BetaTranlocal[] oldArray = array;
         int newSize = oldArray.length*2;
         array = pool.takeTranlocalArray(newSize);
 
         for(int k=0; k < oldArray.length; k++){
-            final Tranlocal tranlocal = oldArray[k];
+            final BetaTranlocal tranlocal = oldArray[k];
 
             if(tranlocal != null){
                attach(tranlocal.owner, tranlocal, tranlocal.owner.___identityHashCode());
@@ -533,7 +542,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         for (int k = 0; k < array.length; k++) {
-            final Tranlocal tranlocal = array[k];
+            final BetaTranlocal tranlocal = array[k];
             if (tranlocal != null && tranlocal.owner.___hasReadConflict(tranlocal)) {
                 return true;
             }
@@ -553,7 +562,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 status = ABORTED;
                 if(size > 0){
                     for (int k = 0; k < array.length; k++) {
-                        final Tranlocal tranlocal = array[k];
+                        final BetaTranlocal tranlocal = array[k];
                         if(tranlocal != null){
                             array[k] = null;
                             tranlocal.owner.___abort(this, tranlocal, pool);
@@ -667,7 +676,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         int listenersArrayIndex = 0;
         for (int k = 0; k < array.length; k++) {
-            Tranlocal tranlocal = array[k];
+            BetaTranlocal tranlocal = array[k];
 
             if(tranlocal == null){
                 continue;
@@ -694,7 +703,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         int listenersArrayIndex = 0;
         for (int k = 0; k < array.length; k++) {
-            Tranlocal tranlocal = array[k];
+            BetaTranlocal tranlocal = array[k];
 
             if(tranlocal == null){
                 continue;
@@ -813,7 +822,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         final int spinCount = config.spinCount;
 
         for (int k = 0; k < array.length; k++) {
-            final Tranlocal tranlocal = array[k];
+            final BetaTranlocal tranlocal = array[k];
 
             if (tranlocal == null){
                 continue;
@@ -831,7 +840,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         final int spinCount = config.spinCount;
 
         for (int k = 0; k < array.length; k++) {
-            final Tranlocal tranlocal = array[k];
+            final BetaTranlocal tranlocal = array[k];
 
             if(tranlocal == null){
                 continue;
@@ -868,7 +877,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             boolean furtherRegistrationNeeded = true;
             boolean atLeastOneRegistration = false;
             for(int k=0; k < array.length; k++){
-                final Tranlocal tranlocal = array[k];
+                final BetaTranlocal tranlocal = array[k];
 
                 if(tranlocal == null){
                     continue;

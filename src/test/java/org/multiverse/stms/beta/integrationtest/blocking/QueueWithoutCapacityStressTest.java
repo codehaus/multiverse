@@ -10,7 +10,7 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
-import org.multiverse.stms.beta.transactionalobjects.RefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.util.LinkedList;
@@ -148,17 +148,17 @@ public class QueueWithoutCapacityStressTest implements BetaStmConstants {
         final BetaRef<Node<E>> head = newRef(stm);
 
         void push(BetaTransaction tx, E item) {
-            RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, lockMode);
+            BetaRefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, lockMode);
             headTranlocal.value = new Node<E>(item, headTranlocal.value);
         }
 
         boolean isEmpty(BetaTransaction tx) {
-            RefTranlocal<Node<E>> headTranlocal = tx.openForRead(head, lockMode);
+            BetaRefTranlocal<Node<E>> headTranlocal = tx.openForRead(head, lockMode);
             return headTranlocal.value == null;
         }
 
         E pop(BetaTransaction tx) {
-            RefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, lockMode);
+            BetaRefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, lockMode);
             Node<E> node = headTranlocal.value;
 
             if (node == null) {

@@ -6,7 +6,7 @@ import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertEquals;
@@ -39,7 +39,7 @@ public class BetaAtomicBlock_blockingTest {
             @Override
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
-                LongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
+                BetaLongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
                 write.value = 1;
             }
         });
@@ -61,7 +61,7 @@ public class BetaAtomicBlock_blockingTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
-                    LongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
+                    BetaLongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
                     if (write.value == 0) {
                         retry();
                     }

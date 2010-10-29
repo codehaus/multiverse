@@ -1,19 +1,22 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.multiverse.api.*;
-import org.multiverse.api.blocking.*;
+import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionConfiguration;
+import org.multiverse.api.TransactionStatus;
+import org.multiverse.api.TransactionalObject;
+import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.*;
-import org.multiverse.api.lifecycle.*;
-
-import org.multiverse.stms.beta.*;
-import org.multiverse.stms.beta.conflictcounters.*;
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.stms.beta.BetaObjectPool;
+import org.multiverse.stms.beta.BetaStmConstants;
+import org.multiverse.stms.beta.conflictcounters.LocalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
-import java.util.*;
+import java.util.ArrayList;
 
+import static java.lang.String.format;
 import static org.multiverse.stms.beta.BetaStmUtils.toDebugString;
-import static java.lang.String.*;
 
 /**
  * @author Peter Veentjer
@@ -119,9 +122,9 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     *
     * @returns the found tranlocal, or null if not found.
     */
-    public abstract Tranlocal get(BetaTransactionalObject object);
+    public abstract BetaTranlocal get(BetaTransactionalObject object);
 
-    public abstract Tranlocal locate(BetaTransactionalObject object);
+    public abstract BetaTranlocal locate(BetaTransactionalObject object);
 
     /**
     * Returns a list containing the normal TransactionLifecycleListeners. The returned list
@@ -147,7 +150,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     }
 
     public final void materializeConflict(BetaTransactionalObject ref){
-        Tranlocal tranlocal = openForRead(ref, LOCKMODE_NONE);
+        BetaTranlocal tranlocal = openForRead(ref, LOCKMODE_NONE);
         tranlocal.setIsConflictCheckNeeded(true);
     }
 
@@ -590,71 +593,71 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract <E> E read(BetaRef<E> ref);
 
-    public abstract <E> RefTranlocal<E> open(BetaRef<E> ref);
+    public abstract <E> BetaRefTranlocal<E> open(BetaRef<E> ref);
 
-    public abstract <E> RefTranlocal<E> openForRead(BetaRef<E> ref, int lockMode);
+    public abstract <E> BetaRefTranlocal<E> openForRead(BetaRef<E> ref, int lockMode);
 
-    public abstract <E> RefTranlocal<E> openForWrite(BetaRef<E> ref, int lockMode);
+    public abstract <E> BetaRefTranlocal<E> openForWrite(BetaRef<E> ref, int lockMode);
 
-    public abstract <E> RefTranlocal<E> openForConstruction(BetaRef<E> ref);
+    public abstract <E> BetaRefTranlocal<E> openForConstruction(BetaRef<E> ref);
 
     public abstract <E> void commute(BetaRef<E> ref, final Function<E> function);
 
     public abstract  int read(BetaIntRef ref);
 
-    public abstract  IntRefTranlocal open(BetaIntRef ref);
+    public abstract  BetaIntRefTranlocal open(BetaIntRef ref);
 
-    public abstract  IntRefTranlocal openForRead(BetaIntRef ref, int lockMode);
+    public abstract  BetaIntRefTranlocal openForRead(BetaIntRef ref, int lockMode);
 
-    public abstract  IntRefTranlocal openForWrite(BetaIntRef ref, int lockMode);
+    public abstract  BetaIntRefTranlocal openForWrite(BetaIntRef ref, int lockMode);
 
-    public abstract  IntRefTranlocal openForConstruction(BetaIntRef ref);
+    public abstract  BetaIntRefTranlocal openForConstruction(BetaIntRef ref);
 
     public abstract  void commute(BetaIntRef ref, final IntFunction function);
 
     public abstract  boolean read(BetaBooleanRef ref);
 
-    public abstract  BooleanRefTranlocal open(BetaBooleanRef ref);
+    public abstract  BetaBooleanRefTranlocal open(BetaBooleanRef ref);
 
-    public abstract  BooleanRefTranlocal openForRead(BetaBooleanRef ref, int lockMode);
+    public abstract  BetaBooleanRefTranlocal openForRead(BetaBooleanRef ref, int lockMode);
 
-    public abstract  BooleanRefTranlocal openForWrite(BetaBooleanRef ref, int lockMode);
+    public abstract  BetaBooleanRefTranlocal openForWrite(BetaBooleanRef ref, int lockMode);
 
-    public abstract  BooleanRefTranlocal openForConstruction(BetaBooleanRef ref);
+    public abstract  BetaBooleanRefTranlocal openForConstruction(BetaBooleanRef ref);
 
     public abstract  void commute(BetaBooleanRef ref, final BooleanFunction function);
 
     public abstract  double read(BetaDoubleRef ref);
 
-    public abstract  DoubleRefTranlocal open(BetaDoubleRef ref);
+    public abstract  BetaDoubleRefTranlocal open(BetaDoubleRef ref);
 
-    public abstract  DoubleRefTranlocal openForRead(BetaDoubleRef ref, int lockMode);
+    public abstract  BetaDoubleRefTranlocal openForRead(BetaDoubleRef ref, int lockMode);
 
-    public abstract  DoubleRefTranlocal openForWrite(BetaDoubleRef ref, int lockMode);
+    public abstract  BetaDoubleRefTranlocal openForWrite(BetaDoubleRef ref, int lockMode);
 
-    public abstract  DoubleRefTranlocal openForConstruction(BetaDoubleRef ref);
+    public abstract  BetaDoubleRefTranlocal openForConstruction(BetaDoubleRef ref);
 
     public abstract  void commute(BetaDoubleRef ref, final DoubleFunction function);
 
     public abstract  long read(BetaLongRef ref);
 
-    public abstract  LongRefTranlocal open(BetaLongRef ref);
+    public abstract  BetaLongRefTranlocal open(BetaLongRef ref);
 
-    public abstract  LongRefTranlocal openForRead(BetaLongRef ref, int lockMode);
+    public abstract  BetaLongRefTranlocal openForRead(BetaLongRef ref, int lockMode);
 
-    public abstract  LongRefTranlocal openForWrite(BetaLongRef ref, int lockMode);
+    public abstract  BetaLongRefTranlocal openForWrite(BetaLongRef ref, int lockMode);
 
-    public abstract  LongRefTranlocal openForConstruction(BetaLongRef ref);
+    public abstract  BetaLongRefTranlocal openForConstruction(BetaLongRef ref);
 
     public abstract  void commute(BetaLongRef ref, final LongFunction function);
 
-    public abstract  Tranlocal open(BetaTransactionalObject ref);
+    public abstract  BetaTranlocal open(BetaTransactionalObject ref);
 
-    public abstract  Tranlocal openForRead(BetaTransactionalObject ref, int lockMode);
+    public abstract  BetaTranlocal openForRead(BetaTransactionalObject ref, int lockMode);
 
-    public abstract  Tranlocal openForWrite(BetaTransactionalObject ref, int lockMode);
+    public abstract  BetaTranlocal openForWrite(BetaTransactionalObject ref, int lockMode);
 
-    public abstract  Tranlocal openForConstruction(BetaTransactionalObject ref);
+    public abstract  BetaTranlocal openForConstruction(BetaTransactionalObject ref);
 
     public abstract  void commute(BetaTransactionalObject ref, final Function function);
 }

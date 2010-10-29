@@ -25,7 +25,7 @@ public class RefTranlocal_prepareForPoolingTest implements BetaStmConstants {
     @Test
     public void whenReferenceHasValue_thenItIsNulled() {
         BetaRef<String> ref = newRef(stm, "peter");
-        RefTranlocal<String> tranlocal = ref.___newTranlocal();
+        BetaRefTranlocal<String> tranlocal = ref.___newTranlocal();
         ref.___load(1, null, LOCKMODE_NONE, tranlocal);
 
         tranlocal.prepareForPooling(pool);

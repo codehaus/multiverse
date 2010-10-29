@@ -12,7 +12,7 @@ import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
 
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
@@ -77,7 +77,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         tx.commute(ref, function);
 
         assertIsActive(tx);
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         assertNotNull(tranlocal);
         assertSame(ref, tranlocal.owner);
         assertTrue(tranlocal.isCommuting());
@@ -107,7 +107,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
 
         assertEquals(localConflictCount, tx.getLocalConflictCounter().get());
         assertIsActive(tx);
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         assertNotNull(tranlocal);
         assertSame(ref, tranlocal.owner);
         assertTrue(tranlocal.isCommuting());
@@ -136,7 +136,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         tx.commute(ref, function3);
 
         assertIsActive(tx);
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         assertNotNull(tranlocal);
         assertSame(ref, tranlocal.owner);
         assertTrue(tranlocal.isCommuting());
@@ -165,9 +165,9 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         tx.commute(ref2, function2);
 
         assertIsActive(tx);
-        LongRefTranlocal tranlocal1 = (LongRefTranlocal) tx.get(ref1);
+        BetaLongRefTranlocal tranlocal1 = (BetaLongRefTranlocal) tx.get(ref1);
         assertHasCommutingFunctions(tranlocal1, function1);
-        LongRefTranlocal tranlocal2 = (LongRefTranlocal) tx.get(ref2);
+        BetaLongRefTranlocal tranlocal2 = (BetaLongRefTranlocal) tx.get(ref2);
         assertHasCommutingFunctions(tranlocal2, function2);
     }
 
@@ -222,7 +222,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         tx.commute(ref, function2);
 
         assertIsActive(tx);
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
 
         assertNotNull(tranlocal);
         assertSame(ref, tranlocal.owner);
@@ -244,10 +244,10 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
         tx.commute(ref, Functions.newIncLongFunction(1));
 
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         assertIsActive(tx);
         assertFalse(tranlocal.isCommuting());
         assertFalse(tranlocal.isReadonly());
@@ -266,7 +266,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tx.commute(ref, Functions.newIncLongFunction(1));
 
         assertIsActive(tx);
@@ -294,7 +294,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         tx.openForConstruction(ref);
         tx.commute(ref, Functions.newIncLongFunction(1));
 
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
 
         assertIsActive(tx);
         assertSame(ref, tranlocal.owner);
@@ -321,7 +321,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         BetaTransaction tx = newTransaction();
         tx.commute(ref, function);
 
-        LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal commuting = (BetaLongRefTranlocal) tx.get(ref);
 
         assertIsActive(tx);
         assertTrue(commuting.isCommuting());
@@ -347,7 +347,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         BetaTransaction tx = newTransaction();
         tx.commute(ref, function);
 
-        LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal commuting = (BetaLongRefTranlocal) tx.get(ref);
 
         assertIsActive(tx);
         assertTrue(commuting.isCommuting());

@@ -29,9 +29,9 @@ public abstract class BetaTransaction_typesTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        IntRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaIntRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
         assertEquals(initialValue, read.value);
-        IntRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaIntRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
         tx.commit();
 
@@ -46,9 +46,9 @@ public abstract class BetaTransaction_typesTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
         assertEquals(initialValue, read.value);
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
         tx.commit();
 
@@ -62,9 +62,9 @@ public abstract class BetaTransaction_typesTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        RefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
         assertEquals(initialValue, read.value);
-        RefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         String newValue = "john";
         write.value = newValue;
         tx.commit();
@@ -80,9 +80,9 @@ public abstract class BetaTransaction_typesTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        BooleanRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaBooleanRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
         assertEquals(initialValue, read.value);
-        BooleanRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaBooleanRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value = true;
         tx.commit();
 
@@ -96,9 +96,9 @@ public abstract class BetaTransaction_typesTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        DoubleRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaDoubleRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
         assertEqualsDouble(initialValue, read.value);
-        DoubleRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaDoubleRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         double newValue = 20;
         write.value = newValue;
         tx.commit();

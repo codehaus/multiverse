@@ -4,7 +4,7 @@ import org.multiverse.TestThread;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
 
@@ -104,7 +104,7 @@ public class ImprovedUncontendedLeanReadBenchmark implements BetaStmConstants {
             long startMs = System.currentTimeMillis();
 
             for (long k = 0; k < transactionCount; k++) {
-                LongRefTranlocal tranlocal = tx.open(ref);
+                BetaLongRefTranlocal tranlocal = tx.open(ref);
                 tranlocal.openForRead(LOCKMODE_NONE);
                 long x = tranlocal.value;
                 tx.commit();

@@ -8,20 +8,20 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 
 /**
- * The Tranlocal contains the transaction local state of a BetaTransactionalObject (so also the refs).
+ * The BetaTranlocal contains the transaction local state of a BetaTransactionalObject (so also the refs).
  * It only exists when a transaction is running, and when it commits, the values it contains will be
  * written to the BetaTransactionalObject if needed.
  *
  * @author Peter Veentjer
  */
-public abstract class Tranlocal implements  BetaStmConstants {
+public abstract class BetaTranlocal implements BetaStmConstants {
 
     public long version;
     public BetaTransaction tx;
     public BetaTransactionalObject owner;
     public CallableNode headCallable;
 
-    public int status = STATUS_NEW;        
+    public int status = STATUS_NEW;
     private int lockMode;
 
     private boolean checkConflict;
@@ -29,7 +29,7 @@ public abstract class Tranlocal implements  BetaStmConstants {
     private boolean isDirty;
     private boolean ignore;
 
-    public Tranlocal(BetaTransactionalObject owner) {
+    public BetaTranlocal(BetaTransactionalObject owner) {
         this.owner = owner;
     }
 
@@ -41,11 +41,23 @@ public abstract class Tranlocal implements  BetaStmConstants {
         return status == STATUS_CONSTRUCTING;
     }
 
-    public final void setStatus(int state){
+    public final void setStatus(int state) {
         this.status = state;
     }
 
     public final boolean isReadonly() {
+        return status == STATUS_READONLY;
+    }
+
+    public final boolean isNew(int status) {
+        return status == STATUS_NEW;
+    }
+
+    public final boolean isConstructing(int status) {
+        return status == STATUS_CONSTRUCTING;
+    }
+
+    public final boolean isReadonly(int status) {
         return status == STATUS_READONLY;
     }
 
@@ -77,7 +89,7 @@ public abstract class Tranlocal implements  BetaStmConstants {
         return status == STATUS_COMMUTING;
     }
 
-     public final boolean hasDepartObligation() {
+    public final boolean hasDepartObligation() {
         return hasDepartObligation;
     }
 
@@ -87,11 +99,11 @@ public abstract class Tranlocal implements  BetaStmConstants {
 
     public abstract void prepareForPooling(final BetaObjectPool pool);
 
-    public boolean ignore(){
+    public boolean ignore() {
         return ignore;
     }
 
-    public void setIgnore(boolean value){
+    public void setIgnore(boolean value) {
         this.ignore = value;
     }
 
@@ -222,7 +234,7 @@ public abstract class Tranlocal implements  BetaStmConstants {
     }
 
     /**
-     * Calculates if this Tranlocal is dirty (so needs to be written) and stores the result in the
+     * Calculates if this BetaTranlocal is dirty (so needs to be written) and stores the result in the
      * isDirty field. The call can be made more than once, but once it is marked as dirty, it will remain
      * dirty.
      *
@@ -231,8 +243,8 @@ public abstract class Tranlocal implements  BetaStmConstants {
     public abstract boolean calculateIsDirty();
 
     /**
-     * Evaluates the commuting functions that are applied to this Tranlocal. This call is made under the
-     * assumption that the Tranlocal is not committed, is in the 'isCommuting' mode and that the read
+     * Evaluates the commuting functions that are applied to this BetaTranlocal. This call is made under the
+     * assumption that the BetaTranlocal is not committed, is in the 'isCommuting' mode and that the read
      * field has been getAndSet. If there is a change, the isDirty field also is getAndSet.
      *
      * @param pool the BetaObjectPool used to pool resources.
@@ -240,8 +252,8 @@ public abstract class Tranlocal implements  BetaStmConstants {
     public abstract void evaluateCommutingFunctions(BetaObjectPool pool);
 
     /**
-     * Adds a Function for commute to this Tranlocal. This call is made under the assumption that
-     * the Tranlocal is not committed and in the 'isCommuting' mode.
+     * Adds a Function for commute to this BetaTranlocal. This call is made under the assumption that
+     * the BetaTranlocal is not committed and in the 'isCommuting' mode.
      * <p/>
      * No checks on the Function are done, so no null check or check if the Function already is added.
      *

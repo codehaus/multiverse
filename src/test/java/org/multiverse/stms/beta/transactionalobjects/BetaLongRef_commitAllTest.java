@@ -40,13 +40,13 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
 
         DefaultRetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
-        LongRefTranlocal load = ref.___newTranlocal();
+        BetaLongRefTranlocal load = ref.___newTranlocal();
         ref.___load(1, null, LOCKMODE_NONE, load);
         ref.___registerChangeListener(latch, load, pool, listenerEra);
         ref.___abort(null, load, pool);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tranlocal.value++;
         tranlocal.setDirty(true);
         tranlocal.prepareAllUpdates(pool, tx, 1);
@@ -74,7 +74,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, LOCKMODE_NONE);
@@ -99,7 +99,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, LOCKMODE_NONE);
@@ -123,7 +123,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
 
         tranlocal.prepareAllUpdates(pool, tx, 1);
         long oldConflictCount = globalConflictCounter.count();
@@ -144,7 +144,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
 
         tranlocal.prepareAllUpdates(pool, tx, 1);
         long oldConflictCount = globalConflictCounter.count();
@@ -166,7 +166,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tranlocal.value = updateValue;
 
         tranlocal.prepareAllUpdates(pool, tx, 1);
@@ -189,7 +189,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tranlocal.prepareAllUpdates(pool, tx, 1);
 
         long oldConflictCount = globalConflictCounter.count();
@@ -210,7 +210,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        Tranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tranlocal.prepareAllUpdates(pool, tx, 1);
 
         long oldConflictCount = globalConflictCounter.count();
@@ -234,7 +234,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.privatize(tx);
         ref.get(tx);
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         tranlocal.prepareAllUpdates(pool, tx, 1);
         Listeners listeners = ref.___commitAll(tranlocal, tx, pool);
 
@@ -255,7 +255,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
 
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.privatize(tx);
-        LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tranlocal.value = updateValue;
         tranlocal.prepareAllUpdates(pool, tx, 1);
         Listeners listeners = ref.___commitAll(tranlocal, tx, pool);
@@ -276,7 +276,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
 
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.privatize(tx);
-        LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tranlocal.value = initialValue;
         tranlocal.prepareAllUpdates(pool, tx, 1);
         Listeners listeners = ref.___commitAll(tranlocal, tx, pool);
@@ -298,7 +298,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.ensure(tx);
         ref.get(tx);
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         tranlocal.prepareAllUpdates(pool, tx, 1);
         Listeners listeners = ref.___commitAll(tranlocal, tx, pool);
 
@@ -320,7 +320,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         ref.ensure(tx);
         int updatedValue = 1;
         ref.set(tx, updatedValue);
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         tranlocal.prepareAllUpdates(pool, tx, 1);
         Listeners listeners = ref.___commitAll(tranlocal, tx, pool);
 
@@ -341,7 +341,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.ensure(tx);
         ref.set(tx, initialValue);
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         tranlocal.prepareAllUpdates(pool, tx, 1);
         Listeners listeners = ref.___commitAll(tranlocal, tx, pool);
 
@@ -359,7 +359,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
 
         BetaTransaction tx = stm.startDefaultTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal tranlocal = tx.openForConstruction(ref);
+        BetaLongRefTranlocal tranlocal = tx.openForConstruction(ref);
         tranlocal.value = 10;
 
         tranlocal.prepareAllUpdates(pool, tx, 1);
@@ -379,7 +379,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
     public void whenCommittingNonDirtyConstructedObject() {
         BetaTransaction tx = stm.startDefaultTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal tranlocal = tx.openForConstruction(ref);
+        BetaLongRefTranlocal tranlocal = tx.openForConstruction(ref);
 
         tranlocal.prepareAllUpdates(pool, tx, 1);
 

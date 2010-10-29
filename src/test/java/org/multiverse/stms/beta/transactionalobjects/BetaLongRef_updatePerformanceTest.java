@@ -29,7 +29,7 @@ public class BetaLongRef_updatePerformanceTest implements BetaStmConstants {
         BetaTransaction tx = stm.startDefaultTransaction();
         BetaObjectPool pool = tx.getPool();
 
-        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
 
         long transactionCount = 1000 * 1000 * 1000;
         long startMs = System.currentTimeMillis();
@@ -59,7 +59,7 @@ public class BetaLongRef_updatePerformanceTest implements BetaStmConstants {
         long transactionCount = 1000 * 1000 * 1000;
         long startMs = System.currentTimeMillis();
         for (long k = 0; k < transactionCount; k++) {
-            LongRefTranlocal tranlocal = ref.___load(2, tx, LOCKMODE_COMMIT,pool);
+            BetaLongRefTranlocal tranlocal = ref.___load(2, tx, LOCKMODE_COMMIT,pool);
             tranlocal.isCommitted = false;
             tranlocal.value++;
             tranlocal.calculateIsDirty();

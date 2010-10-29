@@ -10,9 +10,9 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRefTranlocal;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
-import org.multiverse.stms.beta.transactionalobjects.IntRefTranlocal;
-import org.multiverse.stms.beta.transactionalobjects.RefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import java.util.HashSet;
@@ -134,14 +134,14 @@ public class StackWithCapacityStressTest implements BetaStmConstants {
                 public void execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
 
-                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, lockMode);
+                    BetaIntRefTranlocal sizeTranlocal = btx.openForWrite(size, lockMode);
 
                     if (sizeTranlocal.value >= maxCapacity) {
                         retry();
                     }
 
                     sizeTranlocal.value++;
-                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, lockMode);
+                    BetaRefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, lockMode);
                     headTranlocal.value = new Node<E>(item, headTranlocal.value);
                 }
             });
@@ -153,13 +153,13 @@ public class StackWithCapacityStressTest implements BetaStmConstants {
                 public E execute(Transaction tx) throws Exception {
                     BetaTransaction btx = (BetaTransaction) tx;
 
-                    RefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, lockMode);
+                    BetaRefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, lockMode);
 
                     if (headTranlocal.value == null) {
                         retry();
                     }
 
-                    IntRefTranlocal sizeTranlocal = btx.openForWrite(size, lockMode);
+                    BetaIntRefTranlocal sizeTranlocal = btx.openForWrite(size, lockMode);
                     sizeTranlocal.value--;
 
                     E value = headTranlocal.value.item;

@@ -8,7 +8,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertEquals;
@@ -131,7 +131,7 @@ public class MoneyTransferStressTest {
 
                     sleepRandomMs(10);
 
-                    LongRefTranlocal toTranlocal = btx.openForWrite(from, !optimistic ? LOCKMODE_NONE : LOCKMODE_COMMIT);
+                    BetaLongRefTranlocal toTranlocal = btx.openForWrite(from, !optimistic ? LOCKMODE_NONE : LOCKMODE_COMMIT);
                     if (toTranlocal.value < 0) {
                         throw new NotEnoughMoneyException();
                     }

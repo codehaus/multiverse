@@ -1,6 +1,6 @@
+import org.apache.velocity.Template
 import org.apache.velocity.VelocityContext
 import org.apache.velocity.app.VelocityEngine
-import org.apache.velocity.Template
 
 @Grab(group = 'org.apache.velocity', module = 'velocity', version = '1.6.4')
 
@@ -108,7 +108,7 @@ for (def param in refs) {
 
 def abstractTransactionalObject = new TransactionalObject(
         name: 'AbstractBetaTransactionalObject',
-        tranlocal: 'Tranlocal',
+        tranlocal: 'BetaTranlocal',
         type: "",
         objectType: "",
         typeParameter: '',
@@ -177,7 +177,7 @@ List<TransactionalObject> createTransactionalObjects() {
   def result = []
   result.add new TransactionalObject(
           name: 'BetaRef',
-          tranlocal: 'RefTranlocal',
+          tranlocal: 'BetaRefTranlocal',
           type: 'E',
           objectType: '',
           typeParameter: '<E>',
@@ -192,7 +192,7 @@ List<TransactionalObject> createTransactionalObjects() {
           incFunctionMethod: '')
   result.add new TransactionalObject(
           name: 'BetaIntRef',
-          tranlocal: 'IntRefTranlocal',
+          tranlocal: 'BetaIntRefTranlocal',
           type: 'int',
           objectType: 'Integer',
           referenceInterface: 'IntRef',
@@ -207,7 +207,7 @@ List<TransactionalObject> createTransactionalObjects() {
           incFunctionMethod: 'newIncIntFunction')
   result.add new TransactionalObject(
           name: 'BetaBooleanRef',
-          tranlocal: 'BooleanRefTranlocal',
+          tranlocal: 'BetaBooleanRefTranlocal',
           type: 'boolean',
           objectType: 'Boolean',
           referenceInterface: 'BooleanRef',
@@ -222,7 +222,7 @@ List<TransactionalObject> createTransactionalObjects() {
           incFunctionMethod: '')
   result.add new TransactionalObject(
           name: 'BetaDoubleRef',
-          tranlocal: 'DoubleRefTranlocal',
+          tranlocal: 'BetaDoubleRefTranlocal',
           type: 'double',
           objectType: 'Double',
           referenceInterface: 'DoubleRef',
@@ -237,7 +237,7 @@ List<TransactionalObject> createTransactionalObjects() {
           incFunctionMethod: '')
   result.add new TransactionalObject(
           name: 'BetaLongRef',
-          tranlocal: 'LongRefTranlocal',
+          tranlocal: 'BetaLongRefTranlocal',
           referenceInterface: 'LongRef',
           type: 'long',
           objectType: 'Long',
@@ -252,7 +252,7 @@ List<TransactionalObject> createTransactionalObjects() {
           incFunctionMethod: 'newIncLongFunction')
   result.add new TransactionalObject(
           name: 'BetaTransactionalObject',
-          tranlocal: 'Tranlocal',
+          tranlocal: 'BetaTranlocal',
           type: '',
           objectType: '',
           typeParameter: '',
@@ -419,7 +419,7 @@ void generateTranlocal(VelocityEngine engine, TransactionalObject transactionalO
     return
   }
 
-  Template t = engine.getTemplate('src/main/java/org/multiverse/stms/beta/transactionalobjects/RefTranlocal.vm')
+  Template t = engine.getTemplate('src/main/java/org/multiverse/stms/beta/transactionalobjects/BetaRefTranlocal.vm')
 
   VelocityContext context = new VelocityContext()
   context.put('transactionalObject', transactionalObject)
@@ -474,7 +474,7 @@ void generateBetaTransactionalObject(VelocityEngine engine, TransactionalObject 
     return;
   }
 
-  Template t = engine.getTemplate('src/main/java/org/multiverse/stms/beta/transactionalobjects/Ref.vm');
+  Template t = engine.getTemplate('src/main/java/org/multiverse/stms/beta/transactionalobjects/BetaRef.vm');
 
   VelocityContext context = new VelocityContext()
   context.put('transactionalObject', transactionalObject)

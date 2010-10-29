@@ -18,7 +18,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     public final static AtomicLong conflictScan = new AtomicLong();
 
-    private final Tranlocal[] array;
+    private final BetaTranlocal[] array;
     private LocalConflictCounter localConflictCounter;
     private int firstFreeIndex = 0;
     private boolean hasReads;
@@ -34,7 +34,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     public ${transaction.name}(final BetaTransactionConfiguration config) {
         super(${transaction.poolName}, config);
         this.localConflictCounter = config.globalConflictCounter.createLocalConflictCounter();
-        this.array = new Tranlocal[config.maxArrayTransactionSize];
+        this.array = new BetaTranlocal[config.maxArrayTransactionSize];
         this.remainingTimeoutNs = config.timeoutNs;
     }
 
@@ -58,7 +58,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         final int spinCount = config.spinCount;
         for(int k=0;k<firstFreeIndex;k++){
-            final Tranlocal tranlocal = array[k];
+            final BetaTranlocal tranlocal = array[k];
 
             if(tranlocal.isReadonly()){
                 continue;
@@ -97,7 +97,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortReadOnNull();
         }
 
-        if(ref.getStm()!=config.stm){
+        if(ref.___stm != config.stm){
             throw abortReadOnStmMismatch(ref);
         }
 
@@ -108,7 +108,12 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             return tranlocal.value;
         }
 
-        throw new TodoException();
+        if(config.trackReads || config.isolationLevel!=IsolationLevel.ReadCommitted){
+            throw new TodoException();
+        }else{
+            hasUntrackedReads = true;
+            return ref.atomicWeakGet();
+        }
     }
 #end
 
@@ -121,7 +126,11 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOpenOnNull();
         }
 
-        if(ref.getStm()!=config.stm){
+#if(${ref.isReference})
+        if(ref.___stm != config.stm){
+#else
+        if(ref.getStm() != config.stm){
+#end
             throw abortOnStmMismatch(ref);
         }
 
@@ -475,13 +484,13 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #end ##for loop of transactionalobjects.
 
     @Override
-    public Tranlocal get(BetaTransactionalObject owner){
+    public BetaTranlocal get(BetaTransactionalObject owner){
         int indexOf = indexOf(owner);
         return indexOf == -1 ? null: array[indexOf];
     }
 
     @Override
-    public Tranlocal locate(BetaTransactionalObject owner){
+    public BetaTranlocal locate(BetaTransactionalObject owner){
         if (status != ACTIVE) {
            throw abortLocate(owner);
         }
@@ -504,7 +513,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         assert owner!=null;
 
         for(int k=0; k < firstFreeIndex; k++){
-            final Tranlocal tranlocal = array[k];
+            final BetaTranlocal tranlocal = array[k];
             if(tranlocal.owner == owner){
                 return k;
             }
@@ -531,7 +540,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         for (int k = 0; k < firstFreeIndex; k++) {
-            final Tranlocal tranlocal = array[k];
+            final BetaTranlocal tranlocal = array[k];
 
             if (tranlocal.owner.___hasReadConflict(tranlocal)) {
                 return true;
@@ -551,7 +560,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             case PREPARED:
                 status = ABORTED;
                 for (int k = 0; k < firstFreeIndex; k++) {
-                    final Tranlocal tranlocal = array[k];
+                    final BetaTranlocal tranlocal = array[k];
                     array[k]=null;
                     tranlocal.owner.___abort(this, tranlocal, pool);
                 }
@@ -662,7 +671,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         int listenersArrayIndex = 0;
         for (int k = 0; k < firstFreeIndex; k++) {
-            final Tranlocal tranlocal = array[k];
+            final BetaTranlocal tranlocal = array[k];
             array[k] = null;
 
             final Listeners listeners = tranlocal.owner.___commitAll(tranlocal, this, pool);
@@ -685,7 +694,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         int listenersArrayIndex = 0;
         for (int k = 0; k < firstFreeIndex; k++) {
-            final Tranlocal tranlocal = array[k];
+            final BetaTranlocal tranlocal = array[k];
             array[k] = null;
 
             //we need to make sure that the dirty flag is set since it could happen that the
@@ -802,7 +811,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         final int spinCount = config.spinCount;
 
         for (int k = 0; k < firstFreeIndex; k++) {
-            final Tranlocal tranlocal = array[k];
+            final BetaTranlocal tranlocal = array[k];
 
             if(!tranlocal.prepareAllUpdates(pool, this, spinCount)) {
                 return false;
@@ -816,7 +825,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         final int spinCount = config.spinCount;
 
         for (int k = 0; k < firstFreeIndex; k++) {
-            final Tranlocal tranlocal = array[k];
+            final BetaTranlocal tranlocal = array[k];
 
             if(!tranlocal.prepareDirtyUpdates(pool, this, spinCount)) {
                 return false;
@@ -855,7 +864,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
             for(int k=0; k < firstFreeIndex; k++){
 
-                final Tranlocal tranlocal = array[k];
+                final BetaTranlocal tranlocal = array[k];
                 final BetaTransactionalObject owner = tranlocal.owner;
 
                 if(furtherRegistrationNeeded){

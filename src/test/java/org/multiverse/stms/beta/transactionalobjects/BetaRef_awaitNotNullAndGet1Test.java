@@ -37,7 +37,7 @@ public class BetaRef_awaitNotNullAndGet1Test {
         String result = ref.awaitNotNullAndGet(tx);
 
         assertSame(initialValue, result);
-        RefTranlocal tranlocal = (RefTranlocal) tx.get(ref);
+        BetaRefTranlocal tranlocal = (BetaRefTranlocal) tx.get(ref);
         assertTrue(tranlocal.isReadonly());
         assertTranlocalHasNoLock(tranlocal);
         assertRefHasNoLocks(ref);
@@ -83,7 +83,7 @@ public class BetaRef_awaitNotNullAndGet1Test {
         String result = ref.awaitNotNullAndGet(tx);
 
         assertSame(initialValue, result);
-        RefTranlocal tranlocal = (RefTranlocal) tx.get(ref);
+        BetaRefTranlocal tranlocal = (BetaRefTranlocal) tx.get(ref);
         assertTrue(tranlocal.isReadonly());
         assertTranlocalHasNoLock(tranlocal);
         assertRefHasUpdateLock(ref, otherTx);

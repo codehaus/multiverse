@@ -10,7 +10,7 @@ import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
 
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
@@ -53,7 +53,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
         BetaTransaction tx = newTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
         long version = ref.getVersion();
-        LongRefTranlocal write = tx.openForConstruction(ref);
+        BetaLongRefTranlocal write = tx.openForConstruction(ref);
 
         assertNotNull(write);
         assertEquals(0, write.value);
@@ -73,8 +73,8 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
     public void whenAlreadyOpenedForConstruction_thenNoProblem() {
         BetaTransaction tx = newTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal construction1 = tx.openForConstruction(ref);
-        LongRefTranlocal construction2 = tx.openForConstruction(ref);
+        BetaLongRefTranlocal construction1 = tx.openForConstruction(ref);
+        BetaLongRefTranlocal construction2 = tx.openForConstruction(ref);
 
         assertNotNull(construction1);
         assertSame(construction1, construction2);

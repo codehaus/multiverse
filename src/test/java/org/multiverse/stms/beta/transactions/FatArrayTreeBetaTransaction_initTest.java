@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaTranlocal;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -109,7 +109,7 @@ public class FatArrayTreeBetaTransaction_initTest {
     private void assertInitialized(FatArrayTreeBetaTransaction tx) {
         assertIsActive(tx);
         assertHasNoNormalListeners(tx);
-        assertAllNull((Tranlocal[]) getField(tx, "array"));
+        assertAllNull((BetaTranlocal[]) getField(tx, "array"));
         assertEquals(1, tx.getAttempt());
     }
 }

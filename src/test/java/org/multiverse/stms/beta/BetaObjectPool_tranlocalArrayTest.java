@@ -2,7 +2,7 @@ package org.multiverse.stms.beta;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaTranlocal;
 
 import static org.junit.Assert.*;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
@@ -19,7 +19,7 @@ public class BetaObjectPool_tranlocalArrayTest {
 
     @Test
     public void whenItemPutInPool_thenPreparedForPooling() {
-        Tranlocal[] array = new Tranlocal[2];
+        BetaTranlocal[] array = new BetaTranlocal[2];
         array[0] = newLongRef(stm).___newTranlocal();
         array[1] = newLongRef(stm).___newTranlocal();
 
@@ -55,13 +55,13 @@ public class BetaObjectPool_tranlocalArrayTest {
     }
 
     public void normalScenario(int size) {
-        Tranlocal[] array = new Tranlocal[size];
+        BetaTranlocal[] array = new BetaTranlocal[size];
         pool.putTranlocalArray(array);
 
-        Tranlocal[] result = pool.takeTranlocalArray(array.length);
+        BetaTranlocal[] result = pool.takeTranlocalArray(array.length);
         assertSame(array, result);
 
-        Tranlocal[] result2 = pool.takeTranlocalArray(array.length);
+        BetaTranlocal[] result2 = pool.takeTranlocalArray(array.length);
         assertNotNull(result2);
         assertNotSame(result, result2);
     }

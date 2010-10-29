@@ -10,7 +10,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
-import org.multiverse.stms.beta.transactionalobjects.IntRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.multiverse.TestUtils.*;
@@ -87,7 +87,7 @@ public class NonReentrantSemaphoreStressTest {
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
 
-                IntRefTranlocal write = btx.openForWrite(ref, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
+                BetaIntRefTranlocal write = btx.openForWrite(ref, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
                 write.value++;
             }
         };
@@ -96,7 +96,7 @@ public class NonReentrantSemaphoreStressTest {
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
 
-                IntRefTranlocal write = btx.openForWrite(ref, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
+                BetaIntRefTranlocal write = btx.openForWrite(ref, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
                 if (write.value == 0) {
                     retry();
                 }

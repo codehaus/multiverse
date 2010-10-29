@@ -44,17 +44,17 @@ public class TestUtils implements MultiverseConstants {
         return Runtime.getRuntime().availableProcessors();
     }
 
-    public static void assertAttached(BetaTransaction tx, Tranlocal tranlocal) {
-        Tranlocal result = tx.get(tranlocal.owner);
+    public static void assertAttached(BetaTransaction tx, BetaTranlocal tranlocal) {
+        BetaTranlocal result = tx.get(tranlocal.owner);
         assertSame(tranlocal, result);
     }
 
     public static void assertNotAttached(BetaTransaction tx, BetaTransactionalObject object) {
-        Tranlocal result = tx.get(object);
+        BetaTranlocal result = tx.get(object);
         assertNull(result);
     }
 
-    public static void assertHasNoCommutingFunctions(LongRefTranlocal tranlocal) {
+    public static void assertHasNoCommutingFunctions(BetaLongRefTranlocal tranlocal) {
         assertHasCommutingFunctions(tranlocal);
     }
 
@@ -66,7 +66,7 @@ public class TestUtils implements MultiverseConstants {
         assertFalse((Boolean) getField(tx, "hasUpdates"));
     }
 
-    public static void assertHasCommutingFunctions(LongRefTranlocal tranlocal, Function... expected) {
+    public static void assertHasCommutingFunctions(BetaLongRefTranlocal tranlocal, Function... expected) {
         CallableNode current = tranlocal.headCallable;
         List<Function> functions = new LinkedList<Function>();
         while (current != null) {
@@ -102,10 +102,10 @@ public class TestUtils implements MultiverseConstants {
         assertFalse(latch.isOpen());
     }
 
-    public static void assertAllNull(Tranlocal[] array) {
+    public static void assertAllNull(BetaTranlocal[] array) {
         assertNotNull(array);
 
-        for (Tranlocal tranlocal : array) {
+        for (BetaTranlocal tranlocal : array) {
             assertNull(tranlocal);
         }
     }

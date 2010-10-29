@@ -104,7 +104,7 @@ public class UncontendedFatReadBenchmark implements BetaStmConstants {
 
             //ArrayUpdateTransaction tx = new ArrayUpdateTransaction(stm, 1);
             for (long k = 0; k < transactionCount; k++) {
-                //long x = ((LongRefTranlocal)(tx.openForRead((BetaTransactionalObject)ref, true, pool))).value;
+                //long x = ((BetaLongRefTranlocal)(tx.openForRead((BetaTransactionalObject)ref, true, pool))).value;
                 long x = tx.openForRead(ref, LOCKMODE_NONE).value;
                 tx.commit();
                 tx.hardReset();

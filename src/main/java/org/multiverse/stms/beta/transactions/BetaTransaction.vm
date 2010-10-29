@@ -116,9 +116,9 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     *
     * @returns the found tranlocal, or null if not found.
     */
-    public abstract Tranlocal get(BetaTransactionalObject object);
+    public abstract BetaTranlocal get(BetaTransactionalObject object);
 
-    public abstract Tranlocal locate(BetaTransactionalObject object);
+    public abstract BetaTranlocal locate(BetaTransactionalObject object);
 
     /**
     * Returns a list containing the normal TransactionLifecycleListeners. The returned list
@@ -144,7 +144,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     }
 
     public final void materializeConflict(BetaTransactionalObject ref){
-        Tranlocal tranlocal = openForRead(ref, LOCKMODE_NONE);
+        BetaTranlocal tranlocal = openForRead(ref, LOCKMODE_NONE);
         tranlocal.setIsConflictCheckNeeded(true);
     }
 

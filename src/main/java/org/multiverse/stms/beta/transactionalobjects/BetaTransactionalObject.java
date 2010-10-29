@@ -37,7 +37,7 @@ public interface BetaTransactionalObject extends TransactionalObject {
 
     long getVersion();
 
-    Tranlocal ___newTranlocal();
+    BetaTranlocal ___newTranlocal();
 
     /**
      * Loads the active value. If the value already is locked, by another this call will return a tranlocal
@@ -50,7 +50,7 @@ public interface BetaTransactionalObject extends TransactionalObject {
      * @param tranlocal
      * @return true if it was a success, false otherwise.
      */
-    boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, Tranlocal tranlocal);
+    boolean ___load(int spinCount, BetaTransaction newLockOwner, int lockMode, BetaTranlocal tranlocal);
 
     /**
      * Tries to acquire the lock and checks for conflict. It is safe to call this method when it already is
@@ -66,7 +66,7 @@ public interface BetaTransactionalObject extends TransactionalObject {
      * @return true if locking was a success, false otherwise.
      */
     boolean ___tryLockAndCheckConflict(
-            BetaTransaction newLockOwner, int spinCount, Tranlocal tranlocal, boolean commitLock);
+            BetaTransaction newLockOwner, int spinCount, BetaTranlocal tranlocal, boolean commitLock);
 
     /**
      * Returns the transaction that currently owns the lock. If no transaction owns the lock, null
@@ -81,16 +81,16 @@ public interface BetaTransactionalObject extends TransactionalObject {
      * different or when it is locked (since a conflicting write could be pending). Once a transactional
      * object is locked, its value is undetermined.
      *
-     * @param tranlocal the Tranlocal to check if there is a read conflict
+     * @param tranlocal the BetaTranlocal to check if there is a read conflict
      * @return true if there was a readconflict, false otherwise.
      */
-    boolean ___hasReadConflict(Tranlocal tranlocal);
+    boolean ___hasReadConflict(BetaTranlocal tranlocal);
 
     /**
      * Commits the all the dirty changes. The call also needs to be done when the tranlocal is readonly and
      * not permanent and locked; so that the lock is released and the departs are done.
      *
-     * @param tranlocal the Tranlocal to commit. It doesn't matter if this is just a readonly
+     * @param tranlocal the BetaTranlocal to commit. It doesn't matter if this is just a readonly
      *                  version, since it still may have a lock or
      * @param tx        transaction that does the commit
      * @param pool      the BetaObjectPool to use to pool the replaced tranlocal if possible.
@@ -98,10 +98,10 @@ public interface BetaTransactionalObject extends TransactionalObject {
      *         if no listeners need to be notified.
      */
     Listeners ___commitDirty(
-            Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool);
+            BetaTranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool);
 
     Listeners ___commitAll(
-            Tranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool);
+            BetaTranlocal tranlocal, BetaTransaction tx, BetaObjectPool pool);
 
     /**
      * Aborts this BetaTransactionalObject (so releases the lock if acquired, does departs etc).
@@ -111,7 +111,7 @@ public interface BetaTransactionalObject extends TransactionalObject {
      * @param tranlocal   the tranlocal currently read/written
      * @param pool        the BetaObjectPool
      */
-    void ___abort(BetaTransaction transaction, Tranlocal tranlocal, BetaObjectPool pool);
+    void ___abort(BetaTransaction transaction, BetaTranlocal tranlocal, BetaObjectPool pool);
 
     /**
      * Registers a change listener (needed for blocking operations).
@@ -123,7 +123,7 @@ public interface BetaTransactionalObject extends TransactionalObject {
      * @param lockEra   the era of the lock when it when it 'started'. LockEra is needed for lock pooling.
      * @return true if there already is write has happened an no further registration is needed.
      */
-    int ___registerChangeListener(RetryLatch latch, Tranlocal tranlocal, BetaObjectPool pool, long lockEra);
+    int ___registerChangeListener(RetryLatch latch, BetaTranlocal tranlocal, BetaObjectPool pool, long lockEra);
 
     /**
      * Returns the identity hash of this object. Once calculated it should be cached so that it

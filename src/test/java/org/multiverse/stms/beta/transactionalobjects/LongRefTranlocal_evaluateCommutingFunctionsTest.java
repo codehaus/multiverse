@@ -30,7 +30,7 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
         BetaLongRef ref = newLongRef(stm, initialValue);
         long version = ref.getVersion();
 
-        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.setStatus(STATUS_COMMUTING);
         tranlocal.addCommutingFunction(newIdentityLongFunction(), pool);
         tranlocal.version = version;
@@ -51,7 +51,7 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
         BetaLongRef ref = newLongRef(stm, initialValue);
         long version = ref.getVersion();
 
-        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.setStatus(STATUS_COMMUTING);
 
         tranlocal.addCommutingFunction(newIncLongFunction(), pool);
@@ -73,7 +73,7 @@ public class LongRefTranlocal_evaluateCommutingFunctionsTest implements BetaStmC
         BetaLongRef ref = newLongRef(stm, initialValue);
         long version = ref.getVersion();
 
-        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.setStatus(STATUS_COMMUTING);
         tranlocal.addCommutingFunction(newIncLongFunction(), pool);
         tranlocal.addCommutingFunction(newIncLongFunction(), pool);

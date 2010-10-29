@@ -11,7 +11,7 @@ import org.multiverse.api.functions.Functions;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
 
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
@@ -74,7 +74,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         otherTx.openForRead(ref, LOCKMODE_COMMIT);
@@ -95,7 +95,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
         tx.prepare();
 
@@ -114,7 +114,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
         tx.prepare();
 
         assertIsPrepared(tx);
@@ -131,7 +131,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_UPDATE);
+        BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_UPDATE);
         tranlocal.value++;
         tx.prepare();
 
@@ -167,7 +167,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
@@ -200,7 +200,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
@@ -226,7 +226,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
     public void whenOnlyConstructed() {
         BetaTransaction tx = newTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal constructed = tx.openForConstruction(ref);
+        BetaLongRefTranlocal constructed = tx.openForConstruction(ref);
         tx.prepare();
 
         assertFalse(constructed.isReadonly());
@@ -243,7 +243,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
 
         ref.atomicIncrementAndGet(1);
@@ -271,11 +271,11 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         BetaLongRef ref3 = newLongRef(stm);
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write1 = tx.openForWrite(ref1, LOCKMODE_NONE);
+        BetaLongRefTranlocal write1 = tx.openForWrite(ref1, LOCKMODE_NONE);
         write1.value++;
-        LongRefTranlocal write2 = tx.openForWrite(ref2, LOCKMODE_NONE);
+        BetaLongRefTranlocal write2 = tx.openForWrite(ref2, LOCKMODE_NONE);
         write2.value++;
-        LongRefTranlocal write3 = tx.openForWrite(ref3, LOCKMODE_NONE);
+        BetaLongRefTranlocal write3 = tx.openForWrite(ref3, LOCKMODE_NONE);
         write3.value++;
         tx.prepare();
 
@@ -325,7 +325,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         tx.commute(ref, Functions.newIncLongFunction(1));
         tx.prepare();
 
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
 
         assertNotNull(tranlocal);
         assertEquals(3, tranlocal.value);
@@ -355,9 +355,9 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         tx.commute(ref3, Functions.newIncLongFunction(1));
         tx.prepare();
 
-        LongRefTranlocal commute1 = (LongRefTranlocal) tx.get(ref1);
-        LongRefTranlocal commute2 = (LongRefTranlocal) tx.get(ref2);
-        LongRefTranlocal commute3 = (LongRefTranlocal) tx.get(ref3);
+        BetaLongRefTranlocal commute1 = (BetaLongRefTranlocal) tx.get(ref1);
+        BetaLongRefTranlocal commute2 = (BetaLongRefTranlocal) tx.get(ref2);
+        BetaLongRefTranlocal commute3 = (BetaLongRefTranlocal) tx.get(ref3);
 
         assertNotNull(commute1);
         assertEquals(11, commute1.value);
@@ -380,7 +380,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         tx.commute(ref, newIncLongFunction(1));
         tx.prepare();
 
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
 
         assertNotNull(tranlocal);
         assertEquals(1, tranlocal.value);
@@ -409,7 +409,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         tx.commute(ref, newIncLongFunction(1));
         tx.prepare();
 
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
 
         assertNotNull(tranlocal);
         assertEquals(1, tranlocal.value);
@@ -468,7 +468,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
 
         tx.prepare();
 
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
 
         assertNotNull(tranlocal);
         assertEquals(2, tranlocal.value);
@@ -706,7 +706,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
         tx.prepare();
 

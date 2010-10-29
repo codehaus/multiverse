@@ -8,7 +8,7 @@ import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -244,7 +244,7 @@ public abstract class BetaTransaction_abortTest {
     public void locking_whenHasConstructed_thenRemainLocked() {
         BetaTransaction tx = newTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal write = tx.openForConstruction(ref);
+        BetaLongRefTranlocal write = tx.openForConstruction(ref);
         tx.abort();
 
         assertIsAborted(tx);

@@ -1,27 +1,26 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.functions.*;
-import org.multiverse.api.predicates.*;
-import org.multiverse.stms.beta.*;
+import org.multiverse.api.exceptions.ReadWriteConflict;
+import org.multiverse.api.functions.Function;
+import org.multiverse.api.functions.IntFunction;
+import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 
 
 /**
- * The {@link Tranlocal} for the {@link BetaIntRef).
+ * The {@link BetaTranlocal} for the {@link BetaIntRef).
  *
  * This class is generated.
  *
  * @author Peter Veentjer
  */
-public final class IntRefTranlocal extends Tranlocal{
+public final class BetaIntRefTranlocal extends BetaTranlocal{
 
     public int value;
     public int oldValue;
-    public IntPredicate[] validators;
 
-    public IntRefTranlocal(BetaIntRef ref){
+    public BetaIntRefTranlocal(BetaIntRef ref){
         super(ref);
     }
 
@@ -30,52 +29,52 @@ public final class IntRefTranlocal extends Tranlocal{
             throw tx.abortOpenForRead(owner);
         }
 
-        if (isConstructing()) {
-            return;
-        }
-
         final BetaTransactionConfiguration config = tx.config;
 
         desiredLockMode = desiredLockMode >= config.readLockMode
-                ? desiredLockMode
-                : config.readLockMode;
+             ? desiredLockMode
+             : config.readLockMode;
 
-        if (isNew()) {
-            BetaIntRef o = (BetaIntRef)owner;
+        switch(status){
+            case STATUS_CONSTRUCTING:
+                return;
+            case STATUS_NEW: {
+                 BetaIntRef o = (BetaIntRef)owner;
 
-            final boolean loadSuccess = o.___load(
-                config.spinCount, tx, desiredLockMode, this);
+                final boolean loadSuccess = o.___load(
+                    config.spinCount, tx, desiredLockMode, this);
 
-            if (!loadSuccess) {
-                tx.abort();
-                throw ReadWriteConflict.INSTANCE;
+                if (!loadSuccess) {
+                    tx.abort();
+                    throw ReadWriteConflict.INSTANCE;
+                }
+
+                setStatus(STATUS_READONLY);
+                setIgnore(desiredLockMode == LOCKMODE_NONE && !hasDepartObligation());
+                return;
             }
-
-            setStatus(STATUS_READONLY);
-            setIgnore(desiredLockMode == LOCKMODE_NONE && !hasDepartObligation());
-            return;
-        }
-
-        if (isCommuting()) {
-            final boolean loadSuccess = ((BetaIntRef)owner).___load(
+            case STATUS_COMMUTING: {
+                final boolean loadSuccess = ((BetaIntRef)owner).___load(
                 config.spinCount, tx, LOCKMODE_COMMIT, this);
 
-            if (!loadSuccess) {
-                tx.abort();
-                throw ReadWriteConflict.INSTANCE;
+                if (!loadSuccess) {
+                    tx.abort();
+                    throw ReadWriteConflict.INSTANCE;
+                }
+
+                evaluateCommutingFunctions(tx.pool);
+                return;
             }
+            default:{
+                if (getLockMode() < desiredLockMode) {
+                    boolean loadSuccess = owner.___tryLockAndCheckConflict(
+                        tx, config.spinCount, this, desiredLockMode == LOCKMODE_COMMIT);
 
-            evaluateCommutingFunctions(tx.pool);
-            return;
-        }
-
-        if (getLockMode() < desiredLockMode) {
-            boolean loadSuccess = owner.___tryLockAndCheckConflict(
-                    tx, config.spinCount, this, desiredLockMode == LOCKMODE_COMMIT);
-
-            if (!loadSuccess) {
-                tx.abort();
-                throw ReadWriteConflict.INSTANCE;
+                    if (!loadSuccess) {
+                        tx.abort();
+                        throw ReadWriteConflict.INSTANCE;
+                    }
+                }
             }
         }
     }

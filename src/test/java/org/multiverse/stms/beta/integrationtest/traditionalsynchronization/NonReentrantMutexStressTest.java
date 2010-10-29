@@ -9,7 +9,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
-import org.multiverse.stms.beta.transactionalobjects.IntRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertEquals;
@@ -135,12 +135,12 @@ public class NonReentrantMutexStressTest {
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
 
-                IntRefTranlocal read = btx.openForRead(locked, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
+                BetaIntRefTranlocal read = btx.openForRead(locked, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
                 if (read.value == 1) {
                     retry();
                 }
 
-                IntRefTranlocal write = btx.openForWrite(locked, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
+                BetaIntRefTranlocal write = btx.openForWrite(locked, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
                 write.value = 1;
             }
         };
@@ -150,7 +150,7 @@ public class NonReentrantMutexStressTest {
             public void execute(Transaction tx) throws Exception {
                 BetaTransaction btx = (BetaTransaction) tx;
 
-                IntRefTranlocal write = btx.openForWrite(locked, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
+                BetaIntRefTranlocal write = btx.openForWrite(locked, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
                 if (write.value == 0) {
                     throw new IllegalStateException();
                 }

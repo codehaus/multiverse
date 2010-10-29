@@ -134,7 +134,7 @@ public final class BetaObjectPool {
 #end
 #end
 
-    public Tranlocal take(final BetaTransactionalObject owner) {
+    public BetaTranlocal take(final BetaTransactionalObject owner) {
         if (owner == null) {
             throw new NullPointerException();
         }
@@ -163,7 +163,7 @@ public final class BetaObjectPool {
             return owner.___newTranlocal();
         }
 
-        Tranlocal tranlocal = pool.tranlocals[pool.lastUsed];
+        BetaTranlocal tranlocal = pool.tranlocals[pool.lastUsed];
         tranlocal.owner = owner;
         pool.tranlocals[pool.lastUsed] = null;
         pool.lastUsed--;
@@ -171,10 +171,10 @@ public final class BetaObjectPool {
     }
 
     /**
-     * Puts a Tranlocal in the pool.
+     * Puts a BetaTranlocal in the pool.
      *
      */
-    public void put(final Tranlocal tranlocal) {
+    public void put(final BetaTranlocal tranlocal) {
         if (!tranlocalPoolingEnabled || tranlocal == null) {
             return;
         }
@@ -219,18 +219,18 @@ public final class BetaObjectPool {
 
     static class TranlocalPool{
         int lastUsed = -1;
-        Tranlocal[] tranlocals = new Tranlocal[100];
+        BetaTranlocal[] tranlocals = new BetaTranlocal[100];
     }
 
-    private Tranlocal[][] tranlocalArrayPool = new Tranlocal[8193][];
+    private BetaTranlocal[][] tranlocalArrayPool = new BetaTranlocal[8193][];
 
     /**
-     * Puts a Tranlocal array in the pool.
+     * Puts a BetaTranlocal array in the pool.
      *
-     * @param array the Tranlocal array to put in the pool.
+     * @param array the BetaTranlocal array to put in the pool.
      * @throws NullPointerException is array is null.
      */
-    public void putTranlocalArray(final Tranlocal[] array){
+    public void putTranlocalArray(final BetaTranlocal[] array){
         if(array == null){
             throw new NullPointerException();
         }
@@ -261,29 +261,29 @@ public final class BetaObjectPool {
      * Takes a tranlocal array from the pool with the given size.
      *
      * @param size the size of the array to take
-     * @return the Tranlocal array taken from the pool, or null if none available.
+     * @return the BetaTranlocal array taken from the pool, or null if none available.
      * @throws IllegalArgumentException if size smaller than 0.
      */
-    public Tranlocal[] takeTranlocalArray(final int size){
+    public BetaTranlocal[] takeTranlocalArray(final int size){
         if(size<0){
             throw new IllegalArgumentException();
         }
 
         if(!tranlocalArrayPoolingEnabled){
-            return new Tranlocal[size];
+            return new BetaTranlocal[size];
         }
 
         int index = size;
 
         if(index >= tranlocalArrayPool.length){
-            return new Tranlocal[size];
+            return new BetaTranlocal[size];
         }
 
         if(tranlocalArrayPool[index]==null){
-            return new Tranlocal[size];
+            return new BetaTranlocal[size];
         }
 
-        Tranlocal[] array = tranlocalArrayPool[index];
+        BetaTranlocal[] array = tranlocalArrayPool[index];
         tranlocalArrayPool[index]=null;
         return array;
     }

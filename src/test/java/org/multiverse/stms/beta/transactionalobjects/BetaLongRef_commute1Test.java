@@ -36,7 +36,7 @@ public class BetaLongRef_commute1Test {
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
-        LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal commuting = (BetaLongRefTranlocal) tx.get(ref);
         assertNotNull(commuting);
         assertTrue(commuting.isCommuting());
         assertFalse(commuting.isReadonly());
@@ -63,7 +63,7 @@ public class BetaLongRef_commute1Test {
         LongFunction function = Functions.newIdentityLongFunction();
         ref.commute(function);
 
-        LongRefTranlocal commuting = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal commuting = (BetaLongRefTranlocal) tx.get(ref);
         assertNotNull(commuting);
         assertTrue(commuting.isCommuting());
         assertFalse(commuting.isReadonly());
@@ -212,7 +212,7 @@ public class BetaLongRef_commute1Test {
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         assertNotNull(tranlocal);
         assertFalse(tranlocal.isCommuting());
         assertEquals(3, tranlocal.value);
@@ -241,7 +241,7 @@ public class BetaLongRef_commute1Test {
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         assertNotNull(tranlocal);
         assertFalse(tranlocal.isCommuting());
         assertEquals(3, tranlocal.value);
@@ -273,7 +273,7 @@ public class BetaLongRef_commute1Test {
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         assertNotNull(tranlocal);
         assertTrue(tranlocal.isCommuting());
         assertHasCommutingFunctions(tranlocal, function);
@@ -308,7 +308,7 @@ public class BetaLongRef_commute1Test {
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
-        LongRefTranlocal tranlocal = (LongRefTranlocal) tx.get(ref);
+        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         assertNotNull(tranlocal);
         assertTrue(tranlocal.isCommuting());
         assertHasCommutingFunctions(tranlocal, function);

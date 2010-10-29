@@ -35,7 +35,7 @@ public abstract class VeryAbstractBetaTransactionalObject
 
     //This field has a controlled JMM problem (just like the hashcode of String).
     protected int ___identityHashCode;
-    protected final BetaStm ___stm;
+    public final BetaStm ___stm;
 
     public VeryAbstractBetaTransactionalObject(BetaStm stm) {
         if (stm == null) {
@@ -81,7 +81,7 @@ public abstract class VeryAbstractBetaTransactionalObject
     @Override
     public final int ___registerChangeListener(
             final RetryLatch latch,
-            final Tranlocal tranlocal,
+            final BetaTranlocal tranlocal,
             final BetaObjectPool pool,
             final long listenerEra) {
 
@@ -164,7 +164,7 @@ public abstract class VeryAbstractBetaTransactionalObject
     public final boolean ___tryLockAndCheckConflict(
             final BetaTransaction newLockOwner,
             final int spinCount,
-            final Tranlocal tranlocal,
+            final BetaTranlocal tranlocal,
             final boolean commitLock) {
 
         final int currentLockMode = tranlocal.getLockMode();
@@ -206,7 +206,7 @@ public abstract class VeryAbstractBetaTransactionalObject
     }
 
     @Override
-    public final boolean ___hasReadConflict(final Tranlocal tranlocal) {
+    public final boolean ___hasReadConflict(final BetaTranlocal tranlocal) {
         if (tranlocal.getLockMode() != LOCKMODE_NONE) {
             return false;
         }
@@ -249,7 +249,7 @@ public abstract class VeryAbstractBetaTransactionalObject
             throw new NullPointerException();
         }
 
-        final Tranlocal tranlocal = tx.locate(this);
+        final BetaTranlocal tranlocal = tx.locate(this);
         return tranlocal != null && tranlocal.getLockMode() == LOCKMODE_COMMIT;
     }
 
@@ -274,7 +274,7 @@ public abstract class VeryAbstractBetaTransactionalObject
             throw new NullPointerException();
         }
 
-        final Tranlocal tranlocal = tx.locate(this);
+        final BetaTranlocal tranlocal = tx.locate(this);
 
         if (!___hasCommitLock()) {
             return false;
@@ -309,7 +309,7 @@ public abstract class VeryAbstractBetaTransactionalObject
             throw new NullPointerException();
         }
 
-        final Tranlocal tranlocal = tx.locate(this);
+        final BetaTranlocal tranlocal = tx.locate(this);
         return tranlocal != null && tranlocal.getLockMode() == LOCKMODE_UPDATE;
     }
 
@@ -334,7 +334,7 @@ public abstract class VeryAbstractBetaTransactionalObject
             throw new NullPointerException();
         }
 
-        final Tranlocal tranlocal = tx.locate(this);
+        final BetaTranlocal tranlocal = tx.locate(this);
 
         if (!___hasUpdateLock()) {
             return false;

@@ -35,7 +35,7 @@ public class BetaRef_awaitNull0Test {
         setThreadLocalTransaction(tx);
         ref.awaitNull();
 
-        RefTranlocal tranlocal = (RefTranlocal) tx.get(ref);
+        BetaRefTranlocal tranlocal = (BetaRefTranlocal) tx.get(ref);
         assertTrue(tranlocal.isReadonly());
         assertTranlocalHasNoLock(tranlocal);
         assertRefHasNoLocks(ref);
@@ -81,7 +81,7 @@ public class BetaRef_awaitNull0Test {
         setThreadLocalTransaction(tx);
         ref.awaitNull();
 
-        RefTranlocal tranlocal = (RefTranlocal) tx.get(ref);
+        BetaRefTranlocal tranlocal = (BetaRefTranlocal) tx.get(ref);
         assertTrue(tranlocal.isReadonly());
         assertTranlocalHasNoLock(tranlocal);
         assertRefHasUpdateLock(ref, otherTx);

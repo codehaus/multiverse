@@ -9,8 +9,8 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRefTranlocal;
 import org.multiverse.stms.beta.transactionalobjects.BetaRef;
-import org.multiverse.stms.beta.transactionalobjects.IntRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -75,8 +75,8 @@ public class ImprovedBlockingQueue<E> implements BetaStmConstants {
         @Override
         public void execute(Transaction tx) throws Exception {
             BetaTransaction btx = (BetaTransaction) tx;
-            IntRefTranlocal head = btx.openForWrite(headIndex, LOCKMODE_NONE);
-            IntRefTranlocal tail = btx.openForRead(tailIndex, LOCKMODE_NONE);
+            BetaIntRefTranlocal head = btx.openForWrite(headIndex, LOCKMODE_NONE);
+            BetaIntRefTranlocal tail = btx.openForRead(tailIndex, LOCKMODE_NONE);
 
 
             if (head.value == tail.value - 1) {
@@ -103,9 +103,9 @@ public class ImprovedBlockingQueue<E> implements BetaStmConstants {
         public E execute(Transaction tx) throws Exception {
             BetaTransaction btx = (BetaTransaction) tx;
 
-            IntRefTranlocal head = btx.openForRead(headIndex, LOCKMODE_NONE);
+            BetaIntRefTranlocal head = btx.openForRead(headIndex, LOCKMODE_NONE);
 
-            IntRefTranlocal tail = btx.openForWrite(tailIndex, LOCKMODE_NONE);
+            BetaIntRefTranlocal tail = btx.openForWrite(tailIndex, LOCKMODE_NONE);
 
             if (head.value == tail.value) {
                 retry();

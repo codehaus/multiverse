@@ -7,7 +7,7 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
 
@@ -97,7 +97,7 @@ public class AccountBenchmark implements BetaStmConstants {
         //System.out.printf("Multiverse> Pooled percentage %s\n", percentage);
 
         //long expected = transactionCount * threadCount * 2;
-        //double x = (100f * Tranlocal.created.get()) / expected;
+        //double x = (100f * BetaTranlocal.created.get()) / expected;
         //System.out.printf("Created real percentage %s\n", x);
     }
 
@@ -141,7 +141,7 @@ public class AccountBenchmark implements BetaStmConstants {
                     BetaTransaction btx = (BetaTransaction) tx;
                     for (int k = 0; k < accounts.length; k++) {
                         BetaLongRef account = accounts[k];
-                        LongRefTranlocal tranlocal = btx.openForWrite(account, LOCKMODE_NONE);
+                        BetaLongRefTranlocal tranlocal = btx.openForWrite(account, LOCKMODE_NONE);
                         tranlocal.value = Math.round(tranlocal.value * rate);
                     }
                 }
@@ -157,7 +157,7 @@ public class AccountBenchmark implements BetaStmConstants {
                     BetaTransaction btx = (BetaTransaction) tx;
                     long sum = 0;
                     for (int k = 0; k < accounts.length; k++) {
-                        LongRefTranlocal tranlocal = btx.openForWrite(accounts[k], LOCKMODE_NONE);
+                        BetaLongRefTranlocal tranlocal = btx.openForWrite(accounts[k], LOCKMODE_NONE);
                         sum += tranlocal.value;
                     }
                 }
@@ -176,8 +176,8 @@ public class AccountBenchmark implements BetaStmConstants {
                     BetaLongRef from = accounts[random.nextInt(accountCount)];
                     BetaLongRef to = accounts[random.nextInt(accountCount)];
 
-                    LongRefTranlocal fromTranlocal = btx.openForWrite(from, LOCKMODE_COMMIT);
-                    LongRefTranlocal toTranlocal = btx.openForWrite(to, LOCKMODE_COMMIT);
+                    BetaLongRefTranlocal fromTranlocal = btx.openForWrite(from, LOCKMODE_COMMIT);
+                    BetaLongRefTranlocal toTranlocal = btx.openForWrite(to, LOCKMODE_COMMIT);
 
                     //if (fromTranlocal.value < amount) {
                     //throw OverdraftException.INSTANCE;

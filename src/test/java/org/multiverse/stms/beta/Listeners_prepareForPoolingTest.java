@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
 
 import static org.junit.Assert.*;
 import static org.multiverse.stms.beta.BetaStmTestUtils.assertTranlocalHasNoLock;
@@ -23,7 +23,7 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     @Test
     public void whenCommuting() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.setStatus(STATUS_COMMUTING);
         tranlocal.addCommutingFunction(Functions.newDecLongFunction(), pool);
 
@@ -35,7 +35,7 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     @Test
     public void whenReadonly() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.value = 100;
         tranlocal.oldValue = 100;
         tranlocal.version = 10;
@@ -49,7 +49,7 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     @Test
     public void whenUpdateWithoutDirtyFlag() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.value = 100;
         tranlocal.oldValue = 100;
         tranlocal.version = 10;
@@ -62,7 +62,7 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     @Test
     public void whenUpdateWithDirtyFlag() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
         //todo: setUpdate
         tranlocal.setDirty(true);
         tranlocal.value = 100;
@@ -77,7 +77,7 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     @Test
     public void whenHasCommitLock() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.value = 100;
         tranlocal.oldValue = 100;
@@ -91,7 +91,7 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     @Test
     public void whenHasUpdateLock() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.setLockMode(LOCKMODE_UPDATE);
         tranlocal.value = 100;
         tranlocal.oldValue = 100;
@@ -106,7 +106,7 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     @Test
     public void whenConstructed() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.value = 100;
@@ -120,7 +120,7 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     @Test
     public void whenHasDepartObligation() {
         BetaLongRef ref = newLongRef(stm);
-        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.setDepartObligation(true);
         tranlocal.value = 100;
         tranlocal.oldValue = 0;
@@ -130,7 +130,7 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
         assertCleared(tranlocal);
     }
 
-    private void assertCleared(LongRefTranlocal tranlocal) {
+    private void assertCleared(BetaLongRefTranlocal tranlocal) {
         assertEquals(0, tranlocal.version);
         assertEquals(0, tranlocal.value);
         assertEquals(0, tranlocal.oldValue);

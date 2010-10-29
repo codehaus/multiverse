@@ -15,7 +15,7 @@ import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -60,7 +60,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     public void whenConstructed() {
         BetaTransaction tx = newTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
-        LongRefTranlocal tranlocal = tx.openForConstruction(ref);
+        BetaLongRefTranlocal tranlocal = tx.openForConstruction(ref);
         tranlocal.value++;
         tx.commit();
 
@@ -117,7 +117,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         System.out.println("ref.orec: " + ref.___toOrecString());
         BetaTransaction tx = newTransaction();
         System.out.println("ref.orec: " + ref.___toOrecString());
-        LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         System.out.println("ref.orec: " + ref.___toOrecString());
         tranlocal.value++;
         System.out.println("ref.orec: " + ref.___toOrecString());
@@ -276,7 +276,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tranlocal.value++;
         tx.commit();
 
@@ -336,7 +336,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, refs.length);
         BetaTransaction tx = newTransaction(config);
         for (BetaLongRef ref : refs) {
-            LongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
+            BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
             tranlocal.value++;
         }
         tx.commit();
@@ -777,9 +777,9 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
 
         BetaTransaction tx = newTransaction();
         for (int k = 0; k < 100; k++) {
-            LongRefTranlocal tranlocal1 = tx.openForWrite(ref1, LOCKMODE_NONE);
+            BetaLongRefTranlocal tranlocal1 = tx.openForWrite(ref1, LOCKMODE_NONE);
             tranlocal1.value++;
-            LongRefTranlocal tranlocal2 = tx.openForWrite(ref2, LOCKMODE_NONE);
+            BetaLongRefTranlocal tranlocal2 = tx.openForWrite(ref2, LOCKMODE_NONE);
             tranlocal2.value++;
             tx.commit();
             tx.hardReset();
@@ -916,7 +916,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
         tx.commit();
 
         assertIsCommitted(tx);
@@ -934,7 +934,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
@@ -989,7 +989,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        LongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
         write.value++;
         tx.prepare();
 

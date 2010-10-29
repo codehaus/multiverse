@@ -4,8 +4,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
-import org.multiverse.stms.beta.transactionalobjects.Tranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertFalse;
@@ -26,7 +26,7 @@ public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants {
     public void whenConstructed() {
         BetaTransaction tx = stm.startDefaultTransaction();
         BetaLongRef ref = new BetaLongRef(tx);
-        Tranlocal tranlocal = ref.___newTranlocal();
+        BetaTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.setDirty(true);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
 
@@ -38,7 +38,7 @@ public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants {
     @Ignore
     public void whenCommuting() {
         BetaLongRef ref = new BetaLongRef(stm, 0);
-        Tranlocal tranlocal = ref.___newTranlocal();
+        BetaTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.setStatus(STATUS_COMMUTING);
 
         assertFalse(tranlocal.calculateIsDirty());
@@ -48,7 +48,7 @@ public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants {
     @Test
     public void whenReadonly() {
         BetaLongRef ref = new BetaLongRef(stm, 0);
-        Tranlocal tranlocal = ref.___newTranlocal();
+        BetaTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.setStatus(STATUS_READONLY);
 
         assertFalse(tranlocal.calculateIsDirty());
@@ -58,7 +58,7 @@ public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants {
     @Test
     public void whenNotDirty() {
         BetaLongRef ref = new BetaLongRef(stm, 0);
-        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.value = 10;
         tranlocal.oldValue = 10;
 
@@ -69,7 +69,7 @@ public class Tranlocal_calculateIsDirtyTest implements BetaStmConstants {
     @Test
     public void whenDirty() {
         BetaLongRef ref = new BetaLongRef(stm, 0);
-        LongRefTranlocal tranlocal = ref.___newTranlocal();
+        BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
         tranlocal.value = 10;
         tranlocal.oldValue = 5;
 
