@@ -63,6 +63,11 @@ public abstract class BetaTransaction_readTest {
 
     }
 
+    @Test
+    @Ignore
+    public void whenAlreadyCommuting(){
+
+    }
 
     @Test
     @Ignore
