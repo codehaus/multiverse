@@ -94,7 +94,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         if(ref == null){
-            throw abortReadOnNulll();
+            throw abortReadOnNull();
         }
 
         if(ref.getStm()!=config.stm){
@@ -104,7 +104,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         final int index = indexOf(ref);
         if(index != -1){
             ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})array[index];
-            tranlocal.openForRead();
+            tranlocal.openForRead(config.readLockMode);
             return tranlocal.value;
         }
 

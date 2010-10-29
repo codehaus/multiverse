@@ -8,9 +8,10 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
+import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
 public abstract class BetaTransaction_readTest {
 
@@ -53,19 +54,29 @@ public abstract class BetaTransaction_readTest {
 
     @Test
     @Ignore
-    public void readCommittedIsolationLevel(){
+    public void readCommittedIsolationLevel() {
 
     }
 
     @Test
-    @Ignore
     public void whenAlreadyOpenedForWrite() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.set(tx, initialValue+1);
+
+        long value = tx.read(ref);
+
+        assertEquals(initialValue+1, value);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertRefHasUpdateLock(ref, tx);
     }
 
     @Test
     @Ignore
-    public void whenAlreadyCommuting(){
+    public void whenAlreadyCommuting() {
 
     }
 
@@ -82,20 +93,40 @@ public abstract class BetaTransaction_readTest {
     }
 
     @Test
-    @Ignore
     public void whenEnsuredBySelf() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.ensure(tx);
+
+        long value = tx.read(ref);
+
+        assertEquals(initialValue, value);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertRefHasUpdateLock(ref, tx);
     }
 
     @Test
-    @Ignore
     public void whenPrivatizedBySelf() {
+        long initialValue = 10;
+        BetaLongRef ref = newLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
+        BetaTransaction tx = stm.startDefaultTransaction();
+        ref.privatize(tx);
+
+        long value = tx.read(ref);
+
+        assertEquals(initialValue, value);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertRefHasCommitLock(ref, tx);
     }
 
     @Test
     public void whenStmMismatch() {
-        BetaLongRef ref = new BetaLongRef(new BetaStm());
+        BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = newTransaction();
         try {

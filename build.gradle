@@ -86,6 +86,14 @@ allprojects {
   }
 }
 
+task generate{
+	System.out.println("Starting groovy script")
+	new GroovyShell().run(file('generate.groovy'))
+	System.out.println("Finished groovy script")
+}
+
+ 
+
 project(':multiverse') {
 
   configurations {

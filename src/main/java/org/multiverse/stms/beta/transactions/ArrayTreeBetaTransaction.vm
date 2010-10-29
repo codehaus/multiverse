@@ -89,6 +89,27 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #foreach($ref in $transactionalObjects)
 #if(${ref.isReference})
     public final ${ref.typeParameter} ${ref.type} read(${ref.name}${ref.typeParameter} ref){
+        if (status != ACTIVE) {
+            throw abortRead(ref);
+        }
+
+        if(ref == null){
+            throw abortReadOnNull();
+        }
+
+        if(ref.getStm()!=config.stm){
+            throw abortReadOnStmMismatch(ref);
+        }
+
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = indexOf(ref, identityHashCode);
+
+        if(index != -1){
+            ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})array[index];
+            tranlocal.openForRead(config.readLockMode);
+            return tranlocal.value;
+        }
+
         throw new TodoException();
     }
 

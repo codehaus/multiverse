@@ -1,9 +1,8 @@
 package org.multiverse.api.references;
 
-import org.multiverse.api.Transaction;
-import org.multiverse.api.TransactionalObject;
-import org.multiverse.api.functions.BooleanFunction;
-import org.multiverse.api.predicates.BooleanPredicate;
+import org.multiverse.api.*;
+import org.multiverse.api.functions.*;
+import org.multiverse.api.predicates.*;
 
 /**
  * A Transactional Reference comparable to the <a href="http://clojure.org/refs">Clojure Ref</a>.

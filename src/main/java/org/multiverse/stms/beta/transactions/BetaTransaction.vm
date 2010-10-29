@@ -175,7 +175,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
             config.familyName));
     }
 
-    public final StmMismatchException abortReadOnStmMismatch(BetaTransactionalObject owner){
+    public final StmMismatchException abortReadOnStmMismatch(BetaTransactionalObject ref){
         abort();
         return new StmMismatchException(
             format("[%s] Failed to execute Transaction.read, reason: The transaction belongs to a different stm than the stm that created ref '%s'",
@@ -583,14 +583,13 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     public abstract void init(BetaTransactionConfiguration transactionConfig);
 
     public abstract boolean tryLock(BetaTransactionalObject ref, int lockMode);
-    
+
 #foreach($ref in $transactionalObjects)
 
 #if(${ref.isReference})
     public abstract ${ref.typeParameter} ${ref.type} read(${ref.name}${ref.typeParameter} ref);
 
 #end
-
     public abstract ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} open(${ref.name}${ref.typeParameter} ref);
 
     public abstract ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForRead(${ref.name}${ref.typeParameter} ref, int lockMode);

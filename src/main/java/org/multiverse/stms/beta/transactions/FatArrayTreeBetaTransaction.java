@@ -1,16 +1,17 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.multiverse.api.blocking.DefaultRetryLatch;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.Retry;
-import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.api.functions.*;
-import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.Listeners;
-import org.multiverse.stms.beta.conflictcounters.LocalConflictCounter;
-import org.multiverse.stms.beta.transactionalobjects.*;
+import java.util.*;
 
+import org.multiverse.api.*;
+import org.multiverse.api.blocking.*;
+import org.multiverse.api.exceptions.*;
+import org.multiverse.api.functions.*;
+import org.multiverse.api.lifecycle.*;
+import org.multiverse.stms.beta.*;
+import org.multiverse.stms.beta.transactionalobjects.*;
+import org.multiverse.stms.beta.conflictcounters.*;
+
+import java.util.concurrent.atomic.AtomicLong;
 import static java.lang.String.format;
 
 
@@ -84,6 +85,27 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
     }
 
     public final <E> E read(BetaRef<E> ref){
+        if (status != ACTIVE) {
+            throw abortRead(ref);
+        }
+
+        if(ref == null){
+            throw abortReadOnNull();
+        }
+
+        if(ref.getStm()!=config.stm){
+            throw abortReadOnStmMismatch(ref);
+        }
+
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = indexOf(ref, identityHashCode);
+
+        if(index != -1){
+            RefTranlocal<E> tranlocal = (RefTranlocal<E>)array[index];
+            tranlocal.openForRead(config.readLockMode);
+            return tranlocal.value;
+        }
+
         throw new TodoException();
     }
 
@@ -377,6 +399,27 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
      }
 
     public final  int read(BetaIntRef ref){
+        if (status != ACTIVE) {
+            throw abortRead(ref);
+        }
+
+        if(ref == null){
+            throw abortReadOnNull();
+        }
+
+        if(ref.getStm()!=config.stm){
+            throw abortReadOnStmMismatch(ref);
+        }
+
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = indexOf(ref, identityHashCode);
+
+        if(index != -1){
+            IntRefTranlocal tranlocal = (IntRefTranlocal)array[index];
+            tranlocal.openForRead(config.readLockMode);
+            return tranlocal.value;
+        }
+
         throw new TodoException();
     }
 
@@ -670,6 +713,27 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
      }
 
     public final  boolean read(BetaBooleanRef ref){
+        if (status != ACTIVE) {
+            throw abortRead(ref);
+        }
+
+        if(ref == null){
+            throw abortReadOnNull();
+        }
+
+        if(ref.getStm()!=config.stm){
+            throw abortReadOnStmMismatch(ref);
+        }
+
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = indexOf(ref, identityHashCode);
+
+        if(index != -1){
+            BooleanRefTranlocal tranlocal = (BooleanRefTranlocal)array[index];
+            tranlocal.openForRead(config.readLockMode);
+            return tranlocal.value;
+        }
+
         throw new TodoException();
     }
 
@@ -963,6 +1027,27 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
      }
 
     public final  double read(BetaDoubleRef ref){
+        if (status != ACTIVE) {
+            throw abortRead(ref);
+        }
+
+        if(ref == null){
+            throw abortReadOnNull();
+        }
+
+        if(ref.getStm()!=config.stm){
+            throw abortReadOnStmMismatch(ref);
+        }
+
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = indexOf(ref, identityHashCode);
+
+        if(index != -1){
+            DoubleRefTranlocal tranlocal = (DoubleRefTranlocal)array[index];
+            tranlocal.openForRead(config.readLockMode);
+            return tranlocal.value;
+        }
+
         throw new TodoException();
     }
 
@@ -1256,6 +1341,27 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
      }
 
     public final  long read(BetaLongRef ref){
+        if (status != ACTIVE) {
+            throw abortRead(ref);
+        }
+
+        if(ref == null){
+            throw abortReadOnNull();
+        }
+
+        if(ref.getStm()!=config.stm){
+            throw abortReadOnStmMismatch(ref);
+        }
+
+        final int identityHashCode = ref.___identityHashCode();
+        final int index = indexOf(ref, identityHashCode);
+
+        if(index != -1){
+            LongRefTranlocal tranlocal = (LongRefTranlocal)array[index];
+            tranlocal.openForRead(config.readLockMode);
+            return tranlocal.value;
+        }
+
         throw new TodoException();
     }
 

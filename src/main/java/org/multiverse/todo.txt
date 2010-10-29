@@ -177,7 +177,7 @@ performance.
 
 - automatic publication of javadoc on codehaus
 
-- introduce a debug setting that enabled exceptions 
+- introduce a debug setting that enabled exceptions
 
 todo
 
@@ -265,8 +265,10 @@ the task not being executed at all.
 - the retry should not block:
     makes testing harder
     resources are released too late.
-             
+
 done
+
+- generate script is now part of gradle script
 
 - cigarette smokers problem: assert count of cigarettes smoked
 
