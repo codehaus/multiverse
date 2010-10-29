@@ -37,9 +37,9 @@ public class CigaretteSmokersProblemStressTest {
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        tobaccoAvailable = newBooleanRef(false);
-        paperAvailable = newBooleanRef(false);
-        matchesAvailable = newBooleanRef(false);
+        tobaccoAvailable = newBooleanRef();
+        paperAvailable = newBooleanRef();
+        matchesAvailable = newBooleanRef();
         notifier = newRef();
         arbiterThread = new ArbiterThread();
         paperProvider = new SmokerThread("PaperProviderThread", tobaccoAvailable, matchesAvailable);

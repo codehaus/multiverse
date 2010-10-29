@@ -37,8 +37,6 @@ all operations like openForWrite/checkConflict/ensure etc.
 
 - actor atomic block, doesn't look at an existing transaction. Automatically exposes the onAbort/onCommit
 
-- non repeatable read?
-
 - on read/ on write function
     - stuff like encryption and security could be added through this general purpose mechanism
 

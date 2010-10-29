@@ -148,6 +148,40 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
         tranlocal.setIsConflictCheckNeeded(true);
     }
 
+    public final IllegalTransactionStateException abortRead(BetaTransactionalObject owner){
+        switch (status) {
+            case PREPARED:
+                abort();
+                return new PreparedTransactionException(
+                    format("[%s] Failed to execute BetaTransaction.read, reason: the transaction is prepared",
+                        config.familyName));
+            case ABORTED:
+                return new DeadTransactionException(
+                    format("[%s] Failed to execute BetaTransaction.read, reason: the transaction is aborted",
+                        config.familyName));
+            case COMMITTED:
+                return new DeadTransactionException(
+                    format("[%s] Failed to execute BetaTransaction.read, reason: the transaction is committed",
+                        config.familyName));
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+    public final NullPointerException abortReadOnNull(){
+        abort();
+        return new NullPointerException(
+        format("[%s] Failed to execute BetaTransaction.read, reason: the reference is null",
+            config.familyName));
+    }
+
+    public final StmMismatchException abortReadOnStmMismatch(BetaTransactionalObject owner){
+        abort();
+        return new StmMismatchException(
+            format("[%s] Failed to execute Transaction.read, reason: The transaction belongs to a different stm than the stm that created ref '%s'",
+                config.familyName, toDebugString(ref)));
+    }
+
     public final IllegalTransactionStateException abortLocate(BetaTransactionalObject owner){
          switch (status) {
             case PREPARED:
