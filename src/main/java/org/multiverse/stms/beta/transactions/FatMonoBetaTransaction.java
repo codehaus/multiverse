@@ -1,13 +1,15 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.multiverse.api.*;
-import org.multiverse.api.blocking.*;
-import org.multiverse.api.exceptions.*;
+import org.multiverse.api.blocking.DefaultRetryLatch;
+import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.*;
-import org.multiverse.api.lifecycle.*;
-import org.multiverse.stms.beta.*;
+import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
+import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.Listeners;
+import org.multiverse.stms.beta.conflictcounters.LocalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.*;
-import org.multiverse.stms.beta.conflictcounters.*;
 
 import static java.lang.String.format;
 
@@ -63,6 +65,24 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
     }
 
     public final <E> E read(BetaRef<E> ref){
+        if (status != ACTIVE) {
+            throw abortRead(ref);
+        }
+
+        if(ref == null){
+            throw abortReadOnNull();
+        }
+
+        if(ref.getStm()!=config.stm){
+            throw abortReadOnStmMismatch(ref);
+        }
+
+        if(attached!=null && attached.owner == ref){
+            RefTranlocal<E> tranlocal = (RefTranlocal<E>)attached;
+            tranlocal.openForRead(config.readLockMode);
+            return tranlocal.value;
+        }
+
         throw new TodoException();
     }
 
@@ -151,6 +171,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnReadConflict();
             }
 
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_READONLY);
 
             if(hasReadConflict()){
@@ -195,6 +216,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         RefTranlocal<E> tranlocal = pool.take(ref);
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
 
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
@@ -256,6 +278,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnReadConflict();
             }
 
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_UPDATE);
             hasUpdates = true;
             attached = tranlocal;
@@ -331,6 +354,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         tranlocal = pool.take(ref);
+        tranlocal.tx = this;
         tranlocal.setDirty(true);
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
@@ -368,6 +392,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
             //todo: call to 'openForCommute' can be inlined.
             RefTranlocal<E> tranlocal = pool.take(ref);
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_COMMUTING);
             tranlocal.addCommutingFunction(function, pool);
             attached = tranlocal;
@@ -390,6 +415,24 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
      }
 
     public final  int read(BetaIntRef ref){
+        if (status != ACTIVE) {
+            throw abortRead(ref);
+        }
+
+        if(ref == null){
+            throw abortReadOnNull();
+        }
+
+        if(ref.getStm()!=config.stm){
+            throw abortReadOnStmMismatch(ref);
+        }
+
+        if(attached!=null && attached.owner == ref){
+            IntRefTranlocal tranlocal = (IntRefTranlocal)attached;
+            tranlocal.openForRead(config.readLockMode);
+            return tranlocal.value;
+        }
+
         throw new TodoException();
     }
 
@@ -478,6 +521,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnReadConflict();
             }
 
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_READONLY);
 
             if(hasReadConflict()){
@@ -522,6 +566,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         IntRefTranlocal tranlocal = pool.take(ref);
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
 
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
@@ -583,6 +628,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnReadConflict();
             }
 
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_UPDATE);
             hasUpdates = true;
             attached = tranlocal;
@@ -658,6 +704,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         tranlocal = pool.take(ref);
+        tranlocal.tx = this;
         tranlocal.setDirty(true);
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
@@ -695,6 +742,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
             //todo: call to 'openForCommute' can be inlined.
             IntRefTranlocal tranlocal = pool.take(ref);
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_COMMUTING);
             tranlocal.addCommutingFunction(function, pool);
             attached = tranlocal;
@@ -717,6 +765,24 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
      }
 
     public final  boolean read(BetaBooleanRef ref){
+        if (status != ACTIVE) {
+            throw abortRead(ref);
+        }
+
+        if(ref == null){
+            throw abortReadOnNull();
+        }
+
+        if(ref.getStm()!=config.stm){
+            throw abortReadOnStmMismatch(ref);
+        }
+
+        if(attached!=null && attached.owner == ref){
+            BooleanRefTranlocal tranlocal = (BooleanRefTranlocal)attached;
+            tranlocal.openForRead(config.readLockMode);
+            return tranlocal.value;
+        }
+
         throw new TodoException();
     }
 
@@ -805,6 +871,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnReadConflict();
             }
 
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_READONLY);
 
             if(hasReadConflict()){
@@ -849,6 +916,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         BooleanRefTranlocal tranlocal = pool.take(ref);
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
 
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
@@ -910,6 +978,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnReadConflict();
             }
 
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_UPDATE);
             hasUpdates = true;
             attached = tranlocal;
@@ -985,6 +1054,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         tranlocal = pool.take(ref);
+        tranlocal.tx = this;
         tranlocal.setDirty(true);
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
@@ -1022,6 +1092,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
             //todo: call to 'openForCommute' can be inlined.
             BooleanRefTranlocal tranlocal = pool.take(ref);
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_COMMUTING);
             tranlocal.addCommutingFunction(function, pool);
             attached = tranlocal;
@@ -1044,6 +1115,24 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
      }
 
     public final  double read(BetaDoubleRef ref){
+        if (status != ACTIVE) {
+            throw abortRead(ref);
+        }
+
+        if(ref == null){
+            throw abortReadOnNull();
+        }
+
+        if(ref.getStm()!=config.stm){
+            throw abortReadOnStmMismatch(ref);
+        }
+
+        if(attached!=null && attached.owner == ref){
+            DoubleRefTranlocal tranlocal = (DoubleRefTranlocal)attached;
+            tranlocal.openForRead(config.readLockMode);
+            return tranlocal.value;
+        }
+
         throw new TodoException();
     }
 
@@ -1132,6 +1221,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnReadConflict();
             }
 
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_READONLY);
 
             if(hasReadConflict()){
@@ -1176,6 +1266,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         DoubleRefTranlocal tranlocal = pool.take(ref);
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
 
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
@@ -1237,6 +1328,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnReadConflict();
             }
 
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_UPDATE);
             hasUpdates = true;
             attached = tranlocal;
@@ -1312,6 +1404,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         tranlocal = pool.take(ref);
+        tranlocal.tx = this;
         tranlocal.setDirty(true);
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
@@ -1349,6 +1442,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
             //todo: call to 'openForCommute' can be inlined.
             DoubleRefTranlocal tranlocal = pool.take(ref);
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_COMMUTING);
             tranlocal.addCommutingFunction(function, pool);
             attached = tranlocal;
@@ -1371,6 +1465,24 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
      }
 
     public final  long read(BetaLongRef ref){
+        if (status != ACTIVE) {
+            throw abortRead(ref);
+        }
+
+        if(ref == null){
+            throw abortReadOnNull();
+        }
+
+        if(ref.getStm()!=config.stm){
+            throw abortReadOnStmMismatch(ref);
+        }
+
+        if(attached!=null && attached.owner == ref){
+            LongRefTranlocal tranlocal = (LongRefTranlocal)attached;
+            tranlocal.openForRead(config.readLockMode);
+            return tranlocal.value;
+        }
+
         throw new TodoException();
     }
 
@@ -1459,6 +1571,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnReadConflict();
             }
 
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_READONLY);
 
             if(hasReadConflict()){
@@ -1503,6 +1616,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         LongRefTranlocal tranlocal = pool.take(ref);
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
 
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
@@ -1564,6 +1678,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnReadConflict();
             }
 
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_UPDATE);
             hasUpdates = true;
             attached = tranlocal;
@@ -1639,6 +1754,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         tranlocal = pool.take(ref);
+        tranlocal.tx = this;
         tranlocal.setDirty(true);
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
@@ -1676,6 +1792,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
             //todo: call to 'openForCommute' can be inlined.
             LongRefTranlocal tranlocal = pool.take(ref);
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_COMMUTING);
             tranlocal.addCommutingFunction(function, pool);
             attached = tranlocal;
@@ -1782,6 +1899,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnReadConflict();
             }
 
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_READONLY);
 
             if(hasReadConflict()){
@@ -1826,6 +1944,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         Tranlocal tranlocal = pool.take(ref);
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
 
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
@@ -1887,6 +2006,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
                 throw abortOnReadConflict();
             }
 
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_UPDATE);
             hasUpdates = true;
             attached = tranlocal;
@@ -1962,6 +2082,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         tranlocal = pool.take(ref);
+        tranlocal.tx = this;
         tranlocal.setDirty(true);
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
@@ -1999,6 +2120,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
             //todo: call to 'openForCommute' can be inlined.
             Tranlocal tranlocal = pool.take(ref);
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_COMMUTING);
             tranlocal.addCommutingFunction(function, pool);
             attached = tranlocal;

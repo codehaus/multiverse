@@ -9,6 +9,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.LongRefTranlocal;
 
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
@@ -71,7 +72,7 @@ public abstract class BetaTransaction_readTest {
 
         assertEquals(initialValue+1, value);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertRefHasUpdateLock(ref, tx);
+        assertRefHasNoLocks(ref);
     }
 
     @Test
@@ -126,7 +127,10 @@ public abstract class BetaTransaction_readTest {
 
     @Test
     public void whenStmMismatch() {
-        BetaLongRef ref = newLongRef(stm);
+        long initialValue = 10;
+        BetaStm otherStm = new BetaStm();
+        BetaLongRef ref = newLongRef(otherStm,initialValue);
+        long initialVersion = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
         try {
@@ -137,6 +141,9 @@ public abstract class BetaTransaction_readTest {
         }
 
         assertIsAborted(tx);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertSame(otherStm, ref.getStm());
     }
 
     @Test

@@ -224,6 +224,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOnReadConflict();
         }
 
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
@@ -310,6 +311,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOnReadConflict();
         }
 
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_UPDATE);
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         hasUpdates = true;
@@ -357,6 +359,8 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         ${ref.tranlocal}${ref.typeParameter} tranlocal =  pool.take(ref);
+
+        tranlocal.tx = this;
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);

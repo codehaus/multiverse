@@ -75,6 +75,24 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 #foreach($ref in $transactionalObjects)
 #if(${ref.isReference})
     public final ${ref.typeParameter} ${ref.type} read(${ref.name}${ref.typeParameter} ref){
+        if (status != ACTIVE) {
+            throw abortRead(ref);
+        }
+
+        if(ref == null){
+            throw abortReadOnNull();
+        }
+
+        if(ref.getStm()!=config.stm){
+            throw abortReadOnStmMismatch(ref);
+        }
+
+        if(attached!=null && attached.owner == ref){
+            ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})attached;
+            tranlocal.openForRead(config.readLockMode);
+            return tranlocal.value;
+        }
+
         throw new TodoException();
     }
 
@@ -170,6 +188,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
                 throw abortOnReadConflict();
             }
 
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_READONLY);
 
 #if(!$transaction.lean)
@@ -224,6 +243,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
 #end
         ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
 
         if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
@@ -296,6 +316,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             }
 
 #end
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_UPDATE);
             hasUpdates = true;
             attached = tranlocal;
@@ -375,6 +396,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
         }
 
         tranlocal = pool.take(ref);
+        tranlocal.tx = this;
         tranlocal.setDirty(true);
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
@@ -417,6 +439,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
             //todo: call to 'openForCommute' can be inlined.
             ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
+            tranlocal.tx = this;
             tranlocal.setStatus(STATUS_COMMUTING);
             tranlocal.addCommutingFunction(function, pool);
             attached = tranlocal;

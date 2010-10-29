@@ -1,17 +1,16 @@
 package org.multiverse.stms.beta.transactions;
 
-import java.util.*;
-
-import org.multiverse.api.*;
-import org.multiverse.api.blocking.*;
-import org.multiverse.api.exceptions.*;
+import org.multiverse.api.blocking.DefaultRetryLatch;
+import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.exceptions.SpeculativeConfigurationError;
+import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.*;
-import org.multiverse.api.lifecycle.*;
-import org.multiverse.stms.beta.*;
+import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.Listeners;
+import org.multiverse.stms.beta.conflictcounters.LocalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.*;
-import org.multiverse.stms.beta.conflictcounters.*;
 
-import java.util.concurrent.atomic.AtomicLong;
 import static java.lang.String.format;
 
 
@@ -173,6 +172,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
@@ -248,6 +248,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_UPDATE);
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         hasUpdates = true;
@@ -289,6 +290,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         RefTranlocal<E> tranlocal =  pool.take(ref);
+
+        tranlocal.tx = this;
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
@@ -403,6 +406,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
@@ -478,6 +482,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_UPDATE);
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         hasUpdates = true;
@@ -519,6 +524,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         IntRefTranlocal tranlocal =  pool.take(ref);
+
+        tranlocal.tx = this;
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
@@ -633,6 +640,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
@@ -708,6 +716,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_UPDATE);
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         hasUpdates = true;
@@ -749,6 +758,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         BooleanRefTranlocal tranlocal =  pool.take(ref);
+
+        tranlocal.tx = this;
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
@@ -863,6 +874,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
@@ -938,6 +950,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_UPDATE);
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         hasUpdates = true;
@@ -979,6 +992,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         DoubleRefTranlocal tranlocal =  pool.take(ref);
+
+        tranlocal.tx = this;
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
@@ -1093,6 +1108,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
@@ -1168,6 +1184,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_UPDATE);
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         hasUpdates = true;
@@ -1209,6 +1226,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         LongRefTranlocal tranlocal =  pool.take(ref);
+
+        tranlocal.tx = this;
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
@@ -1298,6 +1317,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_READONLY);
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
 
@@ -1373,6 +1393,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnReadConflict();
         }
 
+        tranlocal.tx = this;
         tranlocal.setStatus(STATUS_UPDATE);
         tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
         hasUpdates = true;
@@ -1414,6 +1435,8 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         }
 
         Tranlocal tranlocal =  pool.take(ref);
+
+        tranlocal.tx = this;
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
