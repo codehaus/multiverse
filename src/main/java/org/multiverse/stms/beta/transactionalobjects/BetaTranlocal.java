@@ -119,73 +119,35 @@ public abstract class BetaTranlocal implements BetaStmConstants {
             throw tx.abortOpenForConstruction(owner);
         }
 
-        if (isConstructing()) {
-            return;
-        }
+        switch (status) {
+            case STATUS_NEW: {
+                if (tx.config.readonly) {
+                    throw tx.abortOpenForWriteWhenReadonly(owner);
+                }
 
-        if (!isNew()) {
-            //todo:
+                status = STATUS_CONSTRUCTING;
+                return;
+            }
+            case STATUS_CONSTRUCTING: {
+                return;
+            }
+            case STATUS_COMMUTING: {
+                throw new IllegalStateException();
+            }
+            case STATUS_UPDATE: {
+                throw new IllegalStateException();
+            }
+            case STATUS_READONLY: {
+                throw new IllegalStateException();
+            }
+            default:
+                throw new IllegalStateException();
         }
-
-        setStatus(STATUS_CONSTRUCTING);
     }
 
     public abstract void openForRead(int desiredLockMode);
 
-    public final void openForWrite(int desiredLockMode) {
-        if (tx.status != BetaTransaction.ACTIVE) {
-            throw tx.abortOpenForWrite(owner);
-        }
-
-        if (isConstructing()) {
-            return;
-        }
-
-        final BetaTransactionConfiguration config = tx.config;
-
-        ignore = false;
-
-        if (config.readonly) {
-            throw tx.abortOpenForWriteWhenReadonly(owner);
-        }
-
-        desiredLockMode = desiredLockMode >= config.writeLockMode
-                ? desiredLockMode
-                : config.writeLockMode;
-
-        if (isNew()) {
-            boolean loadSuccess = owner.___load(config.spinCount, tx, desiredLockMode, this);
-
-            if (!loadSuccess) {
-                tx.abort();
-                throw ReadWriteConflict.INSTANCE;
-            }
-
-
-            setStatus(STATUS_UPDATE);
-            tx.hasUpdates = true;
-            return;
-        }
-
-        if (isCommuting()) {
-            //todo:
-        }
-
-        if (lockMode < desiredLockMode) {
-            boolean loadSuccess = owner.___tryLockAndCheckConflict(
-                    tx, config.spinCount, this, desiredLockMode == LOCKMODE_COMMIT);
-
-            if (!loadSuccess) {
-                tx.abort();
-                throw ReadWriteConflict.INSTANCE;
-            }
-        }
-
-        if (isReadonly()) {
-            setStatus(STATUS_UPDATE);
-            tx.hasUpdates = true;
-        }
-    }
+    public abstract void openForWrite(int desiredLockMode);
 
     public final void upgradeLockMode(int desiredLockMode) {
         if (tx.status != BetaTransaction.ACTIVE) {
@@ -265,83 +227,85 @@ public abstract class BetaTranlocal implements BetaStmConstants {
     public final boolean prepareDirtyUpdates(
             final BetaObjectPool pool, final BetaTransaction tx, final int spinCount) {
 
-        if (isConstructing()) {
-            return true;
-        }
-
-        if (isReadonly()) {
-            if (!checkConflict) {
+        switch (status) {
+            case STATUS_NEW:
+                throw new IllegalStateException();
+            case STATUS_CONSTRUCTING:
                 return true;
-            }
+            case STATUS_COMMUTING:
+                if (!owner.___load(spinCount, tx, LOCKMODE_COMMIT, this)) {
+                    return false;
+                }
 
-            if (lockMode != LOCKMODE_NONE) {
+                evaluateCommutingFunctions(pool);
                 return true;
-            }
+            case STATUS_READONLY:
+                if (!checkConflict) {
+                    return true;
+                }
 
-            return owner.___tryLockAndCheckConflict(tx, spinCount, this, false);
+                if (lockMode != LOCKMODE_NONE) {
+                    return true;
+                }
+
+                return owner.___tryLockAndCheckConflict(tx, spinCount, this, false);
+            case STATUS_UPDATE:
+                if (!(isDirty || calculateIsDirty())) {
+
+                    if (!checkConflict) {
+                        return true;
+                    }
+
+                    if (lockMode != LOCKMODE_NONE) {
+                        return true;
+                    }
+
+                    return owner.___tryLockAndCheckConflict(tx, spinCount, this, false);
+                }
+
+                if (lockMode == LOCKMODE_COMMIT) {
+                    return true;
+                }
+
+                return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
+            default:
+                throw new IllegalStateException();
         }
-
-        if (isCommuting()) {
-            if (!owner.___load(spinCount, tx, LOCKMODE_COMMIT, this)) {
-                return false;
-            }
-
-            evaluateCommutingFunctions(pool);
-            return true;
-        }
-
-        if (!(isDirty || calculateIsDirty())) {
-            if (!checkConflict) {
-                return true;
-            }
-
-            if (lockMode != LOCKMODE_NONE) {
-                return true;
-            }
-
-            return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
-
-        }
-
-        if (lockMode == LOCKMODE_COMMIT) {
-            return true;
-        }
-
-        return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
     }
 
     public final boolean prepareAllUpdates(
-            final BetaObjectPool pool, BetaTransaction tx, int spinCount) {
+            final BetaObjectPool pool, final BetaTransaction tx, final int spinCount) {
 
-        if (lockMode == LOCKMODE_COMMIT) {
-            return true;
-        }
-
-        if (isConstructing()) {
-            return true;
-        }
-
-        if (isReadonly()) {
-            if (!checkConflict) {
+        switch (status) {
+            case STATUS_NEW:
+                throw new IllegalStateException();
+            case STATUS_CONSTRUCTING:
                 return true;
-            }
+            case STATUS_COMMUTING:
+                if (!owner.___load(spinCount, tx, LOCKMODE_COMMIT, this)) {
+                    return false;
+                }
 
-            if (lockMode != LOCKMODE_NONE) {
+                evaluateCommutingFunctions(pool);
                 return true;
-            }
+            case STATUS_READONLY:
+                if (!checkConflict) {
+                    return true;
+                }
 
-            return owner.___tryLockAndCheckConflict(tx, spinCount, this, false);
+                if (lockMode != LOCKMODE_NONE) {
+                    return true;
+                }
+
+                return owner.___tryLockAndCheckConflict(tx, spinCount, this, false);
+            case STATUS_UPDATE:
+                if (lockMode == LOCKMODE_COMMIT) {
+                    return true;
+                }
+
+                return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
+            default:
+                throw new IllegalStateException();
         }
-
-        if (isCommuting()) {
-            if (!owner.___load(spinCount, tx, LOCKMODE_COMMIT, this)) {
-                return false;
-            }
-
-            evaluateCommutingFunctions(pool);
-            return true;
-        }
-
-        return owner.___tryLockAndCheckConflict(tx, spinCount, this, true);
     }
 }

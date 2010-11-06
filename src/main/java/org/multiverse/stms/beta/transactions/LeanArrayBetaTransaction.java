@@ -105,8 +105,22 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             return tranlocal.value;
         }
 
-        if(config.trackReads || config.isolationLevel!=IsolationLevel.ReadCommitted){
-            throw new TodoException();
+        if(    config.trackReads
+            || config.isolationLevel!=IsolationLevel.ReadCommitted
+            || config.readLockMode!=LOCKMODE_NONE){
+
+            //check if the size is not exceeded.
+            if (firstFreeIndex == array.length) {
+                throw abortOnTooSmallSize(array.length+1);
+            }
+
+            BetaRefTranlocal<E> tranlocal = pool.take(ref);
+            tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
+            tranlocal.tx = this;
+            array[firstFreeIndex] = tranlocal;
+            firstFreeIndex++;
+            tranlocal.openForRead(config.readLockMode);
+            return tranlocal.value;
         }else{
             hasUntrackedReads = true;
             return ref.atomicWeakGet();
@@ -379,8 +393,22 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             return tranlocal.value;
         }
 
-        if(config.trackReads || config.isolationLevel!=IsolationLevel.ReadCommitted){
-            throw new TodoException();
+        if(    config.trackReads
+            || config.isolationLevel!=IsolationLevel.ReadCommitted
+            || config.readLockMode!=LOCKMODE_NONE){
+
+            //check if the size is not exceeded.
+            if (firstFreeIndex == array.length) {
+                throw abortOnTooSmallSize(array.length+1);
+            }
+
+            BetaIntRefTranlocal tranlocal = pool.take(ref);
+            tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
+            tranlocal.tx = this;
+            array[firstFreeIndex] = tranlocal;
+            firstFreeIndex++;
+            tranlocal.openForRead(config.readLockMode);
+            return tranlocal.value;
         }else{
             hasUntrackedReads = true;
             return ref.atomicWeakGet();
@@ -653,8 +681,22 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             return tranlocal.value;
         }
 
-        if(config.trackReads || config.isolationLevel!=IsolationLevel.ReadCommitted){
-            throw new TodoException();
+        if(    config.trackReads
+            || config.isolationLevel!=IsolationLevel.ReadCommitted
+            || config.readLockMode!=LOCKMODE_NONE){
+
+            //check if the size is not exceeded.
+            if (firstFreeIndex == array.length) {
+                throw abortOnTooSmallSize(array.length+1);
+            }
+
+            BetaBooleanRefTranlocal tranlocal = pool.take(ref);
+            tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
+            tranlocal.tx = this;
+            array[firstFreeIndex] = tranlocal;
+            firstFreeIndex++;
+            tranlocal.openForRead(config.readLockMode);
+            return tranlocal.value;
         }else{
             hasUntrackedReads = true;
             return ref.atomicWeakGet();
@@ -927,8 +969,22 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             return tranlocal.value;
         }
 
-        if(config.trackReads || config.isolationLevel!=IsolationLevel.ReadCommitted){
-            throw new TodoException();
+        if(    config.trackReads
+            || config.isolationLevel!=IsolationLevel.ReadCommitted
+            || config.readLockMode!=LOCKMODE_NONE){
+
+            //check if the size is not exceeded.
+            if (firstFreeIndex == array.length) {
+                throw abortOnTooSmallSize(array.length+1);
+            }
+
+            BetaDoubleRefTranlocal tranlocal = pool.take(ref);
+            tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
+            tranlocal.tx = this;
+            array[firstFreeIndex] = tranlocal;
+            firstFreeIndex++;
+            tranlocal.openForRead(config.readLockMode);
+            return tranlocal.value;
         }else{
             hasUntrackedReads = true;
             return ref.atomicWeakGet();
@@ -1201,8 +1257,22 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             return tranlocal.value;
         }
 
-        if(config.trackReads || config.isolationLevel!=IsolationLevel.ReadCommitted){
-            throw new TodoException();
+        if(    config.trackReads
+            || config.isolationLevel!=IsolationLevel.ReadCommitted
+            || config.readLockMode!=LOCKMODE_NONE){
+
+            //check if the size is not exceeded.
+            if (firstFreeIndex == array.length) {
+                throw abortOnTooSmallSize(array.length+1);
+            }
+
+            BetaLongRefTranlocal tranlocal = pool.take(ref);
+            tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
+            tranlocal.tx = this;
+            array[firstFreeIndex] = tranlocal;
+            firstFreeIndex++;
+            tranlocal.openForRead(config.readLockMode);
+            return tranlocal.value;
         }else{
             hasUntrackedReads = true;
             return ref.atomicWeakGet();

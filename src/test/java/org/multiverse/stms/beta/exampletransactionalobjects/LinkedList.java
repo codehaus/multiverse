@@ -201,6 +201,11 @@ class LinkedListTranlocal<E> extends BetaTranlocal {
         throw new TodoException();
     }
 
+    @Override
+    public void openForWrite(int desiredLockMode) {
+        throw new TodoException();
+    }
+
     //    @Override
 //    public LinkedListTranlocal<E> openForWrite(BetaObjectPool pool) {
 //        LinkedListTranlocal<E> tranlocal = new LinkedListTranlocal<E>((LinkedList<E>) owner);
@@ -350,6 +355,11 @@ class LinkedListNodeTranlocal<E> extends BetaTranlocal {
     @Override
     public void openForRead(int desiredLockMode) {
         throw new TodoException();
+    }
+
+    @Override
+    public void openForWrite(int desiredLockMode) {
+        throw new TodoException(                );
     }
 
     @Override

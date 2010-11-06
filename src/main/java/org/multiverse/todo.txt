@@ -270,9 +270,17 @@ the task not being executed at all.
 
 - the tranlocal.openForWrite needs to have the conflict stuff added
 
-- the Tranlocal.openForWrite needs to be moved to the tranlocal subclass.
+- the Tranlocal.commitDirty needs to be moved to the tranlocal subclass
+
+- the Tranlocal.commitAll needs to be moved to the tranlocal subclass
 
 done
+
+- tranlocal.prepareAll makes use of switch/case
+
+- tranlocal.prepareDirty makes use of switch/case
+
+- the Tranlocal.openForWrite needs to be moved to the tranlocal subclass.
 
 - tranlocal names should be alligned with the ref names
 

@@ -65,8 +65,75 @@ public final class BetaRefTranlocal<E> extends BetaTranlocal{
                 return;
             }
             default:{
+                BetaRef o = (BetaRef)owner;
                 if (getLockMode() < desiredLockMode) {
-                    boolean loadSuccess = owner.___tryLockAndCheckConflict(
+                    boolean loadSuccess = o.___tryLockAndCheckConflict(
+                        tx, config.spinCount, this, desiredLockMode == LOCKMODE_COMMIT);
+
+                    if (!loadSuccess) {
+                        tx.abort();
+                        throw ReadWriteConflict.INSTANCE;
+                    }
+                }
+            }
+        }
+    }
+
+    public final void openForWrite(int desiredLockMode) {
+        if (tx.status != BetaTransaction.ACTIVE) {
+            throw tx.abortOpenForRead(owner);
+        }
+
+        final BetaTransactionConfiguration config = tx.config;
+
+        if (config.readonly) {
+            throw tx.abortOpenForWriteWhenReadonly(owner);
+        }
+
+        desiredLockMode = desiredLockMode >= config.readLockMode
+             ? desiredLockMode
+             : config.writeLockMode;
+
+        switch(status){
+            case STATUS_CONSTRUCTING:
+                return;
+            case STATUS_NEW: {
+                BetaRef o = (BetaRef)owner;
+
+                final boolean loadSuccess = o.___load(
+                    config.spinCount, tx, desiredLockMode, this);
+
+                if (!loadSuccess) {
+                    tx.abort();
+                    throw ReadWriteConflict.INSTANCE;
+                }
+
+                setStatus(STATUS_UPDATE);
+                tx.hasUpdates = true;
+                setIgnore(desiredLockMode == LOCKMODE_NONE && !hasDepartObligation());
+                return;
+            }
+            case STATUS_COMMUTING: {
+                final boolean loadSuccess = ((BetaRef)owner).___load(
+                config.spinCount, tx, LOCKMODE_COMMIT, this);
+
+                if (!loadSuccess) {
+                    tx.abort();
+                    throw ReadWriteConflict.INSTANCE;
+                }
+
+                evaluateCommutingFunctions(tx.pool);
+                setStatus(STATUS_UPDATE);
+                tx.hasUpdates = true;
+                setIgnore(desiredLockMode == LOCKMODE_NONE && !hasDepartObligation());
+                return;
+            }
+            default:{
+                BetaRef o = (BetaRef)owner;
+                setStatus(STATUS_UPDATE);
+                tx.hasUpdates = true;
+                if (getLockMode() < desiredLockMode) {
+                    boolean loadSuccess = o.___tryLockAndCheckConflict(
                         tx, config.spinCount, this, desiredLockMode == LOCKMODE_COMMIT);
 
                     if (!loadSuccess) {
