@@ -1,17 +1,17 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.multiverse.api.IsolationLevel;
-import org.multiverse.api.blocking.DefaultRetryLatch;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.Retry;
-import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.api.functions.*;
-import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.Listeners;
-import org.multiverse.stms.beta.conflictcounters.LocalConflictCounter;
-import org.multiverse.stms.beta.transactionalobjects.*;
+import java.util.*;
 
+import org.multiverse.api.*;
+import org.multiverse.api.blocking.*;
+import org.multiverse.api.exceptions.*;
+import org.multiverse.api.functions.*;
+import org.multiverse.api.lifecycle.*;
+import org.multiverse.stms.beta.*;
+import org.multiverse.stms.beta.transactionalobjects.*;
+import org.multiverse.stms.beta.conflictcounters.*;
+
+import java.util.concurrent.atomic.AtomicLong;
 import static java.lang.String.format;
 
 
@@ -143,33 +143,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 abort();
             }
         }
-    }
-
-    public final <E> BetaRefTranlocal<E> open(BetaRef<E> ref){
-        if (status != ACTIVE) {
-            throw abortOpen(ref);
-        }
-
-        if(ref == null){
-            throw abortOpenOnNull();
-        }
-
-        if(ref.___stm != config.stm){
-            throw abortOnStmMismatch(ref);
-        }
-
-        final int identityHashCode = ref.___identityHashCode();
-        final int index = indexOf(ref, identityHashCode);
-        if(index != -1){
-            return (BetaRefTranlocal<E>)array[index];
-        }
-
-        BetaRefTranlocal<E> tranlocal = pool.take(ref);
-        tranlocal.tx = this;
-        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
-        attach(ref, tranlocal, identityHashCode);
-        size++;
-        return tranlocal;
     }
 
     @Override
@@ -468,33 +441,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
     }
 
-    public final  BetaIntRefTranlocal open(BetaIntRef ref){
-        if (status != ACTIVE) {
-            throw abortOpen(ref);
-        }
-
-        if(ref == null){
-            throw abortOpenOnNull();
-        }
-
-        if(ref.___stm != config.stm){
-            throw abortOnStmMismatch(ref);
-        }
-
-        final int identityHashCode = ref.___identityHashCode();
-        final int index = indexOf(ref, identityHashCode);
-        if(index != -1){
-            return (BetaIntRefTranlocal)array[index];
-        }
-
-        BetaIntRefTranlocal tranlocal = pool.take(ref);
-        tranlocal.tx = this;
-        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
-        attach(ref, tranlocal, identityHashCode);
-        size++;
-        return tranlocal;
-    }
-
     @Override
     public  BetaIntRefTranlocal openForRead(
         final BetaIntRef ref, int lockMode) {
@@ -789,33 +735,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 abort();
             }
         }
-    }
-
-    public final  BetaBooleanRefTranlocal open(BetaBooleanRef ref){
-        if (status != ACTIVE) {
-            throw abortOpen(ref);
-        }
-
-        if(ref == null){
-            throw abortOpenOnNull();
-        }
-
-        if(ref.___stm != config.stm){
-            throw abortOnStmMismatch(ref);
-        }
-
-        final int identityHashCode = ref.___identityHashCode();
-        final int index = indexOf(ref, identityHashCode);
-        if(index != -1){
-            return (BetaBooleanRefTranlocal)array[index];
-        }
-
-        BetaBooleanRefTranlocal tranlocal = pool.take(ref);
-        tranlocal.tx = this;
-        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
-        attach(ref, tranlocal, identityHashCode);
-        size++;
-        return tranlocal;
     }
 
     @Override
@@ -1114,33 +1033,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
     }
 
-    public final  BetaDoubleRefTranlocal open(BetaDoubleRef ref){
-        if (status != ACTIVE) {
-            throw abortOpen(ref);
-        }
-
-        if(ref == null){
-            throw abortOpenOnNull();
-        }
-
-        if(ref.___stm != config.stm){
-            throw abortOnStmMismatch(ref);
-        }
-
-        final int identityHashCode = ref.___identityHashCode();
-        final int index = indexOf(ref, identityHashCode);
-        if(index != -1){
-            return (BetaDoubleRefTranlocal)array[index];
-        }
-
-        BetaDoubleRefTranlocal tranlocal = pool.take(ref);
-        tranlocal.tx = this;
-        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
-        attach(ref, tranlocal, identityHashCode);
-        size++;
-        return tranlocal;
-    }
-
     @Override
     public  BetaDoubleRefTranlocal openForRead(
         final BetaDoubleRef ref, int lockMode) {
@@ -1437,33 +1329,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
         }
     }
 
-    public final  BetaLongRefTranlocal open(BetaLongRef ref){
-        if (status != ACTIVE) {
-            throw abortOpen(ref);
-        }
-
-        if(ref == null){
-            throw abortOpenOnNull();
-        }
-
-        if(ref.___stm != config.stm){
-            throw abortOnStmMismatch(ref);
-        }
-
-        final int identityHashCode = ref.___identityHashCode();
-        final int index = indexOf(ref, identityHashCode);
-        if(index != -1){
-            return (BetaLongRefTranlocal)array[index];
-        }
-
-        BetaLongRefTranlocal tranlocal = pool.take(ref);
-        tranlocal.tx = this;
-        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
-        attach(ref, tranlocal, identityHashCode);
-        size++;
-        return tranlocal;
-    }
-
     @Override
     public  BetaLongRefTranlocal openForRead(
         final BetaLongRef ref, int lockMode) {
@@ -1728,33 +1593,6 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
                 abort();
             }
         }
-    }
-
-    public final  BetaTranlocal open(BetaTransactionalObject ref){
-        if (status != ACTIVE) {
-            throw abortOpen(ref);
-        }
-
-        if(ref == null){
-            throw abortOpenOnNull();
-        }
-
-        if(ref.getStm() != config.stm){
-            throw abortOnStmMismatch(ref);
-        }
-
-        final int identityHashCode = ref.___identityHashCode();
-        final int index = indexOf(ref, identityHashCode);
-        if(index != -1){
-            return (BetaTranlocal)array[index];
-        }
-
-        BetaTranlocal tranlocal = pool.take(ref);
-        tranlocal.tx = this;
-        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
-        attach(ref, tranlocal, identityHashCode);
-        size++;
-        return tranlocal;
     }
 
     @Override

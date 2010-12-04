@@ -1,19 +1,23 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.LockedException;
-import org.multiverse.api.exceptions.PanicError;
-import org.multiverse.api.exceptions.TransactionRequiredException;
-import org.multiverse.api.functions.BooleanFunction;
-import org.multiverse.api.predicates.BooleanPredicate;
-import org.multiverse.api.references.BooleanRef;
-import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.Listeners;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.*;
+import org.multiverse.api.*;
+import org.multiverse.api.blocking.*;
+import org.multiverse.api.exceptions.*;
+import org.multiverse.api.functions.*;
+import org.multiverse.api.predicates.*;
+import org.multiverse.api.references.*;
+import org.multiverse.stms.beta.*;
+import org.multiverse.stms.beta.conflictcounters.*;
+import org.multiverse.stms.beta.orec.*;
+import org.multiverse.stms.beta.transactions.*;
 
-import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.*;
 
 /**
  * The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
@@ -304,26 +308,6 @@ public final class BetaBooleanRef
     }
 
     @Override
-    public final boolean tryEnsure(){
-        Transaction tx = getThreadLocalTransaction();
-
-        if(tx!=null){
-            throw new TransactionRequiredException(getClass(),"tryEnsure");
-        }
-
-        return tryEnsure((BetaTransaction)tx);
-    }
-
-    @Override
-    public final boolean tryEnsure(final Transaction tx){
-        return tryEnsure((BetaTransaction)tx);
-    }
-
-    public final boolean tryEnsure(BetaTransaction tx){
-        return tx.tryLock(this, LOCKMODE_UPDATE);
-    }
-
-    @Override
     public final void deferredEnsure(){
         Transaction tx = getThreadLocalTransaction();
 
@@ -365,26 +349,6 @@ public final class BetaBooleanRef
 
     public final void privatize(BetaTransaction tx){
         tx.openForRead(this, LOCKMODE_COMMIT);
-    }
-
-    @Override
-    public final boolean tryPrivatize(){
-        Transaction tx = getThreadLocalTransaction();
-
-        if(tx == null){
-            throw new TransactionRequiredException(getClass(),"tryPrivatize");
-        }
-
-        return tryPrivatize((BetaTransaction)tx);
-    }
-
-    @Override
-    public final boolean tryPrivatize(Transaction tx){
-        return tryPrivatize((BetaTransaction)tx);
-    }
-
-    public final boolean tryPrivatize(BetaTransaction tx){
-        return tx.tryLock(this, LOCKMODE_COMMIT);
     }
 
     @Override

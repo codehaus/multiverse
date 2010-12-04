@@ -1,22 +1,19 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.multiverse.api.Transaction;
-import org.multiverse.api.TransactionConfiguration;
-import org.multiverse.api.TransactionStatus;
-import org.multiverse.api.TransactionalObject;
-import org.multiverse.api.blocking.DefaultRetryLatch;
+import org.multiverse.api.*;
+import org.multiverse.api.blocking.*;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.*;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.conflictcounters.LocalConflictCounter;
+import org.multiverse.api.lifecycle.*;
+
+import org.multiverse.stms.beta.*;
+import org.multiverse.stms.beta.conflictcounters.*;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
-import java.util.ArrayList;
+import java.util.*;
 
-import static java.lang.String.format;
 import static org.multiverse.stms.beta.BetaStmUtils.toDebugString;
+import static java.lang.String.*;
 
 /**
  * @author Peter Veentjer
@@ -593,8 +590,6 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract <E> E read(BetaRef<E> ref);
 
-    public abstract <E> BetaRefTranlocal<E> open(BetaRef<E> ref);
-
     public abstract <E> BetaRefTranlocal<E> openForRead(BetaRef<E> ref, int lockMode);
 
     public abstract <E> BetaRefTranlocal<E> openForWrite(BetaRef<E> ref, int lockMode);
@@ -604,8 +599,6 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     public abstract <E> void commute(BetaRef<E> ref, final Function<E> function);
 
     public abstract  int read(BetaIntRef ref);
-
-    public abstract  BetaIntRefTranlocal open(BetaIntRef ref);
 
     public abstract  BetaIntRefTranlocal openForRead(BetaIntRef ref, int lockMode);
 
@@ -617,8 +610,6 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract  boolean read(BetaBooleanRef ref);
 
-    public abstract  BetaBooleanRefTranlocal open(BetaBooleanRef ref);
-
     public abstract  BetaBooleanRefTranlocal openForRead(BetaBooleanRef ref, int lockMode);
 
     public abstract  BetaBooleanRefTranlocal openForWrite(BetaBooleanRef ref, int lockMode);
@@ -628,8 +619,6 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     public abstract  void commute(BetaBooleanRef ref, final BooleanFunction function);
 
     public abstract  double read(BetaDoubleRef ref);
-
-    public abstract  BetaDoubleRefTranlocal open(BetaDoubleRef ref);
 
     public abstract  BetaDoubleRefTranlocal openForRead(BetaDoubleRef ref, int lockMode);
 
@@ -641,8 +630,6 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract  long read(BetaLongRef ref);
 
-    public abstract  BetaLongRefTranlocal open(BetaLongRef ref);
-
     public abstract  BetaLongRefTranlocal openForRead(BetaLongRef ref, int lockMode);
 
     public abstract  BetaLongRefTranlocal openForWrite(BetaLongRef ref, int lockMode);
@@ -650,8 +637,6 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     public abstract  BetaLongRefTranlocal openForConstruction(BetaLongRef ref);
 
     public abstract  void commute(BetaLongRef ref, final LongFunction function);
-
-    public abstract  BetaTranlocal open(BetaTransactionalObject ref);
 
     public abstract  BetaTranlocal openForRead(BetaTransactionalObject ref, int lockMode);
 

@@ -179,7 +179,10 @@ performance.
 
 - introduce a debug setting that enabled exceptions
 
-todo
+
+----------------------------------------------------------------------
+                            todo
+----------------------------------------------------------------------
 
 - orelse
 
@@ -231,13 +234,13 @@ the task not being executed at all.
 
 - testing:
 
+    - testing tranlocal.prepareAll needs to be tested with conflict check
+
+    - testing tranlocal.prepareDirty needs to be tested with conflict check
+
     - testing of transaction access while commute
 
     - when pessimistic locking level used, dirty flag not set correctly.
-
-    - tranlocal.prepareAll needs to be tested
-
-    - tranlocal.prepareDirty needs to be tested
 
     - tranlocal.prepareWithWriteSkewPrevention needs to be tested.
 
@@ -270,11 +273,18 @@ the task not being executed at all.
 
 - the tranlocal.openForWrite needs to have the conflict stuff added
 
-- the Tranlocal.commitDirty needs to be moved to the tranlocal subclass
+- check the version before acquiring the lock, if it has changed, a commit is going
+to fail anyway.
 
-- the Tranlocal.commitAll needs to be moved to the tranlocal subclass
+----------------------------------------------------------------------
+                                done
+----------------------------------------------------------------------
 
-done
+- the Tranlocal.commitDirty needs to be moved to the tranlocal subclass: wont fix
+
+- the Tranlocal.commitAll needs to be moved to the tranlocal subclass: wont fix
+
+- try ensure is removed
 
 - tranlocal.prepareAll makes use of switch/case
 
@@ -312,5 +322,9 @@ done
     about the transaction, e.g. the name
 
 - atomic change methods on ref should deal with listeners
+
+- tranlocal.prepareAll needs to be tested
+
+ - tranlocal.prepareDirty needs to be tested
 
 

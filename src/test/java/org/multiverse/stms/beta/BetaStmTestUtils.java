@@ -16,6 +16,22 @@ import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
  */
 public class BetaStmTestUtils implements BetaStmConstants {
 
+    public static void assertHasDepartObligation(BetaLongRefTranlocal tranlocal, boolean expected){
+        if(expected){
+            assertHasDepartObligation(tranlocal);
+        }else{
+            assertHasNoDepartObligation(tranlocal);
+        }
+    }
+
+    public static void assertHasDepartObligation(BetaLongRefTranlocal tranlocal) {
+        assertTrue(tranlocal.hasDepartObligation());
+    }
+
+    public static void assertHasNoDepartObligation(BetaLongRefTranlocal tranlocal) {
+        assertFalse(tranlocal.hasDepartObligation());
+    }
+
     public static RetryLatch getFirstListener(BetaLongRef ref) {
         Listeners listeners = (Listeners) getField(ref, "___listeners");
         assertNotNull(listeners);
@@ -36,7 +52,7 @@ public class BetaStmTestUtils implements BetaStmConstants {
         assertHasNoCommitLock(ref);
     }
 
-    public static void assertRefLockMode(VeryAbstractBetaTransactionalObject ref, BetaTransaction lockOwner, int lockMode) {
+    public static void assertRefHasLockMode(VeryAbstractBetaTransactionalObject ref, BetaTransaction lockOwner, int lockMode) {
         switch (lockMode) {
             case LOCKMODE_NONE:
                 assertNull(ref.___getLockOwner());
@@ -153,6 +169,10 @@ public class BetaStmTestUtils implements BetaStmConstants {
     public static void assertVersionAndValue(BetaRef ref, long version, Object value) {
         assertEquals("version doesn't match", version, ref.getVersion());
         assertSame("value doesn't match", value, ref.___weakRead());
+    }
+
+    public static BetaLongRef newLongRef(BetaStm stm, long value, boolean readBiased){
+        return readBiased?newReadBiasedLongRef(stm, value):newLongRef(stm, value);
     }
 
     public static BetaLongRef newReadBiasedLongRef(BetaStm stm, long value) {

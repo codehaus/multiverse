@@ -1,16 +1,13 @@
 package org.multiverse.stms.beta.transactions;
 
-import org.multiverse.api.IsolationLevel;
-import org.multiverse.api.blocking.DefaultRetryLatch;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.Retry;
-import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.*;
+import org.multiverse.api.blocking.*;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.*;
-import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.Listeners;
-import org.multiverse.stms.beta.conflictcounters.LocalConflictCounter;
+import org.multiverse.api.lifecycle.*;
+import org.multiverse.stms.beta.*;
 import org.multiverse.stms.beta.transactionalobjects.*;
+import org.multiverse.stms.beta.conflictcounters.*;
 
 import static java.lang.String.format;
 
@@ -123,29 +120,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
     }
 
-    public final <E> BetaRefTranlocal<E> open(BetaRef<E> ref){
-        if (status != ACTIVE) {
-            throw abortOpen(ref);
-        }
-
-        if(ref == null){
-           throw abortOpenOnNull();
-        }
-
-        if(ref.___stm != config.stm){
-            throw abortOnStmMismatch(ref);
-        }
-
-        if(attached!=null && attached.owner == ref){
-            return (BetaRefTranlocal<E>)attached;
-        }
-
-        BetaRefTranlocal<E> tranlocal = pool.take(ref);
-        tranlocal.tx = this;
-        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
-        attached = tranlocal;
-        return tranlocal;
-    }
 
     @Override
     public final <E> BetaRefTranlocal<E> openForRead(final BetaRef<E> ref,int lockMode) {
@@ -478,29 +452,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
     }
 
-    public final  BetaIntRefTranlocal open(BetaIntRef ref){
-        if (status != ACTIVE) {
-            throw abortOpen(ref);
-        }
-
-        if(ref == null){
-           throw abortOpenOnNull();
-        }
-
-        if(ref.___stm != config.stm){
-            throw abortOnStmMismatch(ref);
-        }
-
-        if(attached!=null && attached.owner == ref){
-            return (BetaIntRefTranlocal)attached;
-        }
-
-        BetaIntRefTranlocal tranlocal = pool.take(ref);
-        tranlocal.tx = this;
-        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
-        attached = tranlocal;
-        return tranlocal;
-    }
 
     @Override
     public final  BetaIntRefTranlocal openForRead(final BetaIntRef ref,int lockMode) {
@@ -833,29 +784,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
     }
 
-    public final  BetaBooleanRefTranlocal open(BetaBooleanRef ref){
-        if (status != ACTIVE) {
-            throw abortOpen(ref);
-        }
-
-        if(ref == null){
-           throw abortOpenOnNull();
-        }
-
-        if(ref.___stm != config.stm){
-            throw abortOnStmMismatch(ref);
-        }
-
-        if(attached!=null && attached.owner == ref){
-            return (BetaBooleanRefTranlocal)attached;
-        }
-
-        BetaBooleanRefTranlocal tranlocal = pool.take(ref);
-        tranlocal.tx = this;
-        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
-        attached = tranlocal;
-        return tranlocal;
-    }
 
     @Override
     public final  BetaBooleanRefTranlocal openForRead(final BetaBooleanRef ref,int lockMode) {
@@ -1188,29 +1116,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
     }
 
-    public final  BetaDoubleRefTranlocal open(BetaDoubleRef ref){
-        if (status != ACTIVE) {
-            throw abortOpen(ref);
-        }
-
-        if(ref == null){
-           throw abortOpenOnNull();
-        }
-
-        if(ref.___stm != config.stm){
-            throw abortOnStmMismatch(ref);
-        }
-
-        if(attached!=null && attached.owner == ref){
-            return (BetaDoubleRefTranlocal)attached;
-        }
-
-        BetaDoubleRefTranlocal tranlocal = pool.take(ref);
-        tranlocal.tx = this;
-        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
-        attached = tranlocal;
-        return tranlocal;
-    }
 
     @Override
     public final  BetaDoubleRefTranlocal openForRead(final BetaDoubleRef ref,int lockMode) {
@@ -1543,29 +1448,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
     }
 
-    public final  BetaLongRefTranlocal open(BetaLongRef ref){
-        if (status != ACTIVE) {
-            throw abortOpen(ref);
-        }
-
-        if(ref == null){
-           throw abortOpenOnNull();
-        }
-
-        if(ref.___stm != config.stm){
-            throw abortOnStmMismatch(ref);
-        }
-
-        if(attached!=null && attached.owner == ref){
-            return (BetaLongRefTranlocal)attached;
-        }
-
-        BetaLongRefTranlocal tranlocal = pool.take(ref);
-        tranlocal.tx = this;
-        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
-        attached = tranlocal;
-        return tranlocal;
-    }
 
     @Override
     public final  BetaLongRefTranlocal openForRead(final BetaLongRef ref,int lockMode) {
@@ -1871,29 +1753,6 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
         }
     }
 
-    public final  BetaTranlocal open(BetaTransactionalObject ref){
-        if (status != ACTIVE) {
-            throw abortOpen(ref);
-        }
-
-        if(ref == null){
-           throw abortOpenOnNull();
-        }
-
-        if(ref.getStm() != config.stm){
-            throw abortOnStmMismatch(ref);
-        }
-
-        if(attached!=null && attached.owner == ref){
-            return (BetaTranlocal)attached;
-        }
-
-        BetaTranlocal tranlocal = pool.take(ref);
-        tranlocal.tx = this;
-        tranlocal.setIsConflictCheckNeeded(!config.writeSkewAllowed);
-        attached = tranlocal;
-        return tranlocal;
-    }
 
     @Override
     public final  BetaTranlocal openForRead(final BetaTransactionalObject ref,int lockMode) {

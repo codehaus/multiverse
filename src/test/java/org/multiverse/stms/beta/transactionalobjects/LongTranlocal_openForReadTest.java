@@ -72,14 +72,13 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        BetaLongRefTranlocal tranlocal = tx.open(ref);
+        BetaLongRefTranlocal tranlocal = tx.openForRead(ref,firstTimeLockMode);
 
-        tranlocal.openForRead(firstTimeLockMode);
         tranlocal.openForRead(secondTimeLockMode);
 
         assertHasVersionAndValue(tranlocal, initialVersion, initialValue);
         assertIsActive(tx);
-        assertRefLockMode(ref, tx, expected);
+        assertRefHasLockMode(ref, tx, expected);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -93,9 +92,7 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
         ref.ensure(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        BetaLongRefTranlocal tranlocal = tx.open(ref);
-
-        tranlocal.openForRead(LOCKMODE_NONE);
+        BetaLongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
 
         assertHasVersionAndValue(tranlocal, initialVersion, initialValue);
         assertIsActive(tx);
@@ -113,10 +110,9 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
         ref.privatize(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        BetaLongRefTranlocal tranlocal = tx.open(ref);
 
         try {
-            tranlocal.openForRead(LOCKMODE_NONE);
+            tx.openForRead(ref,LOCKMODE_NONE);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -134,9 +130,8 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        BetaLongRefTranlocal tranlocal = tx.open(ref);
 
-        tranlocal.openForRead(LOCKMODE_UPDATE);
+        BetaLongRefTranlocal tranlocal = tx.openForRead(ref,LOCKMODE_UPDATE);
 
         assertHasVersionAndValue(tranlocal, initialVersion, initialValue);
         assertIsActive(tx);
@@ -151,9 +146,8 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        BetaLongRefTranlocal tranlocal = tx.open(ref);
+        BetaLongRefTranlocal tranlocal = tx.openForRead(ref,LOCKMODE_COMMIT);
 
-        tranlocal.openForRead(LOCKMODE_COMMIT);
 
         assertHasVersionAndValue(tranlocal, initialVersion, initialValue);
         assertIsActive(tx);
@@ -168,8 +162,7 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        BetaLongRefTranlocal tranlocal = tx.open(ref);
-        tranlocal.openForRead(LOCKMODE_NONE);
+        BetaLongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
 
         assertRefHasNoLocks(ref);
         assertTrue(tranlocal.isReadonly());
@@ -185,8 +178,7 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        BetaLongRefTranlocal tranlocal = tx.open(ref);
-        tranlocal.openForRead(LOCKMODE_NONE);
+        BetaLongRefTranlocal tranlocal = tx.openForRead(ref,LOCKMODE_NONE);
         tranlocal.openForRead(LOCKMODE_NONE);
 
         assertRefHasNoLocks(ref);
@@ -203,7 +195,7 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        BetaLongRefTranlocal tranlocal = tx.open(ref);
+        BetaLongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
         tranlocal.openForWrite(LOCKMODE_NONE);
         tranlocal.openForRead(LOCKMODE_NONE);
 

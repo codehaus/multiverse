@@ -1,8 +1,9 @@
 package org.multiverse.stms.beta;
 
-import org.multiverse.api.blocking.DefaultRetryLatch;
+import org.multiverse.api.blocking.*;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.beta.transactionalobjects.*;
-
+import org.multiverse.stms.beta.transactions.*;
 import java.util.ArrayList;
 
 /**
