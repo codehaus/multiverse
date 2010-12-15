@@ -1,0 +1,868 @@
+package org.multiverse.stms.beta.transactions;
+
+import org.multiverse.api.*;
+import org.multiverse.api.blocking.*;
+import org.multiverse.api.exceptions.*;
+import org.multiverse.api.functions.*;
+import org.multiverse.api.lifecycle.*;
+import org.multiverse.stms.beta.*;
+import org.multiverse.stms.beta.transactionalobjects.*;
+import org.multiverse.stms.beta.conflictcounters.*;
+
+import static java.lang.String.format;
+
+/**
+ * A BetaTransaction tailored for dealing with 1 transactional object.
+ *
+ * This class is generated.
+ *
+ * @author Peter Veentjer
+ */
+public final class ${transaction.name} extends ${transaction.superClass} {
+
+    private BetaTranlocal attached;
+#if(!${transaction.lean})
+    private boolean hasReads;
+    private boolean hasUntrackedReads;
+    private LocalConflictCounter localConflictCounter;
+    private boolean evaluatingCommute;
+#end
+
+    public ${transaction.name}(final BetaStm stm){
+        this(new BetaTransactionConfiguration(stm).init());
+    }
+
+    public ${transaction.name}(final BetaTransactionConfiguration config) {
+        super(${transaction.poolName}, config);
+        this.remainingTimeoutNs = config.timeoutNs;
+#if(!${transaction.lean})
+        this.localConflictCounter = config.globalConflictCounter.createLocalConflictCounter();
+#end
+    }
+
+#if(!${transaction.lean})
+    public final LocalConflictCounter getLocalConflictCounter(){
+        return localConflictCounter;
+    }
+#else
+    public final LocalConflictCounter getLocalConflictCounter(){
+        return null;
+    }
+#end
+
+    public final boolean tryLock(BetaTransactionalObject ref, int lockMode){
+        throw new TodoException();
+    }
+
+    public void ensureWrites(){
+        if(status != ACTIVE){
+            throw abortEnsureWrites();
+        }
+
+        if(config.writeLockMode != LOCKMODE_NONE){
+            return;
+        }
+
+        if(attached == null||attached.isReadonly()){
+            return;
+        }
+
+        if(!attached.owner.___tryLockAndCheckConflict(this, config.spinCount, attached, false)){
+            throw abortOnReadConflict();
+        }
+    }
+
+#foreach($ref in $transactionalObjects)
+#if(${ref.isReference})
+    public final ${ref.typeParameter} ${ref.type} read(${ref.name}${ref.typeParameter} ref){
+        if (status != ACTIVE) {
+            throw abortRead(ref);
+        }
+
+        if(ref == null){
+            throw abortReadOnNull();
+        }
+
+        if(ref.___stm != config.stm){
+            throw abortReadOnStmMismatch(ref);
+        }
+
+        if(attached != null && attached.owner == ref){
+            ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})attached;
+            tranlocal.openForRead(config.readLockMode);
+            return tranlocal.value;
+        }
+
+        if(config.trackReads || config.isolationLevel!=IsolationLevel.ReadCommitted){
+            throw new TodoException();
+        }else{
+#if(${transaction.lean})
+            throw abortOnTooSmallSize(2);
+#else
+            hasUntrackedReads = true;
+            return ref.atomicWeakGet();
+#end
+        }
+    }
+
+#end
+#if(!${transaction.lean})
+    private ${ref.typeParameter} void flattenCommute(
+        final ${ref.name}${ref.typeParameter} ref,
+        final ${ref.tranlocal}${ref.typeParameter} tranlocal,
+        final int lockMode){
+
+        if(!hasReads){
+            localConflictCounter.reset();
+            hasReads = true;
+        }
+
+        if(!ref.___load(config.spinCount, this, lockMode,tranlocal)){
+            throw abortOnReadConflict();
+        }
+
+        if (hasReadConflict()) {
+            throw abortOnReadConflict();
+        }
+
+        boolean abort = true;
+        evaluatingCommute = true;
+        try{
+            tranlocal.evaluateCommutingFunctions(pool);
+            abort = false;
+        }finally{
+            evaluatingCommute = false;
+            if(abort){
+                abort();
+            }
+        }
+    }
+
+#end
+
+    @Override
+    public final ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForRead(final ${ref.name}${ref.typeParameter} ref,int lockMode) {
+
+        if (status != ACTIVE) {
+            throw abortOpenForRead(ref);
+        }
+
+#if(!${transaction.lean})
+        if(evaluatingCommute){
+            throw abortOnOpenForReadWhileEvaluatingCommute(ref);
+        }
+
+#end
+        if (ref == null) {
+            return null;
+        }
+
+        lockMode = lockMode>=config.readLockMode ? lockMode : config.readLockMode;
+
+        if(attached == null){
+            //the transaction has no previous attached references.
+
+#if(!$transaction.lean)
+            if(!hasReads){
+                localConflictCounter.reset();
+                hasReads = true;
+            }
+#end
+            ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
+            if (!ref.___load(config.spinCount, this, lockMode, tranlocal)) {
+                pool.put(tranlocal);
+                throw abortOnReadConflict();
+            }
+
+            tranlocal.tx = this;
+            tranlocal.setStatus(STATUS_READONLY);
+
+#if(!$transaction.lean)
+            if(hasReadConflict()){
+                ref.___abort(this, tranlocal, pool);
+                throw abortOnReadConflict();
+            }
+
+#end
+            if(lockMode != LOCKMODE_NONE || tranlocal.hasDepartObligation() || config.trackReads){
+                attached = tranlocal;
+            }else{
+#if(!$transaction.lean)
+                hasUntrackedReads = true;
+#else
+                throw abortOnTooSmallSize(2);
+#end
+            }
+
+            return tranlocal;
+        }
+
+        //the transaction has a previous attached reference
+        if(attached.owner == ref){
+            //the reference is the one we are looking for.
+
+            final ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})attached;
+
+#if(!$transaction.lean)
+            if(tranlocal.isCommuting()){
+                flattenCommute(ref, tranlocal, lockMode);
+                return tranlocal;
+            }
+#end
+            if(tranlocal.getLockMode() < lockMode
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+                throw abortOnReadConflict();
+            }
+
+            return tranlocal;
+        }
+
+        if(lockMode != LOCKMODE_NONE || config.trackReads){
+            throw abortOnTooSmallSize(2);
+        }
+
+#if(!${transaction.lean})
+        if(!hasReads){
+            localConflictCounter.reset();
+            hasReads = true;
+        }
+
+#end
+        ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
+        tranlocal.tx = this;
+        tranlocal.setStatus(STATUS_READONLY);
+
+        if (!ref.___load(config.spinCount, this, lockMode,tranlocal)) {
+            throw abortOnReadConflict();
+        }
+
+#if($transaction.lean)
+        pool.put(tranlocal);
+        throw abortOnTooSmallSize(2);
+#else
+        if(tranlocal.hasDepartObligation()){
+            pool.put(tranlocal);
+            throw abortOnTooSmallSize(2);
+        }
+
+        if(hasReadConflict()){
+            tranlocal.owner.___abort(this, tranlocal, pool);
+            throw abortOnReadConflict();
+        }
+
+        hasUntrackedReads = true;
+        return tranlocal;
+#end
+    }
+
+    @Override
+    public final ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForWrite(
+        final ${ref.name}${ref.typeParameter} ref, int lockMode) {
+
+        if (status != ACTIVE) {
+            throw abortOpenForWrite(ref);
+        }
+
+#if(!${transaction.lean})
+        if(evaluatingCommute){
+            throw abortOnOpenForWriteWhileEvaluatingCommute(ref);
+        }
+
+#end
+        if (ref == null) {
+            throw abortOpenForWriteWhenNullReference();
+        }
+
+        if (config.readonly) {
+            throw abortOpenForWriteWhenReadonly(ref);
+        }
+
+        lockMode = lockMode>=config.writeLockMode? lockMode: config.writeLockMode;
+
+        if(attached == null){
+            //the transaction has no previous attached references.
+
+#if(!${transaction.lean})
+            if(!hasReads){
+                localConflictCounter.reset();
+                hasReads = true;
+            }
+#end
+
+            ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
+            if(!ref.___load(config.spinCount, this, lockMode, tranlocal)){
+                pool.put(tranlocal);
+                throw abortOnReadConflict();
+            }
+
+#if(!${transaction.lean})
+            if(hasReadConflict()){
+                tranlocal.owner.___abort(this, tranlocal, pool);
+                throw abortOnReadConflict();
+            }
+
+#end
+            tranlocal.tx = this;
+            tranlocal.setStatus(STATUS_UPDATE);
+            hasUpdates = true;
+            attached = tranlocal;
+            return tranlocal;
+        }
+
+        //the transaction has a previous attached reference
+
+        if(attached.owner != ref){
+            throw abortOnTooSmallSize(2);
+        }
+
+        //the reference is the one we are looking for.
+        ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})attached;
+
+#if(!$transaction.lean)
+        if(tranlocal.isCommuting()){
+            flattenCommute(ref, tranlocal, lockMode);
+            return tranlocal;
+        }
+
+#end
+        if(tranlocal.getLockMode() < lockMode
+            && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+            throw abortOnReadConflict();
+        }
+
+        if(tranlocal.isReadonly()){
+            tranlocal.setStatus(STATUS_UPDATE);
+            hasUpdates = true;
+        }
+
+        return tranlocal;
+    }
+
+    @Override
+    public final ${ref.typeParameter} ${ref.tranlocal}${ref.typeParameter} openForConstruction(
+        final ${ref.name}${ref.typeParameter} ref) {
+
+        if (status != ACTIVE) {
+           throw abortOpenForConstruction(ref);
+        }
+
+#if(!${transaction.lean})
+        if(evaluatingCommute){
+            throw abortOnOpenForConstructionWhileEvaluatingCommute(ref);
+        }
+
+#end
+        if (ref == null) {
+            throw abortOpenForConstructionWhenNullReference();
+        }
+
+        if (config.readonly) {
+            throw abortOpenForConstructionWhenReadonly(ref);
+        }
+
+        ${ref.tranlocal}${ref.typeParameter} tranlocal = (attached == null || attached.owner != ref)
+            ? null
+            : (${ref.tranlocal}${ref.typeParameter})attached;
+
+        if(tranlocal != null){
+            if(!tranlocal.isConstructing()){
+               throw abortOpenForConstructionWithBadReference(ref);
+            }
+
+            return tranlocal;
+        }
+
+        //check if there is room
+        if (attached != null) {
+            throw abortOnTooSmallSize(2);
+        }
+
+        if(ref.___getLockOwner()!=this && ref.getVersion()!=BetaTransactionalObject.VERSION_UNCOMMITTED){
+            throw abortOpenForConstructionWithBadReference(ref);
+        }
+
+        tranlocal = pool.take(ref);
+        tranlocal.tx = this;
+        tranlocal.setDirty(true);
+        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setStatus(STATUS_CONSTRUCTING);
+        attached = tranlocal;
+        return tranlocal;
+    }
+
+    public ${ref.typeParameter} void commute(
+        ${ref.name}${ref.typeParameter} ref, ${ref.functionClass}${ref.typeParameter} function){
+
+        if (status != ACTIVE) {
+            throw abortCommute(ref, function);
+        }
+
+        if(function == null){
+            throw abortCommuteOnNullFunction(ref);
+        }
+#if($transaction.lean)
+        config.needsCommute();
+        abort();
+        throw SpeculativeConfigurationError.INSTANCE;
+#else
+        if(evaluatingCommute){
+            throw abortOnCommuteWhileEvaluatingCommute(ref);
+        }
+
+        if (config.readonly) {
+            throw abortCommuteWhenReadonly(ref, function);
+        }
+
+        if (ref == null) {
+            throw abortCommuteWhenNullReference(function);
+        }
+
+        final boolean contains = (attached != null && attached.owner == ref);
+        if(!contains){
+            if(attached != null) {
+                throw abortOnTooSmallSize(2);
+            }
+
+            //todo: call to 'openForCommute' can be inlined.
+            ${ref.tranlocal}${ref.typeParameter} tranlocal = pool.take(ref);
+            tranlocal.tx = this;
+            tranlocal.setStatus(STATUS_COMMUTING);
+            tranlocal.addCommutingFunction(function, pool);
+            attached = tranlocal;
+            hasUpdates = true;
+            return;
+        }
+        ${ref.tranlocal}${ref.typeParameter} tranlocal = (${ref.tranlocal}${ref.typeParameter})attached;
+        if(tranlocal.isCommuting()){
+            tranlocal.addCommutingFunction(function, pool);
+            return;
+        }
+
+        if(tranlocal.isReadonly()){
+            tranlocal.setStatus(STATUS_UPDATE);
+            hasUpdates = true;
+        }
+
+#if(${ref.isReference})
+        tranlocal.value = function.call(tranlocal.value);
+#else
+        throw new TodoException();
+#end
+
+#end ##if(transaction.lean)
+    }
+
+#end ##for loop for transactionalobjects
+
+    @Override
+    public BetaTranlocal get(BetaTransactionalObject object){
+        return attached == null || attached.owner!= object? null: attached;
+    }
+
+    @Override
+    public BetaTranlocal locate(BetaTransactionalObject owner){
+        if (status != ACTIVE) {
+            throw abortLocate(owner);
+        }
+
+        if(owner == null){
+            throw abortLocateWhenNullReference();
+        }
+
+        return attached == null || attached.owner!= owner? null: attached;
+    }
+     
+#if(!$transaction.lean)
+    // ======================= read conflict =======================================
+
+    private boolean hasReadConflict() {
+        if(config.readLockMode != LOCKMODE_NONE || config.inconsistentReadAllowed){
+            return false;
+        }
+
+        if(hasUntrackedReads){
+            return localConflictCounter.syncAndCheckConflict();
+        }
+
+        if(attached == null){
+            return false;
+        }
+
+        if (!localConflictCounter.syncAndCheckConflict()) {
+            return false;
+        }
+
+        return attached.owner.___hasReadConflict(attached);
+    }
+
+#end
+  
+    // ======================= abort =======================================
+
+    @Override
+    public final void abort() {
+        if (status != ACTIVE && status != PREPARED) {
+            switch (status) {
+                case ABORTED:
+                    return;
+                case COMMITTED:
+                    throw new DeadTransactionException(
+                        format("[%s] Failed to execute BetaTransaction.abort, reason: the transaction already is committed",
+                            config.familyName));
+                default:
+                    throw new IllegalStateException();
+            }
+        }
+
+        final BetaTranlocal tranlocal = attached;
+        if (tranlocal != null) {
+            tranlocal.owner.___abort(this, tranlocal, pool);
+            attached = null;
+        }
+
+        status = ABORTED;
+
+#if(!$transaction.lean)
+        if(config.permanentListeners != null){
+            notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
+        }
+
+        if(normalListeners != null){
+            notifyListeners(normalListeners, TransactionLifecycleEvent.PostAbort);
+        }
+#end
+    }
+
+    // ================== commit ===========================================
+
+#if(${transaction.lean})
+    @Override
+    public final void commit() {
+        if (status != ACTIVE && status != PREPARED) {
+            switch (status) {
+                case ABORTED:
+                    throw new DeadTransactionException(
+                        format("[%s] Failed to execute BetaTransaction.commit, reason: the transaction already is aborted", config.familyName));
+                case COMMITTED:
+                    return;
+                default:
+                    throw new IllegalStateException();
+            }
+        }
+
+        if(abortOnly){
+            throw abortOnWriteConflict();
+        }
+
+        final BetaTranlocal tranlocal = attached;
+        Listeners listeners = null;
+        if(tranlocal != null){
+            if(tranlocal.ignore()){
+                pool.put(tranlocal);
+            }else{
+                final boolean needsPrepare = status == ACTIVE
+                    && hasUpdates
+                    && config.readLockMode != LOCKMODE_COMMIT;
+
+                if(config.dirtyCheck){
+                    if(needsPrepare && !tranlocal.prepareDirtyUpdates(pool, this, config.spinCount)){
+                        throw abortOnWriteConflict();
+                    } else if(!tranlocal.isReadonly() && !tranlocal.isDirty()){
+                        tranlocal.calculateIsDirty();
+                    }
+
+                    listeners = tranlocal.owner.___commitDirty(tranlocal, this, pool);
+                }else{
+                    if(needsPrepare && !tranlocal.prepareAllUpdates(pool, this, config.spinCount)){
+                        throw abortOnWriteConflict();
+                    }
+
+                    listeners = tranlocal.owner.___commitAll(tranlocal, this, pool);
+                }
+            }
+            attached = null;
+        }
+
+        status = COMMITTED;
+
+        if(listeners != null){
+            listeners.openAll(pool);
+        }
+    }
+#else
+    @Override
+    public final void commit() {
+        if(status == COMMITTED){
+            return;
+        }
+
+        prepare();
+
+        Listeners listeners = null;
+        final BetaTranlocal tranlocal = attached;
+        if (tranlocal != null) {
+            if(config.dirtyCheck){
+                if(!tranlocal.isReadonly() && !tranlocal.isDirty()){
+                    tranlocal.calculateIsDirty();
+                }
+                listeners = attached.owner.___commitDirty(tranlocal, this, pool);
+            }else{
+                listeners = attached.owner.___commitAll(tranlocal, this, pool);
+            }
+            attached = null;
+        }
+        status = COMMITTED;
+
+        if(listeners != null){
+            listeners.openAll(pool);
+        }
+
+        if(config.permanentListeners != null){
+            notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostCommit);
+        }
+
+        if(normalListeners != null){
+            notifyListeners(normalListeners, TransactionLifecycleEvent.PostCommit);
+        }
+    }
+#end
+
+    // ======================= prepare ============================
+
+#if($transaction.lean)
+    @Override
+    public final void prepare() {
+        if(status != ACTIVE){
+            switch (status) {
+                case PREPARED:
+                    return;
+                case ABORTED:
+                    throw new DeadTransactionException(
+                        format("[%s] Failed to execute BetaTransaction.prepare, reason: the transaction already is aborted",
+                            config.familyName));
+                case COMMITTED:
+                    throw new DeadTransactionException(
+                        format("[%s] Failed to execute BetaTransaction.commit, reason: the transaction already is committed",
+                            config.familyName));
+                default:
+                    throw new IllegalStateException();
+            }
+        }
+
+        if(abortOnly){
+            throw abortOnWriteConflict();
+        }
+
+        if(hasUpdates && config.readLockMode != LOCKMODE_COMMIT){
+            final boolean success = config.dirtyCheck
+                    ? attached.prepareDirtyUpdates(pool, this, config.spinCount)
+                    : attached.prepareAllUpdates(pool, this, config.spinCount);
+
+            if(!success){
+                throw abortOnWriteConflict();
+            }
+        }
+
+        status = PREPARED;
+    }
+#else
+    @Override
+    public final void prepare() {
+        if(status != ACTIVE){
+            switch (status) {
+                case PREPARED:
+                    return;
+                case ABORTED:
+                    throw new DeadTransactionException(
+                        format("[%s] Failed to execute BetaTransaction.prepare, reason: the transaction already is aborted",
+                            config.familyName));
+                case COMMITTED:
+                    throw new DeadTransactionException(
+                        format("[%s] Failed to execute BetaTransaction.prepare, reason: the transaction already is committed",
+                            config.familyName));
+                default:
+                    throw new IllegalStateException();
+            }
+        }
+
+        boolean abort = true;
+        try{
+            if(config.permanentListeners != null){
+                notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PrePrepare);
+            }
+
+            if(normalListeners != null){
+                notifyListeners(normalListeners, TransactionLifecycleEvent.PrePrepare);
+            }
+
+            if(abortOnly){
+                throw abortOnWriteConflict();
+            }
+
+            if(hasUpdates && config.readLockMode != LOCKMODE_COMMIT){
+                final boolean success = config.dirtyCheck
+                    ? attached.prepareDirtyUpdates(pool, this, config.spinCount)
+                    : attached.prepareAllUpdates(pool, this, config.spinCount);
+
+                if(!success){
+                    throw abortOnWriteConflict();
+                }
+            }
+
+            status = PREPARED;
+            abort = false;
+        }finally{
+            if(abort){
+                abort();
+            }
+        }
+    }
+#end
+
+    // ============================ retry ===================
+
+    @Override
+    public final void retry() {
+        if (status != ACTIVE) {
+            throw abortOnFaultyStatusOfRetry();
+        }
+
+        if(!config.blockingAllowed){
+            throw abortOnNoBlockingAllowed();
+        }
+
+        if( attached == null){
+            throw abortOnNoRetryPossible();
+        }
+
+        DefaultRetryLatch listener = pool.takeDefaultRetryLatch();
+
+        try{
+            final long listenerEra = listener.getEra();
+            final BetaTransactionalObject owner = attached.owner;
+
+            final boolean noRegistration =
+                owner.___registerChangeListener(listener, attached, pool, listenerEra) == REGISTRATION_NONE;
+            owner.___abort(this, attached, pool);
+            attached = null;
+            status = ABORTED;
+
+#if(!$transaction.lean)
+            if(config.permanentListeners != null){
+                notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
+            }
+
+            if(normalListeners != null){
+                notifyListeners(normalListeners, TransactionLifecycleEvent.PostAbort);
+            }
+
+#end
+            if(noRegistration){
+                throw abortOnNoRetryPossible();
+            }
+
+            awaitUpdate(listener);
+            throw Retry.INSTANCE;
+        }finally{
+            pool.putDefaultRetryLatch(listener);
+        }
+    }
+
+    // =========================== init ================================
+
+    @Override
+    public void init(BetaTransactionConfiguration transactionConfig){
+        if(transactionConfig == null){
+            abort();
+            throw new NullPointerException();
+        }
+
+        if(status == ACTIVE || status == PREPARED){
+            abort();
+        }
+
+        this.config = transactionConfig;
+        hardReset();
+    }
+
+    // ========================= reset ===============================
+
+    @Override
+    public boolean softReset() {
+        if (status == ACTIVE || status == PREPARED) {
+#if($transaction.lean)
+            if(attached!=null){
+                attached.owner.___abort(this, attached, pool);
+            }
+#else
+            abort();
+#end
+        }
+
+        if(attempt >= config.getMaxRetries()){
+            return false;
+        }
+
+        status = ACTIVE;
+        hasUpdates = false;
+        attempt++;
+        abortOnly = false;
+#if(!$transaction.lean)
+        evaluatingCommute = false;
+        hasReads = false;
+        hasUntrackedReads = false;
+        if(normalListeners!=null){
+            normalListeners.clear();
+        }
+#end
+        return true;
+    }
+
+    @Override
+    public void hardReset(){
+        if (status == ACTIVE || status == PREPARED) {
+#if($transaction.lean)
+            if(attached!=null){
+                attached.owner.___abort(this, attached, pool);
+            }
+#else
+            abort();
+#end
+        }
+
+        hasUpdates = false;
+        status = ACTIVE;
+        abortOnly = false;
+        remainingTimeoutNs = config.timeoutNs;
+        attempt = 1;
+#if(!$transaction.lean)
+        evaluatingCommute = false;
+        hasReads = false;
+        hasUntrackedReads = false;
+        if(normalListeners !=null){
+            pool.putArrayList(normalListeners);
+            normalListeners = null;
+        }
+#end
+    }
+
+    // ================== orelse ============================
+
+#if(!$transaction.lean)
+    @Override
+    public final void startEitherBranch(){
+        throw new TodoException();
+    }
+
+    @Override
+    public final void endEitherBranch(){
+        throw new TodoException();
+    }
+
+    @Override
+    public final void startOrElseBranch(){
+        throw new TodoException();
+    }
+#end
+}
+

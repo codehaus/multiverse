@@ -1,109 +1,161 @@
+import org.codehaus.groovy.ant.Groovy
+import org.junit.Test
+
 allprojects {
-  apply plugin: 'base'
-  apply plugin: 'java'
-  apply plugin: 'maven'
-  apply plugin: 'project-reports'
+    apply plugin: 'base'
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'project-reports'
 
-  install.dependsOn ':build'
-  defaultTasks 'clean', 'install'
+    install.dependsOn ':build'
+    defaultTasks 'clean', 'install'
 
-  sourceCompatibility = 1.6
-  version = '0.7-SNAPSHOT'
-  group = 'org.multiverse'
+    sourceCompatibility = 1.6
+    version = '0.7-RC-2-SNAPSHOT'
+    group = 'org.multiverse'
 
-  def localMavenRepo = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
+    def localMavenRepo = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
 
-  repositories {
-    mavenRepo urls: localMavenRepo
-    mavenCentral()
-    mavenRepo(urls: [
-            'http://snapshots.repository.codehaus.org',
-            'http://download.java.net/maven/2/',
-            'https://maven.atlassian.com/content/groups/public'])
-  }
-
-  configurations {
-    deployerJars
-  }
-
-  test {
-    exclude("**/*AbstractTest*")
-    exclude("**/*Benchmark*")
-    exclude("**/*StressTest*")
-    exclude("**/*stressTest*")	
-    exclude("**/*LongTest*")
-    exclude("**/*PerformanceTest*")
-    exclude("**/*performanceTest*")
-  }
-
-  task shortintegrationtest(type: Test) {
-    include("**/*StressTest*")
-    include("**/*stressTest*")
-    include("**/*LongTest*")
-    include("**/*longTest*")
-  }
-
-  task integrationtest(type: Test) {
-    include("**/*StressTest*")
-    include("**/*stressTest*")
-    include("**/*LongTest*")
-    include("**/*longTest*")
-  }
-
-  dependencies {
-    compile group: 'junit', name: 'junit', version: '4.8.1'
-    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.8.2'
-    deployerJars group: 'org.apache.maven.wagon', name: 'wagon-webdav-jackrabbit', version: '1.0-beta-6'
-  }
-
-  dependencies {
-    deployerJars "org.apache.maven.wagon:wagon-ssh:1.0-beta-2"
-  }
-
-  javadoc {
-    title = "Multiverse $version"
-  }
-
-  task deploy(dependsOn: ['clean', 'install', 'uploadArchives'])<<{
-  }
-
-  uploadArchives (){
-    repositories.mavenDeployer {
-      name = 'sshDeployer' 
-      uniqueVersion = false
-      configuration = configurations.deployerJars
-      repository(
-              id: 'multiverse-releases',
-              url: 'dav:https://dav.codehaus.org/repository/multiverse/') {
-          authentication( userName: "$codehaus_loginname", password: "$codehaus_password")
-      }
-      snapshotRepository(
-              id: 'multiverse-snapshots',
-              url: 'dav:https://dav.codehaus.org/snapshots.repository/multiverse/') {
-          authentication( userName: "$codehaus_loginname", password: "$codehaus_password")
-      }
+    repositories {
+        mavenRepo urls: localMavenRepo
+        mavenCentral()
+        mavenRepo(urls: [
+                'http://snapshots.repository.codehaus.org',
+                'http://download.java.net/maven/2/',
+                'https://maven.atlassian.com/content/groups/public'])
     }
-  }
-}
 
-task generate{
-	System.out.println("Starting groovy script")
-	new GroovyShell().run(file('generate.groovy'))
-	System.out.println("Finished groovy script")
-}
-
- 
-
-project(':multiverse') {
-
-  configurations {
-    testFixtures {
-      extendsFrom testRuntime
+    configurations {
+        deployerJars
     }
-  }
 
-  shortintegrationtest {
-    jvmArgs = ["-Dorg.multiverse.integrationtest.durationMs=10000", "-Dorg.multiverse.bugshaker.enabled=true"]
-  }
+    test {
+        exclude("**/*AbstractTest*")
+        exclude("**/*Benchmark*")
+        exclude("**/*StressTest*")
+        exclude("**/*stressTest*")
+        exclude("**/*LongTest*")
+        exclude("**/*PerformanceTest*")
+        exclude("**/*performanceTest*")
+    }
 
+    task shortintegrationtest(type: Test) {
+        include("**/*StressTest*")
+        include("**/*stressTest*")
+        include("**/*LongTest*")
+        include("**/*longTest*")
+    }
+
+    task integrationtest(type: Test) {
+        include("**/*StressTest*")
+        include("**/*stressTest*")
+        include("**/*LongTest*")
+        include("**/*longTest*")
+    }
+
+    dependencies {
+        deployerJars "org.apache.maven.wagon:wagon-ssh:1.0-beta-2"
+        testCompile group: 'junit', name: 'junit', version: '4.8.2'
+        testCompile group: 'org.mockito', name: 'mockito-all', version: '1.8.2'
+        testCompile group: 'org.benchy', name: 'benchy-driver', version: '0.1-SNAPSHOT'
+        deployerJars group: 'org.apache.maven.wagon', name: 'wagon-webdav-jackrabbit', version: '1.0-beta-6'
+    }
+
+    javadoc {
+        title = "Multiverse $version"
+    }
+
+    task deploy(dependsOn: ['clean', 'install', 'uploadArchives']) << {
+    }
+
+    uploadArchives() {
+        repositories.mavenDeployer {
+            name = 'sshDeployer'
+            uniqueVersion = false
+            configuration = configurations.deployerJars
+            repository(
+                    id: 'multiverse-releases',
+                    url: 'dav:https://dav.codehaus.org/repository/multiverse/') {
+                authentication(userName: "$codehaus_loginname", password: "$codehaus_password")
+            }
+            snapshotRepository(
+                    id: 'multiverse-snapshots',
+                    url: 'dav:https://dav.codehaus.org/snapshots.repository/multiverse/') {
+                authentication(userName: "$codehaus_loginname", password: "$codehaus_password")
+            }
+        }
+    }
 }
+
+task benchmarkUncontendedMonoUpdate << {
+    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/uncontended_mono_update_benchmark.groovy")
+    execute("benchy-display benchmarks/uncontended_mono_update_display.groovy")
+}
+
+task benchmarkCounter << {
+    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/contended_counter_benchmark.groovy")
+    execute("benchy-display benchmarks/contended_counter_display.groovy")
+}
+
+task benchmarkMonoread << {
+    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/mono_read_benchmark.groovy")
+    execute("benchy-display benchmarks/mono_read_display.groovy")
+}
+
+task benchmarkAtomicget << {
+    execute("benchy-execute -cp multiverse-beta/build/classes/main:build/classes/test multiverse-beta/benchmarks/atomic_get_benchmark.groovy")
+    execute("benchy-display benchmarks/atomic_get_display.groovy")
+}
+
+task benchmarkAtomicweakget << {
+    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/atomic_weak_get_benchmark.groovy")
+    execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
+}
+
+task benchmark(dependsOn: [
+        benchmarkUncontendedMonoUpdate,
+        benchmarkCounter,
+        benchmarkMonoread,
+        benchmarkAtomicget,
+        benchmarkAtomicweakget]) << {
+}
+
+
+def execute(String s) {
+    Process proc = s.execute()
+    proc.consumeProcessErrorStream(System.err)
+    proc.consumeProcessOutputStream(System.out)
+    if (proc.waitFor() != 0) {
+        throw new RuntimeException('exec failed')
+    }
+}
+
+project(':multiverse-beta') {
+
+    configurations {
+        testFixtures {
+            extendsFrom testRuntime
+        }
+    }
+
+    compileJava.doFirst {
+        System.out.println("Starting groovy script")
+        new GroovyShell().run(new File('multiverse-beta/generate.groovy'))
+        System.out.println("Finished groovy script")
+    }
+
+    shortintegrationtest {
+        jvmArgs = ["-Dorg.multiverse.integrationtest.durationMs=10000", "-Dorg.multiverse.bugshaker.enabled=true"]
+    }
+}
+
+project(':multiverse-site') {
+    jar.doLast {
+        def binding = new Binding()
+        def parent = Groovy.class.getClassLoader()
+        def loader = new GroovyClassLoader(parent)
+        def shell = new GroovyShell(loader, binding)
+        shell.evaluate(new java.io.File("multiverse-site/menu.groovy"))
+    }
+}
+

@@ -1,0 +1,229 @@
+<h1>3 Transaction Lifecycle events</h1>
+
+<ul>
+    <li><a href="#introduction">3.1 Introduction</a></li>
+    <li><a href="#transactionlifecyclelistener">3.2 TransactionLifecycleListener</a></li>
+    <li><a href="#deferred.tasks">3.3 Deferred tasks</a></li>
+    <li><a href="#compensating.tasks">3.4 Compensating tasks</a></li>
+    <li><a href="#transactionlifecyclelisteners.and.exceptions">3.5 TransactionLifecycleListener and Exceptions</a></li>
+    <li><a href="#executing.listeners.asynchronously.parallel">3.6 Executing listeners asynchronously/parallel</a></li>
+</ul>
+
+<h2 id="introduction">3.1 Introduction</h2>
+It is possible in Multiverse to execute additional logic before or after a transaction aborts or commits. The following
+lifecycle events are available:
+<ol>
+    <li><b>pre commit:</b> just before committing.
+    </li>
+    <li><b>post commit:</b> just after committing.
+    </li>
+    <li><b>pre abort:</b> just before aborting, so while the transaction still is active.
+    </li>
+    <li><b>post abort:</b> just after aborting.
+    </li>
+</ol>
+There are all kinds of reasons why a transaction can abort, for example when there is a read or write conflict.
+<p/>
+At the moment there is no support for the pre en post start events because transactions always begin started. It could
+be the unstarted state is added if it is needed.
+
+<h2 id="transactionlifecyclelistener">3.2 TransactionLifecycleListener</h2>
+<p/>
+Using a org.multiverse.api.TransactionLifecycleListener you can listen to events, an example:
+
+<pre>
+    import org.multiverse.api.*;
+
+    public class PostCommitEventListener implements TransactionLifecycleListener{
+        public  void notify(Transaction tx, TransactionLifecycleEvent event){
+            if(event == TransactionLifecycleEvent.postCommit){
+                System.out.println("Transaction is committed");
+            }
+        }
+    }
+</pre>
+
+And this can be registered using the Transaction.register method that gives the following guarantees:
+<ol>
+    <li>It is guaranteed that the listeners are executed in the order they are registered</li>
+    <li>It is guaranteed that the listeners are executed on the same thread that does the commit or abort</li>
+</ol>
+
+An example of using the Transaction.register method:
+<pre>
+    import org.multiverse.api.Transaction;
+    import org.multiverse.annotations.TransactionalObject;
+    import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
+
+    @TransactionalObject
+    public class Account{
+
+        private int balance;
+
+        public Account(){
+            balance = 0;
+        }
+
+        public void transfer(int amount){
+            balance+=amount;
+
+            Transaction tx = getThreadLocalTransaction();
+            tx.register(new PostCommitEventListener());
+        }
+    }
+</pre>
+In this example the 'Transaction is committed' is printed when the transfer method commits.
+
+<h2 id="deferred.tasks">3.3 Deferred tasks</h2>
+A deferred tasks is a task that is executed after the transaction commits and are very useful to execute actions
+on non transactional resources. If these resources are used inside the transaction, it could be that they
+are called more than once because a transaction can be restarted. A good example is starting threads
+after a Transaction commits. A deferred task can be created using the TransactionLifecycleListener.
+
+<pre>
+    import org.multiverse.api.*;
+
+    public class PostCommitEventListener implements TransactionLifecycleListener{
+        public  void notify(Transaction tx, TransactionLifecycleEvent event){
+            if(event == TransactionLifecycleEvent.postCommit){
+                System.out.println("Executing deferred task");
+            }
+        }
+    }
+</pre>
+It is important to realize that when the notify method accesses transactional objects, this is done in a new
+transaction.If the pre-commit task throws a Throwable (Error or RuntimeException), the transaction is aborted,
+but the other pre and post commit tasks are not executed, but the pre-abort and post abort tasks
+are executed.
+<p>
+    Luckily there also is a shortcut for creating and scheduling a deferred task:
+<pre>
+    import org.multiverse.annotations.TransactionalMethod;
+    import static org.multiverse.api.StmUtils.scheduleDeferredTask;
+
+    @TransactionalMethod
+    public void foo(){
+        scheduleDeferredTask(new Runnable(){
+            public void run(){
+                System.out.println("Executing deferred task");
+            }
+        });
+    }
+</pre>
+Under water the runnable automatically is wrapped in a TransactionLifecycleListener and registered on the Transaction
+in the ThreadLocalTransaction. If no transaction is found, a NoTransactionFoundException is thrown. It consumes
+a little more space since an additional object needs to be created (next to the TransactionLifecycleListener).
+
+<h2 id="compensating.tasks">3.4 Compensating tasks</h2>
+A compensating tasks is a tasks that is executed after a transaction aborts. They are very useful to implement
+cleanup actions like removing resources (files for example) that have been created. A compensating tasks
+can be created using
+the TransactionLifecycleListener:
+
+<pre>
+    import org.multiverse.api.*;
+
+    public class PostCommitEventListener implements TransactionLifecycleListener{
+        public  void notify(Transaction tx, TransactionLifecycleEvent event){
+            if(event == TransactionLifecycleEvent.postAbort){
+                System.out.println("Executing compensating task");
+            }
+        }
+    }
+</pre>
+It is important to realize that when the notify method accesses transactional objects, it is done in a new
+transaction.
+<p>
+    If the pre-abort task throws a Throwable (Error or RuntimeException), the transaction is aborted,
+    but the other pre-abort and post-abort tasks are not executed.
+
+<p>
+    Luckily there also is a shortcut for creating and scheduling a compensating task:
+<pre>
+    import org.multiverse.annotations.TransactionalMethod;
+    import static org.multiverse.api.StmUtils.scheduleCompensatingTask;
+
+    @TransactionalMethod
+    public void foo(){
+        scheduleCompensatingTask(new Runnable(){
+            public void run(){
+                System.out.println("Executing compensating task");
+            }
+        });
+    }
+</pre>
+Under water the runnable automatically is wrapped in a TransactionLifecycleListener and registered on the Transaction
+in the ThreadLocalTransaction. If no transaction is found, a NoTransactionFoundException is thrown. It consumes
+a little more space since an additional object needs to be created (next to the TransactionLifecycleListener).
+
+
+<h2 id="transactionlifecyclelisteners.and.exceptions">3.5 TransactionLifecycleListener and exceptions</h2>
+If an exception is thrown while
+the TransactionLifecycleListener.notify method is called, other follwing TransactionLifecycleListeners
+for the same TransactionLifecycleEvent are not executed. This is a schema that shows what happens when
+an exception is thrown during during a TransactionLifecycleEvent:
+<ol>
+    <li><b>pre commit:</b> the transaction is aborted and pre/post abort tasks are executed.</li>
+    <li><b>post commit:</b> the transaction stays committed.</li>
+    <li><b>pre abort:</b> the transaction is aborted and the post abort tasks are called.</li>
+    <li><b>post abort:</b> the transaction stays aborted.</li>
+</ol>
+
+<h2 id="executing.listeners.asynchronously.parallel">3.6 Executing TransactionLifecycleListeners
+    parallel/asynchronously</h2>
+TransactionLifecycleListeners are executed on the thread that aborts or commits. But in some cases you these tasks
+to be executed in paralellel or asynchronously. This behavior it not integrated in the Multiverse Api's,
+but can be realized by using an java.util.concurrent.Executor:
+
+<pre>
+    import java.util.concurrent.Executor;
+
+    import org.multiverse.api.Transaction;
+    import org.multiverse.api.TransactionLifecycleEvent;
+    import org.multiverse.api.TransactionLifecycleListener;
+
+    class LongTaskEventListener implements TransactionLifecycleListener{
+
+        private final Executor executor = ...
+
+        @Override
+        public  void notify(Transaction tx, TransactionLifecycleEvent event){
+            if(event == TransactionLifecycleEvent.postCommit){
+                LongTask longTask = new SomeLongTask();
+                executor.execute(longTask);
+            }
+        }
+    }
+</pre>
+Warning: an executor normally has not an unbound workqueue, and it also can shut down. So it could be that the
+executor starts throwing a RejectedExecutionException when the execute method is called, it could prevent
+the execution of the other listeners. This is the default behavior for dealing with exceptions on
+TransactionLifecycleListeners. To bypass this behavior, and to make sure that the listeners do get called,
+make sure to add a RejectedExecutionException handler.
+
+<pre>
+    import java.util.concurrent.Executor;
+    import java.util.concurrent.RejectedExecutionException;
+
+    import org.multiverse.api.Transaction;
+    import org.multiverse.api.TransactionLifecycleEvent;
+    import org.multiverse.api.TransactionLifecycleListener;
+
+    class LongTaskEventListener implements TransactionLifecycleListener{
+
+        private final Executor executor = ...
+
+        @Override
+        public  void notify(Transaction tx, TransactionLifecycleEvent event){
+            if(event == TransactionLifecycleEvent.postCommit){
+                LongTask longTask = new SomeLongTask();
+                try{
+                    executor.execute(longTask);
+                }catch(RejectedExecutionException ex){
+                    ...
+                }
+            }
+        }
+    }
+</pre>
+        

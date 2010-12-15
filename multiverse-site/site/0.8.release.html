@@ -1,0 +1,34 @@
+<h2>Multiverse 0.8</h2>
+
+The features that are planned for the 0.8 release are not cast in stone atm, but the following is on the radar:
+<ol>
+    <li>Abort for: atm a transaction will always abort for any throwable, </li>
+    <li>Spring support: to make Multiverse easy to integrate with Spring based applications</li>
+    <li>JTA support:</li>
+    <li>TransactionalList/TransactionalDeque</li>
+    <li>Transactional Hashmap/HashSet</li>
+    <li>Contention Management</li>
+    <li>Lock acquire policy: atm a configurable amount of spinning is used, but for lock that are acquired for a longer period, spinning is very inefficient. So
+    blocking locks needed and should be done through a lock acquire policy. This is needed to make it possible to use the STM as a more traditional locking
+    solutions</li>
+    <li>Read/write locks:</li>
+    <li>Better alignment with <a href="http://www.gigaspaces.com/">Gigaspaces</a>. I use Gigaspaces at work in combination with traditional concurrency control,
+    but I want to experiment with aligning Multiverse with more traditional lock based solutions like GigaSpaces so the traditional lock based concurrency control
+    can be removed.</li>
+    <li>Profiler</li>
+    <li>Instrumentation for Java</li>
+    <li>tryprivatize/tryensure</li>
+</ol>
+
+Improved performance:
+<ol>
+    <li>instead of doing 'expensive' arrive/depart operations on reads to provide read consistency, for very short transaction it probably is cheaper to do a full
+    conflict scan instead of expensive cas operations for the arrive/depart</li>
+    <li>
+        less overhead on transactions. I already experimented with transaction implementations where the need for pooling tranlocals is removed since the transaction
+        itself will act as the pool.
+    </li>
+    <li>
+        removal of volatile writes:
+    </li>
+</ol>

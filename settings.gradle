@@ -1,1 +1,1 @@
-include 'multiverse'
+include 'multiverse-beta','multiverse-site'

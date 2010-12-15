@@ -1,0 +1,23 @@
+<h1>Setup Java Agent</h1>
+
+If you want to make use of classes annotated with @TransactionObject or @TransactionalMethod, these classes need
+to be instrumented.
+<p/>
+The setup of the Multiverse Javaagent:
+<pre>
+    java -javaagent:multiverse-alpha-javaagent-0.4-SNAPSHOT.jar YourMain
+</pre>
+Other libraries for Multiverse are not needed (everything is included in this jar). For the time being it only is
+possible to do this through Java agent technology using load time instrumentation. In the near future a compiletime
+instrumentation option will be provided.
+<p/>
+If you want to use Multiverse without the instrumentation, for example to integrate it in a different language, the
+        Javaagent is not needed.
+        
+<p/>
+Multiverse makes use of <a href="http://asm.ow2.org">ASM</a>, a powerful bytecode manipulation framework. And using
+<a href="http://jarjar.googlecode.com">Jar Jar</a>, ASM is included in the multiverse-alpha-javaagent jar
+and automatically refactored so that it is placed on a non conflicting package. This means that it doesn't matter
+if ASM already is on the classpath or that a different version is used.
+
+<!-- make link to parameters for the javaagent-->        
