@@ -4,9 +4,9 @@ import org.benchy.AbstractBenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
-import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
@@ -14,24 +14,25 @@ import static org.multiverse.stms.beta.BetaStmUtils.format;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondPerThread;
 
-public class UncontendedAtomicIncrementAndGetDriver extends AbstractBenchmarkDriver {
+public class AtomicSetDriver extends AbstractBenchmarkDriver implements BetaStmConstants {
 
     private transient BetaStm stm;
-    private transient UpdateThread[] threads;
+    private transient GetThread[] threads;
     private int threadCount;
-    private int transactionsPerThread;
+    private long transactionsPerThread;
+    private boolean sharedRef;
 
     @Override
     public void setUp() {
-        System.out.printf("Multiverse > Running with %s thread(s)\n", threadCount);
-        System.out.printf("Multiverse > Running with %s transactionsPerThread\n", transactionsPerThread);
+        System.out.printf("Multiverse > Threadcount %s\n", threadCount);
+        System.out.printf("Multiverse > Transactions/Thread %s \n", transactionsPerThread);
+        System.out.printf("Multiverse > SharedRef %s \n", sharedRef);
 
         stm = new BetaStm();
-
-        threads = new UpdateThread[threadCount];
-
+        threads = new GetThread[threadCount];
+        BetaLongRef ref = sharedRef ? newLongRef(stm) : null;
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new UpdateThread(k, transactionsPerThread);
+            threads[k] = new GetThread(k, ref == null ? newLongRef(stm) : ref);
         }
     }
 
@@ -44,7 +45,7 @@ public class UncontendedAtomicIncrementAndGetDriver extends AbstractBenchmarkDri
     @Override
     public void processResults(TestCaseResult testCaseResult) {
         long totalDurationMs = 0;
-        for (UpdateThread t : threads) {
+        for (GetThread t : threads) {
             totalDurationMs += t.durationMs;
         }
 
@@ -58,26 +59,22 @@ public class UncontendedAtomicIncrementAndGetDriver extends AbstractBenchmarkDri
         testCaseResult.put("transactionsPerSecondPerThread", transactionsPerSecondPerThread);
     }
 
-    class UpdateThread extends TestThread {
-        private final long transactionCount;
+    class GetThread extends TestThread {
         private long durationMs;
+        private final BetaLongRef ref;
 
-        public UpdateThread(int id, long transactionCount) {
-            super("UpdateThread-" + id);
+        public GetThread(int id, BetaLongRef ref) {
+            super("AtomicGetThread-" + id);
             setPriority(Thread.MAX_PRIORITY);
-            this.transactionCount = transactionCount;
+            this.ref = ref;
         }
 
         public void doRun() {
-            final BetaLongRef ref = newLongRef(stm, -1);
-
             long startMs = System.currentTimeMillis();
-            final long t = transactionCount;
-            for (long k = 0; k < t; k++) {
-                ref.atomicIncrementAndGet(1);
+            final long _transactionsPerThread = transactionsPerThread;
+            for (long k = 0; k < _transactionsPerThread; k++) {
+                ref.atomicGet();
             }
-
-            assertEquals(transactionCount, ref.atomicGet() + 1);
 
             durationMs = System.currentTimeMillis() - startMs;
             System.out.printf("Multiverse > %s is finished in %s ms\n", getName(), durationMs);

@@ -1,5 +1,4 @@
 import org.codehaus.groovy.ant.Groovy
-import org.junit.Test
 
 allprojects {
     apply plugin: 'base'
@@ -112,12 +111,20 @@ task benchmarkAtomicweakget << {
     execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
 }
 
+task benchmarkBoxingOverhead << {
+    //execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/boxing_overhead_benchmark.groovy")
+    execute("benchy-display benchmarks/boxing_overhead_display.groovy")
+    execute("benchy-display benchmarks/boxing_overhead_total_display.groovy")
+}
+
+
 task benchmark(dependsOn: [
         benchmarkUncontendedMonoUpdate,
         benchmarkCounter,
         benchmarkMonoread,
         benchmarkAtomicget,
-        benchmarkAtomicweakget]) << {
+        benchmarkAtomicweakget,
+        benchmarkBoxingOverhead]) << {
 }
 
 
@@ -138,11 +145,11 @@ project(':multiverse-beta') {
         }
     }
 
-    compileJava.doFirst {
-        System.out.println("Starting groovy script")
-        new GroovyShell().run(new File('multiverse-beta/generate.groovy'))
-        System.out.println("Finished groovy script")
-    }
+//    compileJava.doFirst {
+//        System.out.println("Starting groovy script")
+//        new GroovyShell().run(new File('multiverse-beta/generate.groovy'))
+//        System.out.println("Finished groovy script")
+//    }
 
     shortintegrationtest {
         jvmArgs = ["-Dorg.multiverse.integrationtest.durationMs=10000", "-Dorg.multiverse.bugshaker.enabled=true"]
