@@ -25,7 +25,8 @@ for (def benchmark in benchmarks) {
     xySeriesDataSet.addSeries(series);
 }
 
-writeLineChartAsPng(xySeriesDataSet, "Uncontended Mono Update", "threads", "transaction/second/thread", new File("charts/uncontended_mono_update_line.png"))
+writeLineChartAsPng(xySeriesDataSet, "Uncontended Mono Update", "threads", "transaction/second/thread", new File("charts/uncontended_mono_update_line_wide.png"))
+writeLineChartAsPng(xySeriesDataSet, "Uncontended Mono Update", "threads", "transaction/second/thread", 600, new File("charts/uncontended_mono_update_line_narrow.png"))
 writeBarChartAsPng(categoryDataSet, "Uncontended Mono Update", "threads", "transaction/second/thread", new File("charts/uncontended_mono_update_bar.png"))
 
 

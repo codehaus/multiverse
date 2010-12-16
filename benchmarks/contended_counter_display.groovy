@@ -32,7 +32,8 @@ for (def benchmark in benchmarks) {
     xySeriesDataSet.addSeries(seriesDirtyCheck);
 }
 
-writeLineChartAsPng(xySeriesDataSet, "Contended Counter", "threads", "transaction/second/thread", new File("charts/contended_counter_line.png"))
+writeLineChartAsPng(xySeriesDataSet, "Contended Counter", "threads", "transaction/second/thread", new File("charts/contended_counter_line_wide.png"))
+writeLineChartAsPng(xySeriesDataSet, "Contended Counter", "threads", "transaction/second/thread", 600, new File("charts/contended_counter_line_narrow.png"))
 writeBarChartAsPng(categoryDataSet, "Contended Counter", "threads", "transaction/second/thread", new File("charts/contended_counter_update_bar.png"))
 
 

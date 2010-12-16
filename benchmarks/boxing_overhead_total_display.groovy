@@ -30,6 +30,7 @@ for (def benchmark in benchmarks) {
     xySeriesDataSet.addSeries(seriesBoxing);
 }
 
-writeLineChartAsPng(xySeriesDataSet, "Boxing overhead", "threads", "transaction/second", new File("charts/boxing_overhead_total_line.png"))
+writeLineChartAsPng(xySeriesDataSet, "Boxing overhead", "threads", "transaction/second", new File("charts/boxing_overhead_total_line_wide.png"))
+writeLineChartAsPng(xySeriesDataSet, "Boxing overhead", "threads", "transaction/second", 600, new File("charts/boxing_overhead_total_line_narrow.png"))
 
 

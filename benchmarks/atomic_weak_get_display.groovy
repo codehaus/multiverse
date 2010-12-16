@@ -25,7 +25,8 @@ for (def benchmark in benchmarks) {
     xySeriesDataSet.addSeries(series);
 }
 
-writeLineChartAsPng(xySeriesDataSet, "Atomic Get", "threads", "transaction/second/thread", new File("charts/atomic_weak_get_line.png"))
+writeLineChartAsPng(xySeriesDataSet, "Atomic Get", "threads", "transaction/second/thread", new File("charts/atomic_weak_get_line_wide.png"))
+writeLineChartAsPng(xySeriesDataSet, "Atomic Get", "threads", "transaction/second/thread", 600,new File("charts/atomic_weak_get_line_narrow.png"))
 writeBarChartAsPng(categoryDataSet, "Atomic Get", "threads", "transaction/second/thread", new File("charts/atomic_weak_get_bar.png"))
 
 
