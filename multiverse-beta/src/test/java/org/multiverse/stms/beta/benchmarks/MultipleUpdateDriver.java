@@ -1,6 +1,6 @@
 package org.multiverse.stms.beta.benchmarks;
 
-import org.benchy.AbstractBenchmarkDriver;
+import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
 import org.multiverse.stms.beta.BetaStm;
@@ -17,7 +17,7 @@ import static org.multiverse.stms.beta.BetaStmUtils.format;
 /**
  * @author Peter Veentjer
  */
-public class MultipleUpdateDriver extends AbstractBenchmarkDriver implements BetaStmConstants {
+public class MultipleUpdateDriver extends BenchmarkDriver implements BetaStmConstants {
 
     private BetaStm stm;
 

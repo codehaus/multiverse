@@ -1,6 +1,9 @@
 <h2>Benchmarks</h2>
 
+
+
 <h2>Updates</h2>
+
 <a href="uncontended_mono_update_line_wide.png"><img src="uncontended_mono_update_line_narrow.png"/></a>
 <a href="contended_counter_line_wide.png"><img src="contended_counter_line_narrow.png"/></a>
 
@@ -12,5 +15,7 @@
 <a href="atomic_weak_get_line_wide.png"><img src="atomic_weak_get_line_narrow.png"/></a>
 
 <h3>Boxing overhead</h3>
+A benchmark that shows the overhead caused by creating a single primitive wrapper per transaction. As you can see the
+        primitive ref scales linearly, but the boxing version doesn't.
 <a href="boxing_overhead_line_wide.png"><img src="boxing_overhead_line_narrow.png"/></a>
 <a href="boxing_overhead_total_line_wide.png"><img src="boxing_overhead_total_line_narrow.png"/></a>

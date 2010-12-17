@@ -96,34 +96,33 @@ task benchmarkCounter << {
     execute("benchy-display benchmarks/contended_counter_display.groovy")
 }
 
-task benchmarkMonoread << {
+task benchmarkMonoRead << {
     execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/mono_read_benchmark.groovy")
     execute("benchy-display benchmarks/mono_read_display.groovy")
 }
 
-task benchmarkAtomicget << {
-    execute("benchy-execute -cp multiverse-beta/build/classes/main:build/classes/test multiverse-beta/benchmarks/atomic_get_benchmark.groovy")
+task benchmarkAtomicGet << {
+    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/atomic_get_benchmark.groovy")
     execute("benchy-display benchmarks/atomic_get_display.groovy")
 }
 
-task benchmarkAtomicweakget << {
+task benchmarkAtomicWeakGet << {
     execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/atomic_weak_get_benchmark.groovy")
     execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
 }
 
 task benchmarkBoxingOverhead << {
-    //execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/boxing_overhead_benchmark.groovy")
+    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/boxing_overhead_benchmark.groovy")
     execute("benchy-display benchmarks/boxing_overhead_display.groovy")
     execute("benchy-display benchmarks/boxing_overhead_total_display.groovy")
 }
 
-
 task benchmark(dependsOn: [
         benchmarkUncontendedMonoUpdate,
         benchmarkCounter,
-        benchmarkMonoread,
-        benchmarkAtomicget,
-        benchmarkAtomicweakget,
+        benchmarkMonoRead,
+        benchmarkAtomicGet,
+        benchmarkAtomicWeakGet,
         benchmarkBoxingOverhead]) << {
 }
 
@@ -163,6 +162,11 @@ project(':multiverse-site') {
         def loader = new GroovyClassLoader(parent)
         def shell = new GroovyShell(loader, binding)
         shell.evaluate(new java.io.File("multiverse-site/menu.groovy"))
+
+        println "copying files"
+        ant.copy(todir: "${projectDir}/build/site") {
+            fileset(dir: "../charts")
+        }
+        println "finished copying"
     }
 }
-

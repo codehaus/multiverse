@@ -1,6 +1,6 @@
 package org.multiverse.stms.beta.benchmarks;
 
-import org.benchy.AbstractBenchmarkDriver;
+import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
@@ -15,7 +15,7 @@ import java.util.Random;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 
-public class AccountDriver extends AbstractBenchmarkDriver {
+public class AccountDriver extends BenchmarkDriver {
     public static final int WARMUP_PHASE = 1;
     public static final int TEST_PHASE = 2;
     public static final int SHUTDOWN_PHASE = 3;

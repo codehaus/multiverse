@@ -334,11 +334,11 @@ public class TestUtils implements MultiverseConstants {
                         durationMs += thread.getDurationMs();
 
                         if (thread.getThrowable() == null) {
-                            System.out.printf("Multiverse> %s completed successfully\n", thread.getName());
+                            System.out.printf("Multiverse > %s completed successfully\n", thread.getName());
                         } else {
-                            System.out.printf("Multiverse> %s encountered the following error\n", thread.getName());
+                            System.out.printf("Multiverse > %s encountered the following error\n", thread.getName());
                             thread.getThrowable().printStackTrace();
-                            fail(String.format("Multiverse> %s completed with failure", thread.getName()));
+                            fail(String.format("Multiverse > %s completed with failure", thread.getName()));
                         }
                     }
                 } catch (InterruptedException e) {

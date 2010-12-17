@@ -1,6 +1,6 @@
 package org.multiverse.stms.beta.benchmarks;
 
-import org.benchy.AbstractBenchmarkDriver;
+import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
@@ -14,7 +14,7 @@ import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
 
-public class ContendedCounterDriver extends AbstractBenchmarkDriver {
+public class ContendedCounterDriver extends BenchmarkDriver {
 
     private int threadCount;
     private PessimisticLockLevel pessimisticLockLevel = PessimisticLockLevel.LockNone;

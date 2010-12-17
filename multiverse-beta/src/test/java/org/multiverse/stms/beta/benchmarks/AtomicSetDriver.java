@@ -1,6 +1,6 @@
 package org.multiverse.stms.beta.benchmarks;
 
-import org.benchy.AbstractBenchmarkDriver;
+import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
 import org.multiverse.stms.beta.BetaStm;
@@ -14,7 +14,7 @@ import static org.multiverse.stms.beta.BetaStmUtils.format;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondPerThread;
 
-public class AtomicSetDriver extends AbstractBenchmarkDriver implements BetaStmConstants {
+public class AtomicSetDriver extends BenchmarkDriver implements BetaStmConstants {
 
     private transient BetaStm stm;
     private transient GetThread[] threads;

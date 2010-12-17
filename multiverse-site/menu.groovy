@@ -26,6 +26,7 @@ def menus = [
                 new MenuItem(title: 'Overview', pageid: 'overview'),
                 new MenuItem(title: 'Download', pageid: 'download'),
                 new MenuItem(title: 'Features', pageid: 'features'),
+                new MenuItem(title: 'Benchmarks', pageid: 'benchmarks'),
                 new MenuItem(title: 'Mission Statement', pageid: 'missionstatement'),
                 new MenuItem(title: 'NoSQL', pageid: 'nosql'),
                 new MenuItem(title: 'Sponsors', pageid: 'sponsors'),
@@ -73,6 +74,7 @@ def pages = [
         new Page(pageid: '0.6.release'),
         new Page(pageid: '0.7.release'),
         new Page(pageid: '0.8.release'),
+        new Page(pageid: 'benchmarks'),
         new Page(pageid: 'faq'),
         new Page(pageid: 'team'),
         new Page(pageid: 'development'),
@@ -90,7 +92,6 @@ def outputdirectory = "multiverse-site/build/site"
 
 //=============== template engine ==================
 
-println('starting')
 def outputdirectoryfile = new File(outputdirectory)
 if (!outputdirectoryfile.exists()) {
   if (!outputdirectoryfile.mkdirs()) {
@@ -98,7 +99,6 @@ if (!outputdirectoryfile.exists()) {
   }
 }
 
-println("copying pages")
 for (page in pages) {
   def filename = "${page.pageid}.html"
   def engine = new GStringTemplateEngine()

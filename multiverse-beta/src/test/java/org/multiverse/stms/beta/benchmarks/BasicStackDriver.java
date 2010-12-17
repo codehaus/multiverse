@@ -1,6 +1,6 @@
 package org.multiverse.stms.beta.benchmarks;
 
-import org.benchy.AbstractBenchmarkDriver;
+import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
@@ -13,7 +13,7 @@ import org.multiverse.stms.beta.BetaStm;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 
-public class BasicStackDriver extends AbstractBenchmarkDriver {
+public class BasicStackDriver extends BenchmarkDriver {
 
     private int pushThreadCount = 1;
     private int popThreadCount = 1;

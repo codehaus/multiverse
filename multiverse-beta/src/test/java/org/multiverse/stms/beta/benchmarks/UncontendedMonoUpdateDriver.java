@@ -1,6 +1,6 @@
 package org.multiverse.stms.beta.benchmarks;
 
-import org.benchy.AbstractBenchmarkDriver;
+import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
 import org.multiverse.api.PessimisticLockLevel;
@@ -16,7 +16,7 @@ import static org.multiverse.stms.beta.BetaStmUtils.format;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecond;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondPerThread;
 
-public class UncontendedMonoUpdateDriver extends AbstractBenchmarkDriver {
+public class UncontendedMonoUpdateDriver extends BenchmarkDriver {
 
     private BetaStm stm;
     private UpdateThread[] threads;

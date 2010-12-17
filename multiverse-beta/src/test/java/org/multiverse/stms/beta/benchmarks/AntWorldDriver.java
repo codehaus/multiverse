@@ -1,9 +1,9 @@
 package org.multiverse.stms.beta.benchmarks;
 
-import org.benchy.AbstractBenchmarkDriver;
+import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 
-public class AntWorldDriver extends AbstractBenchmarkDriver {
+public class AntWorldDriver extends BenchmarkDriver {
 
     @Override
     public void run(TestCaseResult testCaseResult) {

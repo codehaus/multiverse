@@ -1,6 +1,6 @@
 package org.multiverse.stms.beta.benchmarks;
 
-import org.benchy.AbstractBenchmarkDriver;
+import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
 import org.multiverse.api.PessimisticLockLevel;
@@ -18,7 +18,7 @@ import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
-public class BoxingOverheadDriver extends AbstractBenchmarkDriver implements BetaStmConstants {
+public class BoxingOverheadDriver extends BenchmarkDriver implements BetaStmConstants {
 
     private BetaStm stm;
     private boolean withBoxing;
