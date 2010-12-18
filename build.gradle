@@ -111,6 +111,21 @@ task benchmarkAtomicWeakGet << {
     execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
 }
 
+task benchmarkSimpleStack << {
+    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/simple_stack_benchmark.groovy")
+    //execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
+}
+
+task benchmarkIntrinsicLockStack << {                                                                            
+    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/intrinsic_lock_stack_benchmark.groovy")
+    //execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
+}
+
+task benchmarkJucLockStack << {                                                                            
+    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/juc_lock_stack_benchmark.groovy")
+    //execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
+}
+
 task benchmarkBoxingOverhead << {
     execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/boxing_overhead_benchmark.groovy")
     execute("benchy-display benchmarks/boxing_overhead_display.groovy")
@@ -123,6 +138,9 @@ task benchmark(dependsOn: [
         benchmarkMonoRead,
         benchmarkAtomicGet,
         benchmarkAtomicWeakGet,
+        benchmarkSimpleStack,
+	benchmarkIntrinsicLockStack,
+	benchmarkJucLockStack,
         benchmarkBoxingOverhead]) << {
 }
 
