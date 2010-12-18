@@ -6,7 +6,7 @@ import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.PessimisticLockLevel;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.closures.AtomicClosure;
+import org.multiverse.api.closures.AtomicBooleanClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.IntRef;
 import org.multiverse.api.references.Ref;
@@ -14,9 +14,9 @@ import org.multiverse.stms.beta.BetaStm;
 
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
-import static org.multiverse.api.StmUtils.newIntRef;
+import static org.multiverse.stms.beta.BetaStmUtils.format;
 
-public class StackDriver extends BenchmarkDriver {
+public class SimpleStackDriver extends BenchmarkDriver {
 
     private int pushThreadCount = 1;
     private int popThreadCount = 1;
@@ -34,7 +34,11 @@ public class StackDriver extends BenchmarkDriver {
     public void setUp() {
         System.out.printf("Multiverse > Pop threadcount %s\n", pushThreadCount);
         System.out.printf("Multiverse > Push threadcount %s\n", popThreadCount);
-        System.out.printf("Multiverse > Capacity %s\n", capacity);
+        if (capacity == Integer.MAX_VALUE) {
+            System.out.printf("Multiverse > Capacity unbound\n");
+        } else {
+            System.out.printf("Multiverse > Capacity %s\n", capacity);
+        }
         System.out.printf("Multiverse > Pool Closures %s\n", poolClosures);
         System.out.printf("Multiverse > PessimisticLockLevel %s\n", lockMode);
         System.out.printf("Multiverse > DirtyCheck %s\n", dirtyCheck);
@@ -65,20 +69,26 @@ public class StackDriver extends BenchmarkDriver {
     @Override
     public void processResults(TestCaseResult testCaseResult) {
         long pushCount = 0;
-        long totalDuration = 0;
+        long totalDurationMs = 0;
         for (PushThread t : pushThreads) {
             pushCount += t.count;
-            totalDuration += t.getDurationMs();
+            totalDurationMs += t.getDurationMs();
         }
 
         long popCount = 0;
         for (PopThread t : popThreads) {
             popCount += t.count;
-            totalDuration += t.getDurationMs();
+            totalDurationMs += t.getDurationMs();
         }
 
+        int threadCount = pushThreadCount + popThreadCount;
         long count = pushCount + popCount;
         System.out.printf("Multiverse > Total number of transactions %s\n", count);
+        double transactionsPerSecond = (count * 1000.0d) / totalDurationMs;
+        System.out.printf("Multiverse > Performance %s transactions/second with %s threads\n",
+                format(transactionsPerSecond), threadCount);
+
+        testCaseResult.put("transactionsPerSecond", transactionsPerSecond);
     }
 
     class PushThread extends TestThread {
@@ -114,12 +124,16 @@ public class StackDriver extends BenchmarkDriver {
                 count++;
             }
 
-            pushBlock.execute(new AtomicVoidClosure() {
-                @Override
-                public void execute(Transaction tx) throws Exception {
-                    stack.push(tx, "end");
-                }
-            });
+
+            for (int k = 0; k < popThreadCount; k++) {
+                pushBlock.execute(new AtomicVoidClosure() {
+                    @Override
+                    public void execute(Transaction tx) throws Exception {
+                        stack.push(tx, "end");
+
+                    }
+                });
+            }
         }
 
         private void runWithPooledClosure() {
@@ -131,8 +145,10 @@ public class StackDriver extends BenchmarkDriver {
                 count++;
             }
 
-            pushClosure.item = "end";
-            pushBlock.execute(pushClosure);
+            for (int k = 0; k < popThreadCount; k++) {
+                pushClosure.item = "end";
+                pushBlock.execute(pushClosure);
+            }
         }
 
         class PushClosure implements AtomicVoidClosure {
@@ -169,36 +185,39 @@ public class StackDriver extends BenchmarkDriver {
         }
 
         private void runWithPooledClosure() {
-            while (!shutdown) {
-                popBlock.execute(new AtomicVoidClosure() {
+            boolean end = false;
+            while (!end) {
+                end = popBlock.execute(new AtomicBooleanClosure() {
                     @Override
-                    public void execute(Transaction tx) throws Exception {
-                        stack.pop(tx);
+                    public boolean execute(Transaction tx) throws Exception {
+                        return !stack.pop(tx).equals("end");
                     }
                 });
+
                 count++;
             }
         }
 
         private void runWithoutPooledClosure() {
             PopClosure popClosure = new PopClosure();
-            while (!shutdown) {
-                popBlock.execute(popClosure);
+            boolean end = false;
+            while (!end) {
+                end = popBlock.execute(popClosure);
                 count++;
             }
         }
 
-        class PopClosure implements AtomicClosure<String> {
+        class PopClosure implements AtomicBooleanClosure {
             @Override
-            public String execute(Transaction tx) throws Exception {
-                return stack.pop(tx);
+            public boolean execute(Transaction tx) throws Exception {
+                return !stack.pop(tx).endsWith("end");
             }
         }
     }
 
     class Stack<E> {
         private final Ref<StackNode<E>> head = stm.getDefaultRefFactory().newRef(null);
-        private final IntRef size = newIntRef();
+        private final IntRef size = stm.getReferenceFactoryBuilder().build().newIntRef(0);
 
         public void push(Transaction tx, final E item) {
             if (capacity != Integer.MAX_VALUE) {
