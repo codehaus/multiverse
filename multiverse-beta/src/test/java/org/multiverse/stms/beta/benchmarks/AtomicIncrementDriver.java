@@ -11,10 +11,9 @@ import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
-import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
-import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondPerThread;
+import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
-public class AtomicIncDriver extends BenchmarkDriver implements BetaStmConstants {
+public class AtomicIncrementDriver extends BenchmarkDriver implements BetaStmConstants {
 
     private transient BetaStm stm;
     private transient GetThread[] threads;
@@ -51,12 +50,15 @@ public class AtomicIncDriver extends BenchmarkDriver implements BetaStmConstants
 
         double transactionsPerSecondPerThread = transactionsPerSecondPerThread(
                 transactionsPerThread, totalDurationMs, threadCount);
+        double transactionsPerSecond = transactionsPerSecond(
+                transactionsPerThread, totalDurationMs, threadCount);
         System.out.printf("Multiverse > Performance %s transactions/second/thread\n",
                 format(transactionsPerSecondPerThread));
         System.out.printf("Multiverse > Performance %s transactions/second\n",
-                transactionsPerSecondAsString(transactionsPerThread, totalDurationMs, threadCount));
+                format(transactionsPerSecond));
 
         testCaseResult.put("transactionsPerSecondPerThread", transactionsPerSecondPerThread);
+        testCaseResult.put("transactionsPerSecond", transactionsPerSecond);
     }
 
     class GetThread extends TestThread {

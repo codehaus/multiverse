@@ -111,17 +111,23 @@ task benchmarkAtomicWeakGet << {
     execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
 }
 
-task benchmarkSimpleStack << {
-    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/simple_stack_benchmark.groovy")
-    //execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
+task benchmarkAtomicIncrement << {
+    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/atomic_increment_benchmark.groovy")
+    execute("benchy-display benchmarks/atomic_increment_display.groovy")
 }
 
-task benchmarkIntrinsicLockStack << {                                                                            
+
+task benchmarkSimpleStack << {
+    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/simple_stack_benchmark.groovy")
+    execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
+}
+
+task benchmarkIntrinsicLockStack << {
     execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/intrinsic_lock_stack_benchmark.groovy")
     //execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
 }
 
-task benchmarkJucLockStack << {                                                                            
+task benchmarkJucLockStack << {
     execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/juc_lock_stack_benchmark.groovy")
     //execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
 }
@@ -139,11 +145,10 @@ task benchmark(dependsOn: [
         benchmarkAtomicGet,
         benchmarkAtomicWeakGet,
         benchmarkSimpleStack,
-	benchmarkIntrinsicLockStack,
-	benchmarkJucLockStack,
-        benchmarkBoxingOverhead]) << {
-}
-
+        benchmarkIntrinsicLockStack,
+        benchmarkJucLockStack,
+	benchmarkAtomicIncrement,
+        benchmarkBoxingOverhead]) << {}
 
 def execute(String s) {
     Process proc = s.execute()
@@ -174,6 +179,7 @@ project(':multiverse-beta') {
 }
 
 project(':multiverse-site') {
+
     jar.doLast {
         def binding = new Binding()
         def parent = Groovy.class.getClassLoader()

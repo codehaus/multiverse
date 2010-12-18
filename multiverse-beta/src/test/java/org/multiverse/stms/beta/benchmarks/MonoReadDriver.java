@@ -14,28 +14,28 @@ import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.BetaStmUtils.format;
-import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
+import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecond;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondPerThread;
 
 public class MonoReadDriver extends BenchmarkDriver implements BetaStmConstants{
 
     private BetaStm stm;
-    private UpdateThread[] threads;
+    private ReadThread[] threads;
     private int threadCount;
     private long transactionsPerThread;
     private int lockMode = LOCKMODE_NONE;
 
     @Override
     public void setUp() {
-        System.out.printf("Multiverse > Running with %s thread(s)\n", threadCount);
-        System.out.printf("Multiverse > Running with %s transactionsPerThread\n", transactionsPerThread);
+        System.out.printf("Multiverse > Thread count is %s\n", threadCount);
+        System.out.printf("Multiverse > Transactions/thread is %s\n", transactionsPerThread);
 
         stm = new BetaStm();
 
-        threads = new UpdateThread[threadCount];
+        threads = new ReadThread[threadCount];
 
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new UpdateThread(k, transactionsPerThread);
+            threads[k] = new ReadThread(k, transactionsPerThread);
         }
     }
 
@@ -48,27 +48,28 @@ public class MonoReadDriver extends BenchmarkDriver implements BetaStmConstants{
     @Override
     public void processResults(TestCaseResult testCaseResult) {
         long totalDurationMs = 0;
-        for (UpdateThread t : threads) {
+        for (ReadThread t : threads) {
             totalDurationMs += t.durationMs;
         }
 
         double transactionsPerSecondPerThread = transactionsPerSecondPerThread(
                 transactionsPerThread, totalDurationMs, threadCount);
+        double transactionsPerSecond = transactionsPerSecond(transactionsPerThread,totalDurationMs,threadCount);
         System.out.printf("Multiverse > Performance %s transactions/second/thread\n",
                 format(transactionsPerSecondPerThread));
         System.out.printf("Multiverse > Performance %s transactions/second\n",
-                transactionsPerSecondAsString(transactionsPerThread, totalDurationMs, threadCount));
+                format(transactionsPerSecond));
 
+        testCaseResult.put("transactionsPerSecond",transactionsPerSecond);
         testCaseResult.put("transactionsPerSecondPerThread", transactionsPerSecondPerThread);
     }
 
-    class UpdateThread extends TestThread {
+    class ReadThread extends TestThread {
         private final long transactionCount;
         private long durationMs;
 
-        public UpdateThread(int id, long transactionCount) {
-            super("UpdateThread-" + id);
-            setPriority(Thread.MAX_PRIORITY);
+        public ReadThread(int id, long transactionCount) {
+            super("ReadThread-" + id);
             this.transactionCount = transactionCount;
         }
 

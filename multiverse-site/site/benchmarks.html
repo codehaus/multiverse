@@ -1,20 +1,34 @@
 <h2>Benchmarks</h2>
 
+<ul>
+    <li><a href="#introduction">Updates</a></li>
+    <li><a href="#read">Reads</a></li>
+    <li><a href="#atomicOperations">Atomic operations</a></li>
+    <li><a href="#boxingOverhead">Boxing overhead</a></li>
+</ul>
 
-
-<h2>Updates</h2>
+<h2 id="#updates">Updates</h2>
 
 <a href="uncontended_mono_update_line_wide.png"><img src="uncontended_mono_update_line_narrow.png"/></a>
 <a href="contended_counter_line_wide.png"><img src="contended_counter_line_narrow.png"/></a>
 
-<h2>Read</h2>
+<h2 id="read">Read</h2>
 <a href="mono_read_line_wide.png"><img src="mono_read_line_narrow.png"/></a>
+<h2 id="atomicOperations">Atomic operations</h2>
 
-<h2>Atomic operations</h2>
+<h3>Atomic Get</h3>
 <a href="atomic_get_line_wide.png"><img src="atomic_get_line_narrow.png"/></a>
-<a href="atomic_weak_get_line_wide.png"><img src="atomic_weak_get_line_narrow.png"/></a>
+<a href="atomic_get_line_wide_total.png"><img src="atomic_get_line_total_narrow.png"/></a>
 
-<h3>Boxing overhead</h3>
+<h3>Atomic Weak Get</h3>
+<a href="atomic_weak_get_line_wide.png"><img src="atomic_weak_get_line_narrow.png"/></a>
+<a href="atomic_weak_get_line_total_wide.png"><img src="atomic_weak_get_line_total_narrow.png"/></a>
+
+<h3>Atomic Increment</h3>
+<a href="atomic_increment_line_wide.png"><img src="atomic_increment_line_narrow.png"/></a>
+<a href="atomic_increment_line_total_wide.png"><img src="atomic_increment_line_total_narrow.png"/></a>
+
+<h3 id="boxingOverhead">Boxing overhead</h3>
 A benchmark that shows the overhead caused by creating a single primitive wrapper per transaction. As you can see the
         primitive ref scales linearly, but the boxing version doesn't.
 <a href="boxing_overhead_line_wide.png"><img src="boxing_overhead_line_narrow.png"/></a>
