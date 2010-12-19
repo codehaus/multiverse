@@ -87,53 +87,57 @@ allprojects {
 }
 
 task benchmarkUncontendedMonoUpdate << {
-    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/uncontended_mono_update_benchmark.groovy")
+    execute("benchy-execute -p ${processorCount} -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/uncontended_mono_update_benchmark.groovy")
     execute("benchy-display benchmarks/uncontended_mono_update_display.groovy")
 }
 
 task benchmarkCounter << {
-    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/contended_counter_benchmark.groovy")
+    execute("benchy-execute -p ${processorCount} -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/contended_counter_benchmark.groovy")
     execute("benchy-display benchmarks/contended_counter_display.groovy")
 }
 
 task benchmarkMonoRead << {
-    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/mono_read_benchmark.groovy")
+    execute("benchy-execute -p ${processorCount} -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/mono_read_benchmark.groovy")
     execute("benchy-display benchmarks/mono_read_display.groovy")
 }
 
 task benchmarkAtomicGet << {
-    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/atomic_get_benchmark.groovy")
+    execute("benchy-execute -p ${processorCount} -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/atomic_get_benchmark.groovy")
     execute("benchy-display benchmarks/atomic_get_display.groovy")
 }
 
 task benchmarkAtomicWeakGet << {
-    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/atomic_weak_get_benchmark.groovy")
+    execute("benchy-execute -p ${processorCount} -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/atomic_weak_get_benchmark.groovy")
     execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
 }
 
 task benchmarkAtomicIncrement << {
-    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/atomic_increment_benchmark.groovy")
+    execute("benchy-execute -p ${processorCount} -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/atomic_increment_benchmark.groovy")
     execute("benchy-display benchmarks/atomic_increment_display.groovy")
 }
 
+task benchmarkAtomicLongIncrement << {
+    execute("benchy-execute -p ${processorCount} -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/atomic_long_increment_benchmark.groovy")
+    execute("benchy-display benchmarks/atomic_long_increment_display.groovy")
+}
 
 task benchmarkSimpleStack << {
-    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/simple_stack_benchmark.groovy")
+    execute("benchy-execute -p ${processorCount} -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/simple_stack_benchmark.groovy")
     execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
 }
 
 task benchmarkIntrinsicLockStack << {
-    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/intrinsic_lock_stack_benchmark.groovy")
+    execute("benchy-execute -p ${processorCount} -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/intrinsic_lock_stack_benchmark.groovy")
     //execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
 }
 
 task benchmarkJucLockStack << {
-    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/juc_lock_stack_benchmark.groovy")
+    execute("benchy-execute -p ${processorCount} -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/juc_lock_stack_benchmark.groovy")
     //execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
 }
 
 task benchmarkBoxingOverhead << {
-    execute("benchy-execute -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/boxing_overhead_benchmark.groovy")
+    execute("benchy-execute -p ${processorCount} -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test benchmarks/boxing_overhead_benchmark.groovy")
     execute("benchy-display benchmarks/boxing_overhead_display.groovy")
     execute("benchy-display benchmarks/boxing_overhead_total_display.groovy")
 }
@@ -148,6 +152,7 @@ task benchmark(dependsOn: [
         benchmarkIntrinsicLockStack,
         benchmarkJucLockStack,
 	benchmarkAtomicIncrement,
+	benchmarkAtomicLongIncrement,
         benchmarkBoxingOverhead]) << {}
 
 def execute(String s) {

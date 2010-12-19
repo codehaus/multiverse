@@ -16,7 +16,7 @@ import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 public class AtomicIncrementDriver extends BenchmarkDriver implements BetaStmConstants {
 
     private transient BetaStm stm;
-    private transient GetThread[] threads;
+    private transient IncThread[] threads;
     private int threadCount;
     private long transactionsPerThread;
     private boolean sharedRef;
@@ -28,10 +28,10 @@ public class AtomicIncrementDriver extends BenchmarkDriver implements BetaStmCon
         System.out.printf("Multiverse > SharedRef %s \n", sharedRef);
 
         stm = new BetaStm();
-        threads = new GetThread[threadCount];
+        threads = new IncThread[threadCount];
         BetaLongRef ref = sharedRef ? newLongRef(stm) : null;
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new GetThread(k, ref == null ? newLongRef(stm) : ref);
+            threads[k] = new IncThread(k, ref == null ? newLongRef(stm) : ref);
         }
     }
 
@@ -44,7 +44,7 @@ public class AtomicIncrementDriver extends BenchmarkDriver implements BetaStmCon
     @Override
     public void processResults(TestCaseResult testCaseResult) {
         long totalDurationMs = 0;
-        for (GetThread t : threads) {
+        for (IncThread t : threads) {
             totalDurationMs += t.durationMs;
         }
 
@@ -61,12 +61,12 @@ public class AtomicIncrementDriver extends BenchmarkDriver implements BetaStmCon
         testCaseResult.put("transactionsPerSecond", transactionsPerSecond);
     }
 
-    class GetThread extends TestThread {
+    class IncThread extends TestThread {
         private long durationMs;
         private final BetaLongRef ref;
 
-        public GetThread(int id, BetaLongRef ref) {
-            super("AtomicIncrementAndGetThread-" + id);
+        public IncThread(int id, BetaLongRef ref) {
+            super("IncThread-" + id);
             setPriority(Thread.MAX_PRIORITY);
             this.ref = ref;
         }

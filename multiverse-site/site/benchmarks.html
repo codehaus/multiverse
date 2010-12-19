@@ -8,7 +8,11 @@
 </ul>
 
 <h2 id="#updates">Updates</h2>
-
+The new BetaStm that was introduced in Multiverse 0.7, does not longer rely on a shared clock. TL2/MVCC based STM's
+rely on a shared clock (atomic lock) which needs to be updated by updating threads even though they don't
+share any other state. There are some optimizations that can be applied to reduce contention, but in the long
+run I think it is better to remove the clock altogether. As you can see in the graph, the STM's scale linearly
+as long as there is no contention.
 <a href="uncontended_mono_update_line_wide.png"><img src="uncontended_mono_update_line_narrow.png"/></a>
 <a href="contended_counter_line_wide.png"><img src="contended_counter_line_narrow.png"/></a>
 
@@ -21,15 +25,26 @@
 <a href="atomic_get_line_wide_total.png"><img src="atomic_get_line_total_narrow.png"/></a>
 
 <h3>Atomic Weak Get</h3>
+The atomicWeakGet is the cheapest get since it is atomic and doesn't obay any locking rules. So the only expensive
+thing that needs to be done is volatile read.
 <a href="atomic_weak_get_line_wide.png"><img src="atomic_weak_get_line_narrow.png"/></a>
 <a href="atomic_weak_get_line_total_wide.png"><img src="atomic_weak_get_line_total_narrow.png"/></a>
 
 <h3>Atomic Increment</h3>
+The performance of an AtomicLong.incrementAndGet. The performance is a bit higher than an ordinary uncontended update
+        caused by the overhead of the transaction and not acquiring the lock from the beginning.
 <a href="atomic_increment_line_wide.png"><img src="atomic_increment_line_narrow.png"/></a>
 <a href="atomic_increment_line_total_wide.png"><img src="atomic_increment_line_total_narrow.png"/></a>
+<p/>
+The performance of an uncontended AtomicLong.incrementAndGet. As you can see the performance of an ordinary AtomicLong
+        is quite a bit higher. This is related to the fact that in Multiverse, a cas is needed for acquiring the lock
+        and 3 volatile writes are needed (one for the value, one for the version and one for releasing the lock). For the
+        0.8 release there are some experiments planned for removing one of the volatile writes.
+<a href="atomic_long_increment_line_wide.png"><img src="atomic_long_increment_line_narrow.png"/></a>
+<a href="atomic_long_increment_line_total_wide.png"><img src="atomic_long_increment_line_total_narrow.png"/></a>
 
 <h3 id="boxingOverhead">Boxing overhead</h3>
 A benchmark that shows the overhead caused by creating a single primitive wrapper per transaction. As you can see the
-        primitive ref scales linearly, but the boxing version doesn't.
+primitive ref scales linearly, but the boxing version doesn't.
 <a href="boxing_overhead_line_wide.png"><img src="boxing_overhead_line_narrow.png"/></a>
 <a href="boxing_overhead_total_line_wide.png"><img src="boxing_overhead_total_line_narrow.png"/></a>
