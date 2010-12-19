@@ -4,7 +4,7 @@ import org.jfree.data.xy.XYSeriesCollection
 import static org.benchy.JGraphGraphBuilder.writeBarChartAsPng
 import static org.benchy.JGraphGraphBuilder.writeLineChartAsPng
 
-def benchmarks = searcher.findAllBenchmarks('atomic_weak_get')
+def benchmarks = searcher.findAllBenchmarks('atomic_increment')
 println("Benchy > Found ${benchmarks.size()} results")
 
 def categoryDataSet = new DefaultCategoryDataset()
@@ -32,8 +32,8 @@ for (def benchmark in benchmarks) {
     totalXySeriesDataSet.addSeries(totalSeries);
 }
 
-writeLineChartAsPng(xySeriesDataSet, "Atomic Weak Get", "threads", "transaction/second/thread", new File("charts/atomic_weak_get_line_wide.png"))
-writeLineChartAsPng(xySeriesDataSet, "Atomic Weak Get", "threads", "transaction/second/thread", 600, new File("charts/atomic_weak_get_line_narrow.png"))
-writeLineChartAsPng(totalXySeriesDataSet, "Atomic Weak Get", "threads", "transaction/second", new File("charts/atomic_weak_get_line_total_wide.png"))
-writeLineChartAsPng(totalXySeriesDataSet, "Atomic Weak Get", "threads", "transaction/second", 600, new File("charts/atomic_weak_get_line_total_narrow.png"))
-writeBarChartAsPng(categoryDataSet, "Atomic Weak Get", "threads", "transaction/second/thread", new File("charts/atomic_weak_get_bar.png"))
+writeLineChartAsPng(xySeriesDataSet, "Atomic Increment", "threads", "transaction/second/thread", new File("charts/atomic_increment_line_wide.png"))
+writeLineChartAsPng(xySeriesDataSet, "Atomic Increment", "threads", "transaction/second/thread", 600, new File("charts/atomic_increment_line_narrow.png"))
+writeLineChartAsPng(totalXySeriesDataSet, "Atomic Increment", "threads", "transaction/second", new File("charts/atomic_increment_line_total_wide.png"))
+writeLineChartAsPng(totalXySeriesDataSet, "Atomic Increment", "threads", "transaction/second", 600, new File("charts/atomic_increment_line_total_narrow.png"))
+writeBarChartAsPng(categoryDataSet, "Atomic Increment", "threads", "transaction/second/thread", new File("charts/atomic_increment_bar.png"))

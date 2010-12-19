@@ -9,7 +9,7 @@ for (def k in 1..8) {
     def testCase = new GroovyTestCase()
     testCase.name = "atomic_weak_get_with_${k}_threads"
     testCase.threadCount = k
-    testCase.transactionsPerThread = 1000 * 1000 * 5000L
+    testCase.transactionsPerThread = 1000 * 1000 * 10000L
     testCase.sharedRef = true
     testCase.weakGet = true
     testCase.warmupRunIterationCount = k==1?1:0;
