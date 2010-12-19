@@ -5,7 +5,7 @@ import org.multiverse.stms.beta.benchmarks.ContendedCounterDriver
 def benchmark = new Benchmark();
 benchmark.name = "counter"
 
-for (def k in 1..8) {
+for (def k in 1..processorCount) {
     def testCase = new GroovyTestCase()
     testCase.name = "counter_with_${k}_threads"
     testCase.dirtyCheck = true
@@ -20,7 +20,7 @@ for (def k in 1..8) {
     benchmark.add(testCase)
 }
 
-for (def k in 1..8) {
+for (def k in 1..processorCount) {
     def testCase = new GroovyTestCase()
     testCase.name = "counter_no_dirtyCheck_with_${k}_threads"
     testCase.threadCount = k

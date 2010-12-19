@@ -5,7 +5,7 @@ import org.multiverse.stms.beta.benchmarks.AtomicIncrementDriver
 def benchmark = new Benchmark();
 benchmark.name = "atomic_increment"
 
-for (def k in 1..8) {
+for (def k in 1..processorCount) {
     def testCase = new GroovyTestCase()
     testCase.name = "atomic_increment_with_${k}_threads"
     testCase.warmupRunIterationCount = k==1?1:0;

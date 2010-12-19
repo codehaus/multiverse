@@ -5,7 +5,7 @@ import org.multiverse.stms.beta.benchmarks.AtomicGetDriver
 def benchmark = new Benchmark();
 benchmark.name = "atomic_weak_get"
 
-for (def k in 1..8) {
+for (def k in 1..processorCount) {
     def testCase = new GroovyTestCase()
     testCase.name = "atomic_weak_get_with_${k}_threads"
     testCase.threadCount = k

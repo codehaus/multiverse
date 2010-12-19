@@ -5,7 +5,7 @@ import org.multiverse.stms.beta.benchmarks.UncontendedAtomicIncrementAndGetDrive
 def benchmark = new Benchmark()
 benchmark.name = "uncontended_atomicAndIncrement"
 
-for (def k in 1..8) {
+for (def k in 1..processorCount) {
     def testCase = new GroovyTestCase()
     testCase.name = "uncontended_atomicGetAndIncrement_with_${k}_threads"
     testCase.threadCount = k

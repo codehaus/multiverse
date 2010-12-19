@@ -5,7 +5,7 @@ import org.multiverse.stms.beta.benchmarks.SimpleStackDriver
 def benchmark = new Benchmark();
 benchmark.name = "simple_stack"
 
-for (def k in 1..4) {
+for (def k in 1..processorCount) {
     def testCase = new GroovyTestCase()
     testCase.name = "simple_stack_with_${k}_threads"
     testCase.pushThreadCount = k
@@ -17,7 +17,7 @@ for (def k in 1..4) {
     benchmark.add(testCase)
 }
 
-for (def k in 1..4) {
+for (def k in 1..processorCount) {
     def testCase = new GroovyTestCase()
     testCase.name = "simple_stack_using_pooled_closures_with_${k}_threads"
     testCase.pushThreadCount = k

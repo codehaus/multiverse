@@ -5,7 +5,7 @@ import org.multiverse.stms.beta.benchmarks.JucLockStackDriver
 def benchmark = new Benchmark();
 benchmark.name = "juc_lock_stack"
 
-for (def k in 1..4) {
+for (def k in 1..processorCount) {
     def testCase = new GroovyTestCase()
     testCase.name = "juc_lock_stack_with_${k}_threads"
     testCase.pushThreadCount = k

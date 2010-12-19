@@ -5,7 +5,7 @@ import org.multiverse.stms.beta.benchmarks.MonoReadDriver
 def benchmark = new Benchmark();
 benchmark.name = "mono_read"
 
-for (def k in 1..8) {
+for (def k in 1..processorCount) {
     def testCase = new GroovyTestCase()
     testCase.name = "mono_read_with_${k}_threads"
     testCase.threadCount = k

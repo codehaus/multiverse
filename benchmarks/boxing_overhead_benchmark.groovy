@@ -5,7 +5,7 @@ import org.benchy.GroovyTestCase
 def benchmark = new Benchmark();
 benchmark.name = "boxing_overhead"
 
-for (def k in 1..8) {
+for (def k in 1..processorCount) {
     def testCase = new GroovyTestCase()
     testCase.name = "boxing_overhead_with_${k}_threads_and_boxing"
     testCase.threadCount = k
@@ -16,7 +16,7 @@ for (def k in 1..8) {
     benchmark.add(testCase)
 }
 
-for (def k in 1..8) {
+for (def k in 1..processorCount) {
     def testCase = new GroovyTestCase()
     testCase.name = "boxing_overhead_with_${k}_threads_and_no_boxing"
     testCase.threadCount = k

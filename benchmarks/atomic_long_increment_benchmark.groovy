@@ -5,7 +5,7 @@ import org.multiverse.stms.beta.benchmarks.AtomicLongIncrementDriver
 def benchmark = new Benchmark();
 benchmark.name = "atomic_long_increment"
 
-for (def k in 1..8) {
+for (def k in 1..processorCount) {
     def testCase = new GroovyTestCase()
     testCase.name = "atomic_long_increment_with_${k}_threads"
     testCase.warmupRunIterationCount = k==1?1:0;
@@ -16,7 +16,7 @@ for (def k in 1..8) {
     benchmark.add(testCase)
 }
 
-//for (def k in 1..8) {
+//for (def k in 1..processorCount) {
 //    def testCase = new GroovyTestCase()
 //    testCase.name = "atomic_long_increment_with_${k}_threads_no_shared_ref"
 //    testCase.warmupRunIterationCount = k==1?1:0;
