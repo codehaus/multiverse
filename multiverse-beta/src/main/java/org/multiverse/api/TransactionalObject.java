@@ -19,6 +19,12 @@ public interface TransactionalObject {
      */
     Stm getStm();
 
+    /**
+     * Gets the {@link Lock} that belongs to this TransactionalObject.
+     *
+     * @return the Lock
+     * @throws UnsupportedOperationException if this operation is not supported.
+     */
     Lock getLock();
 
     /**
