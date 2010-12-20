@@ -3,7 +3,7 @@ package org.multiverse.stms.beta.transactions;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.api.PessimisticLockLevel;
+import org.multiverse.api.LockLevel;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadonlyException;
@@ -318,14 +318,14 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
     // ================ isolation level ============================
 
     @Test
-    public void pessimisticLockLevel_whenPessimisticThenNoConflictDetectionNeeded() {
+    public void lockLevel_whenPessimisticThenNoConflictDetectionNeeded() {
         assumeTrue(getMaxTransactionCapacity() > 2);
         assumeTrue(hasLocalConflictCounter());
 
         BetaLongRef ref1 = newLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
+                .setLockLevel(LockLevel.PrivatizeReads)
                 .init();
 
         BetaTransaction tx = newTransaction(config);

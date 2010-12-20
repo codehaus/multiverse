@@ -3,7 +3,7 @@ package org.multiverse.stms.beta;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.IsolationLevel;
-import org.multiverse.api.PessimisticLockLevel;
+import org.multiverse.api.LockLevel;
 
 import static org.junit.Assert.fail;
 
@@ -61,10 +61,10 @@ public class BetaStm_transactionFactoryValidationTest {
 
 
     @Test
-    public void whenPessimisticLockLevelIsRead_thenAutomaticReadTrackingShouldBeEnabled() {
+    public void whenLockLevelIsRead_thenAutomaticReadTrackingShouldBeEnabled() {
         BetaTransactionFactoryBuilder builder = stm.createTransactionFactoryBuilder()
                 .setReadTrackingEnabled(false)
-                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
+                .setLockLevel(LockLevel.PrivatizeReads);
 
         try {
             builder.build();

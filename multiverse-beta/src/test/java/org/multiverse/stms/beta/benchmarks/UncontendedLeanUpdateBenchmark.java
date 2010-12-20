@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.benchmarks;
 
 import org.multiverse.TestThread;
-import org.multiverse.api.PessimisticLockLevel;
+import org.multiverse.api.LockLevel;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.BetaStmUtils;
@@ -101,7 +101,7 @@ public class UncontendedLeanUpdateBenchmark implements BetaStmConstants {
             //FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm,1);
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
                     new BetaTransactionConfiguration(stm)
-                            .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
+                            .setLockLevel(LockLevel.PrivatizeReads)
                             .setDirtyCheckEnabled(false));
             long startMs = System.currentTimeMillis();
             for (long k = 0; k < transactionCount; k++) {

@@ -7,7 +7,6 @@ package org.multiverse.api.predicates;
  */
 public abstract class IntPredicate implements Predicate<Integer>{
 
-
      public static IntPredicate newEqualsPredicate(final int value) {
         return new IntPredicate() {
             @Override

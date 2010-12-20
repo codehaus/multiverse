@@ -7,7 +7,6 @@ package org.multiverse.api.predicates;
  */
 public abstract class LongPredicate implements Predicate<Long>{
 
-
     public static LongPredicate newEqualsPredicate(final long value) {
         return new LongPredicate() {
             @Override

@@ -3,7 +3,7 @@ package org.multiverse.stms.beta.benchmarks;
 import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
-import org.multiverse.api.PessimisticLockLevel;
+import org.multiverse.api.LockLevel;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
@@ -24,14 +24,14 @@ public class UncontendedMonoUpdateDriver extends BenchmarkDriver {
     private int threadCount = 1;
     private int transactionsPerThread = 100 * 1000 * 1000;
     private boolean dirtyCheck = false;
-    private PessimisticLockLevel pessimisticLockLevel = PessimisticLockLevel.LockNone;
+    private LockLevel lockLevel = LockLevel.LockNone;
 
     @Override
     public void setUp() {
         System.out.printf("Multiverse > Thread count %s \n", threadCount);
         System.out.printf("Multiverse > Transactions per thread %s \n", transactionsPerThread);
         System.out.printf("Multiverse > Dirtycheck %s \n", dirtyCheck);
-        System.out.printf("Multiverse > Pessimistic Locklevel %s \n", pessimisticLockLevel);
+        System.out.printf("Multiverse > Locklevel %s \n", lockLevel);
 
         stm = new BetaStm();
 
@@ -78,7 +78,7 @@ public class UncontendedMonoUpdateDriver extends BenchmarkDriver {
 
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
                     new BetaTransactionConfiguration(stm)
-                            .setPessimisticLockLevel(pessimisticLockLevel)
+                            .setLockLevel(lockLevel)
                             .setDirtyCheckEnabled(dirtyCheck));
             long startMs = System.currentTimeMillis();
             final long _transactionCount = transactionsPerThread;

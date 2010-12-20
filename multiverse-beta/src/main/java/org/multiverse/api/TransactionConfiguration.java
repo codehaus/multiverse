@@ -106,14 +106,14 @@ public interface TransactionConfiguration {
     int getSpinCount();
 
     /**
-     * Returns the PessimisticLockLevel used on all reads/writes. The highest level always overrides the
-     * lowest level (so a PessimisticLockLevel.ensureAllReads overrides a non locking individual read and
-     * an ensure overrides PessimisticLockLevel.none).
+     * Returns the LockLevel used on all reads/writes. The highest level always overrides the
+     * lowest level (so a LockLevel.ensureAllReads overrides a non locking individual read and
+     * an ensure overrides LockLevel.none).
      *
-     * @return the PessimisticLockLevel.
-     * @see org.multiverse.api.TransactionFactoryBuilder#setPessimisticLockLevel(PessimisticLockLevel)
+     * @return the LockLevel.
+     * @see org.multiverse.api.TransactionFactoryBuilder#setLockLevel(LockLevel)
      */
-    PessimisticLockLevel getPessimisticLockLevel();
+    LockLevel getLockLevel();
 
     /**
      * Checks if dirty check is enabled on writes when a transaction commits. Turning of saves time,

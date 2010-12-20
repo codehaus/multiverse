@@ -33,7 +33,7 @@ public class BetaStm_transactionFactoryBuilderTest implements BetaStmConstants {
         assertFalse(config.isReadonly());
         assertEquals(LOCKMODE_NONE, config.readLockMode);
         assertEquals(LOCKMODE_NONE, config.writeLockMode);
-        assertEquals(PessimisticLockLevel.LockNone, config.getPessimisticLockLevel());
+        assertEquals(LockLevel.LockNone, config.getLockLevel());
         assertTrue(config.dirtyCheck);
         assertSame(stm, config.getStm());
         assertSame(stm.getGlobalConflictCounter(), config.getGlobalConflictCounter());

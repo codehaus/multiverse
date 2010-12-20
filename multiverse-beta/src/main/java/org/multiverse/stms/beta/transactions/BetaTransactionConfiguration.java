@@ -33,7 +33,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     public IsolationLevel isolationLevel;
     public boolean writeSkewAllowed;
     public boolean inconsistentReadAllowed;
-    public PessimisticLockLevel pessimisticLockLevel;
+    public LockLevel lockLevel;
     public int readLockMode;
     public int writeLockMode;
     public final String familyName;
@@ -79,7 +79,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         this.interruptible = configuration.interruptible;
         this.readonly = configuration.readonly;
         this.spinCount = configuration.spinCount;
-        this.pessimisticLockLevel = configuration.pessimisticLockLevel;
+        this.lockLevel = configuration.level;
         this.dirtyCheck = configuration.dirtyCheck;
         this.minimalArrayTreeSize = configuration.minimalArrayTreeSize;
         this.trackReads = configuration.trackReads;
@@ -162,8 +162,8 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     }
 
     @Override
-    public PessimisticLockLevel getPessimisticLockLevel() {
-        return pessimisticLockLevel;
+    public LockLevel getLockLevel() {
+        return lockLevel;
     }
 
     @Override
@@ -260,7 +260,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
             throw new IllegalTransactionFactoryException(msg);
         }
 
-        if (pessimisticLockLevel == PessimisticLockLevel.PrivatizeReads && !trackReads) {
+        if (lockLevel == LockLevel.PrivatizeReads && !trackReads) {
             String msg = format("[%s] If all reads should be locked, read tracking should be enabled", familyName);
             throw new IllegalTransactionFactoryException(msg);
         }
@@ -285,9 +285,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, familyName, isAnonymous);
         config.readonly = readonly;
         config.spinCount = spinCount;
-        config.pessimisticLockLevel = pessimisticLockLevel;
-        config.readLockMode = pessimisticLockLevel.getReadLockMode();
-        config.writeLockMode = pessimisticLockLevel.getWriteLockMode();
+        config.lockLevel = lockLevel;
+        config.readLockMode = lockLevel.getReadLockMode();
+        config.writeLockMode = lockLevel.getWriteLockMode();
         config.dirtyCheck = dirtyCheck;
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
@@ -315,9 +315,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, familyName, false);
         config.readonly = readonly;
         config.spinCount = spinCount;
-        config.pessimisticLockLevel = pessimisticLockLevel;
-        config.readLockMode = pessimisticLockLevel.getReadLockMode();
-        config.writeLockMode = pessimisticLockLevel.getWriteLockMode();
+        config.lockLevel = lockLevel;
+        config.readLockMode = lockLevel.getReadLockMode();
+        config.writeLockMode = lockLevel.getWriteLockMode();
         config.dirtyCheck = dirtyCheck;
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
@@ -344,9 +344,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, familyName, isAnonymous);
         config.readonly = readonly;
         config.spinCount = spinCount;
-        config.pessimisticLockLevel = pessimisticLockLevel;
-        config.readLockMode = pessimisticLockLevel.getReadLockMode();
-        config.writeLockMode = pessimisticLockLevel.getWriteLockMode();
+        config.lockLevel = lockLevel;
+        config.readLockMode = lockLevel.getReadLockMode();
+        config.writeLockMode = lockLevel.getWriteLockMode();
         config.dirtyCheck = dirtyCheck;
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
@@ -370,9 +370,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, familyName, isAnonymous);
         config.readonly = readonly;
         config.spinCount = spinCount;
-        config.pessimisticLockLevel = pessimisticLockLevel;
-        config.readLockMode = pessimisticLockLevel.getReadLockMode();
-        config.writeLockMode = pessimisticLockLevel.getWriteLockMode();
+        config.lockLevel = lockLevel;
+        config.readLockMode = lockLevel.getReadLockMode();
+        config.writeLockMode = lockLevel.getWriteLockMode();
         config.dirtyCheck = dirtyCheck;
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
@@ -396,9 +396,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, familyName, isAnonymous);
         config.readonly = readonly;
         config.spinCount = spinCount;
-        config.pessimisticLockLevel = pessimisticLockLevel;
-        config.readLockMode = pessimisticLockLevel.getReadLockMode();
-        config.writeLockMode = pessimisticLockLevel.getWriteLockMode();
+        config.lockLevel = lockLevel;
+        config.readLockMode = lockLevel.getReadLockMode();
+        config.writeLockMode = lockLevel.getWriteLockMode();
         config.dirtyCheck = dirtyCheck;
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
@@ -422,9 +422,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, familyName, isAnonymous);
         config.readonly = readonly;
         config.spinCount = spinCount;
-        config.pessimisticLockLevel = pessimisticLockLevel;
-        config.readLockMode = pessimisticLockLevel.getReadLockMode();
-        config.writeLockMode = pessimisticLockLevel.getWriteLockMode();
+        config.lockLevel = lockLevel;
+        config.readLockMode = lockLevel.getReadLockMode();
+        config.writeLockMode = lockLevel.getWriteLockMode();
         config.dirtyCheck = dirtyCheck;
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
@@ -448,9 +448,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, familyName, isAnonymous);
         config.readonly = readonly;
         config.spinCount = spinCount;
-        config.pessimisticLockLevel = pessimisticLockLevel;
-        config.readLockMode = pessimisticLockLevel.getReadLockMode();
-        config.writeLockMode = pessimisticLockLevel.getWriteLockMode();
+        config.lockLevel = lockLevel;
+        config.readLockMode = lockLevel.getReadLockMode();
+        config.writeLockMode = lockLevel.getWriteLockMode();
         config.dirtyCheck = dirtyCheck;
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
@@ -474,9 +474,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, familyName, isAnonymous);
         config.readonly = readonly;
         config.spinCount = spinCount;
-        config.pessimisticLockLevel = pessimisticLockLevel;
-        config.readLockMode = pessimisticLockLevel.getReadLockMode();
-        config.writeLockMode = pessimisticLockLevel.getWriteLockMode();
+        config.lockLevel = lockLevel;
+        config.readLockMode = lockLevel.getReadLockMode();
+        config.writeLockMode = lockLevel.getWriteLockMode();
         config.dirtyCheck = dirtyCheck;
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
@@ -500,9 +500,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, familyName, isAnonymous);
         config.readonly = readonly;
         config.spinCount = spinCount;
-        config.pessimisticLockLevel = pessimisticLockLevel;
-        config.readLockMode = pessimisticLockLevel.getReadLockMode();
-        config.writeLockMode = pessimisticLockLevel.getWriteLockMode();
+        config.lockLevel = lockLevel;
+        config.readLockMode = lockLevel.getReadLockMode();
+        config.writeLockMode = lockLevel.getWriteLockMode();
         config.dirtyCheck = dirtyCheck;
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
@@ -530,9 +530,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, familyName, isAnonymous);
         config.readonly = readonly;
         config.spinCount = spinCount;
-        config.pessimisticLockLevel = pessimisticLockLevel;
-        config.readLockMode = pessimisticLockLevel.getReadLockMode();
-        config.writeLockMode = pessimisticLockLevel.getWriteLockMode();
+        config.lockLevel = lockLevel;
+        config.readLockMode = lockLevel.getReadLockMode();
+        config.writeLockMode = lockLevel.getWriteLockMode();
         config.dirtyCheck = dirtyCheck;
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
@@ -552,17 +552,17 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         return config;
     }
 
-    public BetaTransactionConfiguration setPessimisticLockLevel(PessimisticLockLevel pessimisticLockLevel) {
-        if (pessimisticLockLevel == null) {
-            throw new NullPointerException("pessimisticLockLevel can't be null");
+    public BetaTransactionConfiguration setLockLevel(LockLevel lockLevel) {
+        if (lockLevel == null) {
+            throw new NullPointerException("lockLevel can't be null");
         }
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, familyName, isAnonymous);
         config.readonly = readonly;
         config.spinCount = spinCount;
-        config.pessimisticLockLevel = pessimisticLockLevel;
-        config.readLockMode = pessimisticLockLevel.getReadLockMode();
-        config.writeLockMode = pessimisticLockLevel.getWriteLockMode();
+        config.lockLevel = lockLevel;
+        config.readLockMode = lockLevel.getReadLockMode();
+        config.writeLockMode = lockLevel.getWriteLockMode();
         config.dirtyCheck = dirtyCheck;
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
@@ -590,9 +590,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, familyName, isAnonymous);
         config.readonly = readonly;
         config.spinCount = spinCount;
-        config.pessimisticLockLevel = pessimisticLockLevel;
-        config.readLockMode = pessimisticLockLevel.getReadLockMode();
-        config.writeLockMode = pessimisticLockLevel.getWriteLockMode();
+        config.lockLevel = lockLevel;
+        config.readLockMode = lockLevel.getReadLockMode();
+        config.writeLockMode = lockLevel.getWriteLockMode();
         config.dirtyCheck = dirtyCheck;
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
@@ -620,9 +620,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, familyName, isAnonymous);
         config.readonly = readonly;
         config.spinCount = spinCount;
-        config.pessimisticLockLevel = pessimisticLockLevel;
-        config.readLockMode = pessimisticLockLevel.getReadLockMode();
-        config.writeLockMode = pessimisticLockLevel.getWriteLockMode();
+        config.lockLevel = lockLevel;
+        config.readLockMode = lockLevel.getReadLockMode();
+        config.writeLockMode = lockLevel.getWriteLockMode();
         config.dirtyCheck = dirtyCheck;
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
@@ -650,9 +650,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, familyName, isAnonymous);
         config.readonly = readonly;
         config.spinCount = spinCount;
-        config.pessimisticLockLevel = pessimisticLockLevel;
-        config.readLockMode = pessimisticLockLevel.getReadLockMode();
-        config.writeLockMode = pessimisticLockLevel.getWriteLockMode();
+        config.lockLevel = lockLevel;
+        config.readLockMode = lockLevel.getReadLockMode();
+        config.writeLockMode = lockLevel.getWriteLockMode();
         config.dirtyCheck = dirtyCheck;
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
@@ -681,9 +681,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, familyName, isAnonymous);
         config.readonly = readonly;
         config.spinCount = spinCount;
-        config.pessimisticLockLevel = pessimisticLockLevel;
-        config.readLockMode = pessimisticLockLevel.getReadLockMode();
-        config.writeLockMode = pessimisticLockLevel.getWriteLockMode();
+        config.lockLevel = lockLevel;
+        config.readLockMode = lockLevel.getReadLockMode();
+        config.writeLockMode = lockLevel.getWriteLockMode();
         config.dirtyCheck = dirtyCheck;
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
@@ -718,9 +718,9 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, familyName, isAnonymous);
         config.readonly = readonly;
         config.spinCount = spinCount;
-        config.pessimisticLockLevel = pessimisticLockLevel;
-        config.readLockMode = pessimisticLockLevel.getReadLockMode();
-        config.writeLockMode = pessimisticLockLevel.getWriteLockMode();
+        config.lockLevel = lockLevel;
+        config.readLockMode = lockLevel.getReadLockMode();
+        config.writeLockMode = lockLevel.getWriteLockMode();
         config.dirtyCheck = dirtyCheck;
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
@@ -746,7 +746,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
                 "familyName='" + familyName +
                 ", propagationLevel=" + propagationLevel +
                 ", isolationLevel=" + isolationLevel +
-                ", pessimisticLockLevel=" + pessimisticLockLevel +
+                ", lockLevel=" + lockLevel +
                 ", traceLevel=" + traceLevel +
                 ", readonly=" + readonly +
                 ", speculativeConfiguration=" + speculativeConfiguration +

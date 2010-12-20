@@ -8,7 +8,6 @@ package org.multiverse.api.predicates;
 public abstract class DoublePredicate implements Predicate<Double>{
 
 
-
     /**
      * Evaluates the predicate
      *

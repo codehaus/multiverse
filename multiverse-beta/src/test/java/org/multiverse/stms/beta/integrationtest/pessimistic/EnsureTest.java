@@ -1,6 +1,7 @@
 package org.multiverse.stms.beta.integrationtest.pessimistic;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
@@ -9,9 +10,10 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.*;
+import static org.multiverse.TestUtils.assertIsAborted;
+import static org.multiverse.TestUtils.assertIsCommitted;
+import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasNoLocks;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
 public class EnsureTest {
 
@@ -20,140 +22,30 @@ public class EnsureTest {
     @Before
     public void setUp() {
         stm = new BetaStm();
-        clearThreadLocalTransaction();
     }
 
     @Test
-    public void whenAlreadyPrivatizedByOther_thenEnsureIsNotPossible() {
+    @Ignore
+    public void whenEnsureWrites(){
+
+    }
+
+    @Test
+    @Ignore
+    public void whenPrivatizeWrites(){
+
+    }
+
+    @Test
+    public void whenOnlyReadsThenIgnored() {
         BetaLongRef ref = newLongRef(stm);
-
-        BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(otherTx);
-
-        BetaTransaction tx = stm.startDefaultTransaction();
-        try {
-            ref.getLock().acquireCommitLock(tx);
-            fail();
-        } catch (ReadWriteConflict expected) {
-
-        }
-
-        assertIsAborted(tx);
-        assertRefHasCommitLock(ref, otherTx);
-    }
-
-    @Test
-    public void whenAlreadyEnsuredByOther_thenEnsureIsNotPossible() {
-        BetaLongRef ref = newLongRef(stm);
-
-        BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
-
-        BetaTransaction tx = stm.startDefaultTransaction();
-        try {
-            ref.getLock().acquireWriteLock(tx);
-            fail();
-        } catch (ReadWriteConflict expected) {
-
-        }
-
-        assertIsAborted(tx);
-        assertRefHasUpdateLock(ref, otherTx);
-    }
-
-    @Test
-    public void whenEnsuredByOther_thenReadStillAllowed() {
-        BetaLongRef ref = newLongRef(stm, 5);
-
-        BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
-
-        BetaTransaction tx = stm.startDefaultTransaction();
-
-        long result = ref.get(tx);
-
-        assertEquals(5, result);
-        assertIsActive(tx);
-        assertRefHasUpdateLock(ref,otherTx);
-    }
-
-    @Test
-    public void whenPreviouslyReadByOtherThread_thenNoProblems() {
-        BetaLongRef ref = newLongRef(stm, 10);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.get(tx);
+        ref.ensure(tx);
 
-        BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
+        ref.atomicIncrementAndGet(1);
 
-        long result = ref.get(tx);
-
-        assertEquals(10, result);
-        assertIsActive(tx);
-        assertRefHasUpdateLock(ref,otherTx);        
-    }
-
-    @Test
-    public void whenPreviouslyReadByOtherTransaction_thenWriteSuccessButCommitFails() {
-        BetaLongRef ref = newLongRef(stm, 10);
-
-        BetaTransaction tx = stm.startDefaultTransaction();
-        ref.get(tx);
-
-        BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
-
-        ref.set(tx, 100);
-
-        try {
-            tx.commit();
-            fail();
-        } catch (ReadWriteConflict expected) {
-        }
-
-        assertIsAborted(tx);
-        assertRefHasUpdateLock(ref, otherTx);
-    }
-
-    @Test
-    public void whenEnsuredByOther_thenWriteAllowedButCommitFails() {
-        BetaLongRef ref = newLongRef(stm, 5);
-
-        BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
-
-        BetaTransaction tx = stm.startDefaultTransaction();
-        ref.set(tx, 100);
-
-        try {
-            tx.commit();
-            fail();
-        } catch (ReadWriteConflict expected) {
-        }
-
-        assertIsAborted(tx);
-        assertRefHasUpdateLock(ref, otherTx);
-    }
-
-    @Test
-    public void whenAlreadyPrivatizedBySelf_thenEnsureSuccessful() {
-        BetaLongRef ref = newLongRef(stm, 5);
-
-        BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(tx);
-        ref.getLock().acquireWriteLock(tx);
-
-        assertIsActive(tx);
-        assertRefHasCommitLock(ref, tx);
-    }
-
-    @Test
-    public void whenTransactionCommits_thenEnsureIsEnded() {
-        BetaLongRef ref = newLongRef(stm, 5);
-
-        BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(tx);
         tx.commit();
 
         assertIsCommitted(tx);
@@ -161,57 +53,44 @@ public class EnsureTest {
     }
 
     @Test
-    public void whenTransactionIsPrepared_thenEnsureIsNotEnded() {
-        BetaLongRef ref = newLongRef(stm, 5);
+    public void whenUpdateTransactionButNoConflictOnRead_thenSuccess() {
+        long initialValue = 10;
+        BetaLongRef ref1 = newLongRef(stm, initialValue);
+        BetaLongRef ref2 = newLongRef(stm, initialValue);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(tx);
-        tx.prepare();
+        ref1.get(tx);
+        ref1.ensure(tx);
+        ref2.increment(tx);
 
-        assertIsPrepared(tx);
-        assertRefHasUpdateLock(ref, tx);
+        tx.commit();
+        assertIsCommitted(tx);
+        assertEquals(initialValue, ref1.atomicGet());
+        assertEquals(initialValue + 1, ref2.atomicGet());
     }
 
     @Test
-    public void whenTransactionAborts_thenEnsureIsEnded() {
-        BetaLongRef ref = newLongRef(stm, 5);
+    public void whenUpdateTransactionAndConflictOnRead_thenReadWriteConflict() {
+        long initialValue = 10;
+        BetaLongRef ref1 = newLongRef(stm, initialValue);
+        BetaLongRef ref2 = newLongRef(stm, initialValue);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(tx);
-        tx.abort();
+        ref1.get(tx);
+        ref1.ensure(tx);
+        ref2.increment(tx);
 
-        assertIsAborted(tx);
-        assertRefHasNoLocks(ref);
-    }
-
-    @Test
-    public void whenEnsureIsReentrant() {
-        BetaLongRef ref = newLongRef(stm, 5);
-
-        BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(tx);
-        ref.getLock().acquireWriteLock(tx);
-
-        assertIsActive(tx);
-        assertRefHasUpdateLock(ref, tx);
-    }
-
-    @Test
-    public void whenReadConflict_thenEnsureFails() {
-        BetaLongRef ref = newLongRef(stm, 5);
-
-        BetaTransaction tx = stm.startDefaultTransaction();
-        ref.get(tx);
-
-        ref.atomicIncrementAndGet(1);
+        ref1.atomicIncrementAndGet(1);
 
         try {
-            ref.getLock().acquireWriteLock(tx);
+            tx.commit();
             fail();
         } catch (ReadWriteConflict expected) {
-        }
 
-        assertRefHasNoLocks(ref);
+        }
         assertIsAborted(tx);
+        assertEquals(initialValue+1, ref1.atomicGet());
+        assertEquals(initialValue, ref2.atomicGet());
     }
 }
+

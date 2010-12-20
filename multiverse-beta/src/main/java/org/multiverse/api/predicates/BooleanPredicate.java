@@ -8,7 +8,6 @@ package org.multiverse.api.predicates;
 public abstract class BooleanPredicate implements Predicate<Boolean>{
 
 
-
     /**
      * Evaluates the predicate
      *

@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.IsolationLevel;
-import org.multiverse.api.PessimisticLockLevel;
+import org.multiverse.api.LockLevel;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -57,14 +57,14 @@ public class WriteSkewTest {
     }
 
     @Test
-    public void whenPrivatizeWritesPessimisticLockLevel_thenWriteSkewNotDetected() {
+    public void whenPrivatizeWritesLockLevel_thenWriteSkewNotDetected() {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
-                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites)
+                .setLockLevel(LockLevel.PrivatizeWrites)
                 .build()
                 .newTransaction();
 
@@ -78,14 +78,14 @@ public class WriteSkewTest {
     }
 
     @Test
-    public void whenEnsureWritesPessimisticLockLevel_thenWriteSkewNotDetected() {
+    public void whenEnsureWritesLockLevel_thenWriteSkewNotDetected() {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
-                .setPessimisticLockLevel(PessimisticLockLevel.EnsureWrites)
+                .setLockLevel(LockLevel.EnsureWrites)
                 .build()
                 .newTransaction();
 
@@ -99,14 +99,14 @@ public class WriteSkewTest {
     }
 
     @Test
-    public void whenEnsureReadsPessimisticLockLevel_thenWriteSkewNotPossible() {
+    public void whenEnsureReadsLockLevel_thenWriteSkewNotPossible() {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
-                .setPessimisticLockLevel(PessimisticLockLevel.EnsureReads)
+                .setLockLevel(LockLevel.EnsureReads)
                 .build()
                 .newTransaction();
 
@@ -133,7 +133,7 @@ public class WriteSkewTest {
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
-                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
+                .setLockLevel(LockLevel.PrivatizeReads)
                 .build()
                 .newTransaction();
 

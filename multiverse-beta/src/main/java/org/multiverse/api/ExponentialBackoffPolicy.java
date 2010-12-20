@@ -72,10 +72,8 @@ public final class ExponentialBackoffPolicy implements BackoffPolicy {
 
         if (delayNs >= minDelayNs) {
             parkNanos(delayNs);
-        } else {
-            if (attempt % 20 == 0) {
-                Thread.yield();
-            }
+        } else if (attempt % 20 == 0) {
+            Thread.yield();
         }
     }
 

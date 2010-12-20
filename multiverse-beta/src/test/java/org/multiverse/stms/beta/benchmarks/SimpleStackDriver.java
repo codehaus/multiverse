@@ -4,7 +4,7 @@ import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.PessimisticLockLevel;
+import org.multiverse.api.LockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicBooleanClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
@@ -22,7 +22,7 @@ public class SimpleStackDriver extends BenchmarkDriver {
     private int popThreadCount = 1;
     private int capacity = Integer.MAX_VALUE;
     private boolean poolClosures = false;
-    private PessimisticLockLevel lockMode = PessimisticLockLevel.LockNone;
+    private LockLevel lockMode = LockLevel.LockNone;
     private boolean dirtyCheck = false;
 
     private BetaStm stm;
@@ -40,7 +40,7 @@ public class SimpleStackDriver extends BenchmarkDriver {
             System.out.printf("Multiverse > Capacity %s\n", capacity);
         }
         System.out.printf("Multiverse > Pool Closures %s\n", poolClosures);
-        System.out.printf("Multiverse > PessimisticLockLevel %s\n", lockMode);
+        System.out.printf("Multiverse > LockLevel %s\n", lockMode);
         System.out.printf("Multiverse > DirtyCheck %s\n", dirtyCheck);
 
         stm = new BetaStm();
@@ -96,7 +96,7 @@ public class SimpleStackDriver extends BenchmarkDriver {
         private long count;
         private final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(dirtyCheck)
-                .setPessimisticLockLevel(lockMode)
+                .setLockLevel(lockMode)
                 .buildAtomicBlock();
 
         public PushThread(int id, Stack<String> stack) {
@@ -167,7 +167,7 @@ public class SimpleStackDriver extends BenchmarkDriver {
         private long count;
         private final AtomicBlock popBlock = stm.createTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(dirtyCheck)
-                .setPessimisticLockLevel(lockMode)
+                .setLockLevel(lockMode)
                 .buildAtomicBlock();
 
         public PopThread(int id, Stack<String> stack) {

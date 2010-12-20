@@ -23,7 +23,8 @@ public interface OrElseBlock extends MultiverseConstants{
     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
     * getCause method.
     *
-    * @param closure the closure to execute.
+    * @param either
+    * @param orelse
     * @return the result of the execution.
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
@@ -33,7 +34,8 @@ public interface OrElseBlock extends MultiverseConstants{
     /**
     * Executes the closure.
     *
-    * @param closure the closure to execute.
+    * @param either
+    * @param orelse
     * @return the result of the execution.
     * @throws NullPointerException if closure is null.
     * @throws Exception if the execute call fails.
@@ -45,7 +47,8 @@ public interface OrElseBlock extends MultiverseConstants{
     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
     * getCause method.
     *
-    * @param closure the closure to execute.
+    * @param either
+    * @param orelse
     * @return the result of the execution.
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
@@ -55,7 +58,8 @@ public interface OrElseBlock extends MultiverseConstants{
     /**
     * Executes the closure.
     *
-    * @param closure the closure to execute.
+    * @param either
+    * @param orelse
     * @return the result of the execution.
     * @throws NullPointerException if closure is null.
     * @throws Exception if the execute call fails.
@@ -67,7 +71,8 @@ public interface OrElseBlock extends MultiverseConstants{
     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
     * getCause method.
     *
-    * @param closure the closure to execute.
+    * @param either
+    * @param orelse
     * @return the result of the execution.
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
@@ -77,7 +82,8 @@ public interface OrElseBlock extends MultiverseConstants{
     /**
     * Executes the closure.
     *
-    * @param closure the closure to execute.
+    * @param either
+    * @param orelse
     * @return the result of the execution.
     * @throws NullPointerException if closure is null.
     * @throws Exception if the execute call fails.
@@ -89,7 +95,8 @@ public interface OrElseBlock extends MultiverseConstants{
     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
     * getCause method.
     *
-    * @param closure the closure to execute.
+    * @param either
+    * @param orelse
     * @return the result of the execution.
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
@@ -99,7 +106,8 @@ public interface OrElseBlock extends MultiverseConstants{
     /**
     * Executes the closure.
     *
-    * @param closure the closure to execute.
+    * @param either
+    * @param orelse
     * @return the result of the execution.
     * @throws NullPointerException if closure is null.
     * @throws Exception if the execute call fails.
@@ -111,7 +119,8 @@ public interface OrElseBlock extends MultiverseConstants{
     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
     * getCause method.
     *
-    * @param closure the closure to execute.
+    * @param either
+    * @param orelse
     * @return the result of the execution.
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
@@ -121,7 +130,8 @@ public interface OrElseBlock extends MultiverseConstants{
     /**
     * Executes the closure.
     *
-    * @param closure the closure to execute.
+    * @param either
+    * @param orelse
     * @return the result of the execution.
     * @throws NullPointerException if closure is null.
     * @throws Exception if the execute call fails.
@@ -133,7 +143,8 @@ public interface OrElseBlock extends MultiverseConstants{
     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
     * getCause method.
     *
-    * @param closure the closure to execute.
+    * @param either
+    * @param orelse
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
     */
@@ -142,7 +153,8 @@ public interface OrElseBlock extends MultiverseConstants{
     /**
     * Executes the closure.
     *
-    * @param closure the closure to execute.
+    * @param either
+    * @param orelse
     * @throws NullPointerException if closure is null.
     * @throws Exception if the execute call fails.
     */

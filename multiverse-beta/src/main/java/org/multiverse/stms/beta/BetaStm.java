@@ -204,12 +204,12 @@ public final class BetaStm implements Stm {
         }
 
         @Override
-        public BetaTransactionFactoryBuilder setPessimisticLockLevel(final PessimisticLockLevel lockLevel) {
-            if (lockLevel == config.pessimisticLockLevel) {
+        public BetaTransactionFactoryBuilder setLockLevel(final LockLevel lockLevel) {
+            if (lockLevel == config.lockLevel) {
                 return this;
             }
 
-            return new BetaTransactionFactoryBuilderImpl(config.setPessimisticLockLevel(lockLevel));
+            return new BetaTransactionFactoryBuilderImpl(config.setLockLevel(lockLevel));
         }
 
         @Override

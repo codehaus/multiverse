@@ -49,7 +49,7 @@ public class CigaretteSmokersProblemStressTest {
 
         block = getGlobalStmInstance()
                 .createTransactionFactoryBuilder()
-                        //.setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
+                        //.setLockLevel(PessimisticLockLevel.PrivatizeReads)
                         //.setIsolationLevel(IsolationLevel.Serializable)
                 .buildAtomicBlock();
     }

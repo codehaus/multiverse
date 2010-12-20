@@ -27,8 +27,8 @@ public class BetaStmTransactionFactoryBuilder_argumentsTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void whenNullPessimisticLockLevel_thenNullPointerException() {
-        stm.createTransactionFactoryBuilder().setPessimisticLockLevel(null);
+    public void whenNullLockLevel_thenNullPointerException() {
+        stm.createTransactionFactoryBuilder().setLockLevel(null);
     }
 
     @Test(expected = IllegalArgumentException.class)

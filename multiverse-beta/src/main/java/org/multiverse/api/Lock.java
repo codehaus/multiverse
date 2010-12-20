@@ -21,6 +21,11 @@ package org.multiverse.api;
  * the transaction commits/aborts. This is essentially the same behavior you get with Oracle once a update/
  * delete/insert is done, or when the record is locked manually by executing the 'lock for update'.
  *
+ * <h2>Blocking</h2>
+ * Atm it isn't possible to block on a lock. So what happens is that some spinning is done and then some retries
+ * in combination with backoffs. In the 0.8 release blocking will be added as well. The exact behavior will be
+ * made configurable by some LockAcquisition policy.
+ *
  * @author Peter Veentjer.
  */
 public interface Lock {
@@ -82,9 +87,6 @@ public interface Lock {
      *
      * @return true if privatized, false otherwise.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     boolean atomicIsLockedForCommit();
 

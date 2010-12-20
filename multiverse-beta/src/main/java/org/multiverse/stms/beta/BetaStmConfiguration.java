@@ -14,7 +14,7 @@ public class BetaStmConfiguration {
 
     public PropagationLevel propagationLevel = PropagationLevel.Requires;
     public IsolationLevel isolationLevel = IsolationLevel.Snapshot;
-    public PessimisticLockLevel pessimisticLockLevel = PessimisticLockLevel.LockNone;
+    public LockLevel level = LockLevel.LockNone;
     public boolean blockingAllowed = true;
     public boolean interruptible = false;
     public long timeoutNs = Long.MAX_VALUE;
@@ -52,8 +52,8 @@ public class BetaStmConfiguration {
             throw new IllegalStateException("spinCount can't be smaller than 0, but was " + spinCount);
         }
 
-        if (pessimisticLockLevel == null) {
-            throw new IllegalStateException("pessimisticLockLevel can't be null");
+        if (level == null) {
+            throw new IllegalStateException("lockLevel can't be null");
         }
 
         if (minimalArrayTreeSize < 0) {

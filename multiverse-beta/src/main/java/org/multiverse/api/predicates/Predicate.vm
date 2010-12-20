@@ -19,7 +19,6 @@ public interface ${transactionalObject.predicateClass}${transactionalObject.type
 #else
 public abstract class ${transactionalObject.predicateClass} implements Predicate<${transactionalObject.objectType}>{
 
-
 #if(${transactionalObject.referenceInterface} eq 'LongRef')
     public static LongPredicate newEqualsPredicate(final long value) {
         return new LongPredicate() {

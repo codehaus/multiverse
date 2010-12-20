@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.IsolationLevel;
-import org.multiverse.api.PessimisticLockLevel;
+import org.multiverse.api.LockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicIntClosure;
@@ -24,7 +24,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 
 /**
  * A Test that checks if the writeskew problem is happening. When
- * pessimisticRead/PessimisticLockLevel.Read/writeskew=false is used, no writeskew is possible. Otherwise
+ * pessimisticRead/LockLevel.Read/writeskew=false is used, no writeskew is possible. Otherwise
  * it can happen.
  *
  * @author Peter Veentjer.
@@ -104,7 +104,7 @@ public class WriteSkewStressTest {
     }
 
     @Test
-    public void whenPessimisticLockLevelWrite_thenWriteSkewPossible() {
+    public void whenLockLevelWrite_thenWriteSkewPossible() {
         mode = Mode.privatizedWriteLevel;
         startAll(threads);
         sleepMs(getStressTestDurationMs(30 * 1000));
@@ -119,7 +119,7 @@ public class WriteSkewStressTest {
     }
 
     @Test
-    public void whenPessimisticLockLevelRead_thenNoWriteSkewPossible() {
+    public void whenLockLevelRead_thenNoWriteSkewPossible() {
         mode = Mode.privatizedReadLevel;
         startAll(threads);
         sleepMs(getStressTestDurationMs(30 * 1000));
@@ -179,12 +179,12 @@ public class WriteSkewStressTest {
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
         private final AtomicBlock privatizedReadLevelBlock = stm.createTransactionFactoryBuilder()
-                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
+                .setLockLevel(LockLevel.PrivatizeReads)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
         private final AtomicBlock privatizedWriteLevelBlock = stm.createTransactionFactoryBuilder()
-                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites)
+                .setLockLevel(LockLevel.PrivatizeWrites)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();

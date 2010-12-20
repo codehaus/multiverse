@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.PessimisticLockLevel;
+import org.multiverse.api.LockLevel;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
@@ -29,7 +29,7 @@ public class DiningPhilosophersStressTest implements BetaStmConstants {
     private volatile boolean stop;
 
     private BooleanRef[] forks;
-    private PessimisticLockLevel pessimisticLockLevel;
+    private LockLevel lockLevel;
     private Stm stm;
     private RefFactory refFactory;
 
@@ -45,31 +45,31 @@ public class DiningPhilosophersStressTest implements BetaStmConstants {
 
     @Test
     public void whenLockNone() {
-        test(PessimisticLockLevel.LockNone);
+        test(LockLevel.LockNone);
     }
 
     @Test
     public void testPrivatizeReads() {
-        test(PessimisticLockLevel.PrivatizeReads);
+        test(LockLevel.PrivatizeReads);
     }
 
     @Test
     public void testPrivatizeWrite() {
-        test(PessimisticLockLevel.PrivatizeWrites);
+        test(LockLevel.PrivatizeWrites);
     }
 
     @Test
     public void testEnsureReads() {
-        test(PessimisticLockLevel.EnsureReads);
+        test(LockLevel.EnsureReads);
     }
 
     @Test
     public void testEnsureWrite() {
-        test(PessimisticLockLevel.EnsureWrites);
+        test(LockLevel.EnsureWrites);
     }
 
-    public void test(PessimisticLockLevel pessimisticLockLevel) {
-        this.pessimisticLockLevel = pessimisticLockLevel;
+    public void test(LockLevel lockLevel) {
+        this.lockLevel = lockLevel;
         createForks();
 
         PhilosopherThread[] philosopherThreads = createPhilosopherThreads();
@@ -116,10 +116,10 @@ public class DiningPhilosophersStressTest implements BetaStmConstants {
         private final BooleanRef leftFork;
         private final BooleanRef rightFork;
         private final AtomicBlock releaseForksBlock = stm.createTransactionFactoryBuilder()
-                .setPessimisticLockLevel(pessimisticLockLevel)
+                .setLockLevel(lockLevel)
                 .buildAtomicBlock();
         private final AtomicBlock takeForksBlock = stm.createTransactionFactoryBuilder()
-                .setPessimisticLockLevel(pessimisticLockLevel)
+                .setLockLevel(lockLevel)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
 

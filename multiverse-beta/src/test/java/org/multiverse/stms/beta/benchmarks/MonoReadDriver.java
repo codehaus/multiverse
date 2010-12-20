@@ -3,7 +3,7 @@ package org.multiverse.stms.beta.benchmarks;
 import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
-import org.multiverse.api.PessimisticLockLevel;
+import org.multiverse.api.LockLevel;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -78,7 +78,7 @@ public class MonoReadDriver extends BenchmarkDriver implements BetaStmConstants{
 
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
                     new BetaTransactionConfiguration(stm)
-                            .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
+                            .setLockLevel(LockLevel.PrivatizeReads)
                             .setDirtyCheckEnabled(false));
             long startMs = System.currentTimeMillis();
             final long _transactionCount = transactionCount;

@@ -5,7 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.multiverse.api.IsolationLevel;
-import org.multiverse.api.PessimisticLockLevel;
+import org.multiverse.api.LockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
@@ -605,12 +605,12 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     // ======================= pessimistic lock level =================
 
     @Test
-    public void pessimisticLockLevel_whenPrivatizeWritesAndDirtyCheck() {
+    public void lockLevel_whenPrivatizeWritesAndDirtyCheck() {
         BetaLongRef ref = newLongRef(stm);
         long initialVersion = ref.getVersion();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites)
+                .setLockLevel(LockLevel.PrivatizeWrites)
                 .setDirtyCheckEnabled(true);
 
         BetaTransaction tx = newTransaction(config);
@@ -621,12 +621,12 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     }
 
     @Test
-    public void pessimisticLockLevel_whenPrivatizeReadsReadAndDirtyCheck() {
+    public void lockLevel_whenPrivatizeReadsReadAndDirtyCheck() {
         BetaLongRef ref = newLongRef(stm);
         long initialVersion = ref.getVersion();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads)
+                .setLockLevel(LockLevel.PrivatizeReads)
                 .setDirtyCheckEnabled(true);
         BetaTransaction tx = newTransaction(config);
         tx.openForWrite(ref, LOCKMODE_NONE).value++;

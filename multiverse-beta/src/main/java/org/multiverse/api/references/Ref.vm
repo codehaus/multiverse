@@ -16,7 +16,7 @@ import org.multiverse.api.predicates.*;
  * not be caught, it is task of the AtomicTemplate to do this.
  * 
  * <h1>TransactionalExecutionException</h1>
- * Most of the methods can throw a {@link org.multiverse.api.exceptions.TransactionalExecutionException}.
+ * Most of the methods can throw a {@link org.multiverse.api.exceptions.TransactionExecutionException}.
  * This exception can be caught, but in most cases you want to figure out what the cause is (e.g. because
  * there are too many retries) and solve that problem.
  *

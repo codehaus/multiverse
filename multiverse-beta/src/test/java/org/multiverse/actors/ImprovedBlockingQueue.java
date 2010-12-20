@@ -2,7 +2,7 @@ package org.multiverse.actors;
 
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.GlobalStmInstance;
-import org.multiverse.api.PessimisticLockLevel;
+import org.multiverse.api.LockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
@@ -34,7 +34,7 @@ public class ImprovedBlockingQueue<E> implements BetaStmConstants {
 
     private final AtomicBlock putBlock = GlobalStmInstance.getGlobalStmInstance()
             .createTransactionFactoryBuilder()
-            .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites)
+            .setLockLevel(LockLevel.PrivatizeWrites)
             .setDirtyCheckEnabled(false)
             .buildAtomicBlock();
 
@@ -94,7 +94,7 @@ public class ImprovedBlockingQueue<E> implements BetaStmConstants {
 
     private final AtomicBlock takeBlock = GlobalStmInstance.getGlobalStmInstance()
             .createTransactionFactoryBuilder()
-            .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites)
+            .setLockLevel(LockLevel.PrivatizeWrites)
             .setDirtyCheckEnabled(false)
             .buildAtomicBlock();
 

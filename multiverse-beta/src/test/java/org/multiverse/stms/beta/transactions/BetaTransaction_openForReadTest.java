@@ -3,7 +3,7 @@ package org.multiverse.stms.beta.transactions;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.api.PessimisticLockLevel;
+import org.multiverse.api.LockLevel;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
@@ -565,12 +565,12 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
     // =============================== pessimistic lock level ===================
 
     @Test
-    public void pessimisticLockLevel_whenPrivatizeReadsLevelUsed() {
+    public void lockLevel_whenPrivatizeReadsLevelUsed() {
         BetaLongRef ref = newLongRef(stm, 100);
         long version = ref.getVersion();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
+                .setLockLevel(LockLevel.PrivatizeReads);
         BetaTransaction tx = newTransaction(config);
         BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
@@ -584,12 +584,12 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
     }
 
     @Test
-    public void pessimisticLockLevel_whenEnsureReadsLevelUsed() {
+    public void lockLevel_whenEnsureReadsLevelUsed() {
         BetaLongRef ref = newLongRef(stm, 100);
         long version = ref.getVersion();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setPessimisticLockLevel(PessimisticLockLevel.EnsureReads);
+                .setLockLevel(LockLevel.EnsureReads);
         BetaTransaction tx = newTransaction(config);
         BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
@@ -603,12 +603,12 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
     }
 
     @Test
-    public void pessimisticLockLevel__whenEnsureWritesLevelUsed() {
+    public void lockLevel__whenEnsureWritesLevelUsed() {
         BetaLongRef ref = newLongRef(stm, 100);
         long version = ref.getVersion();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setPessimisticLockLevel(PessimisticLockLevel.EnsureWrites);
+                .setLockLevel(LockLevel.EnsureWrites);
         BetaTransaction tx = newTransaction(config);
         BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
@@ -622,12 +622,12 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
     }
 
     @Test
-    public void pessimisticLockLevel__whenPrivatizeWritesLevelUsed() {
+    public void lockLevel__whenPrivatizeWritesLevelUsed() {
         BetaLongRef ref = newLongRef(stm, 100);
         long version = ref.getVersion();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeWrites);
+                .setLockLevel(LockLevel.PrivatizeWrites);
         BetaTransaction tx = newTransaction(config);
         BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
@@ -785,7 +785,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         BetaLongRef ref2 = newLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setPessimisticLockLevel(PessimisticLockLevel.PrivatizeReads);
+                .setLockLevel(LockLevel.PrivatizeReads);
 
         BetaTransaction tx = newTransaction(config);
         tx.openForRead(ref1, LOCKMODE_NONE);

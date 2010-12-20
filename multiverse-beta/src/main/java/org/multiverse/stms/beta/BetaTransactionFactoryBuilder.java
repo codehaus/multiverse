@@ -42,7 +42,7 @@ public interface BetaTransactionFactoryBuilder extends TransactionFactoryBuilder
     BetaTransactionFactoryBuilder setBackoffPolicy(BackoffPolicy backoffPolicy);
 
     @Override
-    BetaTransactionFactoryBuilder setPessimisticLockLevel(PessimisticLockLevel lockLevel);
+    BetaTransactionFactoryBuilder setLockLevel(LockLevel lockLevel);
 
     @Override
     BetaTransactionFactoryBuilder setDirtyCheckEnabled(boolean dirtyCheckEnabled);

@@ -44,14 +44,14 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setPropagationLevel(PropagationLevel propagationLevel);
 
     /**
-     * Sets the {@link org.multiverse.api.PessimisticLockLevel}. With the PessimisticLockLevel you have control
+     * Sets the {@link LockLevel}. With the LockLevel you have control
      * on transaction level on how pessimistic or optimistic a transaction is.
      *
-     * @param lockLevel the new PessimisticLockLevel
+     * @param lockLevel the new LockLevel
      * @return the updated TransactionFactoryBuilder
      * @throws NullPointerException if lockLevel is null.
      */
-    TransactionFactoryBuilder setPessimisticLockLevel(PessimisticLockLevel lockLevel);
+    TransactionFactoryBuilder setLockLevel(LockLevel lockLevel);
 
     /**
      * Adds a permanent Listener to this TransactionFactoryBuilder. All permanent listeners are always executed

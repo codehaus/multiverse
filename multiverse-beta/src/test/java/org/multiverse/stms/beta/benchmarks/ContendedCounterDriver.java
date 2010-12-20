@@ -4,7 +4,7 @@ import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.PessimisticLockLevel;
+import org.multiverse.api.LockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.beta.BetaStm;
@@ -17,7 +17,7 @@ import static org.multiverse.stms.beta.BetaStmUtils.format;
 public class ContendedCounterDriver extends BenchmarkDriver {
 
     private int threadCount;
-    private PessimisticLockLevel pessimisticLockLevel = PessimisticLockLevel.LockNone;
+    private LockLevel lockLevel = LockLevel.LockNone;
     private long transactionsPerThread;
     private boolean dirtyCheck;
     private BetaStm stm;
@@ -29,7 +29,7 @@ public class ContendedCounterDriver extends BenchmarkDriver {
         System.out.printf("Multiverse > Thread count %s\n", threadCount);
         System.out.printf("Multiverse > Transactions per thread %s\n", transactionsPerThread);
         System.out.printf("Multiverse > Dirty check %s \n", dirtyCheck);
-        System.out.printf("Multiverse > Pessimistic lock level %s \n", pessimisticLockLevel);
+        System.out.printf("Multiverse > Pessimistic lock level %s \n", lockLevel);
 
         stm = new BetaStm();
         ref = stm.getReferenceFactoryBuilder().build().newLongRef(0);
@@ -75,7 +75,7 @@ public class ContendedCounterDriver extends BenchmarkDriver {
         public void doRun() throws Exception {
             final long _incCount = transactionsPerThread;
             AtomicBlock block = stm.createTransactionFactoryBuilder()
-                    .setPessimisticLockLevel(pessimisticLockLevel)
+                    .setLockLevel(lockLevel)
                     .setDirtyCheckEnabled(dirtyCheck)
                     .buildAtomicBlock();
             AtomicVoidClosure closure = new AtomicVoidClosure() {
