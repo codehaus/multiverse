@@ -9,7 +9,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
-public class VeryAbstractBetaTransactionalObject_atomicIsFreeTest {
+public class Lock_atomicIsUnlockedTest {
     private BetaStm stm;
 
     @Before

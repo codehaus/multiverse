@@ -106,7 +106,7 @@ public class WriteSkewTest {
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
-                .setLockLevel(LockLevel.UpdateLockReads)
+                .setLockLevel(LockLevel.WriteLockReads)
                 .build()
                 .newTransaction();
 

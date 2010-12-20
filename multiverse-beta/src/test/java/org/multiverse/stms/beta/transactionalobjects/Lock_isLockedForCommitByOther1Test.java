@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
@@ -12,10 +11,9 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
-public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
+public class Lock_isLockedForCommitByOther1Test {
 
     private BetaStm stm;
 
@@ -25,11 +23,11 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
         clearThreadLocalTransaction();
     }
 
-    @Test(expected = TransactionRequiredException.class)
-    public void whenNoTransactionFound() {
+    @Test(expected = NullPointerException.class)
+    public void whenNullTransaction_thenNullPointerException() {
         BetaLongRef ref = newLongRef(stm);
 
-        ref.isLockedForWriteBySelf();
+        ref.isLockedForCommitByOther(null);
     }
 
     @Test
@@ -37,9 +35,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        setThreadLocalTransaction(tx);
-
-        boolean result = ref.isLockedForWriteBySelf();
+        boolean result = ref.isLockedForCommitByOther(tx);
 
         assertFalse(result);
     }
@@ -49,9 +45,8 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        setThreadLocalTransaction(tx);
-        ref.acquireCommitLock();
-        boolean result = ref.isLockedForWriteBySelf();
+        ref.getLock().acquireCommitLock(tx);
+        boolean result = ref.isLockedForCommitByOther(tx);
 
         assertFalse(result);
     }
@@ -61,11 +56,10 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        setThreadLocalTransaction(tx);
-        ref.acquireWriteLock();
-        boolean result = ref.isLockedForWriteBySelf();
+        ref.getLock().acquireWriteLock(tx);
+        boolean result = ref.isLockedForCommitByOther(tx);
 
-        assertTrue(result);
+        assertFalse(result);
     }
 
     @Test
@@ -76,10 +70,9 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
         ref.getLock().acquireCommitLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        setThreadLocalTransaction(tx);
-        boolean result = ref.isLockedForWriteBySelf();
+        boolean result = ref.isLockedForCommitByOther(tx);
 
-        assertFalse(result);
+        assertTrue(result);
     }
 
     @Test
@@ -90,24 +83,21 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
         ref.getLock().acquireWriteLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        setThreadLocalTransaction(tx);
-        boolean result = ref.isLockedForWriteBySelf();
+        boolean result = ref.isLockedForCommitByOther(tx);
 
         assertFalse(result);
     }
 
-
-    @Test
+  @Test
     public void whenPreparedTransaction_thenPreparedTransactionException() {
         BetaRef ref = newRef(stm);
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.prepare();
-        setThreadLocalTransaction(tx);
 
         try {
-            ref.isLockedForWriteBySelf();
+            ref.isLockedForCommitByOther(tx);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -123,10 +113,9 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.abort();
-        setThreadLocalTransaction(tx);
 
         try {
-            ref.isLockedForWriteBySelf();
+            ref.isLockedForCommitByOther(tx);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -142,10 +131,9 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
 
         BetaTransaction tx = stm.startDefaultTransaction();
         tx.commit();
-        setThreadLocalTransaction(tx);
 
         try {
-            ref.isLockedForWriteBySelf();
+            ref.isLockedForCommitByOther(tx);
             fail();
         } catch (DeadTransactionException expected) {
         }

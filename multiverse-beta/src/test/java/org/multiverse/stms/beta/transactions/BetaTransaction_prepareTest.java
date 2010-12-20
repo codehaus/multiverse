@@ -497,7 +497,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         tx1.openForRead(ref2, LOCKMODE_NONE);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setLockLevel(LockLevel.UpdateLockReads);
+                .setLockLevel(LockLevel.WriteLockReads);
         BetaTransaction tx2 = newTransaction(config);
         tx2.openForRead(ref1, LOCKMODE_NONE);
         tx2.openForWrite(ref2, LOCKMODE_NONE).value++;

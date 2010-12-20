@@ -589,7 +589,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         long version = ref.getVersion();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setLockLevel(LockLevel.UpdateLockReads);
+                .setLockLevel(LockLevel.WriteLockReads);
         BetaTransaction tx = newTransaction(config);
         BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 

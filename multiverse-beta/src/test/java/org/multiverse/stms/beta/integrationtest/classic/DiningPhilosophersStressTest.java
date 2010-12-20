@@ -60,7 +60,7 @@ public class DiningPhilosophersStressTest implements BetaStmConstants {
 
     @Test
     public void testEnsureReads() {
-        test(LockLevel.UpdateLockReads);
+        test(LockLevel.WriteLockReads);
     }
 
     @Test

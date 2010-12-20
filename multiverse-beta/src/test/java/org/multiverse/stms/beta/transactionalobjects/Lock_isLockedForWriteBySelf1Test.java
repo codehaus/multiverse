@@ -13,7 +13,8 @@ import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
-public class VeryAbstractBetaTransactionalObject_isEnsuredByOther1Test {
+public class Lock_isLockedForWriteBySelf1Test {
+
     private BetaStm stm;
 
     @Before
@@ -26,7 +27,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredByOther1Test {
     public void whenNullTransaction_thenNullPointerException() {
         BetaLongRef ref = newLongRef(stm);
 
-        ref.isLockedForWriteByOther(null);
+        ref.isLockedForWriteBySelf(null);
     }
 
     @Test
@@ -34,7 +35,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredByOther1Test {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        boolean result = ref.isLockedForWriteByOther(tx);
+        boolean result = ref.isLockedForWriteBySelf(tx);
 
         assertFalse(result);
     }
@@ -45,7 +46,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredByOther1Test {
 
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.getLock().acquireCommitLock(tx);
-        boolean result = ref.isLockedForWriteByOther(tx);
+        boolean result = ref.isLockedForWriteBySelf(tx);
 
         assertFalse(result);
     }
@@ -56,9 +57,9 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredByOther1Test {
 
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.getLock().acquireWriteLock(tx);
-        boolean result = ref.isLockedForWriteByOther(tx);
+        boolean result = ref.isLockedForWriteBySelf(tx);
 
-        assertFalse(result);
+        assertTrue(result);
     }
 
     @Test
@@ -69,7 +70,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredByOther1Test {
         ref.getLock().acquireCommitLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        boolean result = ref.isLockedForWriteByOther(tx);
+        boolean result = ref.isLockedForWriteBySelf(tx);
 
         assertFalse(result);
     }
@@ -82,9 +83,9 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredByOther1Test {
         ref.getLock().acquireWriteLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        boolean result = ref.isLockedForWriteByOther(tx);
+        boolean result = ref.isLockedForWriteBySelf(tx);
 
-        assertTrue(result);
+        assertFalse(result);
     }
 
     @Test
@@ -96,7 +97,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredByOther1Test {
         tx.prepare();
 
         try {
-            ref.isLockedForWriteByOther(tx);
+            ref.isLockedForWriteBySelf(tx);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -114,7 +115,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredByOther1Test {
         tx.abort();
 
         try {
-            ref.isLockedForWriteByOther(tx);
+            ref.isLockedForWriteBySelf(tx);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -132,7 +133,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredByOther1Test {
         tx.commit();
 
         try {
-            ref.isLockedForWriteByOther(tx);
+            ref.isLockedForWriteBySelf(tx);
             fail();
         } catch (DeadTransactionException expected) {
         }

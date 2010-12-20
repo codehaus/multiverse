@@ -9,7 +9,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
-public class VeryAbstractBetaTransactionalObject_atomicIsPrivatizedTest {
+public class Lock_atomicIsLockedForUpdateTest {
 
     private BetaStm stm;
 
@@ -24,7 +24,7 @@ public class VeryAbstractBetaTransactionalObject_atomicIsPrivatizedTest {
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        boolean result = ref.atomicIsLockedForCommit();
+        boolean result = ref.atomicIsLockedForUpdate();
 
         assertFalse(result);
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -40,9 +40,9 @@ public class VeryAbstractBetaTransactionalObject_atomicIsPrivatizedTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.getLock().acquireWriteLock(tx);
 
-        boolean result = ref.atomicIsLockedForCommit();
+        boolean result = ref.atomicIsLockedForUpdate();
 
-        assertFalse(result);
+        assertTrue(result);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasUpdateLock(ref, tx);
     }
@@ -56,9 +56,9 @@ public class VeryAbstractBetaTransactionalObject_atomicIsPrivatizedTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.getLock().acquireCommitLock(tx);
 
-        boolean result = ref.atomicIsLockedForCommit();
+        boolean result = ref.atomicIsLockedForUpdate();
 
-        assertTrue(result);
+        assertFalse(result);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasCommitLock(ref, tx);
     }

@@ -15,7 +15,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
-public class VeryAbstractBetaTransactionalObject_isEnsuredByOther0Test {
+public class Lock_isLockedForWriteByOtherTest {
     private BetaStm stm;
 
     @Before

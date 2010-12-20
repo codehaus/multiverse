@@ -18,7 +18,7 @@ import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUpdateBiased;
 
-public class VeryAbstractTransactionalObject_ensureTest {
+public class Lock_acquireWriteLockTest {
     private BetaStm stm;
 
     @Before

@@ -12,37 +12,38 @@ import org.multiverse.MultiverseConstants;
 public enum LockLevel implements MultiverseConstants {
 
     /**
-     * A LockLevel that privatizes all writes.
+     * A LockLevel that commit locks all writes.
      */
     CommitLockWrites(LOCKMODE_NONE, LOCKMODE_COMMIT),
 
     /**
-     * A LockLevel that privatizes reads (and therefor all writes). It is the most
+     * A LockLevel that commit locks reads (and therefor all writes). It is the most
      * strict LockLevel.
      */
     CommitLockReads(LOCKMODE_COMMIT, LOCKMODE_COMMIT),
 
     /**
-     * A LockLevel that ensures all writes.
+     * A LockLevel that write locks all writes. This is the default behavior you get when Oracle is used where
+     * each insert/update/delete is locked for the remaining duration of the transaction
      */
     WriteLockWrites(LOCKMODE_NONE, LOCKMODE_UPDATE),
 
     /**
-     * A LockLevel that ensures all reads (and therefor all writes).
+     * A LockLevel that write all reads (and therefor all writes).
      */
-    UpdateLockReads(LOCKMODE_UPDATE, LOCKMODE_UPDATE),
+    WriteLockReads(LOCKMODE_UPDATE, LOCKMODE_UPDATE),
 
     /**
      * A LockLevel that doesn't require any locking. This is the default.
      */
     LockNone(LOCKMODE_NONE, LOCKMODE_NONE);
 
-    private final int lockReads;
-    private final int lockWrites;
+    private final int readLockMode;
+    private final int writeLockMode;
 
-    private LockLevel(int ensureReads, int ensureWrites) {
-        this.lockReads = ensureReads;
-        this.lockWrites = ensureWrites;
+    private LockLevel(int readLockMode, int writeLockMode) {
+        this.readLockMode = readLockMode;
+        this.writeLockMode = writeLockMode;
     }
 
     /**
@@ -51,7 +52,7 @@ public enum LockLevel implements MultiverseConstants {
      * @return true if it requires the lock of a write.
      */
     public final int getWriteLockMode() {
-        return lockWrites;
+        return writeLockMode;
     }
 
     /**
@@ -61,6 +62,6 @@ public enum LockLevel implements MultiverseConstants {
      * @return true if it requires the lock of a read.
      */
     public final int getReadLockMode() {
-        return lockReads;
+        return readLockMode;
     }
 }

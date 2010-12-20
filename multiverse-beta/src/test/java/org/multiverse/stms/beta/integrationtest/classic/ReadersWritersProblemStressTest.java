@@ -47,7 +47,7 @@ public class ReadersWritersProblemStressTest {
 
     @Test
     public void whenEnsureReads() {
-        test(LockLevel.UpdateLockReads);
+        test(LockLevel.WriteLockReads);
     }
 
     @Test
