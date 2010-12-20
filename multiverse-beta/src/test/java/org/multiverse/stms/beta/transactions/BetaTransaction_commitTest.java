@@ -610,7 +610,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setLockLevel(LockLevel.PrivatizeWrites)
+                .setLockLevel(LockLevel.CommitLockWrites)
                 .setDirtyCheckEnabled(true);
 
         BetaTransaction tx = newTransaction(config);
@@ -626,7 +626,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setLockLevel(LockLevel.PrivatizeReads)
+                .setLockLevel(LockLevel.CommitLockReads)
                 .setDirtyCheckEnabled(true);
         BetaTransaction tx = newTransaction(config);
         tx.openForWrite(ref, LOCKMODE_NONE).value++;

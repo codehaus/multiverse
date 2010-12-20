@@ -64,7 +64,7 @@ public class BetaStm_transactionFactoryValidationTest {
     public void whenLockLevelIsRead_thenAutomaticReadTrackingShouldBeEnabled() {
         BetaTransactionFactoryBuilder builder = stm.createTransactionFactoryBuilder()
                 .setReadTrackingEnabled(false)
-                .setLockLevel(LockLevel.PrivatizeReads);
+                .setLockLevel(LockLevel.CommitLockReads);
 
         try {
             builder.build();

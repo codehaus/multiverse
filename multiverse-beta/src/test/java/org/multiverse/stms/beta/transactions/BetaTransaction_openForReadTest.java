@@ -570,7 +570,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         long version = ref.getVersion();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setLockLevel(LockLevel.PrivatizeReads);
+                .setLockLevel(LockLevel.CommitLockReads);
         BetaTransaction tx = newTransaction(config);
         BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
@@ -589,7 +589,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         long version = ref.getVersion();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setLockLevel(LockLevel.EnsureReads);
+                .setLockLevel(LockLevel.UpdateLockReads);
         BetaTransaction tx = newTransaction(config);
         BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
@@ -608,7 +608,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         long version = ref.getVersion();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setLockLevel(LockLevel.EnsureWrites);
+                .setLockLevel(LockLevel.WriteLockWrites);
         BetaTransaction tx = newTransaction(config);
         BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
@@ -627,7 +627,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         long version = ref.getVersion();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setLockLevel(LockLevel.PrivatizeWrites);
+                .setLockLevel(LockLevel.CommitLockWrites);
         BetaTransaction tx = newTransaction(config);
         BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
@@ -785,7 +785,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         BetaLongRef ref2 = newLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setLockLevel(LockLevel.PrivatizeReads);
+                .setLockLevel(LockLevel.CommitLockReads);
 
         BetaTransaction tx = newTransaction(config);
         tx.openForRead(ref1, LOCKMODE_NONE);

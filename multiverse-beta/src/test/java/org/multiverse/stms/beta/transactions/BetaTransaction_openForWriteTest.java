@@ -524,7 +524,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         long version = ref.getVersion();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setLockLevel(LockLevel.PrivatizeReads);
+                .setLockLevel(LockLevel.CommitLockReads);
         BetaTransaction tx = newTransaction(config);
 
         BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
@@ -547,7 +547,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         long version = ref.getVersion();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setLockLevel(LockLevel.PrivatizeWrites);
+                .setLockLevel(LockLevel.CommitLockWrites);
         BetaTransaction tx = newTransaction(config);
         BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
@@ -635,7 +635,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref2 = newLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setLockLevel(LockLevel.PrivatizeReads);
+                .setLockLevel(LockLevel.CommitLockReads);
 
         BetaTransaction tx = newTransaction(config);
         BetaLongRefTranlocal write1 = tx.openForWrite(ref1, LOCKMODE_NONE);
@@ -985,7 +985,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref2 = newLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setLockLevel(LockLevel.PrivatizeReads);
+                .setLockLevel(LockLevel.CommitLockReads);
 
         BetaTransaction tx = newTransaction(config);
         BetaLongRefTranlocal write1 = tx.openForWrite(ref1, LOCKMODE_NONE);

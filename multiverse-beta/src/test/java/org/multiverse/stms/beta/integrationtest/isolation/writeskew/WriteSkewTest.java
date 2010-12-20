@@ -64,7 +64,7 @@ public class WriteSkewTest {
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
-                .setLockLevel(LockLevel.PrivatizeWrites)
+                .setLockLevel(LockLevel.CommitLockWrites)
                 .build()
                 .newTransaction();
 
@@ -85,7 +85,7 @@ public class WriteSkewTest {
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
-                .setLockLevel(LockLevel.EnsureWrites)
+                .setLockLevel(LockLevel.WriteLockWrites)
                 .build()
                 .newTransaction();
 
@@ -106,7 +106,7 @@ public class WriteSkewTest {
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
-                .setLockLevel(LockLevel.EnsureReads)
+                .setLockLevel(LockLevel.UpdateLockReads)
                 .build()
                 .newTransaction();
 
@@ -133,7 +133,7 @@ public class WriteSkewTest {
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
-                .setLockLevel(LockLevel.PrivatizeReads)
+                .setLockLevel(LockLevel.CommitLockReads)
                 .build()
                 .newTransaction();
 

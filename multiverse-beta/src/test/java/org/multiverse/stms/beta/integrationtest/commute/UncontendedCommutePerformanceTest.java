@@ -67,7 +67,7 @@ public class UncontendedCommutePerformanceTest {
         @Override
         public void doRun() throws Exception {
             AtomicBlock block = stm.createTransactionFactoryBuilder()
-                    .setLockLevel(LockLevel.PrivatizeReads)
+                    .setLockLevel(LockLevel.CommitLockReads)
                     .setDirtyCheckEnabled(false)
                     .buildAtomicBlock();
 

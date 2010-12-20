@@ -77,7 +77,7 @@ public class BoxingOverheadDriver extends BenchmarkDriver implements BetaStmCons
         public void doRun() {
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
                     new BetaTransactionConfiguration(stm)
-                            .setLockLevel(LockLevel.PrivatizeReads)
+                            .setLockLevel(LockLevel.CommitLockReads)
                             .setDirtyCheckEnabled(false));
 
             long startMs = System.currentTimeMillis();

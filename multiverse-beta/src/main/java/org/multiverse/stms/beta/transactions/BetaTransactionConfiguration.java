@@ -260,7 +260,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
             throw new IllegalTransactionFactoryException(msg);
         }
 
-        if (lockLevel == LockLevel.PrivatizeReads && !trackReads) {
+        if (lockLevel == LockLevel.CommitLockReads && !trackReads) {
             String msg = format("[%s] If all reads should be locked, read tracking should be enabled", familyName);
             throw new IllegalTransactionFactoryException(msg);
         }

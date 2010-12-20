@@ -179,12 +179,12 @@ public class WriteSkewStressTest {
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
         private final AtomicBlock privatizedReadLevelBlock = stm.createTransactionFactoryBuilder()
-                .setLockLevel(LockLevel.PrivatizeReads)
+                .setLockLevel(LockLevel.CommitLockReads)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
         private final AtomicBlock privatizedWriteLevelBlock = stm.createTransactionFactoryBuilder()
-                .setLockLevel(LockLevel.PrivatizeWrites)
+                .setLockLevel(LockLevel.CommitLockWrites)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();

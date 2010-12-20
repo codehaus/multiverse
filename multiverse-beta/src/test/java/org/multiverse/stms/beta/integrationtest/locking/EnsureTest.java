@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta.integrationtest.pessimistic;
+package org.multiverse.stms.beta.integrationtest.locking;
 
 import org.junit.Before;
 import org.junit.Ignore;

@@ -34,7 +34,7 @@ public class ImprovedBlockingQueue<E> implements BetaStmConstants {
 
     private final AtomicBlock putBlock = GlobalStmInstance.getGlobalStmInstance()
             .createTransactionFactoryBuilder()
-            .setLockLevel(LockLevel.PrivatizeWrites)
+            .setLockLevel(LockLevel.CommitLockWrites)
             .setDirtyCheckEnabled(false)
             .buildAtomicBlock();
 
@@ -94,7 +94,7 @@ public class ImprovedBlockingQueue<E> implements BetaStmConstants {
 
     private final AtomicBlock takeBlock = GlobalStmInstance.getGlobalStmInstance()
             .createTransactionFactoryBuilder()
-            .setLockLevel(LockLevel.PrivatizeWrites)
+            .setLockLevel(LockLevel.CommitLockWrites)
             .setDirtyCheckEnabled(false)
             .buildAtomicBlock();
 

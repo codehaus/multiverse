@@ -101,7 +101,7 @@ public class UncontendedLeanUpdateBenchmark implements BetaStmConstants {
             //FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm,1);
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
                     new BetaTransactionConfiguration(stm)
-                            .setLockLevel(LockLevel.PrivatizeReads)
+                            .setLockLevel(LockLevel.CommitLockReads)
                             .setDirtyCheckEnabled(false));
             long startMs = System.currentTimeMillis();
             for (long k = 0; k < transactionCount; k++) {

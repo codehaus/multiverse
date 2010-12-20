@@ -14,23 +14,23 @@ public enum LockLevel implements MultiverseConstants {
     /**
      * A LockLevel that privatizes all writes.
      */
-    PrivatizeWrites(LOCKMODE_NONE, LOCKMODE_COMMIT),
+    CommitLockWrites(LOCKMODE_NONE, LOCKMODE_COMMIT),
 
     /**
      * A LockLevel that privatizes reads (and therefor all writes). It is the most
      * strict LockLevel.
      */
-    PrivatizeReads(LOCKMODE_COMMIT, LOCKMODE_COMMIT),
+    CommitLockReads(LOCKMODE_COMMIT, LOCKMODE_COMMIT),
 
     /**
      * A LockLevel that ensures all writes.
      */
-    EnsureWrites(LOCKMODE_NONE, LOCKMODE_UPDATE),
+    WriteLockWrites(LOCKMODE_NONE, LOCKMODE_UPDATE),
 
     /**
      * A LockLevel that ensures all reads (and therefor all writes).
      */
-    EnsureReads(LOCKMODE_UPDATE, LOCKMODE_UPDATE),
+    UpdateLockReads(LOCKMODE_UPDATE, LOCKMODE_UPDATE),
 
     /**
      * A LockLevel that doesn't require any locking. This is the default.

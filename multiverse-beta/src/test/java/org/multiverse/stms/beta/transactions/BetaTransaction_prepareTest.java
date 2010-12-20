@@ -497,7 +497,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         tx1.openForRead(ref2, LOCKMODE_NONE);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setLockLevel(LockLevel.EnsureReads);
+                .setLockLevel(LockLevel.UpdateLockReads);
         BetaTransaction tx2 = newTransaction(config);
         tx2.openForRead(ref1, LOCKMODE_NONE);
         tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
@@ -526,7 +526,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         tx1.openForRead(ref2, LOCKMODE_NONE);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setLockLevel(LockLevel.EnsureWrites);
+                .setLockLevel(LockLevel.WriteLockWrites);
         BetaTransaction tx2 = newTransaction(config);
         tx2.openForRead(ref1, LOCKMODE_NONE);
         tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
@@ -553,7 +553,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         tx1.openForRead(ref2, LOCKMODE_NONE);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setLockLevel(LockLevel.PrivatizeReads);
+                .setLockLevel(LockLevel.CommitLockReads);
         BetaTransaction tx2 = newTransaction(config);
         tx2.openForRead(ref1, LOCKMODE_NONE);
         tx2.openForWrite(ref2, LOCKMODE_NONE).value++;
@@ -583,7 +583,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         tx1.openForRead(ref2, LOCKMODE_NONE);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setLockLevel(LockLevel.PrivatizeWrites);
+                .setLockLevel(LockLevel.CommitLockWrites);
         BetaTransaction tx2 = newTransaction(config);
         tx2.openForRead(ref1, LOCKMODE_NONE);
         tx2.openForWrite(ref2, LOCKMODE_NONE).value++;

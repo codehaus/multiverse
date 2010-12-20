@@ -325,7 +325,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
         BetaLongRef ref1 = newLongRef(stm);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
-                .setLockLevel(LockLevel.PrivatizeReads)
+                .setLockLevel(LockLevel.CommitLockReads)
                 .init();
 
         BetaTransaction tx = newTransaction(config);

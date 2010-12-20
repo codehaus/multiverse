@@ -50,22 +50,22 @@ public class DiningPhilosophersStressTest implements BetaStmConstants {
 
     @Test
     public void testPrivatizeReads() {
-        test(LockLevel.PrivatizeReads);
+        test(LockLevel.CommitLockReads);
     }
 
     @Test
     public void testPrivatizeWrite() {
-        test(LockLevel.PrivatizeWrites);
+        test(LockLevel.CommitLockWrites);
     }
 
     @Test
     public void testEnsureReads() {
-        test(LockLevel.EnsureReads);
+        test(LockLevel.UpdateLockReads);
     }
 
     @Test
     public void testEnsureWrite() {
-        test(LockLevel.EnsureWrites);
+        test(LockLevel.WriteLockWrites);
     }
 
     public void test(LockLevel lockLevel) {

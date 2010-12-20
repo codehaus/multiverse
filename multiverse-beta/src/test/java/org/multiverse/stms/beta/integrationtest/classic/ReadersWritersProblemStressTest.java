@@ -47,22 +47,22 @@ public class ReadersWritersProblemStressTest {
 
     @Test
     public void whenEnsureReads() {
-        test(LockLevel.EnsureReads);
+        test(LockLevel.UpdateLockReads);
     }
 
     @Test
     public void whenEnsureWrites() {
-        test(LockLevel.EnsureWrites);
+        test(LockLevel.WriteLockWrites);
     }
 
     @Test
     public void whenPrivatizeReads() {
-        test(LockLevel.PrivatizeReads);
+        test(LockLevel.CommitLockReads);
     }
 
     @Test
     public void whenPrivatizedWrites() {
-        test(LockLevel.PrivatizeWrites);
+        test(LockLevel.CommitLockWrites);
     }
 
     public void test(LockLevel lockLevel) {

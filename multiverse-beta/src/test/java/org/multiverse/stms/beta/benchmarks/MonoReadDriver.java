@@ -78,7 +78,7 @@ public class MonoReadDriver extends BenchmarkDriver implements BetaStmConstants{
 
             LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
                     new BetaTransactionConfiguration(stm)
-                            .setLockLevel(LockLevel.PrivatizeReads)
+                            .setLockLevel(LockLevel.CommitLockReads)
                             .setDirtyCheckEnabled(false));
             long startMs = System.currentTimeMillis();
             final long _transactionCount = transactionCount;
