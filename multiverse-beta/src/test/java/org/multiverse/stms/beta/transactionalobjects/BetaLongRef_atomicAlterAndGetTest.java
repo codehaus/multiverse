@@ -132,7 +132,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         LongFunction function = mock(LongFunction.class);
         try {
@@ -155,7 +155,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         LongFunction function = mock(LongFunction.class);
         try {

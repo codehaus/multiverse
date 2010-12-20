@@ -59,7 +59,7 @@ public class BetaLongRef_commute2Test {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.commute(tx, newIncLongFunction());
@@ -83,7 +83,7 @@ public class BetaLongRef_commute2Test {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.commute(tx, newIncLongFunction());

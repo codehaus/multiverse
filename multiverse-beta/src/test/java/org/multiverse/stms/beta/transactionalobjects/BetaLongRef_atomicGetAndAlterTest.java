@@ -1,16 +1,15 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.LockedException;
-import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConfiguration;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.joinAll;
@@ -20,8 +19,6 @@ import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransactio
 import static org.multiverse.api.functions.Functions.newIdentityLongFunction;
 import static org.multiverse.api.functions.Functions.newIncLongFunction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasUpdateLock;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertVersionAndValue;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
 
 public class BetaLongRef_atomicGetAndAlterTest {
@@ -98,7 +95,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         LongFunction function = mock(LongFunction.class);
         try {
@@ -121,7 +118,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         try {
             ref.atomicGetAndAlter(newIdentityLongFunction());
@@ -143,7 +140,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         LongFunction function = mock(LongFunction.class);
         try {

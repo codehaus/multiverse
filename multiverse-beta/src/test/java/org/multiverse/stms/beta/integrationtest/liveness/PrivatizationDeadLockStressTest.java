@@ -66,12 +66,12 @@ public class PrivatizationDeadLockStressTest {
                 public void execute(Transaction tx) throws Exception {
                     if (leftToRight) {
                         for (int k = 0; k < refCount; k++) {
-                            refs[k].privatize(tx);
+                            refs[k].acquireCommitLock(tx);
                             sleepMs(5);
                         }
                     } else {
                         for (int k = refCount - 1; k >= 0; k--) {
-                            refs[k].privatize(tx);
+                            refs[k].acquireCommitLock(tx);
                             sleepMs(5);
                         }
                     }

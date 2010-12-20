@@ -1026,7 +1026,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         BetaTransaction tx = newTransaction();
         LongFunction function = Functions.newIncLongFunction(1);

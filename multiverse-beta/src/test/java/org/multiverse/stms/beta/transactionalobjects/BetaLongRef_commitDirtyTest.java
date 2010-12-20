@@ -254,7 +254,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.privatize(tx);
+        ref.getLock().acquireCommitLock(tx);
         ref.get(tx);
         BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         tranlocal.prepareDirtyUpdates(pool, tx, 1);
@@ -276,7 +276,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.privatize(tx);
+        ref.getLock().acquireCommitLock(tx);
         BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tranlocal.value = updateValue;
         tranlocal.prepareDirtyUpdates(pool, tx, 1);
@@ -297,7 +297,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.privatize(tx);
+        ref.getLock().acquireCommitLock(tx);
         BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tranlocal.value = initialValue;
         tranlocal.prepareDirtyUpdates(pool, tx, 1);
@@ -318,7 +318,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.ensure(tx);
+        ref.getLock().acquireWriteLock(tx);
         ref.get(tx);
         BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         tranlocal.prepareDirtyUpdates(pool, tx, 1);
@@ -339,7 +339,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.ensure(tx);
+        ref.getLock().acquireWriteLock(tx);
         int updatedValue = 1;
         ref.set(tx, updatedValue);
         BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
@@ -361,7 +361,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.ensure(tx);
+        ref.getLock().acquireWriteLock(tx);
         ref.set(tx, initialValue);
         BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         tranlocal.prepareDirtyUpdates(pool, tx, 1);

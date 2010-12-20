@@ -32,32 +32,32 @@ public class LinkedList<E> extends AbstractBetaTransactionalObject {
     }
 
     @Override
+    public void acquireWriteLock() {
+        throw new TodoException();
+    }
+
+    @Override
+    public void acquireWriteLock(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
+    public void acquireCommitLock() {
+        throw new TodoException();
+    }
+
+    @Override
+    public void acquireCommitLock(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
     public void ensure() {
         throw new TodoException();
     }
 
     @Override
     public void ensure(Transaction tx) {
-        throw new TodoException();
-    }
-
-    @Override
-    public void privatize() {
-        throw new TodoException();
-    }
-
-    @Override
-    public void privatize(Transaction tx) {
-        throw new TodoException();
-    }
-
-    @Override
-    public void deferredEnsure() {
-        throw new TodoException();
-    }
-
-    @Override
-    public void deferredEnsure(Transaction tx) {
         throw new TodoException();
     }
 
@@ -267,32 +267,32 @@ class LinkedListNode<E> extends AbstractBetaTransactionalObject {
     }
 
     @Override
+    public void acquireWriteLock() {
+        throw new TodoException();
+    }
+
+    @Override
+    public void acquireWriteLock(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
+    public void acquireCommitLock() {
+        throw new TodoException();
+    }
+
+    @Override
+    public void acquireCommitLock(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
     public void ensure() {
         throw new TodoException();
     }
 
     @Override
     public void ensure(Transaction tx) {
-        throw new TodoException();
-    }
-
-    @Override
-    public void privatize() {
-        throw new TodoException();
-    }
-
-    @Override
-    public void privatize(Transaction tx) {
-        throw new TodoException();
-    }
-
-    @Override
-    public void deferredEnsure() {
-        throw new TodoException();
-    }
-
-    @Override
-    public void deferredEnsure(Transaction tx) {
         throw new TodoException();
     }
 

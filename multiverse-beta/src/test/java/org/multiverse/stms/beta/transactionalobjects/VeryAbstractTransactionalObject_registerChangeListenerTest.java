@@ -80,7 +80,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
@@ -103,7 +103,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
@@ -128,7 +128,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
@@ -154,7 +154,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();

@@ -53,7 +53,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.ensure(tx);
+        ref.getLock().acquireWriteLock(tx);
 
         BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         tranlocal.prepareForPooling(pool);
@@ -66,7 +66,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.privatize(tx);
+        ref.getLock().acquireCommitLock(tx);
 
         BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         tranlocal.prepareForPooling(pool);

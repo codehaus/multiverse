@@ -368,42 +368,42 @@ public final class BetaRef<E>
     }
 
     @Override
-    public final void ensure(){
+    public final void acquireWriteLock(){
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
             throw new TransactionRequiredException(getClass(),"ensure");
         }
 
-        ensure((BetaTransaction)tx);
+        acquireWriteLock((BetaTransaction)tx);
     }
 
     @Override
-    public final void ensure(Transaction tx){
-        ensure((BetaTransaction)tx);
+    public final void acquireWriteLock(Transaction tx){
+        acquireWriteLock((BetaTransaction)tx);
     }
 
-    public final void ensure(BetaTransaction tx){
+    public final void acquireWriteLock(BetaTransaction tx){
         tx.openForRead(this, LOCKMODE_UPDATE);
     }
 
     @Override
-    public final void deferredEnsure(){
+    public final void ensure(){
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
             throw new TransactionRequiredException(getClass(),"deferredEnsure");
         }
 
-        deferredEnsure((BetaTransaction)tx);
+        ensure((BetaTransaction)tx);
     }
 
     @Override
-    public final void deferredEnsure(final Transaction tx){
-        deferredEnsure((BetaTransaction)tx);
+    public final void ensure(final Transaction tx){
+        ensure((BetaTransaction)tx);
     }
 
-    public final void deferredEnsure(final BetaTransaction tx){
+    public final void ensure(final BetaTransaction tx){
         if(tx == null){
             throw new NullPointerException();
         }
@@ -412,22 +412,22 @@ public final class BetaRef<E>
     }
 
     @Override
-    public final void privatize(){
+    public final void acquireCommitLock(){
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
             throw new TransactionRequiredException(getClass(),"privatize");
         }
 
-        privatize((BetaTransaction)tx);
+        acquireCommitLock((BetaTransaction)tx);
     }
 
     @Override
-    public final void privatize(Transaction tx){
-        privatize((BetaTransaction)tx);
+    public final void acquireCommitLock(Transaction tx){
+        acquireCommitLock((BetaTransaction)tx);
     }
 
-    public final void privatize(BetaTransaction tx){
+    public final void acquireCommitLock(BetaTransaction tx){
         tx.openForRead(this, LOCKMODE_COMMIT);
     }
 

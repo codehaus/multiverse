@@ -27,7 +27,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedByOther1Test {
     public void whenNullTransaction_thenNullPointerException() {
         BetaLongRef ref = newLongRef(stm);
 
-        ref.isPrivatizedByOther(null);
+        ref.isLockedForCommitByOther(null);
     }
 
     @Test
@@ -35,7 +35,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedByOther1Test {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        boolean result = ref.isPrivatizedByOther(tx);
+        boolean result = ref.isLockedForCommitByOther(tx);
 
         assertFalse(result);
     }
@@ -45,8 +45,8 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedByOther1Test {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.privatize(tx);
-        boolean result = ref.isPrivatizedByOther(tx);
+        ref.getLock().acquireCommitLock(tx);
+        boolean result = ref.isLockedForCommitByOther(tx);
 
         assertFalse(result);
     }
@@ -56,8 +56,8 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedByOther1Test {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.ensure(tx);
-        boolean result = ref.isPrivatizedByOther(tx);
+        ref.getLock().acquireWriteLock(tx);
+        boolean result = ref.isLockedForCommitByOther(tx);
 
         assertFalse(result);
     }
@@ -67,10 +67,10 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedByOther1Test {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        boolean result = ref.isPrivatizedByOther(tx);
+        boolean result = ref.isLockedForCommitByOther(tx);
 
         assertTrue(result);
     }
@@ -80,10 +80,10 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedByOther1Test {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        boolean result = ref.isPrivatizedByOther(tx);
+        boolean result = ref.isLockedForCommitByOther(tx);
 
         assertFalse(result);
     }
@@ -97,7 +97,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedByOther1Test {
         tx.prepare();
 
         try {
-            ref.isPrivatizedByOther(tx);
+            ref.isLockedForCommitByOther(tx);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -115,7 +115,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedByOther1Test {
         tx.abort();
 
         try {
-            ref.isPrivatizedByOther(tx);
+            ref.isLockedForCommitByOther(tx);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -133,7 +133,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedByOther1Test {
         tx.commit();
 
         try {
-            ref.isPrivatizedByOther(tx);
+            ref.isLockedForCommitByOther(tx);
             fail();
         } catch (DeadTransactionException expected) {
         }

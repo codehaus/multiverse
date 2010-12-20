@@ -50,7 +50,7 @@ public class BetaLongRef_get0Test {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.privatize();
+        ref.acquireCommitLock();
 
         long value = ref.get();
 
@@ -72,7 +72,7 @@ public class BetaLongRef_get0Test {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.ensure();
+        ref.acquireWriteLock();
         long value = ref.get();
 
         assertEquals(100, value);
@@ -93,7 +93,7 @@ public class BetaLongRef_get0Test {
         setThreadLocalTransaction(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         try {
             ref.get();
@@ -119,7 +119,7 @@ public class BetaLongRef_get0Test {
         setThreadLocalTransaction(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         long value = ref.get();
 

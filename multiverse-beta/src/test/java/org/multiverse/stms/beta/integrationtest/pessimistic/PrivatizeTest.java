@@ -27,11 +27,11 @@ public class PrivatizeTest {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         try {
-            ref.privatize(tx);
+            ref.getLock().acquireCommitLock(tx);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -46,11 +46,11 @@ public class PrivatizeTest {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         try {
-            ref.privatize(tx);
+            ref.getLock().acquireCommitLock(tx);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -65,7 +65,7 @@ public class PrivatizeTest {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.privatize(tx);
+        ref.getLock().acquireCommitLock(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         try {
@@ -83,7 +83,7 @@ public class PrivatizeTest {
         ref.get(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.privatize(tx);
+        ref.getLock().acquireCommitLock(tx);
 
         long result = ref.get(otherTx);
         assertEquals(10, result);
@@ -97,7 +97,7 @@ public class PrivatizeTest {
         ref.get(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         ref.set(tx, 100);
 
@@ -116,7 +116,7 @@ public class PrivatizeTest {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         try {
@@ -134,8 +134,8 @@ public class PrivatizeTest {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.ensure(tx);
-        ref.privatize(tx);
+        ref.getLock().acquireWriteLock(tx);
+        ref.getLock().acquireCommitLock(tx);
 
         assertIsActive(tx);
         assertRefHasCommitLock(ref, tx);
@@ -146,7 +146,7 @@ public class PrivatizeTest {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.privatize(tx);
+        ref.getLock().acquireCommitLock(tx);
         tx.commit();
 
         assertIsCommitted(tx);
@@ -158,7 +158,7 @@ public class PrivatizeTest {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.privatize(tx);
+        ref.getLock().acquireCommitLock(tx);
         tx.prepare();
 
         assertIsPrepared(tx);
@@ -170,7 +170,7 @@ public class PrivatizeTest {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.privatize(tx);
+        ref.getLock().acquireCommitLock(tx);
         tx.abort();
 
         assertIsAborted(tx);
@@ -182,8 +182,8 @@ public class PrivatizeTest {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.privatize(tx);
-        ref.privatize(tx);
+        ref.getLock().acquireCommitLock(tx);
+        ref.getLock().acquireCommitLock(tx);
 
         assertIsActive(tx);
         assertRefHasCommitLock(ref,tx);
@@ -199,7 +199,7 @@ public class PrivatizeTest {
         ref.atomicIncrementAndGet(1);
 
         try {
-            ref.privatize(tx);
+            ref.getLock().acquireCommitLock(tx);
             fail();
         } catch (ReadWriteConflict expected) {
         }

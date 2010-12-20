@@ -24,7 +24,7 @@ public class VeryAbstractBetaTransactionalObject_atomicIsPrivatizedTest {
         BetaLongRef ref = newLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        boolean result = ref.atomicIsPrivatized();
+        boolean result = ref.atomicIsLockedForCommit();
 
         assertFalse(result);
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -38,9 +38,9 @@ public class VeryAbstractBetaTransactionalObject_atomicIsPrivatizedTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.ensure(tx);
+        ref.getLock().acquireWriteLock(tx);
 
-        boolean result = ref.atomicIsPrivatized();
+        boolean result = ref.atomicIsLockedForCommit();
 
         assertFalse(result);
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -54,9 +54,9 @@ public class VeryAbstractBetaTransactionalObject_atomicIsPrivatizedTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.privatize(tx);
+        ref.getLock().acquireCommitLock(tx);
 
-        boolean result = ref.atomicIsPrivatized();
+        boolean result = ref.atomicIsLockedForCommit();
 
         assertTrue(result);
         assertVersionAndValue(ref, initialVersion, initialValue);

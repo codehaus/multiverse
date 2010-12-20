@@ -1,19 +1,23 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.LockedException;
-import org.multiverse.api.exceptions.PanicError;
-import org.multiverse.api.exceptions.TransactionRequiredException;
-import org.multiverse.api.functions.DoubleFunction;
-import org.multiverse.api.predicates.DoublePredicate;
-import org.multiverse.api.references.DoubleRef;
-import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.Listeners;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.*;
+import org.multiverse.api.*;
+import org.multiverse.api.blocking.*;
+import org.multiverse.api.exceptions.*;
+import org.multiverse.api.functions.*;
+import org.multiverse.api.predicates.*;
+import org.multiverse.api.references.*;
+import org.multiverse.stms.beta.*;
+import org.multiverse.stms.beta.conflictcounters.*;
+import org.multiverse.stms.beta.orec.*;
+import org.multiverse.stms.beta.transactions.*;
 
-import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.*;
 
 /**
  * The transactional object. Atm it is just a reference for an int, more complex stuff will be added again
@@ -378,42 +382,42 @@ public  class BetaDoubleRef
     }
 
     @Override
-    public final void ensure(){
+    public final void acquireWriteLock(){
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
             throw new TransactionRequiredException(getClass(),"ensure");
         }
 
-        ensure((BetaTransaction)tx);
+        acquireWriteLock((BetaTransaction)tx);
     }
 
     @Override
-    public final void ensure(Transaction tx){
-        ensure((BetaTransaction)tx);
+    public final void acquireWriteLock(Transaction tx){
+        acquireWriteLock((BetaTransaction)tx);
     }
 
-    public final void ensure(BetaTransaction tx){
+    public final void acquireWriteLock(BetaTransaction tx){
         tx.openForRead(this, LOCKMODE_UPDATE);
     }
 
     @Override
-    public final void deferredEnsure(){
+    public final void ensure(){
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
             throw new TransactionRequiredException(getClass(),"deferredEnsure");
         }
 
-        deferredEnsure((BetaTransaction)tx);
+        ensure((BetaTransaction)tx);
     }
 
     @Override
-    public final void deferredEnsure(final Transaction tx){
-        deferredEnsure((BetaTransaction)tx);
+    public final void ensure(final Transaction tx){
+        ensure((BetaTransaction)tx);
     }
 
-    public final void deferredEnsure(final BetaTransaction tx){
+    public final void ensure(final BetaTransaction tx){
         if(tx == null){
             throw new NullPointerException();
         }
@@ -422,22 +426,22 @@ public  class BetaDoubleRef
     }
 
     @Override
-    public final void privatize(){
+    public final void acquireCommitLock(){
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
             throw new TransactionRequiredException(getClass(),"privatize");
         }
 
-        privatize((BetaTransaction)tx);
+        acquireCommitLock((BetaTransaction)tx);
     }
 
     @Override
-    public final void privatize(Transaction tx){
-        privatize((BetaTransaction)tx);
+    public final void acquireCommitLock(Transaction tx){
+        acquireCommitLock((BetaTransaction)tx);
     }
 
-    public final void privatize(BetaTransaction tx){
+    public final void acquireCommitLock(BetaTransaction tx){
         tx.openForRead(this, LOCKMODE_COMMIT);
     }
 

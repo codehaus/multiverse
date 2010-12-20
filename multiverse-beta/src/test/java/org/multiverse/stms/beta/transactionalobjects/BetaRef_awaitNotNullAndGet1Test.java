@@ -55,7 +55,7 @@ public class BetaRef_awaitNotNullAndGet1Test {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         try {
@@ -77,7 +77,7 @@ public class BetaRef_awaitNotNullAndGet1Test {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         String result = ref.awaitNotNullAndGet(tx);

@@ -33,8 +33,6 @@ all operations like openForWrite/checkConflict/ensure etc.
 - selective notifies in transaction, instead of always waking up.. one could provide a function that only wakes
  up under certain conditions.
 
-- use cas for atomic operations if possible?
-
 - actor atomic block, doesn't look at an existing transaction. Automatically exposes the onAbort/onCommit
 
 - on read/ on write function
@@ -94,7 +92,7 @@ non permanent.
 
 - ref: the registerRetrylatch should also do the abort.
 
-- is it possible to combine pessimistic locking with blockingEnabled? What if a transaction wants to wait for a lock
+- is it possible to combine pessimistic locking with blocking? What if a transaction wants to wait for a lock
 to become free... so can when a lock unlease is done, see if there are listeners before releasing the lock? If
 done before, the transaction knows it can remove the current listeners with the a cas, and add them to the set
 of listeners that to be notified. If a transaction wants to block ...
@@ -197,47 +195,6 @@ performance.
 - mono transaction can do a cheap read of the current tranlocal already is permanent:
   this is because no consistency guaranteed need to be provided.
 
-----------------------------------------------------------------------
-                            todo
-----------------------------------------------------------------------
-
-- orelse
-
-    - mono transaction: support for orelse
-
-    - array transaction:  support for orelse
-
-    - array tree transaction: support for orelse
-
-- tracing
-
-- when hard reset is done, no new local conflict counter is created, so still attached to the old
-globalconflict counter.
-
-- lifecyclelistener
-
-    - fat mono transaction: failing lifecyclelistener while committing
-
-    - fat array transaction: failing lifecyclelistener while committing
-
-    - fat arraytree transaction: failing lifecyclelistener while committing
-
-    - listeners are not cleaned after abort/commit, so still a potential memory leak
-
-- speculative + register doesn't combine because it can lead to transaction not accepting the task and therefor
-the task not being executed at all.
-
-- inconsistent read
-
-    - read uncommitted isolation level
-
-    - when an inconsistent read is done, instead of going through the arrive and depart, do it faster.
-    The arrive/depart is needed for consistency, but when an inconsistent read is done, it isn't needed.
-
-    - improved testing in the transaction for read committed isolation level
-
-    - implement read on transaction.
-
 - testing:
 
     - testing tranlocal.prepareAll needs to be tested with conflict check
@@ -268,6 +225,47 @@ the task not being executed at all.
 
     - improved testing in the transaction for the ensure functionality
 
+----------------------------------------------------------------------
+                            todo
+----------------------------------------------------------------------
+
+- orelse
+
+    - mono transaction: support for orelse
+
+    - array transaction:  support for orelse
+
+    - array tree transaction: support for orelse
+
+- tracing
+
+- when hard reset is done, no new local conflict counter is created, so still attached to the old
+globalconflict counter.
+
+- lifecyclelistener
+
+    - fat mono transaction: failing lifecyclelistener while committing
+
+    - fat array transaction: failing lifecyclelistener while committing
+
+    - fat arraytree transaction: failing lifecyclelistener while committing
+
+    - listeners are not cleaned after abort/commit, so still a potential memory leak
+
+    - speculative + register doesn't combine because it can lead to transaction not accepting the task and therefor
+    the task not being executed at all.
+
+- inconsistent read
+
+    - read uncommitted isolation level
+
+    - when an inconsistent read is done, instead of going through the arrive and depart, do it faster.
+    The arrive/depart is needed for consistency, but when an inconsistent read is done, it isn't needed.
+
+    - improved testing in the transaction for read committed isolation level
+
+    - implement read on transaction.
+
 - the tranlocal.openForRead needs to have the conflict stuff added
 
 - the tranlocal.openForWrite needs to have the conflict stuff added
@@ -275,6 +273,10 @@ the task not being executed at all.
 ----------------------------------------------------------------------
                                 done
 ----------------------------------------------------------------------
+
+-
+
+- externalized the processor count for the benchmarks
 
 - check the version before acquiring the lock, if it has changed, a commit is going
 to fail anyway.

@@ -116,7 +116,7 @@ public class ReadBiasedIsolationStressTest {
                 @Override
                 public boolean execute(Transaction tx) throws Exception {
                     if (pessimistic) {
-                        ref.ensure(tx);
+                        ref.acquireWriteLock(tx);
                     }
 
                     if (randomOneOf(chanceOfUpdate)) {

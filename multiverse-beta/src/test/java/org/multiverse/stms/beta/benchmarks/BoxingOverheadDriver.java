@@ -82,7 +82,7 @@ public class BoxingOverheadDriver extends BenchmarkDriver implements BetaStmCons
 
             long startMs = System.currentTimeMillis();
 
-            long _transactionCount = transactionsPerThread;
+            final long _transactionCount = transactionsPerThread;
             if (withBoxing) {
                 BetaRef<Long> ref = newRef(stm, new Long(0));
                 for (long k = 0; k < _transactionCount; k++) {

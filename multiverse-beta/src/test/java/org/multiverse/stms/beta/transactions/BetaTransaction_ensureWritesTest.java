@@ -86,7 +86,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
         ref.incrementAndGet(tx, 1);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         try {
             tx.ensureWrites();
@@ -106,7 +106,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
         ref.incrementAndGet(tx, 1);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         try {
             tx.ensureWrites();
@@ -136,7 +136,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
 
         BetaTransaction tx = newTransaction();
         ref.incrementAndGet(tx, 1);
-        ref.privatize(tx);
+        ref.getLock().acquireCommitLock(tx);
         tx.ensureWrites();
 
         assertIsActive(tx);
@@ -149,7 +149,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
 
         BetaTransaction tx = newTransaction();
         ref.incrementAndGet(tx, 1);
-        ref.ensure(tx);
+        ref.getLock().acquireWriteLock(tx);
         tx.ensureWrites();
 
         assertIsActive(tx);

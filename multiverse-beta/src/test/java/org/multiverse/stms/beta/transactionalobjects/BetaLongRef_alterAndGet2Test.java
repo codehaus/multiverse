@@ -172,7 +172,7 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongFunction function = mock(LongFunction.class);
@@ -197,7 +197,7 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongFunction function = Functions.newIncLongFunction(1);

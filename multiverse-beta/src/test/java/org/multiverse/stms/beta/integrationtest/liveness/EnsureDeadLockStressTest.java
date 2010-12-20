@@ -66,12 +66,12 @@ public class EnsureDeadLockStressTest {
                 public void execute(Transaction tx) throws Exception {
                     if (leftToRight) {
                         for (int k = 0; k < refCount; k++) {
-                            refs[k].ensure(tx);
+                            refs[k].acquireWriteLock(tx);
                             sleepMs(5);
                         }
                     } else {
                         for (int k = refCount - 1; k >= 0; k--) {
-                            refs[k].ensure(tx);
+                            refs[k].acquireWriteLock(tx);
                             sleepMs(5);
                         }
                     }

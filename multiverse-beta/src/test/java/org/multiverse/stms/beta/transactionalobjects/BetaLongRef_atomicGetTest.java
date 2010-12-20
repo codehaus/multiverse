@@ -58,7 +58,7 @@ public class BetaLongRef_atomicGetTest {
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         try {
             ref.atomicGet();
@@ -78,7 +78,7 @@ public class BetaLongRef_atomicGetTest {
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         long result = ref.atomicGet();
 
@@ -104,7 +104,7 @@ public class BetaLongRef_atomicGetTest {
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         try {
             ref.atomicGet();
@@ -124,7 +124,7 @@ public class BetaLongRef_atomicGetTest {
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         long result = ref.atomicGet();
 

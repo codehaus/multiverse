@@ -30,7 +30,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param value the new value.
      * @return the old value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      */
     boolean getAndSet(boolean value);
 
@@ -40,7 +40,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param value the new value.
      * @return the new value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      */
     boolean set(boolean value);
 
@@ -51,7 +51,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param value the new value
      * @return the old value
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean set(Transaction tx, boolean value);
@@ -60,7 +60,7 @@ public interface BooleanRef extends TransactionalObject {
      * Gets the value using the provided transaction.
      *
      * @return the current value.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      * @see #atomicGet()
      */
@@ -72,7 +72,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param tx the Transaction to lift on.
      * @return the value stored in the ref.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean get(Transaction tx);
@@ -84,7 +84,7 @@ public interface BooleanRef extends TransactionalObject {
      * {@link #atomicWeakGet()}.
      *
      * @return the current value.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      */
     boolean atomicGet();
 
@@ -104,7 +104,7 @@ public interface BooleanRef extends TransactionalObject {
      *
      * @param newValue the new value.
      * @return the new value.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      */
     boolean atomicSet(boolean newValue);
 
@@ -114,7 +114,7 @@ public interface BooleanRef extends TransactionalObject {
      *
      * @param newValue the new value.
      * @return the old value.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      */
     boolean atomicGetAndSet(boolean newValue);
 
@@ -125,7 +125,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param tx    the transaction used to do the getAndSet.
      * @return the old value.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean getAndSet(Transaction tx, boolean value);
@@ -144,7 +144,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param function the function to apply to this reference.
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      */
     void commute(BooleanFunction function);
 
@@ -162,7 +162,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param tx       the transaction used for this operation.
      * @param function the function to apply to this reference.
      * @throws NullPointerException  if function is null. If there is an active transaction, it will be aborted.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void commute(Transaction tx,BooleanFunction function);
@@ -184,7 +184,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param function the function that alters the value stored in this Ref.
      * @return the new value.
      * @throws NullPointerException if function is null. The Transaction will also be aborted.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean alterAndGet(BooleanFunction function);
@@ -196,7 +196,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param tx       the Transaction used by this operation.
      * @return the new value.
      * @throws NullPointerException if function or transaction is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean alterAndGet(Transaction tx,BooleanFunction function);
@@ -208,7 +208,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param function the Function responsible to alterAndGet the function.
      * @return the old value.
      * @throws NullPointerException if function is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      */
     boolean atomicGetAndAlter(BooleanFunction function);
 
@@ -219,7 +219,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param function the function that alters the value stored in this Ref.
      * @return the old value.
      * @throws NullPointerException if function is null. The transaction will be aborted as well.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean getAndAlter(BooleanFunction function);
@@ -231,7 +231,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param tx       the Transaction used by this operation.
      * @return the old value
      * @throws NullPointerException if function or transaction is null. The transaction will be aborted as well.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     boolean getAndAlter(Transaction tx, BooleanFunction function);
@@ -242,7 +242,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param expectedValue the expected value.
      * @param newValue the new value.
      * @return true if the compareAndSwap was a success, false otherwise.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      */
     boolean atomicCompareAndSet(boolean expectedValue, boolean newValue);
 
@@ -253,7 +253,7 @@ public interface BooleanRef extends TransactionalObject {
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
      * @param value the value to wait for.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(boolean value);
@@ -265,7 +265,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param tx the transaction this method lifts on
      * @param value the value to wait for.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx,boolean value);
@@ -278,7 +278,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param predicate the predicate to evaluate.
      * @throws NullPointerException if predicate is null. When there is a non dead transaction,
      *                              it will be aborted.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(BooleanPredicate predicate);
@@ -292,7 +292,7 @@ public interface BooleanRef extends TransactionalObject {
      * @param predicate the predicate to evaluate.
      * @throws NullPointerException if predicate is null or tx is null. When there is a non dead transaction,
      *                              it will be aborted.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx, BooleanPredicate predicate);

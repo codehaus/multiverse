@@ -28,7 +28,7 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
         BetaRef<String> ref = newRef(stm, null);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.privatize(tx);
+        ref.getLock().acquireCommitLock(tx);
 
         ref.atomicIsNull();
     }
@@ -38,7 +38,7 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
         BetaRef<String> ref = newRef(stm, null);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.ensure(tx);
+        ref.getLock().acquireWriteLock(tx);
 
         boolean result = ref.atomicIsNull();
         assertTrue(result);
@@ -95,7 +95,7 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
         BetaRef<String> ref = newRef(stm, "foo");
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.privatize(tx);
+        ref.getLock().acquireCommitLock(tx);
 
         try {
             ref.atomicIsNull();
@@ -113,7 +113,7 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
         BetaRef<String> ref = newRef(stm, "foo");
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.ensure(tx);
+        ref.getLock().acquireWriteLock(tx);
 
         boolean result = ref.atomicIsNull();
 

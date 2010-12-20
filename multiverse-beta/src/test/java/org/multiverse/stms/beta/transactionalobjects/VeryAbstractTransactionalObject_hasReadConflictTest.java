@@ -120,7 +120,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
 
         //privatize it
         BetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         boolean hasConflict = ref.___hasReadConflict(read);
 
@@ -141,7 +141,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
 
         //ensure it.
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         boolean hasConflict = ref.___hasReadConflict(read);
 

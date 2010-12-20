@@ -29,7 +29,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedBySelf0Test {
     public void whenNoTransactionFound() {
         BetaLongRef ref = newLongRef(stm);
 
-        ref.isPrivatizedBySelf();
+        ref.isLockedForCommitBySelf();
     }
 
     @Test
@@ -39,7 +39,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedBySelf0Test {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        boolean result = ref.isPrivatizedBySelf();
+        boolean result = ref.isLockedForCommitBySelf();
 
         assertFalse(result);
     }
@@ -50,8 +50,8 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedBySelf0Test {
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
-        ref.privatize();
-        boolean result = ref.isPrivatizedBySelf();
+        ref.acquireCommitLock();
+        boolean result = ref.isLockedForCommitBySelf();
 
         assertTrue(result);
     }
@@ -62,8 +62,8 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedBySelf0Test {
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
-        ref.ensure();
-        boolean result = ref.isPrivatizedBySelf();
+        ref.acquireWriteLock();
+        boolean result = ref.isLockedForCommitBySelf();
 
         assertFalse(result);
     }
@@ -73,11 +73,11 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedBySelf0Test {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
-        boolean result = ref.isPrivatizedBySelf();
+        boolean result = ref.isLockedForCommitBySelf();
 
         assertFalse(result);
     }
@@ -87,11 +87,11 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedBySelf0Test {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
-        boolean result = ref.isPrivatizedBySelf();
+        boolean result = ref.isLockedForCommitBySelf();
 
         assertFalse(result);
     }
@@ -106,7 +106,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedBySelf0Test {
         setThreadLocalTransaction(tx);
 
         try {
-            ref.isPrivatizedBySelf();
+            ref.isLockedForCommitBySelf();
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -125,7 +125,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedBySelf0Test {
         setThreadLocalTransaction(tx);
 
         try {
-            ref.isPrivatizedBySelf();
+            ref.isLockedForCommitBySelf();
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -144,7 +144,7 @@ public class VeryAbstractBetaTransactionalObject_isPrivatizedBySelf0Test {
         setThreadLocalTransaction(tx);
 
         try {
-            ref.isPrivatizedBySelf();
+            ref.isLockedForCommitBySelf();
             fail();
         } catch (DeadTransactionException expected) {
         }

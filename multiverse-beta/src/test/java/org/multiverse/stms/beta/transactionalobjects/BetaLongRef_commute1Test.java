@@ -208,7 +208,7 @@ public class BetaLongRef_commute1Test {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.ensure();
+        ref.acquireWriteLock();
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
@@ -237,7 +237,7 @@ public class BetaLongRef_commute1Test {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.privatize();
+        ref.acquireCommitLock();
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
@@ -268,7 +268,7 @@ public class BetaLongRef_commute1Test {
         setThreadLocalTransaction(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
@@ -303,7 +303,7 @@ public class BetaLongRef_commute1Test {
         setThreadLocalTransaction(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);

@@ -18,7 +18,7 @@ public class StripeTest {
             refs[k] = newRef();
         }
 
-        refs[0].ensure();
-        refs[1].ensure();
+        refs[0].getLock().acquireWriteLock();
+        refs[1].getLock().acquireWriteLock();
     }
 }

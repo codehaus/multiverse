@@ -33,7 +33,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
         long version = ref.getVersion();
 
         try {
-            ref.privatize();
+            ref.acquireCommitLock();
             fail();
         } catch (TransactionRequiredException expected) {
         }
@@ -56,7 +56,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
         tx.commit();
 
         try {
-            ref.privatize();
+            ref.acquireCommitLock();
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -81,7 +81,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
         tx.abort();
 
         try {
-            ref.privatize();
+            ref.acquireCommitLock();
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -104,7 +104,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
 
         long version = ref.getVersion();
         try {
-            ref.privatize();
+            ref.acquireCommitLock();
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -123,7 +123,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
         long version = ref.getVersion();
 
         try {
-            ref.privatize(null);
+            ref.getLock().acquireCommitLock(null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -142,7 +142,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.privatize();
+        ref.acquireCommitLock();
 
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -166,7 +166,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
         setThreadLocalTransaction(tx);
 
         ref.get();
-        ref.privatize();
+        ref.acquireCommitLock();
 
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -195,7 +195,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
         long version = ref.getVersion();
 
         try {
-            ref.privatize();
+            ref.acquireCommitLock();
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -219,7 +219,7 @@ public class VeryAbstractTransactionalObject_privatizeTest {
                 .newTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.privatize();
+        ref.acquireCommitLock();
 
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -242,8 +242,8 @@ public class VeryAbstractTransactionalObject_privatizeTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.privatize();
-        ref.privatize();
+        ref.acquireCommitLock();
+        ref.acquireCommitLock();
 
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -272,8 +272,8 @@ public class VeryAbstractTransactionalObject_privatizeTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.ensure();
-        ref.privatize();
+        ref.acquireWriteLock();
+        ref.acquireCommitLock();
 
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -297,10 +297,10 @@ public class VeryAbstractTransactionalObject_privatizeTest {
         setThreadLocalTransaction(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         try {
-            ref.privatize();
+            ref.acquireCommitLock();
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -321,10 +321,10 @@ public class VeryAbstractTransactionalObject_privatizeTest {
         setThreadLocalTransaction(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(tx);
 
         try {
-            ref.privatize();
+            ref.acquireCommitLock();
             fail();
         } catch (ReadWriteConflict expected) {
 

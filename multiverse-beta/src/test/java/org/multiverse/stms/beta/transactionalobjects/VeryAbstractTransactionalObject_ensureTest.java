@@ -34,7 +34,7 @@ public class VeryAbstractTransactionalObject_ensureTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.ensure(tx);
+        ref.getLock().acquireWriteLock(tx);
 
         assertUpdateBiased(ref);
         assertRefHasUpdateLock(ref,tx);
@@ -48,7 +48,7 @@ public class VeryAbstractTransactionalObject_ensureTest {
         long version = ref.getVersion();
 
         try {
-            ref.ensure();
+            ref.acquireWriteLock();
             fail();
         } catch (TransactionRequiredException expected) {
         }
@@ -67,7 +67,7 @@ public class VeryAbstractTransactionalObject_ensureTest {
         long version = ref.getVersion();
 
         try {
-            ref.ensure(null);
+            ref.getLock().acquireWriteLock(null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -88,7 +88,7 @@ public class VeryAbstractTransactionalObject_ensureTest {
         tx.commit();
 
         try {
-            ref.ensure(tx);
+            ref.getLock().acquireWriteLock(tx);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -109,7 +109,7 @@ public class VeryAbstractTransactionalObject_ensureTest {
         tx.abort();
 
         try {
-            ref.ensure(tx);
+            ref.getLock().acquireWriteLock(tx);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -129,7 +129,7 @@ public class VeryAbstractTransactionalObject_ensureTest {
         tx.prepare();
 
         try {
-            ref.ensure(tx);
+            ref.getLock().acquireWriteLock(tx);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -149,8 +149,8 @@ public class VeryAbstractTransactionalObject_ensureTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.ensure();
-        ref.ensure();
+        ref.acquireWriteLock();
+        ref.acquireWriteLock();
 
         assertIsActive(tx);
         assertRefHasUpdateLock(ref, tx);
@@ -166,8 +166,8 @@ public class VeryAbstractTransactionalObject_ensureTest {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.privatize(tx);
-        ref.ensure(tx);
+        ref.getLock().acquireCommitLock(tx);
+        ref.getLock().acquireWriteLock(tx);
 
         assertUpdateBiased(ref);
         assertRefHasCommitLock(ref, tx);
@@ -190,10 +190,10 @@ public class VeryAbstractTransactionalObject_ensureTest {
         setThreadLocalTransaction(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         try {
-            ref.ensure(tx);
+            ref.getLock().acquireWriteLock(tx);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -216,10 +216,10 @@ public class VeryAbstractTransactionalObject_ensureTest {
         setThreadLocalTransaction(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         try {
-            ref.ensure(tx);
+            ref.getLock().acquireWriteLock(tx);
             fail();
         } catch (ReadWriteConflict expected) {
         }
@@ -244,7 +244,7 @@ public class VeryAbstractTransactionalObject_ensureTest {
         long version = ref.getVersion();
 
         try {
-            ref.ensure(tx);
+            ref.getLock().acquireWriteLock(tx);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -263,7 +263,7 @@ public class VeryAbstractTransactionalObject_ensureTest {
         long version = ref.getVersion();
         BetaTransaction tx = stm.startDefaultTransaction();
 
-        ref.ensure(tx);
+        ref.getLock().acquireWriteLock(tx);
 
         assertUpdateBiased(ref);
         assertRefHasUpdateLock(ref,tx);

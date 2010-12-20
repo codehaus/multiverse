@@ -29,7 +29,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
     public void whenNoTransactionFound() {
         BetaLongRef ref = newLongRef(stm);
 
-        ref.isEnsuredBySelf();
+        ref.isLockedForWriteBySelf();
     }
 
     @Test
@@ -39,7 +39,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        boolean result = ref.isEnsuredBySelf();
+        boolean result = ref.isLockedForWriteBySelf();
 
         assertFalse(result);
     }
@@ -50,8 +50,8 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
-        ref.privatize();
-        boolean result = ref.isEnsuredBySelf();
+        ref.acquireCommitLock();
+        boolean result = ref.isLockedForWriteBySelf();
 
         assertFalse(result);
     }
@@ -62,8 +62,8 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
-        ref.ensure();
-        boolean result = ref.isEnsuredBySelf();
+        ref.acquireWriteLock();
+        boolean result = ref.isLockedForWriteBySelf();
 
         assertTrue(result);
     }
@@ -73,11 +73,11 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
-        boolean result = ref.isEnsuredBySelf();
+        boolean result = ref.isLockedForWriteBySelf();
 
         assertFalse(result);
     }
@@ -87,11 +87,11 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
-        boolean result = ref.isEnsuredBySelf();
+        boolean result = ref.isLockedForWriteBySelf();
 
         assertFalse(result);
     }
@@ -107,7 +107,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
         setThreadLocalTransaction(tx);
 
         try {
-            ref.isEnsuredBySelf();
+            ref.isLockedForWriteBySelf();
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -126,7 +126,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
         setThreadLocalTransaction(tx);
 
         try {
-            ref.isEnsuredBySelf();
+            ref.isLockedForWriteBySelf();
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -145,7 +145,7 @@ public class VeryAbstractBetaTransactionalObject_isEnsuredBySelf0Test {
         setThreadLocalTransaction(tx);
 
         try {
-            ref.isEnsuredBySelf();
+            ref.isLockedForWriteBySelf();
             fail();
         } catch (DeadTransactionException expected) {
         }

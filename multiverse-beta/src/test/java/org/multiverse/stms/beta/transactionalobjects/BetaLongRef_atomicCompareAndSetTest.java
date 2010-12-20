@@ -33,7 +33,7 @@ public class BetaLongRef_atomicCompareAndSetTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         long newValue = 2;
         try {
@@ -54,7 +54,7 @@ public class BetaLongRef_atomicCompareAndSetTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         long newValue = 2;
         try {

@@ -89,7 +89,7 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         BetaLongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
@@ -107,7 +107,7 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
 

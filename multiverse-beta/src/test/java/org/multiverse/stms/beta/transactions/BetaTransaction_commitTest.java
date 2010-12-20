@@ -824,7 +824,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        ref.privatize(tx);
+        ref.getLock().acquireCommitLock(tx);
 
         tx.commit();
 
@@ -843,7 +843,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        ref.ensure(tx);
+        ref.getLock().acquireWriteLock(tx);
 
         tx.commit();
 
@@ -879,7 +879,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        ref.privatize(tx);
+        ref.getLock().acquireCommitLock(tx);
         ref.incrementAndGet(tx, 1);
         tx.commit();
 
@@ -898,7 +898,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        ref.ensure(tx);
+        ref.getLock().acquireWriteLock(tx);
         ref.incrementAndGet(tx, 1);
         tx.commit();
 

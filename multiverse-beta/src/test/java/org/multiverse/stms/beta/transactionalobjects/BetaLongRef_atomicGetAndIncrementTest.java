@@ -80,7 +80,7 @@ public class BetaLongRef_atomicGetAndIncrementTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         try {
             ref.atomicCompareAndSet(0, 1);
@@ -100,7 +100,7 @@ public class BetaLongRef_atomicGetAndIncrementTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.ensure(otherTx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         try {
             ref.atomicCompareAndSet(initialValue, 20);

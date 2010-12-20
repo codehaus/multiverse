@@ -504,7 +504,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         BetaTransaction tx = newTransaction();
         try {
@@ -847,7 +847,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.privatize(otherTx);
+        ref.getLock().acquireCommitLock(otherTx);
 
         BetaTransaction tx = newTransaction();
         try {

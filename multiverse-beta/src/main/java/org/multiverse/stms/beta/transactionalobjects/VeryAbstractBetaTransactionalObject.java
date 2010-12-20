@@ -1,5 +1,6 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
+import org.multiverse.api.Lock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.TransactionRequiredException;
@@ -14,7 +15,7 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
 
 public abstract class VeryAbstractBetaTransactionalObject
         extends FastOrec
-        implements BetaTransactionalObject {
+        implements BetaTransactionalObject, Lock {
 
     protected final static long listenersOffset;
 
@@ -52,6 +53,11 @@ public abstract class VeryAbstractBetaTransactionalObject
     @Override
     public final BetaStm getStm() {
         return ___stm;
+    }
+
+    @Override
+    public Lock getLock() {
+        return this;
     }
 
     @Override
@@ -219,32 +225,32 @@ public abstract class VeryAbstractBetaTransactionalObject
     }
 
     @Override
-    public final boolean atomicIsFree() {
+    public final boolean atomicIsUnlocked() {
         return !___hasLock();
     }
 
     @Override
-    public final boolean atomicIsPrivatized() {
+    public final boolean atomicIsLockedForCommit() {
         return ___hasCommitLock();
     }
 
     @Override
-    public final boolean isPrivatizedBySelf() {
+    public final boolean isLockedForCommitBySelf() {
         final Transaction tx = getThreadLocalTransaction();
 
         if (tx == null) {
             throw new TransactionRequiredException("No transaction is found for the isPrivatizedBySelf operation");
         }
 
-        return isPrivatizedBySelf((BetaTransaction) tx);
+        return isLockedForCommitBySelf((BetaTransaction) tx);
     }
 
     @Override
-    public final boolean isPrivatizedBySelf(Transaction tx) {
-        return isPrivatizedBySelf((BetaTransaction) tx);
+    public final boolean isLockedForCommitBySelf(Transaction tx) {
+        return isLockedForCommitBySelf((BetaTransaction) tx);
     }
 
-    public final boolean isPrivatizedBySelf(BetaTransaction tx) {
+    public final boolean isLockedForCommitBySelf(BetaTransaction tx) {
         if (tx == null) {
             throw new NullPointerException();
         }
@@ -254,22 +260,22 @@ public abstract class VeryAbstractBetaTransactionalObject
     }
 
     @Override
-    public final boolean isPrivatizedByOther() {
+    public final boolean isLockedForCommitByOther() {
         final Transaction tx = getThreadLocalTransaction();
 
         if (tx == null) {
             throw new TransactionRequiredException("No transaction is found for the isPrivatizedByOther operation");
         }
 
-        return isPrivatizedByOther((BetaTransaction)tx);
+        return isLockedForCommitByOther((BetaTransaction) tx);
     }
 
     @Override
-    public final boolean isPrivatizedByOther(Transaction tx) {
-        return isPrivatizedByOther((BetaTransaction)tx);
+    public final boolean isLockedForCommitByOther(Transaction tx) {
+        return isLockedForCommitByOther((BetaTransaction) tx);
     }
 
-    public final boolean isPrivatizedByOther(BetaTransaction tx){
+    public final boolean isLockedForCommitByOther(BetaTransaction tx){
         if (tx == null) {
             throw new NullPointerException();
         }
@@ -284,27 +290,27 @@ public abstract class VeryAbstractBetaTransactionalObject
     }
 
     @Override
-    public final boolean atomicIsEnsured() {
+    public final boolean atomicIsLockedForUpdate() {
         return ___hasUpdateLock();
     }
 
     @Override
-    public final boolean isEnsuredBySelf() {
+    public final boolean isLockedForWriteBySelf() {
         final Transaction tx = getThreadLocalTransaction();
 
         if (tx == null) {
             throw new TransactionRequiredException("No transaction is found for the isEnsuredBySelf operation");
         }
 
-        return isEnsuredBySelf((BetaTransaction) tx);
+        return isLockedForWriteBySelf((BetaTransaction) tx);
     }
 
     @Override
-    public final boolean isEnsuredBySelf(Transaction tx) {
-        return isEnsuredBySelf((BetaTransaction) tx);
+    public final boolean isLockedForWriteBySelf(Transaction tx) {
+        return isLockedForWriteBySelf((BetaTransaction) tx);
     }
 
-    public final boolean isEnsuredBySelf(BetaTransaction tx) {
+    public final boolean isLockedForWriteBySelf(BetaTransaction tx) {
         if (tx == null) {
             throw new NullPointerException();
         }
@@ -314,22 +320,22 @@ public abstract class VeryAbstractBetaTransactionalObject
     }
 
     @Override
-    public final boolean isEnsuredByOther() {
+    public final boolean isLockedForWriteByOther() {
         final Transaction tx = getThreadLocalTransaction();
 
         if (tx == null) {
             throw new TransactionRequiredException("No transaction is found for the isEnsuredByOther operation");
         }
 
-        return isEnsuredByOther((BetaTransaction) tx);
+        return isLockedForWriteByOther((BetaTransaction) tx);
     }
 
     @Override
-    public final boolean isEnsuredByOther(Transaction tx) {
-        return isEnsuredByOther((BetaTransaction) tx);
+    public final boolean isLockedForWriteByOther(Transaction tx) {
+        return isLockedForWriteByOther((BetaTransaction) tx);
     }
 
-    public final boolean isEnsuredByOther(BetaTransaction tx) {
+    public final boolean isLockedForWriteByOther(BetaTransaction tx) {
         if (tx == null) {
             throw new NullPointerException();
         }

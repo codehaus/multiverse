@@ -170,7 +170,7 @@ public abstract class BetaTransaction_abortTest {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        ref.privatize(tx);
+        ref.getLock().acquireCommitLock(tx);
 
         tx.abort();
 
@@ -189,7 +189,7 @@ public abstract class BetaTransaction_abortTest {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        ref.ensure(tx);
+        ref.getLock().acquireWriteLock(tx);
 
         tx.abort();
 
@@ -208,7 +208,7 @@ public abstract class BetaTransaction_abortTest {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        ref.privatize(tx);
+        ref.getLock().acquireCommitLock(tx);
 
         tx.abort();
 
@@ -228,7 +228,7 @@ public abstract class BetaTransaction_abortTest {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        ref.ensure(tx);
+        ref.getLock().acquireWriteLock(tx);
 
         tx.abort();
 

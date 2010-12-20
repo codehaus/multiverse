@@ -27,19 +27,19 @@ public class ComposabilityAndLockingTest {
         StmUtils.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                ref.ensure();
+                ref.getLock().acquireWriteLock();
 
                 StmUtils.execute(new AtomicVoidClosure() {
                     @Override
                     public void execute(Transaction tx) throws Exception {
-                        ref.ensure();
-                        assertTrue(ref.isEnsuredBySelf());
+                        ref.getLock().acquireWriteLock();
+                        assertTrue(ref.getLock().isLockedForWriteBySelf());
                     }
                 });
             }
         });
 
-        assertTrue(ref.atomicIsFree());
+        assertTrue(ref.getLock().atomicIsUnlocked());
         assertEquals(initialValue, ref.atomicGet());
     }
 
@@ -51,19 +51,19 @@ public class ComposabilityAndLockingTest {
         StmUtils.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                ref.ensure();
+                ref.getLock().acquireWriteLock();
 
                 StmUtils.execute(new AtomicVoidClosure() {
                     @Override
                     public void execute(Transaction tx) throws Exception {
-                        ref.privatize();
-                        assertTrue(ref.isPrivatizedBySelf());
+                        ref.getLock().acquireCommitLock();
+                        assertTrue(ref.getLock().isLockedForCommitBySelf());
                     }
                 });
             }
         });
 
-        assertTrue(ref.atomicIsFree());
+        assertTrue(ref.getLock().atomicIsUnlocked());
         assertEquals(initialValue, ref.atomicGet());
     }
 
@@ -75,19 +75,19 @@ public class ComposabilityAndLockingTest {
         StmUtils.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                ref.privatize();
+                ref.getLock().acquireCommitLock();
 
                 StmUtils.execute(new AtomicVoidClosure() {
                     @Override
                     public void execute(Transaction tx) throws Exception {
-                        ref.ensure();
-                        assertTrue(ref.isPrivatizedBySelf());
+                        ref.getLock().acquireWriteLock();
+                        assertTrue(ref.getLock().isLockedForCommitBySelf());
                     }
                 });
             }
         });
 
-        assertTrue(ref.atomicIsFree());
+        assertTrue(ref.getLock().atomicIsUnlocked());
         assertEquals(initialValue, ref.atomicGet());
     }
 
@@ -99,19 +99,19 @@ public class ComposabilityAndLockingTest {
         StmUtils.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                ref.privatize();
+                ref.getLock().acquireCommitLock();
 
                 StmUtils.execute(new AtomicVoidClosure() {
                     @Override
                     public void execute(Transaction tx) throws Exception {
-                        ref.privatize();
-                        assertTrue(ref.isPrivatizedBySelf());
+                        ref.getLock().acquireCommitLock();
+                        assertTrue(ref.getLock().isLockedForCommitBySelf());
                     }
                 });
             }
         });
 
-        assertTrue(ref.atomicIsFree());
+        assertTrue(ref.getLock().atomicIsUnlocked());
         assertEquals(initialValue, ref.atomicGet());
     }
 }

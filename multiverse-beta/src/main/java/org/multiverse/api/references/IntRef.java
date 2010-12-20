@@ -30,7 +30,7 @@ public interface IntRef extends TransactionalObject {
      * @param value the new value.
      * @return the old value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      */
     int getAndSet(int value);
 
@@ -40,7 +40,7 @@ public interface IntRef extends TransactionalObject {
      * @param value the new value.
      * @return the new value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      */
     int set(int value);
 
@@ -51,7 +51,7 @@ public interface IntRef extends TransactionalObject {
      * @param value the new value
      * @return the old value
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     int set(Transaction tx, int value);
@@ -60,7 +60,7 @@ public interface IntRef extends TransactionalObject {
      * Gets the value using the provided transaction.
      *
      * @return the current value.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      * @see #atomicGet()
      */
@@ -72,7 +72,7 @@ public interface IntRef extends TransactionalObject {
      * @param tx the Transaction to lift on.
      * @return the value stored in the ref.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     int get(Transaction tx);
@@ -84,7 +84,7 @@ public interface IntRef extends TransactionalObject {
      * {@link #atomicWeakGet()}.
      *
      * @return the current value.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      */
     int atomicGet();
 
@@ -104,7 +104,7 @@ public interface IntRef extends TransactionalObject {
      *
      * @param newValue the new value.
      * @return the new value.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      */
     int atomicSet(int newValue);
 
@@ -114,7 +114,7 @@ public interface IntRef extends TransactionalObject {
      *
      * @param newValue the new value.
      * @return the old value.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      */
     int atomicGetAndSet(int newValue);
 
@@ -125,7 +125,7 @@ public interface IntRef extends TransactionalObject {
      * @param tx    the transaction used to do the getAndSet.
      * @return the old value.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     int getAndSet(Transaction tx, int value);
@@ -144,7 +144,7 @@ public interface IntRef extends TransactionalObject {
      * @param function the function to apply to this reference.
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      */
     void commute(IntFunction function);
 
@@ -162,7 +162,7 @@ public interface IntRef extends TransactionalObject {
      * @param tx       the transaction used for this operation.
      * @param function the function to apply to this reference.
      * @throws NullPointerException  if function is null. If there is an active transaction, it will be aborted.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void commute(Transaction tx,IntFunction function);
@@ -184,7 +184,7 @@ public interface IntRef extends TransactionalObject {
      * @param function the function that alters the value stored in this Ref.
      * @return the new value.
      * @throws NullPointerException if function is null. The Transaction will also be aborted.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     int alterAndGet(IntFunction function);
@@ -196,7 +196,7 @@ public interface IntRef extends TransactionalObject {
      * @param tx       the Transaction used by this operation.
      * @return the new value.
      * @throws NullPointerException if function or transaction is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     int alterAndGet(Transaction tx,IntFunction function);
@@ -208,7 +208,7 @@ public interface IntRef extends TransactionalObject {
      * @param function the Function responsible to alterAndGet the function.
      * @return the old value.
      * @throws NullPointerException if function is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      */
     int atomicGetAndAlter(IntFunction function);
 
@@ -219,7 +219,7 @@ public interface IntRef extends TransactionalObject {
      * @param function the function that alters the value stored in this Ref.
      * @return the old value.
      * @throws NullPointerException if function is null. The transaction will be aborted as well.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     int getAndAlter(IntFunction function);
@@ -231,7 +231,7 @@ public interface IntRef extends TransactionalObject {
      * @param tx       the Transaction used by this operation.
      * @return the old value
      * @throws NullPointerException if function or transaction is null. The transaction will be aborted as well.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     int getAndAlter(Transaction tx, IntFunction function);
@@ -242,7 +242,7 @@ public interface IntRef extends TransactionalObject {
      * @param expectedValue the expected value.
      * @param newValue the new value.
      * @return true if the compareAndSwap was a success, false otherwise.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      */
     boolean atomicCompareAndSet(int expectedValue, int newValue);
 
@@ -252,7 +252,7 @@ public interface IntRef extends TransactionalObject {
      *
      * @param amount the amount to increase with.
      * @return the old value.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      */
     int atomicGetAndIncrement(int amount);
 
@@ -261,7 +261,7 @@ public interface IntRef extends TransactionalObject {
      *
      * @param amount the amount to increment with.
      * @return the old value.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     int getAndIncrement(int amount);
@@ -273,7 +273,7 @@ public interface IntRef extends TransactionalObject {
      * @param amount the amount to increment with.
      * @return the old value.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     int getAndIncrement(Transaction tx, int amount);
@@ -284,7 +284,7 @@ public interface IntRef extends TransactionalObject {
      *
      * @param amount the amount to increment with.
      * @return the new value.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      */
     int atomicIncrementAndGet(int amount);
 
@@ -293,7 +293,7 @@ public interface IntRef extends TransactionalObject {
      *
      * @param amount the amount to increment with.
      * @return the new value.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     int incrementAndGet(int amount);
@@ -305,7 +305,7 @@ public interface IntRef extends TransactionalObject {
      * @param amount the amount to increment with.
      * @return the new value.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     int incrementAndGet(Transaction tx, int amount);
@@ -318,7 +318,7 @@ public interface IntRef extends TransactionalObject {
      * <p/>
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void increment();
@@ -331,7 +331,7 @@ public interface IntRef extends TransactionalObject {
      *
      * @param tx the transaction this method lifts on.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void increment(Transaction tx);
@@ -345,7 +345,7 @@ public interface IntRef extends TransactionalObject {
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
      * @param amount the amount to increase with
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void increment(int amount);
@@ -359,7 +359,7 @@ public interface IntRef extends TransactionalObject {
      * @param tx the Transaction this method lifts on
      * @param amount the amount to increment with
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void increment(Transaction tx, int amount);
@@ -372,7 +372,7 @@ public interface IntRef extends TransactionalObject {
      * <p/>
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void decrement();
@@ -385,7 +385,7 @@ public interface IntRef extends TransactionalObject {
      *
      * @param tx the transaction this method lifts on.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void decrement(Transaction tx);
@@ -399,7 +399,7 @@ public interface IntRef extends TransactionalObject {
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
      * @param amount the amount to decrement with
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void decrement(int amount);
@@ -413,7 +413,7 @@ public interface IntRef extends TransactionalObject {
      * @param tx the Transaction this method lifts on
      * @param amount the amount to decrement with
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void decrement(Transaction tx, int amount);
@@ -425,7 +425,7 @@ public interface IntRef extends TransactionalObject {
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
      * @param value the value to wait for.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(int value);
@@ -437,7 +437,7 @@ public interface IntRef extends TransactionalObject {
      * @param tx the transaction this method lifts on
      * @param value the value to wait for.
      * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx,int value);
@@ -450,7 +450,7 @@ public interface IntRef extends TransactionalObject {
      * @param predicate the predicate to evaluate.
      * @throws NullPointerException if predicate is null. When there is a non dead transaction,
      *                              it will be aborted.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(IntPredicate predicate);
@@ -464,7 +464,7 @@ public interface IntRef extends TransactionalObject {
      * @param predicate the predicate to evaluate.
      * @throws NullPointerException if predicate is null or tx is null. When there is a non dead transaction,
      *                              it will be aborted.
-     * @throws org.multiverse.api.exceptions.TransactionalExecutionException
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     void await(Transaction tx, IntPredicate predicate);

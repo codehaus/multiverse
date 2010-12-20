@@ -162,7 +162,7 @@ public class WriteSkewTest {
                 .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
-        ref2.privatize(tx);
+        ref2.getLock().acquireCommitLock(tx);
         ref2.get(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
@@ -188,7 +188,7 @@ public class WriteSkewTest {
                 .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
-        ref2.ensure(tx);
+        ref2.getLock().acquireWriteLock(tx);
         ref2.get(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
