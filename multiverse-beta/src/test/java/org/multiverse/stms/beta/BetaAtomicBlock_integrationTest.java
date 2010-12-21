@@ -10,8 +10,8 @@ import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
 public class BetaAtomicBlock_integrationTest implements BetaStmConstants {
@@ -32,10 +32,12 @@ public class BetaAtomicBlock_integrationTest implements BetaStmConstants {
         long result = block.execute(new AtomicLongClosure() {
             @Override
             public long execute(Transaction tx) throws Exception {
+                assertSame(tx,getThreadLocalTransaction()) ;
                 return ref.get(tx);
             }
         });
 
+        assertNull(getThreadLocalTransaction());
         assertEquals(10, result);
     }
 
