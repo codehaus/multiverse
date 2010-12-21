@@ -10,7 +10,7 @@ import org.multiverse.stms.beta.orec.FastOrec;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 
-public class FastOrecNormalUncontendedUpdateDriver extends BenchmarkDriver implements BetaStmConstants {
+public class FastOrecNormalNormalUpdateDriver extends BenchmarkDriver implements BetaStmConstants {
     private BetaLongRef ref;
     private GlobalConflictCounter globalConflictCounter;
     private BetaStm stm;
