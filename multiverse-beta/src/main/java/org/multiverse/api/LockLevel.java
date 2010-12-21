@@ -4,32 +4,33 @@ import org.multiverse.MultiverseConstants;
 
 /**
  * With the LockLevel one can influence various levels of pessimistic behavior in the Stm.
- * For more information on configuration see
- * {@link TransactionFactoryBuilder#setLockLevel(LockLevel)}.
+ * For more information on configuration see {@link TransactionFactoryBuilder#setLockLevel(LockLevel)}.
  *
  * @author Peter Veentjer.
  */
 public enum LockLevel implements MultiverseConstants {
 
     /**
-     * A LockLevel that commit locks all writes.
+     * A LockLevel that commit locks all writes. Once the commit lock is acquired, it isn't readable
+     * by any other transaction.
      */
     CommitLockWrites(LOCKMODE_NONE, LOCKMODE_COMMIT),
 
     /**
      * A LockLevel that commit locks reads (and therefor all writes). It is the most
-     * strict LockLevel.
+     * strict LockLevel. Once the commit lock is acquired, it isn't readable or writable by any other transaction.
      */
     CommitLockReads(LOCKMODE_COMMIT, LOCKMODE_COMMIT),
 
     /**
      * A LockLevel that write locks all writes. This is the default behavior you get when Oracle is used where
-     * each insert/update/delete is locked for the remaining duration of the transaction
+     * each insert/update/delete is locked for the remaining duration of the transaction. If something is write
+     * locked, it can't be updated by another transaction, but still can be read.
      */
     WriteLockWrites(LOCKMODE_NONE, LOCKMODE_UPDATE),
 
     /**
-     * A LockLevel that write all reads (and therefor all writes).
+     * A LockLevel that write locks all reads (and therefor all writes).
      */
     WriteLockReads(LOCKMODE_UPDATE, LOCKMODE_UPDATE),
 

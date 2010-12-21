@@ -167,7 +167,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     }
 
     @Override
-    public boolean isDirtyCheck() {
+    public boolean isDirtyCheckEnabled() {
         return dirtyCheck;
     }
 

@@ -255,5 +255,4 @@ public interface Lock {
      *
      */
     void acquireWriteLock(Transaction self);
-
 }

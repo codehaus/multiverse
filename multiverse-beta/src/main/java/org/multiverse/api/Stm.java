@@ -39,6 +39,9 @@ public interface Stm {
      */
     AtomicBlock getDefaultAtomicBlock();
 
+    /**
+     * @return
+     */
     OrElseBlock createOrElseBlock();
 
     /**

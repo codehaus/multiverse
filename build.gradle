@@ -182,9 +182,9 @@ project(':multiverse-beta') {
   }
 
   task benchmarkBoxingOverhead << {
-    executeBenchmark("benchmarks/boxing_overhead_benchmark.groovy")
-    executeDisplay("benchmarks/boxing_overhead_display.groovy")
-    executeDisplay("benchmarks/boxing_overhead_total_display.groovy")
+    executeBenchmark("benchmarks/overhead/boxing_overhead_benchmark.groovy")
+    executeDisplay("benchmarks/overhead/boxing_overhead_display.groovy")
+    executeDisplay("benchmarks/overhead/boxing_overhead_total_display.groovy")
   }
 
   task benchmark(dependsOn: [

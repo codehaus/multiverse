@@ -122,7 +122,7 @@ public interface TransactionConfiguration {
      * @return true of dirty check is enabled.
      * @see org.multiverse.api.TransactionFactoryBuilder#setDirtyCheckEnabled(boolean)
      */
-    boolean isDirtyCheck();
+    boolean isDirtyCheckEnabled();
 
     /**
      * Checks if this transaction does automatic read tracking. Read tracking is needed for blocking transactions,

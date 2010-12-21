@@ -3,6 +3,8 @@ package org.multiverse.api;
 /**
  * The interface each transactional object needs to implement.
  *
+ * All methods are threadsafe.
+ *
  * @author Peter Veentjer.
  */
 public interface TransactionalObject {
@@ -16,7 +18,8 @@ public interface TransactionalObject {
     Stm getStm();
 
     /**
-     * Gets the {@link Lock} that belongs to this TransactionalObject.
+     * Gets the {@link Lock} that belongs to this TransactionalObject. This call doesn't cause any locking, it
+     * only provides access to the object that is able to lock. The returned value will never be null.
      *
      * @return the Lock
      * @throws UnsupportedOperationException if this operation is not supported.

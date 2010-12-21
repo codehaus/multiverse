@@ -105,7 +105,7 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setBackoffPolicy(BackoffPolicy backoffPolicy);
 
     /**
-     * Sets id the dirty check is enabled. Dirty check is that something only needs to be written, if there really
+     * Sets if the dirty check is enabled. Dirty check is that something only needs to be written, if there really
      * is a change. If it is disabled, it will always write, and this could prevent the aba isolation anomaly, but
      * causes more conflicts so more contention. In most cases enabling it is the best option.
      *
