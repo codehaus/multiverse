@@ -49,7 +49,6 @@ public class TooManyRetriesRollbackTest {
         joinAll(notifyThread);
     }
 
-
     public void setAndAwaitUneven(final int value) {
         AtomicBlock block = stm.createTransactionFactoryBuilder()
                 .setMaxRetries(10)
