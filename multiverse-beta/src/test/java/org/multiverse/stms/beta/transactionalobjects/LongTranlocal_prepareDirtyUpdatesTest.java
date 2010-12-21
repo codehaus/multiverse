@@ -41,7 +41,7 @@ public class LongTranlocal_prepareDirtyUpdatesTest {
 
         BetaTransaction tx = stm.startDefaultTransaction();
         BetaLongRefTranlocal tranlocal = tx.openForRead(ref, lockMode);
-        ref.deferredEnsure(tx);
+        ref.ensure(tx);
         boolean success = tranlocal.prepareDirtyUpdates(pool, tx, 1);
 
         assertTrue(success);

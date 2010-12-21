@@ -324,7 +324,7 @@ public class Lock_acquireCommitLockTest {
         ref.getLock().acquireWriteLock(tx);
 
         try {
-            ref.acquireCommitLock();
+            ref.getLock().acquireCommitLock();
             fail();
         } catch (ReadWriteConflict expected) {
 
