@@ -328,9 +328,9 @@ public class FastOrec implements Orec {
         while (true) {
             final long current = ___orecValue;
 
-            if (!hasLock(current)) {
+            if (!hasCommitLock(current)) {
                 throw new PanicError(
-                        "Can't ___departAfterUpdateAndUnlock is the update/commit lock is not acquired " + ___toOrecString(current));
+                        "Can't ___departAfterUpdateAndUnlock is the commit lock is not acquired " + ___toOrecString(current));
             }
 
             long surplus = getSurplus(current);
@@ -355,14 +355,12 @@ public class FastOrec implements Orec {
                 conflict = surplus > 0;
             }
 
-            if (conflict) {
-                if (!conflictSend) {
-                    globalConflictCounter.signalConflict(transactionalObject);
-                    conflictSend = true;
-                }
+            if (conflict && !conflictSend) {
+                globalConflictCounter.signalConflict(transactionalObject);
+                conflictSend = true;
             }
 
-            if (surplus == 0 && hasCommitLock(current)) {
+            if (surplus == 0) {
                 ___orecValue = 0;
                 return surplus;
             }

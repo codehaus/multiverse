@@ -35,10 +35,7 @@ public class OrecCommitLockUpdateDriver extends BenchmarkDriver implements BetaS
         final GlobalConflictCounter _conflictCounter = globalConflictCounter;
 
         for (long k = 0; k < _cycles; k++) {
-            int arriveStatus = _orec.___tryLockAndArrive(0, true);
-            if (arriveStatus != ARRIVE_NORMAL) {
-                _orec.___tryLockAndArrive(0, true);
-            }
+            _orec.___tryLockAndArrive(0, true);
             _orec.___departAfterUpdateAndUnlock(_conflictCounter, _ref);
         }
     }
@@ -50,7 +47,7 @@ public class OrecCommitLockUpdateDriver extends BenchmarkDriver implements BetaS
         double transactionsPerSecond = BenchyUtils.operationsPerSecond(operationCount, durationMs, 1);
 
         result.put("transactionsPerSecond", transactionsPerSecond);
-        System.out.printf("Performance : %s update-cycles/second\n", transactionsPerSecond);
+        System.out.printf("Performance : %s update-cycles/second\n", BenchyUtils.format(transactionsPerSecond));
         System.out.printf("Orec        : %s\n", orec.___toOrecString());
     }
 }

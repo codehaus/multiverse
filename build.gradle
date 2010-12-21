@@ -90,6 +90,11 @@ def executeBenchmark(String filepath) {
   execute("benchy-execute -p ${processorCount} -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test ${filepath}")
 }
 
+def executeDisplay(String filepath) {
+  execute("benchy-display ${filepath}")
+}
+
+
 def execute(String s) {
   Process proc = s.execute()
   proc.consumeProcessErrorStream(System.err)
@@ -119,51 +124,50 @@ project(':multiverse-beta') {
 
   task benchmarkUncontendedMonoUpdate << {
     executeBenchmark("benchmarks/uncontended_mono_update_benchmark.groovy")
-    execute("benchy-display benchmarks/uncontended_mono_update_display.groovy")
+    executeDisplay("benchmarks/uncontended_mono_update_display.groovy")
   }
 
   task benchmarkCounter << {
     executeBenchmark("benchmarks/contended_counter_benchmark.groovy")
-    execute("benchy-display benchmarks/contended_counter_display.groovy")
+    executeDisplay("benchmarks/contended_counter_display.groovy")
   }
 
   task benchmarkMonoRead << {
     executeBenchmark("benchmarks/mono_read_benchmark.groovy")
-    execute("benchy-display benchmarks/mono_read_display.groovy")
+    executeDisplay("benchmarks/mono_read_display.groovy")
   }
 
   task benchmarkAtomicGet << {
     executeBenchmark("benchmarks/atomic/atomic_get_benchmark.groovy")
-    execute("benchy-display benchmarks/atomic/atomic_get_display.groovy")
+    executeDisplay("benchmarks/atomic/atomic_get_display.groovy")
   }
 
   task benchmarkAtomicWeakGet << {
     executeBenchmark("benchmarks/atomic/atomic_weak_get_benchmark.groovy")
-    execute("benchy-display benchmarks/atomic/atomic_weak_get_display.groovy")
+    executeDisplay("benchmarks/atomic/atomic_weak_get_display.groovy")
   }
 
   task benchmarkAtomicIncrement << {
     executeBenchmark("benchmarks/atomic/atomic_increment_benchmark.groovy")
-    execute("benchy-display benchmarks/atomic/atomic_increment_display.groovy")
+    executeDisplay("benchmarks/atomic/atomic_increment_display.groovy")
   }
 
   task benchmarkAtomicLongIncrement << {
     executeBenchmark("benchmarks/atomic/atomic_long_increment_benchmark.groovy")
-    execute("benchy-display benchmarks/atomic/atomic_long_increment_display.groovy")
+    executeDisplay("benchmarks/atomic/atomic_long_increment_display.groovy")
   }
 
   task benchmarkSimpleStack << {
-    executeBenchmark("benchmarks/simple_stack_benchmark.groovy")
-    execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
+    executeBenchmark("benchmarks/blocking/simple_stack_benchmark.groovy")
   }
 
   task benchmarkIntrinsicLockStack << {
-    executeBenchmark("benchmarks/intrinsic_lock_stack_benchmark.groovy")
+    executeBenchmark("benchmarks/blocking/intrinsic_lock_stack_benchmark.groovy")
     //execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
   }
 
   task benchmarkJucLockStack << {
-    executeBenchmark("benchmarks/juc_lock_stack_benchmark.groovy")
+    executeBenchmark("benchmarks/blocking/juc_lock_stack_benchmark.groovy")
     //execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
   }
 
@@ -172,10 +176,15 @@ project(':multiverse-beta') {
     //execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
   }
 
+  task benchmarkOrecRead << {
+    executeBenchmark("benchmarks/orec/update_benchmark.groovy")
+    //execute("benchy-display benchmarks/atomic_weak_get_display.groovy")
+  }
+
   task benchmarkBoxingOverhead << {
     executeBenchmark("benchmarks/boxing_overhead_benchmark.groovy")
-    execute("benchy-display benchmarks/boxing_overhead_display.groovy")
-    execute("benchy-display benchmarks/boxing_overhead_total_display.groovy")
+    executeDisplay("benchmarks/boxing_overhead_display.groovy")
+    executeDisplay("benchmarks/boxing_overhead_total_display.groovy")
   }
 
   task benchmark(dependsOn: [
@@ -190,6 +199,7 @@ project(':multiverse-beta') {
           benchmarkAtomicIncrement,
           benchmarkAtomicLongIncrement,
           benchmarkOrecUpdate,
+          benchmarkOrecRead,
           benchmarkBoxingOverhead]) << {}
 }
 

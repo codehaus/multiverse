@@ -9,7 +9,7 @@ import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 import org.multiverse.stms.beta.orec.FastOrec;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
-public class OrecWriteLockUpdateDriver extends BenchmarkDriver implements BetaStmConstants {
+public class OrecNormalUpdateDriver extends BenchmarkDriver implements BetaStmConstants {
     private BetaLongRef ref;
     private GlobalConflictCounter globalConflictCounter;
     private BetaStm stm;
@@ -35,8 +35,8 @@ public class OrecWriteLockUpdateDriver extends BenchmarkDriver implements BetaSt
         final GlobalConflictCounter _conflictCounter = globalConflictCounter;
 
         for (long k = 0; k < _cycles; k++) {
-            _orec.___tryLockAndArrive(0, false);
-            _orec.___upgradeToCommitLock();
+            _orec.___arrive(1);
+            _orec.___tryLockAfterNormalArrive(1, true);
             _orec.___departAfterUpdateAndUnlock(_conflictCounter, _ref);
         }
     }
