@@ -5,10 +5,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.RetryLatch;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.RetryNotAllowedException;
-import org.multiverse.api.exceptions.RetryNotPossibleException;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
@@ -60,10 +57,11 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         tx.openForRead(ref2, LOCKMODE_NONE);
         tx.openForRead(ref3, LOCKMODE_NONE);
 
-        RetryThread thread = new RetryThread(tx);
-        thread.start();
-
-        sleepMs(500);
+        try {
+            tx.retry();
+            fail();
+        } catch (Retry retry) {
+        }
 
         assertIsAborted(tx);
         RetryLatch latch = getFirstListener(ref1);
@@ -150,11 +148,12 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaTransaction tx = newTransaction();
         BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
-        RetryThread thread = new RetryThread(tx);
-        thread.start();
+        try {
+            tx.retry();
+            fail();
+        } catch (Retry retry) {
 
-        sleepMs(1000);
-
+        }
         RetryLatch latch = getFirstListener(ref);
 
         assertFalse(latch.isOpen());
@@ -170,10 +169,11 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaTransaction tx = newTransaction();
         BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_COMMIT);
 
-        RetryThread thread = new RetryThread(tx);
-        thread.start();
-
-        sleepMs(1000);
+        try {
+            tx.retry();
+            fail();
+        } catch (Retry retry) {
+        }
 
         RetryLatch latch = getFirstListener(ref);
 
@@ -190,10 +190,12 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaTransaction tx = newTransaction();
         BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
 
-        RetryThread thread = new RetryThread(tx);
-        thread.start();
+        try {
+            tx.retry();
+            fail();
+        } catch (Retry retry) {
 
-        sleepMs(1000);
+        }
 
         RetryLatch latch = getFirstListener(ref);
 
@@ -210,10 +212,12 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaTransaction tx = newTransaction();
         tx.openForWrite(ref, LOCKMODE_COMMIT);
 
-        RetryThread thread = new RetryThread(tx);
-        thread.start();
+        try {
+            tx.retry();
+            fail();
+        } catch (Retry retry) {
 
-        sleepMs(1000);
+        }
 
         RetryLatch latch = getFirstListener(ref);
 
@@ -256,10 +260,14 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         tx.openForRead(ref1, LOCKMODE_NONE);
         BetaLongRefTranlocal write3 = tx.openForConstruction(ref3);
         tx.openForWrite(ref2, LOCKMODE_NONE);
-        RetryThread thread = new RetryThread(tx);
-        thread.start();
 
-        sleepMs(1000);
+        try {
+            tx.retry();
+            fail();
+        } catch (Retry retry) {
+
+        }
+
 
         RetryLatch latch = getFirstListener(ref1);
 
@@ -281,10 +289,11 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         tx.register(listenerMock);
         tx.openForRead(ref, LOCKMODE_NONE);
 
-        RetryThread thread = new RetryThread(tx);
-        thread.start();
-
-        sleepMs(1000);
+        try {
+            tx.retry();
+            fail();
+        } catch (Retry retry) {
+        }
 
         RetryLatch latch = getFirstListener(ref);
 
@@ -304,10 +313,11 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaTransaction tx = newTransaction(config);
         tx.openForRead(ref, LOCKMODE_NONE);
 
-        RetryThread thread = new RetryThread(tx);
-        thread.start();
-
-        sleepMs(1000);
+        try {
+            tx.retry();
+            fail();
+        } catch (Retry retry) {
+        }
 
         assertEquals(1, listenerMock.events.size());
         assertEquals(TransactionLifecycleEvent.PostAbort, listenerMock.events.get(0));
