@@ -33,13 +33,14 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     public final static int ABORTED = 3;
     public final static int COMMITTED = 4;
 
-    private final int poolTransactionType;
+    public final RetryLatch listener = new DefaultRetryLatch();
+    public final BetaObjectPool pool = new BetaObjectPool();
+    public final int poolTransactionType;
     public int status = ACTIVE;
     public int attempt = 1;
     public long remainingTimeoutNs;
     public BetaTransactionConfiguration config;
     public boolean abortOnly;
-    public final BetaObjectPool pool = new BetaObjectPool();
     public boolean hasUpdates;
 
     public BetaTransaction(int poolTransactionType, BetaTransactionConfiguration config) {
@@ -546,35 +547,28 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
 
     public abstract void hardReset();
 
-    protected final void awaitUpdate(final DefaultRetryLatch latch){
-       final long lockEra = latch.getEra();
+    public final void awaitUpdate(){
+       final long lockEra = listener.getEra();
 
-       try {
-            if(config.timeoutNs == Long.MAX_VALUE){
-                if (config.isInterruptible()) {
-                    latch.await(lockEra, config.familyName);
-                } else {
-                    latch.awaitUninterruptible(lockEra);
-                }
-            }else{
-                if (config.isInterruptible()) {
-                    remainingTimeoutNs = latch.awaitNanos(
-                        lockEra, remainingTimeoutNs, config.familyName);
-                } else {
-                    remainingTimeoutNs = latch.awaitNanosUninterruptible(
-                        lockEra, remainingTimeoutNs);
-                }
-
-                if (remainingTimeoutNs < 0) {
-                    throw new RetryTimeoutException(
-                       format("[%s] Transaction has timed with a total timeout of %s ns",
-                               config.getFamilyName(),
-                               config.getTimeoutNs()));
-                }
+        if(config.timeoutNs == Long.MAX_VALUE){
+            if (config.isInterruptible()) {
+                listener.await(lockEra, config.familyName);
+            } else {
+                listener.awaitUninterruptible(lockEra);
             }
-       } finally {
-           pool.putDefaultRetryLatch(latch);
-       }
+        }else{
+            if (config.isInterruptible()) {
+                remainingTimeoutNs = listener.awaitNanos(lockEra, remainingTimeoutNs, config.familyName);
+            } else {
+                remainingTimeoutNs = listener.awaitNanosUninterruptible(lockEra, remainingTimeoutNs);
+            }
+
+            if (remainingTimeoutNs < 0) {
+                throw new RetryTimeoutException(
+                    format("[%s] Transaction has timed with a total timeout of %s ns",
+                        config.getFamilyName(),config.getTimeoutNs()));
+            }
+        }
    }
 
     public abstract void startEitherBranch();

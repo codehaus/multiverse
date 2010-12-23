@@ -1430,39 +1430,24 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
     @Override
     public final void retry() {
-        if (status != ACTIVE) {
-            throw abortOnFaultyStatusOfRetry();
-        }
+        if (status != ACTIVE) throw abortOnFaultyStatusOfRetry();
 
-        if(!config.blockingAllowed){
-            throw abortOnNoBlockingAllowed();
-        }
+        if (!config.blockingAllowed) throw abortOnNoBlockingAllowed();
 
-        if( attached == null){
-            throw abortOnNoRetryPossible();
-        }
+        if (attached == null) throw abortOnNoRetryPossible();
 
-        DefaultRetryLatch listener = pool.takeDefaultRetryLatch();
+        final long listenerEra = listener.getEra();
+        final BetaTransactionalObject owner = attached.owner;
 
-        try{
-            final long listenerEra = listener.getEra();
-            final BetaTransactionalObject owner = attached.owner;
+        final boolean noRegistration =
+            owner.___registerChangeListener(listener, attached, pool, listenerEra) == REGISTRATION_NONE;
+        owner.___abort(this, attached, pool);
+        attached = null;
+        status = ABORTED;
 
-            final boolean noRegistration =
-                owner.___registerChangeListener(listener, attached, pool, listenerEra) == REGISTRATION_NONE;
-            owner.___abort(this, attached, pool);
-            attached = null;
-            status = ABORTED;
+        if(noRegistration) throw abortOnNoRetryPossible();
 
-            if(noRegistration){
-                throw abortOnNoRetryPossible();
-            }
-
-            awaitUpdate(listener);
-            throw Retry.INSTANCE;
-        }finally{
-            pool.putDefaultRetryLatch(listener);
-        }
+        throw Retry.INSTANCE;
     }
 
     // =========================== init ================================

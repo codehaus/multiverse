@@ -18,7 +18,7 @@ public final class BetaStm implements Stm {
         return new BetaStm(new BetaStmConfiguration());
     }
 
-   public final AtomicBlock defaultAtomicBlock;
+    public final AtomicBlock defaultAtomicBlock;
     public final GlobalConflictCounter globalConflictCounter;
     public final int spinCount;
     public final BetaTransactionConfiguration defaultConfig;
@@ -326,8 +326,7 @@ public final class BetaStm implements Stm {
         }
 
         @Override
-        public BetaTransaction upgradeAfterSpeculativeFailure(
-                final BetaTransaction failingTransaction, final BetaTransactionPool pool) {
+        public BetaTransaction upgradeAfterSpeculativeFailure(final BetaTransaction tailingTx, final BetaTransactionPool pool) {
             throw new UnsupportedOperationException();
         }
     }
@@ -351,10 +350,9 @@ public final class BetaStm implements Stm {
         }
 
         @Override
-        public BetaTransaction upgradeAfterSpeculativeFailure(
-                final BetaTransaction failingTransaction, final BetaTransactionPool pool) {
+        public BetaTransaction upgradeAfterSpeculativeFailure(final BetaTransaction failingTx, final BetaTransactionPool pool) {
             final BetaTransaction tx = newTransaction(pool);
-            tx.copyForSpeculativeFailure(failingTransaction);
+            tx.copyForSpeculativeFailure(failingTx);
             return tx;
         }
 

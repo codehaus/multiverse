@@ -20,6 +20,9 @@ import org.multiverse.api.predicates.*;
  * This exception can be caught, but in most cases you want to figure out what the cause is (e.g. because
  * there are too many retries) and solve that problem.
  *
+ * <h1>Threadsafe</h1>
+ * All methods are threadsafe.
+ *
  * @author Peter Veentjer.
  */
 public interface LongRef extends TransactionalObject {

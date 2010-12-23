@@ -33,9 +33,6 @@ public final class BetaObjectPool {
     private final static boolean TRANLOCALARRAY_POOLING_ENABLED = Boolean.parseBoolean(
         System.getProperty("org.multiverse.stm.beta.BetaObjectPool.tranlocalArrayPooling",""+ENABLED));
 
-    private final static boolean LATCH_POOLING_ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.latchPooling",""+ENABLED));
-
     private final static boolean LISTENER_POOLING_ENABLED  = Boolean.parseBoolean(
         System.getProperty("org.multiverse.stm.beta.BetaObjectPool.listenersPooling",""+ENABLED));
 
@@ -50,7 +47,6 @@ public final class BetaObjectPool {
 
     private final boolean tranlocalPoolingEnabled;
     private final boolean tranlocalArrayPoolingEnabled;
-    private final boolean latchPoolingEnabled;
     private final boolean listenersPoolingEnabled;
     private final boolean listenersArrayPoolingEnabled;
     private final boolean arrayListPoolingEnabled;
@@ -80,7 +76,6 @@ public final class BetaObjectPool {
         arrayListPoolingEnabled = ARRAYLIST_POOLING_ENABLED;
         tranlocalArrayPoolingEnabled = TRANLOCALARRAY_POOLING_ENABLED;
         tranlocalPoolingEnabled = TRANLOCAL_POOLING_ENABLED;
-        latchPoolingEnabled = LATCH_POOLING_ENABLED;
         listenersPoolingEnabled = LISTENER_POOLING_ENABLED;
         listenersArrayPoolingEnabled = LISTENERSARRAY_POOLING_ENABLED;
         callableNodePoolingEnabled = CALLABLENODE_POOLING_ENABLED;
@@ -322,42 +317,6 @@ public final class BetaObjectPool {
         node.prepareForPooling();
         callableNodePoolIndex++;
         callableNodePool[callableNodePoolIndex]=node;
-    }
-
-    /**
-     * Takes a DefaultRetryLatch from the pool, or null if none is available.
-     *
-     * @return the DefaultRetryLatch from the pool, or null if none available.
-     */
-    public DefaultRetryLatch takeDefaultRetryLatch(){
-        if(!latchPoolingEnabled || defaultRetryLatchPoolIndex == -1){
-            return new DefaultRetryLatch();
-        }
-
-        DefaultRetryLatch latch = defaultRetryLatchPool[defaultRetryLatchPoolIndex];
-        defaultRetryLatchPool[defaultRetryLatchPoolIndex]=null;
-        defaultRetryLatchPoolIndex--;
-        return latch;
-    }
-
-    /**
-     * Puts a CheapLatch in the pool. Before the latch is put in the pool, it is prepared for pooling.
-     *
-     * @param latch the CheapLatch to pool.
-     * @throws NullPointerException if latch is null.
-     */
-    public void putDefaultRetryLatch(DefaultRetryLatch latch){
-        if(latch == null){
-            throw new NullPointerException();
-        }
-
-        if(!latchPoolingEnabled || defaultRetryLatchPoolIndex == defaultRetryLatchPool.length-1){
-            return;
-        }
-
-        latch.prepareForPooling();
-        defaultRetryLatchPoolIndex++;
-        defaultRetryLatchPool[defaultRetryLatchPoolIndex]=latch;
     }
 
     // ====================== array list ===================================

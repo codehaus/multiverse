@@ -5,6 +5,8 @@ import sun.misc.Unsafe;
 import java.lang.reflect.Field;
 
 /**
+ * A Utility class for accessing the {@link Unsafe}.
+ *
  * @author Peter Veentjer
  */
 public class ToolUnsafe {
@@ -18,8 +20,10 @@ public class ToolUnsafe {
      */
     public static Unsafe getUnsafe() {
         // Not on bootclasspath
-        if (ToolUnsafe.class.getClassLoader() == null)
+        if (ToolUnsafe.class.getClassLoader() == null) {
             return Unsafe.getUnsafe();
+        }
+
         try {
             final Field fld = Unsafe.class.getDeclaredField("theUnsafe");
             fld.setAccessible(true);

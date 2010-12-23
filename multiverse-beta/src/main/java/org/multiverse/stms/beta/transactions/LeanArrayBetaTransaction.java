@@ -1860,53 +1860,43 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnNoRetryPossible();
         }
 
-        DefaultRetryLatch listener = pool.takeDefaultRetryLatch();
-        if(listener == null){
-            listener = new DefaultRetryLatch();
-        }
+        final long listenerEra = listener.getEra();
 
-        try{
-            final long listenerEra = listener.getEra();
+        boolean furtherRegistrationNeeded = true;
+        boolean atLeastOneRegistration = false;
 
-            boolean furtherRegistrationNeeded = true;
-            boolean atLeastOneRegistration = false;
+        for(int k=0; k < firstFreeIndex; k++){
 
-            for(int k=0; k < firstFreeIndex; k++){
+            final BetaTranlocal tranlocal = array[k];
+            final BetaTransactionalObject owner = tranlocal.owner;
 
-                final BetaTranlocal tranlocal = array[k];
-                final BetaTransactionalObject owner = tranlocal.owner;
-
-                if(furtherRegistrationNeeded){
-                    switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
-                        case REGISTRATION_DONE:
-                            atLeastOneRegistration = true;
-                            break;
-                        case REGISTRATION_NOT_NEEDED:
-                            furtherRegistrationNeeded = false;
-                            atLeastOneRegistration = true;
-                            break;
-                        case REGISTRATION_NONE:
-                            break;
-                        default:
-                            throw new IllegalStateException();
-                    }
+            if(furtherRegistrationNeeded){
+                switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
+                    case REGISTRATION_DONE:
+                         atLeastOneRegistration = true;
+                         break;
+                    case REGISTRATION_NOT_NEEDED:
+                         furtherRegistrationNeeded = false;
+                         atLeastOneRegistration = true;
+                         break;
+                    case REGISTRATION_NONE:
+                         break;
+                    default:
+                         throw new IllegalStateException();
                 }
-
-                owner.___abort(this, tranlocal, pool);
-                array[k]=null;
             }
 
-            status = ABORTED;
-
-            if(!atLeastOneRegistration){
-                throw abortOnNoRetryPossible();
-            }
-
-            awaitUpdate(listener);
-            throw Retry.INSTANCE;
-        }finally{
-            pool.putDefaultRetryLatch(listener);
+            owner.___abort(this, tranlocal, pool);
+            array[k]=null;
         }
+
+        status = ABORTED;
+
+        if(!atLeastOneRegistration){
+            throw abortOnNoRetryPossible();
+        }
+
+        throw Retry.INSTANCE;
     }
 
     // ==================== reset ==============================

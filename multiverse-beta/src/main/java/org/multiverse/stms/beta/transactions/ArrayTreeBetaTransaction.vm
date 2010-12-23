@@ -827,73 +827,52 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
     @Override
     public void retry() {
-        if (status != ACTIVE) {
-            throw abortOnFaultyStatusOfRetry();
-        }
+        if (status != ACTIVE) throw abortOnFaultyStatusOfRetry();
 
-        if(!config.blockingAllowed){
-            throw abortOnNoBlockingAllowed();
-        }
+        if(!config.blockingAllowed) throw abortOnNoBlockingAllowed();
 
-        if( size == 0){
-            throw abortOnNoRetryPossible();
-        }
+        if( size == 0) throw abortOnNoRetryPossible();
 
-        DefaultRetryLatch listener = pool.takeDefaultRetryLatch();
+        final long listenerEra = listener.getEra();
+        boolean furtherRegistrationNeeded = true;
+        boolean atLeastOneRegistration = false;
+        for(int k=0; k < array.length; k++){
+            final BetaTranlocal tranlocal = array[k];
 
-        try{
-            final long listenerEra = listener.getEra();
-            boolean furtherRegistrationNeeded = true;
-            boolean atLeastOneRegistration = false;
-            for(int k=0; k < array.length; k++){
-                final BetaTranlocal tranlocal = array[k];
+            if(tranlocal == null) continue;
 
-                if(tranlocal == null){
-                    continue;
+            array[k]=null;
+            final BetaTransactionalObject owner = tranlocal.owner;
+
+            if(furtherRegistrationNeeded){
+                switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
+                    case REGISTRATION_DONE:
+                        atLeastOneRegistration = true;
+                        break;
+                    case REGISTRATION_NOT_NEEDED:
+                        furtherRegistrationNeeded = false;
+                        atLeastOneRegistration = true;
+                        break;
+                    case REGISTRATION_NONE:
+                        break;
+                    default:
+                        throw new IllegalStateException();
                 }
 
-                array[k]=null;
-                final BetaTransactionalObject owner = tranlocal.owner;
-
-                if(furtherRegistrationNeeded){
-                    switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
-                        case REGISTRATION_DONE:
-                            atLeastOneRegistration = true;
-                            break;
-                        case REGISTRATION_NOT_NEEDED:
-                            furtherRegistrationNeeded = false;
-                            atLeastOneRegistration = true;
-                            break;
-                        case REGISTRATION_NONE:
-                            break;
-                        default:
-                            throw new IllegalStateException();
-                    }
-
-                    owner.___abort(this, tranlocal, pool);
-                }
+                owner.___abort(this, tranlocal, pool);
             }
+        }
 
-            status = ABORTED;
+        status = ABORTED;
 #if(!$transaction.lean)
-            if(config.permanentListeners != null){
-                notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
-            }
+        if(config.permanentListeners != null) notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
 
-            if(normalListeners != null){
-                notifyListeners(normalListeners, TransactionLifecycleEvent.PostAbort);
-            }
+        if(normalListeners != null) notifyListeners(normalListeners, TransactionLifecycleEvent.PostAbort);
 
 #end
-            if(!atLeastOneRegistration){
-                throw abortOnNoRetryPossible();
-            }
+        if(!atLeastOneRegistration)throw abortOnNoRetryPossible();
 
-            awaitUpdate(listener);
-            throw Retry.INSTANCE;
-        }finally{
-            pool.putDefaultRetryLatch(listener);
-        }
+        throw Retry.INSTANCE;
     }
 
     // ============================== reset ========================================

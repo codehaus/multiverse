@@ -179,10 +179,6 @@ performance.
 
 - profiler
 
-- the retry should not block:
-    makes testing harder
-    resources are released too late.
-
 - full transactional objects
 
     - logic for full transactional objects needs to be fixed.
@@ -228,6 +224,11 @@ performance.
 ----------------------------------------------------------------------
                             todo
 ----------------------------------------------------------------------
+
+- the retry should not block:
+    makes testing harder
+    resources are released too late.
+    - move the Latch to the Transaction so that is can be retrieved on the retry exception handling.
 
 - orelse
 
