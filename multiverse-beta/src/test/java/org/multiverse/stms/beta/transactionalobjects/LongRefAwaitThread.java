@@ -31,7 +31,6 @@ public class LongRefAwaitThread extends TestThread {
     @Override
     public void doRun() throws Exception {
         execute(new AtomicVoidClosure(){
-
             @Override
             public void execute(Transaction tx) throws Exception {
                 ref.await(predicate);

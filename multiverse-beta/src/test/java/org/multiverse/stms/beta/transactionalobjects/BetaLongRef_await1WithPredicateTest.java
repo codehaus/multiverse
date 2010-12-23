@@ -4,13 +4,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.RetryTimeoutException;
+import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.api.predicates.LongPredicate;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
-
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
@@ -37,7 +35,6 @@ public class BetaLongRef_await1WithPredicateTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
-                .setTimeoutNs(TimeUnit.SECONDS.toNanos(2))
                 .build()
                 .newTransaction();
         setThreadLocalTransaction(tx);
@@ -45,7 +42,7 @@ public class BetaLongRef_await1WithPredicateTest {
         try {
             ref.await(newEqualsPredicate(initialValue + 1));
             fail();
-        } catch (RetryTimeoutException expected) {
+        } catch (Retry expected) {
         }
 
         assertIsAborted(tx);
@@ -235,6 +232,4 @@ public class BetaLongRef_await1WithPredicateTest {
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 2, 20);
     }
-
-
 }

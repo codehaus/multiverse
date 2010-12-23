@@ -6,8 +6,6 @@ import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
-import java.util.concurrent.TimeUnit;
-
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
@@ -100,7 +98,6 @@ public class BetaRef_awaitNull0Test {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
-                .setTimeoutNs(TimeUnit.SECONDS.toNanos(1))
                 .build()
                 .newTransaction();
 
@@ -109,7 +106,7 @@ public class BetaRef_awaitNull0Test {
         try {
             ref.awaitNull();
             fail();
-        } catch (RetryTimeoutException expected) {
+        } catch (Retry expected) {
         }
 
         assertIsAborted(tx);

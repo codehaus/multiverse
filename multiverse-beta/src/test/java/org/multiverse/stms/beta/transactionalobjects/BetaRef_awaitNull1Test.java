@@ -5,11 +5,9 @@ import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.api.exceptions.RetryTimeoutException;
+import org.multiverse.api.exceptions.Retry;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
-
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -99,14 +97,13 @@ public class BetaRef_awaitNull1Test {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.createTransactionFactoryBuilder()
-                .setTimeoutNs(TimeUnit.SECONDS.toNanos(1))
-                .build()
+                 .build()
                 .newTransaction();
 
         try {
             ref.awaitNull(tx);
             fail();
-        } catch (RetryTimeoutException expected) {
+        } catch (Retry expected) {
         }
 
         assertIsAborted(tx);
