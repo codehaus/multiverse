@@ -321,7 +321,7 @@ public class Lock_acquireCommitLockTest {
         setThreadLocalTransaction(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(tx);
+        ref.getLock().acquireWriteLock(otherTx);
 
         try {
             ref.getLock().acquireCommitLock();
