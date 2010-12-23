@@ -34,7 +34,7 @@ public class DefaultRetryLatch_tryAwaitTest {
     public void whenAlreadyOpenAndDifferentEra(){
         DefaultRetryLatch latch = new DefaultRetryLatch();
         long oldEra = latch.getEra();
-        latch.prepareForPooling();
+        latch.reset();
         long era = latch.getEra();
         latch.open(era);
 
@@ -49,7 +49,7 @@ public class DefaultRetryLatch_tryAwaitTest {
     public void whenClosedButDifferentEra() {
         DefaultRetryLatch latch = new DefaultRetryLatch();
         long era = latch.getEra();
-        latch.prepareForPooling();
+        latch.reset();
 
         long expectedEra = latch.getEra();
         long result = latch.awaitNanos(era, 10,"sometransaction");
@@ -189,7 +189,7 @@ public class DefaultRetryLatch_tryAwaitTest {
         sleepMs(500);
         assertAlive(t);
 
-        latch.prepareForPooling();
+        latch.reset();
         joinAll(t);
 
         assertClosed(latch);

@@ -11,7 +11,7 @@ public class DefaultRetryLatch_prepareForPoolingTest {
     public void whenClosed() {
         DefaultRetryLatch latch = new DefaultRetryLatch();
         long era = latch.getEra();
-        latch.prepareForPooling();
+        latch.reset();
 
         assertClosed(latch);
         assertEquals(era + 1, latch.getEra());
@@ -23,7 +23,7 @@ public class DefaultRetryLatch_prepareForPoolingTest {
         long era = latch.getEra();
         latch.open(era);
 
-        latch.prepareForPooling();
+        latch.reset();
         assertClosed(latch);
         assertEquals(era + 1, latch.getEra());
     }

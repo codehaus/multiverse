@@ -90,5 +90,5 @@ public interface RetryLatch {
     /**
      * Prepares the Latch for pooling. All waiting threads will be notified and the era is increased.
      */
-    void prepareForPooling();
+    void reset();
 }

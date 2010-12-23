@@ -22,7 +22,7 @@ public class BetaObjectPool_listenersTest {
     @Test
     public void whenPutInPool_thenPreparedForPooling() {
         DefaultRetryLatch latch = new DefaultRetryLatch();
-        latch.prepareForPooling();
+        latch.reset();
 
         Listeners next = new Listeners();
 

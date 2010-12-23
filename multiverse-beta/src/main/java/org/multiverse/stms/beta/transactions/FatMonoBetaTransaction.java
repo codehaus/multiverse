@@ -2205,6 +2205,7 @@ public final class FatMonoBetaTransaction extends AbstractFatBetaTransaction {
 
         if (attached == null) throw abortOnNoRetryPossible();
 
+        listener.reset();
         final long listenerEra = listener.getEra();
         final BetaTransactionalObject owner = attached.owner;
 

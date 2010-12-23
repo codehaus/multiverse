@@ -729,6 +729,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         if (attached == null) throw abortOnNoRetryPossible();
 
+        listener.reset();
         final long listenerEra = listener.getEra();
         final BetaTransactionalObject owner = attached.owner;
 

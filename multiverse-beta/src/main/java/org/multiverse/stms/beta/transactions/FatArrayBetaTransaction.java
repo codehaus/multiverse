@@ -2422,6 +2422,7 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
             throw abortOnNoRetryPossible();
         }
 
+        listener.reset();
         final long listenerEra = listener.getEra();
 
         boolean furtherRegistrationNeeded = true;

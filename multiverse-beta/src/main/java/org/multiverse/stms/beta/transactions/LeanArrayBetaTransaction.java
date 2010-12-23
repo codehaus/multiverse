@@ -1860,6 +1860,7 @@ public final class LeanArrayBetaTransaction extends AbstractLeanBetaTransaction 
             throw abortOnNoRetryPossible();
         }
 
+        listener.reset();
         final long listenerEra = listener.getEra();
 
         boolean furtherRegistrationNeeded = true;

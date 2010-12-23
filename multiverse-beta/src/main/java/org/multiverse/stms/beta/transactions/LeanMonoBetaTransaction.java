@@ -1436,6 +1436,7 @@ public final class LeanMonoBetaTransaction extends AbstractLeanBetaTransaction {
 
         if (attached == null) throw abortOnNoRetryPossible();
 
+        listener.reset();
         final long listenerEra = listener.getEra();
         final BetaTransactionalObject owner = attached.owner;
 

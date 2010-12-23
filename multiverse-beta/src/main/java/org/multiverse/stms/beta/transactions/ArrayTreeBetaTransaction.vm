@@ -833,6 +833,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         if( size == 0) throw abortOnNoRetryPossible();
 
+        listener.reset();
         final long listenerEra = listener.getEra();
         boolean furtherRegistrationNeeded = true;
         boolean atLeastOneRegistration = false;

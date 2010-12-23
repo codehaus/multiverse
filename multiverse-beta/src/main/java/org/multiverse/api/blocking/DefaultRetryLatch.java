@@ -152,7 +152,7 @@ public final class DefaultRetryLatch implements RetryLatch {
     }
 
     @Override
-    public void prepareForPooling() {
+    public void reset() {
         synchronized (this) {
             if (!isOpen) {
                 notifyAll();

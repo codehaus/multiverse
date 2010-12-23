@@ -212,7 +212,7 @@ public class BetaLongRef_await1WithPredicateTest {
         thread1.start();
         thread2.start();
 
-        sleepMs(500);
+        sleepMs(1000);
         assertAlive(thread1, thread2);
 
         ref.atomicSet(10);

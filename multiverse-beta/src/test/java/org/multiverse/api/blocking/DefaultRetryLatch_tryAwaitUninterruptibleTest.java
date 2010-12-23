@@ -33,7 +33,7 @@ public class DefaultRetryLatch_tryAwaitUninterruptibleTest {
     public void whenAlreadyOpenAndDifferentEra() {
         DefaultRetryLatch latch = new DefaultRetryLatch();
         long oldEra = latch.getEra();
-        latch.prepareForPooling();
+        latch.reset();
         long era = latch.getEra();
         latch.open(era);
 
@@ -48,7 +48,7 @@ public class DefaultRetryLatch_tryAwaitUninterruptibleTest {
     public void whenClosedButDifferentEra() {
         DefaultRetryLatch latch = new DefaultRetryLatch();
         long era = latch.getEra();
-        latch.prepareForPooling();
+        latch.reset();
 
         long expectedEra = latch.getEra();
         long result = latch.awaitNanosUninterruptible(era, 10);
@@ -208,7 +208,7 @@ public class DefaultRetryLatch_tryAwaitUninterruptibleTest {
         sleepMs(500);
         assertAlive(t);
 
-        latch.prepareForPooling();
+        latch.reset();
         joinAll(t);
 
         assertClosed(latch);

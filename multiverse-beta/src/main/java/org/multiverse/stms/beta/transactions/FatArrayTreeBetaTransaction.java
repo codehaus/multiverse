@@ -2167,6 +2167,7 @@ public final class FatArrayTreeBetaTransaction extends AbstractFatBetaTransactio
 
         if( size == 0) throw abortOnNoRetryPossible();
 
+        listener.reset();
         final long listenerEra = listener.getEra();
         boolean furtherRegistrationNeeded = true;
         boolean atLeastOneRegistration = false;
