@@ -225,11 +225,6 @@ performance.
                             todo
 ----------------------------------------------------------------------
 
-- the retry should not block:
-    makes testing harder
-    resources are released too late.
-    - move the Latch to the Transaction so that is can be retrieved on the retry exception handling.
-
 - orelse
 
     - mono transaction: support for orelse
@@ -275,7 +270,12 @@ globalconflict counter.
                                 done
 ----------------------------------------------------------------------
 
--
+- Lock functionality now is extracted to seperate Lock interface
+
+- the retry should not block:
+    makes testing harder
+    resources are released too late.
+    - move the Latch to the Transaction so that is can be retrieved on the retry exception handling.
 
 - externalized the processor count for the benchmarks
 
