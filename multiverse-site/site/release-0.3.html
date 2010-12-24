@@ -1,4 +1,4 @@
-<h2>Multiverse 0.3</h2>
+<h1>Multiverse 0.3</h1>
 
 Multiverse 0.3 was released at 19 December 2009 afer more than a year of hard working (read almost
 every bit of spare time I had). This is a list of the most important features of the 0.3 release:
@@ -37,13 +37,13 @@ every bit of spare time I had). This is a list of the most important features of
     <li>
         TransactionalLinkedList: a general purpose transactional LinkedList that can be used
         as:
-        <ol>
+        <ul>
             <li>java.util.Queue</li>
             <li>java.util.Deque</li>
             <li>java.util.concurrent.BlockingQueue</li>
             <li>java.util.concurrent.BlockingDeque</li>
             <li>java.util.List</li>
-        </ol>
+        </ul>
     </li>
     <li>
         TransactionalRef: a transactional reference to Objects. Can be seen as the
@@ -70,7 +70,7 @@ every bit of spare time I had). This is a list of the most important features of
     </li>
 </ol>
 
-<h3>Known limitations</h3>
+<h2>Known limitations</h2>
 <ol>
     <li>Java agent has no support for a transactional object subclassing.</li>
     <li>The TransactionalLinkedList is very non concurrent because it causes a lot of conflicts

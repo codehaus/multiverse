@@ -1,7 +1,7 @@
 package org.multiverse.api.functions;
 
 /**
- * Functions utility class.
+ * A utility class for {@link Function} functionality.
  *
  * @author Peter Veentjer.
  */
@@ -16,56 +16,54 @@ public class Functions {
     private static final LongFunction decOneLongFunction = new IncLongFunction(-1);
 
     /**
-     * Creates a identity IntFunction (a function that returns its input value). You will receive an existing
-     * instance.
+     * Returns an identity IntFunction (a function that returns its input value). The instance is cached.
      *
-     * @return the create identity IntFunction.
+     * @return the identity IntFunction.
      */
     public static IntFunction newIdentityIntFunction() {
         return identityIntFunction;
     }
 
     /**
-     * Creates a identity LongFunction (a function that returns its input value). You will receive an existing
-     * instance.
+     * Returns an identity LongFunction (a function that returns its input value). The instance is cached.
      *
-     * @return the create identity LongFunction.
+     * @return the identity LongFunction.
      */
     public static LongFunction newIdentityLongFunction() {
         return identityLongFunction;
     }
 
     /**
-     * Creates a IntFunction that increases the value by one.
+     * Returns an {@link IntFunction} that increments the input value by one. The instance is cached.
      *
-     * @return the created function.
+     * @return the increment IntFunction.
      */
     public static IntFunction newIncIntFunction() {
         return incOneIntFunction;
     }
 
     /**
-     * Creates a IntFunction that decreases the value by one.
+     * Returns an {@link IntFunction} that decrements the input value by one. The instance is cached.
      *
-     * @return the created function.
+     * @return the decrease IntFunction.
      */
     public static IntFunction newDecIntFunction() {
         return decOneIntFunction;
     }
 
     /**
-     * Creates a new LongFunction that increases the value by one.
+     * Returns a {@link LongFunction} that increments the input value by one. The instance is cached.
      *
-     * @return the created function.
+     * @return the increment LongFunction.
      */
     public static LongFunction newIncLongFunction() {
         return incOneLongFunction;
     }
 
     /**
-     * Creates a new LongFunction that decreases the value by one.
+     * Returns a {@link LongFunction} that decrements the input value by one. The instance is cached.
      *
-     * @return the created function.
+     * @return the decrement LongFunction.
      */
     public static LongFunction newDecLongFunction() {
         return decOneLongFunction;
@@ -73,10 +71,11 @@ public class Functions {
 
 
     /**
-     * Creates a IntFunction that increments. For the -1, 0 and 1 you get an already existing instance.
+     * Returns a {@link IntFunction} that increments with the given amount. For the -1, 0 and 1
+     * a cached instance is returned. In the other cases a new instance is created.
      *
      * @param amount the value to increment with. A negative value does a decrement.
-     * @return the create identity IntFunction.
+     * @return the increment IntFunction.
      */
     public static IntFunction newIncIntFunction(int amount) {
         switch (amount) {
@@ -92,11 +91,11 @@ public class Functions {
     }
 
     /**
-     * Creates a LongFunction that increments with the given amount. For the -1, 0 and 1 you
-     * get an already existing instance.
+     * Returns a {@link LongFunction} that increments with the given amount. For the -1, 0 and 1
+     * a cached instance is returned. In the other cases a new instance is created.
      *
      * @param amount the value to increment with. A negative value does a decrement.
-     * @return the create identity IntFunction.
+     * @return the increment LongFunction.
      */
     public static LongFunction newIncLongFunction(long amount) {
         if (amount == 0) {
@@ -178,6 +177,7 @@ public class Functions {
         }
     }
 
+    //we don't want instances.
     private Functions() {
     }
 }

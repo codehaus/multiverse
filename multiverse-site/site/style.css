@@ -27,11 +27,16 @@ li {
 h1 {
     font-size: 160%;
     font-weight: normal;
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
 
 h2 {
     font-size: 150%;
     font-weight: normal;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 85%;
 }
 
 h3 {
@@ -91,7 +96,8 @@ form {
 }
 
 img {
-    border: 0;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 #side {
@@ -148,7 +154,7 @@ h1.main-header-right {
 }
 
 /* =========================================
-				header 
+				header
 =========================================*/
 
 #header {
@@ -213,8 +219,43 @@ h1.main-header-right {
     border-bottom: 1px solid #333333;
 }
 
+.submenu {
+}
+
+.submenu ul {
+    list-style-image: none;
+    list-style-position: outside;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.submenu ul li {
+    font-size: 95%;
+    margin: 0;
+    padding: 0;
+}
+
+.submenu ul li a {
+    display: block;
+    border-bottom-color: #DDDDDD;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-top-color: #FFFFFF;
+    border-top-style: solid;
+    border-top-width: 1px;
+    padding-bottom: 5px;
+    padding-left: 36px;
+    padding-right: 7px;
+    padding-top: 5px;
+    border-left-color: #DDDDDD;
+    border-left-style: solid;
+    border-left-width: 1px;
+    background: #FEFEFE;
+}
+
 /* ========================================
-		 		Sidebar 
+                 Sidebar
 =========================================*/
 
 .nav-title {

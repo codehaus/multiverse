@@ -1,9 +1,14 @@
 package org.multiverse.api.functions;
 
 /**
- * A Function that accepts an argument of a certain type and returns a new value of the same type.
+ * A {@link Function} for primitives that accepts an argument of type int and returns a new
+ * value of the same type.
  * <p/>
- * Can be used for commuting functions or for the Ref.alter methods.
+ * The reason why {@link IntFunction} is an abstract class instead of an ordinary interface, is that
+ * this class doesn't cause any unwanted boxing of primitives version of the call method is used instead of the one that
+ * accepts and returns a/an Integer).
+ * <p/>
+ * This class is generated.
  *
  * @author Peter Veentjer.
  */

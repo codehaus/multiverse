@@ -1,4 +1,4 @@
-import groovy.text.GStringTemplateEngine;
+import groovy.text.GStringTemplateEngine
 
 class Menu {
   String name
@@ -7,10 +7,25 @@ class Menu {
 
 class MenuItem {
   String url, title, pageid
+  SubMenuItem[] items
+
+  boolean containsSubMenuItem(String pageid) {
+    for (def item in items) {
+      if (item.pageid == pageid) {
+        return true;
+      }
+    }
+
+    false
+  }
+}
+
+class SubMenuItem {
+  String url, title, pageid
 }
 
 class Page {
-  String pageid, file
+  String pageid, dir
 }
 
 //=======================================================
@@ -25,8 +40,21 @@ def menus = [
         new Menu(name: 'Menu', items: [
                 new MenuItem(title: 'Overview', pageid: 'overview'),
                 new MenuItem(title: 'Download', pageid: 'download'),
-                new MenuItem(title: 'Features', pageid: 'features'),
-                new MenuItem(title: 'Benchmarks', pageid: 'benchmarks'),
+                new MenuItem(title: 'Features', pageid: 'features', items: [
+                        new SubMenuItem(title: 'Release 0.8', pageid: 'release-0.8'),
+                        new SubMenuItem(title: 'Release 0.7', pageid: 'release-0.7'),
+                        new SubMenuItem(title: 'Release 0.6', pageid: 'release-0.6'),
+                        new SubMenuItem(title: 'Release 0.5', pageid: 'release-0.5'),
+                        new SubMenuItem(title: 'Release 0.4', pageid: 'release-0.4'),
+                        new SubMenuItem(title: 'Release 0.3', pageid: 'release-0.3')
+                ]),
+                new MenuItem(title: 'Benchmarks', pageid: 'benchmarks', items: [
+                        new SubMenuItem(title: 'Atomic Operations', pageid: 'benchmark-atomic'),
+                        new SubMenuItem(title: 'Update', pageid: 'benchmark-update'),
+                        new SubMenuItem(title: 'Read', pageid: 'benchmark-read'),
+                        new SubMenuItem(title: 'Miscellaneous', pageid: 'benchmark-misc'),
+                        new SubMenuItem(title: 'Rig Rig', pageid: 'benchmark-testrig')
+                ]),
                 new MenuItem(title: 'Mission Statement', pageid: 'missionstatement'),
                 new MenuItem(title: 'NoSQL', pageid: 'nosql'),
                 new MenuItem(title: 'Sponsors', pageid: 'sponsors'),
@@ -39,18 +67,40 @@ def menus = [
 
         new Menu(name: 'Documentation', items: [
                 new MenuItem(title: 'Overview', pageid: 'documentationoverview'),
-                new MenuItem(title: 'Reference Manual', pageid: 'manual'),
+                new MenuItem(title: 'Reference Manual', pageid: 'manual', items: [
+                        new SubMenuItem(title: 'Manual Blocking', pageid: 'manual-blocking'),
+                        new SubMenuItem(title: 'Manual JMM', pageid: 'manual-jmm')
+                ]),
                 new MenuItem(title: 'Javadoc', url: 'http://multiverse.codehaus.org/maven-site/apidocs/')
         ])
 ]
 
 //this is redundant information, all pages can be derived from the menu.
 def pages = [
-        new Page(pageid: 'overview'),
-        new Page(pageid: 'nosql'),
-        new Page(pageid: 'flyingstart'),
-        new Page(pageid: 'architecture'),
         new Page(pageid: '60second'),
+        new Page(pageid: 'architecture'),
+        new Page(pageid: 'benchmarks'),
+        new Page(pageid: 'benchmark-atomic'),
+        new Page(pageid: 'benchmark-misc'),
+        new Page(pageid: 'benchmark-testrig'),
+        new Page(pageid: 'benchmark-update'),
+        new Page(pageid: 'benchmark-read'),
+        new Page(pageid: 'contact'),
+        new Page(pageid: 'development'),
+        new Page(pageid: 'developconfiguration'),
+        new Page(pageid: 'documentationoverview'),
+        new Page(pageid: 'download'),
+        new Page(pageid: 'faq'),
+        new Page(pageid: 'features'),
+        new Page(pageid: 'release-0.3'),
+        new Page(pageid: 'release-0.4'),
+        new Page(pageid: 'release-0.5'),
+        new Page(pageid: 'release-0.6'),
+        new Page(pageid: 'release-0.7'),
+        new Page(pageid: 'release-0.8'),
+        new Page(pageid: 'flyingstart'),
+        new Page(pageid: 'index'),
+        new Page(pageid: 'license'),
         new Page(pageid: 'manual'),
         new Page(pageid: 'manual-blocking'),
         new Page(pageid: 'manual-isolation'),
@@ -63,29 +113,15 @@ def pages = [
         new Page(pageid: 'manual-templates'),
         new Page(pageid: 'manual-javaagent'),
         new Page(pageid: 'manual-compiler'),
-        new Page(pageid: 'contact'),
         new Page(pageid: 'missionstatement'),
-        new Page(pageid: 'download'),
-        new Page(pageid: 'license'),
-        new Page(pageid: 'features'),
-        new Page(pageid: '0.3.release'),
-        new Page(pageid: '0.4.release'),
-        new Page(pageid: '0.5.release'),
-        new Page(pageid: '0.6.release'),
-        new Page(pageid: '0.7.release'),
-        new Page(pageid: '0.8.release'),
-        new Page(pageid: 'benchmarks'),
-        new Page(pageid: 'faq'),
-        new Page(pageid: 'team'),
-        new Page(pageid: 'development'),
-        new Page(pageid: 'sponsors'),
-        new Page(pageid: 'tutorial'),
-        new Page(pageid: 'index'),
-        new Page(pageid: 'setup-javaagent'),
-        new Page(pageid: 'support'),
-        new Page(pageid: 'developconfiguration'),
+        new Page(pageid: 'nosql'),
         new Page(pageid: 'otherjvmlanguages'),
-        new Page(pageid: 'documentationoverview')
+        new Page(pageid: 'overview'),
+        new Page(pageid: 'setup-javaagent'),
+        new Page(pageid: 'sponsors'),
+        new Page(pageid: 'support'),
+        new Page(pageid: 'team'),
+        new Page(pageid: 'tutorial')
 ]
 
 def outputdirectory = "multiverse-site/build/site"
@@ -110,21 +146,18 @@ for (page in pages) {
           lastupdate: lastupdate]
   def result = template.make(binding).toString()
   def output = new File("$outputdirectory/$filename")
+  output.parentFile.mkdirs()
   println(output.absolutePath)
   output.text = result
 }
 
 def output = new File("$outputdirectory/style.css")
-output.createNewFile()
 output.text = new File("$basedir/multiverse-site/site/style.css").text
 
 def settingsxml = new File("$outputdirectory/settings.xml")
-settingsxml.createNewFile()
 settingsxml.text = new File("$basedir/multiverse-site/site/settings.xml").text
 
 def pomxml = new File("$outputdirectory/pom.xml")
-pomxml.createNewFile()
 pomxml.text = new File("$basedir/multiverse-site/site/pom.xml").text
-
 
 println('finished')

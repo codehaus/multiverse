@@ -1,4 +1,4 @@
-<h2>Multiverse 0.6</h2>
+<h1>Multiverse 0.6</h1>
 
 Multiverse 0.6 release currently is under development and expected around the end of June 2010. The main focus will
 not be on adding new features, but on improving scalability, performance and stability.
@@ -12,7 +12,7 @@ not be on adding new features, but on improving scalability, performance and sta
     </li>
     <li>
         New bytecode optimizations:
-        <ol>
+        <ul>
             <li>
                 speculative inlining of transactions: removing the creation of the transaction object and inlining
                 it completely in simple methods. Based on experiments, this should give a big performance boost.
@@ -27,7 +27,7 @@ not be on adding new features, but on improving scalability, performance and sta
                 access the owning transactional object and thus cause some bytecode noise. Some of this noise will be
                 removed for the 0.6 release so that the JIT has a better chance to do its magic.
             </li>
-        </ol>
+        </ul>
     </li>
     <li>
         Transaction reuse: instead of creating a new transaction every time a transactional method is executed,
@@ -43,10 +43,10 @@ not be on adding new features, but on improving scalability, performance and sta
     </li>
     <li>
         New transactional collections:
-        <ol>
+        <ul>
             <li>TransactionalTreeMap</li>
             <li>TransactionalTreeSet</li>
-        </ol>
+        </ul>
     </li>
     <li>
         Groovy integration.
