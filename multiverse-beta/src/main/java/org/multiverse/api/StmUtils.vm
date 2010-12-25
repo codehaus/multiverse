@@ -22,6 +22,8 @@ public class StmUtils {
         = getGlobalStmInstance().getDefaultRefFactory();
     private final static AtomicBlock defaultAtomicBlock
         = getGlobalStmInstance().getDefaultAtomicBlock();
+    private final OrElseBlock orelseBlock
+        = getGlobalStmInstance().createOrElseBlock();
 
 #foreach($closure in $closures)
     /**
@@ -67,6 +69,48 @@ public class StmUtils {
        return defaultAtomicBlock.executeChecked(closure);
 #end
    }
+
+   /**
+    * * Executes the either block, or in case of a retry, the orelse block is executed.
+    *
+    * If in the execution of the closure a checked exception is thrown, the exception
+    * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
+    * getCause method.
+    *
+    * @param either
+    * @param orelse
+#if(${closure.type} ne 'void')
+    * @return the result of the execution.
+#end
+    * @throws NullPointerException if closure is null.
+    * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
+    */
+    public ${closure.typeParameter} ${closure.type} execute(${closure.name}${closure.typeParameter} either, ${closure.name}${closure.typeParameter} orelse){
+#if(${closure.type} ne 'void')
+        return orelseBlock.execute(either,orelse);
+#else
+        orelseBlock.execute(either,orelse);
+#end
+    }
+
+    /**
+    * Executes the either block, or in case of a retry, the orelse block is executed.
+    *
+    * @param either
+    * @param orelse
+#if(${closure.type} ne 'void')
+    * @return the result of the execution.
+#end
+    * @throws NullPointerException if closure is null.
+    * @throws Exception if the execute call fails.
+    */
+    public ${closure.typeParameter} ${closure.type} executeChecked(${closure.name}${closure.typeParameter} either, ${closure.name}${closure.typeParameter} orelse)throws Exception{
+#if(${closure.type} ne 'void')
+        return orelseBlock.executeChecked(either,orelse);
+#else
+        orelseBlock.executeChecked(either,orelse);
+#end
+    }
 
 #end
     /**

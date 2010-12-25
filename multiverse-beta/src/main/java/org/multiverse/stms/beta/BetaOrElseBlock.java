@@ -21,6 +21,14 @@ public class BetaOrElseBlock implements OrElseBlock{
 
     @Override
     public <E> E executeChecked(AtomicClosure<E> either, AtomicClosure<E> orelse)throws Exception{
+        if(either == null){
+            throw new NullPointerException("either closure can't be null");
+        }
+
+        if(orelse == null){
+            throw new NullPointerException("orelse closure can't be null");
+        }
+
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
@@ -47,6 +55,14 @@ public class BetaOrElseBlock implements OrElseBlock{
 
     @Override
     public  int executeChecked(AtomicIntClosure either, AtomicIntClosure orelse)throws Exception{
+        if(either == null){
+            throw new NullPointerException("either closure can't be null");
+        }
+
+        if(orelse == null){
+            throw new NullPointerException("orelse closure can't be null");
+        }
+
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
@@ -73,6 +89,14 @@ public class BetaOrElseBlock implements OrElseBlock{
 
     @Override
     public  long executeChecked(AtomicLongClosure either, AtomicLongClosure orelse)throws Exception{
+        if(either == null){
+            throw new NullPointerException("either closure can't be null");
+        }
+
+        if(orelse == null){
+            throw new NullPointerException("orelse closure can't be null");
+        }
+
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
@@ -99,6 +123,14 @@ public class BetaOrElseBlock implements OrElseBlock{
 
     @Override
     public  double executeChecked(AtomicDoubleClosure either, AtomicDoubleClosure orelse)throws Exception{
+        if(either == null){
+            throw new NullPointerException("either closure can't be null");
+        }
+
+        if(orelse == null){
+            throw new NullPointerException("orelse closure can't be null");
+        }
+
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
@@ -125,6 +157,14 @@ public class BetaOrElseBlock implements OrElseBlock{
 
     @Override
     public  boolean executeChecked(AtomicBooleanClosure either, AtomicBooleanClosure orelse)throws Exception{
+        if(either == null){
+            throw new NullPointerException("either closure can't be null");
+        }
+
+        if(orelse == null){
+            throw new NullPointerException("orelse closure can't be null");
+        }
+
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
@@ -152,6 +192,14 @@ public class BetaOrElseBlock implements OrElseBlock{
 
     @Override
     public  void executeChecked(AtomicVoidClosure either, AtomicVoidClosure orelse)throws Exception{
+        if(either == null){
+            throw new NullPointerException("either closure can't be null");
+        }
+
+        if(orelse == null){
+            throw new NullPointerException("orelse closure can't be null");
+        }
+
         Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
