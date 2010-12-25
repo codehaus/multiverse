@@ -14,6 +14,7 @@ import static java.lang.System.currentTimeMillis;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.randomOneOf;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
@@ -34,7 +35,7 @@ public class ReadBiasedIsolationStressTest {
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
     }
 
     @Test

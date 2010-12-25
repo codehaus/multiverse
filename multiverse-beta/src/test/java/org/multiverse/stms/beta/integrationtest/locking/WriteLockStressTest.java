@@ -4,6 +4,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
 
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class WriteLockStressTest {
@@ -11,7 +12,7 @@ public class WriteLockStressTest {
 
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
     }
 
     @Test

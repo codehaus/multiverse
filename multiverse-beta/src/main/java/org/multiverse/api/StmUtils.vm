@@ -22,7 +22,7 @@ public class StmUtils {
         = getGlobalStmInstance().getDefaultRefFactory();
     private final static AtomicBlock defaultAtomicBlock
         = getGlobalStmInstance().getDefaultAtomicBlock();
-    private final OrElseBlock orelseBlock
+    private final static OrElseBlock orelseBlock
         = getGlobalStmInstance().createOrElseBlock();
 
 #foreach($closure in $closures)
@@ -85,7 +85,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
     */
-    public ${closure.typeParameter} ${closure.type} execute(${closure.name}${closure.typeParameter} either, ${closure.name}${closure.typeParameter} orelse){
+    public static ${closure.typeParameter} ${closure.type} execute(${closure.name}${closure.typeParameter} either, ${closure.name}${closure.typeParameter} orelse){
 #if(${closure.type} ne 'void')
         return orelseBlock.execute(either,orelse);
 #else
@@ -104,7 +104,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws Exception if the execute call fails.
     */
-    public ${closure.typeParameter} ${closure.type} executeChecked(${closure.name}${closure.typeParameter} either, ${closure.name}${closure.typeParameter} orelse)throws Exception{
+    public static ${closure.typeParameter} ${closure.type} executeChecked(${closure.name}${closure.typeParameter} either, ${closure.name}${closure.typeParameter} orelse)throws Exception{
 #if(${closure.type} ne 'void')
         return orelseBlock.executeChecked(either,orelse);
 #else

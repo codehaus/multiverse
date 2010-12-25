@@ -12,6 +12,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasNoLocks;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
@@ -21,19 +23,8 @@ public class EnsureTest {
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
-    }
-
-    @Test
-    @Ignore
-    public void whenEnsureWrites(){
-
-    }
-
-    @Test
-    @Ignore
-    public void whenPrivatizeWrites(){
-
+        stm = (BetaStm) getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
     @Test

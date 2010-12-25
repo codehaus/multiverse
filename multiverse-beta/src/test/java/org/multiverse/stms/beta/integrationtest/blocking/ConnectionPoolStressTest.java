@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
@@ -43,7 +44,7 @@ public class ConnectionPoolStressTest implements BetaStmConstants {
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
         pool = new ConnectionPool(poolsize);
         stop = false;
     }

@@ -13,6 +13,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
@@ -29,7 +30,7 @@ public class ReadConsistencyStressTest {
     public void setUp() {
         clearThreadLocalTransaction();
         stop = false;
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
     }
 
     @Test

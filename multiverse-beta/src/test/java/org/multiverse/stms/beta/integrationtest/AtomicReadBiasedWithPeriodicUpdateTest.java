@@ -6,6 +6,7 @@ import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static org.junit.Assert.assertEquals;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasNoLocks;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
@@ -19,7 +20,7 @@ public class AtomicReadBiasedWithPeriodicUpdateTest {
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
     }
 
     @Test

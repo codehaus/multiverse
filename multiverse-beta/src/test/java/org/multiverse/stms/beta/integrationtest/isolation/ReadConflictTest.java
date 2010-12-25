@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
@@ -19,7 +20,7 @@ public class ReadConflictTest {
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
         clearThreadLocalTransaction();
     }
 

@@ -225,13 +225,7 @@ performance.
                             todo
 ----------------------------------------------------------------------
 
-- orelse
-
-    - mono transaction: support for orelse
-
-    - array transaction:  support for orelse
-
-    - array tree transaction: support for orelse
+- orelse: testing
 
 - tracing
 
@@ -277,6 +271,10 @@ globalconflict counter.
 ----------------------------------------------------------------------
                                 done
 ----------------------------------------------------------------------
+
+- orelse: betastm implementation
+
+- orelse: integration stm utils
 
 - Lock functionality now is extracted to seperate Lock interface
 

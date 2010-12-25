@@ -11,6 +11,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertEquals;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newReadBiasedLongRef;
@@ -21,7 +22,7 @@ public class IsolationLevelReadCommittedTest {
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
         clearThreadLocalTransaction();
         transactionFactory = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)

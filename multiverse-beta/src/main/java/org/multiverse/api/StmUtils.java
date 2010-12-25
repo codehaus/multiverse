@@ -22,7 +22,7 @@ public class StmUtils {
         = getGlobalStmInstance().getDefaultRefFactory();
     private final static AtomicBlock defaultAtomicBlock
         = getGlobalStmInstance().getDefaultAtomicBlock();
-    private final OrElseBlock orelseBlock
+    private final static OrElseBlock orelseBlock
         = getGlobalStmInstance().createOrElseBlock();
 
     /**
@@ -70,7 +70,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
     */
-    public <E> E execute(AtomicClosure<E> either, AtomicClosure<E> orelse){
+    public static <E> E execute(AtomicClosure<E> either, AtomicClosure<E> orelse){
         return orelseBlock.execute(either,orelse);
     }
 
@@ -83,7 +83,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws Exception if the execute call fails.
     */
-    public <E> E executeChecked(AtomicClosure<E> either, AtomicClosure<E> orelse)throws Exception{
+    public static <E> E executeChecked(AtomicClosure<E> either, AtomicClosure<E> orelse)throws Exception{
         return orelseBlock.executeChecked(either,orelse);
     }
 
@@ -132,7 +132,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
     */
-    public  int execute(AtomicIntClosure either, AtomicIntClosure orelse){
+    public static  int execute(AtomicIntClosure either, AtomicIntClosure orelse){
         return orelseBlock.execute(either,orelse);
     }
 
@@ -145,7 +145,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws Exception if the execute call fails.
     */
-    public  int executeChecked(AtomicIntClosure either, AtomicIntClosure orelse)throws Exception{
+    public static  int executeChecked(AtomicIntClosure either, AtomicIntClosure orelse)throws Exception{
         return orelseBlock.executeChecked(either,orelse);
     }
 
@@ -194,7 +194,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
     */
-    public  long execute(AtomicLongClosure either, AtomicLongClosure orelse){
+    public static  long execute(AtomicLongClosure either, AtomicLongClosure orelse){
         return orelseBlock.execute(either,orelse);
     }
 
@@ -207,7 +207,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws Exception if the execute call fails.
     */
-    public  long executeChecked(AtomicLongClosure either, AtomicLongClosure orelse)throws Exception{
+    public static  long executeChecked(AtomicLongClosure either, AtomicLongClosure orelse)throws Exception{
         return orelseBlock.executeChecked(either,orelse);
     }
 
@@ -256,7 +256,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
     */
-    public  double execute(AtomicDoubleClosure either, AtomicDoubleClosure orelse){
+    public static  double execute(AtomicDoubleClosure either, AtomicDoubleClosure orelse){
         return orelseBlock.execute(either,orelse);
     }
 
@@ -269,7 +269,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws Exception if the execute call fails.
     */
-    public  double executeChecked(AtomicDoubleClosure either, AtomicDoubleClosure orelse)throws Exception{
+    public static  double executeChecked(AtomicDoubleClosure either, AtomicDoubleClosure orelse)throws Exception{
         return orelseBlock.executeChecked(either,orelse);
     }
 
@@ -318,7 +318,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
     */
-    public  boolean execute(AtomicBooleanClosure either, AtomicBooleanClosure orelse){
+    public static  boolean execute(AtomicBooleanClosure either, AtomicBooleanClosure orelse){
         return orelseBlock.execute(either,orelse);
     }
 
@@ -331,7 +331,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws Exception if the execute call fails.
     */
-    public  boolean executeChecked(AtomicBooleanClosure either, AtomicBooleanClosure orelse)throws Exception{
+    public static  boolean executeChecked(AtomicBooleanClosure either, AtomicBooleanClosure orelse)throws Exception{
         return orelseBlock.executeChecked(either,orelse);
     }
 
@@ -377,7 +377,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
     */
-    public  void execute(AtomicVoidClosure either, AtomicVoidClosure orelse){
+    public static  void execute(AtomicVoidClosure either, AtomicVoidClosure orelse){
         orelseBlock.execute(either,orelse);
     }
 
@@ -389,7 +389,7 @@ public class StmUtils {
     * @throws NullPointerException if closure is null.
     * @throws Exception if the execute call fails.
     */
-    public  void executeChecked(AtomicVoidClosure either, AtomicVoidClosure orelse)throws Exception{
+    public static  void executeChecked(AtomicVoidClosure either, AtomicVoidClosure orelse)throws Exception{
         orelseBlock.executeChecked(either,orelse);
     }
 

@@ -19,6 +19,7 @@ import static org.multiverse.api.StmUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class NoBlockingTest {
+
     @Before
     public void setUp() {
         clearThreadLocalTransaction();

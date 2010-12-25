@@ -13,6 +13,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
@@ -25,7 +26,7 @@ public class UncontendedCommutePerformanceTest {
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
         ref = newLongRef(stm);
     }
 

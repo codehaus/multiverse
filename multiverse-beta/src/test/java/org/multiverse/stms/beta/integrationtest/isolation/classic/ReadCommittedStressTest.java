@@ -13,6 +13,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
 
@@ -33,7 +34,7 @@ public class ReadCommittedStressTest {
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
         ref = newIntRef(stm);
         stop = false;
     }

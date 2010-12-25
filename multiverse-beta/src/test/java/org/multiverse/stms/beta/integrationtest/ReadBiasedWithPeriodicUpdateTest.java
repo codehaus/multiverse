@@ -8,6 +8,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasNoLocks;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
@@ -21,7 +22,7 @@ public class ReadBiasedWithPeriodicUpdateTest implements BetaStmConstants {
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
     }
 
     @Test

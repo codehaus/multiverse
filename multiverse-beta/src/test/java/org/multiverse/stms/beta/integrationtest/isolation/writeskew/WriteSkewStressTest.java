@@ -20,6 +20,7 @@ import static java.lang.String.format;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
@@ -51,7 +52,7 @@ public class WriteSkewStressTest {
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
         clearThreadLocalTransaction();
         user1 = new User();
         user2 = new User();

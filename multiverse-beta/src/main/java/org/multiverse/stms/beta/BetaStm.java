@@ -82,7 +82,7 @@ public final class BetaStm implements Stm {
 
     @Override
     public OrElseBlock createOrElseBlock() {
-        throw new TodoException();
+        return new BetaOrElseBlock();
     }
 
     public final class BetaRefFactoryImpl implements BetaRefFactory {

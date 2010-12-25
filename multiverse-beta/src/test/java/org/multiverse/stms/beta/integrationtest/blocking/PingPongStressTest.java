@@ -15,6 +15,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static java.lang.Math.abs;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
@@ -29,7 +30,7 @@ public class PingPongStressTest {
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
         ref = newLongRef(stm);
         stop = false;
     }

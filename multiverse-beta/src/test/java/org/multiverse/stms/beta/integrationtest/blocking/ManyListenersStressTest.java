@@ -20,7 +20,6 @@ public class ManyListenersStressTest {
     private LongRef[] refs;
     private StressThread[] threads;
 
-
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
@@ -62,7 +61,6 @@ public class ManyListenersStressTest {
 
         @Override
         public void doRun() throws Exception {
-            //sleepMs(id * 2000);
             while (!stop) {
                 execute(new AtomicVoidClosure() {
                     @Override

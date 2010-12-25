@@ -4,12 +4,14 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaStm;
 
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+
 public class SerializedTest {
     private BetaStm stm;
 
     @Test
     public void setUp() {
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
     }
 
     @Test

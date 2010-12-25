@@ -14,6 +14,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaIntRefTranlocal;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
@@ -31,7 +32,7 @@ public class NonReentrantSemaphoreStressTest {
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
         stop = false;
     }
 

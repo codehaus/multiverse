@@ -9,6 +9,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import static java.lang.System.currentTimeMillis;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondAsString;
@@ -20,8 +21,8 @@ public class AtomicIncrementIsolationStressTest {
 
     @Before
     public void setUp() {
+        stm = (BetaStm) getGlobalStmInstance();
         clearThreadLocalTransaction();
-        stm = new BetaStm();
     }
 
     @Test

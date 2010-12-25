@@ -8,6 +8,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 import static org.multiverse.stms.beta.orec.OrecTestUtils.assertReadBiased;
@@ -19,7 +20,7 @@ public class ReadBiasedTest implements BetaStmConstants {
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
     }
 
     @Test

@@ -13,6 +13,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
@@ -28,7 +29,7 @@ public class MoneyTransferStressTest {
     public void setUp() {
         clearThreadLocalTransaction();
         stop = false;
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
     }
 
     @Test

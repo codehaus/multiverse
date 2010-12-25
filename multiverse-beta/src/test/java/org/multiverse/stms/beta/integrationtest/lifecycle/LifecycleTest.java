@@ -9,6 +9,7 @@ import org.multiverse.stms.beta.BetaStm;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
@@ -17,7 +18,7 @@ public class LifecycleTest {
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
         clearThreadLocalTransaction();
     }
 

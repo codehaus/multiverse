@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
@@ -43,7 +44,7 @@ public class StackWithCapacityStressTest implements BetaStmConstants {
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
         stack = new Stack<Integer>();
     }
 
@@ -61,7 +62,6 @@ public class StackWithCapacityStressTest implements BetaStmConstants {
     public void testOptimistic() {
         test(LOCKMODE_NONE);
     }
-
 
     public void test(int lockMode) {
         this.lockMode = lockMode;

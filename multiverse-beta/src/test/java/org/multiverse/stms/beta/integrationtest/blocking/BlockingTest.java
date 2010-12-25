@@ -8,6 +8,8 @@ import org.multiverse.stms.beta.transactionalobjects.LongRefAwaitThread;
 
 import static org.multiverse.TestUtils.assertAlive;
 import static org.multiverse.TestUtils.sleepMs;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class BlockingTest {
 
@@ -15,7 +17,8 @@ public class BlockingTest {
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = (BetaStm) getGlobalStmInstance();
+        clearThreadLocalTransaction();
     }
 
     @Test
