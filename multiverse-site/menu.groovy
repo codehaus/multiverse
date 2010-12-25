@@ -53,7 +53,7 @@ def menus = [
                         new SubMenuItem(title: 'Update', pageid: 'benchmark-update'),
                         new SubMenuItem(title: 'Read', pageid: 'benchmark-read'),
                         new SubMenuItem(title: 'Miscellaneous', pageid: 'benchmark-misc'),
-                        new SubMenuItem(title: 'Rig Rig', pageid: 'benchmark-testrig')
+                        new SubMenuItem(title: 'Test Rig', pageid: 'benchmark-testrig')
                 ]),
                 new MenuItem(title: 'Mission Statement', pageid: 'missionstatement'),
                 new MenuItem(title: 'NoSQL', pageid: 'nosql'),

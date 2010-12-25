@@ -266,6 +266,14 @@ globalconflict counter.
 
 - the tranlocal.openForWrite needs to have the conflict stuff added
 
+- no artifact for the 'root' project should be created
+
+- javadoc should be upped to codehaus
+
+- site should be updated
+
+- site should be upped to codehaus.
+
 ----------------------------------------------------------------------
                                 done
 ----------------------------------------------------------------------
