@@ -1,7 +1,6 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
@@ -187,25 +186,5 @@ public class BetaLongRef_abortTest implements BetaStmConstants {
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
-    }
-
-    @Test
-    @Ignore
-    public void whenListenersAvailable_theyRemain() {
-        /*
-        BetaLongRef ref = newLongRef(stm);
-
-        BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.get(otherTx);
-        Latch listener = mock(Latch.class);
-        otherTx.retry(listener);
-
-        BetaTransaction tx = stm.startDefaultTransaction();
-        ref.get(tx);
-        tx.abort();
-
-        assertIsAborted(tx);
-        assertHasListeners(ref, listener);
-        */
     }
 }
