@@ -26,7 +26,6 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class NonReentrantSemaphoreStressTest {
     private BetaStm stm;
-    private boolean pessimistic;
     private volatile boolean stop;
     private int threadCount = 10;
     private int resourceCount = 5;

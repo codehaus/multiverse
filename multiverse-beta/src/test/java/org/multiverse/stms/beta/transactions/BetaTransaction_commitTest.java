@@ -51,11 +51,6 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         stm = new BetaStm();
     }
 
-    @Ignore
-    public void whenUndefined() {
-
-    }
-
     @Test
     public void whenConstructed() {
         BetaTransaction tx = newTransaction();

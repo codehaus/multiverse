@@ -16,10 +16,4 @@ public class BetaObjectPool_listenerArrayTest {
     public void whenNullPutInPool_thenNullPointerException() {
         pool.putListenersArray(null);
     }
-
-    @Test
-    @Ignore
-    public void test() {
-    }
-
 }
