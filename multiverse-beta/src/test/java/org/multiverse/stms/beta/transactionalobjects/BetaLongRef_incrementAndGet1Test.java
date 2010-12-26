@@ -150,7 +150,7 @@ public class BetaLongRef_incrementAndGet1Test {
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(1, ref);
-        assertRefHasUpdateLock(ref, tx);
+        assertRefHasWriteLock(ref, tx);
     }
 
     @Test
@@ -214,7 +214,7 @@ public class BetaLongRef_incrementAndGet1Test {
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(2, ref);
-        assertRefHasUpdateLock(ref,otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertSame(version, ref.getVersion());
         assertEquals(10, ref.___weakRead());
 
@@ -227,7 +227,7 @@ public class BetaLongRef_incrementAndGet1Test {
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(1, ref);
-        assertRefHasUpdateLock(ref,otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertSame(version, ref.getVersion());
         assertEquals(10, ref.___weakRead());
     }

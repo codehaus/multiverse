@@ -332,7 +332,7 @@ public class Lock_acquireCommitLockTest {
 
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
-        assertRefHasUpdateLock(ref,otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertSame(tx, getThreadLocalTransaction());
         assertIsAborted(tx);
     }

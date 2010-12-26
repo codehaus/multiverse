@@ -15,7 +15,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
 public class BetaLongRef_increment2Test {
-    
+
      private BetaStm stm;
 
     @Before
@@ -83,7 +83,7 @@ public class BetaLongRef_increment2Test {
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
     }
 
     @Test

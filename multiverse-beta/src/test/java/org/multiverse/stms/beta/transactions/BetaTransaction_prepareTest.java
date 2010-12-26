@@ -83,7 +83,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
 
         assertIsPrepared(tx);
         assertIsActive(otherTx);
-        assertRefHasCommitLock(ref,otherTx);
+        assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, version, 10);
         assertSurplus(2, ref);
         assertUpdateBiased(ref);
@@ -101,7 +101,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
 
         assertIsPrepared(tx);
 
-        assertRefHasCommitLock(ref,tx);
+        assertRefHasCommitLock(ref, tx);
         assertVersionAndValue(ref, version, 10);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -118,7 +118,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         tx.prepare();
 
         assertIsPrepared(tx);
-        assertRefHasCommitLock(ref,tx);
+        assertRefHasCommitLock(ref, tx);
         assertVersionAndValue(ref, version, 10);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -147,7 +147,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         assertEquals(version, tranlocal.version);
 
         assertIsPrepared(tx);
-        assertRefHasCommitLock(ref,tx);
+        assertRefHasCommitLock(ref, tx);
         assertVersionAndValue(ref, version, 10);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -181,7 +181,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
 
         assertIsAborted(tx);
         assertIsActive(otherTx);
-        assertRefHasCommitLock(ref,otherTx);
+        assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, version, 10);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -215,7 +215,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         assertIsAborted(tx);
         assertIsActive(otherTx);
 
-        assertRefHasUpdateLock(ref,otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, version, 10);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
@@ -279,12 +279,9 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         write3.value++;
         tx.prepare();
 
-        assertSame(tx, ref1.___getLockOwner());
-        assertSame(tx, ref2.___getLockOwner());
-        assertSame(tx, ref3.___getLockOwner());
-        assertRefHasCommitLock(ref1,tx);
-        assertRefHasCommitLock(ref2,tx);
-        assertRefHasCommitLock(ref3,tx);
+        assertRefHasCommitLock(ref1, tx);
+        assertRefHasCommitLock(ref2, tx);
+        assertRefHasCommitLock(ref3, tx);
         assertSurplus(1, ref1);
         assertSurplus(1, ref2);
         assertSurplus(1, ref3);
@@ -335,7 +332,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         assertTrue(tranlocal.hasDepartObligation());
         assertSame(ref, tranlocal.owner);
 
-        assertRefHasCommitLock(ref,tx);
+        assertRefHasCommitLock(ref, tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
     }
@@ -391,7 +388,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         assertTrue(tranlocal.isDirty());
         assertTranlocalHasCommitLock(tranlocal);
         assertSame(ref, tranlocal.owner);
-        assertRefHasCommitLock(ref,tx);
+        assertRefHasCommitLock(ref, tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
     }
@@ -421,7 +418,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         assertSame(ref, tranlocal.owner);
 
         assertEquals(1, tranlocal.value);
-        assertRefHasCommitLock(ref,tx);
+        assertRefHasCommitLock(ref, tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
     }
@@ -447,7 +444,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
 
         assertIsAborted(tx);
 
-        assertRefHasCommitLock(ref,otherTx);
+        assertRefHasCommitLock(ref, otherTx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertVersionAndValue(ref, initialVersion, 0);
@@ -479,7 +476,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         assertTrue(tranlocal.hasDepartObligation());
         assertSame(ref, tranlocal.owner);
         assertTrue(tranlocal.isDirty());
-        assertRefHasCommitLock(ref,tx);
+        assertRefHasCommitLock(ref, tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
     }
@@ -713,7 +710,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         tx.prepare();
         assertIsPrepared(tx);
 
-        assertRefHasCommitLock(ref,tx);
+        assertRefHasCommitLock(ref, tx);
         assertVersionAndValue(ref, version, 0);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);

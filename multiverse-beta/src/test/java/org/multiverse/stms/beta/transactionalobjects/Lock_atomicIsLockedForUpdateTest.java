@@ -44,7 +44,7 @@ public class Lock_atomicIsLockedForUpdateTest {
 
         assertTrue(result);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertRefHasUpdateLock(ref, tx);
+        assertRefHasWriteLock(ref, tx);
     }
 
     @Test

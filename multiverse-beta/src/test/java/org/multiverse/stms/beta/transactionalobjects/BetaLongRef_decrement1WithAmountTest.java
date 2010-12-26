@@ -88,7 +88,7 @@ public class BetaLongRef_decrement1WithAmountTest {
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
     }
 
     @Test

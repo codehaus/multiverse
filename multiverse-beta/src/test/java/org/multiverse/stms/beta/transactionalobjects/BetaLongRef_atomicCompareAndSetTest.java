@@ -64,7 +64,7 @@ public class BetaLongRef_atomicCompareAndSetTest {
         }
 
         assertSurplus(1, ref);
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 

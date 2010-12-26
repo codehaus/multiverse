@@ -73,7 +73,7 @@ public class BetaLongRef_getAndSet1Test {
 
         assertEquals(10, result);
         assertIsActive(tx);
-        assertRefHasUpdateLock(ref,tx);
+        assertRefHasWriteLock(ref, tx);
         assertSurplus(1, ref);
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, version, 10);
@@ -113,7 +113,7 @@ public class BetaLongRef_getAndSet1Test {
         long result = ref.getAndSet(20);
         assertEquals(10, result);
         assertIsActive(tx);
-        assertRefHasUpdateLock(ref,otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertSurplus(2, ref);
         assertIsActive(otherTx);
         assertSame(tx, getThreadLocalTransaction());
@@ -127,7 +127,7 @@ public class BetaLongRef_getAndSet1Test {
 
         assertIsAborted(tx);
         assertIsActive(otherTx);
-        assertRefHasUpdateLock(ref,otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertSurplus(1, ref);
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, version, 10);

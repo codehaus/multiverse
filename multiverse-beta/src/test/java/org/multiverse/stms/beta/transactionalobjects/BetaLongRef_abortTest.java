@@ -103,7 +103,7 @@ public class BetaLongRef_abortTest implements BetaStmConstants {
 
         ref.___abort(tx, tranlocal, pool);
 
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertSurplus(1, ref);
         assertReadonlyCount(0, ref);
         assertUpdateBiased(ref);

@@ -83,7 +83,7 @@ public class BetaLongRef_increment0Test {
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
     }
 
     @Test

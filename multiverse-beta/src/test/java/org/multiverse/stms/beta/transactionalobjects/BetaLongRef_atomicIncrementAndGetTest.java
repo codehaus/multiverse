@@ -111,7 +111,7 @@ public class BetaLongRef_atomicIncrementAndGetTest {
         }
 
         assertSurplus(1, ref);
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 

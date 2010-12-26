@@ -76,7 +76,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
 
         assertFalse(hasConflict);
         assertSurplus(1, ref);
-        assertRefHasUpdateLock(ref,tx);
+        assertRefHasWriteLock(ref, tx);
     }
 
     @Test
@@ -147,7 +147,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
 
         assertTrue(hasConflict);
         assertSurplus(2, ref);
-        assertRefHasUpdateLock(ref,otherTx);
+        assertRefHasWriteLock(ref, otherTx);
     }
 
     @Test

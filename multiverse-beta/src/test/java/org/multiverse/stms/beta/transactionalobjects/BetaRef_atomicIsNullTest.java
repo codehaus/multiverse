@@ -119,7 +119,7 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
 
         assertFalse(result);
         assertSurplus(1, ref);
-        assertRefHasUpdateLock(ref,tx);
+        assertRefHasWriteLock(ref, tx);
         assertIsActive(tx);
     }
 }

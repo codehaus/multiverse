@@ -242,7 +242,6 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         assertIsAborted(tx);
         assertHasNoListeners(ref);
         assertHasCommitLock(ref);
-        assertNull(ref.___getLockOwner());
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertVersionAndValue(ref, 0, 0);

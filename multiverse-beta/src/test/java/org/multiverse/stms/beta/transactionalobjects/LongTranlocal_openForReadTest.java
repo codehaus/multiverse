@@ -96,7 +96,7 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
 
         assertHasVersionAndValue(tranlocal, initialVersion, initialValue);
         assertIsActive(tx);
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -135,7 +135,7 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
 
         assertHasVersionAndValue(tranlocal, initialVersion, initialValue);
         assertIsActive(tx);
-        assertRefHasUpdateLock(ref, tx);
+        assertRefHasWriteLock(ref, tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 

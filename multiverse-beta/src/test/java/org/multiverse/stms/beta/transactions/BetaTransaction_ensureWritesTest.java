@@ -44,7 +44,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
         tx.ensureWrites();
 
         assertIsActive(tx);
-        assertRefHasUpdateLock(ref,tx);
+        assertRefHasWriteLock(ref, tx);
     }
 
     @Test
@@ -56,7 +56,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
         tx.ensureWrites();
 
         assertIsActive(tx);
-        assertRefHasUpdateLock(ref,tx);
+        assertRefHasWriteLock(ref, tx);
     }
 
     @Test
@@ -95,7 +95,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
         }
 
         assertIsAborted(tx);
-        assertRefHasUpdateLock(ref,otherTx);        
+        assertRefHasWriteLock(ref, otherTx);
     }
 
     @Test
@@ -153,7 +153,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
         tx.ensureWrites();
 
         assertIsActive(tx);
-        assertRefHasUpdateLock(ref, tx);
+        assertRefHasWriteLock(ref, tx);
     }
 
     @Test

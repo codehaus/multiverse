@@ -81,13 +81,13 @@ public class BetaRef_awaitNull1Test {
         BetaRefTranlocal tranlocal = (BetaRefTranlocal) tx.get(ref);
         assertTrue(tranlocal.isReadonly());
         assertTranlocalHasNoLock(tranlocal);
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
 
         tx.commit();
 
         assertIsCommitted(tx);
         assertVersionAndValue(ref, initialVersion, null);
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
     }
 
     @Test

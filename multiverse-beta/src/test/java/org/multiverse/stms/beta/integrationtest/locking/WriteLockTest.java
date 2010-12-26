@@ -59,7 +59,7 @@ public class WriteLockTest {
         }
 
         assertIsAborted(tx);
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class WriteLockTest {
 
         assertEquals(5, result);
         assertIsActive(tx);
-        assertRefHasUpdateLock(ref,otherTx);
+        assertRefHasWriteLock(ref, otherTx);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class WriteLockTest {
 
         assertEquals(10, result);
         assertIsActive(tx);
-        assertRefHasUpdateLock(ref,otherTx);
+        assertRefHasWriteLock(ref, otherTx);
     }
 
     @Test
@@ -114,7 +114,7 @@ public class WriteLockTest {
         }
 
         assertIsAborted(tx);
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
     }
 
     @Test
@@ -134,7 +134,7 @@ public class WriteLockTest {
         }
 
         assertIsAborted(tx);
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
     }
 
     @Test
@@ -170,7 +170,7 @@ public class WriteLockTest {
         tx.prepare();
 
         assertIsPrepared(tx);
-        assertRefHasUpdateLock(ref, tx);
+        assertRefHasWriteLock(ref, tx);
     }
 
     @Test
@@ -194,7 +194,7 @@ public class WriteLockTest {
         ref.getLock().acquireWriteLock(tx);
 
         assertIsActive(tx);
-        assertRefHasUpdateLock(ref, tx);
+        assertRefHasWriteLock(ref, tx);
     }
 
     @Test

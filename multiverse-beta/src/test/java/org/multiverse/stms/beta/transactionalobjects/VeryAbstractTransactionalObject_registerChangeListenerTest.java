@@ -112,7 +112,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         assertEquals(REGISTRATION_DONE, result);
         assertSurplus(2, ref);
         assertHasListeners(ref, latch);
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, version, 10);
         assertFalse(latch.isOpen());
     }
@@ -165,7 +165,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         assertTrue(latch.isOpen());
         assertSurplus(2, ref);
         assertHasNoListeners(ref);
-        assertRefHasUpdateLock(ref,otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, version, 1);
     }
 

@@ -58,7 +58,7 @@ public class CommitLockTest {
         }
 
         assertIsAborted(tx);
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
     }
 
     @Test

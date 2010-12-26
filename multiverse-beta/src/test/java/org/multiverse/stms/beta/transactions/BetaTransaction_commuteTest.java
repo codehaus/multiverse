@@ -355,7 +355,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         //todo:
         //assertNull(commuting.read);
         assertHasCommutingFunctions(commuting, function);
-        assertRefHasUpdateLock(ref,otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
     }

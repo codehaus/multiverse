@@ -183,10 +183,9 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
         } catch (ReadWriteConflict expected) {
         }
 
-        assertRefHasCommitLock(ref, otherTx);
         assertSurplus(1, ref);
         assertIsAborted(tx);
-        assertSame(otherTx, ref.___getLockOwner());
+        assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, version, initialValue);
     }
 
@@ -209,7 +208,7 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
         } catch (ReadWriteConflict expected) {
         }
 
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertSurplus(1, ref);
         assertIsActive(otherTx);
         assertIsAborted(tx);

@@ -20,7 +20,7 @@ public class BetaLongRef_toDebugStringTest {
     public void test() {
         BetaLongRef ref = newLongRef(stm);
         String s = ref.toDebugString();
-        assertEquals("Ref{orec=FastOrec(hasCommitLock=false, hasUpdateLock=false, surplus=0, " +
+        assertEquals("BetaLongRef{orec=Orec(hasCommitLock=false, hasUpdateLock=false, surplus=0, " +
                 "isReadBiased=false, readonlyCount=0), version=1, value=0, hasListeners=false)",s);
     }
 }

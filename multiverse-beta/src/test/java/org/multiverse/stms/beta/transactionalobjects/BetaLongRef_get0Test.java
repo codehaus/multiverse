@@ -76,7 +76,7 @@ public class BetaLongRef_get0Test {
         long value = ref.get();
 
         assertEquals(100, value);
-        assertRefHasUpdateLock(ref,tx);
+        assertRefHasWriteLock(ref, tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertIsActive(tx);
@@ -124,7 +124,7 @@ public class BetaLongRef_get0Test {
         long value = ref.get();
 
         assertEquals(100, value);
-        assertRefHasUpdateLock(ref,otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertSurplus(2, ref);
         assertUpdateBiased(ref);
         assertIsActive(otherTx);

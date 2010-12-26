@@ -84,7 +84,7 @@ public class BetaLongRef_atomicGetTest {
 
         assertEquals(100, result);
         assertSurplus(1, ref);
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertUpdateBiased(ref);
         assertVersionAndValue(ref, version, 100);
     }
@@ -130,7 +130,7 @@ public class BetaLongRef_atomicGetTest {
 
         assertEquals(100, result);
         assertSurplus(1, ref);
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertReadBiased(ref);
         assertVersionAndValue(ref, version, 100);
     }

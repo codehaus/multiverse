@@ -246,7 +246,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertIsActive(tx);
         assertAttached(tx, write);
         assertHasUpdates(tx);
-        assertRefHasUpdateLock(ref,tx);
+        assertRefHasWriteLock(ref, tx);
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
         assertReadonlyCount(oldReadonlyCount, ref);
@@ -312,7 +312,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertFalse(write.isReadonly());
         assertTrue(write.hasDepartObligation());
         assertUpdateBiased(ref);
-        assertRefHasUpdateLock(ref,tx);
+        assertRefHasWriteLock(ref, tx);
         assertSurplus(1, ref);
         assertReadonlyCount(0, ref);
         assertIsActive(tx);
@@ -466,7 +466,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         assertSame(ref, write2.owner);
         assertFalse(write2.isReadonly());
         assertTrue(write2.hasDepartObligation());
-        assertRefHasUpdateLock(ref,tx);
+        assertRefHasWriteLock(ref, tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);

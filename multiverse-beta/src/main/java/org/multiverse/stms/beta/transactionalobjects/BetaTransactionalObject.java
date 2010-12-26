@@ -61,14 +61,6 @@ public interface BetaTransactionalObject extends TransactionalObject {
             BetaTransaction newLockOwner, int spinCount, BetaTranlocal tranlocal, boolean commitLock);
 
     /**
-     * Returns the transaction that currently owns the lock. If no transaction owns the lock, null
-     * is returned. This call is not thread-safe.
-     *
-     * @return the transaction that currently owns the lock.
-     */
-    BetaTransaction ___getLockOwner();
-
-    /**
      * Checks if the tranlocal has a read conflict. There is a readconflict when the current value is
      * different or when it is locked (since a conflicting write could be pending). Once a transactional
      * object is locked, its value is undetermined.

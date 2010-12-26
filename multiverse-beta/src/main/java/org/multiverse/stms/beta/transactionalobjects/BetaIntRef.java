@@ -1,8 +1,6 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
-import org.multiverse.*;
 import org.multiverse.api.*;
-import org.multiverse.api.blocking.*;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.*;
 import org.multiverse.api.predicates.*;
@@ -44,9 +42,8 @@ public final class BetaIntRef
      * @throws NullPointerException if tx is null.
      */
     public BetaIntRef(BetaTransaction tx){
-        super(tx.getConfiguration().stm);
+        super(tx.config.stm);
         ___tryLockAndArrive(0, true);
-        this.___lockOwner = tx;
     }
 
     /**
@@ -147,7 +144,6 @@ public final class BetaIntRef
                 return false;
             }
 
-            ___lockOwner = newLockOwner;
             final int value = ___value;
 
             tranlocal.version = ___version;
@@ -169,8 +165,6 @@ public final class BetaIntRef
 
         if(!tranlocal.isDirty()){
             if(tranlocal.getLockMode() != LOCKMODE_NONE){
-                ___lockOwner = null;
-
                 if(tranlocal.hasDepartObligation()){
                     ___departAfterReadingAndUnlock();
                 }else{
@@ -204,8 +198,6 @@ public final class BetaIntRef
            listenersAfterWrite = ___removeListenersAfterWrite();
         }
 
-        ___lockOwner = null;
-
         ___departAfterUpdateAndUnlock();
         pool.put(specializedTranlocal);
         return listenersAfterWrite;
@@ -221,8 +213,6 @@ public final class BetaIntRef
 
         if(tranlocal.isReadonly()){
             if(tranlocal.getLockMode() != LOCKMODE_NONE){
-                ___lockOwner = null;
-
                 if(tranlocal.hasDepartObligation()){
                     ___departAfterReadingAndUnlock();
                 }else{
@@ -242,7 +232,6 @@ public final class BetaIntRef
 
         ___value = specializedTranlocal.value;
         ___version = specializedTranlocal.version+1;
-        ___lockOwner = null;
 
         //todo: JMM problem here, the volatile read could jump in front of the volatile write of version, meaning
         //that it could lead to not picking up the listeners that is done after the write. And this could lead to
@@ -265,8 +254,6 @@ public final class BetaIntRef
         final BetaObjectPool pool) {
 
         if(tranlocal.getLockMode() != LOCKMODE_NONE){
-            ___lockOwner = null;
-
             if(!tranlocal.isConstructing()){
                 //depart and release the lock. This call is able to deal with readbiased and normal reads.
                 ___departAfterFailureAndUnlock();
@@ -904,7 +891,7 @@ public final class BetaIntRef
 
     @Override
     public String toDebugString(){
-        return String.format("Ref{orec=%s, version=%s, value=%s, hasListeners=%s)",
+        return String.format("BetaIntRef{orec=%s, version=%s, value=%s, hasListeners=%s)",
             ___toOrecString(),___version,___value, ___listeners!=null);
     }
 }

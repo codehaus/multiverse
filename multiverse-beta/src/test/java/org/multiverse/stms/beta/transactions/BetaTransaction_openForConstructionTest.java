@@ -197,7 +197,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertRefHasUpdateLock(ref,otherTx);
+        assertRefHasWriteLock(ref, otherTx);
     }
 
     @Test

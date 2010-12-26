@@ -96,7 +96,7 @@ public class BetaLongRef_commute2Test {
 
         assertIsAborted(tx);
         assertSurplus(1, ref);
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 

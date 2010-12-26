@@ -377,7 +377,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
             throw abortOnTooSmallSize(2);
         }
 
-        if(ref.___getLockOwner()!=this && ref.getVersion()!=BetaTransactionalObject.VERSION_UNCOMMITTED){
+        if(ref.getVersion() != BetaTransactionalObject.VERSION_UNCOMMITTED){
             throw abortOpenForConstructionWithBadReference(ref);
         }
 
@@ -471,7 +471,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
 
         return attached == null || attached.owner!= owner? null: attached;
     }
-     
+
 #if(!$transaction.lean)
     // ======================= read conflict =======================================
 
@@ -496,7 +496,7 @@ public final class ${transaction.name} extends ${transaction.superClass} {
     }
 
 #end
-  
+
     // ======================= abort =======================================
 
     @Override

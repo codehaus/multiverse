@@ -441,15 +441,13 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
             tx.retry();
             fail();
         } catch (Retry retry) {
-
         }
 
         ref.atomicIncrementAndGet(1);
 
         assertTrue(latch.isOpen());
         assertHasNoListeners(ref);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
+        assertRefHasNoLocks(ref);
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
     }
@@ -474,9 +472,8 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         tx.commit();
 
         assertFalse(latch.isOpen());
+        assertRefHasNoLocks(ref);
         assertHasListeners(ref, latch);
-        assertHasNoCommitLock(ref);
-        assertNull(ref.___getLockOwner());
         assertSurplus(0, ref);
         assertUpdateBiased(ref);
     }

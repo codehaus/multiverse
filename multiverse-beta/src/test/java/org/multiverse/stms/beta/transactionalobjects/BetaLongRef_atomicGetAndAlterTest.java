@@ -126,7 +126,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
         } catch (LockedException expected) {
         }
 
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
@@ -150,7 +150,7 @@ public class BetaLongRef_atomicGetAndAlterTest {
         }
 
         verifyZeroInteractions(function);
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
         assertVersionAndValue(ref, initialVersion, initialValue);

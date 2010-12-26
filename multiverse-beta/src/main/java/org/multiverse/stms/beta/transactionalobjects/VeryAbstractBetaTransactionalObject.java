@@ -51,14 +51,15 @@ public abstract class VeryAbstractBetaTransactionalObject
 
     //it is important that the maximum threshold is not larger than 1023 (there are 10 bits for the readonly count)
     private static final int READBIASED_THRESHOLD = 16;
+
     private static final long BITMASK_COMMITLOCK = 0x8000000000000000L;
     private static final long BITMASK_UPDATELOCK = 0x4000000000000000L;
     private static final long BITMASK_READBIASED = 0x2000000000000000L;
     private static final long BITMASK_SURPLUS = 0x1FFFFFFFFFFFFE00L;
     private static final long BITMASK_READONLY_COUNT = 0x00000000000003FFL;
 
-    protected final static long listenersOffset;
     protected static final Unsafe ___unsafe = ToolUnsafe.getUnsafe();
+    protected static final long listenersOffset;
     protected static final long valueOffset;
 
     static {
@@ -66,22 +67,19 @@ public abstract class VeryAbstractBetaTransactionalObject
             listenersOffset = ___unsafe.objectFieldOffset(
                     VeryAbstractBetaTransactionalObject.class.getDeclaredField("___listeners"));
             valueOffset = ___unsafe.objectFieldOffset(
-                    VeryAbstractBetaTransactionalObject.class.getDeclaredField("___orecValue"));
-
+                    VeryAbstractBetaTransactionalObject.class.getDeclaredField("___orec"));
         } catch (Exception ex) {
             throw new Error(ex);
         }
     }
 
-    private volatile long ___orecValue;
-
     public final BetaStm ___stm;
-
-    protected BetaTransaction ___lockOwner;
 
     protected volatile Listeners ___listeners;
 
     protected volatile long ___version;
+
+    private volatile long ___orec;
 
     //This field has a controlled JMM problem (just like the hashcode of String).
     protected int ___identityHashCode;
@@ -101,13 +99,8 @@ public abstract class VeryAbstractBetaTransactionalObject
     }
 
     @Override
-    public Lock getLock() {
+    public final Lock getLock() {
         return this;
-    }
-
-    @Override
-    public final BetaTransaction ___getLockOwner() {
-        return ___lockOwner;
     }
 
     protected final Listeners ___removeListenersAfterWrite() {
@@ -246,7 +239,6 @@ public abstract class VeryAbstractBetaTransactionalObject
         }
 
         //the lock was acquired successfully.
-        ___lockOwner = newLockOwner;
         tranlocal.setLockMode(commitLock ? LOCKMODE_COMMIT : LOCKMODE_UPDATE);
         return expectedVersion == ___version;
     }
@@ -418,18 +410,18 @@ public abstract class VeryAbstractBetaTransactionalObject
 
     @Override
     public boolean ___hasLock() {
-        final long current = ___orecValue;
-        return hasUpdateLock(current) || hasCommitLock(___orecValue);
+        final long current = ___orec;
+        return hasUpdateLock(current) || hasCommitLock(___orec);
     }
 
     @Override
     public boolean ___hasUpdateLock() {
-        return hasUpdateLock(___orecValue);
+        return hasUpdateLock(___orec);
     }
 
     @Override
     public final boolean ___hasCommitLock() {
-        return hasCommitLock(___orecValue);
+        return hasCommitLock(___orec);
     }
 
     @Override
@@ -439,23 +431,23 @@ public abstract class VeryAbstractBetaTransactionalObject
 
     @Override
     public final long ___getSurplus() {
-        return getSurplus(___orecValue);
+        return getSurplus(___orec);
     }
 
     @Override
     public final boolean ___isReadBiased() {
-        return isReadBiased(___orecValue);
+        return isReadBiased(___orec);
     }
 
     @Override
     public final int ___getReadonlyCount() {
-        return getReadonlyCount(___orecValue);
+        return getReadonlyCount(___orec);
     }
 
     @Override
     public final int ___arrive(int spinCount) {
         do {
-            final long current = ___orecValue;
+            final long current = ___orec;
 
             if (hasCommitLock(current)) {
                 spinCount--;
@@ -498,7 +490,7 @@ public abstract class VeryAbstractBetaTransactionalObject
     @Override
     public final int ___tryLockAndArrive(int spinCount, final boolean commitLock) {
         do {
-            final long current = ___orecValue;
+            final long current = ___orec;
 
             if (hasLock(current)) {
                 spinCount--;
@@ -539,7 +531,7 @@ public abstract class VeryAbstractBetaTransactionalObject
     @Override
     public final boolean ___tryLockAfterNormalArrive(int spinCount, final boolean commitLock) {
         do {
-            final long current = ___orecValue;
+            final long current = ___orec;
 
             if (hasLock(current)) {
                 spinCount--;
@@ -572,7 +564,7 @@ public abstract class VeryAbstractBetaTransactionalObject
     @Override
     public void ___upgradeToCommitLock() {
         while (true) {
-            final long current = ___orecValue;
+            final long current = ___orec;
 
             if (hasCommitLock(current)) {
                 return;
@@ -594,7 +586,7 @@ public abstract class VeryAbstractBetaTransactionalObject
     @Override
     public final void ___departAfterReading() {
         while (true) {
-            final long current = ___orecValue;
+            final long current = ___orec;
             long surplus = getSurplus(current);
 
             if (surplus == 0) {
@@ -630,7 +622,7 @@ public abstract class VeryAbstractBetaTransactionalObject
     @Override
     public final void ___departAfterReadingAndUnlock() {
         while (true) {
-            final long current = ___orecValue;
+            final long current = ___orec;
             long surplus = getSurplus(current);
 
             if (surplus == 0) {
@@ -677,7 +669,7 @@ public abstract class VeryAbstractBetaTransactionalObject
     public final long ___departAfterUpdateAndUnlock() {
         boolean conflictSend = false;
         while (true) {
-            final long current = ___orecValue;
+            final long current = ___orec;
 
             if (!hasCommitLock(current)) {
                 throw new PanicError(
@@ -712,7 +704,7 @@ public abstract class VeryAbstractBetaTransactionalObject
             }
 
             if (surplus == 0) {
-                ___orecValue = 0;
+                ___orec = 0;
                 return surplus;
             }
 
@@ -726,7 +718,7 @@ public abstract class VeryAbstractBetaTransactionalObject
     @Override
     public final long ___departAfterFailureAndUnlock() {
         while (true) {
-            final long current = ___orecValue;
+            final long current = ___orec;
 
             if (!hasLock(current)) {
                 throw new PanicError(
@@ -764,7 +756,7 @@ public abstract class VeryAbstractBetaTransactionalObject
     @Override
     public final void ___departAfterFailure() {
         while (true) {
-            final long current = ___orecValue;
+            final long current = ___orec;
 
             if (isReadBiased(current)) {
                 throw new PanicError("Can't departAfterFailure when orec is readbiased:" + ___toOrecString(current));
@@ -797,7 +789,7 @@ public abstract class VeryAbstractBetaTransactionalObject
     @Override
     public final void ___unlockByReadBiased() {
         while (true) {
-            final long current = ___orecValue;
+            final long current = ___orec;
 
             if (!isReadBiased(current)) {
                 throw new PanicError(
@@ -823,7 +815,7 @@ public abstract class VeryAbstractBetaTransactionalObject
     }
 
     public final String ___toOrecString() {
-        return ___toOrecString(___orecValue);
+        return ___toOrecString(___orec);
     }
 
     public static long setCommitLock(final long value, final boolean commitLock) {
@@ -872,12 +864,11 @@ public abstract class VeryAbstractBetaTransactionalObject
 
     private static String ___toOrecString(long value) {
         return format(
-                "FastOrec(hasCommitLock=%s, hasUpdateLock=%s, surplus=%s, isReadBiased=%s, readonlyCount=%s)",
+                "Orec(hasCommitLock=%s, hasUpdateLock=%s, surplus=%s, isReadBiased=%s, readonlyCount=%s)",
                 hasCommitLock(value),
                 hasUpdateLock(value),
                 getSurplus(value),
                 isReadBiased(value),
                 getReadonlyCount(value));
     }
-
 }

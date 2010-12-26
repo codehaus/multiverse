@@ -43,7 +43,7 @@ public class Lock_atomicIsUnlockedTest {
 
         assertFalse(result);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertRefHasUpdateLock(ref, tx);
+        assertRefHasWriteLock(ref, tx);
     }
 
     @Test

@@ -1,7 +1,16 @@
 package org.multiverse.stms.beta;
 
 import org.multiverse.api.blocking.RetryLatch;
-import org.multiverse.stms.beta.transactionalobjects.*;
+import org.multiverse.stms.beta.transactionalobjects.BetaBooleanRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaDoubleRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaDoubleRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaRef;
+import org.multiverse.stms.beta.transactionalobjects.BetaRefTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.BetaTranlocal;
+import org.multiverse.stms.beta.transactionalobjects.VeryAbstractBetaTransactionalObject;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
@@ -16,10 +25,10 @@ import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
  */
 public class BetaStmTestUtils implements BetaStmConstants {
 
-    public static void assertHasDepartObligation(BetaLongRefTranlocal tranlocal, boolean expected){
-        if(expected){
+    public static void assertHasDepartObligation(BetaLongRefTranlocal tranlocal, boolean expected) {
+        if (expected) {
             assertHasDepartObligation(tranlocal);
-        }else{
+        } else {
             assertHasNoDepartObligation(tranlocal);
         }
     }
@@ -41,43 +50,53 @@ public class BetaStmTestUtils implements BetaStmConstants {
     }
 
     public static void assertRefHasNoLocks(VeryAbstractBetaTransactionalObject ref) {
-        assertNull(ref.___getLockOwner());
         assertHasNoUpdateLock(ref);
         assertHasNoCommitLock(ref);
     }
 
-    public static void assertRefHasUpdateLock(VeryAbstractBetaTransactionalObject ref, BetaTransaction lockOwner) {
-        assertSame(lockOwner, ref.___getLockOwner());
+    public static void assertRefHasNoLocks(VeryAbstractBetaTransactionalObject ref, BetaTransaction tx) {
+        BetaTranlocal tranlocal = tx.get(ref);
+        if (tranlocal != null) {
+            assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
+        }
+        assertHasNoUpdateLock(ref);
+        assertHasNoCommitLock(ref);
+    }
+
+    public static void assertRefHasWriteLock(VeryAbstractBetaTransactionalObject ref, BetaTransaction lockOwner) {
+        BetaTranlocal tranlocal = lockOwner.get(ref);
+        if (tranlocal == null) {
+            fail("A Tranlocal should have been available for a ref that has the write lock");
+        }
+        assertEquals(LOCKMODE_UPDATE, tranlocal.getLockMode());
         assertHasUpdateLock(ref);
         assertHasNoCommitLock(ref);
+    }
+
+    public static void assertRefHasCommitLock(VeryAbstractBetaTransactionalObject ref, BetaTransaction lockOwner) {
+        BetaTranlocal tranlocal = lockOwner.get(ref);
+        if (tranlocal == null) {
+            fail("A tranlocal should have been stored in the transaction for the ref");
+        }
+        assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
+        assertHasCommitLock(ref);
+        assertHasNoUpdateLock(ref);
     }
 
     public static void assertRefHasLockMode(VeryAbstractBetaTransactionalObject ref, BetaTransaction lockOwner, int lockMode) {
         switch (lockMode) {
             case LOCKMODE_NONE:
-                assertNull(ref.___getLockOwner());
-                assertHasNoUpdateLock(ref);
-                assertHasNoCommitLock(ref);
+                assertRefHasNoLocks(ref, lockOwner);
                 break;
             case LOCKMODE_UPDATE:
-                assertSame(lockOwner, ref.___getLockOwner());
-                assertHasUpdateLock(ref);
-                assertHasNoCommitLock(ref);
+                assertRefHasWriteLock(ref, lockOwner);
                 break;
             case LOCKMODE_COMMIT:
-                assertSame(lockOwner, ref.___getLockOwner());
-                assertHasNoUpdateLock(ref);
-                assertHasCommitLock(ref);
+                assertRefHasCommitLock(ref, lockOwner);
                 break;
             default:
                 throw new IllegalArgumentException();
         }
-    }
-
-    public static void assertRefHasCommitLock(VeryAbstractBetaTransactionalObject ref, BetaTransaction lockOwner) {
-        assertSame(lockOwner, ref.___getLockOwner());
-        assertHasCommitLock(ref);
-        assertHasNoUpdateLock(ref);
     }
 
     public static <E> BetaRef<E> newRef(BetaStm stm, E value) {
@@ -171,8 +190,8 @@ public class BetaStmTestUtils implements BetaStmConstants {
         assertSame("value doesn't match", value, ref.___weakRead());
     }
 
-    public static BetaLongRef newLongRef(BetaStm stm, long value, boolean readBiased){
-        return readBiased?newReadBiasedLongRef(stm, value):newLongRef(stm, value);
+    public static BetaLongRef newLongRef(BetaStm stm, long value, boolean readBiased) {
+        return readBiased ? newReadBiasedLongRef(stm, value) : newLongRef(stm, value);
     }
 
     public static BetaLongRef newReadBiasedLongRef(BetaStm stm, long value) {

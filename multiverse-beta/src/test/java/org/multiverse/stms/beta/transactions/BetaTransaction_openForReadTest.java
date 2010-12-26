@@ -309,7 +309,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         assertFalse(read.hasDepartObligation());
         assertTrue(read.isReadonly());
 
-        assertRefHasUpdateLock(ref,tx);
+        assertRefHasWriteLock(ref, tx);
         assertSurplus(1, ref);
         assertReadBiased(ref);
         assertVersionAndValue(ref, version, 100);
@@ -357,7 +357,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         assertFalse(read.hasDepartObligation());
         assertEquals(10, read.value);
         assertSurplus(1, ref);
-        assertRefHasUpdateLock(ref,tx);
+        assertRefHasWriteLock(ref, tx);
         assertReadBiased(ref);
         assertReadonlyCount(0, ref);
         assertAttached(tx, read);
@@ -399,7 +399,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         assertIsActive(tx);
         assertAttached(tx, read);
 
-        assertRefHasUpdateLock(ref,tx);
+        assertRefHasWriteLock(ref, tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
         assertVersionAndValue(ref, version, 100);
@@ -448,7 +448,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         assertEquals(version, read2.version);
         assertEquals(100, read2.value);
         assertIsActive(tx);
-        assertRefHasUpdateLock(ref,otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertSurplus(2, ref);
         assertUpdateBiased(ref);
         assertReadonlyCount(oldReadonlyCount, ref);
@@ -521,7 +521,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         assertIsActive(tx);
         assertSame(read1, read2);
         assertVersionAndValue(ref, version, 0);
-        assertRefHasUpdateLock(ref,tx);
+        assertRefHasWriteLock(ref, tx);
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
         assertAttached(tx, read2);
@@ -597,7 +597,7 @@ public abstract class BetaTransaction_openForReadTest implements BetaStmConstant
         assertTrue(read.hasDepartObligation());
         assertAttached(tx, read);
         assertVersionAndValue(ref, version, 100);
-        assertRefHasUpdateLock(ref,tx);
+        assertRefHasWriteLock(ref, tx);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);
     }

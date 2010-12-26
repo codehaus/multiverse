@@ -113,7 +113,7 @@ public class BetaLongRef_ensure1Test {
         BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         assertIsActive(tx);
         assertTrue(tranlocal.isConflictCheckNeeded());
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertVersionAndValue(ref, initialVersion, initialValue);
     }

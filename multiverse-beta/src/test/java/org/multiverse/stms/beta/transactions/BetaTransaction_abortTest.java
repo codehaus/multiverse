@@ -249,7 +249,6 @@ public abstract class BetaTransaction_abortTest {
 
         assertIsAborted(tx);
 
-        assertNull(ref.___getLockOwner());
         assertHasCommitLock(ref);
         assertSurplus(1, ref);
         assertUpdateBiased(ref);

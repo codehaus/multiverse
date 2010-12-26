@@ -143,7 +143,7 @@ public class BetaLongRef_atomicAlterAndGetTest {
 
         verifyZeroInteractions(function);
         assertSurplus(1, ref);
-        assertRefHasUpdateLock(ref, otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertUpdateBiased(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }

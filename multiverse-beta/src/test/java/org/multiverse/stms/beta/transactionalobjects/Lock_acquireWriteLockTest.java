@@ -37,7 +37,7 @@ public class Lock_acquireWriteLockTest {
         ref.getLock().acquireWriteLock(tx);
 
         assertUpdateBiased(ref);
-        assertRefHasUpdateLock(ref,tx);
+        assertRefHasWriteLock(ref, tx);
         assertSurplus(1, ref);
         assertVersionAndValue(ref, version, 10);
     }
@@ -153,7 +153,7 @@ public class Lock_acquireWriteLockTest {
         ref.acquireWriteLock();
 
         assertIsActive(tx);
-        assertRefHasUpdateLock(ref, tx);
+        assertRefHasWriteLock(ref, tx);
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
         assertVersionAndValue(ref, version, 10);
@@ -203,7 +203,7 @@ public class Lock_acquireWriteLockTest {
         assertIsActive(otherTx);
         assertUpdateBiased(ref);
         assertSurplus(1, ref);
-        assertRefHasUpdateLock(ref,otherTx);
+        assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, version, 10);
     }
 
@@ -266,7 +266,7 @@ public class Lock_acquireWriteLockTest {
         ref.getLock().acquireWriteLock(tx);
 
         assertUpdateBiased(ref);
-        assertRefHasUpdateLock(ref,tx);
+        assertRefHasWriteLock(ref, tx);
         assertSurplus(1, ref);
         assertVersionAndValue(ref, version, 10);
     }
