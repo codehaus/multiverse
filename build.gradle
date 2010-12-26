@@ -1,91 +1,5 @@
 import org.codehaus.groovy.ant.Groovy
 
-allprojects {
-  apply plugin: 'base'
-  apply plugin: 'java'
-  apply plugin: 'maven'
-  apply plugin: 'project-reports'
-
-  install.dependsOn ':build'
-  defaultTasks 'clean', 'install'
-
-  sourceCompatibility = 1.6
-  version = '0.7-RC-2-SNAPSHOT'
-  group = 'org.multiverse'
-
-  def localMavenRepo = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
-
-  repositories {
-    mavenRepo urls: localMavenRepo
-    mavenCentral()
-    mavenRepo(urls: [
-            'http://snapshots.repository.codehaus.org',
-            'http://download.java.net/maven/2/',
-            'https://maven.atlassian.com/content/groups/public'])
-  }
-
-  configurations {
-    deployerJars
-  }
-
-  test {
-    exclude("**/*AbstractTest*")
-    exclude("**/*Benchmark*")
-    exclude("**/*StressTest*")
-    exclude("**/*stressTest*")
-    exclude("**/*LongTest*")
-    exclude("**/*PerformanceTest*")
-    exclude("**/*performanceTest*")
-  }
-
-  task shortintegrationtest(type: Test) {
-    include("**/*StressTest*")
-    include("**/*stressTest*")
-    include("**/*LongTest*")
-    include("**/*longTest*")
-  }
-
-  task integrationtest(type: Test) {
-    include("**/*StressTest*")
-    include("**/*stressTest*")
-    include("**/*LongTest*")
-    include("**/*longTest*")
-  }
-
-  dependencies {
-    deployerJars "org.apache.maven.wagon:wagon-ssh:1.0-beta-2"
-    testCompile group: 'junit', name: 'junit', version: '4.8.2'
-    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.8.2'
-    testCompile group: 'org.benchy', name: 'benchy-driver', version: '0.1-SNAPSHOT'
-    deployerJars group: 'org.apache.maven.wagon', name: 'wagon-webdav-jackrabbit', version: '1.0-beta-6'
-  }
-
-  javadoc {
-    title = "Multiverse $version"
-  }
-
-  task deploy(dependsOn: ['clean', 'install', 'uploadArchives']) << {
-  }
-
-  uploadArchives() {
-    repositories.mavenDeployer {
-      name = 'sshDeployer'
-      uniqueVersion = false
-      configuration = configurations.deployerJars
-      repository(
-              id: 'multiverse-releases',
-              url: 'dav:https://dav.codehaus.org/repository/multiverse/') {
-        authentication(userName: "$codehaus_loginname", password: "$codehaus_password")
-      }
-      snapshotRepository(
-              id: 'multiverse-snapshots',
-              url: 'dav:https://dav.codehaus.org/snapshots.repository/multiverse/') {
-        authentication(userName: "$codehaus_loginname", password: "$codehaus_password")
-      }
-    }
-  }
-}
-
 def executeBenchmark(String filepath) {
   execute("benchy-execute -p ${processorCount} -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test ${filepath}")
 }
@@ -93,7 +7,6 @@ def executeBenchmark(String filepath) {
 def executeDisplay(String filepath) {
   execute("benchy-display ${filepath}")
 }
-
 
 def execute(String s) {
   Process proc = s.execute()
@@ -104,22 +17,50 @@ def execute(String s) {
   }
 }
 
+allprojects {
+//  apply plugin: 'base'
+  defaultTasks 'clean', 'install'
+}
+
 project(':multiverse-beta') {
+  apply plugin: 'java'
+  apply plugin: 'maven'
+  apply plugin: 'project-reports'
+
+  sourceCompatibility = 1.6
+  version = '0.7-RC-2-SNAPSHOT'
+  group = 'org.multiverse'
+
+  //install.dependsOn ':build'
+
+  def localMavenRepo = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
 
   configurations {
     testFixtures {
       extendsFrom testRuntime
     }
+    deployerJars
   }
 
-//    compileJava.doFirst {
-//        System.out.println("Starting groovy script")
-//        new GroovyShell().run(new File('multiverse-beta/generate.groovy'))
-//        System.out.println("Finished groovy script")
-//    }
+  javadoc {
+    title = "Multiverse $version"
+  }
 
-  shortintegrationtest {
-    jvmArgs = ["-Dorg.multiverse.integrationtest.durationMs=10000", "-Dorg.multiverse.bugshaker.enabled=true"]
+  repositories {
+    mavenRepo urls: localMavenRepo
+    mavenCentral()
+    mavenRepo(urls: [
+            'http://snapshots.repository.codehaus.org',
+            'http://download.java.net/maven/2/',
+            'https://maven.atlassian.com/content/groups/public'])
+  }
+
+  dependencies {
+    deployerJars "org.apache.maven.wagon:wagon-ssh:1.0-beta-2"
+    testCompile group: 'junit', name: 'junit', version: '4.8.2'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.8.2'
+    testCompile group: 'org.benchy', name: 'benchy-driver', version: '0.1-SNAPSHOT'
+    deployerJars group: 'org.apache.maven.wagon', name: 'wagon-webdav-jackrabbit', version: '1.0-beta-6'
   }
 
   task benchmarkUncontendedMonoUpdate << {
@@ -201,11 +142,64 @@ project(':multiverse-beta') {
           benchmarkOrecUpdate,
           benchmarkOrecRead,
           benchmarkBoxingOverhead]) << {}
+
+  test {
+    exclude("**/*AbstractTest*")
+    exclude("**/*Benchmark*")
+    exclude("**/*StressTest*")
+    exclude("**/*stressTest*")
+    exclude("**/*LongTest*")
+    exclude("**/*PerformanceTest*")
+    exclude("**/*performanceTest*")
+  }
+
+  task shortintegrationtest(type: Test) {
+    include("**/*StressTest*")
+    include("**/*stressTest*")
+    include("**/*LongTest*")
+    include("**/*longTest*")
+  }
+
+  task integrationtest(type: Test) {
+    include("**/*StressTest*")
+    include("**/*stressTest*")
+    include("**/*LongTest*")
+    include("**/*longTest*")
+  }
+
+  shortintegrationtest {
+    jvmArgs = ["-Dorg.multiverse.integrationtest.durationMs=10000", "-Dorg.multiverse.bugshaker.enabled=true"]
+  }
+
+  task deploy(dependsOn: ['clean', 'install', 'uploadArchives']) << {
+  }
+
+  uploadArchives() {
+    repositories.mavenDeployer {
+      name = 'sshDeployer'
+      uniqueVersion = false
+      configuration = configurations.deployerJars
+      repository(
+              id: 'multiverse-releases',
+              url: 'dav:https://dav.codehaus.org/repository/multiverse/') {
+        authentication(userName: "$codehaus_loginname", password: "$codehaus_password")
+      }
+      snapshotRepository(
+              id: 'multiverse-snapshots',
+              url: 'dav:https://dav.codehaus.org/snapshots.repository/multiverse/') {
+        authentication(userName: "$codehaus_loginname", password: "$codehaus_password")
+      }
+    }
+  }
 }
 
 project(':multiverse-site') {
 
-  jar.doLast {
+  task clean <<{
+    ant.delete(dir: "${projectDir}/build")
+  }
+
+  task install(dependsOn: clean) << {
     def binding = new Binding()
     def parent = Groovy.class.getClassLoader()
     def loader = new GroovyClassLoader(parent)

@@ -34,7 +34,7 @@ public interface TransactionalObject {
      * ensured/privatized tranlocals (although it doesn't provide any value anymore since the ensure
      * privatize already prevent conflicts).
      * <p/>
-     * Unlike the {@link #getLock().acquireWriteLock()} which is pessimistic, this is optimistic.
+     * Unlike the {@link Lock#acquireWriteLock()} which is pessimistic, this is optimistic.
      * <p/>
      * This method doesn't provide any value if the transaction is readonly.
      * <p/>
@@ -55,7 +55,7 @@ public interface TransactionalObject {
      * ensured/privatized tranlocals (although it doesn't provide any value anymore since the ensure
      * privatize already prevent conflicts).
      * <p/>
-     * Unlike the {@link #getLock().acquireWriteLock(Transaction)} which is pessimistic, this is optimistic.
+     * Unlike the {@link Lock#acquireWriteLock(Transaction)} which is pessimistic, this is optimistic.
      * <p/>
      * This method doesn't provide any value if the transaction is readonly.
      * <p/>

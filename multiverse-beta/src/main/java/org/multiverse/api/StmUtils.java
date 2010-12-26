@@ -495,8 +495,7 @@ public class StmUtils {
      * to happen on certain datastructures, e.g. an item to come available on a transactional blocking queue.
      * <p/>
      * Under the hood the retry throws an Retry that will be caught up the callstack
-     * (by the {@link AtomicBlock for example). The Retry should not be caught by user code in 99% procent
-     * of the cases.
+     * (by the {@link AtomicBlock} for example). The Retry should not be caught by user code in almost all cases.
      */
     public static void retry() {
         Transaction tx = getRequiredThreadLocalTransaction();

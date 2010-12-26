@@ -40,7 +40,9 @@ public interface Stm {
     AtomicBlock getDefaultAtomicBlock();
 
     /**
-     * @return
+     * Creates an OrElseBlock.
+     *
+     * @return the created OrElseBlock.
      */
     OrElseBlock createOrElseBlock();
 
