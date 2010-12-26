@@ -18,7 +18,7 @@ import static org.junit.Assume.assumeTrue;
 import static org.multiverse.MultiverseConstants.LOCKMODE_NONE;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
 
 public abstract class BetaTransaction_abortTest {
 

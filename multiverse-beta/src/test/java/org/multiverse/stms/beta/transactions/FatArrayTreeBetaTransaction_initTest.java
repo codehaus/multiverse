@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.assertHasNoCommitLock;
 
 public class FatArrayTreeBetaTransaction_initTest {
     private BetaStm stm;

@@ -21,7 +21,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertHasNoCommitLock;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.assertHasNoCommitLock;
 
 /**
  * @author Peter Veentjer
@@ -231,14 +231,14 @@ public class TestUtils implements MultiverseConstants {
     public static BetaLongRef createReadBiasedLongRef(BetaStm stm, long value) {
         BetaLongRef ref = newLongRef(stm, value);
 
-        for (int k = 0; k < ref.___getOrec().___getReadBiasedThreshold(); k++) {
+        for (int k = 0; k < ref.___getReadBiasedThreshold(); k++) {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);
             tx.openForRead(ref, LOCKMODE_NONE);
             tx.commit();
-            assertHasNoCommitLock(ref.___getOrec());
+            assertHasNoCommitLock(ref);
         }
 
-        assertTrue(ref.___getOrec().___isReadBiased());
+        assertTrue(ref.___isReadBiased());
 
         return ref;
     }

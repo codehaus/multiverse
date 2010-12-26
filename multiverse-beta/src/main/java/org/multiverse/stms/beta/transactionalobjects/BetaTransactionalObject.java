@@ -4,7 +4,6 @@ import org.multiverse.api.TransactionalObject;
 import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.Listeners;
-import org.multiverse.stms.beta.orec.Orec;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 /**
@@ -27,13 +26,6 @@ public interface BetaTransactionalObject extends TransactionalObject {
      * @return the index that uniquely identifies this class
      */
     int ___getClassIndex();
-
-    /**
-     * Returns the Orec that belongs to this TransactionalObject.
-     *
-     * @return the Orec that belongs to this TransactionalObject.
-     */
-    Orec ___getOrec();
 
     long getVersion();
 
@@ -132,4 +124,160 @@ public interface BetaTransactionalObject extends TransactionalObject {
      * @return the identity hashcode.
      */
     int ___identityHashCode();
+
+    boolean ___hasLock();
+
+    /**
+     * Checks if the Orec is locked for update. While it is locked for update, it still is readable (so arrives)
+     * are allowed). The update lock can be acquired to prevent other threads from updating this orec.
+     *
+     * @return true if owned for writing, false otherwise.
+     */
+    boolean ___hasUpdateLock();
+
+    /**
+     * Checks if the Orec is locked for committing. Once it is locked, no arrives are allowed.  The commit
+     * lock normally is acquired when the transaction is about to commit.
+     *
+     * @return true if the Orec is locked.
+     */
+    boolean ___hasCommitLock();
+
+    /**
+     * Returns the current number of surplus. Value is unspecified if Orec is biased to reading.
+     *
+     * @return the current surplus.
+     */
+    long ___getSurplus();
+
+    /**
+     * Tries to do an arrive. If the orec is locked for commit, arrive is not possible. But if it is locked
+     * for update, an arrive is still possible.
+     * <p/>
+     * This call will also act as a barrier. So all changed made after a depart successfully is executed,
+     * will be visible after this arrive is done.
+     *
+     * @param spinCount the maximum number of spins in the lock.
+     * @return the arrive status (see BetaStmConstants).
+     */
+    int ___arrive(int spinCount);
+
+    /**
+     * Arrives at this orec an acquired the lock.
+     * <p/>
+     * This call also acts as a barrier.
+     *
+     * @param spinCount  the maximum number of spins when locked.
+     * @param commitLock true if the commitLock should be acquired, false for the update lock.
+     * @return the arrive status (see BetaStmConstants).
+     */
+    int ___tryLockAndArrive(int spinCount, boolean commitLock);
+
+    /**
+     * Lowers the amount of surplus (so called when a reading transaction stops using a transactional
+     * object).
+     * <p/>
+     * If there is no surplus, and the orec becomes biased towards
+     * readonly, the orec is locked and true is returned. This means that no other transactions are able to
+     * access the orec.
+     * <p/>
+     * Biased towards reading, only happens when there is no surplus.
+     * <p/>
+     *
+     * @throws org.multiverse.api.exceptions.PanicError
+     *          if read biased.
+     */
+    void ___departAfterReading();
+
+    /**
+     * Departs and releases the lock.
+     * <p/>
+     * This method normally is called when a successful update is done.
+     *
+     * @return the current surplus (so transactionalobject the depart is done)
+     * @throws IllegalStateException if the orec is not locked.
+     */
+    long ___departAfterUpdateAndUnlock();
+
+    /**
+     *
+     */
+    void ___departAfterFailure();
+
+    /**
+     * Departs after failure and releases the locks (so the commit locks and the update lock).
+     *
+     * @return the remaining surplus
+     * @throws org.multiverse.api.exceptions.PanicError
+     *          if not locked, or when there is no surplus
+     */
+    long ___departAfterFailureAndUnlock();
+
+    /**
+     * Departs after a transaction has successfully read an orec and acquired the commit or update lock.
+     *
+     * @throws org.multiverse.api.exceptions.PanicError
+     *          if no locks are acquired or if the orec is readbiased or if
+     *          there is no surplus.
+     */
+    void ___departAfterReadingAndUnlock();
+
+    /**
+     * Unlocks the update lock and or commit lock. This call should be done by a transaction that did an arrive
+     * an a readbiased orec.
+     */
+    void ___unlockByReadBiased();
+
+    /**
+     * Upgrades the updatelock to a commit lock. The call safely can be made if the commit lock
+     * already is acquired.
+     *
+     * @throws org.multiverse.api.exceptions.PanicError
+     *          if the updateLock and commitLock is not acquired
+     */
+    void ___upgradeToCommitLock();
+
+    /**
+     * Tries to lock this Orec for update purposes. This automatically resets the biased to reading
+     * behavior since an expected update is going to be done.
+     *
+     * @param spinCount  the maximum number of times to spin on the lock.
+     * @param updateLock if the updateLock or commit lock should be acquired.
+     * @return true if the lock was acquired successfully, false otherwise.
+     * @throws org.multiverse.api.exceptions.PanicError
+     *          if the surplus is 0 (a tryUpdateLock only can be done if the current
+     *          transaction did an arrive).
+     */
+    boolean ___tryLockAfterNormalArrive(int spinCount, boolean updateLock);
+
+    /**
+     * Checks if this Orec is biased towards reading.
+     *
+     * @return true if this Orec is biased towards reading.
+     */
+    boolean ___isReadBiased();
+
+    /**
+     * Returns the number of readonly operations that need to be done before being biased to
+     * reading.
+     *
+     * @return the number of readonly operations
+     */
+    int ___getReadBiasedThreshold();
+
+    /**
+     * Returns the current number of consecutive readonly operations.
+     * <p/>
+     * Value is undetermined if the orec is biased towards reading.
+     *
+     * @return the current number of consecutive readonly operations.
+     */
+    int ___getReadonlyCount();
+
+    /**
+     * Returns a String representation of the orec useful for debugging purposes.
+     *
+     * @return a String representation useful for debugging purposes.
+     */
+    String ___toOrecString();
 }

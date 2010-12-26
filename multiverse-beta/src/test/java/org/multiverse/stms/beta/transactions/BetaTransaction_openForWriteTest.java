@@ -23,7 +23,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
 
 public abstract class BetaTransaction_openForWriteTest implements BetaStmConstants {
 

@@ -6,7 +6,6 @@ import org.benchy.TestCaseResult;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
-import org.multiverse.stms.beta.orec.FastOrec;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 public class OrecNormalUpdateDriver extends BenchmarkDriver implements BetaStmConstants {
@@ -15,7 +14,7 @@ public class OrecNormalUpdateDriver extends BenchmarkDriver implements BetaStmCo
     private BetaStm stm;
 
     private long operationCount = 1000 * 1000 * 1000;
-    private FastOrec orec;
+    private BetaLongRef orec;
 
     @Override
     public void setUp() {
@@ -24,20 +23,18 @@ public class OrecNormalUpdateDriver extends BenchmarkDriver implements BetaStmCo
         stm = new BetaStm();
         ref = new BetaLongRef(stm);
         globalConflictCounter = stm.getGlobalConflictCounter();
-        orec = new FastOrec();
+        orec = new BetaLongRef(stm);
     }
 
     @Override
     public void run(TestCaseResult testCaseResult) {
         final long _cycles = operationCount;
-        final FastOrec _orec = orec;
-        final BetaLongRef _ref = ref;
-        final GlobalConflictCounter _conflictCounter = globalConflictCounter;
+        final BetaLongRef _orec = orec;
 
         for (long k = 0; k < _cycles; k++) {
             _orec.___arrive(1);
             _orec.___tryLockAfterNormalArrive(1, true);
-            _orec.___departAfterUpdateAndUnlock(_conflictCounter, _ref);
+            _orec.___departAfterUpdateAndUnlock();
         }
     }
 

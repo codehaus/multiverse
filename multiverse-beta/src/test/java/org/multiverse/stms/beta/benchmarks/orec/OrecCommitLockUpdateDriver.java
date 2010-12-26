@@ -6,7 +6,6 @@ import org.multiverse.TestThread;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
-import org.multiverse.stms.beta.orec.FastOrec;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static org.benchy.BenchyUtils.*;
@@ -64,17 +63,14 @@ public class OrecCommitLockUpdateDriver extends BenchmarkDriver implements BetaS
         @Override
         public void doRun() throws Exception {
             final long _cycles = operationCount;
-            final FastOrec   _orec = new FastOrec();
-
-            final BetaLongRef _ref = ref;
-            final GlobalConflictCounter _conflictCounter = globalConflictCounter;
+            final BetaLongRef _orec = new BetaLongRef(stm);
 
             for (long k = 0; k < _cycles; k++) {
                 int arriveStatus = _orec.___tryLockAndArrive(0, true);
                 if (arriveStatus != ARRIVE_NORMAL) {
                     _orec.___tryLockAndArrive(0, true);
                 }
-                _orec.___departAfterUpdateAndUnlock(_conflictCounter, _ref);
+                _orec.___departAfterUpdateAndUnlock();
             }
         }
     }

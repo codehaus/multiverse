@@ -1,20 +1,30 @@
-package org.multiverse.stms.beta.orec;
+package org.multiverse.stms.beta.transactionalobjects;
 
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PanicError;
+import org.multiverse.stms.beta.BetaStm;
 
 import static org.junit.Assert.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
 
 /**
  * @author Peter Veentjer
  */
-public class FastOrec_tryLockAfterNormalArriveTest {
+public class VeryAbstractBetaTransactionalObject_tryLockAfterNormalArriveTest {
+
+    private BetaStm stm;
+
+    @Before
+    public void setUp() {
+        stm = new BetaStm();
+    }
 
     @Test
     public void whenUpdateBiasedAndNoSurplus_thenPanicErrorWhenCommitLockAcquired() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
 
         try {
             orec.___tryLockAfterNormalArrive(1, true);
@@ -31,7 +41,7 @@ public class FastOrec_tryLockAfterNormalArriveTest {
 
     @Test
     public void whenUpdateBiasedAndNoSurplus_thenPanicErrorWhenUpdateLockAcquired() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
 
         try {
             orec.___tryLockAfterNormalArrive(1, false);
@@ -48,7 +58,7 @@ public class FastOrec_tryLockAfterNormalArriveTest {
 
     @Test
     public void whenUpdateBiasedAndFree_thenCommitLockCanBeAcquired() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
 
         boolean result = orec.___tryLockAfterNormalArrive(1, true);
@@ -63,7 +73,7 @@ public class FastOrec_tryLockAfterNormalArriveTest {
 
     @Test
     public void whenUpdateBiasedAndFree_thenUpdateLockCanBeAcquired() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
 
         boolean result = orec.___tryLockAfterNormalArrive(1, false);
@@ -78,7 +88,7 @@ public class FastOrec_tryLockAfterNormalArriveTest {
 
     @Test
     public void whenUpdateBiasedAndFreeAndSurplus_thenCommitLockCanBeAcquired() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
         orec.___arrive(1);
 
@@ -94,7 +104,7 @@ public class FastOrec_tryLockAfterNormalArriveTest {
 
     @Test
     public void whenUpdateBiasedAndFreeAndSurplus_thenUpdateLockCanBeAcquired() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
         orec.___arrive(1);
 
@@ -110,7 +120,7 @@ public class FastOrec_tryLockAfterNormalArriveTest {
 
     @Test
     public void whenUpdateBiasedAndLockedForCommit_thenCommitLockCantBeAcquired() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
         //conflicting lock
         orec.___tryLockAfterNormalArrive(1, true);
@@ -127,7 +137,7 @@ public class FastOrec_tryLockAfterNormalArriveTest {
 
     @Test
     public void whenUpdateBiasedAndLockedForCommit_thenUpdateLockCantBeAcquired() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
         //conflicting lock
         orec.___tryLockAfterNormalArrive(1, true);
@@ -144,7 +154,7 @@ public class FastOrec_tryLockAfterNormalArriveTest {
 
     @Test
     public void whenUpdateBiasedAndLockedForUpdate_thenCommitLockCantBeAcquired() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
         //conflicting lock
         orec.___tryLockAfterNormalArrive(1, false);
@@ -161,7 +171,7 @@ public class FastOrec_tryLockAfterNormalArriveTest {
 
     @Test
     public void whenUpdateBiasedAndLockedForUpdate_thenUpdateLockCantBeAcquired() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
         //conflicting lock
         orec.___tryLockAfterNormalArrive(1, false);
@@ -176,10 +186,11 @@ public class FastOrec_tryLockAfterNormalArriveTest {
         assertFalse(orec.___isReadBiased());
     }
 
+    /*
     @Test
     @Ignore
     public void whenReadBiasedAndNoSurplus_thenPanicErrorWhenCommitLockAcquired() {
-        FastOrec orec = makeReadBiased(new FastOrec());
+        FastOrec orec = makeReadBiased(new FastOrec(stm));
 
         try {
             orec.___tryLockAfterNormalArrive(1, true);
@@ -197,7 +208,7 @@ public class FastOrec_tryLockAfterNormalArriveTest {
     @Test
     @Ignore
     public void whenReadBiasedAndNoSurplus_thenPanicErrorWhenUpdateLockAcquired() {
-        FastOrec orec = makeReadBiased(new FastOrec());
+        FastOrec orec = makeReadBiased(new FastOrec(stm));
 
         try {
             orec.___tryLockAfterNormalArrive(1, false);
@@ -215,7 +226,7 @@ public class FastOrec_tryLockAfterNormalArriveTest {
     @Test
     @Ignore
     public void whenReadBiasedAndFree_thenCommitLockCanBeAcquired() {
-        FastOrec orec = makeReadBiased(new FastOrec());
+        FastOrec orec = makeReadBiased(new FastOrec(stm));
         orec.___arrive(1);
 
         boolean result = orec.___tryLockAfterNormalArrive(1, true);
@@ -231,7 +242,7 @@ public class FastOrec_tryLockAfterNormalArriveTest {
     @Test
     @Ignore
     public void whenReadBiasedAndFree_thenUpdateLockCanBeAcquired() {
-        FastOrec orec = makeReadBiased(new FastOrec());
+        FastOrec orec = makeReadBiased(new FastOrec(stm));
         orec.___arrive(1);
 
         boolean result = orec.___tryLockAfterNormalArrive(1, false);
@@ -247,7 +258,7 @@ public class FastOrec_tryLockAfterNormalArriveTest {
     @Test
     @Ignore
     public void whenReadBiasedAndLockedForCommit_thenCommitLockCantBeAcquired() {
-        FastOrec orec = makeReadBiased(new FastOrec());
+        FastOrec orec = makeReadBiased(new FastOrec(stm));
 
         orec.___tryLockAndArrive(1, true);
 
@@ -264,7 +275,7 @@ public class FastOrec_tryLockAfterNormalArriveTest {
     @Test
     @Ignore
     public void whenReadBiasedAndLockedForCommit_thenUpdateLockCantBeAcquired() {
-        FastOrec orec = new FastOrec();
+        FastOrec orec = new FastOrec(stm);
         orec.___arrive(1);
         //conflicting lock
         orec.___tryLockAfterNormalArrive(1, true);
@@ -282,7 +293,7 @@ public class FastOrec_tryLockAfterNormalArriveTest {
     @Test
     @Ignore
     public void whenReadBiasedAndLockedForUpdate_thenCommitLockCantBeAcquired() {
-        FastOrec orec = new FastOrec();
+        FastOrec orec = new FastOrec(stm);
         orec.___arrive(1);
         //conflicting lock
         orec.___tryLockAfterNormalArrive(1, false);
@@ -300,7 +311,7 @@ public class FastOrec_tryLockAfterNormalArriveTest {
     @Test
     @Ignore
     public void whenReadBiasedAndLockedForUpdate_thenUpdateLockCantBeAcquired() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
         //conflicting lock
         orec.___tryLockAfterNormalArrive(1, false);
@@ -313,6 +324,6 @@ public class FastOrec_tryLockAfterNormalArriveTest {
         assertHasUpdateLock(orec);
         assertEquals(1, orec.___getSurplus());
         assertFalse(orec.___isReadBiased());
-    }
+    } */
 
 }

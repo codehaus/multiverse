@@ -20,7 +20,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 import static org.multiverse.api.functions.Functions.newIncLongFunction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.assertSurplus;
 
 public class BetaLongRef_commute2Test {
 

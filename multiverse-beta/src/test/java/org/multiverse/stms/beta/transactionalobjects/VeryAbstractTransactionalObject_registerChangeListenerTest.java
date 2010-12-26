@@ -18,7 +18,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.assertSurplus;
 
 public class VeryAbstractTransactionalObject_registerChangeListenerTest implements BetaStmConstants {
     private BetaStm stm;

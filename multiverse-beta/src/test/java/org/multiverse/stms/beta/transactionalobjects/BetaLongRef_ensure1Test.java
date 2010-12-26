@@ -15,7 +15,7 @@ import static org.multiverse.stms.beta.BetaStmTestUtils.LOCKMODE_COMMIT;
 import static org.multiverse.stms.beta.BetaStmTestUtils.LOCKMODE_NONE;
 import static org.multiverse.stms.beta.BetaStmTestUtils.LOCKMODE_UPDATE;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.assertSurplus;
 
 public class BetaLongRef_ensure1Test {
 

@@ -11,7 +11,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.makeReadBiased;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.makeReadBiased;
 
 public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants {
 

@@ -9,7 +9,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
 
 public class BetaLongRef_constructionTest implements BetaStmConstants {
     private BetaStm stm;

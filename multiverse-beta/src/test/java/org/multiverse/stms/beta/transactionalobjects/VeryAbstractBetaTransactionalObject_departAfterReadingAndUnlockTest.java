@@ -1,17 +1,26 @@
-package org.multiverse.stms.beta.orec;
+package org.multiverse.stms.beta.transactionalobjects;
 
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PanicError;
+import org.multiverse.stms.beta.BetaStm;
 
 import static org.junit.Assert.fail;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
 
-public class FastOrec_departAfterReadingAndUnlockTest {
+public class VeryAbstractBetaTransactionalObject_departAfterReadingAndUnlockTest {
+
+    private BetaStm stm;
+
+    @Before
+    public void setUp(){
+        stm = new BetaStm();
+    }
 
     @Test
     public void whenMultipleArrivesAndLockedForCommit() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
         orec.___arrive(2);
         orec.___tryLockAndArrive(1, true);
@@ -27,7 +36,7 @@ public class FastOrec_departAfterReadingAndUnlockTest {
 
     @Test
     public void whenMultipleArrivesAndLockedForUpdate() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
         orec.___arrive(2);
         orec.___tryLockAndArrive(1, false);
@@ -43,7 +52,7 @@ public class FastOrec_departAfterReadingAndUnlockTest {
 
     @Test
     public void whenSuccess() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___tryLockAndArrive(1, true);
 
         orec.___departAfterReadingAndUnlock();
@@ -55,14 +64,26 @@ public class FastOrec_departAfterReadingAndUnlockTest {
     }
 
     @Test
-    @Ignore
     public void whenLockedAndReadBiased() {
+        BetaTransactionalObject orec = makeReadBiased(newLongRef(stm));
+        orec.___tryLockAndArrive(1, true);
 
+        try {
+            orec.___departAfterReadingAndUnlock();
+            fail();
+        } catch (PanicError expected) {
+        }
+
+        assertSurplus(1, orec);
+        assertHasCommitLock(orec);
+        assertHasNoUpdateLock(orec);
+        assertReadBiased(orec);
+        assertReadonlyCount(0, orec);
     }
 
     @Test
     public void whenNotLockedAndNoSurplus_thenPanicError() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
 
         try {
             orec.___departAfterReadingAndUnlock();
@@ -79,7 +100,7 @@ public class FastOrec_departAfterReadingAndUnlockTest {
 
     @Test
     public void whenNotLockedAndSurplus_thenPanicError() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
 
         try {

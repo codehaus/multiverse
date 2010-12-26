@@ -9,7 +9,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
 
 /**
  * @author Peter Veentjer

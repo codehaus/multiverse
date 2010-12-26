@@ -20,7 +20,7 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
 import static org.multiverse.api.functions.Functions.newIncLongFunction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasNoLocks;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
 
 /**
  * Tests {@link BetaLongRef#alterAndGet(BetaTransaction, LongFunction)}.

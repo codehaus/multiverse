@@ -14,7 +14,7 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.assertSurplus;
 
 /**
  * Tests {@link BetaLongRef#getAndSet(org.multiverse.api.Transaction, long)}.

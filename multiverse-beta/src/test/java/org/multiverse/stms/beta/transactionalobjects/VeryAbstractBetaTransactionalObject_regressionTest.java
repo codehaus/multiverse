@@ -1,31 +1,29 @@
-package org.multiverse.stms.beta.orec;
+package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PanicError;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static org.junit.Assert.fail;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.makeReadBiased;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.makeReadBiased;
 
-public class FastOrec_regressionTest {
+public class VeryAbstractBetaTransactionalObject_regressionTest {
 
     private GlobalConflictCounter globalConflictCounter;
-    private BetaLongRef dummyRef;
     private BetaStm stm;
 
     @Before
     public void setUp() {
         globalConflictCounter = new GlobalConflictCounter(1);
         stm = new BetaStm();
-        dummyRef = new BetaLongRef(stm);
     }
 
     @Test
     public void test1() {
-        FastOrec orec = makeReadBiased(new FastOrec());
+        BetaTransactionalObject orec = makeReadBiased(newLongRef(stm));
 
         //transaction 1
         orec.___arrive(1);
@@ -35,7 +33,7 @@ public class FastOrec_regressionTest {
         //transaction 1
         orec.___tryLockAfterNormalArrive(1, true);
         //transaction 1
-        orec.___departAfterUpdateAndUnlock(globalConflictCounter, dummyRef);
+        orec.___departAfterUpdateAndUnlock();
 
         //transaction 2   (this method should not be called since the the read was readbiased).  The ref does check for
         //only calling this method when it isn't read biased, but the exception still happens.
@@ -48,7 +46,7 @@ public class FastOrec_regressionTest {
 
     @Test
     public void test2() {
-        FastOrec orec = makeReadBiased(new FastOrec());
+        BetaTransactionalObject  orec = makeReadBiased(newLongRef(stm));
 
         //transaction 1
         orec.___arrive(1);
@@ -57,11 +55,11 @@ public class FastOrec_regressionTest {
 
         //transaction 1 does the update
         orec.___tryLockAfterNormalArrive(1, true);
-        orec.___departAfterUpdateAndUnlock(globalConflictCounter, dummyRef);
+        orec.___departAfterUpdateAndUnlock();
 
         //transaction 2 now does the update.
         orec.___tryLockAndArrive(1, true);
-        orec.___departAfterUpdateAndUnlock(globalConflictCounter, dummyRef);
+        orec.___departAfterUpdateAndUnlock();
 
         System.out.println("orec: " + orec.___toOrecString());
 

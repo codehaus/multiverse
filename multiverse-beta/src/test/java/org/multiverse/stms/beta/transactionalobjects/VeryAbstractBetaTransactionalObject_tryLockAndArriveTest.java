@@ -1,19 +1,29 @@
-package org.multiverse.stms.beta.orec;
+package org.multiverse.stms.beta.transactionalobjects;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
 
 /**
  * @author Peter Veentjer
  */
-public class FastOrec_tryLockAndArriveTest implements BetaStmConstants {
+public class VeryAbstractBetaTransactionalObject_tryLockAndArriveTest implements BetaStmConstants {
+
+    private BetaStm stm;
+
+    @Before
+    public void setUp() {
+        stm = new BetaStm();
+    }
 
     @Test
     public void whenUpdateBiasedAndAlreadyLockedForCommit() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
         orec.___tryLockAfterNormalArrive(1, true);
 
@@ -29,7 +39,7 @@ public class FastOrec_tryLockAndArriveTest implements BetaStmConstants {
 
     @Test
     public void whenUpdateBiasedAndUnlocked() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
 
         int result = orec.___tryLockAndArrive(1, true);
 
@@ -43,7 +53,7 @@ public class FastOrec_tryLockAndArriveTest implements BetaStmConstants {
 
     @Test
     public void whenReadBiasedAndLockedForCommit() {
-        FastOrec orec = makeReadBiased(new FastOrec());
+        BetaTransactionalObject orec = makeReadBiased(newLongRef(stm));
         orec.___arrive(1);
         orec.___tryLockAfterNormalArrive(1, true);
 
@@ -59,7 +69,7 @@ public class FastOrec_tryLockAndArriveTest implements BetaStmConstants {
 
     @Test
     public void whenReadBiasedAndUnlocked() {
-        FastOrec orec = makeReadBiased(new FastOrec());
+        BetaTransactionalObject orec = makeReadBiased(newLongRef(stm));
 
         int result = orec.___tryLockAndArrive(1, true);
 

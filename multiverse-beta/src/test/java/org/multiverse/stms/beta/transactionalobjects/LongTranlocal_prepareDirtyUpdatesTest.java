@@ -9,7 +9,7 @@ import org.multiverse.stms.beta.transactions.BetaTransaction;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.assertSurplus;
 
 public class LongTranlocal_prepareDirtyUpdatesTest {
 

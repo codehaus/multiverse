@@ -12,7 +12,7 @@ import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.assertSurplus;
 
 public class BetaLongRef_atomicIncrementAndGetTest {
     private BetaStm stm;

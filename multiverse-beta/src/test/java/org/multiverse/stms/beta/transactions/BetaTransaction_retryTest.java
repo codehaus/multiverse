@@ -23,7 +23,7 @@ import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
 
 public abstract class BetaTransaction_retryTest implements BetaStmConstants {
     protected BetaStm stm;

@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.functions.Functions.newIncLongFunction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
 
 
 //todo: improved testing of version and value on the tranlocal

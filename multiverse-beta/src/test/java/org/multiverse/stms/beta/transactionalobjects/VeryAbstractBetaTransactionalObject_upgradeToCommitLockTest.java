@@ -1,16 +1,26 @@
-package org.multiverse.stms.beta.orec;
+package org.multiverse.stms.beta.transactionalobjects;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PanicError;
+import org.multiverse.stms.beta.BetaStm;
 
 import static org.junit.Assert.fail;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
 
-public class FastOrec_upgradeToCommitLockTest {
+public class VeryAbstractBetaTransactionalObject_upgradeToCommitLockTest {
+
+    private BetaStm stm;
+
+    @Before
+    public void setUp(){
+        stm = new BetaStm();
+    }
 
     @Test
     public void whenUpdateBiasedAlreadyUpgradedToCommitLock() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___tryLockAndArrive(1, true);
 
         orec.___upgradeToCommitLock();
@@ -24,7 +34,7 @@ public class FastOrec_upgradeToCommitLockTest {
 
     @Test
     public void whenUpdateBiasedUpdateLockAlreadyAcquired() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___tryLockAndArrive(1, false);
 
         orec.___upgradeToCommitLock();
@@ -38,7 +48,7 @@ public class FastOrec_upgradeToCommitLockTest {
 
     @Test
     public void whenMultipleSurplusAndUpdateBiasedAlreadyUpgradedToCommitLock() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
         orec.___arrive(1);
         orec.___tryLockAndArrive(1, true);
@@ -54,7 +64,7 @@ public class FastOrec_upgradeToCommitLockTest {
 
     @Test
     public void whenMultipleSurplusAndUpdateBiasedUpdateLockAlreadyAcquired() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
         orec.___arrive(1);
         orec.___tryLockAndArrive(1, false);
@@ -70,7 +80,7 @@ public class FastOrec_upgradeToCommitLockTest {
 
     @Test
     public void whenSurplusAndUpdateBiasedNoLockAcquired_thenPanicError() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
 
         try {
@@ -88,7 +98,7 @@ public class FastOrec_upgradeToCommitLockTest {
 
     @Test
     public void whenNoSurplusAndUpdateBiasedNoLockAcquired_thenPanicError() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
 
         try {
             orec.___upgradeToCommitLock();
@@ -105,7 +115,7 @@ public class FastOrec_upgradeToCommitLockTest {
 
     @Test
     public void whenReadBiasedAndNoLocks_thenPanicError() {
-        FastOrec orec = makeReadBiased(new FastOrec());
+        BetaTransactionalObject orec = makeReadBiased(newLongRef(stm));
 
         try {
             orec.___upgradeToCommitLock();
@@ -122,7 +132,7 @@ public class FastOrec_upgradeToCommitLockTest {
 
     @Test
     public void whenReadBiasedAndAlreadyCommitLock() {
-        FastOrec orec = makeReadBiased(new FastOrec());
+        BetaTransactionalObject orec = makeReadBiased(newLongRef(stm));
         orec.___tryLockAndArrive(1, true);
 
         orec.___upgradeToCommitLock();
@@ -136,7 +146,7 @@ public class FastOrec_upgradeToCommitLockTest {
 
     @Test
     public void whenReadBiasedAndAlreadyUpdateLock() {
-        FastOrec orec = makeReadBiased(new FastOrec());
+        BetaTransactionalObject orec = makeReadBiased(newLongRef(stm));
         orec.___tryLockAndArrive(1, false);
 
         orec.___upgradeToCommitLock();

@@ -1,20 +1,30 @@
-package org.multiverse.stms.beta.orec;
+package org.multiverse.stms.beta.transactionalobjects;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PanicError;
+import org.multiverse.stms.beta.BetaStm;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
 
 /**
  * @author Peter Veentjer
  */
-public class FastOrec_departAfterFailureAndUnlockTest {
+public class VeryAbstractBetaTransactionalObject_departAfterFailureAndUnlockTest {
+
+    private BetaStm stm;
+
+    @Before
+    public void setUp() {
+        stm = new BetaStm();
+    }
 
     @Test
     public void whenUpdateBiasedNotLocked_thenPanicError() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         try {
             orec.___departAfterFailureAndUnlock();
             fail();
@@ -30,7 +40,7 @@ public class FastOrec_departAfterFailureAndUnlockTest {
 
     @Test
     public void whenReadBiasedAndNotLocked_thenPanicError() {
-        Orec orec = OrecTestUtils.makeReadBiased(new FastOrec());
+        BetaTransactionalObject orec = OrecTestUtils.makeReadBiased(newLongRef(stm));
 
         try {
             orec.___departAfterFailureAndUnlock();
@@ -47,7 +57,7 @@ public class FastOrec_departAfterFailureAndUnlockTest {
 
     @Test
     public void whenUpdateBiasedAndLocked() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
         orec.___tryLockAfterNormalArrive(1, true);
 
@@ -62,7 +72,7 @@ public class FastOrec_departAfterFailureAndUnlockTest {
 
     @Test
     public void whenReadBiasedAndLocked() {
-        FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
+        BetaTransactionalObject orec = makeReadBiased(newLongRef(stm));
         orec.___arrive(1);
         orec.___tryLockAfterNormalArrive(1, true);
 

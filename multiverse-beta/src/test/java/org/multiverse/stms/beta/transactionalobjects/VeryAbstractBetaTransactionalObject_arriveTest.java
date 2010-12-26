@@ -1,20 +1,30 @@
-package org.multiverse.stms.beta.orec;
+package org.multiverse.stms.beta.transactionalobjects;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 
 import static junit.framework.Assert.assertEquals;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
 
 
 /**
  * @author Peter Veentjer
  */
-public class FastOrec_arriveTest implements BetaStmConstants {
+public class VeryAbstractBetaTransactionalObject_arriveTest implements BetaStmConstants {
+
+    private BetaStm stm;
+
+    @Before
+    public void setUp() {
+        stm = new BetaStm();
+    }
 
     @Test
     public void whenUpdateBiasedNotLockedAndNoSurplus_thenNormalArrive() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         int result = orec.___arrive(1);
 
         assertEquals(ARRIVE_NORMAL, result);
@@ -27,7 +37,7 @@ public class FastOrec_arriveTest implements BetaStmConstants {
 
     @Test
     public void whenUpdateBiasedAndNotLockedAndSurplus_thenNormalArrive() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
         orec.___arrive(1);
 
@@ -43,7 +53,7 @@ public class FastOrec_arriveTest implements BetaStmConstants {
 
     @Test
     public void whenUpdateBiasedAndLockedForCommit_thenLockNotFree() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___tryLockAndArrive(1, true);
 
         int result = orec.___arrive(1);
@@ -58,7 +68,7 @@ public class FastOrec_arriveTest implements BetaStmConstants {
 
     @Test
     public void whenUpdateBiasedAndLockedForUpdate_thenUnregisteredArrive() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___tryLockAndArrive(1, false);
 
         int result = orec.___arrive(1);
@@ -73,7 +83,7 @@ public class FastOrec_arriveTest implements BetaStmConstants {
 
     @Test
     public void whenReadBiasedAndLockedForCommit() {
-        FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
+        BetaTransactionalObject orec = OrecTestUtils.makeReadBiased(newLongRef(stm));
         orec.___arrive(1);
         orec.___tryLockAfterNormalArrive(1, true);
 
@@ -89,7 +99,7 @@ public class FastOrec_arriveTest implements BetaStmConstants {
 
     @Test
     public void whenReadBiasedAndNoSurplus() {
-        FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
+        BetaTransactionalObject orec = OrecTestUtils.makeReadBiased(newLongRef(stm));
 
         int result = orec.___arrive(1);
 
@@ -103,7 +113,7 @@ public class FastOrec_arriveTest implements BetaStmConstants {
 
     @Test
     public void whenReadBiasedAndSurplus_thenCallIgnored() {
-        FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
+        BetaTransactionalObject orec = OrecTestUtils.makeReadBiased(newLongRef(stm));
         orec.___arrive(1);
 
         int result = orec.___arrive(1);

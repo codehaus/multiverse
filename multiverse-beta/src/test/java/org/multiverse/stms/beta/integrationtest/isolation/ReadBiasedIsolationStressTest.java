@@ -6,8 +6,8 @@ import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicBooleanClosure;
+import org.multiverse.api.references.LongRef;
 import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.orec.FastOrec;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static java.lang.System.currentTimeMillis;
@@ -28,14 +28,13 @@ import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPer
  */
 public class ReadBiasedIsolationStressTest {
 
-    private BetaStm stm;
-    private int chanceOfUpdate = new FastOrec().___getReadBiasedThreshold() * 5;
+    private BetaStm stm = (BetaStm) getGlobalStmInstance();
+    private int chanceOfUpdate = new BetaLongRef(stm).___getReadBiasedThreshold() * 5;
     private int threadCount = 4;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = (BetaStm) getGlobalStmInstance();
     }
 
     @Test

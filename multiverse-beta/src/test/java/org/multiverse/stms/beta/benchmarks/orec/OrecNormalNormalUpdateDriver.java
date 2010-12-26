@@ -6,12 +6,12 @@ import org.multiverse.TestThread;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
-import org.multiverse.stms.beta.orec.FastOrec;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
 import static org.benchy.BenchyUtils.format;
 import static org.benchy.BenchyUtils.operationsPerSecond;
 import static org.benchy.BenchyUtils.operationsPerSecondPerThread;
+import static org.multiverse.TestUtils.assertEqualsDouble;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 
@@ -44,6 +44,8 @@ public class OrecNormalNormalUpdateDriver extends BenchmarkDriver implements Bet
     public void run(TestCaseResult testCaseResult) {
         startAll(threads);
         joinAll(threads);
+
+        assertEqualsDouble(0, globalConflictCounter.count());
     }
 
     @Override
@@ -68,9 +70,8 @@ public class OrecNormalNormalUpdateDriver extends BenchmarkDriver implements Bet
         @Override
         public void doRun() throws Exception {
             final long _cycles = operationCount;
-            final FastOrec orec = new FastOrec();
+            final BetaLongRef orec = new BetaLongRef(stm);
             final BetaLongRef _ref = ref;
-            final GlobalConflictCounter _globalGlobalConflictCounter = globalConflictCounter;
 
             for (long k = 0; k < _cycles; k++) {
                 int arriveStatus = orec.___arrive(0);
@@ -79,7 +80,7 @@ public class OrecNormalNormalUpdateDriver extends BenchmarkDriver implements Bet
                 } else {
                     orec.___tryLockAndArrive(0, true);
                 }
-                orec.___departAfterUpdateAndUnlock(_globalGlobalConflictCounter, _ref);
+                orec.___departAfterUpdateAndUnlock();
             }
 
             System.out.printf("Orec        : %s\n", orec.___toOrecString());

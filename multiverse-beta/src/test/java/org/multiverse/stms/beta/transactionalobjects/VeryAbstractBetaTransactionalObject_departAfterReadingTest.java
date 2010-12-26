@@ -1,19 +1,29 @@
-package org.multiverse.stms.beta.orec;
+package org.multiverse.stms.beta.transactionalobjects;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PanicError;
+import org.multiverse.stms.beta.BetaStm;
 
 import static org.junit.Assert.fail;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
 
 /**
  * @author Peter Veentjer
  */
-public class FastOrec_departAfterReadingTest {
+public class VeryAbstractBetaTransactionalObject_departAfterReadingTest {
+
+    private BetaStm stm;
+
+    @Before
+    public void setUp(){
+        stm = new BetaStm();
+    }
 
     @Test
     public void whenNoSurplus_thenPanicError() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
 
         try {
             orec.___departAfterReading();
@@ -30,7 +40,7 @@ public class FastOrec_departAfterReadingTest {
 
     @Test
     public void whenMuchSurplus() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
         orec.___arrive(1);
 
@@ -46,7 +56,7 @@ public class FastOrec_departAfterReadingTest {
 
     @Test
     public void whenLockedForCommit() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
         orec.___arrive(1);
         orec.___tryLockAfterNormalArrive(1, true);
@@ -62,7 +72,7 @@ public class FastOrec_departAfterReadingTest {
 
     @Test
     public void whenLockedForUpdate() {
-        FastOrec orec = new FastOrec();
+        BetaTransactionalObject orec = newLongRef(stm);
         orec.___arrive(1);
         orec.___arrive(1);
         orec.___tryLockAfterNormalArrive(1, false);
@@ -78,7 +88,7 @@ public class FastOrec_departAfterReadingTest {
 
     @Test
     public void whenReadBiasedAndLockedForCommit_thenPanicError() {
-        FastOrec orec = makeReadBiased(new FastOrec());
+        BetaTransactionalObject orec = makeReadBiased(newLongRef(stm));
         orec.___arrive(1);
         orec.___tryLockAfterNormalArrive(1, true);
 
@@ -98,7 +108,7 @@ public class FastOrec_departAfterReadingTest {
 
     @Test
     public void whenReadBiasedAndUnlocked_thenPanicError() {
-        FastOrec orec = makeReadBiased(new FastOrec());
+        BetaTransactionalObject orec = makeReadBiased(newLongRef(stm));
 
         try {
             orec.___departAfterReading();

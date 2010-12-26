@@ -1,15 +1,25 @@
-package org.multiverse.stms.beta.orec;
+package org.multiverse.stms.beta.transactionalobjects;
 
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.stms.beta.BetaStm;
 
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
 
-public class FastOrec_unlockByReadBiased {
+public class VeryAbstractBetaTransactionalObject_unlockByReadBiased {
+
+    private BetaStm stm;
+
+    @Before
+    public void setUp() {
+        stm = new BetaStm();
+    }
 
     @Test
     public void whenSurplusAndReadBiasedAndLocked() {
-        FastOrec orec = OrecTestUtils.makeReadBiased(new FastOrec());
+        BetaTransactionalObject orec = OrecTestUtils.makeReadBiased(newLongRef(stm));
         orec.___tryLockAndArrive(1, true);
 
         orec.___unlockByReadBiased();

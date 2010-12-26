@@ -8,13 +8,7 @@ import org.multiverse.api.functions.*;
 import org.multiverse.api.predicates.*;
 import org.multiverse.api.references.*;
 import org.multiverse.stms.beta.*;
-import org.multiverse.stms.beta.conflictcounters.*;
-import org.multiverse.stms.beta.orec.*;
 import org.multiverse.stms.beta.transactions.*;
-
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.*;
@@ -188,7 +182,7 @@ public  class BetaDoubleRef
                 }
             }
 
-            pool.put(specializedTranlocal);            
+            pool.put(specializedTranlocal);
             return null;
         }
 
@@ -212,7 +206,7 @@ public  class BetaDoubleRef
 
         ___lockOwner = null;
 
-        ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
+        ___departAfterUpdateAndUnlock();
         pool.put(specializedTranlocal);
         return listenersAfterWrite;
     }
@@ -259,7 +253,7 @@ public  class BetaDoubleRef
            listenersAfterWrite = ___removeListenersAfterWrite();
         }
 
-        ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
+        ___departAfterUpdateAndUnlock();
         pool.put(specializedTranlocal);
         return listenersAfterWrite;
     }
@@ -286,7 +280,7 @@ public  class BetaDoubleRef
         pool.put((BetaDoubleRefTranlocal)tranlocal);
     }
 
-   
+
     @Override
     public final double atomicGetAndIncrement(final double amount){
         double result = atomicIncrementAndGet(amount);
@@ -343,7 +337,7 @@ public  class BetaDoubleRef
 
         Listeners listeners = ___removeListenersAfterWrite();
 
-        ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
+        ___departAfterUpdateAndUnlock();
 
         if(listeners!=null){
             listeners.openAll(getThreadLocalBetaObjectPool());
@@ -552,7 +546,7 @@ public  class BetaDoubleRef
 
         Listeners listeners = ___removeListenersAfterWrite();
 
-        ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
+        ___departAfterUpdateAndUnlock();
 
         if(listeners!=null){
            listeners.openAll(getThreadLocalBetaObjectPool());
@@ -628,7 +622,7 @@ public  class BetaDoubleRef
         ___version++;
         Listeners listeners = ___removeListenersAfterWrite();
 
-        ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
+        ___departAfterUpdateAndUnlock();
 
         if(listeners!=null){
             listeners.openAll(getThreadLocalBetaObjectPool());
@@ -733,7 +727,7 @@ public  class BetaDoubleRef
 
         Listeners listeners = ___removeListenersAfterWrite();
 
-        ___departAfterUpdateAndUnlock(___stm.globalConflictCounter, this);
+        ___departAfterUpdateAndUnlock();
 
         if(listeners != null){
             BetaObjectPool pool = getThreadLocalBetaObjectPool();
@@ -770,7 +764,7 @@ public  class BetaDoubleRef
         final Transaction tx = getThreadLocalTransaction();
 
         if(tx == null){
-            throw new TransactionRequiredException(getClass(),"await");                                            
+            throw new TransactionRequiredException(getClass(),"await");
         }
 
         await((BetaTransaction)tx, value);

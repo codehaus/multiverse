@@ -9,7 +9,7 @@ import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertEqualsDouble;
 import static org.multiverse.TestUtils.getField;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
 
 /**
  * @author Peter Veentjer
@@ -178,7 +178,7 @@ public class BetaStmTestUtils implements BetaStmConstants {
     public static BetaLongRef newReadBiasedLongRef(BetaStm stm, long value) {
         BetaLongRef ref = newLongRef(stm, value);
 
-        for (int k = 0; k < ref.___getOrec().___getReadBiasedThreshold(); k++) {
+        for (int k = 0; k < ref.___getReadBiasedThreshold(); k++) {
             BetaTransaction tx = new FatMonoBetaTransaction(stm);
             ref.get(tx);
             tx.commit();

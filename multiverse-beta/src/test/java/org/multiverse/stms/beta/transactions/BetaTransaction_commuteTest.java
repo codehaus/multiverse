@@ -20,8 +20,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUpdateBiased;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.assertUpdateBiased;
 
 public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
 

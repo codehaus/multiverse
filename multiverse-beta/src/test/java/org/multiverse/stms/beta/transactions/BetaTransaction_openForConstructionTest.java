@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.*;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
 
 public abstract class BetaTransaction_openForConstructionTest implements BetaStmConstants {
 
@@ -197,7 +197,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertRefHasUpdateLock(ref,otherTx);        
+        assertRefHasUpdateLock(ref,otherTx);
     }
 
     @Test

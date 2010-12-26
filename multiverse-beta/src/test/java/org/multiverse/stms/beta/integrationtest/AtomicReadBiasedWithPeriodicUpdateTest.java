@@ -10,8 +10,8 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasNoLocks;
 import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUpdateBiased;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.assertUpdateBiased;
 
 public class AtomicReadBiasedWithPeriodicUpdateTest {
 

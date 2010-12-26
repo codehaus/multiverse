@@ -14,8 +14,8 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertSurplus;
-import static org.multiverse.stms.beta.orec.OrecTestUtils.assertUpdateBiased;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.assertSurplus;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.assertUpdateBiased;
 
 public class BetaLongRef_get0Test {
     private BetaStm stm;

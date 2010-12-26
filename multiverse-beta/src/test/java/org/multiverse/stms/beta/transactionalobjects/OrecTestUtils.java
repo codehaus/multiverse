@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta.orec;
+package org.multiverse.stms.beta.transactionalobjects;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -9,39 +9,39 @@ import static org.junit.Assert.assertTrue;
  */
 public class OrecTestUtils {
 
-    public static void assertHasUpdateLock(Orec orec) {
+    public static void assertHasUpdateLock(BetaTransactionalObject orec) {
         assertTrue(orec.___hasUpdateLock());
     }
 
-    public static void assertHasNoUpdateLock(Orec orec) {
+    public static void assertHasNoUpdateLock(BetaTransactionalObject orec) {
         assertFalse(orec.___hasUpdateLock());
     }
 
-    public static void assertHasCommitLock(Orec orec) {
+    public static void assertHasCommitLock(BetaTransactionalObject orec) {
         assertTrue(orec.___hasCommitLock());
     }
 
-    public static void assertHasNoCommitLock(Orec orec) {
+    public static void assertHasNoCommitLock(BetaTransactionalObject orec) {
         assertFalse(orec.___hasCommitLock());
     }
 
-    public static void assertSurplus(int expectedSurplus, Orec orec) {
+    public static void assertSurplus(int expectedSurplus, BetaTransactionalObject orec) {
         assertEquals(expectedSurplus, orec.___getSurplus());
     }
 
-    public static void assertReadBiased(Orec orec) {
+    public static void assertReadBiased(BetaTransactionalObject orec) {
         assertTrue(orec.___isReadBiased());
     }
 
-    public static void assertUpdateBiased(Orec orec) {
+    public static void assertUpdateBiased(BetaTransactionalObject orec) {
         assertFalse(orec.___isReadBiased());
     }
 
-    public static void assertReadonlyCount(int expectedReadonlyCount, Orec orec) {
+    public static void assertReadonlyCount(int expectedReadonlyCount, BetaTransactionalObject orec) {
         assertEquals(expectedReadonlyCount, orec.___getReadonlyCount());
     }
 
-    public static <O extends Orec> O makeReadBiased(O orec) {
+    public static <O extends BetaTransactionalObject> O makeReadBiased(O orec) {
         if (orec.___isReadBiased()) {
             return orec;
         }
