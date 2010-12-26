@@ -9,7 +9,7 @@ import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 
 
 /**
- * The {@link BetaTranlocal} for the {@link BetaIntRef).
+ * The {@link BetaTranlocal} for the {@link BetaIntRef}.
  *
  * This class is generated.
  *

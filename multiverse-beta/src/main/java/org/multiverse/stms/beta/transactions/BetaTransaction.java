@@ -118,7 +118,7 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     /**
     * Returns the tranlocal that belongs to the given transactional object.
     *
-    * @returns the found tranlocal, or null if not found.
+    * @return the found tranlocal, or null if not found.
     */
     public abstract BetaTranlocal get(BetaTransactionalObject object);
 
