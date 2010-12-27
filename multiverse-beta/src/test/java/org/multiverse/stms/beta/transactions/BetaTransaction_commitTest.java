@@ -379,6 +379,69 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     // =========================== listeners =======================
 
     @Test
+    public void listeners_whenPostCommitListenerFails() {
+        assumeTrue(isSupportingListeners());
+
+        TransactionLifecycleListener listener1 = mock(TransactionLifecycleListener.class);
+        TransactionLifecycleListener listener2 = mock(TransactionLifecycleListener.class);
+        TransactionLifecycleListener listener3 = mock(TransactionLifecycleListener.class);
+
+
+        BetaTransaction tx = newTransaction();
+        tx.register(listener1);
+        tx.register(listener2);
+        tx.register(listener3);
+
+        doThrow(new MyException()).when(listener2).notify(tx, TransactionLifecycleEvent.PostCommit);
+
+        try {
+            tx.commit();
+            fail();
+        } catch (MyException expected) {
+
+        }
+
+        assertIsCommitted(tx);
+        verify(listener1).notify(tx, TransactionLifecycleEvent.PostCommit);
+        verify(listener2).notify(tx, TransactionLifecycleEvent.PostCommit);
+        verify(listener3, times(0)).notify(tx, TransactionLifecycleEvent.PostCommit);
+    }
+
+    @Test
+    public void listeners_whenPermanentListenerFailsWithPostCommit() {
+        assumeTrue(isSupportingListeners());
+
+        TransactionLifecycleListener listener1 = mock(TransactionLifecycleListener.class);
+        TransactionLifecycleListener listener2 = mock(TransactionLifecycleListener.class);
+        TransactionLifecycleListener listener3 = mock(TransactionLifecycleListener.class);
+
+        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
+                .addPermanentListener(listener1)
+                .addPermanentListener(listener2)
+                .addPermanentListener(listener3);
+
+
+        BetaTransaction tx = newTransaction(config);
+
+        doThrow(new MyException()).when(listener2).notify(tx, TransactionLifecycleEvent.PostCommit);
+
+        try {
+            tx.commit();
+            fail();
+        } catch (MyException expected) {
+
+        }
+
+        assertIsCommitted(tx);
+        verify(listener1).notify(tx, TransactionLifecycleEvent.PostCommit);
+        verify(listener2).notify(tx, TransactionLifecycleEvent.PostCommit);
+        verify(listener3, times(0)).notify(tx, TransactionLifecycleEvent.PostCommit);
+    }
+
+    class MyException extends RuntimeException {
+    }
+
+    @Test
     public void listeners_whenPermanentLifecycleListenerAvailable_thenNotified() {
         assumeTrue(isSupportingListeners());
 

@@ -228,12 +228,6 @@ globalconflict counter.
 
 - lifecyclelistener
 
-    - fat mono transaction: failing lifecyclelistener while committing
-
-    - fat array transaction: failing lifecyclelistener while committing
-
-    - fat arraytree transaction: failing lifecyclelistener while committing
-
     - listeners are not cleaned after abort/commit, so still a potential memory leak
 
     - speculative + register doesn't combine because it can lead to transaction not accepting the task and therefor
@@ -285,4 +279,16 @@ to fail anyway.
 - lockowner should be removed from ref. Can be accessed through the transaction. Is a bit more expensive
  but reduces another volatile write in the commit. This is complicated since the openForConstruction
  depends on it.
+
+- normal: fat mono transaction: failing lifecyclelistener while committing
+
+    - normal:fat array transaction: failing lifecyclelistener while committing
+
+    - normal:fat arraytree transaction: failing lifecyclelistener while committing
+
+- permanent: fat mono transaction: failing lifecyclelistener while committing
+
+    - permanent: fat array transaction: failing lifecyclelistener while committing
+
+    - permanent: fat arraytree transaction: failing lifecyclelistener while committing
 
