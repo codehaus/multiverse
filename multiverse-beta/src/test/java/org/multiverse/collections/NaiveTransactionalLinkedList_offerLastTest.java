@@ -50,11 +50,11 @@ public class NaiveTransactionalLinkedList_offerLastTest {
         execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                String item = "foo";
+                String item = "1";
                 list.offerLast(item);
 
                 assertEquals(1, list.size());
-                assertEquals("[foo]", list.toString());
+                assertEquals("[1]", list.toString());
             }
         });
     }
@@ -67,13 +67,12 @@ public class NaiveTransactionalLinkedList_offerLastTest {
         execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                String item1 = "foo";
-                String item2 = "bar";
-                list.offerLast(item1);
-                list.offerLast(item2);
+                list.offerLast("1");
+                list.offerLast("2");
+                list.offerLast("3");
 
-                assertEquals(2, list.size());
-                assertEquals("[foo, bar]", list.toString());
+                assertEquals(3, list.size());
+                assertEquals("[1, 2, 3]", list.toString());
             }
         });
     }
