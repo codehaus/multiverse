@@ -10,27 +10,13 @@ import java.util.Map;
 
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public final class NaiveTransactionalHashSet<E> implements TransactionalSet<E> {
+public final class NaiveTransactionalHashSet<E>  extends AbstractTransactionalCollection<E> implements TransactionalSet<E>{
 
-    private final Stm stm;
     private final NaiveTransactionalHashMap<E, Object> map;
 
     public NaiveTransactionalHashSet(Stm stm) {
-        if (stm == null) {
-            throw new NullPointerException();
-        }
-        this.stm = stm;
+        super(stm);
         this.map = new NaiveTransactionalHashMap<E, Object>(stm);
-    }
-
-    @Override
-    public Stm getStm() {
-        return stm;
-    }
-
-    @Override
-    public boolean add(E item) {
-        return add(getThreadLocalTransaction(), item);
     }
 
     @Override
@@ -59,43 +45,13 @@ public final class NaiveTransactionalHashSet<E> implements TransactionalSet<E> {
     }
 
     @Override
-    public int size() {
-        return size(getThreadLocalTransaction());
-    }
-
-    @Override
     public int size(Transaction tx) {
         return map.size(tx);
     }
 
     @Override
-    public boolean isEmpty() {
-        return isEmpty(getThreadLocalTransaction());
-    }
-
-    @Override
-    public boolean isEmpty(Transaction tx) {
-        return map.isEmpty(tx);
-    }
-
-    @Override
-    public void clear() {
-        clear(getThreadLocalTransaction());
-    }
-
-    @Override
     public void clear(Transaction tx) {
         map.clear(tx);
-    }
-
-    @Override
-    public String toString() {
-        return toString(getThreadLocalTransaction());
-    }
-
-    @Override
-    public TransactionalIterator<E> iterator() {
-        return iterator(getThreadLocalTransaction());
     }
 
     @Override

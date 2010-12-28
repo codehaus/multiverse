@@ -17,9 +17,9 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
  *
  * @param <E>
  */
-public final class NaiveTransactionalLinkedList<E> implements TransactionalDeque<E>, TransactionalList<E> {
+public final class NaiveTransactionalLinkedList<E> extends AbstractTransactionalCollection<E>
+        implements TransactionalDeque<E>, TransactionalList<E> {
 
-    private final Stm stm;
     private final int capacity;
     private final IntRef size;
     private final Ref<Node<E>> head;
@@ -30,15 +30,12 @@ public final class NaiveTransactionalLinkedList<E> implements TransactionalDeque
     }
 
     public NaiveTransactionalLinkedList(Stm stm, int capacity) {
-        if (stm == null) {
-            throw new NullPointerException();
-        }
+        super(stm);
 
         if (capacity < 0) {
             throw new IllegalArgumentException();
         }
 
-        this.stm = stm;
         this.capacity = capacity;
         this.size = stm.getDefaultRefFactory().newIntRef(0);
         this.head = stm.getDefaultRefFactory().newRef(null);
@@ -46,18 +43,8 @@ public final class NaiveTransactionalLinkedList<E> implements TransactionalDeque
     }
 
     @Override
-    public Stm getStm() {
-        return stm;
-    }
-
-    @Override
     public int getCapacity() {
         return capacity;
-    }
-
-    @Override
-    public boolean add(E item) {
-        return add(getThreadLocalTransaction(), item);
     }
 
     @Override
@@ -80,23 +67,8 @@ public final class NaiveTransactionalLinkedList<E> implements TransactionalDeque
     }
 
     @Override
-    public int size() {
-        return size(getThreadLocalTransaction());
-    }
-
-    @Override
     public int size(Transaction tx) {
         return size.get(tx);
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return isEmpty(getThreadLocalTransaction());
-    }
-
-    @Override
-    public boolean isEmpty(Transaction tx) {
-        return size(tx) == 0;
     }
 
     @Override
@@ -139,8 +111,8 @@ public final class NaiveTransactionalLinkedList<E> implements TransactionalDeque
     }
 
     @Override
-    public void clear() {
-        clear(getThreadLocalTransaction());
+    public boolean contains(Transaction tx, Object item) {
+        throw new TodoException();
     }
 
     @Override
@@ -405,17 +377,7 @@ public final class NaiveTransactionalLinkedList<E> implements TransactionalDeque
         return peekLast(tx);
     }
 
-    @Override
-    public String toString() {
-        return toString(getThreadLocalTransaction());
-    }
-
     // ================ misc ==========================
-
-    @Override
-    public TransactionalIterator<E> iterator() {
-        return iterator(getThreadLocalTransaction());
-    }
 
     @Override
     public TransactionalIterator<E> iterator(Transaction tx) {

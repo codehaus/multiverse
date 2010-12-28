@@ -2,18 +2,20 @@ package org.multiverse.collections;
 
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.collections.TransactionalCollection;
 import org.multiverse.api.collections.TransactionalIterator;
 import org.multiverse.api.collections.TransactionalStack;
+import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.references.IntRef;
 import org.multiverse.api.references.Ref;
 
+import java.util.Collection;
 import java.util.NoSuchElementException;
 
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public final class NaiveTransactionalStack<E> implements TransactionalStack<E> {
+public final class NaiveTransactionalStack<E> extends AbstractTransactionalCollection<E> implements TransactionalStack<E> {
 
-    private final Stm stm;
     private final int capacity;
     private final Ref<Node<E>> head;
     private final IntRef size;
@@ -23,28 +25,15 @@ public final class NaiveTransactionalStack<E> implements TransactionalStack<E> {
     }
 
     public NaiveTransactionalStack(Stm stm, int capacity) {
-        if (stm == null) {
-            throw new NullPointerException();
-        }
+        super(stm);
 
         if (capacity < 0) {
             throw new IllegalArgumentException();
         }
 
-        this.stm = stm;
         this.capacity = capacity;
         this.head = stm.getDefaultRefFactory().newRef(null);
         this.size = stm.getDefaultRefFactory().newIntRef(0);
-    }
-
-    @Override
-    public Stm getStm() {
-        return stm;
-    }
-
-    @Override
-    public int size() {
-        return size(getThreadLocalTransaction());
     }
 
     @Override
@@ -53,23 +42,8 @@ public final class NaiveTransactionalStack<E> implements TransactionalStack<E> {
     }
 
     @Override
-    public boolean isEmpty() {
-        return isEmpty(getThreadLocalTransaction());
-    }
-
-    @Override
-    public boolean isEmpty(Transaction tx) {
-        return size.get(tx) == 0;
-    }
-
-    @Override
     public int getCapacity() {
         return capacity;
-    }
-
-    @Override
-    public void clear() {
-        clear(getThreadLocalTransaction());
     }
 
     @Override
@@ -160,16 +134,6 @@ public final class NaiveTransactionalStack<E> implements TransactionalStack<E> {
     }
 
     @Override
-    public String toString() {
-        return toString(getThreadLocalTransaction());
-    }
-
-    @Override
-    public boolean add(E item) {
-        return add(getThreadLocalTransaction(), item);
-    }
-
-    @Override
     public boolean add(Transaction tx, E item) {
         if (!offer(tx, item)) {
             throw new IllegalStateException("NaiveTransactionalStack full");
@@ -179,8 +143,47 @@ public final class NaiveTransactionalStack<E> implements TransactionalStack<E> {
     }
 
     @Override
-    public TransactionalIterator<E> iterator() {
-        return iterator(getThreadLocalTransaction());
+    public boolean addAll(Collection<? extends E> c) {
+        return addAll(getThreadLocalTransaction(), c);
+    }
+
+    @Override
+    public boolean addAll(Transaction tx, Collection<? extends E> c) {
+        if (c == null) {
+            throw new NullPointerException();
+        }
+
+        if (c.isEmpty()) {
+            return false;
+        }
+
+        for (E item : c) {
+            add(tx, item);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean addAll(TransactionalCollection<? extends E> c) {
+        return addAll(getThreadLocalTransaction(), c);
+    }
+
+    @Override
+    public boolean addAll(Transaction tx, TransactionalCollection<? extends E> c) {
+        if (c == null) {
+            throw new NullPointerException();
+        }
+
+        if (c.isEmpty()) {
+            return false;
+        }
+
+        for (E item : c) {
+            add(tx, item);
+        }
+
+        return true;
     }
 
     @Override
@@ -188,7 +191,12 @@ public final class NaiveTransactionalStack<E> implements TransactionalStack<E> {
         return new It<E>(stm, head.get(tx));
     }
 
-    static class It<E> implements TransactionalIterator<E> {
+    @Override
+    public boolean contains(Transaction tx, Object item) {
+        throw new TodoException();
+    }
+
+    static class It<E> extends AbstractTransactionalIterator<E> {
         final Ref<Node<E>> node;
 
         It(Stm stm, Node<E> node) {
@@ -196,18 +204,8 @@ public final class NaiveTransactionalStack<E> implements TransactionalStack<E> {
         }
 
         @Override
-        public boolean hasNext() {
-            return hasNext(getThreadLocalTransaction());
-        }
-
-        @Override
         public boolean hasNext(Transaction tx) {
             return node.get() != null;
-        }
-
-        @Override
-        public E next() {
-            return next(getThreadLocalTransaction());
         }
 
         @Override
@@ -221,11 +219,6 @@ public final class NaiveTransactionalStack<E> implements TransactionalStack<E> {
             E value = n.value;
             node.set(tx, n.next);
             return value;
-        }
-
-        @Override
-        public void remove() {
-            remove(getThreadLocalTransaction());
         }
 
         @Override
