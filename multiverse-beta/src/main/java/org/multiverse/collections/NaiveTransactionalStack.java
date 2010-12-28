@@ -2,16 +2,19 @@ package org.multiverse.collections;
 
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.collections.TransactionalIterator;
 import org.multiverse.api.collections.TransactionalStack;
 import org.multiverse.api.references.IntRef;
 import org.multiverse.api.references.Ref;
 
+import java.util.NoSuchElementException;
+
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class NaiveTransactionalStack<E> implements TransactionalStack<E> {
+public final class NaiveTransactionalStack<E> implements TransactionalStack<E> {
 
     private final Stm stm;
-    private int capacity;
+    private final int capacity;
     private final Ref<Node<E>> head;
     private final IntRef size;
 
@@ -173,6 +176,62 @@ public class NaiveTransactionalStack<E> implements TransactionalStack<E> {
         }
 
         return true;
+    }
+
+    @Override
+    public TransactionalIterator<E> iterator() {
+        return iterator(getThreadLocalTransaction());
+    }
+
+    @Override
+    public TransactionalIterator<E> iterator(Transaction tx) {
+        return new StackIterator<E>(stm, head.get(tx));
+    }
+
+    static class StackIterator<E> implements TransactionalIterator<E> {
+        final Ref<Node<E>> node;
+
+        StackIterator(Stm stm, Node<E> node) {
+            this.node = stm.getDefaultRefFactory().newRef(node);
+        }
+
+        @Override
+        public boolean hasNext() {
+            return hasNext(getThreadLocalTransaction());
+        }
+
+        @Override
+        public boolean hasNext(Transaction tx) {
+            return node.get() != null;
+        }
+
+        @Override
+        public E next() {
+            return next(getThreadLocalTransaction());
+        }
+
+        @Override
+        public E next(Transaction tx) {
+            Node<E> n = node.get(tx);
+
+            if (n == null) {
+                throw new NoSuchElementException();
+            }
+
+            E value = n.value;
+            node.set(tx, n.next);
+            return value;
+        }
+
+        @Override
+        public void remove() {
+            remove(getThreadLocalTransaction());
+        }
+
+        @Override
+        public void remove(Transaction tx) {
+            throw new UnsupportedOperationException();
+        }
     }
 
     @Override

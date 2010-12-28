@@ -3,6 +3,7 @@ package org.multiverse.collections;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.collections.TransactionalDeque;
+import org.multiverse.api.collections.TransactionalIterator;
 import org.multiverse.api.collections.TransactionalList;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.references.IntRef;
@@ -16,7 +17,7 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
  *
  * @param <E>
  */
-public class NaiveTransactionalLinkedList<E> implements TransactionalDeque<E>, TransactionalList<E> {
+public final class NaiveTransactionalLinkedList<E> implements TransactionalDeque<E>, TransactionalList<E> {
 
     private final Stm stm;
     private final int capacity;
@@ -210,7 +211,7 @@ public class NaiveTransactionalLinkedList<E> implements TransactionalDeque<E>, T
 
     @Override
     public boolean offerFirst(Transaction tx, E item) {
-         if (item == null) {
+        if (item == null) {
             throw new NullPointerException();
         }
 
@@ -380,6 +381,18 @@ public class NaiveTransactionalLinkedList<E> implements TransactionalDeque<E>, T
         return toString(getThreadLocalTransaction());
     }
 
+    // ================ misc ==========================
+
+    @Override
+    public TransactionalIterator<E> iterator() {
+        return iterator(getThreadLocalTransaction());
+    }
+
+    @Override
+    public TransactionalIterator<E> iterator(Transaction tx) {
+        throw new TodoException();
+    }
+
     @Override
     public String toString(Transaction tx) {
         int s = size(tx);
@@ -390,13 +403,13 @@ public class NaiveTransactionalLinkedList<E> implements TransactionalDeque<E>, T
         StringBuffer sb = new StringBuffer();
         sb.append('[');
         Node<E> node = head.get(tx);
-        do{
+        do {
             sb.append(node.value);
             node = node.next.get(tx);
-            if(node!=null){
+            if (node != null) {
                 sb.append(", ");
             }
-        }while(node!=null);
+        } while (node != null);
         sb.append(']');
         return sb.toString();
     }

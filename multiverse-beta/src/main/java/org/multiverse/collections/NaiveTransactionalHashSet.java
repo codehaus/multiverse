@@ -5,9 +5,11 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.collections.TransactionalSet;
 import org.multiverse.api.exceptions.TodoException;
 
+import java.util.Iterator;
+
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class NaiveTransactionalHashSet<E> implements TransactionalSet<E> {
+public final class NaiveTransactionalHashSet<E> implements TransactionalSet<E> {
 
     private final Stm stm;
     private final NaiveTransactionalHashMap<E, Object> map;
@@ -86,8 +88,18 @@ public class NaiveTransactionalHashSet<E> implements TransactionalSet<E> {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return toString(getThreadLocalTransaction());
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return iterator(getThreadLocalTransaction());
+    }
+
+    @Override
+    public Iterator<E> iterator(Transaction tx) {
+        throw new TodoException();
     }
 
     @Override

@@ -41,8 +41,8 @@ public class NaiveTransactionalStack_clearTest {
          execute(new AtomicVoidClosure() {
              @Override
              public void execute(Transaction tx) throws Exception {
-                 stack.push("foo");
-                 stack.push("foo");
+                 stack.push("1");
+                 stack.push("2");
                  stack.clear();
                  assertTrue(stack.isEmpty());
                  assertEquals("[]", stack.toString());

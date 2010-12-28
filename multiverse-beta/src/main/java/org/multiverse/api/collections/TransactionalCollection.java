@@ -3,7 +3,7 @@ package org.multiverse.api.collections;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 
-public interface TransactionalCollection<E> {
+public interface TransactionalCollection<E> extends TransactionalIterable<E>{
 
     Stm getStm();
 
@@ -23,5 +23,5 @@ public interface TransactionalCollection<E> {
 
     boolean add(Transaction tx, E item);
 
-     String toString(Transaction tx);
+    String toString(Transaction tx);
 }

@@ -8,7 +8,7 @@ import org.multiverse.api.references.IntRef;
 
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class NaiveTransactionalHashMap<K, V> implements TransactionalMap<K, V> {
+public final class NaiveTransactionalHashMap<K, V> implements TransactionalMap<K, V> {
 
     private final IntRef size;
     private final Stm stm;

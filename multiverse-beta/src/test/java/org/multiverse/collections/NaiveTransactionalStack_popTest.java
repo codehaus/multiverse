@@ -30,7 +30,7 @@ public class NaiveTransactionalStack_popTest {
         execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                String item = "foo";
+                String item = "1";
                 stack.push(item);
 
                 String found = stack.pop();
@@ -46,15 +46,15 @@ public class NaiveTransactionalStack_popTest {
         execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                String item1 = "foo";
-                String item2 = "bar";
+                String item1 = "1";
+                String item2 = "2";
                 stack.push(item1);
                 stack.push(item2);
 
                 String found = stack.pop();
                 assertSame(found, item2);
                 assertEquals(1, stack.size());
-                assertEquals("[foo]", stack.toString());
+                assertEquals("[1]", stack.toString());
             }
         });
     }
