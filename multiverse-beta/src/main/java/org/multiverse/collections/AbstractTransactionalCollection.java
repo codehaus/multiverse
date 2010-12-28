@@ -4,7 +4,6 @@ import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.collections.TransactionalCollection;
 import org.multiverse.api.collections.TransactionalIterator;
-import org.multiverse.api.exceptions.TodoException;
 
 import java.util.Collection;
 
@@ -32,7 +31,7 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
     }
 
     @Override
-    public boolean isEmpty(Transaction tx) {
+    public boolean isEmpty(final Transaction tx) {
         return size(tx) == 0;
     }
 
@@ -47,33 +46,64 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
     }
 
     @Override
-    public boolean contains(Object item) {
+    public boolean contains(final Object item) {
         return contains(getThreadLocalTransaction(), item);
     }
 
     @Override
-    public boolean add(E item) {
+    public boolean add(final E item) {
         return add(getThreadLocalTransaction(), item);
     }
 
     @Override
-    public boolean addAll(Collection<? extends E> c) {
+    public boolean addAll(final Collection<? extends E> c) {
         return addAll(getThreadLocalTransaction(), c);
     }
 
     @Override
-    public boolean addAll(Transaction tx, Collection<? extends E> c) {
-       throw new TodoException();
+    public boolean addAll(final Transaction tx, final Collection<? extends E> c) {
+        if (c == null) {
+            throw new NullPointerException();
+        }
+
+        if (c.isEmpty()) {
+            return false;
+        }
+
+        boolean change = false;
+        for (E item : c) {
+            if (add(tx, item)) {
+                change = true;
+            }
+        }
+
+        return change;
     }
 
     @Override
-    public boolean addAll(TransactionalCollection<? extends E> c) {
-        return addAll(getThreadLocalTransaction(),c);
+    public boolean addAll(final TransactionalCollection<? extends E> c) {
+        return addAll(getThreadLocalTransaction(), c);
     }
 
     @Override
-    public boolean addAll(Transaction tx, TransactionalCollection<? extends E> c) {
-        throw new TodoException();
+    public boolean addAll(final Transaction tx, final TransactionalCollection<? extends E> c) {
+        if (c == null) {
+            throw new NullPointerException();
+        }
+
+        if (c.isEmpty(tx)) {
+            return false;
+        }
+
+        boolean change = false;
+        for (TransactionalIterator<? extends E> it = c.iterator(tx);it.hasNext(tx);) {
+
+            if(add(tx, it.next(tx))){
+                change = true;
+            }
+        }
+
+        return change;
     }
 
     @Override

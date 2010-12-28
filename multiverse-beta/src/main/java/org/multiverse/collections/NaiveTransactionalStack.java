@@ -2,14 +2,12 @@ package org.multiverse.collections;
 
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.collections.TransactionalCollection;
 import org.multiverse.api.collections.TransactionalIterator;
 import org.multiverse.api.collections.TransactionalStack;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.references.IntRef;
 import org.multiverse.api.references.Ref;
 
-import java.util.Collection;
 import java.util.NoSuchElementException;
 
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
@@ -137,50 +135,6 @@ public final class NaiveTransactionalStack<E> extends AbstractTransactionalColle
     public boolean add(Transaction tx, E item) {
         if (!offer(tx, item)) {
             throw new IllegalStateException("NaiveTransactionalStack full");
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends E> c) {
-        return addAll(getThreadLocalTransaction(), c);
-    }
-
-    @Override
-    public boolean addAll(Transaction tx, Collection<? extends E> c) {
-        if (c == null) {
-            throw new NullPointerException();
-        }
-
-        if (c.isEmpty()) {
-            return false;
-        }
-
-        for (E item : c) {
-            add(tx, item);
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean addAll(TransactionalCollection<? extends E> c) {
-        return addAll(getThreadLocalTransaction(), c);
-    }
-
-    @Override
-    public boolean addAll(Transaction tx, TransactionalCollection<? extends E> c) {
-        if (c == null) {
-            throw new NullPointerException();
-        }
-
-        if (c.isEmpty()) {
-            return false;
-        }
-
-        for (E item : c) {
-            add(tx, item);
         }
 
         return true;
