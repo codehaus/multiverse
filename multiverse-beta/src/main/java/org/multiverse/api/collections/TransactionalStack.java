@@ -1,21 +1,10 @@
 package org.multiverse.api.collections;
 
-import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 
-public interface TransactionalStack<E> {
-
-    Stm getStm();
+public interface TransactionalStack<E> extends TransactionalCollection<E> {
 
     int getCapacity();
-
-    int size();
-
-    int size(Transaction tx);
-
-    boolean isEmpty();
-
-    boolean isEmpty(Transaction tx);
 
     void push(E item);
 
@@ -36,10 +25,4 @@ public interface TransactionalStack<E> {
     E peek();
 
     E peek(Transaction tx);
-
-    void clear();
-
-    void clear(Transaction tx);
-
-    String toString(Transaction tx);
 }

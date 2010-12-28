@@ -1,19 +1,8 @@
 package org.multiverse.api.collections;
 
-import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 
-public interface TransactionalQueue<E> {
-
-    Stm getStm();
-
-    int size();
-
-    int size(Transaction tx);
-
-    boolean isEmpty();
-
-    boolean isEmpty(Transaction tx);
+public interface TransactionalQueue<E> extends TransactionalCollection<E>{
 
     int getCapacity();
 
@@ -37,9 +26,4 @@ public interface TransactionalQueue<E> {
 
     E peek(Transaction tx);
 
-    void clear();
-
-    void clear(Transaction tx);
-
-    String toString(Transaction tx);
 }

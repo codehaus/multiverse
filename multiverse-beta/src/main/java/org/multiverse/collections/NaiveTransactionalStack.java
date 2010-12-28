@@ -162,6 +162,20 @@ public class NaiveTransactionalStack<E> implements TransactionalStack<E> {
     }
 
     @Override
+    public boolean add(E item) {
+        return add(getThreadLocalTransaction(), item);
+    }
+
+    @Override
+    public boolean add(Transaction tx, E item) {
+        if (!offer(tx, item)) {
+            throw new IllegalStateException("NaiveTransactionalStack full");
+        }
+
+        return true;
+    }
+
+    @Override
     public String toString(Transaction tx) {
         int s = size.get(tx);
         if (s == 0) {
@@ -174,7 +188,7 @@ public class NaiveTransactionalStack<E> implements TransactionalStack<E> {
         while (node != null) {
             sb.append(node.value);
             node = node.next;
-            if(node!=null){
+            if (node != null) {
                 sb.append(", ");
             }
         }

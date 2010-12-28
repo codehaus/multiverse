@@ -1,27 +1,8 @@
 package org.multiverse.api.collections;
 
-import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 
-public interface TransactionalList<E>{
-
-    Stm getStm();
-
-    boolean isEmpty();
-
-    boolean isEmpty(Transaction tx);
-
-    int size();
-
-    int size(Transaction tx);
-
-    void clear();
-
-    void clear(Transaction tx);
-
-    boolean add(E item);
-
-    boolean add(Transaction tx, E item);
+public interface TransactionalList<E> extends TransactionalCollection<E>{
 
     E get(int index);
 
@@ -30,6 +11,4 @@ public interface TransactionalList<E>{
     E remove(int index);
 
     E remove(Transaction tx, int index);
-
-    String toString(Transaction tx);
 }

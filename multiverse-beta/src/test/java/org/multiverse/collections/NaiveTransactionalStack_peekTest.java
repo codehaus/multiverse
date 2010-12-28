@@ -5,11 +5,8 @@ import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.collections.NaiveTransactionalStack;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.execute;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -43,13 +40,11 @@ public class NaiveTransactionalStack_peekTest {
         execute(new AtomicVoidClosure(){
             @Override
             public void execute(Transaction tx) throws Exception {
-                String item1 = "foo";
-                String item2 = "bar";
-                stack.push(item1);
-                stack.push(item2);
+                stack.push("1");
+                stack.push("2");
                 String s = stack.peek();
-                assertSame(item2,s);
-                assertEquals("[bar, foo]", stack.toString());
+                assertSame("2",s);
+                assertEquals("[2, 1]", stack.toString());
             }
         });
     }

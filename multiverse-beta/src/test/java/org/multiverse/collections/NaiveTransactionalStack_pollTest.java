@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.collections.NaiveTransactionalStack;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -37,36 +36,33 @@ public class NaiveTransactionalStack_pollTest {
     }
 
     @Test
-    public void whenSingleItem(){
-         execute(new AtomicVoidClosure() {
-             @Override
-             public void execute(Transaction tx) throws Exception {
-                 String item = "foo";
-                 stack.push(item);
+    public void whenSingleItem() {
+        execute(new AtomicVoidClosure() {
+            @Override
+            public void execute(Transaction tx) throws Exception {
+                stack.push("1");
 
-                 String found = stack.poll();
-                 assertSame(item, found);
-                 assertTrue(stack.isEmpty());
-                 assertEquals("[]", stack.toString());
-             }
-         });
+                String found = stack.poll();
+                assertEquals("1", found);
+                assertTrue(stack.isEmpty());
+                assertEquals("[]", stack.toString());
+            }
+        });
     }
 
-     @Test
-    public void whenMultipleItem(){
-         execute(new AtomicVoidClosure() {
-             @Override
-             public void execute(Transaction tx) throws Exception {
-                 String item1 = "foo";
-                 String item2 = "bar";
-                 stack.push(item1);
-                 stack.push(item2);
+    @Test
+    public void whenMultipleItem() {
+        execute(new AtomicVoidClosure() {
+            @Override
+            public void execute(Transaction tx) throws Exception {
+                stack.push("1");
+                stack.push("2");
 
-                 String found = stack.poll();
-                 assertSame(item2, found);
-                 assertEquals(1, stack.size());
-                 assertEquals("[foo]", stack.toString());
-             }
-         });
+                String found = stack.poll();
+                assertEquals("2", found);
+                assertEquals(1, stack.size());
+                assertEquals("[1]", stack.toString());
+            }
+        });
     }
 }
