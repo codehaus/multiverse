@@ -51,13 +51,22 @@ public final class NaiveTransactionalLinkedList<E> implements TransactionalDeque
     }
 
     @Override
+    public int getCapacity() {
+        return capacity;
+    }
+
+    @Override
     public boolean add(E item) {
         return add(getThreadLocalTransaction(), item);
     }
 
     @Override
     public boolean add(Transaction tx, E item) {
-        throw new TodoException();
+        if (!offer(tx, item)) {
+            throw new IllegalStateException("NaiveTransactionalLinkedList full");
+        }
+
+        return true;
     }
 
     @Override
@@ -91,22 +100,32 @@ public final class NaiveTransactionalLinkedList<E> implements TransactionalDeque
     }
 
     @Override
-    public int getCapacity() {
-        return capacity;
-    }
-
-    @Override
     public E get(int index) {
-        if (index < 0) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        throw new TodoException();
+        return get(getThreadLocalTransaction(), index);
     }
 
     @Override
     public E get(Transaction tx, int index) {
-        throw new TodoException();
+        if (index < 0) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        int s = size.get(tx);
+        if (index >= s) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        //todo: make choice between searching in the end or front.
+
+        int i = 0;
+        Node<E> node = head.get(tx);
+        while (true) {
+            if (i == index) {
+                return node.value;
+            }
+            node = node.next.get(tx);
+            i++;
+        }
     }
 
     @Override

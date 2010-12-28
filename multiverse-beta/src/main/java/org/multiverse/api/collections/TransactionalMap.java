@@ -31,5 +31,9 @@ public interface TransactionalMap<K, V> {
 
     V remove(Transaction tx, Object key);
 
+    TransactionalIterable<K> keySet();
+
+    TransactionalIterable<K> keySet(Transaction tx);
+
     String toString(Transaction tx);
 }

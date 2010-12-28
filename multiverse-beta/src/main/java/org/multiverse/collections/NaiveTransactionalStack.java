@@ -185,13 +185,13 @@ public final class NaiveTransactionalStack<E> implements TransactionalStack<E> {
 
     @Override
     public TransactionalIterator<E> iterator(Transaction tx) {
-        return new StackIterator<E>(stm, head.get(tx));
+        return new It<E>(stm, head.get(tx));
     }
 
-    static class StackIterator<E> implements TransactionalIterator<E> {
+    static class It<E> implements TransactionalIterator<E> {
         final Ref<Node<E>> node;
 
-        StackIterator(Stm stm, Node<E> node) {
+        It(Stm stm, Node<E> node) {
             this.node = stm.getDefaultRefFactory().newRef(node);
         }
 

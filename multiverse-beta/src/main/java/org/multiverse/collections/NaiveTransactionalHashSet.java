@@ -2,10 +2,11 @@ package org.multiverse.collections;
 
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.collections.TransactionalIterator;
 import org.multiverse.api.collections.TransactionalSet;
 import org.multiverse.api.exceptions.TodoException;
 
-import java.util.Iterator;
+import java.util.Map;
 
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
@@ -93,13 +94,51 @@ public final class NaiveTransactionalHashSet<E> implements TransactionalSet<E> {
     }
 
     @Override
-    public Iterator<E> iterator() {
+    public TransactionalIterator<E> iterator() {
         return iterator(getThreadLocalTransaction());
     }
 
     @Override
-    public Iterator<E> iterator(Transaction tx) {
-        throw new TodoException();
+    public TransactionalIterator<E> iterator(Transaction tx) {
+        return map.keySet(tx).iterator(tx);
+    }
+
+    static class It<E> implements TransactionalIterator<E> {
+
+        private final TransactionalIterator<Map.Entry<E, Object>> iterator;
+
+        It(TransactionalIterator<Map.Entry<E, Object>> iterator) {
+            this.iterator = iterator;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return hasNext(getThreadLocalTransaction());
+        }
+
+        @Override
+        public boolean hasNext(Transaction tx) {
+            return iterator.hasNext(tx);
+        }
+
+        @Override
+        public E next() {
+            return next(getThreadLocalTransaction());
+        }
+        @Override
+        public E next(Transaction tx) {
+            return iterator.next(tx).getKey();
+        }
+
+        @Override
+        public void remove() {
+            remove(getThreadLocalTransaction());
+        }
+
+        @Override
+        public void remove(Transaction tx) {
+            iterator.remove(tx);
+        }
     }
 
     @Override

@@ -2,6 +2,7 @@ package org.multiverse.collections;
 
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.collections.TransactionalIterable;
 import org.multiverse.api.collections.TransactionalMap;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.references.IntRef;
@@ -101,6 +102,14 @@ public final class NaiveTransactionalHashMap<K, V> implements TransactionalMap<K
 
     @Override
     public String toString(Transaction tx) {
+        throw new TodoException();
+    }
+
+    public TransactionalIterable<K> keySet(){
+        return keySet(getThreadLocalTransaction());
+    }
+
+    public TransactionalIterable<K> keySet(Transaction tx) {
         throw new TodoException();
     }
 }
