@@ -81,21 +81,26 @@ public class NaiveTransactionalLinkedList_get_int_test {
 
     @Test
     public void whenMultipleItems() {
-          execute(new AtomicVoidClosure() {
+        execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
                 list.add("1");
                 list.add("2");
                 list.add("3");
                 list.add("4");
+                list.add("5");
+                list.add("6");
 
                 assertEquals("1", list.get(0));
                 assertEquals("2", list.get(1));
                 assertEquals("3", list.get(2));
                 assertEquals("4", list.get(3));
+                assertEquals("5", list.get(4));
+                assertEquals("6", list.get(5));
 
-                assertEquals("[1, 2, 3, 4]", list.toString());
-                assertEquals(4, list.size());
+
+                assertEquals("[1, 2, 3, 4, 5, 6]", list.toString());
+                assertEquals(6, list.size());
             }
         });
     }

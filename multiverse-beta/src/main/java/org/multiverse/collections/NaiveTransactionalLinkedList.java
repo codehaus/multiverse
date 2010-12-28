@@ -115,16 +115,26 @@ public final class NaiveTransactionalLinkedList<E> implements TransactionalDeque
             throw new IndexOutOfBoundsException();
         }
 
-        //todo: make choice between searching in the end or front.
-
-        int i = 0;
-        Node<E> node = head.get(tx);
-        while (true) {
-            if (i == index) {
-                return node.value;
+        if (index < (s >> 1)) {
+            int i = 0;
+            Node<E> node = head.get(tx);
+            while (true) {
+                if (i == index) {
+                    return node.value;
+                }
+                node = node.next.get(tx);
+                i++;
             }
-            node = node.next.get(tx);
-            i++;
+        } else {
+            int i = s-1;
+            Node<E> node = tail.get(tx);
+            while (true) {
+                if (i == index) {
+                    return node.value;
+                }
+                node = node.previous.get(tx);
+                i--;
+            }
         }
     }
 
