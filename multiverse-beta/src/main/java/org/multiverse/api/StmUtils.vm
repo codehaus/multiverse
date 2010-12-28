@@ -1,6 +1,7 @@
 package org.multiverse.api;
 
 import org.multiverse.api.closures.*;
+import org.multiverse.api.collections.*;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.lifecycle.*;
 import org.multiverse.api.references.*;
@@ -24,6 +25,40 @@ public class StmUtils {
         = getGlobalStmInstance().getDefaultAtomicBlock();
     private final static OrElseBlock orelseBlock
         = getGlobalStmInstance().createOrElseBlock();
+    private final static TransactionalCollectionsFactory transactionalCollectionsFactory
+        = getGlobalStmInstance().getDefaultTransactionalCollectionFactory();
+
+    public static <E> TransactionalStack<E> newStack(){
+        return transactionalCollectionsFactory.newStack();
+    }
+
+    public static <E> TransactionalStack<E> newStack(int capacity){
+        return transactionalCollectionsFactory.newStack(capacity);
+    }
+
+    public static <E> TransactionalQueue<E> newQueue(){
+        return transactionalCollectionsFactory.newQueue();
+    }
+
+    public static <E> TransactionalQueue<E> newQueue(int capacity){
+        return transactionalCollectionsFactory.newQueue(capacity);
+    }
+
+    public static <E> TransactionalDeque<E> newDeque(){
+        return transactionalCollectionsFactory.newDeque();
+    }
+
+    public static <E> TransactionalDeque<E> newDeque(int capacity){
+        return transactionalCollectionsFactory.newDeque(capacity);
+    }
+
+    public static <E> TransactionalSet<E> newHashSet(){
+        return transactionalCollectionsFactory.newHashSet();
+    }
+
+    public static <K, V> TransactionalMap<K, V> newHashMap(){
+        return transactionalCollectionsFactory.newHashMap();
+    }
 
 #foreach($closure in $closures)
     /**

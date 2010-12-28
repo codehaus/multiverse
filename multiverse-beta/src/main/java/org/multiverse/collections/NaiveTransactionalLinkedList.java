@@ -1,7 +1,9 @@
-package org.multiverse.api.collections;
+package org.multiverse.collections;
 
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.collections.TransactionalDeque;
+import org.multiverse.api.collections.TransactionalList;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.references.IntRef;
 import org.multiverse.api.references.Ref;
@@ -13,7 +15,7 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
  *
  * @param <E>
  */
-public class NaiveTransactionalLinkedList<E> implements TransactionalQueue<E>, TransactionalList<E> {
+public class NaiveTransactionalLinkedList<E> implements TransactionalDeque<E>, TransactionalList<E> {
 
     private final Stm stm;
     private final int capacity;
@@ -44,6 +46,26 @@ public class NaiveTransactionalLinkedList<E> implements TransactionalQueue<E>, T
     @Override
     public Stm getStm() {
         return stm;
+    }
+
+    @Override
+    public boolean add(E item) {
+        return add(getThreadLocalTransaction(),item);
+    }
+
+    @Override
+    public boolean add(Transaction tx, E item) {
+        throw new TodoException();
+    }
+
+    @Override
+    public E remove(int index) {
+        return remove(getThreadLocalTransaction(), index);
+    }
+
+    @Override
+    public E remove(Transaction tx, int index) {
+        throw new TodoException();
     }
 
     @Override

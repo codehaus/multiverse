@@ -1,5 +1,6 @@
 package org.multiverse.api;
 
+import org.multiverse.api.collections.TransactionalCollectionsFactory;
 import org.multiverse.api.references.RefFactory;
 import org.multiverse.api.references.RefFactoryBuilder;
 
@@ -61,6 +62,8 @@ public interface Stm {
      * @return the TransactionFactoryBuilder that needs to be used to execute transactions on this Stm.
      */
     TransactionFactoryBuilder createTransactionFactoryBuilder();
+
+    TransactionalCollectionsFactory getDefaultTransactionalCollectionFactory();
 
     /**
      * Gets the {@link org.multiverse.api.references.RefFactoryBuilder}.

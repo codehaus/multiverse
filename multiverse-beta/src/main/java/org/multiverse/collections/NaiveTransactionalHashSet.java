@@ -1,16 +1,17 @@
-package org.multiverse.api.collections;
+package org.multiverse.collections;
 
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.collections.TransactionalSet;
 
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public class NaiveHashSet<E> implements TransactionalSet<E> {
+public class NaiveTransactionalHashSet<E> implements TransactionalSet<E> {
 
     private final Stm stm;
     private final NaiveTransactionalHashMap<E, Object> map;
 
-    public NaiveHashSet(Stm stm) {
+    public NaiveTransactionalHashSet(Stm stm) {
         if (stm == null) {
             throw new NullPointerException();
         }

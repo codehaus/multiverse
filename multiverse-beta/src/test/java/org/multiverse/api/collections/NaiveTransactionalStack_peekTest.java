@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
+import org.multiverse.collections.NaiveTransactionalStack;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;

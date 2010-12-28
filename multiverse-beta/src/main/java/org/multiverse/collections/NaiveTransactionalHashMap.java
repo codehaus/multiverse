@@ -1,7 +1,8 @@
-package org.multiverse.api.collections;
+package org.multiverse.collections;
 
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.collections.TransactionalMap;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.references.IntRef;
 
