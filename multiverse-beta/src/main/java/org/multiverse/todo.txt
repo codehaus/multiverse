@@ -219,7 +219,11 @@ performance.
                             todo
 ----------------------------------------------------------------------
 
-- orelse: testing
+- orelse:
+
+    - testing
+
+    - problem with the registration in the retry itself.
 
 - tracing
 
@@ -229,9 +233,6 @@ globalconflict counter.
 - lifecyclelistener
 
     - listeners are not cleaned after abort/commit, so still a potential memory leak
-
-    - speculative + register doesn't combine because it can lead to transaction not accepting the task and therefor
-    the task not being executed at all.
 
 - inconsistent read
 
