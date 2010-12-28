@@ -3,6 +3,7 @@ package org.multiverse.collections;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.collections.TransactionalSet;
+import org.multiverse.api.exceptions.TodoException;
 
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
@@ -82,5 +83,15 @@ public class NaiveTransactionalHashSet<E> implements TransactionalSet<E> {
     @Override
     public void clear(Transaction tx) {
         map.clear(tx);
+    }
+
+    @Override
+    public String toString(){
+        return toString(getThreadLocalTransaction());
+    }
+
+    @Override
+    public String toString(Transaction tx) {
+        throw new TodoException();
     }
 }

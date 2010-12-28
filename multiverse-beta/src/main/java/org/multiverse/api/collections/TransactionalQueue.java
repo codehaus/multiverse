@@ -40,4 +40,6 @@ public interface TransactionalQueue<E> {
     void clear();
 
     void clear(Transaction tx);
+
+    String toString(Transaction tx);
 }

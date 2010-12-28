@@ -1,4 +1,4 @@
-package org.multiverse.api.collections;
+package org.multiverse.collections;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -7,6 +7,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.collections.NaiveTransactionalStack;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -32,6 +33,7 @@ public class NaiveTransactionalStack_peekTest {
             public void execute(Transaction tx) throws Exception {
                 String s = stack.peek();
                 assertNull(s);
+                assertEquals("[]", stack.toString());
             }
         });
     }
@@ -47,6 +49,7 @@ public class NaiveTransactionalStack_peekTest {
                 stack.push(item2);
                 String s = stack.peek();
                 assertSame(item2,s);
+                assertEquals("[bar, foo]", stack.toString());
             }
         });
     }

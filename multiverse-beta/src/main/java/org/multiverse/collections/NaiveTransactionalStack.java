@@ -6,7 +6,6 @@ import org.multiverse.api.collections.TransactionalStack;
 import org.multiverse.api.references.IntRef;
 import org.multiverse.api.references.Ref;
 
-import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 public class NaiveTransactionalStack<E> implements TransactionalStack<E> {
@@ -157,6 +156,31 @@ public class NaiveTransactionalStack<E> implements TransactionalStack<E> {
         return node.value;
     }
 
+    @Override
+    public String toString() {
+        return toString(getThreadLocalTransaction());
+    }
+
+    @Override
+    public String toString(Transaction tx) {
+        int s = size.get(tx);
+        if (s == 0) {
+            return "[]";
+        }
+
+        StringBuffer sb = new StringBuffer("[");
+        Node<E> node = head.get();
+
+        while (node != null) {
+            sb.append(node.value);
+            node = node.next;
+            if(node!=null){
+                sb.append(", ");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
 
     static class Node<E> {
         final Node<E> next;

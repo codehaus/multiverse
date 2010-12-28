@@ -30,4 +30,6 @@ public interface TransactionalSet<E> {
     void clear();
 
     void clear(Transaction tx);
+
+    String toString(Transaction tx);
 }

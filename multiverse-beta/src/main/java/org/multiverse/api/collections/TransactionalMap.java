@@ -30,4 +30,6 @@ public interface TransactionalMap<K, V> {
     V remove(Object key);
 
     V remove(Transaction tx, Object key);
+
+    String toString(Transaction tx);
 }

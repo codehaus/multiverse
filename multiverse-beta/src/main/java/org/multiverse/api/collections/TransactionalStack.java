@@ -7,6 +7,8 @@ public interface TransactionalStack<E> {
 
     Stm getStm();
 
+    int getCapacity();
+
     int size();
 
     int size(Transaction tx);
@@ -14,8 +16,6 @@ public interface TransactionalStack<E> {
     boolean isEmpty();
 
     boolean isEmpty(Transaction tx);
-
-    int getCapacity();
 
     void push(E item);
 
@@ -40,4 +40,6 @@ public interface TransactionalStack<E> {
     void clear();
 
     void clear(Transaction tx);
+
+    String toString(Transaction tx);
 }

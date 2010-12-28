@@ -1,10 +1,6 @@
 package org.multiverse.collections;
 
 import org.multiverse.api.collections.*;
-import org.multiverse.collections.NaiveTransactionalHashMap;
-import org.multiverse.collections.NaiveTransactionalHashSet;
-import org.multiverse.collections.NaiveTransactionalLinkedList;
-import org.multiverse.collections.NaiveTransactionalStack;
 import org.multiverse.stms.beta.BetaStm;
 
 public final class NaiveTransactionalCollectionFactory implements TransactionalCollectionsFactory {

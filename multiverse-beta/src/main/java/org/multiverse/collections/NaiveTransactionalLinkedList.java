@@ -8,6 +8,7 @@ import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.references.IntRef;
 import org.multiverse.api.references.Ref;
 
+import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 /**
@@ -50,7 +51,7 @@ public class NaiveTransactionalLinkedList<E> implements TransactionalDeque<E>, T
 
     @Override
     public boolean add(E item) {
-        return add(getThreadLocalTransaction(),item);
+        return add(getThreadLocalTransaction(), item);
     }
 
     @Override
@@ -94,42 +95,6 @@ public class NaiveTransactionalLinkedList<E> implements TransactionalDeque<E>, T
     }
 
     @Override
-    public boolean offer(E item) {
-        return offer(getThreadLocalTransaction(), item);
-    }
-
-    @Override
-    public boolean offer(Transaction tx, E item) {
-        if (size.get(tx) == capacity) {
-            return false;
-        }
-
-        put(tx, item);
-        return true;
-    }
-
-    @Override
-    public E peek() {
-        return peek(getThreadLocalTransaction());
-    }
-
-    @Override
-    public E peek(Transaction tx) {
-        Node<E> t = tail.get();
-        return t == null ? null : t.value;
-    }
-
-    @Override
-    public E poll() {
-        return poll(getThreadLocalTransaction());
-    }
-
-    @Override
-    public E poll(Transaction tx) {
-        throw new TodoException();
-    }
-
-    @Override
     public E get(int index) {
         if (index < 0) {
             throw new IndexOutOfBoundsException();
@@ -159,6 +124,19 @@ public class NaiveTransactionalLinkedList<E> implements TransactionalDeque<E>, T
         tail.set(tx, null);
     }
 
+    // ================ puts ==========================
+
+    @Override
+    public void putFirst(E item) {
+        putFirst(getThreadLocalTransaction(), item);
+    }
+
+    @Override
+    public void putFirst(Transaction tx, E item) {
+        if (!offerFirst(tx, item)) {
+            tx.retry();
+        }
+    }
 
     @Override
     public void put(E item) {
@@ -167,14 +145,78 @@ public class NaiveTransactionalLinkedList<E> implements TransactionalDeque<E>, T
 
     @Override
     public void put(Transaction tx, E item) {
+        putLast(tx, item);
+    }
+
+    @Override
+    public void putLast(E item) {
+        putLast(getRequiredThreadLocalTransaction(), item);
+    }
+
+    @Override
+    public void putLast(Transaction tx, E item) {
+        if (!offerLast(tx, item)) {
+            tx.retry();
+        }
+    }
+
+    // ================== takes ===============================
+
+    @Override
+    public E take() {
+        return take(getThreadLocalTransaction());
+    }
+
+    @Override
+    public E take(Transaction tx) {
+        return takeLast(tx);
+    }
+
+    @Override
+    public E takeFirst() {
+        return takeFirst(getThreadLocalTransaction());
+    }
+
+    @Override
+    public E takeFirst(Transaction tx) {
+        E item = pollFirst(tx);
         if (item == null) {
+            tx.retry();
+        }
+        return item;
+    }
+
+    @Override
+    public E takeLast() {
+        return takeLast(getThreadLocalTransaction());
+    }
+
+    @Override
+    public E takeLast(Transaction tx) {
+        E item = pollLast(tx);
+        if (item == null) {
+            tx.retry();
+        }
+
+        return item;
+    }
+
+    // ================== offers ========================
+
+    @Override
+    public boolean offerFirst(E e) {
+        return offerFirst(getThreadLocalTransaction(), e);
+    }
+
+    @Override
+    public boolean offerFirst(Transaction tx, E item) {
+         if (item == null) {
             throw new NullPointerException();
         }
 
-        int s = size.get(tx);
-
+        int s = size.get();
         if (s == capacity) {
-            tx.retry();
+            return false;
         }
 
         Node<E> node = new Node<E>(stm, item);
@@ -187,19 +229,90 @@ public class NaiveTransactionalLinkedList<E> implements TransactionalDeque<E>, T
             head.set(tx, node);
         }
         size.increment(tx);
+        return true;
     }
 
     @Override
-    public E take() {
-        return take(getThreadLocalTransaction());
+    public boolean offerLast(E e) {
+        return offerLast(getThreadLocalTransaction(), e);
     }
 
     @Override
-    public E take(Transaction tx) {
+    public boolean offerLast(Transaction tx, E item) {
+        if (item == null) {
+            throw new NullPointerException();
+        }
+
+        int s = size.get();
+        if (s == capacity) {
+            return false;
+        }
+
+        Node<E> node = new Node<E>(stm, item);
+        if (s == 0) {
+            head.set(tx, node);
+            tail.set(tx, node);
+        } else {
+            node.previous.set(tx, tail.get(tx));
+            tail.get(tx).next.set(tx, node);
+            tail.set(tx, node);
+        }
+        size.increment(tx);
+        return true;
+    }
+
+    @Override
+    public boolean offer(E item) {
+        return offer(getThreadLocalTransaction(), item);
+    }
+
+    @Override
+    public boolean offer(Transaction tx, E item) {
+        return offerLast(tx, item);
+    }
+
+    // ================ polls =======================
+
+    @Override
+    public E pollFirst() {
+        return pollFirst(getThreadLocalTransaction());
+    }
+
+    @Override
+    public E pollFirst(Transaction tx) {
         int s = size.get(tx);
 
         if (s == 0) {
-            tx.retry();
+            return null;
+        }
+
+        E item;
+        if (s == 1) {
+            item = tail.get(tx).value;
+            head.set(tx, null);
+            tail.set(tx, null);
+        } else {
+            Node<E> oldHead = head.get(tx);
+            item = oldHead.value;
+            Node<E> newHead = oldHead.next.get(tx);
+            head.set(tx, newHead);
+            newHead.previous.set(tx, null);
+        }
+        size.decrement(tx);
+        return item;
+    }
+
+    @Override
+    public E pollLast() {
+        return pollLast(getThreadLocalTransaction());
+    }
+
+    @Override
+    public E pollLast(Transaction tx) {
+        int s = size.get(tx);
+
+        if (s == 0) {
+            return null;
         }
 
         E item;
@@ -216,6 +329,76 @@ public class NaiveTransactionalLinkedList<E> implements TransactionalDeque<E>, T
         }
         size.decrement(tx);
         return item;
+    }
+
+    @Override
+    public E poll() {
+        return poll(getThreadLocalTransaction());
+    }
+
+    @Override
+    public E poll(Transaction tx) {
+        return pollLast(tx);
+    }
+
+    // =============== peeks =================
+
+    @Override
+    public E peekFirst() {
+        return peekFirst(getThreadLocalTransaction());
+    }
+
+    @Override
+    public E peekFirst(Transaction tx) {
+        Node<E> h = head.get(tx);
+        return h == null ? null : h.value;
+    }
+
+    @Override
+    public E peekLast() {
+        return peekLast(getThreadLocalTransaction());
+    }
+
+    @Override
+    public E peekLast(Transaction tx) {
+        Node<E> t = tail.get(tx);
+        return t == null ? null : t.value;
+    }
+
+    @Override
+    public E peek() {
+        return peek(getThreadLocalTransaction());
+    }
+
+    @Override
+    public E peek(Transaction tx) {
+        return peekLast(tx);
+    }
+
+    @Override
+    public String toString() {
+        return toString(getThreadLocalTransaction());
+    }
+
+    @Override
+    public String toString(Transaction tx) {
+        int s = size(tx);
+        if (s == 0) {
+            return "[]";
+        }
+
+        StringBuffer sb = new StringBuffer();
+        sb.append('[');
+        Node<E> node = head.get(tx);
+        do{
+            sb.append(node.value);
+            node = node.next.get(tx);
+            if(node!=null){
+                sb.append(", ");
+            }
+        }while(node!=null);
+        sb.append(']');
+        return sb.toString();
     }
 
     static class Node<E> {

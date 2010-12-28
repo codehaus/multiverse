@@ -1,11 +1,10 @@
-package org.multiverse.api.collections;
+package org.multiverse.collections;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.collections.NaiveTransactionalLinkedList;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -32,6 +31,7 @@ public class NaiveTransactionalLinkedList_clearTest {
                 list.clear();
 
                 assertEquals(0, list.size());
+                assertEquals("[]", list.toString());
             }
         });
     }
@@ -45,6 +45,7 @@ public class NaiveTransactionalLinkedList_clearTest {
                 list.clear();
 
                 assertEquals(0, list.size());
+                assertEquals("[]", list.toString());
             }
         });
     }
@@ -59,6 +60,7 @@ public class NaiveTransactionalLinkedList_clearTest {
                 list.clear();
 
                 assertEquals(0, list.size());
+                assertEquals("[]", list.toString());
             }
         });
     }

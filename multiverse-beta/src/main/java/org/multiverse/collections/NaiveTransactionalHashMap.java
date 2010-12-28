@@ -93,4 +93,14 @@ public class NaiveTransactionalHashMap<K, V> implements TransactionalMap<K, V> {
     public V remove(Transaction tx, Object key) {
         throw new TodoException();
     }
+
+    @Override
+    public String toString(){
+        return toString(getThreadLocalTransaction());
+    }
+
+    @Override
+    public String toString(Transaction tx) {
+        throw new TodoException();
+    }
 }

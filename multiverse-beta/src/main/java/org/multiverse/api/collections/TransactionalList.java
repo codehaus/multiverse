@@ -30,4 +30,6 @@ public interface TransactionalList<E>{
     E remove(int index);
 
     E remove(Transaction tx, int index);
+
+    String toString(Transaction tx);
 }

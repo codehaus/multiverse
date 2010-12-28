@@ -1,4 +1,4 @@
-package org.multiverse.api.collections;
+package org.multiverse.collections;
 
 public class NaiveTransactionalStack_pushTest {
 }

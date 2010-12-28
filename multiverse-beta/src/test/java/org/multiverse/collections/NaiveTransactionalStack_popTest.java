@@ -1,4 +1,4 @@
-package org.multiverse.api.collections;
+package org.multiverse.collections;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -7,7 +7,6 @@ import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.Retry;
-import org.multiverse.collections.NaiveTransactionalStack;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -37,6 +36,7 @@ public class NaiveTransactionalStack_popTest {
                 String found = stack.pop();
                 assertSame(found, item);
                 assertEquals(0, stack.size());
+                assertEquals("[]", stack.toString());
             }
         });
     }
@@ -54,6 +54,7 @@ public class NaiveTransactionalStack_popTest {
                 String found = stack.pop();
                 assertSame(found, item2);
                 assertEquals(1, stack.size());
+                assertEquals("[foo]", stack.toString());
             }
         });
     }

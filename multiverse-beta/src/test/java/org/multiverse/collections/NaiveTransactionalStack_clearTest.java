@@ -1,18 +1,18 @@
-package org.multiverse.api.collections;
+package org.multiverse.collections;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.collections.NaiveTransactionalStack;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.execute;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class NaiveTransactionalStack_pollTest {
+public class NaiveTransactionalStack_clearTest {
 
     private Stm stm;
     private NaiveTransactionalStack<String> stack;
@@ -29,40 +29,23 @@ public class NaiveTransactionalStack_pollTest {
         execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                String item = stack.poll();
-                assertNull(item);
+                stack.clear();
+                assertTrue(stack.isEmpty());
+                assertEquals("[]", stack.toString());
             }
         });
     }
 
     @Test
-    public void whenSingleItem(){
+    public void whenNotEmpty(){
          execute(new AtomicVoidClosure() {
              @Override
              public void execute(Transaction tx) throws Exception {
-                 String item = "foo";
-                 stack.push(item);
-
-                 String found = stack.poll();
-                 assertSame(item, found);
+                 stack.push("foo");
+                 stack.push("foo");
+                 stack.clear();
                  assertTrue(stack.isEmpty());
-             }
-         });
-    }
-
-     @Test
-    public void whenMultipleItem(){
-         execute(new AtomicVoidClosure() {
-             @Override
-             public void execute(Transaction tx) throws Exception {
-                 String item1 = "foo";
-                 String item2 = "foo";
-                 stack.push(item1);
-                 stack.push(item2);
-
-                 String found = stack.poll();
-                 assertSame(item2, found);
-                 assertEquals(1, stack.size());
+                 assertEquals("[]", stack.toString());
              }
          });
     }
