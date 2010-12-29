@@ -62,7 +62,25 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
 
     @Override
     public boolean containsAll(Transaction tx, Collection<?> c) {
-        throw new UnsupportedOperationException();
+        if(c == null){
+            throw new NullPointerException();
+        }
+
+        if(c.isEmpty()){
+            return true;
+        }
+
+        if(isEmpty(tx)){
+            return false;
+        }
+
+        for(Object item : c){
+            if(!contains(tx, item)){
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override

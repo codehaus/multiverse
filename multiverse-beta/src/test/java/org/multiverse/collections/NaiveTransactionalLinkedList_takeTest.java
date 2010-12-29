@@ -14,7 +14,7 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.execute;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class NaiveTransactionalLinkedList_takeTest {
+public class                                                                                                                                                                                                                              NaiveTransactionalLinkedList_takeTest {
 
    private Stm stm;
     private NaiveTransactionalLinkedList<String> list;
