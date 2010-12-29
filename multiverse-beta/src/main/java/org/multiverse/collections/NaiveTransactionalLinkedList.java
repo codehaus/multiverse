@@ -172,7 +172,7 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
     @Override
     public E element(Transaction tx) {
-        throw new TodoException();
+        return getFirst(tx);
     }
 
     @Override
