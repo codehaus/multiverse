@@ -8,6 +8,10 @@ public interface TransactionalList<E> extends TransactionalCollection<E>{
 
     E get(Transaction tx, int index);
 
+    E set(int index, E element);
+
+    E set(Transaction tx, int index, E element);
+
     E remove(int index);
 
     E remove(Transaction tx, int index);

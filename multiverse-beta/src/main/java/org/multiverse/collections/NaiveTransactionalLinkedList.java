@@ -8,6 +8,7 @@ import org.multiverse.api.collections.TransactionalList;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.references.IntRef;
 import org.multiverse.api.references.Ref;
+import org.multiverse.api.references.RefFactory;
 
 import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
@@ -22,8 +23,8 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
     private final int capacity;
     private final IntRef size;
-    private final Ref<Node<E>> head;
-    private final Ref<Node<E>> tail;
+    private final Ref<Entry<E>> head;
+    private final Ref<Entry<E>> tail;
 
     public NaiveTransactionalLinkedList(Stm stm) {
         this(stm, Integer.MAX_VALUE);
@@ -63,7 +64,18 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
     @Override
     public E remove(Transaction tx, int index) {
-        throw new TodoException();
+        Entry entry = entry(tx, index);
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public E set(int index, E element) {
+        return set(getThreadLocalTransaction(), index, element);
+    }
+
+    @Override
+    public E set(Transaction tx, int index, E element) {
+        return entry(tx,index).value.getAndSet(element);
     }
 
     @Override
@@ -78,6 +90,10 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
     @Override
     public E get(Transaction tx, int index) {
+        return entry(tx, index).value.get(tx);
+    }
+
+    private Entry<E> entry(Transaction tx, int index) {
         if (index < 0) {
             throw new IndexOutOfBoundsException();
         }
@@ -89,20 +105,20 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
         if (index < (s >> 1)) {
             int i = 0;
-            Node<E> node = head.get(tx);
+            Entry<E> node = head.get(tx);
             while (true) {
                 if (i == index) {
-                    return node.value;
+                    return node;
                 }
                 node = node.next.get(tx);
                 i++;
             }
         } else {
-            int i = s-1;
-            Node<E> node = tail.get(tx);
+            int i = s - 1;
+            Entry<E> node = tail.get(tx);
             while (true) {
                 if (i == index) {
-                    return node.value;
+                    return node;
                 }
                 node = node.previous.get(tx);
                 i--;
@@ -221,7 +237,7 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
             return false;
         }
 
-        Node<E> node = new Node<E>(stm, item);
+        Entry<E> node = new Entry<E>(defaultRefFactory, item);
         if (s == 0) {
             head.set(tx, node);
             tail.set(tx, node);
@@ -250,7 +266,7 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
             return false;
         }
 
-        Node<E> node = new Node<E>(stm, item);
+        Entry<E> node = new Entry<E>(defaultRefFactory, item);
         if (s == 0) {
             head.set(tx, node);
             tail.set(tx, node);
@@ -290,13 +306,13 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
         E item;
         if (s == 1) {
-            item = tail.get(tx).value;
+            item = tail.get(tx).value.get(tx);
             head.set(tx, null);
             tail.set(tx, null);
         } else {
-            Node<E> oldHead = head.get(tx);
-            item = oldHead.value;
-            Node<E> newHead = oldHead.next.get(tx);
+            Entry<E> oldHead = head.get(tx);
+            item = oldHead.value.get(tx);
+            Entry<E> newHead = oldHead.next.get(tx);
             head.set(tx, newHead);
             newHead.previous.set(tx, null);
         }
@@ -319,13 +335,13 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
         E item;
         if (s == 1) {
-            item = head.get(tx).value;
+            item = head.get(tx).value.get(tx);
             head.set(tx, null);
             tail.set(tx, null);
         } else {
-            Node<E> oldTail = tail.get(tx);
-            item = oldTail.value;
-            Node<E> newTail = oldTail.previous.get(tx);
+            Entry<E> oldTail = tail.get(tx);
+            item = oldTail.value.get(tx);
+            Entry<E> newTail = oldTail.previous.get(tx);
             tail.set(tx, newTail);
             newTail.next.set(tx, null);
         }
@@ -352,8 +368,8 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
     @Override
     public E peekFirst(Transaction tx) {
-        Node<E> h = head.get(tx);
-        return h == null ? null : h.value;
+        Entry<E> h = head.get(tx);
+        return h == null ? null : h.value.get(tx);
     }
 
     @Override
@@ -363,8 +379,8 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
     @Override
     public E peekLast(Transaction tx) {
-        Node<E> t = tail.get(tx);
-        return t == null ? null : t.value;
+        Entry<E> t = tail.get(tx);
+        return t == null ? null : t.value.get(tx);
     }
 
     @Override
@@ -393,9 +409,9 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
         StringBuffer sb = new StringBuffer();
         sb.append('[');
-        Node<E> node = head.get(tx);
+        Entry<E> node = head.get(tx);
         do {
-            sb.append(node.value);
+            sb.append(node.value.get(tx));
             node = node.next.get(tx);
             if (node != null) {
                 sb.append(", ");
@@ -405,15 +421,15 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
         return sb.toString();
     }
 
-    static class Node<E> {
-        private final Ref<Node<E>> next;
-        private final Ref<Node<E>> previous;
-        private final E value;
+    static class Entry<E> {
+        private final Ref<Entry<E>> next;
+        private final Ref<Entry<E>> previous;
+        private final Ref<E> value;
 
-        Node(Stm stm, E value) {
-            this.next = stm.getDefaultRefFactory().newRef(null);
-            this.previous = stm.getDefaultRefFactory().newRef(null);
-            this.value = value;
+        Entry(RefFactory refFactory, E value) {
+            this.next = refFactory.newRef(null);
+            this.previous = refFactory.newRef(null);
+            this.value = refFactory.newRef(value);
         }
     }
 }

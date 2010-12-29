@@ -10,7 +10,9 @@ import java.util.Map;
 
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
-public final class NaiveTransactionalHashSet<E>  extends AbstractTransactionalCollection<E> implements TransactionalSet<E>{
+public final class NaiveTransactionalHashSet<E>
+        extends AbstractTransactionalCollection<E>
+        implements TransactionalSet<E>{
 
     private final NaiveTransactionalHashMap<E, Object> map;
 
@@ -59,7 +61,7 @@ public final class NaiveTransactionalHashSet<E>  extends AbstractTransactionalCo
         return map.keySet(tx).iterator(tx);
     }
 
-    static class It<E> implements TransactionalIterator<E> {
+    static class It<E> extends AbstractTransactionalIterator<E> {
 
         private final TransactionalIterator<Map.Entry<E, Object>> iterator;
 
@@ -68,27 +70,13 @@ public final class NaiveTransactionalHashSet<E>  extends AbstractTransactionalCo
         }
 
         @Override
-        public boolean hasNext() {
-            return hasNext(getThreadLocalTransaction());
-        }
-
-        @Override
         public boolean hasNext(Transaction tx) {
             return iterator.hasNext(tx);
         }
 
         @Override
-        public E next() {
-            return next(getThreadLocalTransaction());
-        }
-        @Override
         public E next(Transaction tx) {
             return iterator.next(tx).getKey();
-        }
-
-        @Override
-        public void remove() {
-            remove(getThreadLocalTransaction());
         }
 
         @Override

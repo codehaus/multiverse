@@ -4,6 +4,9 @@ import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.collections.TransactionalCollection;
 import org.multiverse.api.collections.TransactionalIterator;
+import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.functions.Function;
+import org.multiverse.api.references.RefFactory;
 
 import java.util.Collection;
 
@@ -12,12 +15,14 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
 public abstract class AbstractTransactionalCollection<E> implements TransactionalCollection<E> {
 
     protected final Stm stm;
+    protected final RefFactory defaultRefFactory;
 
     protected AbstractTransactionalCollection(Stm stm) {
         if (stm == null) {
             throw new NullPointerException();
         }
         this.stm = stm;
+        this.defaultRefFactory = stm.getDefaultRefFactory();
     }
 
     @Override
@@ -96,9 +101,9 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
         }
 
         boolean change = false;
-        for (TransactionalIterator<? extends E> it = c.iterator(tx);it.hasNext(tx);) {
+        for (TransactionalIterator<? extends E> it = c.iterator(tx); it.hasNext(tx);) {
 
-            if(add(tx, it.next(tx))){
+            if (add(tx, it.next(tx))) {
                 change = true;
             }
         }
@@ -109,6 +114,70 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
     @Override
     public TransactionalIterator<E> iterator() {
         return iterator(getThreadLocalTransaction());
+    }
+
+    @Override
+    public TransactionalCollection<E> map(Function<E> function) {
+        return map(getThreadLocalTransaction(),function);
+    }
+
+    @Override
+    public TransactionalCollection<E> map(Transaction tx, Function<E> function) {
+        throw new TodoException();
+    }
+
+    @Override
+    public TransactionalCollection<E> filter() {
+        return filter(getThreadLocalTransaction());
+    }
+
+    @Override
+    public TransactionalCollection<E> filter(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
+    public TransactionalCollection<E> flatMap() {
+        return flatMap(getThreadLocalTransaction());
+    }
+
+    @Override
+    public TransactionalCollection<E> flatMap(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
+    public E foldLeft(Function<E> function) {
+        return foldLeft(getThreadLocalTransaction(), function);
+    }
+
+    @Override
+    public E foldLeft(Transaction tx, Function<E> function) {
+        if(function == null){
+            throw new NullPointerException("function can't be null");
+        }
+
+        throw new TodoException();
+    }
+
+    @Override
+    public E foldRight(Function<E> function) {
+        return foldRight(getThreadLocalTransaction(), function);
+    }
+
+    @Override
+    public E foldRight(Transaction tx, Function<E> function) {
+        throw new TodoException();
+    }
+
+    @Override
+    public TransactionalCollection<E> foreach() {
+        return foreach(getThreadLocalTransaction());
+    }
+
+    @Override
+    public TransactionalCollection<E> foreach(Transaction tx) {
+        throw new TodoException();
     }
 
     @Override
