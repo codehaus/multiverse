@@ -10,6 +10,8 @@ import org.multiverse.api.references.IntRef;
 import org.multiverse.api.references.Ref;
 import org.multiverse.api.references.RefFactory;
 
+import java.util.NoSuchElementException;
+
 import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
@@ -267,7 +269,11 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
     @Override
     public E getFirst(Transaction tx) {
-        throw new TodoException();
+        E result = pollFirst();
+        if(result == null){
+            throw new NoSuchElementException("NaiveTransactionalLinkedList is empty");
+        }
+        return result;
     }
 
     @Override
@@ -277,7 +283,11 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
     @Override
     public E getLast(Transaction tx) {
-        throw new TodoException();
+        E result = pollLast();
+        if(result == null){
+            throw new NoSuchElementException("NaiveTransactionalLinkedList is empty");
+        }
+        return result;
     }
 
     @Override
@@ -289,7 +299,6 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
     public E get(Transaction tx, int index) {
         return entry(tx, index).value.get(tx);
     }
-
 
     // ============== adds ================
 
@@ -574,7 +583,7 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
     @Override
     public E peek(Transaction tx) {
-        return peekLast(tx);
+        return peekFirst(tx);
     }
 
     // ================ misc ==========================
