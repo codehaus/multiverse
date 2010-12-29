@@ -57,7 +57,7 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
     @Override
     public E set(Transaction tx, int index, E element) {
-        return entry(tx, index).value.getAndSet(element);
+        return entry(tx, index).value.getAndSet(tx, element);
     }
 
     @Override
@@ -180,7 +180,6 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-
     @Override
     public void push(E e) {
         //To change body of implemented methods use File | Settings | File Templates.
@@ -190,7 +189,6 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
     public void push(Transaction tx, E e) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
-
 
     @Override
     public E pop() {
@@ -278,7 +276,7 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
     @Override
     public E getFirst(Transaction tx) {
-        E result = pollFirst();
+        E result = pollFirst(tx);
         if (result == null) {
             throw new NoSuchElementException("NaiveTransactionalLinkedList is empty");
         }
@@ -292,7 +290,7 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
     @Override
     public E getLast(Transaction tx) {
-        E result = pollLast();
+        E result = pollLast(tx);
         if (result == null) {
             throw new NoSuchElementException("NaiveTransactionalLinkedList is empty");
         }
@@ -434,7 +432,7 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
             throw new NullPointerException();
         }
 
-        int s = size.get();
+        int s = size.get(tx);
         if (s == capacity) {
             return false;
         }
@@ -463,7 +461,7 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
             throw new NullPointerException();
         }
 
-        int s = size.get();
+        int s = size.get(tx);
         if (s == capacity) {
             return false;
         }
