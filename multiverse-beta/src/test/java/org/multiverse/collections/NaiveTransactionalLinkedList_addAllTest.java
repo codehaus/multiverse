@@ -90,7 +90,7 @@ public class NaiveTransactionalLinkedList_addAllTest {
                 list.add("2");
                 list.addAll(new LinkedList<String>());
 
-                assertEquals("[2, 1]", list.toString());
+                assertEquals("[1, 2]", list.toString());
                 assertEquals(2, list.size());
             }
         });
