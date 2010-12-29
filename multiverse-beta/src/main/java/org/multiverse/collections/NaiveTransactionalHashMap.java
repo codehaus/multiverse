@@ -73,6 +73,11 @@ public final class NaiveTransactionalHashMap<K, V> extends AbstractTransactional
 
     @Override
     public V get(Transaction tx, Object key) {
+        NaiveEntry<K, V> entry = getEntry(tx, key);
+        return entry == null ? null : entry.value.get(tx);
+    }
+
+    private NaiveEntry<K, V> getEntry(Transaction tx, Object key) {
         if (key == null) {
             return null;
         }
@@ -86,7 +91,7 @@ public final class NaiveTransactionalHashMap<K, V> extends AbstractTransactional
         for (NaiveEntry<K, V> entry = table.get(tx)[indexFor(hash, table.get(tx).length)].get(tx); entry != null; entry = entry.next.get(tx)) {
             Object k;
             if (entry.hash == hash && ((k = entry.key) == key || key.equals(k))) {
-                return entry.value.get(tx);
+                return entry;
             }
         }
         return null;
@@ -152,8 +157,8 @@ public final class NaiveTransactionalHashMap<K, V> extends AbstractTransactional
                 do {
                     NaiveEntry<K, V> next = e.next.get(tx);
                     int i = indexFor(e.hash, newCapacity);
-                    e.next.set(tx,newTable[i].get(tx));
-                    newTable[i].set(tx,e);
+                    e.next.set(tx, newTable[i].get(tx));
+                    newTable[i].set(tx, e);
                     e = next;
                 } while (e != null);
             }
@@ -191,7 +196,7 @@ public final class NaiveTransactionalHashMap<K, V> extends AbstractTransactional
 
     @Override
     public boolean containsKey(Transaction tx, Object key) {
-        throw new TodoException();
+        return getEntry(tx, key) != null;
     }
 
     @Override

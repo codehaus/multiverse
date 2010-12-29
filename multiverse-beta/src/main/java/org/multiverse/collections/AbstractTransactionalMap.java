@@ -5,7 +5,6 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.collections.TransactionalCollection;
 import org.multiverse.api.collections.TransactionalMap;
 import org.multiverse.api.collections.TransactionalSet;
-import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.references.RefFactory;
 
 import java.util.Map;
@@ -75,6 +74,25 @@ public abstract class AbstractTransactionalMap<K, V> implements TransactionalMap
         return containsKey(getThreadLocalTransaction(), key);
     }
 
+    /*
+    public boolean containsKey(Transaction tx, Object key) {
+        TransactionalIterator<Entry<K, V>> i = entrySet(tx).iterator();
+        if (key == null) {
+            while (i.hasNext()) {
+                Entry<K, V> e = i.next();
+                if (e.getKey() == null)
+                    return true;
+            }
+        } else {
+            while (i.hasNext()) {
+                Entry<K, V> e = i.next();
+                if (key.equals(e.getKey()))
+                    return true;
+            }
+        }
+        return false;
+    } */
+
     @Override
     public boolean containsValue(Object value) {
         return containsValue(getThreadLocalTransaction(), value);
@@ -87,7 +105,9 @@ public abstract class AbstractTransactionalMap<K, V> implements TransactionalMap
 
     @Override
     public void putAll(Transaction tx, Map<? extends K, ? extends V> m) {
-        throw new TodoException();
+        for (Map.Entry<? extends K, ? extends V> e : m.entrySet()){
+            put(tx, e.getKey(), e.getValue());
+        }
     }
 
     @Override
