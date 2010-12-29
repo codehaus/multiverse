@@ -1,7 +1,6 @@
 package org.multiverse.collections;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
@@ -19,7 +18,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 
 public class NaiveTransactionalLinkedList_addAllTest {
 
-     private Stm stm;
+    private Stm stm;
 
     @Before
     public void setUp() {
@@ -53,7 +52,7 @@ public class NaiveTransactionalLinkedList_addAllTest {
             execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    List<String> c = Arrays.asList("a","b",null,"d");
+                    List<String> c = Arrays.asList("a", "b", null, "d");
 
                     try {
                         list.addAll(c);
@@ -130,7 +129,7 @@ public class NaiveTransactionalLinkedList_addAllTest {
 
     @Test
     public void whenBothNonEmpty() {
-         final NaiveTransactionalLinkedList<String> list = new NaiveTransactionalLinkedList<String>(stm);
+        final NaiveTransactionalLinkedList<String> list = new NaiveTransactionalLinkedList<String>(stm);
 
         execute(new AtomicVoidClosure() {
             @Override
@@ -148,8 +147,45 @@ public class NaiveTransactionalLinkedList_addAllTest {
     }
 
     @Test
-    @Ignore
     public void whenCapacityExceeded() {
+        final NaiveTransactionalLinkedList<String> list = new NaiveTransactionalLinkedList<String>(stm, 2);
 
+        execute(new AtomicVoidClosure() {
+            @Override
+            public void execute(Transaction tx) throws Exception {
+                list.add("1");
+            }
+        });
+
+        try {
+            execute(new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    List<String> c = Arrays.asList("2", "3");
+
+                    try {
+                        list.addAll(c);
+                        fail();
+                    } catch (IllegalStateException expected) {
+
+                    }
+
+                    assertEquals("[1, 2]", list.toString());
+                    assertEquals(2, list.size());
+                    throw new IllegalStateException();
+                }
+            });
+            fail();
+        } catch (IllegalStateException expected) {
+
+        }
+
+        execute(new AtomicVoidClosure() {
+            @Override
+            public void execute(Transaction tx) throws Exception {
+                assertEquals(1, list.size());
+                assertEquals("[1]", list.toString());
+            }
+        });
     }
 }

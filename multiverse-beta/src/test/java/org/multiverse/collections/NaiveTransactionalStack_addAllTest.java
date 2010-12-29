@@ -1,7 +1,6 @@
 package org.multiverse.collections;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
@@ -134,7 +133,7 @@ public class NaiveTransactionalStack_addAllTest {
 
     @Test
     public void whenBothNonEmpty() {
-         final NaiveTransactionalStack<String> stack = new NaiveTransactionalStack<String>(stm);
+        final NaiveTransactionalStack<String> stack = new NaiveTransactionalStack<String>(stm);
 
         execute(new AtomicVoidClosure() {
             @Override
@@ -152,8 +151,45 @@ public class NaiveTransactionalStack_addAllTest {
     }
 
     @Test
-    @Ignore
     public void whenCapacityExceeded() {
+        final NaiveTransactionalStack<String> stack = new NaiveTransactionalStack<String>(stm, 2);
 
+        execute(new AtomicVoidClosure() {
+            @Override
+            public void execute(Transaction tx) throws Exception {
+                stack.add("1");
+            }
+        });
+
+        try {
+            execute(new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    List<String> c = Arrays.asList("2", "3");
+
+                    try {
+                        stack.addAll(c);
+                        fail();
+                    } catch (IllegalStateException expected) {
+
+                    }
+
+                    assertEquals("[2, 1]", stack.toString());
+                    assertEquals(2, stack.size());
+                    throw new IllegalStateException();
+                }
+            });
+            fail();
+        } catch (IllegalStateException expected) {
+
+        }
+
+        execute(new AtomicVoidClosure() {
+            @Override
+            public void execute(Transaction tx) throws Exception {
+                assertEquals(1, stack.size());
+                assertEquals("[1]", stack.toString());
+            }
+        });
     }
 }
