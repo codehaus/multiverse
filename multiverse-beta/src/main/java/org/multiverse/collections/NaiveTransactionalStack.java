@@ -131,8 +131,8 @@ public final class NaiveTransactionalStack<E> extends AbstractTransactionalColle
     }
 
     @Override
-    public boolean add(Transaction tx, E item) {
-        if (!offer(tx, item)) {
+    public boolean add(Transaction tx, E e) {
+        if (!offer(tx, e)) {
             throw new IllegalStateException("NaiveTransactionalStack full");
         }
 
@@ -145,8 +145,8 @@ public final class NaiveTransactionalStack<E> extends AbstractTransactionalColle
     }
 
     @Override
-    public boolean contains(Transaction tx, Object item) {
-        if (item == null) {
+    public boolean contains(Transaction tx, Object o) {
+        if (o == null) {
             return false;
         }
 
@@ -158,7 +158,7 @@ public final class NaiveTransactionalStack<E> extends AbstractTransactionalColle
 
         Node<E> node = head.get();
         while (node != null) {
-            if(node.value.equals(item)){
+            if(node.value.equals(o)){
                 return true;
             }
             node = node.next;

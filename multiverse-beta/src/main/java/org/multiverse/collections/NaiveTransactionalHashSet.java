@@ -22,8 +22,8 @@ public final class NaiveTransactionalHashSet<E>
     }
 
     @Override
-    public boolean add(Transaction tx, E item) {
-        return map.put(tx, item, this) == null;
+    public boolean add(Transaction tx, E e) {
+        return map.put(tx, e, this) == null;
     }
 
     @Override
@@ -32,8 +32,8 @@ public final class NaiveTransactionalHashSet<E>
     }
 
     @Override
-    public boolean contains(Transaction tx, Object item) {
-        return map.get(tx, item) != null;
+    public boolean contains(Transaction tx, Object o) {
+        return map.get(tx, o) != null;
     }
 
     @Override

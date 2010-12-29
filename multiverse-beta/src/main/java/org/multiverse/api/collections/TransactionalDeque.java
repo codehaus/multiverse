@@ -2,17 +2,15 @@ package org.multiverse.api.collections;
 
 import org.multiverse.api.Transaction;
 
-public interface TransactionalDeque<E> extends TransactionalQueue<E> {
+import java.util.Deque;
 
-    boolean offerFirst(E e);
+public interface TransactionalDeque<E> extends TransactionalQueue<E>, Deque<E> {
 
     boolean offerFirst(Transaction tx, E e);
 
-    E pollFirst();
+    E pollLast(Transaction tx);
 
     E pollFirst(Transaction tx);
-
-    E peekFirst();
 
     E peekFirst(Transaction tx);
 
@@ -24,15 +22,7 @@ public interface TransactionalDeque<E> extends TransactionalQueue<E> {
 
     E takeFirst(Transaction tx);
 
-    boolean offerLast(E e);
-
     boolean offerLast(Transaction tx, E e);
-
-    E pollLast();
-
-    E pollLast(Transaction tx);
-
-    E peekLast();
 
     E peekLast(Transaction tx);
 
@@ -43,4 +33,26 @@ public interface TransactionalDeque<E> extends TransactionalQueue<E> {
     E takeLast();
 
     E takeLast(Transaction tx);
+
+    void addFirst(Transaction tx, E e);
+
+    void addLast(Transaction tx, E e);
+
+    E removeFirst(Transaction tx);
+
+    E removeLast(Transaction tx);
+
+    E getFirst(Transaction tx);
+
+    E getLast(Transaction tx);
+
+    boolean removeFirstOccurrence(Transaction tx, Object o);
+
+    boolean removeLastOccurrence(Transaction tx, Object o);
+
+    void push(Transaction tx, E e);
+
+    E pop(Transaction tx);
+
+    TransactionalIterator<E> descendingIterator(Transaction tx);
 }

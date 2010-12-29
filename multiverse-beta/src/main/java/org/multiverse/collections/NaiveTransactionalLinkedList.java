@@ -49,26 +49,6 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
     }
 
     @Override
-    public boolean add(Transaction tx, E item) {
-        if (!offer(tx, item)) {
-            throw new IllegalStateException("NaiveTransactionalLinkedList full");
-        }
-
-        return true;
-    }
-
-    @Override
-    public E remove(int index) {
-        return remove(getThreadLocalTransaction(), index);
-    }
-
-    @Override
-    public E remove(Transaction tx, int index) {
-        Entry entry = entry(tx, index);
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public E set(int index, E element) {
         return set(getThreadLocalTransaction(), index, element);
     }
@@ -81,16 +61,6 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
     @Override
     public int size(Transaction tx) {
         return size.get(tx);
-    }
-
-    @Override
-    public E get(int index) {
-        return get(getThreadLocalTransaction(), index);
-    }
-
-    @Override
-    public E get(Transaction tx, int index) {
-        return entry(tx, index).value.get(tx);
     }
 
     @Override
@@ -175,8 +145,8 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
     }
 
     @Override
-    public boolean contains(Transaction tx, Object item) {
-        return indexOf(tx, item) != -1;
+    public boolean contains(Transaction tx, Object o) {
+        return indexOf(tx, o) != -1;
     }
 
     @Override
@@ -188,6 +158,172 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
         size.set(tx, 0);
         head.set(tx, null);
         tail.set(tx, null);
+    }
+
+    // ==================== needs sorting =====================================
+
+
+    @Override
+    public E element() {
+        return element(getThreadLocalTransaction());
+    }
+
+    @Override
+    public E element(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
+    public E pop(Transaction tx) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
+    @Override
+    public void push(E e) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void push(Transaction tx, E e) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
+    @Override
+    public E pop() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    // =============== remove ==============
+
+    @Override
+    public E remove(int index) {
+        return remove(getThreadLocalTransaction(), index);
+    }
+
+    @Override
+    public E remove(Transaction tx, int index) {
+        Entry entry = entry(tx, index);
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public E removeFirst() {
+        return removeFirst(getThreadLocalTransaction());
+    }
+
+    @Override
+    public E removeFirst(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
+    public E removeLast() {
+        return removeLast(getThreadLocalTransaction());
+    }
+
+    @Override
+    public E removeLast(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean removeFirstOccurrence(Object o) {
+        return removeFirstOccurrence(getThreadLocalTransaction(), o);
+    }
+
+    @Override
+    public boolean removeFirstOccurrence(Transaction tx, Object o) {
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean removeLastOccurrence(Object o) {
+        return removeLastOccurrence(getThreadLocalTransaction(), o);
+    }
+
+    @Override
+    public boolean removeLastOccurrence(Transaction tx, Object o) {
+        throw new TodoException();
+    }
+
+    @Override
+    public E remove() {
+        return remove(getThreadLocalTransaction());
+    }
+
+    @Override
+    public E remove(Transaction tx) {
+        throw new TodoException();
+    }
+
+    // =============== gets ==============
+
+    @Override
+    public E getFirst() {
+        return getFirst(getThreadLocalTransaction());
+    }
+
+    @Override
+    public E getFirst(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
+    public E getLast() {
+        return getLast(getThreadLocalTransaction());
+    }
+
+    @Override
+    public E getLast(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
+    public E get(int index) {
+        return get(getThreadLocalTransaction(), index);
+    }
+
+    @Override
+    public E get(Transaction tx, int index) {
+        return entry(tx, index).value.get(tx);
+    }
+
+
+    // ============== adds ================
+
+    @Override
+    public void addFirst(E e) {
+        addFirst(getThreadLocalTransaction(), e);
+    }
+
+    @Override
+    public void addFirst(Transaction tx, E e) {
+        if(!offerFirst(tx, e)){
+            throw new IllegalStateException("NaiveTransactionalLinkedList full");
+        }
+    }
+
+    @Override
+    public void addLast(E e) {
+        addLast(getThreadLocalTransaction(), e);
+    }
+
+    @Override
+    public void addLast(Transaction tx, E e) {
+        if(!offerLast(tx, e)){
+            throw new IllegalStateException("NaiveTransactionalLinkedList full");
+        }
+    }
+
+    @Override
+    public boolean add(Transaction tx, E e) {
+        if (!offer(tx, e)) {
+            throw new IllegalStateException("NaiveTransactionalLinkedList full");
+        }
+
+        return true;
     }
 
     // ================ puts ==========================
@@ -447,6 +583,19 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
     public TransactionalIterator<E> iterator(Transaction tx) {
         throw new TodoException();
     }
+
+    @Override
+    public TransactionalIterator<E> descendingIterator() {
+        return descendingIterator(getThreadLocalTransaction());
+    }
+
+    @Override
+    public TransactionalIterator<E> descendingIterator(Transaction tx) {
+        throw new TodoException();
+    }
+
+    // ================ misc ==========================
+
 
     @Override
     public String toString(Transaction tx) {

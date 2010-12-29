@@ -6,7 +6,7 @@ public interface TransactionalSet<E> extends TransactionalCollection<E>{
 
     boolean contains(Object item);
 
-    boolean contains(Transaction tx, Object item);
+    boolean contains(Transaction tx, Object o);
 
     boolean remove(Object item);
 
