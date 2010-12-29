@@ -176,23 +176,23 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
     }
 
     @Override
+    public E pop() {
+        return pop(getThreadLocalTransaction());
+    }
+
+    @Override
     public E pop(Transaction tx) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return removeFirst(tx);
     }
 
     @Override
     public void push(E e) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        push(getThreadLocalTransaction(), e);
     }
 
     @Override
     public void push(Transaction tx, E e) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public E pop() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        addFirst(tx, e);
     }
 
     // =============== remove ==============
