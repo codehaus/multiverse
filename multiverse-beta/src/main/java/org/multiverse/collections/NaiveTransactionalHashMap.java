@@ -35,7 +35,11 @@ public final class NaiveTransactionalHashMap<K, V> extends AbstractTransactional
             return;
         }
 
-        throw new TodoException();
+        Ref<NaiveEntry>[] tab = table.get();
+        for (int i = 0; i < tab.length; i++) {
+            tab[i].set(null);
+        }
+        size.set(0);
     }
 
     @Override

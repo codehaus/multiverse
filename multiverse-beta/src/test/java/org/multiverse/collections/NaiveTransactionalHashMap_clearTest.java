@@ -1,7 +1,6 @@
 package org.multiverse.collections;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
@@ -25,17 +24,30 @@ public class NaiveTransactionalHashMap_clearTest {
     }
 
     @Test
-    @Ignore
-    public void whenNotEmpty(){}
+    public void whenNotEmpty() {
+        execute(new AtomicVoidClosure() {
+            @Override
+            public void execute(Transaction tx) throws Exception {
+                map.put("1", "a");
+                map.put("2", "b");
+                map.put("3", "c");
+                map.put("4", "d");
+
+                map.clear();
+                assertEquals(0, map.size());
+                assertEquals("[]",map.toString());
+            }
+        });
+    }
 
     @Test
     public void whenEmpty() {
-        execute(new AtomicVoidClosure(){
+        execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
                 map.clear();
                 assertEquals(0, map.size());
-                assertEquals("[]",map.toString());
+                assertEquals("[]", map.toString());
             }
         });
     }
