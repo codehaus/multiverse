@@ -217,7 +217,11 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
     @Override
     public E removeFirst(Transaction tx) {
-        throw new TodoException();
+        E element = pollFirst(tx);
+        if (element == null) {
+            throw new NoSuchElementException("NaiveTransactionalLinkedList is empty");
+        }
+        return element;
     }
 
     @Override
@@ -227,7 +231,21 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
     @Override
     public E removeLast(Transaction tx) {
-        throw new TodoException();
+        E element = pollLast(tx);
+        if (element == null) {
+            throw new NoSuchElementException("NaiveTransactionalLinkedList is empty");
+        }
+        return element;
+    }
+
+    @Override
+    public E remove() {
+        return remove(getThreadLocalTransaction());
+    }
+
+    @Override
+    public E remove(Transaction tx) {
+        return removeFirst(tx);
     }
 
     @Override
@@ -250,15 +268,6 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
         throw new TodoException();
     }
 
-    @Override
-    public E remove() {
-        return remove(getThreadLocalTransaction());
-    }
-
-    @Override
-    public E remove(Transaction tx) {
-        throw new TodoException();
-    }
 
     // =============== gets ==============
 
@@ -270,7 +279,7 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
     @Override
     public E getFirst(Transaction tx) {
         E result = pollFirst();
-        if(result == null){
+        if (result == null) {
             throw new NoSuchElementException("NaiveTransactionalLinkedList is empty");
         }
         return result;
@@ -284,7 +293,7 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
     @Override
     public E getLast(Transaction tx) {
         E result = pollLast();
-        if(result == null){
+        if (result == null) {
             throw new NoSuchElementException("NaiveTransactionalLinkedList is empty");
         }
         return result;
@@ -309,7 +318,7 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
     @Override
     public void addFirst(Transaction tx, E e) {
-        if(!offerFirst(tx, e)){
+        if (!offerFirst(tx, e)) {
             throw new IllegalStateException("NaiveTransactionalLinkedList full");
         }
     }
@@ -321,7 +330,7 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
     @Override
     public void addLast(Transaction tx, E e) {
-        if(!offerLast(tx, e)){
+        if (!offerLast(tx, e)) {
             throw new IllegalStateException("NaiveTransactionalLinkedList full");
         }
     }
