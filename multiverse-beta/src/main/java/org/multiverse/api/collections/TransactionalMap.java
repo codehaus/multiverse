@@ -3,37 +3,41 @@ package org.multiverse.api.collections;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 
-public interface TransactionalMap<K, V> {
+import java.util.Map;
+
+public interface TransactionalMap<K, V> extends Map<K, V> {
 
     Stm getStm();
 
-    int size();
-
     int size(Transaction tx);
-
-    boolean isEmpty();
 
     boolean isEmpty(Transaction tx);
 
-    void clear();
-
     void clear(Transaction tx);
-
-    V get(Object key);
 
     V get(Transaction tx, Object key);
 
-    V put(K key, V value);
+    boolean containsKey(Transaction tx, Object key);
+
+    boolean containsValue(Transaction tx, Object value);
 
     V put(Transaction tx, K key, V value);
 
-    V remove(Object key);
+    void putAll(Transaction tx, Map<? extends K, ? extends V> m);
 
     V remove(Transaction tx, Object key);
 
-    TransactionalIterable<K> keySet();
+    TransactionalCollection<V> values();
 
-    TransactionalIterable<K> keySet(Transaction tx);
+    TransactionalCollection<V> values(Transaction tx);
+
+    TransactionalSet<K> keySet();
+
+    TransactionalSet<K> keySet(Transaction tx);
+
+    TransactionalSet<Entry<K, V>> entrySet();
+
+    TransactionalSet<Entry<K, V>> entrySet(Transaction tx);
 
     String toString(Transaction tx);
 }

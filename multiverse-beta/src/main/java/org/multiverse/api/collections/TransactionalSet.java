@@ -1,14 +1,7 @@
 package org.multiverse.api.collections;
 
-import org.multiverse.api.Transaction;
+import java.util.Set;
 
-public interface TransactionalSet<E> extends TransactionalCollection<E>{
+public interface TransactionalSet<E> extends TransactionalCollection<E> , Set<E> {
 
-    boolean contains(Object item);
-
-    boolean contains(Transaction tx, Object o);
-
-    boolean remove(Object item);
-
-    boolean remove(Transaction tx, Object item);
 }
