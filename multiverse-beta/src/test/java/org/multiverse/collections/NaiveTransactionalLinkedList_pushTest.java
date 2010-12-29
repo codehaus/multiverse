@@ -3,7 +3,7 @@ package org.multiverse.collections;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class NaiveTransactionalLinkedList_addLastTest {
+public class NaiveTransactionalLinkedList_pushTest {
     @Test
     @Ignore
     public void test(){
