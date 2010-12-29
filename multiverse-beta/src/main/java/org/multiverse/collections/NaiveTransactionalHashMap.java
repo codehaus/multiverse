@@ -13,13 +13,33 @@ import java.util.Map;
 public final class NaiveTransactionalHashMap<K, V> extends AbstractTransactionalMap<K, V> {
 
     static final int DEFAULT_INITIAL_CAPACITY = 16;
+    /**
+     * The load factor used when none specified in constructor.
+     */
+    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    /**
+     * The maximum capacity, used if a higher value is implicitly specified
+     * by either of the constructors with arguments.
+     * MUST be a power of two <= 1<<30.
+     */
+    static final int MAXIMUM_CAPACITY = 1 << 30;
 
     private final IntRef size;
     private final Ref<Ref<NaiveEntry>[]> table;
+    private final IntRef threshold;
+
+    /**
+     * The load factor for the hash table.
+     *
+     * @serial
+     */
+    final float loadFactor;
 
     public NaiveTransactionalHashMap(Stm stm) {
         super(stm);
-        this.size = stm.getDefaultRefFactory().newIntRef(0);
+        this.size = defaultRefFactory.newIntRef(0);
+        this.threshold = defaultRefFactory.newIntRef((int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR));
+        this.loadFactor = DEFAULT_LOAD_FACTOR;
 
         Ref<NaiveEntry>[] entries = new Ref[DEFAULT_INITIAL_CAPACITY];
         for (int k = 0; k < entries.length; k++) {
@@ -27,6 +47,10 @@ public final class NaiveTransactionalHashMap<K, V> extends AbstractTransactional
         }
 
         table = defaultRefFactory.newRef(entries);
+    }
+
+    public float getLoadFactor() {
+        return loadFactor;
     }
 
     @Override
@@ -95,9 +119,45 @@ public final class NaiveTransactionalHashMap<K, V> extends AbstractTransactional
         NaiveEntry<K, V> e = table.get(tx)[bucketIndex].get(tx);
         table.get(tx)[bucketIndex].set(new NaiveEntry<K, V>(hash, key, value, e));
         size.increment(tx);
-        //if (size++ >= threshold) {
-        //    resize(2 * table.length);
-        //}
+        if (size.get(tx) >= threshold.get(tx)) {
+            resize(tx, 2 * table.get(tx).length);
+        }
+    }
+
+    void resize(Transaction tx, int newCapacity) {
+        Ref<NaiveEntry>[] oldTable = table.get(tx);
+        int oldCapacity = oldTable.length;
+        if (oldCapacity == MAXIMUM_CAPACITY) {
+            threshold.set(Integer.MAX_VALUE);
+            return;
+        }
+
+        Ref<NaiveEntry>[] newTable = new Ref[newCapacity];
+        for (int k = 0; k < newTable.length; k++) {
+            newTable[k] = defaultRefFactory.newRef(null);
+        }
+
+        transfer(tx, newTable);
+        table.set(tx, newTable);
+        threshold.set(tx, (int) (newCapacity * loadFactor));
+    }
+
+    void transfer(Transaction tx, Ref<NaiveEntry>[] newTable) {
+        Ref<NaiveEntry>[] src = table.get(tx);
+        int newCapacity = newTable.length;
+        for (int j = 0; j < src.length; j++) {
+            NaiveEntry<K, V> e = src[j].get(tx);
+            if (e != null) {
+                src[j] = null;
+                do {
+                    NaiveEntry<K, V> next = e.next.get(tx);
+                    int i = indexFor(e.hash, newCapacity);
+                    e.next.set(tx,newTable[i].get(tx));
+                    newTable[i].set(tx,e);
+                    e = next;
+                } while (e != null);
+            }
+        }
     }
 
     static int indexFor(int h, int length) {

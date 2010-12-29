@@ -73,4 +73,40 @@ public class NaiveTransactionalHashMap_putTest {
             }
         });
     }
+
+    @Test
+    public void whenManyItems() {
+        final int itemCount = 100 * 1000;
+
+        for (int k = 0; k < itemCount; k++) {
+            final int key = k;
+            execute(new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    map.put("" + key, "" + key);
+                }
+            });
+        }
+
+        System.out.println("Finished inserting");
+
+        execute(new AtomicVoidClosure() {
+            @Override
+            public void execute(Transaction tx) throws Exception {
+                assertEquals(itemCount, map.size());
+            }
+        });
+
+        System.out.println("Doing content check");
+
+        for (int k = 0; k < itemCount; k++) {
+            final int key = k;
+            execute(new AtomicVoidClosure() {
+                @Override
+                public void execute(Transaction tx) throws Exception {
+                    assertEquals("" + key, map.get("" + key));
+                }
+            });
+        }
+    }
 }
