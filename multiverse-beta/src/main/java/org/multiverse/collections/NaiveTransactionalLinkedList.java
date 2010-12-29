@@ -75,7 +75,7 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
     @Override
     public E set(Transaction tx, int index, E element) {
-        return entry(tx,index).value.getAndSet(element);
+        return entry(tx, index).value.getAndSet(element);
     }
 
     @Override
@@ -91,6 +91,55 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
     @Override
     public E get(Transaction tx, int index) {
         return entry(tx, index).value.get(tx);
+    }
+
+
+    @Override
+    public int indexOf(Object item) {
+        return indexOf(getThreadLocalTransaction(), item);
+    }
+
+    @Override
+    public int indexOf(Transaction tx, Object item) {
+        if (item == null) {
+            return -1;
+        }
+
+        int index = 0;
+        Entry<E> node = head.get(tx);
+        while (node != null) {
+            if (node.value.get(tx).equals(item)) {
+                return index;
+            }
+            node = node.next.get(tx);
+            index++;
+        }
+
+        return -1;
+    }
+
+    @Override
+    public int lastIndexOf(Object item) {
+        return lastIndexOf(getThreadLocalTransaction(), item);
+    }
+
+    @Override
+    public int lastIndexOf(Transaction tx, Object item) {
+        if (item == null) {
+            return -1;
+        }
+
+        int index = size.get(tx) - 1;
+        Entry<E> node = tail.get(tx);
+        while (node != null) {
+            if (node.value.get(tx).equals(item)) {
+                return index;
+            }
+            node = node.previous.get(tx);
+            index--;
+        }
+
+        return -1;
     }
 
     private Entry<E> entry(Transaction tx, int index) {

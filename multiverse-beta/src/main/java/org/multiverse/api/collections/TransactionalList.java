@@ -4,6 +4,14 @@ import org.multiverse.api.Transaction;
 
 public interface TransactionalList<E> extends TransactionalCollection<E>{
 
+    int indexOf(Object item);
+
+    int indexOf(Transaction tx, Object item);
+
+    int lastIndexOf(Object item);
+
+    int lastIndexOf(Transaction tx, Object item);
+
     E get(int index);
 
     E get(Transaction tx, int index);

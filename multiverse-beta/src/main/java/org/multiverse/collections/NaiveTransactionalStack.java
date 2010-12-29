@@ -4,7 +4,6 @@ import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.collections.TransactionalIterator;
 import org.multiverse.api.collections.TransactionalStack;
-import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.references.IntRef;
 import org.multiverse.api.references.Ref;
 
@@ -147,7 +146,24 @@ public final class NaiveTransactionalStack<E> extends AbstractTransactionalColle
 
     @Override
     public boolean contains(Transaction tx, Object item) {
-        throw new TodoException();
+        if (item == null) {
+            return false;
+        }
+
+        int s = size.get(tx);
+
+        if (s == 0) {
+            return false;
+        }
+
+        Node<E> node = head.get();
+        while (node != null) {
+            if(node.value.equals(item)){
+                return true;
+            }
+            node = node.next;
+        }
+        return false;
     }
 
     static class It<E> extends AbstractTransactionalIterator<E> {
