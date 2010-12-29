@@ -35,7 +35,23 @@ public class NaiveTransactionalHashMap_clearTest {
 
                 map.clear();
                 assertEquals(0, map.size());
-                assertEquals("[]",map.toString());
+                assertEquals("[]", map.toString());
+            }
+        });
+    }
+
+    @Test
+    public void whenManyItems() {
+        execute(new AtomicVoidClosure() {
+            @Override
+            public void execute(Transaction tx) throws Exception {
+                for (int k = 0; k < 1000; k++) {
+                    map.put("" + k, "" + k);
+                }
+
+                map.clear();
+                assertEquals(0, map.size());
+                assertEquals("[]", map.toString());
             }
         });
     }
