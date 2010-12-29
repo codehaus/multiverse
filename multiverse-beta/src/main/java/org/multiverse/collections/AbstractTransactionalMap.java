@@ -6,6 +6,7 @@ import org.multiverse.api.collections.TransactionalCollection;
 import org.multiverse.api.collections.TransactionalMap;
 import org.multiverse.api.collections.TransactionalSet;
 import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.references.RefFactory;
 
 import java.util.Map;
 
@@ -13,13 +14,15 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
 
 public abstract class AbstractTransactionalMap<K, V> implements TransactionalMap<K, V> {
 
-    private final Stm stm;
+    protected final Stm stm;
+    protected final RefFactory defaultRefFactory;
 
     public AbstractTransactionalMap(Stm stm) {
         if (stm == null) {
             throw new NullPointerException();
         }
         this.stm = stm;
+        this.defaultRefFactory = stm.getDefaultRefFactory();
     }
 
     @Override
