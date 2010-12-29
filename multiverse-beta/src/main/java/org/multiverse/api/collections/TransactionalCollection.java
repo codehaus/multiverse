@@ -18,6 +18,14 @@ public interface TransactionalCollection<E> extends TransactionalIterable<E> {
 
     boolean contains(Transaction tx, Object item);
 
+    boolean containsAll(Collection<?> c);
+
+    boolean containsAll(Transaction tx, Collection<?> c);
+
+    boolean remove(Object o);
+
+    boolean remove(Transaction tx, Object o);
+
     int size();
 
     int size(Transaction tx);

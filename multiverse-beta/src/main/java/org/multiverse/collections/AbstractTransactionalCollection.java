@@ -56,6 +56,26 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
     }
 
     @Override
+    public boolean containsAll(Collection<?> c) {
+        return containsAll(getThreadLocalTransaction(), c);
+    }
+
+    @Override
+    public boolean containsAll(Transaction tx, Collection<?> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return remove(getThreadLocalTransaction(),o);
+    }
+
+    @Override
+    public boolean remove(Transaction tx, Object o) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean add(final E item) {
         return add(getThreadLocalTransaction(), item);
     }

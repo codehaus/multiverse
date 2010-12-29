@@ -93,7 +93,6 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
         return entry(tx, index).value.get(tx);
     }
 
-
     @Override
     public int indexOf(Object item) {
         return indexOf(getThreadLocalTransaction(), item);
@@ -177,7 +176,7 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
 
     @Override
     public boolean contains(Transaction tx, Object item) {
-        throw new TodoException();
+        return indexOf(tx, item) != -1;
     }
 
     @Override
