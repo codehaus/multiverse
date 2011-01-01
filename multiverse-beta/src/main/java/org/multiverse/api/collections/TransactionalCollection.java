@@ -3,6 +3,7 @@ package org.multiverse.api.collections;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.functions.Function;
+import org.multiverse.api.predicates.Predicate;
 
 import java.util.Collection;
 
@@ -234,6 +235,14 @@ public interface TransactionalCollection<E> extends TransactionalIterable<E>, Co
      */
     boolean addAll(Transaction tx, TransactionalCollection<? extends E> c);
 
+    TransactionalCollection<E> drop(int numToDrop);
+
+    TransactionalCollection<E> drop(Transaction tx, int numToDrop);
+
+    TransactionalCollection<E> dropWhile(Predicate<E> predicate);
+
+    TransactionalCollection<E> dropWhile(Transaction tx, Predicate<E> predicate);
+
     String toString(Transaction tx);
 
     E foldLeft(Function<E> function);
@@ -248,15 +257,15 @@ public interface TransactionalCollection<E> extends TransactionalIterable<E>, Co
 
     TransactionalCollection<E> map(Transaction tx, Function<E> function);
 
-    TransactionalCollection<E> flatMap();
+    TransactionalCollection<E> flatMap(Function<E> function);
 
-    TransactionalCollection<E> flatMap(Transaction tx);
+    TransactionalCollection<E> flatMap(Transaction tx, Function<E> function);
 
-    TransactionalCollection<E> filter();
+    TransactionalCollection<E> filter(Predicate<E> predicate);
 
-    TransactionalCollection<E> filter(Transaction tx);
+    TransactionalCollection<E> filter(Transaction tx, Predicate<E> predicate);
 
-    TransactionalCollection<E> foreach();
+    TransactionalCollection<E> foreach(Function<E> function);
 
-    TransactionalCollection<E> foreach(Transaction tx);
+    TransactionalCollection<E> foreach(Transaction tx, Function<E> function);
 }

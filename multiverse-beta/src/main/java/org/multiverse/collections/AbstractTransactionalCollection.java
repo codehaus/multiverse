@@ -6,6 +6,7 @@ import org.multiverse.api.collections.TransactionalCollection;
 import org.multiverse.api.collections.TransactionalIterator;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.Function;
+import org.multiverse.api.predicates.Predicate;
 import org.multiverse.api.references.RefFactory;
 
 import java.util.Collection;
@@ -165,22 +166,22 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
     }
 
     @Override
-    public TransactionalCollection<E> filter() {
-        return filter(getThreadLocalTransaction());
+    public TransactionalCollection<E> filter(Predicate<E> predicate) {
+        return filter(getThreadLocalTransaction(), predicate);
     }
 
     @Override
-    public TransactionalCollection<E> filter(Transaction tx) {
+    public TransactionalCollection<E> filter(Transaction tx, Predicate<E> predicate) {
         throw new TodoException();
     }
 
     @Override
-    public TransactionalCollection<E> flatMap() {
-        return flatMap(getThreadLocalTransaction());
+    public TransactionalCollection<E> flatMap(Function<E> function) {
+        return flatMap(getThreadLocalTransaction(), function);
     }
 
     @Override
-    public TransactionalCollection<E> flatMap(Transaction tx) {
+    public TransactionalCollection<E> flatMap(Transaction tx, Function<E> function) {
         throw new TodoException();
     }
 
@@ -209,12 +210,12 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
     }
 
     @Override
-    public TransactionalCollection<E> foreach() {
-        return foreach(getThreadLocalTransaction());
+    public TransactionalCollection<E> foreach(Function<E> function) {
+        return foreach(getThreadLocalTransaction(), function);
     }
 
     @Override
-    public TransactionalCollection<E> foreach(Transaction tx) {
+    public TransactionalCollection<E> foreach(Transaction tx, Function<E> function) {
         throw new TodoException();
     }
 
@@ -241,5 +242,25 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
     @Override
     public boolean retainAll(Collection<?> c) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public TransactionalCollection<E> drop(int numToDrop){
+        return drop(getThreadLocalTransaction(), numToDrop);
+    }
+
+    @Override
+    public TransactionalCollection<E> drop(Transaction tx, int numToDrop){
+        throw new TodoException();
+    }
+
+    @Override
+    public TransactionalCollection<E> dropWhile(Predicate<E> predicate){
+        return dropWhile(getThreadLocalTransaction(), predicate);
+    }
+
+    @Override
+    public TransactionalCollection<E> dropWhile(Transaction tx, Predicate<E> predicate){
+        throw new TodoException();
     }
 }
