@@ -17,4 +17,6 @@ public interface TransactionalCollectionsFactory {
     <E> TransactionalSet<E> newHashSet();
 
     <K, V> TransactionalMap<K, V> newHashMap();
+
+    <E> TransactionalList<E> newLinkedList();
 }
