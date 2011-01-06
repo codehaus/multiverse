@@ -432,7 +432,7 @@ public class StmUtils {
     }
 
     /**
-     * Scheduled an compensating task on the Transaction in the ThreadLocalTransaction. This task is executed after
+     * Scheduled a compensating task on the Transaction in the ThreadLocalTransaction. This task is executed after
      * the transaction aborts and one of the use cases is cleaning up non transaction resources like the file system.
      * <p/>
      * @param task the deferred task to execute.
