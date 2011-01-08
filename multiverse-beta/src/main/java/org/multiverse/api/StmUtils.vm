@@ -28,34 +28,89 @@ public class StmUtils {
     private final static TransactionalCollectionsFactory transactionalCollectionsFactory
         = getGlobalStmInstance().getDefaultTransactionalCollectionFactory();
 
+    /**
+     * Creates a new TransactionList based on linked nodes.
+     *
+     * @return the created TransactionalList.
+     */
+    public static <E> TransactionalList<E> newLinkedList(){
+        return transactionalCollectionsFactory.newLinkedList();
+    }
+
+    /**
+     * Creates a new unbound TransactionalStack.
+     *
+     * @return the created TransactionalStack.
+     */
     public static <E> TransactionalStack<E> newStack(){
         return transactionalCollectionsFactory.newStack();
     }
 
+    /**
+     * Creates a bound TransactionalStack.
+     *
+     * @param the maximum capacity of the stack. Integer.MAX_VALUE indicates that there is no bound.
+     * @return the create TransactionalStack
+     * @throws IllegalArgumentException if capacity smaller than 0.
+     */
     public static <E> TransactionalStack<E> newStack(int capacity){
         return transactionalCollectionsFactory.newStack(capacity);
     }
 
+    /**
+     * Creates a unbound TransactionalQueue.
+     *
+     * @return the created TransactionalQueue.
+     */
     public static <E> TransactionalQueue<E> newQueue(){
         return transactionalCollectionsFactory.newQueue();
     }
 
+    /**
+     * Creates a bound TransactionalQueue.
+     *
+     * @param capactiy the maximum capacity of the queue. Integer.MAX_VALUE indicates that there is no bound.
+     * @return the created TransactionalQueue
+     * @throws IllegalArgumentException if capacity smaller than 0.
+     */
     public static <E> TransactionalQueue<E> newQueue(int capacity){
         return transactionalCollectionsFactory.newQueue(capacity);
     }
 
+    /**
+     * Creates an unbound TransactionalDeque.
+     *
+     * @return the created TransactionalDeque
+     */
     public static <E> TransactionalDeque<E> newDeque(){
         return transactionalCollectionsFactory.newDeque();
     }
 
+    /**
+     * Creates a bound TransactionalDeque.
+     *
+     * @param capacity the maximum capacity of the deque. Integer.MAX_VALUE indicates that there is no bound.
+     * @return the created TransactionalDeque.
+     * @throws IllegalArgumentException if capacity is smaller than 0.
+     */
     public static <E> TransactionalDeque<E> newDeque(int capacity){
         return transactionalCollectionsFactory.newDeque(capacity);
     }
 
+    /**
+     * Creates a TransactionalSet that is based on a hashing.
+     *
+     * @return the created TransactionalSet.
+     */
     public static <E> TransactionalSet<E> newHashSet(){
         return transactionalCollectionsFactory.newHashSet();
     }
 
+    /**
+     * Creates a TransactionalMap.
+     *
+     * @return the created TransactionalMap
+     */
     public static <K, V> TransactionalMap<K, V> newHashMap(){
         return transactionalCollectionsFactory.newHashMap();
     }
@@ -377,7 +432,7 @@ public class StmUtils {
     }
 
     /**
-     * Scheduled an compensating task on the Transaction in the ThreadLocalTransaction. This task is executed after
+     * Scheduled a compensating task on the Transaction in the ThreadLocalTransaction. This task is executed after
      * the transaction aborts and one of the use cases is cleaning up non transaction resources like the file system.
      * <p/>
      * @param task the deferred task to execute.

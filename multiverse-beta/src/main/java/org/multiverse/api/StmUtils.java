@@ -2,10 +2,12 @@ package org.multiverse.api;
 
 import org.multiverse.api.closures.*;
 import org.multiverse.api.collections.*;
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.lifecycle.*;
+import org.multiverse.api.exceptions.ControlFlowError;
+import org.multiverse.api.exceptions.IllegalTransactionStateException;
+import org.multiverse.api.exceptions.TransactionRequiredException;
+import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.api.references.*;
-import java.util.*;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTransaction;
@@ -27,6 +29,10 @@ public class StmUtils {
         = getGlobalStmInstance().createOrElseBlock();
     private final static TransactionalCollectionsFactory transactionalCollectionsFactory
         = getGlobalStmInstance().getDefaultTransactionalCollectionFactory();
+
+    public static <E> TransactionalList<E> newLinkedList(){
+        return transactionalCollectionsFactory.newLinkedList();
+    }
 
     public static <E> TransactionalStack<E> newStack(){
         return transactionalCollectionsFactory.newStack();

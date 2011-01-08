@@ -53,4 +53,9 @@ public final class NaiveTransactionalCollectionFactory implements TransactionalC
     public <K, V> TransactionalMap<K, V> newHashMap() {
         return new NaiveTransactionalHashMap<K, V>(stm);
     }
+
+    @Override
+    public <E> TransactionalList<E> newLinkedList() {
+        return new NaiveTransactionalLinkedList<E>(stm);
+    }
 }
