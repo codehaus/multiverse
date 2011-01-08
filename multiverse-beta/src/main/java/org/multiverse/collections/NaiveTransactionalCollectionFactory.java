@@ -15,12 +15,12 @@ public final class NaiveTransactionalCollectionFactory implements TransactionalC
     }
 
     @Override
-    public <E> TransactionalStack<E> newStack() {
+    public <E> org.multiverse.api.collections.TransactionalStack newStack() {
         return new NaiveTransactionalStack<E>(stm);
     }
 
     @Override
-    public <E> TransactionalStack<E> newStack(int capacity) {
+    public <E> org.multiverse.api.collections.TransactionalStack newStack(int capacity) {
         return new NaiveTransactionalStack<E>(stm, capacity);
     }
 
@@ -45,7 +45,7 @@ public final class NaiveTransactionalCollectionFactory implements TransactionalC
     }
 
     @Override
-    public <E> TransactionalSet<E> newHashSet() {
+    public <E> TransactionalStack<E> newHashSet() {
         return new NaiveTransactionalHashSet<E>(stm);
     }
 

@@ -63,20 +63,20 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
 
     @Override
     public boolean containsAll(Transaction tx, Collection<?> c) {
-        if(c == null){
+        if (c == null) {
             throw new NullPointerException();
         }
 
-        if(c.isEmpty()){
+        if (c.isEmpty()) {
             return true;
         }
 
-        if(isEmpty(tx)){
+        if (isEmpty(tx)) {
             return false;
         }
 
-        for(Object item : c){
-            if(!contains(tx, item)){
+        for (Object item : c) {
+            if (!contains(tx, item)) {
                 return false;
             }
         }
@@ -86,12 +86,12 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
 
     @Override
     public boolean remove(Object o) {
-        return remove(getThreadLocalTransaction(),o);
+        return remove(getThreadLocalTransaction(), o);
     }
 
     @Override
     public boolean remove(Transaction tx, Object o) {
-        throw new UnsupportedOperationException();
+        throw new TodoException();
     }
 
     @Override
@@ -157,7 +157,7 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
 
     @Override
     public TransactionalCollection<E> map(Function<E> function) {
-        return map(getThreadLocalTransaction(),function);
+        return map(getThreadLocalTransaction(), function);
     }
 
     @Override
@@ -171,7 +171,7 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
     }
 
     @Override
-    public TransactionalCollection<E> filter(Transaction tx, Predicate<E> predicate) {
+    public TransactionalCollection<E> filter(Transaction tx, final Predicate<E> predicate) {
         throw new TodoException();
     }
 
@@ -192,7 +192,7 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
 
     @Override
     public E foldLeft(Transaction tx, Function<E> function) {
-        if(function == null){
+        if (function == null) {
             throw new NullPointerException("function can't be null");
         }
 
@@ -245,22 +245,22 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
     }
 
     @Override
-    public TransactionalCollection<E> drop(int numToDrop){
+    public TransactionalCollection<E> drop(int numToDrop) {
         return drop(getThreadLocalTransaction(), numToDrop);
     }
 
     @Override
-    public TransactionalCollection<E> drop(Transaction tx, int numToDrop){
+    public TransactionalCollection<E> drop(Transaction tx, int numToDrop) {
         throw new TodoException();
     }
 
     @Override
-    public TransactionalCollection<E> dropWhile(Predicate<E> predicate){
+    public TransactionalCollection<E> dropWhile(Predicate<E> predicate) {
         return dropWhile(getThreadLocalTransaction(), predicate);
     }
 
     @Override
-    public TransactionalCollection<E> dropWhile(Transaction tx, Predicate<E> predicate){
+    public TransactionalCollection<E> dropWhile(Transaction tx, Predicate<E> predicate) {
         throw new TodoException();
     }
 }

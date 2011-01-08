@@ -263,7 +263,7 @@ public interface TransactionalCollection<E> extends TransactionalIterable<E>, Co
 
     TransactionalCollection<E> filter(Predicate<E> predicate);
 
-    TransactionalCollection<E> filter(Transaction tx, Predicate<E> predicate);
+    TransactionalCollection<E> filter(Transaction tx, Predicate<E> predicate) throws CloneNotSupportedException;
 
     TransactionalCollection<E> foreach(Function<E> function);
 
