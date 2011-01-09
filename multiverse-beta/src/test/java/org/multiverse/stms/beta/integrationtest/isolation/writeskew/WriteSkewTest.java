@@ -6,6 +6,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.LockLevel;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -163,7 +164,7 @@ public class WriteSkewTest {
                 .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
-        ref2.getLock().acquireCommitLock(tx);
+        ref2.getLock().acquire(tx, LockMode.Commit);
         ref2.get(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
@@ -189,7 +190,7 @@ public class WriteSkewTest {
                 .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
-        ref2.getLock().acquireWriteLock(tx);
+        ref2.getLock().acquire(tx, LockMode.Write);
         ref2.get(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();

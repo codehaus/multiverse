@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
@@ -28,7 +29,7 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
         BetaRef<String> ref = newRef(stm, null);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(tx);
+        ref.getLock().acquire(tx, LockMode.Commit);
 
         ref.atomicIsNull();
     }
@@ -38,7 +39,7 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
         BetaRef<String> ref = newRef(stm, null);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(tx);
+        ref.getLock().acquire(tx, LockMode.Write);
 
         boolean result = ref.atomicIsNull();
         assertTrue(result);
@@ -95,7 +96,7 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
         BetaRef<String> ref = newRef(stm, "foo");
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(tx);
+        ref.getLock().acquire(tx, LockMode.Commit);
 
         try {
             ref.atomicIsNull();
@@ -113,7 +114,7 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
         BetaRef<String> ref = newRef(stm, "foo");
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(tx);
+        ref.getLock().acquire(tx, LockMode.Write);
 
         boolean result = ref.atomicIsNull();
 

@@ -33,7 +33,8 @@ public interface MultiverseConstants {
     int ___SpinYield =
             parseInt(getProperty("org.multiverse.spinYield", "32"));
 
-    int LOCKMODE_NONE = 0;
-    int LOCKMODE_UPDATE = 1;
-    int LOCKMODE_COMMIT = 2;
+    final int LOCKMODE_NONE = 0;
+    final int LOCKMODE_READ = 1;
+    final int LOCKMODE_WRITE = 2;
+    final int LOCKMODE_COMMIT = 3;
 }

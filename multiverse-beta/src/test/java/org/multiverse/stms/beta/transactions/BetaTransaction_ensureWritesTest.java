@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
@@ -86,7 +87,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
         ref.incrementAndGet(tx, 1);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Write);
 
         try {
             tx.ensureWrites();
@@ -106,7 +107,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
         ref.incrementAndGet(tx, 1);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
         try {
             tx.ensureWrites();
@@ -136,7 +137,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
 
         BetaTransaction tx = newTransaction();
         ref.incrementAndGet(tx, 1);
-        ref.getLock().acquireCommitLock(tx);
+        ref.getLock().acquire(tx, LockMode.Commit);
         tx.ensureWrites();
 
         assertIsActive(tx);
@@ -149,7 +150,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
 
         BetaTransaction tx = newTransaction();
         ref.incrementAndGet(tx, 1);
-        ref.getLock().acquireWriteLock(tx);
+        ref.getLock().acquire(tx, LockMode.Write);
         tx.ensureWrites();
 
         assertIsActive(tx);

@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.functions.LongFunction;
@@ -80,7 +81,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
         RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
@@ -103,7 +104,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Write);
 
         RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
@@ -128,7 +129,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
         RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
@@ -154,7 +155,7 @@ public class VeryAbstractTransactionalObject_registerChangeListenerTest implemen
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Write);
 
         RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();

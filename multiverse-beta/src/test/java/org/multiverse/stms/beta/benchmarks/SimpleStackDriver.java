@@ -217,7 +217,7 @@ public class SimpleStackDriver extends BenchmarkDriver {
 
     class Stack<E> {
         private final Ref<StackNode<E>> head = stm.getDefaultRefFactory().newRef(null);
-        private final IntRef size = stm.getReferenceFactoryBuilder().build().newIntRef(0);
+        private final IntRef size = stm.getRefFactoryBuilder().build().newIntRef(0);
 
         public void push(Transaction tx, final E item) {
             if (capacity != Integer.MAX_VALUE) {

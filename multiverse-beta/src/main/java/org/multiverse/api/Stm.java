@@ -70,5 +70,5 @@ public interface Stm {
      *
      * @return the RefFactoryBuilder.
      */
-    RefFactoryBuilder getReferenceFactoryBuilder();
+    RefFactoryBuilder getRefFactoryBuilder();
 }

@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
@@ -19,8 +20,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 import static org.multiverse.api.functions.Functions.newIncLongFunction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasNoLocks;
-import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.*;
+import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.assertSurplus;
 
 /**
  * Tests {@link BetaLongRef#alterAndGet(BetaTransaction, LongFunction)}.
@@ -172,7 +172,7 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongFunction function = mock(LongFunction.class);
@@ -196,7 +196,7 @@ public class BetaLongRef_alterAndGet2Test implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Write);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         LongFunction function = Functions.newIncLongFunction(1);

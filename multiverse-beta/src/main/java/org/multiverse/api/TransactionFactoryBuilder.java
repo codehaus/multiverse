@@ -43,6 +43,10 @@ public interface TransactionFactoryBuilder {
      */
     TransactionFactoryBuilder setPropagationLevel(PropagationLevel propagationLevel);
 
+    TransactionFactoryBuilder setReadLockLevel(LockMode lockMode);
+
+    TransactionFactoryBuilder setWriteLockLevel(LockMode lockMode);
+
     /**
      * Sets the {@link LockLevel}. With the LockLevel you have control
      * on transaction level on how pessimistic or optimistic a transaction is.

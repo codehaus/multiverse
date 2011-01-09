@@ -3,6 +3,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -70,7 +71,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        BetaTranlocal read = tx.openForRead(ref, LOCKMODE_UPDATE);
+        BetaTranlocal read = tx.openForRead(ref, LOCKMODE_WRITE);
 
         boolean hasConflict = ref.___hasReadConflict(read);
 
@@ -120,7 +121,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
 
         //privatize it
         BetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        ref.getLock().acquireCommitLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
         boolean hasConflict = ref.___hasReadConflict(read);
 
@@ -141,7 +142,7 @@ public class VeryAbstractTransactionalObject_hasReadConflictTest implements Beta
 
         //ensure it.
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Write);
 
         boolean hasConflict = ref.___hasReadConflict(read);
 

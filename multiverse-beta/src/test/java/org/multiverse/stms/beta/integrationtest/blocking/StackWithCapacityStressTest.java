@@ -55,7 +55,7 @@ public class StackWithCapacityStressTest implements BetaStmConstants {
 
     @Test
     public void testEnsured() {
-        test(LOCKMODE_UPDATE);
+        test(LOCKMODE_WRITE);
     }
 
     @Test

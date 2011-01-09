@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.*;
 import org.multiverse.api.exceptions.IllegalTransactionFactoryException;
+import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConfiguration;
@@ -102,6 +103,16 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     public BetaTransactionConfiguration(BetaStm stm, int maxArrayTransactionSize) {
         this(stm);
         this.maxArrayTransactionSize = maxArrayTransactionSize;
+    }
+
+    @Override
+    public LockMode getReadLockLevel() {
+        throw new TodoException();
+    }
+
+    @Override
+    public LockMode getWriteLockLevel() {
+        throw new TodoException();
     }
 
     @Override

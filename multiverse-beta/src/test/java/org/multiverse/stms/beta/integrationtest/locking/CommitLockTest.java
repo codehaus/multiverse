@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.integrationtest.locking;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -28,11 +29,11 @@ public class CommitLockTest {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         try {
-            ref.getLock().acquireCommitLock(tx);
+            ref.getLock().acquire(tx, LockMode.Commit);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -47,11 +48,11 @@ public class CommitLockTest {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Write);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         try {
-            ref.getLock().acquireCommitLock(tx);
+            ref.getLock().acquire(tx, LockMode.Commit);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -66,7 +67,7 @@ public class CommitLockTest {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(tx);
+        ref.getLock().acquire(tx, LockMode.Commit);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
         try {
@@ -84,7 +85,7 @@ public class CommitLockTest {
         ref.get(otherTx);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(tx);
+        ref.getLock().acquire(tx, LockMode.Commit);
 
         long result = ref.get(otherTx);
         assertEquals(10, result);
@@ -98,7 +99,7 @@ public class CommitLockTest {
         ref.get(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
         ref.set(tx, 100);
 
@@ -117,7 +118,7 @@ public class CommitLockTest {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         try {
@@ -131,12 +132,12 @@ public class CommitLockTest {
     }
 
     @Test
-    public void whenAlreadyEnsuredBySelf_thenUpgradeToPrivatizeSuccessful() {
+    public void writeLockIsUpgradableToCommitLock() {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(tx);
-        ref.getLock().acquireCommitLock(tx);
+        ref.getLock().acquire(tx, LockMode.Write);
+        ref.getLock().acquire(tx, LockMode.Commit);
 
         assertIsActive(tx);
         assertRefHasCommitLock(ref, tx);
@@ -147,7 +148,7 @@ public class CommitLockTest {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(tx);
+        ref.getLock().acquire(tx,LockMode.Commit);
         tx.commit();
 
         assertIsCommitted(tx);
@@ -159,7 +160,7 @@ public class CommitLockTest {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(tx);
+        ref.getLock().acquire(tx, LockMode.Commit);
         tx.prepare();
 
         assertIsPrepared(tx);
@@ -171,7 +172,7 @@ public class CommitLockTest {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(tx);
+        ref.getLock().acquire(tx, LockMode.Commit);
         tx.abort();
 
         assertIsAborted(tx);
@@ -183,8 +184,8 @@ public class CommitLockTest {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(tx);
-        ref.getLock().acquireCommitLock(tx);
+        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Commit);
 
         assertIsActive(tx);
         assertRefHasCommitLock(ref,tx);
@@ -200,7 +201,7 @@ public class CommitLockTest {
         ref.atomicIncrementAndGet(1);
 
         try {
-            ref.getLock().acquireCommitLock(tx);
+            ref.getLock().acquire(tx, LockMode.Commit);
             fail();
         } catch (ReadWriteConflict expected) {
         }

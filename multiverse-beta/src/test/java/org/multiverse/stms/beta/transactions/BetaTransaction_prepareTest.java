@@ -131,7 +131,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_UPDATE);
+        BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_WRITE);
         tranlocal.value++;
         tx.prepare();
 
@@ -204,7 +204,7 @@ public abstract class BetaTransaction_prepareTest implements BetaStmConstants {
         write.value++;
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForRead(ref, LOCKMODE_UPDATE);
+        otherTx.openForRead(ref, LOCKMODE_WRITE);
 
         try {
             tx.prepare();

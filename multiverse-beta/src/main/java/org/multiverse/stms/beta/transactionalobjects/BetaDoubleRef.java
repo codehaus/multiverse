@@ -149,7 +149,7 @@ public  class BetaDoubleRef
             tranlocal.version = ___version;
             tranlocal.value = value;
             tranlocal.oldValue = value;
-            tranlocal.setLockMode(commitLock ? LOCKMODE_COMMIT: LOCKMODE_UPDATE);
+            tranlocal.setLockMode(commitLock ? LOCKMODE_COMMIT: LOCKMODE_WRITE);
             tranlocal.setDepartObligation(arriveStatus == ARRIVE_NORMAL);
             return true;
         }
@@ -362,7 +362,6 @@ public  class BetaDoubleRef
         return write.value;
     }
 
-    @Override
     public final void acquireWriteLock(){
         Transaction tx = getThreadLocalTransaction();
 
@@ -373,13 +372,12 @@ public  class BetaDoubleRef
         acquireWriteLock((BetaTransaction)tx);
     }
 
-    @Override
     public final void acquireWriteLock(Transaction tx){
         acquireWriteLock((BetaTransaction)tx);
     }
 
     public final void acquireWriteLock(BetaTransaction tx){
-        tx.openForRead(this, LOCKMODE_UPDATE);
+        tx.openForRead(this, LOCKMODE_WRITE);
     }
 
     @Override
@@ -406,7 +404,6 @@ public  class BetaDoubleRef
         tx.materializeConflict(this);
     }
 
-    @Override
     public final void acquireCommitLock(){
         Transaction tx = getThreadLocalTransaction();
 
@@ -417,7 +414,6 @@ public  class BetaDoubleRef
         acquireCommitLock((BetaTransaction)tx);
     }
 
-    @Override
     public final void acquireCommitLock(Transaction tx){
         acquireCommitLock((BetaTransaction)tx);
     }

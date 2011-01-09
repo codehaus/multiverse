@@ -1,9 +1,11 @@
 package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.Lock;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.PanicError;
+import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
@@ -209,7 +211,7 @@ public abstract class VeryAbstractBetaTransactionalObject
         final int currentLockMode = tranlocal.getLockMode();
 
         if (currentLockMode != LOCKMODE_NONE) {
-            if (commitLock && currentLockMode == LOCKMODE_UPDATE) {
+            if (commitLock && currentLockMode == LOCKMODE_WRITE) {
                 tranlocal.setLockMode(LOCKMODE_COMMIT);
                 ___upgradeToCommitLock();
             }
@@ -239,7 +241,7 @@ public abstract class VeryAbstractBetaTransactionalObject
         }
 
         //the lock was acquired successfully.
-        tranlocal.setLockMode(commitLock ? LOCKMODE_COMMIT : LOCKMODE_UPDATE);
+        tranlocal.setLockMode(commitLock ? LOCKMODE_COMMIT : LOCKMODE_WRITE);
         return expectedVersion == ___version;
     }
 
@@ -256,42 +258,6 @@ public abstract class VeryAbstractBetaTransactionalObject
         return tranlocal.version != ___version;
     }
 
-    @Override
-    public final boolean atomicIsUnlocked() {
-        return !___hasLock();
-    }
-
-    @Override
-    public final boolean atomicIsLockedForCommit() {
-        return ___hasCommitLock();
-    }
-
-    @Override
-    public final boolean isLockedForCommitBySelf() {
-        final Transaction tx = getThreadLocalTransaction();
-
-        if (tx == null) {
-            throw new TransactionRequiredException("No transaction is found for the isPrivatizedBySelf operation");
-        }
-
-        return isLockedForCommitBySelf((BetaTransaction) tx);
-    }
-
-    @Override
-    public final boolean isLockedForCommitBySelf(Transaction tx) {
-        return isLockedForCommitBySelf((BetaTransaction) tx);
-    }
-
-    public final boolean isLockedForCommitBySelf(BetaTransaction tx) {
-        if (tx == null) {
-            throw new NullPointerException();
-        }
-
-        final BetaTranlocal tranlocal = tx.locate(this);
-        return tranlocal != null && tranlocal.getLockMode() == LOCKMODE_COMMIT;
-    }
-
-    @Override
     public final boolean isLockedForCommitByOther() {
         final Transaction tx = getThreadLocalTransaction();
 
@@ -302,7 +268,6 @@ public abstract class VeryAbstractBetaTransactionalObject
         return isLockedForCommitByOther((BetaTransaction) tx);
     }
 
-    @Override
     public final boolean isLockedForCommitByOther(Transaction tx) {
         return isLockedForCommitByOther((BetaTransaction) tx);
     }
@@ -321,37 +286,15 @@ public abstract class VeryAbstractBetaTransactionalObject
         return tranlocal == null || tranlocal.getLockMode() == LOCKMODE_NONE;
     }
 
-    @Override
-    public final boolean atomicIsLockedForUpdate() {
-        return ___hasUpdateLock();
-    }
-
-    @Override
-    public final boolean isLockedForWriteBySelf() {
-        final Transaction tx = getThreadLocalTransaction();
-
-        if (tx == null) {
-            throw new TransactionRequiredException("No transaction is found for the isEnsuredBySelf operation");
-        }
-
-        return isLockedForWriteBySelf((BetaTransaction) tx);
-    }
-
-    @Override
-    public final boolean isLockedForWriteBySelf(Transaction tx) {
-        return isLockedForWriteBySelf((BetaTransaction) tx);
-    }
-
-    public final boolean isLockedForWriteBySelf(BetaTransaction tx) {
+     public final boolean isLockedForWriteBySelf(BetaTransaction tx) {
         if (tx == null) {
             throw new NullPointerException();
         }
 
         final BetaTranlocal tranlocal = tx.locate(this);
-        return tranlocal != null && tranlocal.getLockMode() == LOCKMODE_UPDATE;
+        return tranlocal != null && tranlocal.getLockMode() == LOCKMODE_WRITE;
     }
 
-    @Override
     public final boolean isLockedForWriteByOther() {
         final Transaction tx = getThreadLocalTransaction();
 
@@ -362,7 +305,6 @@ public abstract class VeryAbstractBetaTransactionalObject
         return isLockedForWriteByOther((BetaTransaction) tx);
     }
 
-    @Override
     public final boolean isLockedForWriteByOther(Transaction tx) {
         return isLockedForWriteByOther((BetaTransaction) tx);
     }
@@ -870,5 +812,38 @@ public abstract class VeryAbstractBetaTransactionalObject
                 getSurplus(value),
                 isReadBiased(value),
                 getReadonlyCount(value));
+    }
+
+    @Override
+    public void acquire(LockMode lockMode) {
+        throw new TodoException();
+    }
+
+    @Override
+    public void acquire(Transaction tx, LockMode lockMode) {
+        throw new TodoException();
+    }
+
+    @Override
+    public LockMode atomicGetLockMode() {
+        throw new UnsupportedOperationException();
+    }
+
+    public LockMode getLockMode() {
+        throw new TodoException();
+    }
+
+    public LockMode getLockMode(Transaction tx) {
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean tryAcquire(LockMode lockMode) {
+        throw new TodoException();
+    }
+
+    @Override
+    public boolean tryAcquire(Transaction tx, LockMode lockMode) {
+        throw new TodoException();
     }
 }

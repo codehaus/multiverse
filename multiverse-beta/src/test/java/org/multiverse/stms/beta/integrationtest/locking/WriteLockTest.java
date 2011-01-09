@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.integrationtest.locking;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -29,11 +30,11 @@ public class WriteLockTest {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         try {
-            ref.getLock().acquireCommitLock(tx);
+            ref.getLock().acquire(tx, LockMode.Commit);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -48,11 +49,11 @@ public class WriteLockTest {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Write);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         try {
-            ref.getLock().acquireWriteLock(tx);
+            ref.getLock().acquire(tx, LockMode.Write);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -67,7 +68,7 @@ public class WriteLockTest {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Write);
 
         BetaTransaction tx = stm.startDefaultTransaction();
 
@@ -86,7 +87,7 @@ public class WriteLockTest {
         ref.get(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Write);
 
         long result = ref.get(tx);
 
@@ -103,7 +104,7 @@ public class WriteLockTest {
         ref.get(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Write);
 
         ref.set(tx, 100);
 
@@ -122,7 +123,7 @@ public class WriteLockTest {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Write);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         ref.set(tx, 100);
@@ -142,8 +143,8 @@ public class WriteLockTest {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(tx);
-        ref.getLock().acquireWriteLock(tx);
+        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Write);
 
         assertIsActive(tx);
         assertRefHasCommitLock(ref, tx);
@@ -154,7 +155,7 @@ public class WriteLockTest {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(tx);
+        ref.getLock().acquire(tx, LockMode.Write);
         tx.commit();
 
         assertIsCommitted(tx);
@@ -166,7 +167,7 @@ public class WriteLockTest {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(tx);
+        ref.getLock().acquire(tx, LockMode.Write);
         tx.prepare();
 
         assertIsPrepared(tx);
@@ -178,7 +179,7 @@ public class WriteLockTest {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(tx);
+        ref.getLock().acquire(tx, LockMode.Write);
         tx.abort();
 
         assertIsAborted(tx);
@@ -190,8 +191,8 @@ public class WriteLockTest {
         BetaLongRef ref = newLongRef(stm, 5);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(tx);
-        ref.getLock().acquireWriteLock(tx);
+        ref.getLock().acquire(tx, LockMode.Write);
+        ref.getLock().acquire(tx, LockMode.Write);
 
         assertIsActive(tx);
         assertRefHasWriteLock(ref, tx);
@@ -207,7 +208,7 @@ public class WriteLockTest {
         ref.atomicIncrementAndGet(1);
 
         try {
-            ref.getLock().acquireWriteLock(tx);
+            ref.getLock().acquire(tx, LockMode.Write);
             fail();
         } catch (ReadWriteConflict expected) {
         }

@@ -92,7 +92,7 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     public void whenHasUpdateLock() {
         BetaLongRef ref = newLongRef(stm);
         BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.setLockMode(LOCKMODE_UPDATE);
+        tranlocal.setLockMode(LOCKMODE_WRITE);
         tranlocal.value = 100;
         tranlocal.oldValue = 100;
         tranlocal.version = 10;
