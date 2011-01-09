@@ -12,13 +12,13 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
 
 public abstract class GammaTransaction implements GammaConstants, Transaction {
-
+    public final GammaObjectPool pool = new GammaObjectPool();
     public int status = TX_ACTIVE;
     public GammaTransactionConfiguration config;
     public int attempt;
     public long remainingTimeoutNs;
     public boolean hasWrites;
-    public final GammaObjectPool pool = new GammaObjectPool();
+    public boolean arriveEnabled;
 
     public GammaTransaction(GammaTransactionConfiguration config) {
         this.config = config;

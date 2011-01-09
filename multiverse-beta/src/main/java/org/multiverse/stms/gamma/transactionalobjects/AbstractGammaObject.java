@@ -467,6 +467,18 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return true;
     }
 
+    public final boolean waitForNoCommitLock(int spinCount) {
+        do {
+            if (!hasCommitLock(___orec)) {
+                return true;
+            }
+
+            spinCount--;
+        } while (spinCount >= 0);
+
+        return false;
+    }
+
     public final boolean hasCommitLock() {
         return hasCommitLock(___orec);
     }

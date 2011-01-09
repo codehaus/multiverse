@@ -14,7 +14,6 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeTrue;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsActive;
@@ -133,6 +132,27 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         assertEquals(initialValue, second.long_oldValue);
         assertTrue(second.isWrite());
         assertTrue(tx.hasWrites());
+    }
+
+    @Test
+    public void readConsistency_whenNotConsistent(){
+         assumeTrue(getMaxCapacity()>1);
+
+        GammaLongRef ref1 = new GammaLongRef(stm, 0);
+        GammaLongRef ref2 = new GammaLongRef(stm, 0);
+
+        GammaTransaction tx = newTransaction();
+        ref1.openForRead(tx, LOCKMODE_NONE);
+
+        ref1.atomicIncrementAndGet(1);
+
+        try{
+        ref2.openForRead(tx, LOCKMODE_NONE);
+            fail();
+        }catch(ReadWriteConflict expected){
+        }
+
+        assertIsAborted(tx);
     }
 
     // ====================== lock level ========================================

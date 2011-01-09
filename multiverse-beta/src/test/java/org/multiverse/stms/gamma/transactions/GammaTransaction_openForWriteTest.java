@@ -131,6 +131,27 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         assertTrue(tx.hasWrites());
     }
 
+     @Test
+    public void readConsistency_whenNotConsistent(){
+         assumeTrue(getMaxCapacity()>1);
+
+        GammaLongRef ref1 = new GammaLongRef(stm, 0);
+        GammaLongRef ref2 = new GammaLongRef(stm, 0);
+
+        GammaTransaction tx = newTransaction();
+        ref1.openForWrite(tx, LOCKMODE_NONE);
+
+        ref1.atomicIncrementAndGet(1);
+
+        try{
+        ref2.openForWrite(tx, LOCKMODE_NONE);
+            fail();
+        }catch(ReadWriteConflict expected){
+        }
+
+        assertIsAborted(tx);
+    }
+
 // ====================== lock level ========================================
 
     @Test

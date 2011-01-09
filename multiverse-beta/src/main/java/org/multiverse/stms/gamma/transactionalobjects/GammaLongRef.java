@@ -42,7 +42,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
                 if (arriveNeeded) {
                     arriveStatus = arrive(spinCount);
                 } else {
-                    arriveStatus = hasCommitLock() ? ARRIVE_LOCK_NOT_FREE : ARRIVE_UNREGISTERED;
+                    arriveStatus = waitForNoCommitLock(spinCount) ? ARRIVE_UNREGISTERED: ARRIVE_LOCK_NOT_FREE ;
                 }
 
                 if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
@@ -138,17 +138,25 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
         }
 
         GammaTranlocal tranlocal = tx.pool.take(this);
+        tx.attach(tranlocal, identityHash);
+        tx.size++;
+        tx.hasWrites = true;
 
-        //todo: correct acquire arriveneeded
-        if (!load(tranlocal, lockMode, config.spinCount, false)) {
+        if (!load(tranlocal, lockMode, config.spinCount, tx.arriveEnabled)) {
             throw tx.abortOnReadWriteConflict();
         }
 
-        tx.attach(tranlocal, identityHash);
-        tx.size++;
         tranlocal.setDirty(!config.dirtyCheck);
         tranlocal.mode = TRANLOCAL_WRITE;
-        tx.hasWrites = true;
+
+        if (tx.needsConsistency) {
+            if (!tx.isReadConsistent(tranlocal)) {
+                throw tx.abortOnReadWriteConflict();
+            }
+        } else {
+            tx.needsConsistency = true;
+        }
+
         return tranlocal;
     }
 
@@ -185,7 +193,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
             throw tx.abortOnTransactionTooSmall();
         }
 
-        if (!load(tranlocal, lockMode, config.spinCount, false)) {
+        if (!load(tranlocal, lockMode, config.spinCount, tx.arriveEnabled)) {
             throw tx.abortOnReadWriteConflict();
         }
 
@@ -207,7 +215,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
         }
 
         GammaTranlocal found = null;
-        GammaTranlocal free = null;
+        GammaTranlocal newNode = null;
         GammaTranlocal node = tx.head;
         while (true) {
             if (node == null) {
@@ -216,7 +224,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
                 found = node;
                 break;
             } else if (node.owner == null) {
-                free = node;
+                newNode = node;
                 break;
             } else {
                 node = node.next;
@@ -239,21 +247,29 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
             return found;
         }
 
-        if (free == null) {
+        if (newNode == null) {
             throw tx.abortOnTransactionTooSmall();
         }
 
-        //todo: correct arriveNeeded needs to be set here
-        if (!load(free, lockMode, config.spinCount, false)) {
+        if (!load(newNode, lockMode, config.spinCount, tx.arriveEnabled)) {
             throw tx.abortOnReadWriteConflict();
         }
 
-        free.mode = TRANLOCAL_WRITE;
-        free.setDirty(!config.dirtyCheck);
+        if (tx.needsConsistency) {
+            if (!tx.isReadConsistent(newNode)) {
+                throw tx.abortOnReadWriteConflict();
+            }
+        } else {
+            tx.needsConsistency = true;
+        }
+
+        newNode.mode = TRANLOCAL_WRITE;
+        newNode.setDirty(!config.dirtyCheck);
+        tx.needsConsistency = true;
         tx.hasWrites = true;
         tx.size++;
-        tx.shiftInFront(free);
-        return free;
+        tx.shiftInFront(newNode);
+        return newNode;
     }
 
     @Override
@@ -297,7 +313,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
             throw tx.abortOnTransactionTooSmall();
         }
 
-        if (!load(tranlocal, lockMode, config.spinCount, false)) {
+        if (!load(tranlocal, lockMode, config.spinCount, tx.arriveEnabled)) {
             throw tx.abortOnReadWriteConflict();
         }
 
@@ -312,7 +328,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
         }
 
         GammaTranlocal found = null;
-        GammaTranlocal free = null;
+        GammaTranlocal newNode = null;
         GammaTranlocal node = tx.head;
         while (true) {
             if (node == null) {
@@ -321,7 +337,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
                 found = node;
                 break;
             } else if (node.owner == null) {
-                free = node;
+                newNode = node;
                 break;
             } else {
                 node = node.next;
@@ -343,19 +359,28 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
             return found;
         }
 
-        if (free == null) {
+        if (newNode == null) {
             throw tx.abortOnTransactionTooSmall();
         }
 
-        //todo: correct arriveRequired needs to be set here.
-        if (!load(free, lockMode, config.spinCount, false)) {
+        newNode.mode = TRANLOCAL_READ;
+
+        if (!load(newNode, lockMode, config.spinCount, tx.arriveEnabled)) {
             throw tx.abortOnReadWriteConflict();
         }
 
-        free.mode = TRANLOCAL_READ;
         tx.size++;
-        tx.shiftInFront(free);
-        return free;
+        tx.shiftInFront(newNode);
+
+        if (tx.needsConsistency) {
+            if (!tx.isReadConsistent(newNode)) {
+                throw tx.abortOnReadWriteConflict();
+            }
+        } else {
+            tx.needsConsistency = true;
+        }
+
+        return newNode;
     }
 
     @Override
@@ -384,14 +409,22 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
         }
 
         GammaTranlocal tranlocal = tx.pool.take(this);
+        tranlocal.mode = TRANLOCAL_READ;
+        tx.attach(tranlocal, identityHash);
+        tx.size++;
 
-        if (!load(tranlocal, lockMode, config.spinCount, false)) {
+        if (!load(tranlocal, lockMode, config.spinCount, tx.arriveEnabled)) {
             throw tx.abortOnReadWriteConflict();
         }
 
-        tx.attach(tranlocal, identityHash);
-        tx.size++;
-        tranlocal.mode = TRANLOCAL_READ;
+        if (tx.needsConsistency) {
+            if (!tx.isReadConsistent(tranlocal)) {
+                throw tx.abortOnReadWriteConflict();
+            }
+        } else {
+            tx.needsConsistency = true;
+        }
+
         return tranlocal;
     }
 

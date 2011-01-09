@@ -10,7 +10,8 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
 public final class MapGammaTransaction extends GammaTransaction {
 
     public GammaTranlocal[] array;
-    public int size;
+    public int size = 0;
+    public boolean needsConsistency = false;
 
     public MapGammaTransaction(GammaStm stm) {
         this(new GammaTransactionConfiguration(stm));
@@ -130,7 +131,7 @@ public final class MapGammaTransaction extends GammaTransaction {
             }
 
 
-            array[k]=null;
+            array[k] = null;
             if (tranlocal.isDirty) {
                 GammaLongRef ref = (GammaLongRef) tranlocal.owner;
                 ref.version++;
@@ -229,6 +230,7 @@ public final class MapGammaTransaction extends GammaTransaction {
         remainingTimeoutNs = config.timeoutNs;
         attempt = 0;
         size = 0;
+        needsConsistency = false;
     }
 
     @Override
@@ -248,5 +250,33 @@ public final class MapGammaTransaction extends GammaTransaction {
         }
 
         throw new TodoException();
+    }
+
+    public boolean isReadConsistent(GammaTranlocal justAdded) {
+        if(!needsConsistency){
+            return true;
+        }
+
+        if (config.writeLockMode > LOCKMODE_NONE) {
+            return true;
+        }
+
+        if (arriveEnabled) {
+
+        }
+
+        //doing a full conflict scan
+        for (int k = 0; k < array.length; k++) {
+            GammaTranlocal tranlocal = array[k];
+            if (tranlocal == null || tranlocal == justAdded) {
+                continue;
+            }
+
+            if(tranlocal.owner.hasReadConflict(tranlocal)){
+                return false;
+            }
+        }
+
+        return true;
     }
 }

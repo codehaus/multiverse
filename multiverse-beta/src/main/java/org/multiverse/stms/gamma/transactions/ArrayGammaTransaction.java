@@ -11,6 +11,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
 
     public GammaTranlocal head;
     public int size = 0;
+    public boolean needsConsistency = false;
 
     public ArrayGammaTransaction(GammaStm stm) {
         this(new GammaTransactionConfiguration(stm));
@@ -127,13 +128,13 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         while (node != null) {
             GammaObject owner = node.owner;
 
-            if(owner == null){
+            if (owner == null) {
                 return;
             }
 
-            if(success){
+            if (success) {
                 owner.releaseAfterReading(node, pool);
-            }else{
+            } else {
                 owner.releaseAfterFailure(node, pool);
             }
 
@@ -177,6 +178,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         size = 0;
         remainingTimeoutNs = config.timeoutNs;
         attempt = 0;
+        needsConsistency = false;
     }
 
     public void shiftInFront(GammaTranlocal newHead) {
@@ -224,4 +226,37 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         throw new TodoException();
     }
 
+    public boolean isReadConsistent(GammaTranlocal justAdded) {
+        if (!needsConsistency) {
+            return true;
+        }
+
+        if (config.writeLockMode > LOCKMODE_NONE) {
+            return true;
+        }
+
+        if (arriveEnabled) {
+
+        }
+
+        GammaTranlocal node = head;
+        while (node != null) {
+            //if we are at the end, we are done.
+            if (node.owner == null) {
+                break;
+            }
+
+            //lets skip the one we just added
+            if (node != justAdded) {
+                //if there is a read conflict, we are doe
+                if (node.owner.hasReadConflict(node)) {
+                    return false;
+                }
+            }
+
+            node = node.next;
+        }
+
+        return true;
+    }
 }
