@@ -363,6 +363,110 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
     }
 
+
+    private void yieldIfNeeded(int remainingSpins) {
+        if (remainingSpins % ___SpinYield == 0 && remainingSpins > 0) {
+            Thread.yield();
+        }
+    }
+
+    @Override
+    public void releaseAfterFailure(GammaTranlocal tranlocal, GammaObjectPool pool) {
+        if (tranlocal.hasDepartObligation()) {
+            if (tranlocal.getLockMode() != LOCKMODE_NONE) {
+                departAfterFailureAndUnlock();
+                tranlocal.setLockMode(LOCKMODE_NONE);
+            } else {
+                departAfterFailure();
+            }
+            tranlocal.setDepartObligation(false);
+        }
+
+        tranlocal.owner = null;
+    }
+
+    @Override
+    public void releaseAfterUpdate(GammaTranlocal tranlocal, GammaObjectPool pool) {
+        departAfterUpdateAndUnlock();
+        tranlocal.setLockMode(LOCKMODE_NONE);
+        tranlocal.owner = null;
+        tranlocal.setDepartObligation(false);
+    }
+
+    @Override
+    public void releaseAfterReading(GammaTranlocal tranlocal, GammaObjectPool pool) {
+        if (tranlocal.hasDepartObligation()) {
+            if (tranlocal.getLockMode() != LOCKMODE_NONE) {
+                departAfterReadingAndUnlock();
+                tranlocal.setLockMode(LOCKMODE_NONE);
+            } else {
+                departAfterReading();
+            }
+            tranlocal.setDepartObligation(false);
+        }
+
+        tranlocal.owner = null;
+    }
+
+    @Override
+    public final boolean tryLockAndCheckConflict(
+            final int spinCount,
+            final GammaTranlocal tranlocal,
+            final int desiredLockMode) {
+
+        final int currentLockMode = tranlocal.getLockMode();
+
+        //if the currentlock mode is higher or equal than the desired lockmode, we are done.
+        if (currentLockMode >= desiredLockMode) {
+            return true;
+        }
+
+        //no lock currently is acquired, lets acquire it.
+        if (currentLockMode == LOCKMODE_NONE) {
+            long expectedVersion = tranlocal.version;
+
+            //if the version already is different, we are since since the lock doesn't need to be acquired.
+            if (expectedVersion != version) {
+                return false;
+            }
+
+            if (!tranlocal.hasDepartObligation()) {
+                //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
+                final int arriveStatus = tryLockAndArrive(spinCount, desiredLockMode);
+
+                if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+                    return false;
+                }
+
+                if (arriveStatus == ARRIVE_NORMAL) {
+                    tranlocal.setDepartObligation(true);
+                }
+            } else if (!tryLockAfterNormalArrive(spinCount, desiredLockMode)) {
+                return false;
+            }
+
+            tranlocal.setLockMode(desiredLockMode);
+
+            //if the version already is different, we are done since we know that there is a conflict.
+            return version == expectedVersion;
+        }
+
+        //if a readlock is acquired, we need to upgrade it.
+        if (currentLockMode == LOCKMODE_READ) {
+            if (!tryUpgradeFromReadLock(spinCount, desiredLockMode == LOCKMODE_COMMIT)) {
+                return false;
+            }
+
+            tranlocal.setLockMode(desiredLockMode);
+            return true;
+        }
+
+        //so we have the write lock, its needs to be upgraded to a commit lock.
+        upgradeWriteLockToCommitLock();
+        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        return true;
+    }
+
     public final boolean hasCommitLock() {
         return hasCommitLock(___orec);
     }
@@ -423,144 +527,39 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return ARRIVE_LOCK_NOT_FREE;
     }
 
-    private void yieldIfNeeded(int remainingSpins) {
-        if (remainingSpins % ___SpinYield == 0 && remainingSpins > 0) {
-            Thread.yield();
-        }
-    }
+    public boolean tryUpgradeFromReadLock(int spinCount, boolean commitLock) {
+        do {
+            final long current = ___orec;
 
-    @Override
-    public void releaseAfterFailure(GammaTranlocal tranlocal, GammaObjectPool pool) {
-        if(tranlocal.hasDepartObligation()){
-            if(tranlocal.getLockMode()!=LOCKMODE_NONE){
-                departAfterFailureAndUnlock();
-                tranlocal.setLockMode(LOCKMODE_NONE);
-            }else{
-                departAfterFailure();
-            }
-            tranlocal.setDepartObligation(false);
-        }
+            int readLockCount = getReadLockCount(current);
 
-        tranlocal.owner = null;
-    }
-
-    @Override
-    public void releaseAfterUpdate(GammaTranlocal tranlocal, GammaObjectPool pool) {
-        departAfterUpdateAndUnlock();
-        tranlocal.setLockMode(LOCKMODE_NONE);
-        tranlocal.owner = null;
-        tranlocal.setDepartObligation(false);
-    }
-
-    @Override
-    public void releaseAfterReading(GammaTranlocal tranlocal, GammaObjectPool pool) {
-        if(tranlocal.hasDepartObligation()){
-            if(tranlocal.getLockMode()!=LOCKMODE_NONE){
-                departAfterReadingAndUnlock();
-                tranlocal.setLockMode(LOCKMODE_NONE);
-            }else{
-                departAfterReading();
-            }
-            tranlocal.setDepartObligation(false);
-        }
-
-        tranlocal.owner = null;
-    }
-
-    @Override
-    public final boolean tryLockAndCheckConflict(
-            final int spinCount,
-            final GammaTranlocal tranlocal,
-            final int desiredLockMode) {
-
-        final int currentLockMode = tranlocal.getLockMode();
-
-        if (currentLockMode >= desiredLockMode) {
-            return true;
-        }
-
-        if (currentLockMode == LOCKMODE_WRITE && desiredLockMode == LOCKMODE_COMMIT) {
-            upgradeWriteLockToCommitLock();
-            tranlocal.setLockMode(LOCKMODE_COMMIT);
-            return true;
-        }
-
-        final long expectedVersion = tranlocal.version;
-
-        //if the version already is different, we are done since we know that there is a conflict.
-        if (version != expectedVersion) {
-            return false;
-        }
-
-        if (!tranlocal.hasDepartObligation()) {
-            //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
-            final int arriveStatus = tryLockAndArrive(spinCount, desiredLockMode);
-
-            if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
-                return false;
+            if (readLockCount == 0) {
+                throw new PanicError();
             }
 
-            if (arriveStatus == ARRIVE_NORMAL) {
-                tranlocal.setDepartObligation(true);
-            }
-        } else if (!tryLockAfterNormalArrive(spinCount, desiredLockMode)) {
-            return false;
-        }
-
-        //the lock was acquired successfully.
-        tranlocal.setLockMode(desiredLockMode);
-        return expectedVersion == version;
-    }
-
-    @Override
-    public final boolean tryCommitLockAndCheckConflict(
-            final int spinCount,
-            final GammaTranlocal tranlocal) {
-
-        final int currentLockMode = tranlocal.getLockMode();
-
-        if (currentLockMode == LOCKMODE_COMMIT) {
-            return true;
-        }
-
-        if (currentLockMode == LOCKMODE_WRITE) {
-            upgradeWriteLockToCommitLock();
-            tranlocal.setLockMode(LOCKMODE_COMMIT);
-            return true;
-        }
-
-        final long expectedVersion = tranlocal.version;
-
-        //if the version already is different, we are done since we know that there is a conflict.
-        if (version != expectedVersion) {
-            return false;
-        }
-
-        if (!tranlocal.hasDepartObligation()) {
-            //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
-            final int arriveStatus = ___tryCommitLockAndArrive(spinCount);
-
-            if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
-                return false;
+            if (readLockCount > 1) {
+                spinCount--;
+                yieldIfNeeded(spinCount);
+                continue;
             }
 
-            if (arriveStatus == ARRIVE_NORMAL) {
-                tranlocal.setDepartObligation(true);
+            long next = setReadLockCount(current, 0);
+            if (commitLock) {
+                next = setCommitLock(next, true);
+            } else {
+                next = setWriteLock(next, true);
             }
-        } else if (!tryLockAfterNormalArrive(spinCount, LOCKMODE_COMMIT)) {
-            return false;
-        }
+            int x = getReadLockCount(current);
 
-        //the lock was acquired successfully.
-        tranlocal.setLockMode(LOCKMODE_COMMIT);
-        return expectedVersion == version;
+            if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
+                return true;
+            }
+        } while (spinCount >= 0);
+
+        return false;
     }
 
     public final int tryLockAndArrive(int spinCount, final int lockMode) {
-        if(lockMode == LOCKMODE_NONE){
-            return arrive(spinCount);
-        }
-
         do {
             final long current = ___orec;
 
@@ -790,24 +789,24 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         while (true) {
             final long current = ___orec;
 
-            if (!hasCommitLock(current)) {
-                throw new PanicError(
-                        "Can't ___departAfterUpdateAndUnlock is the commit lock is not acquired " + toOrecString(current));
-            }
+            //if (!hasCommitLock(current)) {
+            //    throw new PanicError(
+            //            "Can't ___departAfterUpdateAndUnlock is the commit lock is not acquired " + toOrecString(current));
+            //}
 
             long surplus = getSurplus(current);
 
-            if (surplus == 0) {
-                throw new PanicError(
-                        "Can't ___departAfterUpdateAndUnlock is there is no surplus " + toOrecString(current));
-            }
+            //if (surplus == 0) {
+            //    throw new PanicError(
+            //            "Can't ___departAfterUpdateAndUnlock is there is no surplus " + toOrecString(current));
+            //}
 
             boolean conflict;
             if (isReadBiased(current)) {
-                if (surplus > 1) {
-                    throw new PanicError(
-                            "The surplus can never be larger than 1 if readBiased " + toOrecString(current));
-                }
+                //if (surplus > 1) {
+                //    throw new PanicError(
+                //            "The surplus can never be larger than 1 if readBiased " + toOrecString(current));
+                //}
 
                 //there always is a conflict when a readbiased orec is updated.
                 conflict = true;
@@ -828,6 +827,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             }
 
             final long next = setSurplus(0, surplus);
+
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
                 return surplus;
             }
@@ -876,7 +876,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 next = setCommitLock(next, false);
                 next = setWriteLock(next, false);
             } else {
-                next = setReadonlyCount(next, getReadLockCount()-1);
+                next = setReadonlyCount(next, getReadLockCount() - 1);
             }
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {

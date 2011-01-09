@@ -274,7 +274,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
     @Override
     public GammaTranlocal openForRead(final MonoGammaTransaction tx, int lockMode) {
         if (tx.status != TX_ACTIVE) {
-            throw tx.abortOpenForWriteOnBadStatus();
+            throw tx.abortOpenForReadOnBadStatus();
         }
 
         final GammaTransactionConfiguration config = tx.config;
@@ -308,7 +308,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
     @Override
     public GammaTranlocal openForRead(ArrayGammaTransaction tx, int lockMode) {
         if (tx.status != TX_ACTIVE) {
-            throw tx.abortOpenForWriteOnBadStatus();
+            throw tx.abortOpenForReadOnBadStatus();
         }
 
         GammaTranlocal found = null;
@@ -361,7 +361,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
     @Override
     public GammaTranlocal openForRead(MapGammaTransaction tx, int lockMode) {
         if (tx.status != TX_ACTIVE) {
-            throw tx.abortOpenForWriteOnBadStatus();
+            throw tx.abortOpenForReadOnBadStatus();
         }
 
         final GammaTransactionConfiguration config = tx.config;
@@ -585,7 +585,6 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
 
         return returnOld ? oldValue : newValue;
     }
-
 
     @Override
     public long alterAndGet(LongFunction function) {

@@ -1,4 +1,4 @@
-package org.multiverse.stms.benchmarks;
+package org.multiverse.stms.gamma.benchmarks;
 
 import org.benchy.BenchyUtils;
 import org.junit.Before;
@@ -20,6 +20,12 @@ public class MonoUpdateDriver implements GammaConstants {
          stm = new GammaStm();
     }
 
+    public static void main(String[] srgs){
+        MonoUpdateDriver driver = new MonoUpdateDriver();
+        driver.setUp();
+        driver.test();
+    }
+
     @Test
     public void test(){
         final long txCount = 1000 * 1000 * 1000;
@@ -32,7 +38,7 @@ public class MonoUpdateDriver implements GammaConstants {
         for(long k=0;k<txCount;k++){
             ref.openForWrite(tx,LOCKMODE_NONE).long_value++;
             tx.commit();
-            tx.reset();
+            tx.hardReset();
         }
         long durationMs = System.currentTimeMillis()-startMs;
 

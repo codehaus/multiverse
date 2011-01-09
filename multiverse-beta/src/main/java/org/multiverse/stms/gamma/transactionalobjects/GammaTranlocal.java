@@ -1,10 +1,9 @@
 package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.multiverse.stms.gamma.GammaConstants;
-import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
-public class GammaTranlocal implements GammaConstants {
+public final class GammaTranlocal implements GammaConstants {
 
     public long long_value;
     public long long_oldValue;
@@ -17,8 +16,6 @@ public class GammaTranlocal implements GammaConstants {
     public GammaTranlocal next;
     public GammaTranlocal previous;
     public boolean isDirty = false;
-
-
 
     public boolean isDirty() {
         return isDirty;
@@ -76,7 +73,7 @@ public class GammaTranlocal implements GammaConstants {
             setDirty(true);
         }
 
-        return owner.tryCommitLockAndCheckConflict(config.spinCount, this);
+        return owner.tryLockAndCheckConflict(config.spinCount, this, LOCKMODE_COMMIT);
     }
 
 

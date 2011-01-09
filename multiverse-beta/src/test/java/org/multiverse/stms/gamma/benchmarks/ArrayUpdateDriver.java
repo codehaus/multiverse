@@ -1,4 +1,4 @@
-package org.multiverse.stms.benchmarks;
+package org.multiverse.stms.gamma.benchmarks;
 
 import org.benchy.BenchyUtils;
 import org.junit.Before;
@@ -36,7 +36,7 @@ public class ArrayUpdateDriver implements GammaConstants {
                 refs[l].openForWrite(tx,LOCKMODE_NONE).long_value++;
             }
             tx.commit();
-            tx.reset();
+            tx.hardReset();
         }
         long durationMs = System.currentTimeMillis()-startMs;
 

@@ -223,7 +223,7 @@ public final class MapGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public void reset() {
+    public void hardReset() {
         status = TX_ACTIVE;
         hasWrites = false;
         remainingTimeoutNs = config.timeoutNs;

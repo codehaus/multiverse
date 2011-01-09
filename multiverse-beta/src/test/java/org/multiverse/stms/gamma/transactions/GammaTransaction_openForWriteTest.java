@@ -131,6 +131,89 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         assertTrue(tx.hasWrites());
     }
 
+// ====================== lock level ========================================
+
+    @Test
+    public void lockLevel() {
+        lockLevel(LOCKMODE_NONE, LOCKMODE_NONE, LOCKMODE_NONE);
+        lockLevel(LOCKMODE_NONE, LOCKMODE_READ, LOCKMODE_READ);
+        lockLevel(LOCKMODE_NONE, LOCKMODE_WRITE, LOCKMODE_WRITE);
+        lockLevel(LOCKMODE_NONE, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+
+        lockLevel(LOCKMODE_READ, LOCKMODE_NONE, LOCKMODE_READ);
+        lockLevel(LOCKMODE_READ, LOCKMODE_READ, LOCKMODE_READ);
+        lockLevel(LOCKMODE_READ, LOCKMODE_WRITE, LOCKMODE_WRITE);
+        lockLevel(LOCKMODE_READ, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+
+        lockLevel(LOCKMODE_WRITE, LOCKMODE_NONE, LOCKMODE_WRITE);
+        lockLevel(LOCKMODE_WRITE, LOCKMODE_READ, LOCKMODE_WRITE);
+        lockLevel(LOCKMODE_WRITE, LOCKMODE_WRITE, LOCKMODE_WRITE);
+        lockLevel(LOCKMODE_WRITE, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+
+        lockLevel(LOCKMODE_COMMIT, LOCKMODE_NONE, LOCKMODE_COMMIT);
+        lockLevel(LOCKMODE_COMMIT, LOCKMODE_READ, LOCKMODE_COMMIT);
+        lockLevel(LOCKMODE_COMMIT, LOCKMODE_WRITE, LOCKMODE_COMMIT);
+        lockLevel(LOCKMODE_COMMIT, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+    }
+
+    public void lockLevel(int transactionWriteLockMode, int writeLockMode, int expectedLockMode) {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm);
+        config.writeLockMode = transactionWriteLockMode;
+        GammaTransaction tx = newTransaction(config);
+        GammaTranlocal tranlocal = ref.openForWrite(tx, writeLockMode);
+
+        assertEquals(expectedLockMode, tranlocal.getLockMode());
+        assertEquals(TRANLOCAL_WRITE, tranlocal.getMode());
+        assertIsActive(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertRefHasLockMode(ref, tx, expectedLockMode);
+    }
+
+    // ======================= lock upgrade ===================================
+
+    @Test
+    public void lockUpgrade() {
+        lockUpgrade(LOCKMODE_NONE, LOCKMODE_NONE, LOCKMODE_NONE);
+        lockUpgrade(LOCKMODE_NONE, LOCKMODE_READ, LOCKMODE_READ);
+        lockUpgrade(LOCKMODE_NONE, LOCKMODE_WRITE, LOCKMODE_WRITE);
+        lockUpgrade(LOCKMODE_NONE, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+
+        lockUpgrade(LOCKMODE_READ, LOCKMODE_NONE, LOCKMODE_READ);
+        lockUpgrade(LOCKMODE_READ, LOCKMODE_READ, LOCKMODE_READ);
+        lockUpgrade(LOCKMODE_READ, LOCKMODE_WRITE, LOCKMODE_WRITE);
+        lockUpgrade(LOCKMODE_READ, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+
+        lockUpgrade(LOCKMODE_WRITE, LOCKMODE_NONE, LOCKMODE_WRITE);
+        lockUpgrade(LOCKMODE_WRITE, LOCKMODE_READ, LOCKMODE_WRITE);
+        lockUpgrade(LOCKMODE_WRITE, LOCKMODE_WRITE, LOCKMODE_WRITE);
+        lockUpgrade(LOCKMODE_WRITE, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+
+        lockUpgrade(LOCKMODE_COMMIT, LOCKMODE_NONE, LOCKMODE_COMMIT);
+        lockUpgrade(LOCKMODE_COMMIT, LOCKMODE_READ, LOCKMODE_COMMIT);
+        lockUpgrade(LOCKMODE_COMMIT, LOCKMODE_WRITE, LOCKMODE_COMMIT);
+        lockUpgrade(LOCKMODE_COMMIT, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+    }
+
+    public void lockUpgrade(int firstMode, int secondLockMode, int expectedLockMode) {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction tx = newTransaction();
+        ref.openForWrite(tx, firstMode);
+        GammaTranlocal tranlocal = ref.openForWrite(tx, secondLockMode);
+
+        assertEquals(expectedLockMode, tranlocal.getLockMode());
+        assertEquals(TRANLOCAL_WRITE, tranlocal.getMode());
+        assertIsActive(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertRefHasLockMode(ref, tx, expectedLockMode);
+    }
+
     // ===================== locking ============================================
 
     @Test
@@ -219,7 +302,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         long initialVersion = ref.getVersion();
 
         T otherTx = newTransaction();
-        ref.getLock().acquire(otherTx,LockMode.Read);
+        ref.getLock().acquire(otherTx, LockMode.Read);
 
         T tx = newTransaction();
         GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_READ);

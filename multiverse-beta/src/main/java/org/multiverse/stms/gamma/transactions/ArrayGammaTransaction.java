@@ -171,7 +171,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         return get(o);
     }
 
-    public void reset() {
+    public void hardReset() {
         status = TX_ACTIVE;
         hasWrites = false;
         size = 0;

@@ -44,7 +44,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
 
     @Override
     public void commit() {
-        if(status == TX_COMMITTED){
+        if (status == TX_COMMITTED) {
             return;
         }
 
@@ -58,18 +58,36 @@ public final class MonoGammaTransaction extends GammaTransaction {
             if (tranlocal.mode == TRANLOCAL_READ) {
                 owner.releaseAfterReading(tranlocal, pool);
             } else if (tranlocal.mode == TRANLOCAL_WRITE) {
+                GammaLongRef ref = (GammaLongRef) owner;
+
                 if (status == TX_ACTIVE) {
-                    if (!tranlocal.prepare(config)) {
+                    if (!tranlocal.isDirty()) {
+                        boolean isDirty = tranlocal.long_value != tranlocal.long_oldValue;
+
+                        if (isDirty) {
+                            tranlocal.setDirty(true);
+                        }
+                    }
+
+                    if (!ref.tryLockAndCheckConflict(config.spinCount, tranlocal, LOCKMODE_COMMIT)) {
                         throw abortOnReadWriteConflict();
                     }
+
+
+                    //if (!tranlocal.prepare(config)) {
+                    //
+                    //}
                 }
 
                 if (tranlocal.isDirty()) {
-                    GammaLongRef ref = (GammaLongRef) owner;
-                    ref.version++;
+                    ref.version = tranlocal.version + 1;
                     ref.value = tranlocal.long_value;
-                    ref.releaseAfterUpdate(tranlocal, pool);
-                 }else{
+                    //ref.releaseAfterUpdate(tranlocal, pool);
+                    ref.departAfterUpdateAndUnlock();
+                    tranlocal.setLockMode(LOCKMODE_NONE);
+                    tranlocal.owner = null;
+                    tranlocal.setDepartObligation(false);
+                } else {
                     owner.releaseAfterReading(tranlocal, pool);
                 }
             } else {
@@ -118,7 +136,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
     }
 
 
-    public void reset() {
+    public void hardReset() {
         status = TX_ACTIVE;
         hasWrites = false;
         remainingTimeoutNs = config.timeoutNs;

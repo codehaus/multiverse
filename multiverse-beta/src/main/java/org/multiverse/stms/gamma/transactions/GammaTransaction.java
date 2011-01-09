@@ -189,7 +189,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         throw new TodoException();
     }
 
-    public abstract void reset();
+    public abstract void hardReset();
 
     public abstract GammaTranlocal get(GammaObject ref);
 

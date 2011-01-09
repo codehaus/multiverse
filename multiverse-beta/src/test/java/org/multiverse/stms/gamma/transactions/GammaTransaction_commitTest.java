@@ -113,7 +113,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
         for (int k = 0; k < txCount; k++) {
             ref.openForWrite(tx, LOCKMODE_NONE).long_value++;
             tx.commit();
-            tx.reset();
+            tx.hardReset();
         }
 
         assertEquals(initialValue + txCount, ref.value);

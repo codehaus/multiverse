@@ -75,7 +75,7 @@ public class MapGammaTransaction_stressTest implements GammaConstants{
                 }
             }
             tx.commit();
-            tx.reset();
+            tx.hardReset();
 
             if (transaction % 1000 == 0) {
                 System.out.println("at " + transaction);

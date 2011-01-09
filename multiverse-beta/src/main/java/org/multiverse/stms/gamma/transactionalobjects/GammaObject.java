@@ -34,8 +34,6 @@ public interface GammaObject extends GammaConstants {
 
     boolean tryLockAndCheckConflict(int spinCount, GammaTranlocal tranlocal, int lockMode);
 
-    boolean tryCommitLockAndCheckConflict(int spinCount, GammaTranlocal tranlocal);
-
     boolean hasReadConflict(GammaTranlocal tranlocal);
 
     void releaseAfterFailure(GammaTranlocal tranlocal, GammaObjectPool pool);

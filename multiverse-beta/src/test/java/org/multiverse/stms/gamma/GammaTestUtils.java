@@ -15,6 +15,7 @@ public class GammaTestUtils implements GammaConstants{
 
     public static void assertRefHasNoLocks(AbstractGammaObject ref) {
         assertLockMode(ref, LOCKMODE_NONE);
+        assertReadLockCount(ref, 0);
     }
 
     public static void assertRefHasReadLock(AbstractGammaObject ref, GammaTransaction tx){
@@ -32,6 +33,7 @@ public class GammaTestUtils implements GammaConstants{
             Assert.assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         }
         assertLockMode(ref, LOCKMODE_NONE);
+        assertReadLockCount(ref, 0);
     }
 
     public static void assertRefHasWriteLock(AbstractGammaObject ref, GammaTransaction lockOwner) {
@@ -41,6 +43,7 @@ public class GammaTestUtils implements GammaConstants{
         }
         Assert.assertEquals(LOCKMODE_WRITE, tranlocal.getLockMode());
         assertLockMode(ref, LOCKMODE_WRITE);
+        assertReadLockCount(ref, 0);
     }
 
     public static void assertRefHasCommitLock(AbstractGammaObject ref, GammaTransaction lockOwner) {
@@ -50,12 +53,16 @@ public class GammaTestUtils implements GammaConstants{
         }
         Assert.assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
         assertLockMode(ref, LOCKMODE_COMMIT);
+        assertReadLockCount(ref, 0);
     }
 
     public static void assertRefHasLockMode(AbstractGammaObject ref, GammaTransaction lockOwner, int lockMode) {
         switch (lockMode) {
             case LOCKMODE_NONE:
                 assertRefHasNoLocks(ref, lockOwner);
+                break;
+            case LOCKMODE_READ:
+                assertRefHasReadLock(ref, lockOwner);
                 break;
             case LOCKMODE_WRITE:
                 assertRefHasWriteLock(ref, lockOwner);
