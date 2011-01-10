@@ -13,6 +13,11 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
 
 public abstract class GammaTransaction implements GammaConstants, Transaction {
+
+    public final static int POOL_TRANSACTIONTYPE_MONO = 1;
+    public final static int POOL_TRANSACTIONTYPE_ARRAY = 2;
+    public final static int POOL_TRANSACTIONTYPE_MAP = 3;
+
     public final GammaObjectPool pool = new GammaObjectPool();
     public int status = TX_ACTIVE;
     public GammaTransactionConfiguration config;
@@ -20,9 +25,11 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public long remainingTimeoutNs;
     public boolean hasWrites;
     public boolean arriveEnabled;
+    public final int transactionType;
 
-    public GammaTransaction(GammaTransactionConfiguration config) {
+    public GammaTransaction(GammaTransactionConfiguration config, int transactionType) {
         this.config = config;
+        this.transactionType = transactionType;
     }
 
     public abstract void commute(GammaLongRef ref, LongFunction function);
@@ -194,10 +201,12 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public abstract void hardReset();
 
+    public abstract boolean softReset();
+
     public abstract GammaTranlocal get(GammaObject ref);
 
-    public final NullPointerException abortOnNullLockMode(){
-        switch (status){
+    public final NullPointerException abortOnNullLockMode() {
+        switch (status) {
             case TX_ACTIVE:
                 abort();
                 return new NullPointerException();
@@ -212,4 +221,14 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                 throw new IllegalStateException();
         }
     }
+
+    public final boolean isAlive() {
+        return status == TX_ACTIVE || status == TX_PREPARED;
+    }
+
+    public final void awaitUpdate(){
+        throw new TodoException();
+    }
+
+    public abstract void copyForSpeculativeFailure(GammaTransaction failingTx);
 }

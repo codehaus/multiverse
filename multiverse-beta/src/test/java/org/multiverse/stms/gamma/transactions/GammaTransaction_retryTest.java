@@ -57,7 +57,7 @@ public abstract class GammaTransaction_retryTest<T extends GammaTransaction> {
     @Test
     public void whenNoRetryAllowed(){
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm);
-        config.isBlockingAllowed = false;
+        config.blockingAllowed = false;
 
         T tx = newTransaction(config);
         try{

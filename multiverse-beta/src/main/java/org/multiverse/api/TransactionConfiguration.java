@@ -115,9 +115,9 @@ public interface TransactionConfiguration {
      */
     LockLevel getLockLevel();
 
-    LockMode getReadLockLevel();
+    LockMode getReadLockMode();
 
-    LockMode getWriteLockLevel();
+    LockMode getWriteLockMode();
 
     /**
      * Checks if dirty check is enabled on writes when a transaction commits. Turning of saves time,

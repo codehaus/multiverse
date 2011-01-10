@@ -1,15 +1,15 @@
 package org.multiverse.stms.gamma;
 
-import org.multiverse.api.BackoffPolicy;
-import org.multiverse.api.OrElseBlock;
-import org.multiverse.api.Stm;
+import org.multiverse.api.*;
 import org.multiverse.api.collections.TransactionalCollectionsFactory;
 import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.api.references.*;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactions.ArrayGammaTransaction;
-import org.multiverse.stms.gamma.transactions.GammaTransaction;
-import org.multiverse.stms.gamma.transactions.GammaTransactionFactoryBuilder;
+import org.multiverse.stms.gamma.transactions.*;
+
+import static org.multiverse.stms.gamma.ThreadLocalGammaTransactionPool.getThreadLocalGammaTransactionPool;
+
 
 public final class GammaStm implements Stm {
 
@@ -19,31 +19,237 @@ public final class GammaStm implements Stm {
 
     public final GlobalConflictCounter globalConflictCounter = new GlobalConflictCounter();
     public final GammaRefFactory defaultRefFactory = new GammaRefFactory();
+    public final GammaAtomicBlock defaultAtomicBlock;
+    public final GammaTransactionConfiguration defaultConfig;
 
     public GammaStm() {
         this(new GammaStmConfiguration());
     }
 
-    public GammaStm(GammaStmConfiguration config) {
-        this.defaultMaxRetries = config.maxRetries;
-        this.spinCount = config.spinCount;
-        this.defaultBackoffPolicy = config.backoffPolicy;
+    public GammaStm(GammaStmConfiguration configuration) {
+        this.defaultMaxRetries = configuration.maxRetries;
+        this.spinCount = configuration.spinCount;
+        this.defaultBackoffPolicy = configuration.backoffPolicy;
+        this.defaultConfig = new GammaTransactionConfiguration(this, configuration)
+                .setSpinCount(spinCount);
+        this.defaultAtomicBlock = createTransactionFactoryBuilder()
+                .setSpeculativeConfigurationEnabled(false)
+                .buildAtomicBlock();
     }
 
     @Override
     public GammaTransaction startDefaultTransaction() {
-        //todo: correct transaction needs to be selected here
-        return new ArrayGammaTransaction(this);
+        return new MapGammaTransaction(this);
     }
 
     @Override
     public GammaAtomicBlock getDefaultAtomicBlock() {
-        throw new TodoException();
+        return defaultAtomicBlock;
     }
 
     @Override
     public OrElseBlock createOrElseBlock() {
         throw new TodoException();
+    }
+
+    public GlobalConflictCounter getGlobalConflictCounter() {
+        return globalConflictCounter;
+    }
+
+    public class GammaTransactionFactoryBuilderImpl implements GammaTransactionFactoryBuilder {
+
+        private final GammaTransactionConfiguration config;
+
+        GammaTransactionFactoryBuilderImpl(final GammaTransactionConfiguration config) {
+            this.config = config;
+        }
+
+        @Override
+        public GammaTransactionConfiguration getTransactionConfiguration() {
+            return config;
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder addPermanentListener(TransactionLifecycleListener listener) {
+            return new GammaTransactionFactoryBuilderImpl(config.addPermanentListener(listener));
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder setReadLockLevel(LockMode lockMode) {
+            if(config.readLockMode==lockMode){
+                return this;
+            }
+
+            return new GammaTransactionFactoryBuilderImpl(config.setReadLockMode(lockMode));
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder setWriteLockLevel(LockMode lockMode) {
+            if(config.writeLockMode==lockMode){
+                return this;
+            }
+
+            return new GammaTransactionFactoryBuilderImpl(config.setWriteLockMode(lockMode));
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder setFamilyName(String familyName) {
+            if (config.familyName.equals(familyName)) {
+                return this;
+            }
+
+            return new GammaTransactionFactoryBuilderImpl(config.setFamilyName(familyName));
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder setPropagationLevel(final PropagationLevel level) {
+            if (level == config.propagationLevel) {
+                return this;
+            }
+
+            return new GammaTransactionFactoryBuilderImpl(config.setPropagationLevel(level));
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder setBlockingAllowed(final boolean blockingAllowed) {
+            if (blockingAllowed == config.blockingAllowed) {
+                return this;
+            }
+
+            return new GammaTransactionFactoryBuilderImpl(config.setBlockingAllowed(blockingAllowed));
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder setIsolationLevel(final IsolationLevel isolationLevel) {
+            if (isolationLevel == config.isolationLevel) {
+                return this;
+            }
+
+            return new GammaTransactionFactoryBuilderImpl(config.setIsolationLevel(isolationLevel));
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder setTraceLevel(final TraceLevel traceLevel) {
+            if (traceLevel == config.traceLevel) {
+                return this;
+            }
+
+            return new GammaTransactionFactoryBuilderImpl(config.setTraceLevel(traceLevel));
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder setTimeoutNs(final long timeoutNs) {
+            if (timeoutNs == config.timeoutNs) {
+                return this;
+            }
+
+            return new GammaTransactionFactoryBuilderImpl(config.setTimeoutNs(timeoutNs));
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder setInterruptible(final boolean interruptible) {
+            if (interruptible == config.interruptible) {
+                return this;
+            }
+
+            return new GammaTransactionFactoryBuilderImpl(config.setInterruptible(interruptible));
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder setBackoffPolicy(final BackoffPolicy backoffPolicy) {
+            if (backoffPolicy == config.backoffPolicy) {
+                return this;
+            }
+
+            return new GammaTransactionFactoryBuilderImpl(config.setBackoffPolicy(backoffPolicy));
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder setLockLevel(final LockLevel lockLevel) {
+            throw new TodoException();
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder setDirtyCheckEnabled(final boolean dirtyCheckEnabled) {
+            if (dirtyCheckEnabled == config.dirtyCheck) {
+                return this;
+            }
+
+            return new GammaTransactionFactoryBuilderImpl(config.setDirtyCheckEnabled(dirtyCheckEnabled));
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder setSpinCount(final int spinCount) {
+            if (spinCount == config.spinCount) {
+                return this;
+            }
+
+            return new GammaTransactionFactoryBuilderImpl(config.setSpinCount(spinCount));
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder setSpeculativeConfigurationEnabled(final boolean enabled) {
+            if (enabled == config.speculativeConfigEnabled) {
+                return this;
+            }
+
+            return new GammaTransactionFactoryBuilderImpl(
+                    config.setSpeculativeConfigurationEnabled(enabled));
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder setReadonly(final boolean readonly) {
+            if (readonly == config.readonly) {
+                return this;
+            }
+
+            return new GammaStm.GammaTransactionFactoryBuilderImpl(config.setReadonly(readonly));
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder setReadTrackingEnabled(final boolean enabled) {
+            if (enabled == config.trackReads) {
+                return this;
+            }
+
+            return new GammaStm.GammaTransactionFactoryBuilderImpl(config.setReadTrackingEnabled(enabled));
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder setMaxRetries(final int maxRetries) {
+            if (maxRetries == config.maxRetries) {
+                return this;
+            }
+
+            return new GammaStm.GammaTransactionFactoryBuilderImpl(config.setMaxRetries(maxRetries));
+        }
+
+        @Override
+        public GammaAtomicBlock buildAtomicBlock() {
+            config.init();
+
+            if (leanAtomicBlock()) {
+                return new LeanGammaAtomicBlock(build());
+            } else {
+                throw new TodoException();
+                //return new FatGammaAtomicBlock(build());
+            }
+        }
+
+        private boolean leanAtomicBlock() {
+            return config.propagationLevel == PropagationLevel.Requires;
+        }
+
+        @Override
+        public GammaTransactionFactory build() {
+            config.init();
+
+            if (config.isSpeculativeConfigEnabled()) {
+                return new SpeculativeGammaTransactionFactory(config);
+            } else {
+                return new NonSpeculativeGammaTransactionFactory(config);
+            }
+        }
     }
 
     @Override
@@ -80,7 +286,8 @@ public final class GammaStm implements Stm {
 
     @Override
     public GammaTransactionFactoryBuilder createTransactionFactoryBuilder() {
-        throw new TodoException();
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
+        return new GammaTransactionFactoryBuilderImpl(config);
     }
 
     @Override
@@ -91,5 +298,104 @@ public final class GammaStm implements Stm {
     @Override
     public RefFactoryBuilder getRefFactoryBuilder() {
         throw new TodoException();
+    }
+
+    public final class NonSpeculativeGammaTransactionFactory implements GammaTransactionFactory {
+
+        private final GammaTransactionConfiguration config;
+
+        NonSpeculativeGammaTransactionFactory(final GammaTransactionConfiguration config) {
+            this.config = config;
+        }
+
+        @Override
+        public GammaTransactionConfiguration getTransactionConfiguration() {
+            return config;
+        }
+
+        @Override
+        public GammaTransaction newTransaction() {
+            return newTransaction(getThreadLocalGammaTransactionPool());
+        }
+
+        @Override
+        public GammaTransaction newTransaction(final GammaTransactionPool pool) {
+            MapGammaTransaction tx = pool.takeMapGammaTransaction();
+
+            if (tx == null) {
+                tx = new MapGammaTransaction(config);
+            } else {
+                tx.init(config);
+            }
+
+            return tx;
+        }
+
+        @Override
+        public GammaTransaction upgradeAfterSpeculativeFailure(final GammaTransaction tailingTx, final GammaTransactionPool pool) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public final class SpeculativeGammaTransactionFactory implements GammaTransactionFactory {
+
+        private final GammaTransactionConfiguration config;
+
+        SpeculativeGammaTransactionFactory(final GammaTransactionConfiguration config) {
+            this.config = config;
+        }
+
+        @Override
+        public GammaTransactionConfiguration getTransactionConfiguration() {
+            return config;
+        }
+
+        @Override
+        public GammaTransaction newTransaction() {
+            return newTransaction(getThreadLocalGammaTransactionPool());
+        }
+
+        @Override
+        public GammaTransaction upgradeAfterSpeculativeFailure(final GammaTransaction failingTx, final GammaTransactionPool pool) {
+            final GammaTransaction tx = newTransaction(pool);
+            tx.copyForSpeculativeFailure(failingTx);
+            return tx;
+        }
+
+        @Override
+        public GammaTransaction newTransaction(final GammaTransactionPool pool) {
+            final SpeculativeGammaConfiguration speculativeConfiguration = config.speculativeConfiguration.get();
+            final int length = speculativeConfiguration.minimalLength;
+
+            if (length <= 1) {
+                MonoGammaTransaction tx = pool.takeMonoGammaTransaction();
+                if (tx == null) {
+                    return new MonoGammaTransaction(config);
+                }
+
+                tx.init(config);
+                return tx;
+
+            } else if (length <= config.maxArrayTransactionSize) {
+
+                final ArrayGammaTransaction tx = pool.takeArrayGammaTransaction();
+                if (tx == null) {
+                    return new ArrayGammaTransaction(config);
+                }
+
+                tx.init(config);
+                return tx;
+
+            } else {
+                final MapGammaTransaction tx = pool.takeMapGammaTransaction();
+                if (tx == null) {
+                    return new MapGammaTransaction(config);
+                }
+
+                tx.init(config);
+                return tx;
+
+            }
+        }
     }
 }

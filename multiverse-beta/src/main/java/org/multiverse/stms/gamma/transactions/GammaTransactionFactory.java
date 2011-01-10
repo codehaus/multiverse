@@ -7,6 +7,7 @@ public interface GammaTransactionFactory extends TransactionFactory {
     @Override
     GammaTransactionConfiguration getTransactionConfiguration();
 
-    @Override
-    GammaTransaction newTransaction();
+    GammaTransaction newTransaction(GammaTransactionPool pool);
+
+    GammaTransaction upgradeAfterSpeculativeFailure(GammaTransaction tx, GammaTransactionPool pool);
 }

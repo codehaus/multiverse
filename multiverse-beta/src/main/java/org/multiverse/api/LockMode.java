@@ -18,7 +18,7 @@ public enum LockMode implements MultiverseConstants{
         this.lockMode = lockMode;
     }
 
-    public int getLockMode() {
+    public int asInt() {
         return lockMode;
     }
 }

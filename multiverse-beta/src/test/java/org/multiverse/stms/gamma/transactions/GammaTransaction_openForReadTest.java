@@ -186,7 +186,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         long initialVersion = ref.getVersion();
 
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm);
-        config.readLockMode = transactionReadLockMode;
+        config.readLockModeAsInt = transactionReadLockMode;
         GammaTransaction tx = newTransaction(config);
         GammaTranlocal tranlocal = ref.openForRead(tx, readLockMode);
 

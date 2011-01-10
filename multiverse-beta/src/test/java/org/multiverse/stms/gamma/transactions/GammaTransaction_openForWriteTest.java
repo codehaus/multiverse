@@ -183,7 +183,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         long initialVersion = ref.getVersion();
 
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm);
-        config.writeLockMode = transactionWriteLockMode;
+        config.writeLockModeAsInt = transactionWriteLockMode;
         GammaTransaction tx = newTransaction(config);
         GammaTranlocal tranlocal = ref.openForWrite(tx, writeLockMode);
 

@@ -14,6 +14,6 @@ public class ArrayGammaTransaction_openForWriteTest extends GammaTransaction_ope
 
      @Override
     protected int getMaxCapacity() {
-        return new GammaTransactionConfiguration(stm).arraySize;
+        return new GammaTransactionConfiguration(stm).maxArrayTransactionSize;
     }
 }

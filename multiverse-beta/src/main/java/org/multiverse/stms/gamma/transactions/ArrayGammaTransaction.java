@@ -19,10 +19,10 @@ public final class ArrayGammaTransaction extends GammaTransaction {
     }
 
     public ArrayGammaTransaction(GammaTransactionConfiguration config) {
-        super(config);
+        super(config, POOL_TRANSACTIONTYPE_ARRAY);
 
         GammaTranlocal h = null;
-        for (int k = 0; k < config.arraySize; k++) {
+        for (int k = 0; k < config.maxArrayTransactionSize; k++) {
             GammaTranlocal newNode = new GammaTranlocal();
             if (h != null) {
                 h.previous = newNode;
@@ -187,6 +187,11 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         needsConsistency = false;
     }
 
+    @Override
+    public boolean softReset() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     public void shiftInFront(GammaTranlocal newHead) {
         if (newHead == head) {
             return;
@@ -237,7 +242,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
             return true;
         }
 
-        if (config.writeLockMode > LOCKMODE_NONE) {
+        if (config.writeLockModeAsInt > LOCKMODE_NONE) {
             return true;
         }
 
@@ -264,5 +269,14 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         }
 
         return true;
+    }
+
+    @Override
+    public void copyForSpeculativeFailure(GammaTransaction failingTx) {
+        throw new TodoException();
+    }
+
+    public void init(GammaTransactionConfiguration config) {
+        throw new TodoException();
     }
 }

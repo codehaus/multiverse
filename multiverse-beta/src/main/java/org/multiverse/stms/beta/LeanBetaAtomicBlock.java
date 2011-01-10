@@ -1,24 +1,18 @@
 package org.multiverse.stms.beta;
 
-import org.multiverse.api.*;
-import org.multiverse.api.exceptions.*;
 import org.multiverse.api.closures.*;
-import org.multiverse.stms.beta.transactions.*;
-import java.util.logging.Logger;
 
-import static java.lang.String.format;
-import static org.multiverse.api.ThreadLocalTransaction.*;
+import java.util.logging.Logger;
 
 /**
  * An AbstractBetaAtomicBlock made for the BetaStm.
- *
+ * <p/>
  * This code is generated.
  *
  * @author Peter Veentjer
  */
-public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
+public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock {
     private static final Logger logger = Logger.getLogger(LeanBetaAtomicBlock.class.getName());
-
 
 
     public LeanBetaAtomicBlock(final BetaTransactionFactory transactionFactory) {
@@ -26,597 +20,67 @@ public final class LeanBetaAtomicBlock extends AbstractBetaAtomicBlock{
     }
 
     @Override
-    public BetaTransactionFactory getTransactionFactory(){
+    public BetaTransactionFactory getTransactionFactory() {
         return transactionFactory;
     }
 
     @Override
-    public <E> E executeChecked(
-        final AtomicClosure<E> closure)throws Exception{
-
-        try{
-            return execute(closure);
-        }catch(InvisibleCheckedException e){
-            throw e.getCause();
-        }
+    public <E> E execute(AtomicClosure<E> closure) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public <E> E execute(final AtomicClosure<E> closure){
-
-        if(closure == null){
-            throw new NullPointerException();
-        }
-
-        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
-        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
-        if(tx == null || !tx.isAlive()){
-            tx = null;
-        }
-
-        try{
-            if(tx != null && tx.isAlive()){
-                return closure.execute(tx);
-            }
-
-            tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
-            transactionContainer.transaction=tx;
-            boolean abort = true;
-
-            try {
-                do {
-                    try {
-                        E result = closure.execute(tx);
-                        tx.commit();
-                        abort = false;
-                        return result;
-                    } catch (Retry e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(format("[%s] Encountered a retry",
-                                    transactionConfiguration.familyName));
-                            }
-                        }
-                        tx.awaitUpdate();
-                    } catch (SpeculativeConfigurationError e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(format("[%s] Encountered a speculative configuration error",
-                                    transactionConfiguration.familyName));
-                            }
-                        }
-
-                        abort = false;
-                        BetaTransaction old = tx;
-                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
-                        transactionContainer.transactionPool.putBetaTransaction(old);
-                        transactionContainer.transaction = tx;
-                    } catch (ReadWriteConflict e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(format("[%s] Encountered a read or write conflict",
-                                    transactionConfiguration.familyName));
-                            }
-                        }
-
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    }
-                } while (tx.softReset());
-            } finally {
-                if (abort) {
-                    tx.abort();
-                }
-
-                transactionContainer.transactionPool.putBetaTransaction(tx);
-                transactionContainer.transaction = null;
-            }
-        }catch(RuntimeException e){
-            throw e;
-        }catch(Exception e){
-            throw new InvisibleCheckedException(e);
-        }
-
-        if(___TracingEnabled){
-            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                logger.info(format("[%s] Maximum number of %s retries has been reached",
-                    transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
-            }
-        }
-
-        throw new TooManyRetriesException(
-            format("[%s] Maximum number of %s retries has been reached",
-                transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
-
-    }
-     @Override
-    public  int executeChecked(
-        final AtomicIntClosure closure)throws Exception{
-
-        try{
-            return execute(closure);
-        }catch(InvisibleCheckedException e){
-            throw e.getCause();
-        }
+    public <E> E executeChecked(AtomicClosure<E> closure) throws Exception {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public  int execute(final AtomicIntClosure closure){
-
-        if(closure == null){
-            throw new NullPointerException();
-        }
-
-        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
-        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
-        if(tx == null || !tx.isAlive()){
-            tx = null;
-        }
-
-        try{
-            if(tx != null && tx.isAlive()){
-                return closure.execute(tx);
-            }
-
-            tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
-            transactionContainer.transaction=tx;
-            boolean abort = true;
-
-            try {
-                do {
-                    try {
-                        int result = closure.execute(tx);
-                        tx.commit();
-                        abort = false;
-                        return result;
-                    } catch (Retry e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(format("[%s] Encountered a retry",
-                                    transactionConfiguration.familyName));
-                            }
-                        }
-                        tx.awaitUpdate();
-                    } catch (SpeculativeConfigurationError e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(format("[%s] Encountered a speculative configuration error",
-                                    transactionConfiguration.familyName));
-                            }
-                        }
-
-                        abort = false;
-                        BetaTransaction old = tx;
-                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
-                        transactionContainer.transactionPool.putBetaTransaction(old);
-                        transactionContainer.transaction = tx;
-                    } catch (ReadWriteConflict e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(format("[%s] Encountered a read or write conflict",
-                                    transactionConfiguration.familyName));
-                            }
-                        }
-
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    }
-                } while (tx.softReset());
-            } finally {
-                if (abort) {
-                    tx.abort();
-                }
-
-                transactionContainer.transactionPool.putBetaTransaction(tx);
-                transactionContainer.transaction = null;
-            }
-        }catch(RuntimeException e){
-            throw e;
-        }catch(Exception e){
-            throw new InvisibleCheckedException(e);
-        }
-
-        if(___TracingEnabled){
-            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                logger.info(format("[%s] Maximum number of %s retries has been reached",
-                    transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
-            }
-        }
-
-        throw new TooManyRetriesException(
-            format("[%s] Maximum number of %s retries has been reached",
-                transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
-
-    }
-     @Override
-    public  long executeChecked(
-        final AtomicLongClosure closure)throws Exception{
-
-        try{
-            return execute(closure);
-        }catch(InvisibleCheckedException e){
-            throw e.getCause();
-        }
+    public int execute(AtomicIntClosure closure) {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public  long execute(final AtomicLongClosure closure){
-
-        if(closure == null){
-            throw new NullPointerException();
-        }
-
-        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
-        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
-        if(tx == null || !tx.isAlive()){
-            tx = null;
-        }
-
-        try{
-            if(tx != null && tx.isAlive()){
-                return closure.execute(tx);
-            }
-
-            tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
-            transactionContainer.transaction=tx;
-            boolean abort = true;
-
-            try {
-                do {
-                    try {
-                        long result = closure.execute(tx);
-                        tx.commit();
-                        abort = false;
-                        return result;
-                    } catch (Retry e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(format("[%s] Encountered a retry",
-                                    transactionConfiguration.familyName));
-                            }
-                        }
-                        tx.awaitUpdate();
-                    } catch (SpeculativeConfigurationError e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(format("[%s] Encountered a speculative configuration error",
-                                    transactionConfiguration.familyName));
-                            }
-                        }
-
-                        abort = false;
-                        BetaTransaction old = tx;
-                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
-                        transactionContainer.transactionPool.putBetaTransaction(old);
-                        transactionContainer.transaction = tx;
-                    } catch (ReadWriteConflict e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(format("[%s] Encountered a read or write conflict",
-                                    transactionConfiguration.familyName));
-                            }
-                        }
-
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    }
-                } while (tx.softReset());
-            } finally {
-                if (abort) {
-                    tx.abort();
-                }
-
-                transactionContainer.transactionPool.putBetaTransaction(tx);
-                transactionContainer.transaction = null;
-            }
-        }catch(RuntimeException e){
-            throw e;
-        }catch(Exception e){
-            throw new InvisibleCheckedException(e);
-        }
-
-        if(___TracingEnabled){
-            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                logger.info(format("[%s] Maximum number of %s retries has been reached",
-                    transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
-            }
-        }
-
-        throw new TooManyRetriesException(
-            format("[%s] Maximum number of %s retries has been reached",
-                transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
-
-    }
-     @Override
-    public  double executeChecked(
-        final AtomicDoubleClosure closure)throws Exception{
-
-        try{
-            return execute(closure);
-        }catch(InvisibleCheckedException e){
-            throw e.getCause();
-        }
+    public int executeChecked(AtomicIntClosure closure) throws Exception {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public  double execute(final AtomicDoubleClosure closure){
-
-        if(closure == null){
-            throw new NullPointerException();
-        }
-
-        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
-        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
-        if(tx == null || !tx.isAlive()){
-            tx = null;
-        }
-
-        try{
-            if(tx != null && tx.isAlive()){
-                return closure.execute(tx);
-            }
-
-            tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
-            transactionContainer.transaction=tx;
-            boolean abort = true;
-
-            try {
-                do {
-                    try {
-                        double result = closure.execute(tx);
-                        tx.commit();
-                        abort = false;
-                        return result;
-                    } catch (Retry e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(format("[%s] Encountered a retry",
-                                    transactionConfiguration.familyName));
-                            }
-                        }
-                        tx.awaitUpdate();
-                    } catch (SpeculativeConfigurationError e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(format("[%s] Encountered a speculative configuration error",
-                                    transactionConfiguration.familyName));
-                            }
-                        }
-
-                        abort = false;
-                        BetaTransaction old = tx;
-                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
-                        transactionContainer.transactionPool.putBetaTransaction(old);
-                        transactionContainer.transaction = tx;
-                    } catch (ReadWriteConflict e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(format("[%s] Encountered a read or write conflict",
-                                    transactionConfiguration.familyName));
-                            }
-                        }
-
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    }
-                } while (tx.softReset());
-            } finally {
-                if (abort) {
-                    tx.abort();
-                }
-
-                transactionContainer.transactionPool.putBetaTransaction(tx);
-                transactionContainer.transaction = null;
-            }
-        }catch(RuntimeException e){
-            throw e;
-        }catch(Exception e){
-            throw new InvisibleCheckedException(e);
-        }
-
-        if(___TracingEnabled){
-            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                logger.info(format("[%s] Maximum number of %s retries has been reached",
-                    transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
-            }
-        }
-
-        throw new TooManyRetriesException(
-            format("[%s] Maximum number of %s retries has been reached",
-                transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
-
-    }
-     @Override
-    public  boolean executeChecked(
-        final AtomicBooleanClosure closure)throws Exception{
-
-        try{
-            return execute(closure);
-        }catch(InvisibleCheckedException e){
-            throw e.getCause();
-        }
+    public long execute(AtomicLongClosure closure) {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public  boolean execute(final AtomicBooleanClosure closure){
-
-        if(closure == null){
-            throw new NullPointerException();
-        }
-
-        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
-        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
-        if(tx == null || !tx.isAlive()){
-            tx = null;
-        }
-
-        try{
-            if(tx != null && tx.isAlive()){
-                return closure.execute(tx);
-            }
-
-            tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
-            transactionContainer.transaction=tx;
-            boolean abort = true;
-
-            try {
-                do {
-                    try {
-                        boolean result = closure.execute(tx);
-                        tx.commit();
-                        abort = false;
-                        return result;
-                    } catch (Retry e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(format("[%s] Encountered a retry",
-                                    transactionConfiguration.familyName));
-                            }
-                        }
-                        tx.awaitUpdate();
-                    } catch (SpeculativeConfigurationError e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(format("[%s] Encountered a speculative configuration error",
-                                    transactionConfiguration.familyName));
-                            }
-                        }
-
-                        abort = false;
-                        BetaTransaction old = tx;
-                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
-                        transactionContainer.transactionPool.putBetaTransaction(old);
-                        transactionContainer.transaction = tx;
-                    } catch (ReadWriteConflict e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(format("[%s] Encountered a read or write conflict",
-                                    transactionConfiguration.familyName));
-                            }
-                        }
-
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    }
-                } while (tx.softReset());
-            } finally {
-                if (abort) {
-                    tx.abort();
-                }
-
-                transactionContainer.transactionPool.putBetaTransaction(tx);
-                transactionContainer.transaction = null;
-            }
-        }catch(RuntimeException e){
-            throw e;
-        }catch(Exception e){
-            throw new InvisibleCheckedException(e);
-        }
-
-        if(___TracingEnabled){
-            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                logger.info(format("[%s] Maximum number of %s retries has been reached",
-                    transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
-            }
-        }
-
-        throw new TooManyRetriesException(
-            format("[%s] Maximum number of %s retries has been reached",
-                transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
-
-    }
-     @Override
-    public  void executeChecked(
-        final AtomicVoidClosure closure)throws Exception{
-
-        try{
-            execute(closure);
-        }catch(InvisibleCheckedException e){
-            throw e.getCause();
-        }
+    public long executeChecked(AtomicLongClosure closure) throws Exception {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public  void execute(final AtomicVoidClosure closure){
-
-        if(closure == null){
-            throw new NullPointerException();
-        }
-
-        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
-        BetaTransaction tx = (BetaTransaction)transactionContainer.transaction;
-        if(tx == null || !tx.isAlive()){
-            tx = null;
-        }
-
-        try{
-            if(tx != null && tx.isAlive()){
-                closure.execute(tx);
-                return;
-            }
-
-            tx = transactionFactory.newTransaction(transactionContainer.transactionPool);
-            transactionContainer.transaction=tx;
-            boolean abort = true;
-
-            try {
-                do {
-                    try {
-                        closure.execute(tx);
-                        tx.commit();
-                        abort = false;
-                        return;
-                    } catch (Retry e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(format("[%s] Encountered a retry",
-                                    transactionConfiguration.familyName));
-                            }
-                        }
-                        tx.awaitUpdate();
-                    } catch (SpeculativeConfigurationError e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(format("[%s] Encountered a speculative configuration error",
-                                    transactionConfiguration.familyName));
-                            }
-                        }
-
-                        abort = false;
-                        BetaTransaction old = tx;
-                        tx = transactionFactory.upgradeAfterSpeculativeFailure(tx,transactionContainer.transactionPool);
-                        transactionContainer.transactionPool.putBetaTransaction(old);
-                        transactionContainer.transaction = tx;
-                    } catch (ReadWriteConflict e) {
-                        if(___TracingEnabled){
-                            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                                logger.info(format("[%s] Encountered a read or write conflict",
-                                    transactionConfiguration.familyName));
-                            }
-                        }
-
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
-                    }
-                } while (tx.softReset());
-            } finally {
-                if (abort) {
-                    tx.abort();
-                }
-
-                transactionContainer.transactionPool.putBetaTransaction(tx);
-                transactionContainer.transaction = null;
-            }
-        }catch(RuntimeException e){
-            throw e;
-        }catch(Exception e){
-            throw new InvisibleCheckedException(e);
-        }
-
-        if(___TracingEnabled){
-            if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
-                logger.info(format("[%s] Maximum number of %s retries has been reached",
-                    transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
-            }
-        }
-
-        throw new TooManyRetriesException(
-            format("[%s] Maximum number of %s retries has been reached",
-                transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
-
+    public double execute(AtomicDoubleClosure closure) {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
-   }
+
+    @Override
+    public double executeChecked(AtomicDoubleClosure closure) throws Exception {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean execute(AtomicBooleanClosure closure) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean executeChecked(AtomicBooleanClosure closure) throws Exception {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void execute(AtomicVoidClosure closure) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void executeChecked(AtomicVoidClosure closure) throws Exception {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+}

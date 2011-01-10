@@ -106,12 +106,12 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     }
 
     @Override
-    public LockMode getReadLockLevel() {
+    public LockMode getReadLockMode() {
         throw new TodoException();
     }
 
     @Override
-    public LockMode getWriteLockLevel() {
+    public LockMode getWriteLockMode() {
         throw new TodoException();
     }
 

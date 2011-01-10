@@ -19,8 +19,8 @@ public final class MapGammaTransaction extends GammaTransaction {
     }
 
     public MapGammaTransaction(GammaTransactionConfiguration config) {
-        super(config);
-        this.array = new GammaTranlocal[config.arraySize];
+        super(config, POOL_TRANSACTIONTYPE_MAP);
+        this.array = new GammaTranlocal[config.minimalArrayTreeSize];
     }
 
     @Override
@@ -230,6 +230,11 @@ public final class MapGammaTransaction extends GammaTransaction {
     }
 
     @Override
+    public boolean softReset() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
     public void hardReset() {
         status = TX_ACTIVE;
         hasWrites = false;
@@ -263,7 +268,7 @@ public final class MapGammaTransaction extends GammaTransaction {
             return true;
         }
 
-        if (config.writeLockMode > LOCKMODE_NONE) {
+        if (config.writeLockModeAsInt > LOCKMODE_NONE) {
             return true;
         }
 
@@ -284,5 +289,14 @@ public final class MapGammaTransaction extends GammaTransaction {
         }
 
         return true;
+    }
+
+    @Override
+    public void copyForSpeculativeFailure(GammaTransaction failingTx) {
+        throw new TodoException();
+    }
+
+    public void init(GammaTransactionConfiguration config) {
+        throw new TodoException();
     }
 }

@@ -17,7 +17,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
     }
 
     public MonoGammaTransaction(GammaTransactionConfiguration config) {
-        super(config);
+        super(config, POOL_TRANSACTIONTYPE_MONO);
     }
 
     @Override
@@ -141,6 +141,10 @@ public final class MonoGammaTransaction extends GammaTransaction {
         status = TX_PREPARED;
     }
 
+    @Override
+    public boolean softReset() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 
     public void hardReset() {
         status = TX_ACTIVE;
@@ -167,4 +171,12 @@ public final class MonoGammaTransaction extends GammaTransaction {
         throw new TodoException();
     }
 
+    public void init(GammaTransactionConfiguration config) {
+        throw new TodoException();
+    }
+
+    @Override
+    public void copyForSpeculativeFailure(GammaTransaction failingTx) {
+        throw new TodoException();
+    }
 }

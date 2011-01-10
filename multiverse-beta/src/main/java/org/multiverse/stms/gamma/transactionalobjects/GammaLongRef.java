@@ -117,7 +117,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
             throw tx.abortOpenForWriteOnReadonly();
         }
 
-        lockMode = config.writeLockMode <= lockMode ? lockMode : config.writeLockMode;
+        lockMode = config.writeLockModeAsInt <= lockMode ? lockMode : config.writeLockModeAsInt;
 
         final int identityHash = identityHashCode();
 
@@ -172,7 +172,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
             throw tx.abortOpenForWriteOnReadonly();
         }
 
-        lockMode = config.writeLockMode <= lockMode ? lockMode : config.writeLockMode;
+        lockMode = config.writeLockModeAsInt <= lockMode ? lockMode : config.writeLockModeAsInt;
 
         final GammaTranlocal tranlocal = tx.tranlocal;
 
@@ -231,7 +231,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
             }
         }
 
-        lockMode = config.writeLockMode > lockMode ? config.writeLockMode : lockMode;
+        lockMode = config.writeLockModeAsInt > lockMode ? config.writeLockModeAsInt : lockMode;
 
         if (found != null) {
             if (lockMode > found.getLockMode()) {
@@ -295,7 +295,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
 
         final GammaTransactionConfiguration config = tx.config;
 
-        lockMode = config.readLockMode <= lockMode ? lockMode : config.readLockMode;
+        lockMode = config.readLockModeAsInt <= lockMode ? lockMode : config.readLockModeAsInt;
 
         final GammaTranlocal tranlocal = tx.tranlocal;
 
@@ -346,7 +346,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
 
         final GammaTransactionConfiguration config = tx.config;
 
-        lockMode = config.readLockMode <= lockMode ? lockMode : config.readLockMode;
+        lockMode = config.readLockModeAsInt <= lockMode ? lockMode : config.readLockModeAsInt;
 
         if (found != null) {
             if (lockMode > found.getLockMode()) {
@@ -391,7 +391,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
 
         final GammaTransactionConfiguration config = tx.config;
 
-        lockMode = config.readLockMode <= lockMode ? lockMode : config.readLockMode;
+        lockMode = config.readLockModeAsInt <= lockMode ? lockMode : config.readLockModeAsInt;
 
         final int identityHash = identityHashCode();
         final int indexOf = tx.indexOf(this, identityHash);
