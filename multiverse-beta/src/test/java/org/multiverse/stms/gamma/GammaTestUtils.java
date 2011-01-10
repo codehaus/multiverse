@@ -2,16 +2,38 @@ package org.multiverse.stms.gamma;
 
 import org.junit.Assert;
 import org.multiverse.api.LockMode;
+import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.*;
+import static org.multiverse.TestUtils.getField;
 
 public class GammaTestUtils implements GammaConstants{
+
+     public static void assertHasListeners(AbstractGammaObject ref, RetryLatch... listeners) {
+        Set<RetryLatch> expected = new HashSet<RetryLatch>(Arrays.asList(listeners));
+
+        Set<RetryLatch> found = new HashSet<RetryLatch>();
+        Listeners l = (Listeners) getField(ref, "___listeners");
+        while (l != null) {
+            found.add(l.listener);
+            l = l.next;
+        }
+        Assert.assertEquals(expected, found);
+    }
+
+    public static void assertHasNoListeners(AbstractGammaObject ref) {
+        assertHasListeners(ref);
+    }
 
     public static void assertRefHasNoLocks(AbstractGammaObject ref) {
         assertLockMode(ref, LOCKMODE_NONE);

@@ -7,13 +7,13 @@ import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.predicates.LongPredicate;
 import org.multiverse.api.references.LongRef;
-import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.Listeners;
+import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactions.*;
 
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.stms.beta.ThreadLocalBetaObjectPool.getThreadLocalBetaObjectPool;
+import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLocalGammaObjectPool;
 
 public class GammaLongRef extends AbstractGammaObject implements LongRef {
 
@@ -550,7 +550,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
         departAfterUpdateAndUnlock();
 
         if (listeners != null) {
-            BetaObjectPool pool = getThreadLocalBetaObjectPool();
+            GammaObjectPool pool = getThreadLocalGammaObjectPool();
             listeners.openAll(pool);
         }
 
@@ -613,7 +613,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
         departAfterUpdateAndUnlock();
 
         if (listeners != null) {
-            listeners.openAll(getThreadLocalBetaObjectPool());
+            listeners.openAll(getThreadLocalGammaObjectPool());
         }
 
         return returnOld ? oldValue : newValue;
@@ -725,7 +725,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
         departAfterUpdateAndUnlock();
 
         if (listeners != null) {
-            listeners.openAll(getThreadLocalBetaObjectPool());
+            listeners.openAll(getThreadLocalGammaObjectPool());
         }
 
         return true;
@@ -789,7 +789,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
         departAfterUpdateAndUnlock();
 
         if (listeners != null) {
-            listeners.openAll(getThreadLocalBetaObjectPool());
+            listeners.openAll(getThreadLocalGammaObjectPool());
         }
 
         return newValue;

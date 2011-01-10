@@ -7,10 +7,9 @@ import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.PanicError;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.exceptions.TransactionRequiredException;
-import org.multiverse.stms.beta.BetaObjectPool;
-import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.utils.ToolUnsafe;
 import sun.misc.Unsafe;
@@ -93,7 +92,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     public final int registerChangeListener(
             final RetryLatch latch,
             final GammaTranlocal tranlocal,
-            final BetaObjectPool pool,
+            final GammaObjectPool pool,
             final long listenerEra) {
 
         if (tranlocal.isCommuting() || tranlocal.isConstructing()) {

@@ -1,7 +1,6 @@
 package org.multiverse.stms.gamma;
 
 import org.multiverse.api.blocking.DefaultRetryLatch;
-import org.multiverse.stms.beta.Listeners;
 import org.multiverse.stms.beta.transactionalobjects.CallableNode;
 import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;

@@ -2,7 +2,6 @@ package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.multiverse.api.Lock;
 import org.multiverse.api.blocking.RetryLatch;
-import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.GammaStm;
@@ -48,7 +47,7 @@ public interface GammaObject extends GammaConstants {
 
     Lock getLock();
 
-    int registerChangeListener(RetryLatch latch, GammaTranlocal tranlocal, BetaObjectPool pool, long listenerEra);
+    int registerChangeListener(RetryLatch latch, GammaTranlocal tranlocal, GammaObjectPool pool, long listenerEra);
 
     int identityHashCode();
 }

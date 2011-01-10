@@ -4,6 +4,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionConfiguration;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.*;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaObjectPool;
@@ -23,6 +24,8 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public GammaTransaction(GammaTransactionConfiguration config) {
         this.config = config;
     }
+
+    public abstract void commute(GammaLongRef ref, LongFunction function);
 
     public final ReadWriteConflict abortOnReadWriteConflict() {
         abort();

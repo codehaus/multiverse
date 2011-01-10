@@ -2,6 +2,7 @@ package org.multiverse.stms.gamma.transactions;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
@@ -20,6 +21,11 @@ public final class MapGammaTransaction extends GammaTransaction {
     public MapGammaTransaction(GammaTransactionConfiguration config) {
         super(config);
         this.array = new GammaTranlocal[config.arraySize];
+    }
+
+    @Override
+    public void commute(GammaLongRef ref, LongFunction function) {
+        throw new TodoException();
     }
 
     @Override
