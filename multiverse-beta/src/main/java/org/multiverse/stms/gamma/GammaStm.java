@@ -203,7 +203,7 @@ public final class GammaStm implements Stm {
                 return this;
             }
 
-            return new GammaStm.GammaTransactionFactoryBuilderImpl(config.setReadonly(readonly));
+            return new GammaTransactionFactoryBuilderImpl(config.setReadonly(readonly));
         }
 
         @Override
@@ -212,7 +212,7 @@ public final class GammaStm implements Stm {
                 return this;
             }
 
-            return new GammaStm.GammaTransactionFactoryBuilderImpl(config.setReadTrackingEnabled(enabled));
+            return new GammaTransactionFactoryBuilderImpl(config.setReadTrackingEnabled(enabled));
         }
 
         @Override
@@ -221,7 +221,7 @@ public final class GammaStm implements Stm {
                 return this;
             }
 
-            return new GammaStm.GammaTransactionFactoryBuilderImpl(config.setMaxRetries(maxRetries));
+            return new GammaTransactionFactoryBuilderImpl(config.setMaxRetries(maxRetries));
         }
 
         @Override

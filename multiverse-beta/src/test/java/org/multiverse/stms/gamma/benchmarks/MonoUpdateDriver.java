@@ -3,6 +3,7 @@ package org.multiverse.stms.gamma.benchmarks;
 import org.benchy.BenchyUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
@@ -23,14 +24,36 @@ public class MonoUpdateDriver implements GammaConstants {
     public static void main(String[] srgs){
         MonoUpdateDriver driver = new MonoUpdateDriver();
         driver.setUp();
-        driver.test();
+        driver.testNoLocking();
     }
 
     @Test
-    public void test(){
+    public void testNoLocking(){
+        test(LockMode.None);
+    }
+
+    @Test
+    public void testReadLock(){
+        test(LockMode.Read);
+    }
+
+    @Test
+    public void testWriteLock(){
+        test(LockMode.Write);
+    }
+
+    @Test
+    public void testWriteCommit(){
+        test(LockMode.Commit);
+    }
+
+    public void test(LockMode writeLockMode){
         final long txCount = 1000 * 1000 * 1000;
 
-        MonoGammaTransaction tx = new MonoGammaTransaction(new GammaTransactionConfiguration(stm));
+        MonoGammaTransaction tx = new MonoGammaTransaction(
+                new GammaTransactionConfiguration(stm).setWriteLockMode(writeLockMode));
+
+
         GammaLongRef ref = new GammaLongRef(stm, 0);
         long initialVersion = ref.getVersion();
 
@@ -48,6 +71,5 @@ public class MonoUpdateDriver implements GammaConstants {
 
         assertEquals(txCount, ref.value);
         assertEquals(txCount+initialVersion, ref.version);
-
     }
 }
