@@ -81,8 +81,7 @@ public class Orec_departAfterReadingTest {
     @Test
     public void whenReadBiasedAndLockedForCommit_thenPanicError() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
-        orec.arrive(1);
-        orec.tryLockAfterNormalArrive(1, LOCKMODE_COMMIT);
+        orec.tryLockAndArrive(1, LOCKMODE_COMMIT);
 
         try {
             orec.departAfterReading();

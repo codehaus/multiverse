@@ -565,7 +565,6 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             } else {
                 next = setWriteLock(next, true);
             }
-            int x = getReadLockCount(current);
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
                 return true;
@@ -662,7 +661,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             final long current = ___orec;
 
             if (isReadBiased(current)) {
-                throw new PanicError("Can't tryLockActerNormalArrive of the orec is readbiased " + toOrecString(current));
+                throw new PanicError("Can't tryLockAfterNormalArrive of the orec is readbiased " + toOrecString(current));
             }
 
             boolean locked = lockMode == LOCKMODE_READ ? hasWriteOrCommitLock(current) : hasAnyLock(current);
@@ -805,24 +804,24 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         while (true) {
             final long current = ___orec;
 
-            //if (!hasCommitLock(current)) {
-            //    throw new PanicError(
-            //            "Can't ___departAfterUpdateAndUnlock is the commit lock is not acquired " + toOrecString(current));
-            //}
+            if (!hasCommitLock(current)) {
+                throw new PanicError(
+                        "Can't ___departAfterUpdateAndUnlock is the commit lock is not acquired " + toOrecString(current));
+            }
 
             long surplus = getSurplus(current);
 
-            //if (surplus == 0) {
-            //    throw new PanicError(
-            //            "Can't ___departAfterUpdateAndUnlock is there is no surplus " + toOrecString(current));
-            //}
+            if (surplus == 0) {
+                throw new PanicError(
+                        "Can't ___departAfterUpdateAndUnlock is there is no surplus " + toOrecString(current));
+            }
 
             boolean conflict;
             if (isReadBiased(current)) {
-                //if (surplus > 1) {
-                //    throw new PanicError(
-                //            "The surplus can never be larger than 1 if readBiased " + toOrecString(current));
-                //}
+                if (surplus > 1) {
+                    throw new PanicError(
+                            "The surplus can never be larger than 1 if readBiased " + toOrecString(current));
+                }
 
                 //there always is a conflict when a readbiased orec is updated.
                 conflict = true;
@@ -853,7 +852,6 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     public final long departAfterFailureAndUnlock() {
         while (true) {
             final long current = ___orec;
-
 
             //-1 indicates write or commit lock, value bigger than 0 indicates readlock
             int lockMode;
@@ -892,7 +890,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 next = setCommitLock(next, false);
                 next = setWriteLock(next, false);
             } else {
-                next = setReadonlyCount(next, getReadLockCount() - 1);
+                next = setReadLockCount(next, getReadLockCount() - 1);
             }
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
