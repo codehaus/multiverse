@@ -479,6 +479,10 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return false;
     }
 
+    public final boolean hasWriteLock(){
+        return hasWriteLock(___orec);
+    }
+
     public final boolean hasCommitLock() {
         return hasCommitLock(___orec);
     }
