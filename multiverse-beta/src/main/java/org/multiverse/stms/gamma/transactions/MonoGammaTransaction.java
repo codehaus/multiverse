@@ -7,6 +7,7 @@ import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.omg.PortableInterceptor.ACTIVE;
 
 public final class MonoGammaTransaction extends GammaTransaction {
 
@@ -56,6 +57,10 @@ public final class MonoGammaTransaction extends GammaTransaction {
 
         if (status != TX_ACTIVE && status != TX_PREPARED) {
             throw abortCommitOnBadStatus();
+        }
+
+        if (abortOnly) {
+            //throw new AbortOn
         }
 
         GammaObject owner = tranlocal.owner;
@@ -142,18 +147,6 @@ public final class MonoGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public boolean softReset() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public void hardReset() {
-        status = TX_ACTIVE;
-        hasWrites = false;
-        remainingTimeoutNs = config.timeoutNs;
-        attempt = 0;
-    }
-
-    @Override
     public GammaTranlocal get(GammaObject ref) {
         return tranlocal.owner == ref ? tranlocal : null;
     }
@@ -169,6 +162,27 @@ public final class MonoGammaTransaction extends GammaTransaction {
         }
 
         throw new TodoException();
+    }
+
+    @Override
+    public boolean softReset() {
+        if(attempt >= config.getMaxRetries()){
+            return false;
+        }
+
+        status = TX_ACTIVE;
+        hasWrites = false;
+        attempt++;
+        abortOnly = false;
+        return true;
+    }
+
+    public void hardReset() {
+        status = TX_ACTIVE;
+        hasWrites = false;
+        remainingTimeoutNs = config.timeoutNs;
+        attempt = 0;
+        abortOnly = false;
     }
 
     public void init(GammaTransactionConfiguration config) {

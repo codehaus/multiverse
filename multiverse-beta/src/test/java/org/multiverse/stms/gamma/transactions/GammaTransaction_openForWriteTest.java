@@ -32,6 +32,33 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
     protected abstract int getMaxCapacity();
 
+       @Test
+    public void whenTransactionAbortOnly_thenReadStillPossible(){
+        GammaLongRef ref = new GammaLongRef(stm, 0);
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        tx.setAbortOnly();
+        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+
+        assertNotNull(tranlocal);
+        assertTrue(tx.isAbortOnly());
+        assertIsActive(tx);
+    }
+
+    @Test
+    public void whenTransactionAbortOnly_thenRereadStillPossible(){
+        GammaLongRef ref = new GammaLongRef(stm, 0);
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTranlocal read = ref.openForWrite(tx, LOCKMODE_NONE);
+        tx.setAbortOnly();
+        GammaTranlocal reread = ref.openForWrite(tx, LOCKMODE_NONE);
+
+        assertSame(read, reread);
+        assertTrue(tx.isAbortOnly());
+        assertIsActive(tx);
+    }
+
     @Test
     @Ignore
     public void whenReadWrittenAndThenLockedByOtherAndThenWritten(){

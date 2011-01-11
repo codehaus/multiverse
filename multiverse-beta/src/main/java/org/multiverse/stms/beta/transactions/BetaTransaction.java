@@ -214,6 +214,11 @@ public abstract class BetaTransaction implements Transaction, BetaStmConstants {
     }
 
     @Override
+    public boolean isAbortOnly() {
+        throw new TodoException();
+    }
+
+    @Override
     public final void setAbortOnly() {
         switch (status) {
             case NEW:

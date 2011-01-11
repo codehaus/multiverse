@@ -36,6 +36,33 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
     protected abstract T newTransaction(GammaTransactionConfiguration config);
 
     @Test
+    public void whenTransactionAbortOnly_thenReadStillPossible(){
+        GammaLongRef ref = new GammaLongRef(stm, 0);
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        tx.setAbortOnly();
+        GammaTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
+
+        assertNotNull(tranlocal);
+        assertTrue(tx.isAbortOnly());
+        assertIsActive(tx);
+    }
+
+    @Test
+    public void whenTransactionAbortOnly_thenRereadStillPossible(){
+        GammaLongRef ref = new GammaLongRef(stm, 0);
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
+        tx.setAbortOnly();
+        GammaTranlocal reread = ref.openForRead(tx, LOCKMODE_NONE);
+
+        assertSame(read, reread);
+        assertTrue(tx.isAbortOnly());
+        assertIsActive(tx);
+    }
+
+    @Test
     @Ignore
     public void whenReadFirstAndThenLockedByOtherAndThenReread(){
 

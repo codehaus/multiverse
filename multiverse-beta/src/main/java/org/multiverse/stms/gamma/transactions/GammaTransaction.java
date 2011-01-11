@@ -12,6 +12,8 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
 
+import static java.lang.String.format;
+
 public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public final static int POOL_TRANSACTIONTYPE_MONO = 1;
@@ -26,6 +28,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public boolean hasWrites;
     public boolean arriveEnabled;
     public final int transactionType;
+    public boolean abortOnly = false;
 
     public GammaTransaction(GammaTransactionConfiguration config, int transactionType) {
         this.config = config;
@@ -185,8 +188,46 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     @Override
+    public boolean isAbortOnly() {
+        switch (status) {
+            case TX_ACTIVE:
+                return abortOnly;
+            case TX_PREPARED:
+                return abortOnly;
+            case TX_COMMITTED:
+                throw new DeadTransactionException(
+                        format("[%s] Failed to execute BetaTransaction.setAbortOnly, reason: the transaction is committed",
+                                config.familyName));
+            case TX_ABORTED:
+                throw new DeadTransactionException(
+                        format("[%s] Failed to execute BetaTransaction.setAbortOnly, reason: the transaction is aborted",
+                                config.familyName));
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+    @Override
     public final void setAbortOnly() {
-        throw new TodoException();
+        switch (status) {
+            case TX_ACTIVE:
+                abortOnly = true;
+                break;
+            case TX_PREPARED:
+                throw new PreparedTransactionException(
+                        format("[%s] Failed to execute BetaTransaction.setAbortOnly, reason: the transaction is prepared",
+                                config.familyName));
+            case TX_COMMITTED:
+                throw new DeadTransactionException(
+                        format("[%s] Failed to execute BetaTransaction.setAbortOnly, reason: the transaction is committed",
+                                config.familyName));
+            case TX_ABORTED:
+                throw new DeadTransactionException(
+                        format("[%s] Failed to execute BetaTransaction.setAbortOnly, reason: the transaction is aborted",
+                                config.familyName));
+            default:
+                throw new IllegalStateException();
+        }
     }
 
     @Override
@@ -226,7 +267,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         return status == TX_ACTIVE || status == TX_PREPARED;
     }
 
-    public final void awaitUpdate(){
+    public final void awaitUpdate() {
         throw new TodoException();
     }
 

@@ -38,6 +38,14 @@ public final class MapGammaTransaction extends GammaTransaction {
         return o.openForWrite(this, lockMode);
     }
 
+    public float getUsage(){
+        return (size * 1.0f)/array.length;
+    }
+
+    public int size() {
+        return size;
+    }
+
     public int indexOf(final GammaObject ref, final int hash) {
         int jump = 0;
         boolean goLeft = true;
@@ -230,21 +238,6 @@ public final class MapGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public boolean softReset() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void hardReset() {
-        status = TX_ACTIVE;
-        hasWrites = false;
-        remainingTimeoutNs = config.timeoutNs;
-        attempt = 0;
-        size = 0;
-        needsConsistency = false;
-    }
-
-    @Override
     public GammaTranlocal get(GammaObject ref) {
         int indexOf = indexOf(ref, ref.identityHashCode());
         return indexOf == -1 ? null : array[indexOf];
@@ -300,11 +293,29 @@ public final class MapGammaTransaction extends GammaTransaction {
         throw new TodoException();
     }
 
-    public float getUsage(){
-        return (size * 1.0f)/array.length;
+    @Override
+    public boolean softReset() {
+        if(attempt >= config.getMaxRetries()){
+            return false;
+        }
+
+        status = TX_ACTIVE;
+        hasWrites = false;
+        size = 0;
+        needsConsistency = false;
+        abortOnly = false;
+        attempt++;
+        return true;
     }
 
-    public int size() {
-        return size;
+    @Override
+    public void hardReset() {
+        status = TX_ACTIVE;
+        hasWrites = false;
+        remainingTimeoutNs = config.timeoutNs;
+        attempt = 0;
+        size = 0;
+        needsConsistency = false;
+        abortOnly = false;
     }
 }

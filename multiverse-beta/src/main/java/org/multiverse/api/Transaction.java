@@ -137,6 +137,8 @@ public interface Transaction {
      */
     void setAbortOnly();
 
+    boolean isAbortOnly();
+
     /**
      * Ensures all writes that have been made. If one or more of the ref have been privatized, this call will also
      * complete successfully. After this call completes successfully, the transaction still can be used (unlike the

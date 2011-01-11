@@ -49,6 +49,40 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         return o.openForWrite(this, lockMode);
     }
 
+     public boolean isReadConsistent(GammaTranlocal justAdded) {
+        if (!needsConsistency) {
+            return true;
+        }
+
+        if (config.writeLockModeAsInt > LOCKMODE_NONE) {
+            return true;
+        }
+
+        if (arriveEnabled) {
+
+        }
+
+        GammaTranlocal node = head;
+        while (node != null) {
+            //if we are at the end, we are done.
+            if (node.owner == null) {
+                break;
+            }
+
+            //lets skip the one we just added
+            if (node != justAdded) {
+                //if there is a read conflict, we are doe
+                if (node.owner.hasReadConflict(node)) {
+                    return false;
+                }
+            }
+
+            node = node.next;
+        }
+
+        return true;
+    }
+
     @Override
     public void commit() {
         if (status == TX_COMMITTED) {
@@ -148,6 +182,36 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         }
     }
 
+      @Override
+    public GammaTranlocal get(GammaObject ref) {
+        GammaTranlocal node = head;
+        while (node != null) {
+            if (node.owner == ref) {
+                return node;
+            }
+
+            if (node.owner == null) {
+                return null;
+            }
+
+            node = node.next;
+        }
+        return null;
+    }
+
+    @Override
+    public void retry() {
+        if (status != TX_ACTIVE && status != TX_PREPARED) {
+            throw abortRetryOnBadStatus();
+        }
+
+        if (!config.isBlockingAllowed()) {
+            throw abortRetryOnNoBlockingAllowed();
+        }
+
+        throw new TodoException();
+    }
+
     @Override
     public void prepare() {
         if (status == TX_PREPARED) {
@@ -185,11 +249,22 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         remainingTimeoutNs = config.timeoutNs;
         attempt = 0;
         needsConsistency = false;
+        abortOnly = false;
     }
 
     @Override
     public boolean softReset() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        if(attempt >= config.getMaxRetries()){
+            return false;
+        }
+
+        status = TX_ACTIVE;
+        hasWrites = false;
+        size = 0;
+        needsConsistency = false;
+        abortOnly = false;
+        attempt++;
+        return true;
     }
 
     public void shiftInFront(GammaTranlocal newHead) {
@@ -205,70 +280,6 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         newHead.next = head;
         newHead.previous = null;
         head = newHead;
-    }
-
-    @Override
-    public GammaTranlocal get(GammaObject ref) {
-        GammaTranlocal node = head;
-        while (node != null) {
-            if (node.owner == ref) {
-                return node;
-            }
-
-            if (node.owner == null) {
-                return null;
-            }
-
-            node = node.next;
-        }
-        return null;
-    }
-
-    @Override
-    public void retry() {
-        if (status != TX_ACTIVE && status != TX_PREPARED) {
-            throw abortRetryOnBadStatus();
-        }
-
-        if (!config.isBlockingAllowed()) {
-            throw abortRetryOnNoBlockingAllowed();
-        }
-
-        throw new TodoException();
-    }
-
-    public boolean isReadConsistent(GammaTranlocal justAdded) {
-        if (!needsConsistency) {
-            return true;
-        }
-
-        if (config.writeLockModeAsInt > LOCKMODE_NONE) {
-            return true;
-        }
-
-        if (arriveEnabled) {
-
-        }
-
-        GammaTranlocal node = head;
-        while (node != null) {
-            //if we are at the end, we are done.
-            if (node.owner == null) {
-                break;
-            }
-
-            //lets skip the one we just added
-            if (node != justAdded) {
-                //if there is a read conflict, we are doe
-                if (node.owner.hasReadConflict(node)) {
-                    return false;
-                }
-            }
-
-            node = node.next;
-        }
-
-        return true;
     }
 
     @Override
