@@ -43,9 +43,9 @@ public interface TransactionFactoryBuilder {
      */
     TransactionFactoryBuilder setPropagationLevel(PropagationLevel propagationLevel);
 
-    TransactionFactoryBuilder setReadLockLevel(LockMode lockMode);
+    TransactionFactoryBuilder setReadLockMode(LockMode lockMode);
 
-    TransactionFactoryBuilder setWriteLockLevel(LockMode lockMode);
+    TransactionFactoryBuilder setWriteLockMode(LockMode lockMode);
 
     /**
      * Sets the {@link LockLevel}. With the LockLevel you have control

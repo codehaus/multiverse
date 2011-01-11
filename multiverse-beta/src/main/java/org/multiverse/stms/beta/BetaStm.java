@@ -140,12 +140,12 @@ public final class BetaStm implements Stm {
         }
 
         @Override
-        public BetaTransactionFactoryBuilder setReadLockLevel(LockMode lockMode) {
+        public BetaTransactionFactoryBuilder setReadLockMode(LockMode lockMode) {
             throw new TodoException();
         }
 
         @Override
-        public BetaTransactionFactoryBuilder setWriteLockLevel(LockMode lockMode) {
+        public BetaTransactionFactoryBuilder setWriteLockMode(LockMode lockMode) {
             throw new TodoException();
         }
 

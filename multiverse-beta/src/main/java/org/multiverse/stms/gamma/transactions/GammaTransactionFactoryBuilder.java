@@ -10,10 +10,10 @@ public interface GammaTransactionFactoryBuilder extends TransactionFactoryBuilde
     GammaTransactionConfiguration getTransactionConfiguration();
 
     @Override
-    GammaTransactionFactoryBuilder setReadLockLevel(LockMode lockMode);
+    GammaTransactionFactoryBuilder setReadLockMode(LockMode lockMode);
 
     @Override
-    GammaTransactionFactoryBuilder setWriteLockLevel(LockMode lockMode);
+    GammaTransactionFactoryBuilder setWriteLockMode(LockMode lockMode);
 
     @Override
     GammaTransactionFactoryBuilder setFamilyName(String familyName);

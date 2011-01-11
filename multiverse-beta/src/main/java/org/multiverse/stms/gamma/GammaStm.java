@@ -75,7 +75,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setReadLockLevel(LockMode lockMode) {
+        public GammaTransactionFactoryBuilder setReadLockMode(LockMode lockMode) {
             if(config.readLockMode==lockMode){
                 return this;
             }
@@ -84,7 +84,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setWriteLockLevel(LockMode lockMode) {
+        public GammaTransactionFactoryBuilder setWriteLockMode(LockMode lockMode) {
             if(config.writeLockMode==lockMode){
                 return this;
             }
