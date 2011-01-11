@@ -1,6 +1,7 @@
 package org.multiverse.stms.gamma.transactions;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.TransactionStatus;
@@ -30,6 +31,19 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
     protected abstract T newTransaction();
 
     protected abstract int getMaxCapacity();
+
+    @Test
+    @Ignore
+    public void whenReadWrittenAndThenLockedByOtherAndThenWritten(){
+
+    }
+
+    @Test
+    @Ignore
+    public void whenWritenFirstAndThenLockedByOtherAndThenLockUpgrade(){
+
+    }
+
 
     @Test
     public void whenOverflowing() {

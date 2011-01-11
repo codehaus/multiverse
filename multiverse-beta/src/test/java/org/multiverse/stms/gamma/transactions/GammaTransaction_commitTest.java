@@ -67,6 +67,9 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
         assertCleaned(tx);
     }
 
+    //todo: dirty checking
+    //todo: lock releasing
+
     @Test
     public void whenContainsDirtyWrite() {
         long initialValue = 10;
