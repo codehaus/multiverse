@@ -231,4 +231,8 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public abstract void copyForSpeculativeFailure(GammaTransaction failingTx);
+
+    public void openForConstruction() {
+        throw new TodoException();
+    }
 }

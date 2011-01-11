@@ -299,4 +299,12 @@ public final class MapGammaTransaction extends GammaTransaction {
     public void init(GammaTransactionConfiguration config) {
         throw new TodoException();
     }
+
+    public float getUsage(){
+        return (size * 1.0f)/array.length;
+    }
+
+    public int size() {
+        return size;
+    }
 }

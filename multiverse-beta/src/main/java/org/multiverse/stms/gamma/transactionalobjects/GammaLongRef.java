@@ -29,6 +29,12 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
         this.version = VERSION_UNCOMMITTED + 1;
     }
 
+    public GammaLongRef(GammaTransaction tx) {
+        super(tx.config.stm);
+        tx.openForConstruction();
+
+    }
+
     public boolean load(GammaTranlocal tranlocal, int lockMode, int spinCount, boolean arriveNeeded) {
         if (lockMode == LOCKMODE_NONE) {
             while (true) {

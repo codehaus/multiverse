@@ -115,14 +115,36 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
     }
 
     @Test
-    public void whenRefAlreadyOpenedForWrite() {
+    public void whenRefAlreadOpenedForRead() {
+        whenRefAlreadyOpenedForRead(LockMode.None, LockMode.None, LockMode.None);
+        whenRefAlreadyOpenedForRead(LockMode.None, LockMode.Read, LockMode.Read);
+        whenRefAlreadyOpenedForRead(LockMode.None, LockMode.Write, LockMode.Write);
+        whenRefAlreadyOpenedForRead(LockMode.None, LockMode.Commit, LockMode.Commit);
+
+        whenRefAlreadyOpenedForRead(LockMode.Read, LockMode.None, LockMode.Read);
+        whenRefAlreadyOpenedForRead(LockMode.Read, LockMode.Read, LockMode.Read);
+        whenRefAlreadyOpenedForRead(LockMode.Read, LockMode.Write, LockMode.Write);
+        whenRefAlreadyOpenedForRead(LockMode.Read, LockMode.Commit, LockMode.Commit);
+
+        whenRefAlreadyOpenedForRead(LockMode.Write, LockMode.None, LockMode.Write);
+        whenRefAlreadyOpenedForRead(LockMode.Write, LockMode.Read, LockMode.Write);
+        whenRefAlreadyOpenedForRead(LockMode.Write, LockMode.Write, LockMode.Write);
+        whenRefAlreadyOpenedForRead(LockMode.Write, LockMode.Commit, LockMode.Commit);
+
+        whenRefAlreadyOpenedForRead(LockMode.Commit, LockMode.None, LockMode.Commit);
+        whenRefAlreadyOpenedForRead(LockMode.Commit, LockMode.Read, LockMode.Commit);
+        whenRefAlreadyOpenedForRead(LockMode.Commit, LockMode.Write, LockMode.Commit);
+        whenRefAlreadyOpenedForRead(LockMode.Commit, LockMode.Commit, LockMode.Commit);
+    }
+
+    public void whenRefAlreadyOpenedForRead(LockMode firstReadLockMode, LockMode secondReadLockMode, LockMode expectedLockMode) {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = newTransaction();
-        GammaTranlocal first = ref.openForWrite(tx, LOCKMODE_NONE);
-        GammaTranlocal second = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaTranlocal first = ref.openForWrite(tx, firstReadLockMode.asInt());
+        GammaTranlocal second = ref.openForRead(tx, secondReadLockMode.asInt());
 
         assertSame(first, second);
         assertNotNull(second);
@@ -130,13 +152,56 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         assertEquals(initialVersion, second.version);
         assertEquals(initialValue, second.long_value);
         assertEquals(initialValue, second.long_oldValue);
+        assertLockMode(ref, expectedLockMode);
         assertTrue(second.isWrite());
         assertTrue(tx.hasWrites());
     }
 
     @Test
-    public void readConsistency_whenNotConsistent(){
-         assumeTrue(getMaxCapacity()>1);
+    public void whenRefAlreadOpenedForWrite() {
+        whenRefAlreadyOpenedForWrite(LockMode.None, LockMode.None, LockMode.None);
+        whenRefAlreadyOpenedForWrite(LockMode.None, LockMode.Read, LockMode.Read);
+        whenRefAlreadyOpenedForWrite(LockMode.None, LockMode.Write, LockMode.Write);
+        whenRefAlreadyOpenedForWrite(LockMode.None, LockMode.Commit, LockMode.Commit);
+
+        whenRefAlreadyOpenedForWrite(LockMode.Read, LockMode.None, LockMode.Read);
+        whenRefAlreadyOpenedForWrite(LockMode.Read, LockMode.Read, LockMode.Read);
+        whenRefAlreadyOpenedForWrite(LockMode.Read, LockMode.Write, LockMode.Write);
+        whenRefAlreadyOpenedForWrite(LockMode.Read, LockMode.Commit, LockMode.Commit);
+
+        whenRefAlreadyOpenedForWrite(LockMode.Write, LockMode.None, LockMode.Write);
+        whenRefAlreadyOpenedForWrite(LockMode.Write, LockMode.Read, LockMode.Write);
+        whenRefAlreadyOpenedForWrite(LockMode.Write, LockMode.Write, LockMode.Write);
+        whenRefAlreadyOpenedForWrite(LockMode.Write, LockMode.Commit, LockMode.Commit);
+
+        whenRefAlreadyOpenedForWrite(LockMode.Commit, LockMode.None, LockMode.Commit);
+        whenRefAlreadyOpenedForWrite(LockMode.Commit, LockMode.Read, LockMode.Commit);
+        whenRefAlreadyOpenedForWrite(LockMode.Commit, LockMode.Write, LockMode.Commit);
+        whenRefAlreadyOpenedForWrite(LockMode.Commit, LockMode.Commit, LockMode.Commit);
+    }
+
+    public void whenRefAlreadyOpenedForWrite(LockMode writeLockMode, LockMode readLockMode, LockMode expectedLockMode) {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction tx = newTransaction();
+        GammaTranlocal first = ref.openForWrite(tx, writeLockMode.asInt());
+        GammaTranlocal second = ref.openForRead(tx, readLockMode.asInt());
+
+        assertSame(first, second);
+        assertSame(ref, second.owner);
+        assertEquals(initialVersion, second.version);
+        assertEquals(initialValue, second.long_value);
+        assertEquals(initialValue, second.long_oldValue);
+        assertLockMode(ref, expectedLockMode);
+        assertTrue(second.isWrite());
+        assertTrue(tx.hasWrites());
+    }
+
+    @Test
+    public void readConsistency_whenNotConsistent() {
+        assumeTrue(getMaxCapacity() > 1);
 
         GammaLongRef ref1 = new GammaLongRef(stm, 0);
         GammaLongRef ref2 = new GammaLongRef(stm, 0);
@@ -146,10 +211,10 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
 
         ref1.atomicIncrementAndGet(1);
 
-        try{
-        ref2.openForRead(tx, LOCKMODE_NONE);
+        try {
+            ref2.openForRead(tx, LOCKMODE_NONE);
             fail();
-        }catch(ReadWriteConflict expected){
+        } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx);
@@ -180,7 +245,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         lockLevel(LOCKMODE_COMMIT, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
     }
 
-    public void lockLevel(int transactionReadLockMode, int readLockMode, int expectedReadLockMode){
+    public void lockLevel(int transactionReadLockMode, int readLockMode, int expectedReadLockMode) {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -200,7 +265,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
     // ===================== lock upgrade ======================================
 
     @Test
-    public void lockUpgrade(){
+    public void lockUpgrade() {
         lockUpgrade(LOCKMODE_NONE, LOCKMODE_NONE, LOCKMODE_NONE);
         lockUpgrade(LOCKMODE_NONE, LOCKMODE_READ, LOCKMODE_READ);
         lockUpgrade(LOCKMODE_NONE, LOCKMODE_WRITE, LOCKMODE_WRITE);
@@ -222,8 +287,8 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         lockUpgrade(LOCKMODE_COMMIT, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
     }
 
-    public void lockUpgrade(int firstMode, int secondLockMode, int expectedLockMode){
-       long initialValue = 10;
+    public void lockUpgrade(int firstMode, int secondLockMode, int expectedLockMode) {
+        long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
