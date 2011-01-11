@@ -51,7 +51,7 @@ public class ConnectionPoolStressTest implements BetaStmConstants {
 
     @Test
     public void testEnsured() {
-        test(LOCKMODE_UPDATE);
+        test(LOCKMODE_WRITE);
     }
 
     @Test

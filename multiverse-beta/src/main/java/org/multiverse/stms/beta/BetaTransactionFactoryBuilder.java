@@ -42,6 +42,12 @@ public interface BetaTransactionFactoryBuilder extends TransactionFactoryBuilder
     BetaTransactionFactoryBuilder setBackoffPolicy(BackoffPolicy backoffPolicy);
 
     @Override
+    BetaTransactionFactoryBuilder setReadLockMode(LockMode lockMode);
+
+    @Override
+    BetaTransactionFactoryBuilder setWriteLockMode(LockMode lockMode);
+
+    @Override
     BetaTransactionFactoryBuilder setLockLevel(LockLevel lockLevel);
 
     @Override

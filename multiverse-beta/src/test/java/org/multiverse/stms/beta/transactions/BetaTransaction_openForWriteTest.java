@@ -3,6 +3,7 @@ package org.multiverse.stms.beta.transactions;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.LockLevel;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
@@ -235,7 +236,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_UPDATE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_WRITE);
 
         assertNotNull(write);
         assertEquals(100, write.value);
@@ -305,7 +306,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction tx = newTransaction();
-        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_UPDATE);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_WRITE);
 
         assertEquals(100, write.value);
         assertSame(ref, write.owner);
@@ -458,8 +459,8 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction tx = newTransaction();
-        BetaLongRefTranlocal write1 = tx.openForWrite(ref, LOCKMODE_UPDATE);
-        BetaLongRefTranlocal write2 = tx.openForWrite(ref, LOCKMODE_UPDATE);
+        BetaLongRefTranlocal write1 = tx.openForWrite(ref, LOCKMODE_WRITE);
+        BetaLongRefTranlocal write2 = tx.openForWrite(ref, LOCKMODE_WRITE);
 
         assertSame(write1, write2);
         assertEquals(100, write2.value);
@@ -504,7 +505,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
         BetaTransaction tx = newTransaction();
         try {
@@ -847,7 +848,7 @@ public abstract class BetaTransaction_openForWriteTest implements BetaStmConstan
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
         BetaTransaction tx = newTransaction();
         try {

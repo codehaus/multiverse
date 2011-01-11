@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
@@ -12,7 +13,6 @@ import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasNoLocks;
 
 public class BetaLongRef_decrement1WithAmountTest {
 
@@ -73,7 +73,7 @@ public class BetaLongRef_decrement1WithAmountTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Write);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -98,7 +98,7 @@ public class BetaLongRef_decrement1WithAmountTest {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);

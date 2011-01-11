@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.LockLevel;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.DeadTransactionException;
@@ -888,7 +889,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        ref.getLock().acquireCommitLock(tx);
+        ref.getLock().acquire(tx, LockMode.Commit);
 
         tx.commit();
 
@@ -907,7 +908,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        ref.getLock().acquireWriteLock(tx);
+        ref.getLock().acquire(tx, LockMode.Write);
 
         tx.commit();
 
@@ -943,7 +944,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        ref.getLock().acquireCommitLock(tx);
+        ref.getLock().acquire(tx, LockMode.Commit);
         ref.incrementAndGet(tx, 1);
         tx.commit();
 
@@ -962,7 +963,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        ref.getLock().acquireWriteLock(tx);
+        ref.getLock().acquire(tx, LockMode.Write);
         ref.incrementAndGet(tx, 1);
         tx.commit();
 

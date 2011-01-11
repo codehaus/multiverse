@@ -31,25 +31,6 @@ public class LinkedList<E> extends AbstractBetaTransactionalObject {
         throw new TodoException();
     }
 
-    @Override
-    public void acquireWriteLock() {
-        throw new TodoException();
-    }
-
-    @Override
-    public void acquireWriteLock(Transaction tx) {
-        throw new TodoException();
-    }
-
-    @Override
-    public void acquireCommitLock() {
-        throw new TodoException();
-    }
-
-    @Override
-    public void acquireCommitLock(Transaction tx) {
-        throw new TodoException();
-    }
 
     @Override
     public void ensure() {
@@ -266,27 +247,7 @@ class LinkedListNode<E> extends AbstractBetaTransactionalObject {
         throw new TodoException();
     }
 
-    @Override
-    public void acquireWriteLock() {
-        throw new TodoException();
-    }
-
-    @Override
-    public void acquireWriteLock(Transaction tx) {
-        throw new TodoException();
-    }
-
-    @Override
-    public void acquireCommitLock() {
-        throw new TodoException();
-    }
-
-    @Override
-    public void acquireCommitLock(Transaction tx) {
-        throw new TodoException();
-    }
-
-    @Override
+     @Override
     public void ensure() {
         throw new TodoException();
     }

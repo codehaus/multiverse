@@ -2,13 +2,13 @@ package org.multiverse.stms.beta.integrationtest.composability;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.StmUtils;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.IntRef;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.multiverse.api.StmUtils.newIntRef;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
@@ -27,19 +27,19 @@ public class ComposabilityAndLockingTest {
         StmUtils.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                ref.getLock().acquireWriteLock();
+                ref.getLock().acquire(LockMode.Write);
 
                 StmUtils.execute(new AtomicVoidClosure() {
                     @Override
                     public void execute(Transaction tx) throws Exception {
-                        ref.getLock().acquireWriteLock();
-                        assertTrue(ref.getLock().isLockedForWriteBySelf());
+                        ref.getLock().acquire(LockMode.Write);
+                        assertEquals(LockMode.Write, ref.getLock().getLockMode());
                     }
                 });
             }
         });
 
-        assertTrue(ref.getLock().atomicIsUnlocked());
+        assertEquals(LockMode.None, ref.getLock().atomicGetLockMode());
         assertEquals(initialValue, ref.atomicGet());
     }
 
@@ -51,19 +51,19 @@ public class ComposabilityAndLockingTest {
         StmUtils.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                ref.getLock().acquireWriteLock();
+                ref.getLock().acquire(LockMode.Write);
 
                 StmUtils.execute(new AtomicVoidClosure() {
                     @Override
                     public void execute(Transaction tx) throws Exception {
-                        ref.getLock().acquireCommitLock();
-                        assertTrue(ref.getLock().isLockedForCommitBySelf());
+                        ref.getLock().acquire(LockMode.Commit);
+                        assertEquals(LockMode.Commit, ref.getLock().getLockMode());
                     }
                 });
             }
         });
 
-        assertTrue(ref.getLock().atomicIsUnlocked());
+        assertEquals(LockMode.None, ref.getLock().atomicGetLockMode());
         assertEquals(initialValue, ref.atomicGet());
     }
 
@@ -75,19 +75,19 @@ public class ComposabilityAndLockingTest {
         StmUtils.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                ref.getLock().acquireCommitLock();
+                ref.getLock().acquire(LockMode.Commit);
 
                 StmUtils.execute(new AtomicVoidClosure() {
                     @Override
                     public void execute(Transaction tx) throws Exception {
-                        ref.getLock().acquireWriteLock();
-                        assertTrue(ref.getLock().isLockedForCommitBySelf());
+                        ref.getLock().acquire(LockMode.Write);
+                        assertEquals(LockMode.Commit, ref.getLock().getLockMode());
                     }
                 });
             }
         });
 
-        assertTrue(ref.getLock().atomicIsUnlocked());
+        assertEquals(LockMode.None,ref.getLock().atomicGetLockMode());
         assertEquals(initialValue, ref.atomicGet());
     }
 
@@ -99,19 +99,19 @@ public class ComposabilityAndLockingTest {
         StmUtils.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                ref.getLock().acquireCommitLock();
+                ref.getLock().acquire(LockMode.Commit);
 
                 StmUtils.execute(new AtomicVoidClosure() {
                     @Override
                     public void execute(Transaction tx) throws Exception {
-                        ref.getLock().acquireCommitLock();
-                        assertTrue(ref.getLock().isLockedForCommitBySelf());
+                        ref.getLock().acquire(LockMode.Commit);
+                        assertEquals(LockMode.Commit, ref.getLock().getLockMode());
                     }
                 });
             }
         });
 
-        assertTrue(ref.getLock().atomicIsUnlocked());
+        assertEquals(LockMode.None, ref.getLock().atomicGetLockMode());
         assertEquals(initialValue, ref.atomicGet());
     }
 }

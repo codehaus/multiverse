@@ -2,6 +2,7 @@ package org.multiverse.stms.beta;
 
 import org.multiverse.api.*;
 import org.multiverse.api.collections.TransactionalCollectionsFactory;
+import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.collections.NaiveTransactionalCollectionFactory;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
@@ -57,7 +58,7 @@ public final class BetaStm implements Stm {
     }
 
     @Override
-    public BetaRefFactoryBuilder getReferenceFactoryBuilder() {
+    public BetaRefFactoryBuilder getRefFactoryBuilder() {
         return new BetaRefFactoryBuilderImpl();
     }
 
@@ -136,6 +137,16 @@ public final class BetaStm implements Stm {
         @Override
         public BetaTransactionFactoryBuilder addPermanentListener(TransactionLifecycleListener listener) {
             return new BetaTransactionFactoryBuilderImpl(config.addPermanentListener(listener));
+        }
+
+        @Override
+        public BetaTransactionFactoryBuilder setReadLockMode(LockMode lockMode) {
+            throw new TodoException();
+        }
+
+        @Override
+        public BetaTransactionFactoryBuilder setWriteLockMode(LockMode lockMode) {
+            throw new TodoException();
         }
 
         @Override

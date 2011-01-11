@@ -47,7 +47,7 @@ public class IsolationStressTest implements BetaStmConstants {
 
     @Test
     public void withUpdateLockSettingsAndDirtyCheck() {
-        test(LOCKMODE_UPDATE, true);
+        test(LOCKMODE_WRITE, true);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class IsolationStressTest implements BetaStmConstants {
 
     @Test
     public void withUpdateLockNoDirtyCheck() {
-        test(LOCKMODE_UPDATE, false);
+        test(LOCKMODE_WRITE, false);
     }
 
     @Test
@@ -79,8 +79,8 @@ public class IsolationStressTest implements BetaStmConstants {
         UpdateThread[] threads = new UpdateThread[6];
         threads[0] = new UpdateThread(0, ref, LOCKMODE_NONE, true);
         threads[1] = new UpdateThread(1, ref, LOCKMODE_NONE, false);
-        threads[2] = new UpdateThread(2, ref, LOCKMODE_UPDATE, true);
-        threads[3] = new UpdateThread(3, ref, LOCKMODE_UPDATE, false);
+        threads[2] = new UpdateThread(2, ref, LOCKMODE_WRITE, true);
+        threads[3] = new UpdateThread(3, ref, LOCKMODE_WRITE, false);
         threads[4] = new UpdateThread(4, ref, LOCKMODE_COMMIT, true);
         threads[5] = new UpdateThread(5, ref, LOCKMODE_COMMIT, false);
 

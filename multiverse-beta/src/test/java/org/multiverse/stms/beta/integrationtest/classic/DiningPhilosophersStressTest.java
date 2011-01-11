@@ -39,7 +39,7 @@ public class DiningPhilosophersStressTest implements BetaStmConstants {
         BetaStmConfiguration config = new BetaStmConfiguration();
         //config.backoffPolicy = new SpinningBackoffPolicy();
         stm = new BetaStm(config);
-        refFactory = stm.getReferenceFactoryBuilder().build();
+        refFactory = stm.getRefFactoryBuilder().build();
         stop = false;
     }
 

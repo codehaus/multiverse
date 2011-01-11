@@ -1,0 +1,88 @@
+--------------------------------------------------------------------
+                        to do
+--------------------------------------------------------------------
+
+
+- read consistency
+
+- different types
+
+- write skew
+
+- speculative size for full conflict scan
+
+- add constructing state for tranlocal
+
+- add commuting state for tranlocal
+
+- transaction template.
+
+- mono transaction and retry
+
+- array transaction and retry
+
+- map transaction and retry
+
+--------------------------------------------------------------------
+                        done
+--------------------------------------------------------------------
+
+- lock upgrade testing on open for write
+
+- lock upgrade testing on open for read
+
+- upgrade from readlock to commit lock
+
+- upgrade readlock to write lock.
+
+- testing: correct mode needs to be determined for openfor read and mono tx
+
+- testing:  correct mode needs to be determined for openfor write and mono tx
+
+- testing:  correct mode needs to be determined for openfor read and array tx
+
+- testing:  correct mode needs to be determined for openfor write and array tx
+
+- lean map transaction
+
+- lean map transaction: add prepare
+
+- test for locate
+
+- prepare for mono transaction
+
+- prepare for array transaction
+
+- read lock
+
+- write lock
+
+- correct mode needs to be determined for openfor read and mono tx
+
+- correct mode needs to be determined for openfor write and mono tx
+
+- correct mode needs to be determined for openfor read and array tx
+
+- correct mode needs to be determined for openfor write and array tx
+
+- renamed leanarray to array
+
+- renamed leanmono to mono
+
+- lean mono transaction: add prepare
+
+- lean array transaction: add prepare
+
+- gamma long ref now implements the longref interface
+
+- gamma transaction now implement transacton interface
+
+- gamma transaction config now implement transactionconfig interface
+
+- testing overflow: open for read
+
+- testing overflow: open for write
+
+- readonly
+
+- gamma stm now implements the stm interface

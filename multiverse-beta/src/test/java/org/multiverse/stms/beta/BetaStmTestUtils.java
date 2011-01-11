@@ -68,7 +68,7 @@ public class BetaStmTestUtils implements BetaStmConstants {
         if (tranlocal == null) {
             fail("A Tranlocal should have been available for a ref that has the write lock");
         }
-        assertEquals(LOCKMODE_UPDATE, tranlocal.getLockMode());
+        assertEquals(LOCKMODE_WRITE, tranlocal.getLockMode());
         assertHasUpdateLock(ref);
         assertHasNoCommitLock(ref);
     }
@@ -88,7 +88,7 @@ public class BetaStmTestUtils implements BetaStmConstants {
             case LOCKMODE_NONE:
                 assertRefHasNoLocks(ref, lockOwner);
                 break;
-            case LOCKMODE_UPDATE:
+            case LOCKMODE_WRITE:
                 assertRefHasWriteLock(ref, lockOwner);
                 break;
             case LOCKMODE_COMMIT:
@@ -131,7 +131,7 @@ public class BetaStmTestUtils implements BetaStmConstants {
     }
 
     public static void assertTranlocalHasUpdateLock(BetaTranlocal tranlocal) {
-        assertEquals(LOCKMODE_UPDATE, tranlocal.getLockMode());
+        assertEquals(LOCKMODE_WRITE, tranlocal.getLockMode());
     }
 
     public static BetaRef newRef(BetaStm stm) {

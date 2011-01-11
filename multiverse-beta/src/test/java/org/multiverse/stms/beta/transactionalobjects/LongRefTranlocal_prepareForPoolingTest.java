@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
@@ -53,7 +54,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(tx);
+        ref.getLock().acquire(tx, LockMode.Write);
 
         BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         tranlocal.prepareForPooling(pool);
@@ -66,7 +67,7 @@ public class LongRefTranlocal_prepareForPoolingTest implements BetaStmConstants 
         BetaLongRef ref = newLongRef(stm, 100);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(tx);
+        ref.getLock().acquire(tx, LockMode.Commit);
 
         BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         tranlocal.prepareForPooling(pool);

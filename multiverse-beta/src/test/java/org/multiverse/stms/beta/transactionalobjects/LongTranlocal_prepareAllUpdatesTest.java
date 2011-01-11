@@ -24,8 +24,8 @@ public class LongTranlocal_prepareAllUpdatesTest implements BetaStmConstants {
 
     @Test
     public void readonly_whenCheckConflictAndNoConflict(){
-        readonly_whenCheckConflictAndNoConflict(LOCKMODE_NONE, LOCKMODE_UPDATE);
-        readonly_whenCheckConflictAndNoConflict(LOCKMODE_UPDATE, LOCKMODE_UPDATE);
+        readonly_whenCheckConflictAndNoConflict(LOCKMODE_NONE, LOCKMODE_WRITE);
+        readonly_whenCheckConflictAndNoConflict(LOCKMODE_WRITE, LOCKMODE_WRITE);
         readonly_whenCheckConflictAndNoConflict(LOCKMODE_COMMIT, LOCKMODE_COMMIT);
     }
 
@@ -48,10 +48,10 @@ public class LongTranlocal_prepareAllUpdatesTest implements BetaStmConstants {
     @Test
     public void readonly_notLockedByOther() {
         readonly_notLockedByOther(false, LOCKMODE_NONE);
-        readonly_notLockedByOther(false, LOCKMODE_UPDATE);
+        readonly_notLockedByOther(false, LOCKMODE_WRITE);
         readonly_notLockedByOther(false, LOCKMODE_COMMIT);
         readonly_notLockedByOther(true, LOCKMODE_NONE);
-        readonly_notLockedByOther(true, LOCKMODE_UPDATE);
+        readonly_notLockedByOther(true, LOCKMODE_WRITE);
         readonly_notLockedByOther(true, LOCKMODE_COMMIT);
     }
 
@@ -72,9 +72,9 @@ public class LongTranlocal_prepareAllUpdatesTest implements BetaStmConstants {
 
     @Test
     public void readonly_lockedByOther() {
-        readonly_lockedByOther(false, LOCKMODE_UPDATE);
+        readonly_lockedByOther(false, LOCKMODE_WRITE);
         readonly_lockedByOther(false, LOCKMODE_COMMIT);
-        readonly_lockedByOther(true, LOCKMODE_UPDATE);
+        readonly_lockedByOther(true, LOCKMODE_WRITE);
         readonly_lockedByOther(true, LOCKMODE_COMMIT);
     }
 
@@ -120,16 +120,16 @@ public class LongTranlocal_prepareAllUpdatesTest implements BetaStmConstants {
     @Test
     public void update_notLockedByOther() {
         update_notLockedByOther(true, true, LOCKMODE_NONE);
-        update_notLockedByOther(true, true, LOCKMODE_UPDATE);
+        update_notLockedByOther(true, true, LOCKMODE_WRITE);
         update_notLockedByOther(true, true, LOCKMODE_COMMIT);
         update_notLockedByOther(true, false, LOCKMODE_NONE);
-        update_notLockedByOther(true, false, LOCKMODE_UPDATE);
+        update_notLockedByOther(true, false, LOCKMODE_WRITE);
         update_notLockedByOther(true, false, LOCKMODE_COMMIT);
         update_notLockedByOther(false, true, LOCKMODE_NONE);
-        update_notLockedByOther(false, true, LOCKMODE_UPDATE);
+        update_notLockedByOther(false, true, LOCKMODE_WRITE);
         update_notLockedByOther(false, true, LOCKMODE_COMMIT);
         update_notLockedByOther(false, false, LOCKMODE_NONE);
-        update_notLockedByOther(false, false, LOCKMODE_UPDATE);
+        update_notLockedByOther(false, false, LOCKMODE_WRITE);
         update_notLockedByOther(false, false, LOCKMODE_COMMIT);
     }
 
@@ -187,13 +187,13 @@ public class LongTranlocal_prepareAllUpdatesTest implements BetaStmConstants {
 
     @Test
     public void update_andLockedByOther_thenConflict() {
-        update_lockedByOther_thenConflict(false, false, LOCKMODE_UPDATE);
+        update_lockedByOther_thenConflict(false, false, LOCKMODE_WRITE);
         update_lockedByOther_thenConflict(false, false, LOCKMODE_COMMIT);
-        update_lockedByOther_thenConflict(false, true, LOCKMODE_UPDATE);
+        update_lockedByOther_thenConflict(false, true, LOCKMODE_WRITE);
         update_lockedByOther_thenConflict(false, true, LOCKMODE_COMMIT);
-        update_lockedByOther_thenConflict(true, false, LOCKMODE_UPDATE);
+        update_lockedByOther_thenConflict(true, false, LOCKMODE_WRITE);
         update_lockedByOther_thenConflict(true, false, LOCKMODE_COMMIT);
-        update_lockedByOther_thenConflict(true, true, LOCKMODE_UPDATE);
+        update_lockedByOther_thenConflict(true, true, LOCKMODE_WRITE);
         update_lockedByOther_thenConflict(true, true, LOCKMODE_COMMIT);
     }
 

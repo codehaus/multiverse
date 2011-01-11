@@ -32,7 +32,7 @@ public class ContendedCounterDriver extends BenchmarkDriver {
         System.out.printf("Multiverse > Pessimistic lock level %s \n", lockLevel);
 
         stm = new BetaStm();
-        ref = stm.getReferenceFactoryBuilder().build().newLongRef(0);
+        ref = stm.getRefFactoryBuilder().build().newLongRef(0);
         threads = new IncThread[threadCount];
         for (int k = 0; k < threads.length; k++) {
             threads[k] = new IncThread(k);

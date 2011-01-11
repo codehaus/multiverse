@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
@@ -170,7 +171,7 @@ public abstract class BetaTransaction_abortTest {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        ref.getLock().acquireCommitLock(tx);
+        ref.getLock().acquire(tx, LockMode.Commit);
 
         tx.abort();
 
@@ -189,7 +190,7 @@ public abstract class BetaTransaction_abortTest {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        ref.getLock().acquireWriteLock(tx);
+        ref.getLock().acquire(tx, LockMode.Write);
 
         tx.abort();
 
@@ -208,7 +209,7 @@ public abstract class BetaTransaction_abortTest {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        ref.getLock().acquireCommitLock(tx);
+        ref.getLock().acquire(tx, LockMode.Commit);
 
         tx.abort();
 
@@ -228,7 +229,7 @@ public abstract class BetaTransaction_abortTest {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        ref.getLock().acquireWriteLock(tx);
+        ref.getLock().acquire(tx, LockMode.Write);
 
         tx.abort();
 

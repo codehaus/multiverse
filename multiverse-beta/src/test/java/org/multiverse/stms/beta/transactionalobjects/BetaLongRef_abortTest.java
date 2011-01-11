@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.stms.beta.BetaObjectPool;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
@@ -64,7 +65,7 @@ public class BetaLongRef_abortTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        BetaTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_UPDATE);
+        BetaTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_WRITE);
 
         ref.___abort(tx, tranlocal, pool);
 
@@ -99,7 +100,7 @@ public class BetaLongRef_abortTest implements BetaStmConstants {
         BetaLongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Write);
 
         ref.___abort(tx, tranlocal, pool);
 
@@ -120,7 +121,7 @@ public class BetaLongRef_abortTest implements BetaStmConstants {
         BetaLongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
         ref.___abort(tx, tranlocal, pool);
 
@@ -156,7 +157,7 @@ public class BetaLongRef_abortTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_UPDATE);
+        BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_WRITE);
 
         ref.___abort(tx, tranlocal, pool);
 
@@ -177,7 +178,7 @@ public class BetaLongRef_abortTest implements BetaStmConstants {
         BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
         ref.___abort(tx, tranlocal, pool);
 

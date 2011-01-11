@@ -27,12 +27,12 @@ public enum LockLevel implements MultiverseConstants {
      * each insert/update/delete is locked for the remaining duration of the transaction. If something is write
      * locked, it can't be updated by another transaction, but still can be read.
      */
-    WriteLockWrites(LOCKMODE_NONE, LOCKMODE_UPDATE),
+    WriteLockWrites(LOCKMODE_NONE, LOCKMODE_WRITE),
 
     /**
      * A LockLevel that write locks all reads (and therefor all writes).
      */
-    WriteLockReads(LOCKMODE_UPDATE, LOCKMODE_UPDATE),
+    WriteLockReads(LOCKMODE_WRITE, LOCKMODE_WRITE),
 
     /**
      * A LockLevel that doesn't require any locking. This is the default.

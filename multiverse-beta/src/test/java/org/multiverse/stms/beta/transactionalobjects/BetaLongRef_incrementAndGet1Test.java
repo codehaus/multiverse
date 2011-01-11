@@ -2,6 +2,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
@@ -180,7 +181,7 @@ public class BetaLongRef_incrementAndGet1Test {
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
 
-        ref.getLock().acquireCommitLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
         try {
             ref.incrementAndGet(1);
@@ -206,7 +207,7 @@ public class BetaLongRef_incrementAndGet1Test {
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
 
-        ref.getLock().acquireWriteLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Write);
 
         long result = ref.incrementAndGet(1);
         assertEquals(11, result);

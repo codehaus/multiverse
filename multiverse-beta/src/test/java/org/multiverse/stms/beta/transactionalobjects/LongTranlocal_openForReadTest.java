@@ -3,6 +3,7 @@ package org.multiverse.stms.beta.transactionalobjects;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
@@ -28,7 +29,7 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
 
     @Test
     public void selfUpgrade_whenNoLockAndUpgradeToEnsure() {
-        self_upgrade(LOCKMODE_NONE, LOCKMODE_UPDATE, LOCKMODE_UPDATE);
+        self_upgrade(LOCKMODE_NONE, LOCKMODE_WRITE, LOCKMODE_WRITE);
     }
 
     @Test
@@ -38,17 +39,17 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
 
     @Test
     public void selfUpgrade_whenEnsuredAndUpgradeToNone() {
-        self_upgrade(LOCKMODE_UPDATE, LOCKMODE_NONE, LOCKMODE_UPDATE);
+        self_upgrade(LOCKMODE_WRITE, LOCKMODE_NONE, LOCKMODE_WRITE);
     }
 
     @Test
     public void selfUpgrade_whenEnsuredAndUpgradeToEnsure() {
-        self_upgrade(LOCKMODE_UPDATE, LOCKMODE_UPDATE, LOCKMODE_UPDATE);
+        self_upgrade(LOCKMODE_WRITE, LOCKMODE_WRITE, LOCKMODE_WRITE);
     }
 
     @Test
     public void selfUpgrade_whenEnsuredAndUpgradeToPrivatize() {
-        self_upgrade(LOCKMODE_UPDATE, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+        self_upgrade(LOCKMODE_WRITE, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
     }
 
     @Test
@@ -58,7 +59,7 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
 
     @Test
     public void selfUpgrade_whenPrivatizeAndUpgradeToEnsure() {
-        self_upgrade(LOCKMODE_COMMIT, LOCKMODE_UPDATE, LOCKMODE_COMMIT);
+        self_upgrade(LOCKMODE_COMMIT, LOCKMODE_WRITE, LOCKMODE_COMMIT);
     }
 
     @Test
@@ -89,7 +90,7 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireWriteLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Write);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         BetaLongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
@@ -107,7 +108,7 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquireCommitLock(otherTx);
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
         BetaTransaction tx = stm.startDefaultTransaction();
 
@@ -131,7 +132,7 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
 
         BetaTransaction tx = stm.startDefaultTransaction();
 
-        BetaLongRefTranlocal tranlocal = tx.openForRead(ref,LOCKMODE_UPDATE);
+        BetaLongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_WRITE);
 
         assertHasVersionAndValue(tranlocal, initialVersion, initialValue);
         assertIsActive(tx);
