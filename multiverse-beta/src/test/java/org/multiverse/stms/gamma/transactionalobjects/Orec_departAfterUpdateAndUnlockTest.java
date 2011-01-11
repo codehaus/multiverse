@@ -11,8 +11,8 @@ import static org.junit.Assert.fail;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class Orec_departAfterUpdateAndUnlockTest {
-    
-     private GlobalConflictCounter globalConflictCounter;
+
+    private GlobalConflictCounter globalConflictCounter;
     private GammaStm stm;
 
     @Before
@@ -94,6 +94,49 @@ public class Orec_departAfterUpdateAndUnlockTest {
         assertEquals(2, result);
         assertLockMode(orec, LOCKMODE_NONE);
         assertSurplus(2, orec);
+        assertUpdateBiased(orec);
+        assertReadonlyCount(0, orec);
+    }
+
+    @Test
+    public void whenWriteLock_thenPanicError() {
+        AbstractGammaObject orec = new GammaLongRef(stm);
+        orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+
+        long oldConflictCount = globalConflictCounter.count();
+
+        try {
+            orec.departAfterUpdateAndUnlock();
+            fail();
+        } catch (PanicError expected) {
+
+        }
+
+        assertEquals(oldConflictCount, globalConflictCounter.count());
+        assertLockMode(orec, LOCKMODE_WRITE);
+        assertSurplus(1, orec);
+        assertUpdateBiased(orec);
+        assertReadonlyCount(0, orec);
+    }
+
+    @Test
+    public void whenReadLockAcquired_thenPanicError() {
+        AbstractGammaObject orec = new GammaLongRef(stm);
+        orec.tryLockAndArrive(1, LOCKMODE_READ);
+
+        long oldConflictCount = globalConflictCounter.count();
+
+        try {
+            orec.departAfterUpdateAndUnlock();
+            fail();
+        } catch (PanicError expected) {
+
+        }
+
+        assertEquals(oldConflictCount, globalConflictCounter.count());
+        assertLockMode(orec, LOCKMODE_READ);
+        assertReadLockCount(orec, 1);
+        assertSurplus(1, orec);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
     }

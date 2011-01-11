@@ -6,4 +6,9 @@ public class MonoGammaTransaction_prepareTest extends GammaTransaction_prepareTe
     protected MonoGammaTransaction newTransaction() {
         return new MonoGammaTransaction(stm);
     }
+
+    @Override
+    protected MonoGammaTransaction newTransaction(GammaTransactionConfiguration config) {
+        return new MonoGammaTransaction(config);
+    }
 }

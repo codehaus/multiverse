@@ -6,4 +6,9 @@ public class ArrayGammaTransaction_prepareTest extends GammaTransaction_prepareT
     protected ArrayGammaTransaction newTransaction() {
         return new ArrayGammaTransaction(stm);
     }
+
+    @Override
+    protected ArrayGammaTransaction newTransaction(GammaTransactionConfiguration config) {
+        return new ArrayGammaTransaction(config);
+    }
 }

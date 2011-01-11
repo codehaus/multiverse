@@ -1,4 +1,6 @@
 package org.multiverse.stms.gamma.transactionalobjects;
 
-public class Orec_upgradeToCommitLockTest {
+public class Lock_acquire0Test {
+
+
 }

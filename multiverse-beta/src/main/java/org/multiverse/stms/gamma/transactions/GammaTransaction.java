@@ -276,4 +276,25 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public void openForConstruction() {
         throw new TodoException();
     }
+
+    public NullPointerException abortTryAcquireOnNullLockMode() {
+        abort();
+        return new NullPointerException("LockMode can't be null");
+    }
+
+    public IllegalTransactionStateException abortTryAcquireOnBadStatus() {
+         switch (status) {
+            case TX_ABORTED:
+                return new DeadTransactionException();
+            case TX_PREPARED:
+                abort();
+                return new PreparedTransactionException();
+            case TX_COMMITTED:
+                abort();
+                return new DeadTransactionException();
+            default:
+                throw new IllegalStateException();
+
+        }
+    }
 }
