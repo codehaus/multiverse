@@ -42,6 +42,18 @@ public abstract class GammaTransaction_prepareTest<T extends GammaTransaction> i
 
     @Test
     @Ignore
+    public void whenAbortOnly(){
+
+    }
+
+    @Test
+     @Ignore
+     public void whenContainsReadLockedRead() {
+
+     }
+
+    @Test
+    @Ignore
     public void whenContainsWriteLockedRead() {
 
     }
@@ -54,9 +66,25 @@ public abstract class GammaTransaction_prepareTest<T extends GammaTransaction> i
 
     @Test
     @Ignore
-    public void whenContainsReadLockedRead() {
+    public void writeSkew(){
 
     }
+
+    @Test
+    @Ignore
+    public void whenContainsCommute(){
+
+    }
+
+    @Test
+    @Ignore
+    public void whenContainsCommuteThatConflicts(){
+
+    }
+
+    @Test
+    @Ignore
+    public void whenContainsConstructed(){}
 
     @Test
     public void whenContainsDirtyWrite() {
