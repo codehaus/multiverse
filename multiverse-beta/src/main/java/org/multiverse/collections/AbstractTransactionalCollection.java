@@ -5,6 +5,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.collections.TransactionalCollection;
 import org.multiverse.api.collections.TransactionalIterator;
 import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.functions.BinaryFunction;
 import org.multiverse.api.functions.Function;
 import org.multiverse.api.predicates.Predicate;
 import org.multiverse.api.references.RefFactory;
@@ -90,11 +91,6 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
     }
 
     @Override
-    public boolean remove(Transaction tx, Object o) {
-        throw new TodoException();
-    }
-
-    @Override
     public boolean add(final E item) {
         return add(getThreadLocalTransaction(), item);
     }
@@ -162,7 +158,13 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
 
     @Override
     public TransactionalCollection<E> map(Transaction tx, Function<E> function) {
-        throw new TodoException();
+        TransactionalIterator<E> it = iterator(tx);
+        TransactionalCollection<E> collection = buildNew(tx);
+        while (it.hasNext(tx)){
+            E item = it.next(tx);
+            collection.add(tx, function.call(item));
+        }
+        return collection;
     }
 
     @Override
@@ -172,7 +174,15 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
 
     @Override
     public TransactionalCollection<E> filter(Transaction tx, final Predicate<E> predicate) {
-        throw new TodoException();
+        TransactionalIterator<E> it = iterator(tx);
+        TransactionalCollection<E> collection = buildNew(tx);
+        while (it.hasNext(tx)){
+            E item = it.next(tx);
+            if(predicate.evaluate(item)){
+                collection.add(tx, item);
+            }
+        }
+        return collection;
     }
 
     @Override
@@ -186,37 +196,55 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
     }
 
     @Override
-    public E foldLeft(Function<E> function) {
-        return foldLeft(getThreadLocalTransaction(), function);
+    public E foldLeft(BinaryFunction<E> function, E initial) {
+        return foldLeft(getThreadLocalTransaction(), function, initial);
     }
 
     @Override
-    public E foldLeft(Transaction tx, Function<E> function) {
+    public E foldLeft(Transaction tx, BinaryFunction<E> function, E initial) {
         if (function == null) {
             throw new NullPointerException("function can't be null");
         }
 
+        if(isEmpty(tx)){
+            //Fix this
+            throw new  RuntimeException();
+        }
+
+        TransactionalIterator<E> iterator = iterator(tx);
+        E result = function.call(initial, iterator.next(tx));
+        while (iterator.hasNext(tx)){
+            result = function.call(result,iterator.next(tx));
+
+        }
+        return result;
+    }
+
+    @Override
+    public E foldRight(BinaryFunction<E> function, E initial) {
+        return foldRight(getThreadLocalTransaction(), function, initial);
+    }
+
+    @Override
+    public E foldRight(Transaction tx, BinaryFunction<E> function, E initial) {
         throw new TodoException();
     }
 
     @Override
-    public E foldRight(Function<E> function) {
-        return foldRight(getThreadLocalTransaction(), function);
+    public void foreach(Function<E> function) {
+         foreach(getThreadLocalTransaction(), function);
     }
 
     @Override
-    public E foldRight(Transaction tx, Function<E> function) {
-        throw new TodoException();
-    }
-
-    @Override
-    public TransactionalCollection<E> foreach(Function<E> function) {
-        return foreach(getThreadLocalTransaction(), function);
-    }
-
-    @Override
-    public TransactionalCollection<E> foreach(Transaction tx, Function<E> function) {
-        throw new TodoException();
+    public void foreach(Transaction tx, Function<E> function) {
+        TransactionalIterator<E> it = iterator(tx);
+        TransactionalCollection<E> collection = buildNew(tx);
+        while (it.hasNext(tx)){
+            E item = it.next(tx);
+            collection.add(tx, function.call(item));
+        }
+        clear(tx);
+        addAll(tx, collection);
     }
 
     @Override

@@ -2,6 +2,7 @@ package org.multiverse.api.collections;
 
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.functions.BinaryFunction;
 import org.multiverse.api.functions.Function;
 import org.multiverse.api.predicates.Predicate;
 
@@ -245,13 +246,13 @@ public interface TransactionalCollection<E> extends TransactionalIterable<E>, Co
 
     String toString(Transaction tx);
 
-    E foldLeft(Function<E> function);
+    E foldLeft(BinaryFunction<E> function, E initial);
 
-    E foldLeft(Transaction tx, Function<E> function);
+    E foldLeft(Transaction tx, BinaryFunction<E> function, E initial);
 
-    E foldRight(Function<E> function);
+    E foldRight(BinaryFunction<E> function, E initial);
 
-    E foldRight(Transaction tx, Function<E> function);
+    E foldRight(Transaction tx, BinaryFunction<E> function, E initial);
 
     TransactionalCollection<E> map(Function<E> function);
 
@@ -265,7 +266,9 @@ public interface TransactionalCollection<E> extends TransactionalIterable<E>, Co
 
     TransactionalCollection<E> filter(Transaction tx, Predicate<E> predicate) throws CloneNotSupportedException;
 
-    TransactionalCollection<E> foreach(Function<E> function);
+    void foreach(Function<E> function);
 
-    TransactionalCollection<E> foreach(Transaction tx, Function<E> function);
+    void foreach(Transaction tx, Function<E> function);
+
+    TransactionalCollection<E> buildNew(Transaction tx);
 }

@@ -2,6 +2,7 @@ package org.multiverse.collections;
 
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.collections.TransactionalCollection;
 import org.multiverse.api.collections.TransactionalIterator;
 import org.multiverse.api.collections.TransactionalStack;
 import org.multiverse.api.references.IntRef;
@@ -166,6 +167,11 @@ public final class NaiveTransactionalStack<E> extends AbstractTransactionalColle
         return false;
     }
 
+    @Override
+    public boolean remove(Transaction tx, Object o) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     static class It<E> extends AbstractTransactionalIterator<E> {
         final Ref<Node<E>> node;
 
@@ -216,6 +222,11 @@ public final class NaiveTransactionalStack<E> extends AbstractTransactionalColle
         }
         sb.append("]");
         return sb.toString();
+    }
+
+    @Override
+    public TransactionalCollection<E> buildNew(Transaction tx) {
+        return new NaiveTransactionalStack(stm);
     }
 
     static class Node<E> {
