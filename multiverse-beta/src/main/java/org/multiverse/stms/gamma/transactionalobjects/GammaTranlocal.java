@@ -1,6 +1,8 @@
 package org.multiverse.stms.gamma.transactionalobjects;
 
+import org.multiverse.api.functions.Function;
 import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
 public final class GammaTranlocal implements GammaConstants {
@@ -56,6 +58,13 @@ public final class GammaTranlocal implements GammaConstants {
 
     public boolean isWrite() {
         return mode == TRANLOCAL_WRITE;
+    }
+
+    public void addCommutingFunction(GammaObjectPool pool, Function function) {
+        final CallableNode newHead = pool.takeCallableNode();
+        newHead.function = function;
+        newHead.next = headCallable;
+        headCallable = newHead;
     }
 
     public boolean prepare(GammaTransactionConfiguration config) {
