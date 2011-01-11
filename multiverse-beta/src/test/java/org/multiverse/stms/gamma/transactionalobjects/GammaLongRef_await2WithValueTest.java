@@ -1,30 +1,29 @@
-package org.multiverse.stms.beta.transactionalobjects;
+package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.RetryNotAllowedException;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
-public class BetaLongRef_await2WithValueTest {
-    private BetaStm stm;
+public class GammaLongRef_await2WithValueTest {
+    private GammaStm stm;
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = new GammaStm();
         clearThreadLocalTransaction();
     }
 
     @Test
     public void whenNullTransaction_thenNullPointerException() {
-        BetaLongRef ref = newLongRef(stm);
+        GammaLongRef ref = new GammaLongRef(stm);
 
         try {
             ref.await(null, 10);
@@ -35,8 +34,8 @@ public class BetaLongRef_await2WithValueTest {
 
     @Test
     public void whenPreparedTransaction_thenPreparedTransactionException() {
-        BetaLongRef ref = newLongRef(stm);
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaLongRef ref = new GammaLongRef(stm);
+        GammaTransaction tx = stm.startDefaultTransaction();
         tx.prepare();
 
         try {
@@ -50,8 +49,8 @@ public class BetaLongRef_await2WithValueTest {
 
     @Test
     public void whenAbortedTransaction_thenDeadTransactionException() {
-        BetaLongRef ref = newLongRef(stm);
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaLongRef ref = new GammaLongRef(stm);
+        GammaTransaction tx = stm.startDefaultTransaction();
         tx.abort();
 
         try {
@@ -65,8 +64,8 @@ public class BetaLongRef_await2WithValueTest {
 
     @Test
     public void whenCommittedTransaction_thenDeadTransactionException() {
-        BetaLongRef ref = newLongRef(stm);
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaLongRef ref = new GammaLongRef(stm);
+        GammaTransaction tx = stm.startDefaultTransaction();
         tx.abort();
 
         try {
@@ -80,8 +79,8 @@ public class BetaLongRef_await2WithValueTest {
 
     @Test
     public void whenBlockingNotAllowed_thenRetryNotAllowedException() {
-        BetaLongRef ref = newLongRef(stm);
-        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+        GammaLongRef ref = new GammaLongRef(stm);
+        GammaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setBlockingAllowed(false)
                 .setSpeculativeConfigurationEnabled(false)
                 .build()

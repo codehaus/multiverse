@@ -289,10 +289,6 @@ public final class MapGammaTransaction extends GammaTransaction {
         throw new TodoException();
     }
 
-    public void init(GammaTransactionConfiguration config) {
-        throw new TodoException();
-    }
-
     @Override
     public boolean softReset() {
         if(attempt >= config.getMaxRetries()){

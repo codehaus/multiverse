@@ -3,23 +3,32 @@ package org.multiverse.stms.gamma;
 import org.junit.Assert;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.blocking.RetryLatch;
-import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaObject;
-import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.api.functions.Function;
+import org.multiverse.stms.gamma.transactionalobjects.*;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
+import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.getField;
 
-public class GammaTestUtils implements GammaConstants{
+public class GammaTestUtils implements GammaConstants {
 
-     public static void assertHasListeners(AbstractGammaObject ref, RetryLatch... listeners) {
+    public static void assertHasCommutingFunctions(GammaTranlocal tranlocal, Function... expected) {
+        CallableNode current = tranlocal.headCallable;
+        List<Function> functions = new LinkedList<Function>();
+        while (current != null) {
+            functions.add(current.function);
+            current = current.next;
+        }
+
+        Assert.assertEquals(asList(expected), functions);
+    }
+
+
+    public static void assertHasListeners(AbstractGammaObject ref, RetryLatch... listeners) {
         Set<RetryLatch> expected = new HashSet<RetryLatch>(Arrays.asList(listeners));
 
         Set<RetryLatch> found = new HashSet<RetryLatch>();
@@ -40,7 +49,7 @@ public class GammaTestUtils implements GammaConstants{
         assertReadLockCount(ref, 0);
     }
 
-    public static void assertRefHasReadLock(AbstractGammaObject ref, GammaTransaction tx){
+    public static void assertRefHasReadLock(AbstractGammaObject ref, GammaTransaction tx) {
         GammaTranlocal tranlocal = tx.get(ref);
         if (tranlocal == null) {
             fail("A Tranlocal should have been available for a ref that has the read lock");
@@ -96,7 +105,7 @@ public class GammaTestUtils implements GammaConstants{
                 throw new IllegalArgumentException();
         }
     }
-    
+
     // public static void assertVersionAndValue(GammaBooleanRef ref, long version, boolean value) {
     //    Assert.assertEquals("version doesn't match", version, ref.getVersion());
     //    Assert.assertEquals("value doesn't match", value, ref.___weakRead());
@@ -123,18 +132,18 @@ public class GammaTestUtils implements GammaConstants{
     //    assertSame("value doesn't match", value, ref.___weakRead());
     //}
 
-    public static void assertReadLockCount(AbstractGammaObject orec, int readLockCount){
-        if(readLockCount>0){
+    public static void assertReadLockCount(AbstractGammaObject orec, int readLockCount) {
+        if (readLockCount > 0) {
             assertEquals(LOCKMODE_READ, orec.atomicGetLockModeAsInt());
         }
         assertEquals(readLockCount, orec.getReadLockCount());
     }
 
-     public static void assertLockMode(GammaObject orec, LockMode lockMode){
+    public static void assertLockMode(GammaObject orec, LockMode lockMode) {
         assertEquals(lockMode, orec.getLock().atomicGetLockMode());
     }
 
-    public static void assertLockMode(AbstractGammaObject orec, int lockMode){
+    public static void assertLockMode(AbstractGammaObject orec, int lockMode) {
         assertEquals(lockMode, orec.atomicGetLockModeAsInt());
     }
 
@@ -142,10 +151,10 @@ public class GammaTestUtils implements GammaConstants{
         assertEquals(expectedSurplus, orec.getSurplus());
     }
 
-    public static void assertReadBiased(AbstractGammaObject orec, boolean readBiased){
-        if(readBiased){
+    public static void assertReadBiased(AbstractGammaObject orec, boolean readBiased) {
+        if (readBiased) {
             assertReadBiased(orec);
-        }else{
+        } else {
             assertUpdateBiased(orec);
         }
     }
@@ -174,7 +183,7 @@ public class GammaTestUtils implements GammaConstants{
         }
 
         assertReadBiased(orec);
-        assertLockMode(orec,LOCKMODE_NONE);
+        assertLockMode(orec, LOCKMODE_NONE);
 
         return orec;
     }

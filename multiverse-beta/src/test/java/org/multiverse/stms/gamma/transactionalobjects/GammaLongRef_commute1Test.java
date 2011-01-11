@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta.transactionalobjects;
+package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -9,41 +9,39 @@ import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.BetaStmTestUtils.*;
-import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.assertSurplus;
-import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.assertUpdateBiased;
+import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
-public class BetaLongRef_commute1Test {
-    private BetaStm stm;
+public class GammaLongRef_commute1Test {
+    private GammaStm stm;
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = new GammaStm();
         clearThreadLocalTransaction();
     }
 
     @Test
     public void whenActiveTransactionAvailable() {
-        BetaLongRef ref = newLongRef(stm);
+        GammaLongRef ref = new GammaLongRef(stm);
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
-        BetaLongRefTranlocal commuting = (BetaLongRefTranlocal) tx.get(ref);
+        GammaTranlocal commuting = tx.get(ref);
         assertNotNull(commuting);
         assertTrue(commuting.isCommuting());
-        assertFalse(commuting.isReadonly());
+        assertFalse(commuting.isRead());
         assertSurplus(0, ref);
         assertRefHasNoLocks(ref);
-        assertEquals(0, commuting.value);
+        assertEquals(0, commuting.long_value);
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
         tx.commit();
@@ -57,20 +55,20 @@ public class BetaLongRef_commute1Test {
 
     @Test
     public void whenActiveTransactionAvailableAndNoChange() {
-        BetaLongRef ref = newLongRef(stm);
+        GammaLongRef ref = new GammaLongRef(stm);
         long version = ref.getVersion();
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         LongFunction function = Functions.newIdentityLongFunction();
         ref.commute(function);
 
-        BetaLongRefTranlocal commuting = (BetaLongRefTranlocal) tx.get(ref);
+        GammaTranlocal commuting = (GammaTranlocal) tx.get(ref);
         assertNotNull(commuting);
         assertTrue(commuting.isCommuting());
-        assertFalse(commuting.isReadonly());
+        assertFalse(commuting.isRead());
         assertSurplus(0, ref);
         assertRefHasNoLocks(ref);
-        assertEquals(0, commuting.value);
+        assertEquals(0, commuting.long_value);
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
         tx.commit();
@@ -85,9 +83,9 @@ public class BetaLongRef_commute1Test {
 
     @Test
     public void whenActiveTransactionAvailableAndNullFunction_thenNullPointerException() {
-        BetaLongRef ref = newLongRef(stm);
+        GammaLongRef ref = new GammaLongRef(stm);
         long version = ref.getVersion();
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
         try {
@@ -107,7 +105,7 @@ public class BetaLongRef_commute1Test {
     @Test
     public void whenNoTransactionAvailable_thenNoTransactionFoundException() {
         long initialValue = 10;
-        BetaLongRef ref = newLongRef(stm, initialValue);
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         LongFunction function = Functions.newIncLongFunction(1);
@@ -127,10 +125,10 @@ public class BetaLongRef_commute1Test {
     @Test
     public void whenCommittedTransactionAvailable_thenDeadTransactionException() {
         long initialValue = 10;
-        BetaLongRef ref = newLongRef(stm, initialValue);
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         tx.commit();
 
@@ -153,10 +151,10 @@ public class BetaLongRef_commute1Test {
     @Test
     public void whenAbortedTransactionAvailable_thenDeadTransactionException() {
         long initialValue = 10;
-        BetaLongRef ref = newLongRef(stm, initialValue);
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         tx.abort();
 
@@ -178,10 +176,10 @@ public class BetaLongRef_commute1Test {
 
     @Test
     public void whenPreparedTransactionAvailable_thenPreparedTransactionException() {
-        BetaLongRef ref = newLongRef(stm, 2);
+        GammaLongRef ref = new GammaLongRef(stm, 2);
         long version = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         tx.prepare();
 
@@ -204,19 +202,19 @@ public class BetaLongRef_commute1Test {
 
     @Test
     public void whenAlreadyEnsuredBySelf_thenNoCommute() {
-        BetaLongRef ref = newLongRef(stm, 2);
+        GammaLongRef ref = new GammaLongRef(stm, 2);
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.acquireWriteLock();
+        ref.getLock().acquire(LockMode.Write);
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
-        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
+        GammaTranlocal tranlocal =  tx.get(ref);
         assertNotNull(tranlocal);
         assertFalse(tranlocal.isCommuting());
-        assertEquals(3, tranlocal.value);
+        assertEquals(3, tranlocal.long_value);
         assertIsActive(tx);
         assertRefHasWriteLock(ref, tx);
         assertSurplus(1, ref);
@@ -233,19 +231,19 @@ public class BetaLongRef_commute1Test {
 
     @Test
     public void whenAlreadyPrivatizedBySelf_thenNoCommute() {
-        BetaLongRef ref = newLongRef(stm, 2);
+        GammaLongRef ref = new GammaLongRef(stm, 2);
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.acquireCommitLock();
+        ref.getLock().acquire(LockMode.Commit);
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
-        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
+        GammaTranlocal tranlocal = tx.get(ref);
         assertNotNull(tranlocal);
         assertFalse(tranlocal.isCommuting());
-        assertEquals(3, tranlocal.value);
+        assertEquals(3, tranlocal.long_value);
         assertIsActive(tx);
         assertRefHasCommitLock(ref, tx);
         assertSurplus(1, ref);
@@ -262,19 +260,19 @@ public class BetaLongRef_commute1Test {
 
     @Test
     public void whenEnsuredByOther_thenCommuteSucceedsButCommitFails() {
-        BetaLongRef ref = newLongRef(stm, 2);
+        GammaLongRef ref = new GammaLongRef(stm, 2);
         long version = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        BetaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.startDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
-        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
+        GammaTranlocal tranlocal = tx.get(ref);
         assertNotNull(tranlocal);
         assertTrue(tranlocal.isCommuting());
         assertHasCommutingFunctions(tranlocal, function);
@@ -297,19 +295,19 @@ public class BetaLongRef_commute1Test {
 
     @Test
     public void whenPrivatizedByOther_thenCommuteSucceedsButCommitFails() {
-        BetaLongRef ref = newLongRef(stm, 2);
+        GammaLongRef ref = new GammaLongRef(stm, 2);
         long version = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        BetaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.startDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Commit);
 
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
-        BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
+        GammaTranlocal tranlocal = tx.get(ref);
         assertNotNull(tranlocal);
         assertTrue(tranlocal.isCommuting());
         assertHasCommutingFunctions(tranlocal, function);

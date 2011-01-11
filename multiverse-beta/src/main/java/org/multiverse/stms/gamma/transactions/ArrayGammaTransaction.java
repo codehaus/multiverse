@@ -286,8 +286,4 @@ public final class ArrayGammaTransaction extends GammaTransaction {
     public void copyForSpeculativeFailure(GammaTransaction failingTx) {
         throw new TodoException();
     }
-
-    public void init(GammaTransactionConfiguration config) {
-        throw new TodoException();
-    }
 }

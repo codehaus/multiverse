@@ -1,38 +1,41 @@
-package org.multiverse.stms.beta.transactionalobjects;
+package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
-import org.multiverse.api.exceptions.*;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.exceptions.ReadWriteConflict;
+import org.multiverse.api.exceptions.ReadonlyException;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.*;
+import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasCommitLock;
+import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasWriteLock;
+import static org.multiverse.stms.gamma.GammaTestUtils.assertVersionAndValue;
 
-public class BetaLongRef_increment1WithAmountTest {
+public class GammaLongRef_increment2Test {
 
-    private BetaStm stm;
+     private GammaStm stm;
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = new GammaStm();
         clearThreadLocalTransaction();
     }
 
     @Test
     public void whenSuccess() {
         long initialValue = 10;
-        BetaLongRef ref = newLongRef(stm, initialValue);
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
-        setThreadLocalTransaction(tx);
+        GammaTransaction tx = stm.startDefaultTransaction();
 
-        ref.increment(5);
+        ref.increment(tx,5);
 
         tx.commit();
 
@@ -43,18 +46,17 @@ public class BetaLongRef_increment1WithAmountTest {
     @Test
     public void whenReadonlyTransaction_thenReadonlyException() {
         long initialValue = 10;
-        BetaLongRef ref = newLongRef(stm, initialValue);
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+        GammaTransaction tx = stm.createTransactionFactoryBuilder()
                 .setReadonly(true)
                 .setSpeculativeConfigurationEnabled(false)
                 .build()
                 .newTransaction();
-        setThreadLocalTransaction(tx);
 
         try {
-            ref.increment(5);
+            ref.increment(tx,5);
             fail();
         } catch (ReadonlyException expected) {
         }
@@ -66,16 +68,15 @@ public class BetaLongRef_increment1WithAmountTest {
     @Test
     public void whenEnsuredByOther_thenIncrementSucceedsButCommitFails() {
         long initialValue = 10;
-        BetaLongRef ref = newLongRef(stm, initialValue);
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.startDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
-        BetaTransaction tx = stm.startDefaultTransaction();
-        setThreadLocalTransaction(tx);
+        GammaTransaction tx = stm.startDefaultTransaction();
 
-        ref.increment(5);
+        ref.increment(tx,5);
 
         try {
             tx.commit();
@@ -91,16 +92,15 @@ public class BetaLongRef_increment1WithAmountTest {
     @Test
     public void whenPrivatizedByOther_thenIncrementSucceedsButCommitFails() {
         long initialValue = 10;
-        BetaLongRef ref = newLongRef(stm, initialValue);
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.startDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Commit);
 
-        BetaTransaction tx = stm.startDefaultTransaction();
-        setThreadLocalTransaction(tx);
+        GammaTransaction tx = stm.startDefaultTransaction();
 
-        ref.increment(5);
+        ref.increment(tx,5);
 
         try {
             tx.commit();
@@ -116,15 +116,14 @@ public class BetaLongRef_increment1WithAmountTest {
     @Test
     public void whenCommittedTransactionFound() {
         long initialValue = 10;
-        BetaLongRef ref = newLongRef(stm, initialValue);
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
-        setThreadLocalTransaction(tx);
+        GammaTransaction tx = stm.startDefaultTransaction();
         tx.commit();
 
         try {
-            ref.increment(5);
+            ref.increment(tx,5);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -136,15 +135,14 @@ public class BetaLongRef_increment1WithAmountTest {
     @Test
     public void whenAbortedTransactionFound_thenDeadTransactionException() {
         long initialValue = 10;
-        BetaLongRef ref = newLongRef(stm, initialValue);
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
-        setThreadLocalTransaction(tx);
+        GammaTransaction tx = stm.startDefaultTransaction();
         tx.abort();
 
         try {
-            ref.increment(5);
+            ref.increment(tx,5);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -156,15 +154,14 @@ public class BetaLongRef_increment1WithAmountTest {
     @Test
     public void whenPreparedTransactionFound_thenPreparedTransactionException() {
         long initialValue = 10;
-        BetaLongRef ref = newLongRef(stm, initialValue);
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
-        setThreadLocalTransaction(tx);
+        GammaTransaction tx = stm.startDefaultTransaction();
         tx.prepare();
 
         try {
-            ref.increment(5);
+            ref.increment(tx,5);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -176,22 +173,22 @@ public class BetaLongRef_increment1WithAmountTest {
     @Test
     public void whenNoTransaction_thenTransactionRequiredException() {
         long initialValue = 10;
-        BetaLongRef ref = newLongRef(stm, initialValue);
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         try {
-            ref.increment(5);
+            ref.increment(null,5);
             fail();
-        } catch (TransactionRequiredException expected) {
+        } catch (NullPointerException expected) {
         }
 
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
-      @Test
+         @Test
     public void whenListenersAvailable() {
         long initialValue = 10;
-        BetaLongRef ref = newLongRef(stm, initialValue);
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         long amount = 4;
@@ -200,9 +197,8 @@ public class BetaLongRef_increment1WithAmountTest {
 
         sleepMs(500);
 
-        BetaTransaction tx = stm.startDefaultTransaction();
-        setThreadLocalTransaction(tx);
-        ref.increment(amount);
+        GammaTransaction tx = stm.startDefaultTransaction();
+        ref.increment(tx,amount);
         tx.commit();
 
         joinAll(thread);

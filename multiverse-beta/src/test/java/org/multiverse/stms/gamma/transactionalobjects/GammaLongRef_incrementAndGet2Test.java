@@ -1,10 +1,12 @@
-package org.multiverse.stms.beta.transactionalobjects;
+package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
+import org.multiverse.stms.beta.transactionalobjects.LongRefAwaitThread;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 
 import static org.junit.Assert.assertEquals;
@@ -13,7 +15,7 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
 
-public class BetaLongRef_incrementAndGet2Test {
+public class GammaLongRef_incrementAndGet2Test {
 
     private BetaStm stm;
 

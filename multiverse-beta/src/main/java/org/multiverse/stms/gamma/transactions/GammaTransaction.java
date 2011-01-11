@@ -112,7 +112,6 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                 abort();
                 return new PreparedTransactionException();
             case TX_COMMITTED:
-                abort();
                 return new DeadTransactionException();
             default:
                 throw new IllegalStateException();
@@ -125,7 +124,6 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
             case TX_ABORTED:
                 return new DeadTransactionException();
             case TX_COMMITTED:
-                abort();
                 return new DeadTransactionException();
             default:
                 throw new IllegalStateException();
@@ -141,7 +139,6 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                 abort();
                 return new PreparedTransactionException();
             case TX_COMMITTED:
-                abort();
                 return new DeadTransactionException();
             default:
                 throw new IllegalStateException();
@@ -155,6 +152,51 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                 return new DeadTransactionException();
             default:
                 throw new IllegalStateException();
+        }
+    }
+
+    public IllegalTransactionStateException abortCommuteOnBadStatus() {
+        switch (status) {
+            case TX_ABORTED:
+                return new DeadTransactionException();
+            case TX_PREPARED:
+                abort();
+                return new PreparedTransactionException();
+            case TX_COMMITTED:
+                return new DeadTransactionException();
+            default:
+                throw new IllegalStateException();
+
+        }
+    }
+
+    public IllegalTransactionStateException abortTryAcquireOnBadStatus() {
+        switch (status) {
+            case TX_ABORTED:
+                return new DeadTransactionException();
+            case TX_PREPARED:
+                abort();
+                return new PreparedTransactionException();
+            case TX_COMMITTED:
+                return new DeadTransactionException();
+            default:
+                throw new IllegalStateException();
+
+        }
+    }
+
+    public IllegalTransactionStateException abortEnsureOnBadStatus() {
+        switch (status) {
+            case TX_ABORTED:
+                return new DeadTransactionException();
+            case TX_PREPARED:
+                abort();
+                return new PreparedTransactionException();
+            case TX_COMMITTED:
+                return new DeadTransactionException();
+            default:
+                throw new IllegalStateException();
+
         }
     }
 
@@ -214,6 +256,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                 abortOnly = true;
                 break;
             case TX_PREPARED:
+                abort();
                 throw new PreparedTransactionException(
                         format("[%s] Failed to execute BetaTransaction.setAbortOnly, reason: the transaction is prepared",
                                 config.familyName));
@@ -273,7 +316,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public abstract void copyForSpeculativeFailure(GammaTransaction failingTx);
 
-    public void openForConstruction() {
+    public GammaTranlocal openForConstruction(GammaObject o) {
         throw new TodoException();
     }
 
@@ -282,19 +325,21 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         return new NullPointerException("LockMode can't be null");
     }
 
-    public IllegalTransactionStateException abortTryAcquireOnBadStatus() {
-         switch (status) {
-            case TX_ABORTED:
-                return new DeadTransactionException();
-            case TX_PREPARED:
-                abort();
-                return new PreparedTransactionException();
-            case TX_COMMITTED:
-                abort();
-                return new DeadTransactionException();
-            default:
-                throw new IllegalStateException();
+    public NullPointerException abortCommuteOnNullFunction() {
+        abort();
+        return new NullPointerException();
+    }
 
+    public ReadonlyException abortCommuteOnReadonly() {
+        abort();
+        return new ReadonlyException();
+    }
+
+    public final void init(GammaTransactionConfiguration config) {
+        if (config == null) {
+            throw new NullPointerException();
         }
+        this.config = config;
+        hardReset();
     }
 }

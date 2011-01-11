@@ -4,6 +4,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.exceptions.TransactionRequiredException;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.predicates.LongPredicate;
 import org.multiverse.api.references.LongRef;
@@ -31,8 +32,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
 
     public GammaLongRef(GammaTransaction tx) {
         super(tx.config.stm);
-        tx.openForConstruction();
-
+        tx.openForConstruction(this);
     }
 
     public boolean load(GammaTranlocal tranlocal, int lockMode, int spinCount, boolean arriveNeeded) {
@@ -48,7 +48,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
                 if (arriveNeeded) {
                     arriveStatus = arrive(spinCount);
                 } else {
-                    arriveStatus = waitForNoCommitLock(spinCount) ? ARRIVE_UNREGISTERED: ARRIVE_LOCK_NOT_FREE ;
+                    arriveStatus = waitForNoCommitLock(spinCount) ? ARRIVE_UNREGISTERED : ARRIVE_LOCK_NOT_FREE;
                 }
 
                 if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
@@ -565,11 +565,89 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
 
     @Override
     public void commute(LongFunction function) {
-        throw new TodoException();
+        GammaTransaction tx = (GammaTransaction) getThreadLocalTransaction();
+        if (tx == null) {
+            throw new TransactionRequiredException();
+        }
+
+        commute(tx, function);
     }
 
     @Override
     public void commute(Transaction tx, LongFunction function) {
+        commute((GammaTransaction) tx, function);
+    }
+
+    public void commute(GammaTransaction tx, LongFunction function) {
+        if (tx instanceof MonoGammaTransaction) {
+            commute((MonoGammaTransaction) tx, function);
+        } else if (tx instanceof ArrayGammaTransaction) {
+            commute((ArrayGammaTransaction) tx, function);
+        } else {
+            commute((MapGammaTransaction) tx, function);
+        }
+    }
+
+    public void commute(MonoGammaTransaction tx, LongFunction function) {
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortCommuteOnBadStatus();
+        }
+
+        if (function == null) {
+            throw tx.abortCommuteOnBadStatus();
+        }
+
+        GammaTransactionConfiguration config = tx.config;
+        if (config.isReadonly()) {
+            throw tx.abortCommuteOnReadonly();
+        }
+
+        throw new TodoException();
+    }
+
+    public void commute(ArrayGammaTransaction tx, LongFunction function) {
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortCommuteOnBadStatus();
+        }
+
+        if (function == null) {
+            throw tx.abortCommuteOnNullFunction();
+        }
+
+        GammaTransactionConfiguration config = tx.config;
+        if (config.isReadonly()) {
+            throw tx.abortCommuteOnReadonly();
+        }
+
+        throw new TodoException();
+    }
+
+    public void commute(MapGammaTransaction tx, LongFunction function) {
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortCommuteOnBadStatus();
+        }
+
+        if (function == null) {
+            throw tx.abortCommuteOnNullFunction();
+        }
+
+        GammaTransactionConfiguration config = tx.config;
+        if (config.isReadonly()) {
+            throw tx.abortCommuteOnReadonly();
+        }
+
         throw new TodoException();
     }
 
@@ -825,50 +903,65 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
 
     @Override
     public void increment() {
-        //todo
-        throw new TodoException();
+        GammaTransaction tx = (GammaTransaction) getThreadLocalTransaction();
+        if (tx == null) {
+            throw new TransactionRequiredException();
+        }
+
+        increment(tx);
     }
 
     @Override
     public void increment(Transaction tx) {
-        //todo
-        throw new TodoException();
+        commute((GammaTransaction) tx, Functions.newIncLongFunction());
+    }
+
+    public void increment(GammaTransaction tx) {
+        commute(tx, Functions.newIncLongFunction());
     }
 
     @Override
     public void increment(long amount) {
-        //todo
-        throw new TodoException();
+        GammaTransaction tx = (GammaTransaction) getThreadLocalTransaction();
+        if (tx == null) {
+            throw new TransactionRequiredException();
+        }
+        commute(tx, Functions.newIncLongFunction(amount));
     }
 
     @Override
     public void increment(Transaction tx, long amount) {
-        //todo
-        throw new TodoException();
+        commute((GammaTransaction) tx, Functions.newIncLongFunction(amount));
     }
 
     @Override
     public void decrement() {
-        //todo
-        throw new TodoException();
+        GammaTransaction tx = (GammaTransaction) getThreadLocalTransaction();
+        if (tx == null) {
+            throw new TransactionRequiredException();
+        }
+
+        commute(tx, Functions.newDecLongFunction());
     }
 
     @Override
     public void decrement(Transaction tx) {
-        //todo
-        throw new TodoException();
+        commute((GammaTransaction) tx, Functions.newDecLongFunction());
     }
 
     @Override
     public void decrement(long amount) {
-        //todo
-        throw new TodoException();
+        GammaTransaction tx = (GammaTransaction) getThreadLocalTransaction();
+        if (tx == null) {
+            throw new TransactionRequiredException();
+        }
+
+        commute(tx, Functions.newIncLongFunction(-amount));
     }
 
     @Override
     public void decrement(Transaction tx, long amount) {
-        //todo
-        throw new TodoException();
+        commute((GammaTransaction) tx, Functions.newIncLongFunction(-amount));
     }
 
     @Override
@@ -897,13 +990,28 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
 
     @Override
     public void ensure() {
-        //todo
-        throw new TodoException();
+        GammaTransaction tx = (GammaTransaction) getThreadLocalTransaction();
+        if (tx == null) {
+            throw new TransactionRequiredException();
+        }
+        ensure(tx);
     }
 
     @Override
-    public void ensure(Transaction self) {
-        //todo
+    public void ensure(Transaction tx) {
+        ensure((GammaTransaction) tx);
+    }
+
+    public void ensure(GammaTransaction tx) {
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortEnsureOnBadStatus();
+        }
+
+        //openForRead(tx, LOCKMODE_NONE);
         throw new TodoException();
     }
 

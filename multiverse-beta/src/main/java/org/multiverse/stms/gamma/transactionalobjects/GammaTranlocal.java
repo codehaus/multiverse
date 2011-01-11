@@ -16,6 +16,7 @@ public final class GammaTranlocal implements GammaConstants {
     public GammaTranlocal next;
     public GammaTranlocal previous;
     public boolean isDirty = false;
+    public CallableNode headCallable;
 
     public boolean isDirty() {
         return isDirty;
@@ -57,7 +58,6 @@ public final class GammaTranlocal implements GammaConstants {
         return mode == TRANLOCAL_WRITE;
     }
 
-
     public boolean prepare(GammaTransactionConfiguration config) {
         if (!isWrite()) {
             return true;
@@ -79,5 +79,9 @@ public final class GammaTranlocal implements GammaConstants {
 
     public int getMode() {
         return mode;
+    }
+
+    public boolean isConflictCheckNeeded() {
+        return false;
     }
 }

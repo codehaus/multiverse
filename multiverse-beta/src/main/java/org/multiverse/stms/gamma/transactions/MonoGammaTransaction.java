@@ -7,7 +7,6 @@ import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
-import org.omg.PortableInterceptor.ACTIVE;
 
 public final class MonoGammaTransaction extends GammaTransaction {
 
@@ -183,10 +182,6 @@ public final class MonoGammaTransaction extends GammaTransaction {
         remainingTimeoutNs = config.timeoutNs;
         attempt = 0;
         abortOnly = false;
-    }
-
-    public void init(GammaTransactionConfiguration config) {
-        throw new TodoException();
     }
 
     @Override
