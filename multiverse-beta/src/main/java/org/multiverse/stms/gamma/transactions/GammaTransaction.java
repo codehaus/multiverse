@@ -342,4 +342,6 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         this.config = config;
         hardReset();
     }
+
+    public abstract boolean isReadConsistent(GammaTranlocal justAdded);
 }

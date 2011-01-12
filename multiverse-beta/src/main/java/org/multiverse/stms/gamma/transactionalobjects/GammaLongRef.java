@@ -111,17 +111,19 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
         }
     }
 
-    public boolean flatten(GammaTransaction tx, GammaTranlocal tranlocal, int lockMode) {
-        if (!load(tranlocal, lockMode, tx.config.spinCount, tx.arriveEnabled)) {
+    public boolean flattenCommute(final GammaTransaction tx, final GammaTranlocal tranlocal, final int lockMode) {
+        final GammaTransactionConfiguration config = tx.config;
+
+        if (!load(tranlocal, lockMode, config.spinCount, tx.arriveEnabled)) {
             return false;
         }
 
-        if (hasReadConflict(tranlocal)) {
-            return false;
-        }
-
-        tranlocal.setDirty(!tx.config.dirtyCheck);
+        tranlocal.setDirty(!config.dirtyCheck);
         tranlocal.mode = TRANLOCAL_WRITE;
+
+        if (!tx.isReadConsistent(tranlocal)) {
+            return false;
+        }
 
         boolean abort = true;
         //evaluatingCommute = true;
@@ -167,7 +169,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
             GammaTranlocal tranlocal = tx.array[indexOf];
 
             if (tranlocal.isCommuting()) {
-                if (!flatten(tx, tranlocal, lockMode)) {
+                if (!flattenCommute(tx, tranlocal, lockMode)) {
                     throw tx.abortOnReadWriteConflict();
                 }
                 return tranlocal;
@@ -226,7 +228,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
 
         if (tranlocal.owner == this) {
             if (tranlocal.isCommuting()) {
-                if (!flatten(tx, tranlocal, lockMode)) {
+                if (!flattenCommute(tx, tranlocal, lockMode)) {
                     throw tx.abortOnReadWriteConflict();
                 }
                 return tranlocal;
@@ -289,8 +291,10 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
         lockMode = config.writeLockModeAsInt > lockMode ? config.writeLockModeAsInt : lockMode;
 
         if (found != null) {
+            tx.shiftInFront(found);
+
             if (found.isCommuting()) {
-                if (!flatten(tx, found, lockMode)) {
+                if (!flattenCommute(tx, found, lockMode)) {
                     throw tx.abortOnReadWriteConflict();
                 }
                 return found;
@@ -305,7 +309,6 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
             found.mode = TRANLOCAL_WRITE;
             found.setDirty(!config.dirtyCheck);
             tx.hasWrites = true;
-            tx.shiftInFront(found);
             return found;
         }
 
@@ -362,9 +365,15 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
         final GammaTranlocal tranlocal = tx.tranlocal;
 
         if (tranlocal.owner == this) {
-            if (!flatten(tx, tranlocal, lockMode)) {
-                throw tx.abortOnReadWriteConflict();
-            } else if (lockMode > tranlocal.getLockMode()) {
+            if (tranlocal.isCommuting()) {
+                if (!flattenCommute(tx, tranlocal, lockMode)) {
+                    throw tx.abortOnReadWriteConflict();
+                }
+
+                return tranlocal;
+            }
+
+            if (lockMode > tranlocal.getLockMode()) {
                 if (!tryLockAndCheckConflict(config.spinCount, tranlocal, lockMode)) {
                     throw tx.abortOnReadWriteConflict();
                 }
@@ -413,9 +422,15 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
         lockMode = config.readLockModeAsInt <= lockMode ? lockMode : config.readLockModeAsInt;
 
         if (found != null) {
-            if (!flatten(tx, found, lockMode)) {
-                throw tx.abortOnReadWriteConflict();
-            } else if (lockMode > found.getLockMode()) {
+            if (found.isCommuting()) {
+                if (!flattenCommute(tx, found, lockMode)) {
+                    throw tx.abortOnReadWriteConflict();
+                }
+
+                return found;
+            }
+
+            if (lockMode > found.getLockMode()) {
                 if (!tryLockAndCheckConflict(config.spinCount, found, lockMode)) {
                     throw tx.abortOnReadWriteConflict();
                 }
@@ -465,9 +480,15 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
         if (indexOf > -1) {
             final GammaTranlocal tranlocal = tx.array[indexOf];
 
-            if (!flatten(tx, tranlocal, lockMode)) {
-                throw tx.abortOnReadWriteConflict();
-            } else if (lockMode > tranlocal.getLockMode()) {
+            if (tranlocal.isCommuting()) {
+                if (!flattenCommute(tx, tranlocal, lockMode)) {
+                    throw tx.abortOnReadWriteConflict();
+                }
+
+                return tranlocal;
+            }
+
+            if (lockMode > tranlocal.getLockMode()) {
                 if (!tryLockAndCheckConflict(config.spinCount, tranlocal, lockMode)) {
                     throw tx.abortOnReadWriteConflict();
                 }

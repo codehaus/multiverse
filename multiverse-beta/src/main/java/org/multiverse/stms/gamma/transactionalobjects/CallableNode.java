@@ -2,7 +2,7 @@ package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.multiverse.api.functions.Function;
 
-public class CallableNode {
+public final class CallableNode {
     public CallableNode next;
     public Function function;
 

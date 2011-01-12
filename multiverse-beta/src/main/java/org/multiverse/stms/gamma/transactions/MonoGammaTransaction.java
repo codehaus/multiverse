@@ -184,6 +184,10 @@ public final class MonoGammaTransaction extends GammaTransaction {
         abortOnly = false;
     }
 
+    public boolean isReadConsistent(GammaTranlocal justAdded){
+        return true;
+    }
+
     @Override
     public void copyForSpeculativeFailure(GammaTransaction failingTx) {
         throw new TodoException();
