@@ -1164,26 +1164,56 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
 
     @Override
     public void await(final long value) {
-        //todo
-        throw new TodoException();
+        GammaTransaction tx = (GammaTransaction)getThreadLocalTransaction();
+        if(tx == null){
+            throw new TransactionRequiredException();
+        }
+
+        await(tx, value);
     }
 
     @Override
     public void await(final Transaction tx, final long value) {
-        //todo
-        throw new TodoException();
+        await((GammaTransaction)tx, value);
+    }
+
+    public void await(final GammaTransaction tx, final long value){
+        GammaTranlocal tranlocal = openForRead(tx, LOCKMODE_NONE);
+        if(value == tranlocal.long_value){
+            return;
+        }
+
+        tx.retry();
     }
 
     @Override
     public void await(final LongPredicate predicate) {
-        //todo
-        throw new TodoException();
+        GammaTransaction tx = (GammaTransaction) getThreadLocalTransaction();
+        if(tx == null){
+            throw new TransactionRequiredException();
+        }
+
+        await(tx, predicate);
     }
 
     @Override
     public void await(final Transaction tx, final LongPredicate predicate) {
-        //todo
-        throw new TodoException();
+        await((GammaTransaction)tx, predicate);
+    }
+
+    public void await(final GammaTransaction tx, final LongPredicate predicate){
+        GammaTranlocal tranlocal = openForRead(tx, LOCKMODE_NONE);
+        boolean abort = true;
+        try{
+            if(!predicate.evaluate(tranlocal.long_value)){
+                tx.retry();
+            }
+            abort = false;
+        }finally{
+            if(abort){
+                tx.abort();
+            }
+        }
     }
 
     @Override
