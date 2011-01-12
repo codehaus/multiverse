@@ -44,7 +44,7 @@ public abstract class GammaTransaction_setAbortOnlyTest <T extends GammaTransact
         } catch (PreparedTransactionException expected) {
         }
 
-        assertIsPrepared(tx);
+        assertIsAborted(tx);
         assertFalse((Boolean) getField(tx, "abortOnly"));
     }
 

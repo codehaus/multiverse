@@ -6,12 +6,14 @@ import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
@@ -53,6 +55,24 @@ public abstract class GammaTransaction_abortTest<T extends GammaTransaction> imp
         assertVersionAndValue(ref, 0, 0);
         assertFalse(write.hasDepartObligation());
         assertTrue(write.isConstructing());
+    }
+
+    @Test
+    public void whenContainsCommutes() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        T tx = newTransaction();
+        LongFunction function = mock(LongFunction.class);
+        ref.commute(tx, function);
+        GammaTranlocal tranlocal = tx.get(ref);
+        tx.abort();
+
+        assertIsAborted(tx);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertNull(tranlocal.headCallable);
     }
 
     @Test

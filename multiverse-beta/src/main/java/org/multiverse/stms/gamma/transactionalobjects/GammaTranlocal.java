@@ -3,6 +3,7 @@ package org.multiverse.stms.gamma.transactionalobjects;
 import org.multiverse.api.functions.Function;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaObjectPool;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
 public final class GammaTranlocal implements GammaConstants {
@@ -85,7 +86,6 @@ public final class GammaTranlocal implements GammaConstants {
         return owner.tryLockAndCheckConflict(config.spinCount, this, LOCKMODE_COMMIT);
     }
 
-
     public int getMode() {
         return mode;
     }
@@ -93,4 +93,6 @@ public final class GammaTranlocal implements GammaConstants {
     public boolean isConflictCheckNeeded() {
         return false;
     }
+
+
 }

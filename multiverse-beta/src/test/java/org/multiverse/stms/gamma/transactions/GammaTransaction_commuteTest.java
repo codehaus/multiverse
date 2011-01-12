@@ -1,15 +1,19 @@
 package org.multiverse.stms.gamma.transactions;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadonlyException;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.*;
@@ -28,6 +32,90 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
     protected abstract T newTransaction();
 
     protected abstract T newTransaction(GammaTransactionConfiguration config);
+
+    @Test
+    public void whenAlreadyOpenedForRead() {
+        whenAlreadyOpenedForRead(LockMode.None);
+        whenAlreadyOpenedForRead(LockMode.Read);
+        whenAlreadyOpenedForRead(LockMode.Write);
+        whenAlreadyOpenedForRead(LockMode.Commit);
+    }
+
+    public void whenAlreadyOpenedForRead(LockMode lockMode) {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.version;
+
+        GammaTransaction tx = newTransaction();
+        GammaTranlocal tranlocal = ref.openForRead(tx, lockMode.asInt());
+        LongFunction incFunction = Functions.newIncLongFunction();
+        ref.commute(tx, incFunction);
+
+        assertEquals(initialValue + 1, tranlocal.long_value);
+        assertTrue(tx.hasWrites);
+        assertIsActive(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertLockMode(ref, lockMode);
+        assertTrue(tranlocal.isWrite());
+        assertNull(tranlocal.headCallable);
+    }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForReadAndFunctionCausesProblem() {
+
+    }
+
+    @Test
+    public void whenAlreadyOpenedForWrite() {
+        whenAlreadyOpenedForWrite(LockMode.None);
+        whenAlreadyOpenedForWrite(LockMode.Read);
+        whenAlreadyOpenedForWrite(LockMode.Write);
+        whenAlreadyOpenedForWrite(LockMode.Commit);
+    }
+
+    public void whenAlreadyOpenedForWrite(LockMode lockMode) {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.version;
+
+        GammaTransaction tx = newTransaction();
+        GammaTranlocal tranlocal = ref.openForWrite(tx, lockMode.asInt());
+        LongFunction incFunction = Functions.newIncLongFunction();
+        ref.commute(tx, incFunction);
+
+        assertEquals(initialValue + 1, tranlocal.long_value);
+        assertTrue(tx.hasWrites);
+        assertIsActive(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertLockMode(ref, lockMode);
+        assertTrue(tranlocal.isWrite());
+        assertNull(tranlocal.headCallable);
+    }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForWriteAndFunctionsCausesProblem() {
+
+    }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForCommute() {
+
+    }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForConstruction() {
+
+    }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForConstructionAndFunctionCausesProblem() {
+
+    }
 
     @Test
     public void whenNullTransaction() {
