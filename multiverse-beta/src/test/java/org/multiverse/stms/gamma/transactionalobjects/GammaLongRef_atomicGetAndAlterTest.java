@@ -20,7 +20,7 @@ import static org.multiverse.api.functions.Functions.newIncLongFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class GammaLongRef_atomicGetAndAlterTest {
-    
+
     private GammaStm stm;
 
     @Before
@@ -43,7 +43,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
         assertEquals(2, result);
         assertRefHasNoLocks(ref);
         assertUpdateBiased(ref);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertVersionAndValue(ref, initialVersion+1, initialValue+1);
     }
 
@@ -61,7 +61,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
 
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasNoLocks(ref);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertUpdateBiased(ref);
     }
 
@@ -83,7 +83,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
         assertEquals(initialValue, result);
         assertRefHasNoLocks(ref);
         assertUpdateBiased(ref);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertVersionAndValue(ref, initialVersion+1, initialValue+1);
     }
 
@@ -106,7 +106,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
         verifyZeroInteractions(function);
         assertRefHasCommitLock(ref, otherTx);
         assertUpdateBiased(ref);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -126,7 +126,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
         }
 
         assertRefHasWriteLock(ref, otherTx);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertUpdateBiased(ref);
         assertReadonlyCount(0, ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -151,7 +151,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
         verifyZeroInteractions(function);
         assertRefHasWriteLock(ref, otherTx);
         assertUpdateBiased(ref);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 

@@ -82,7 +82,7 @@ public class GammaLongRef_incrementAndGet1Test {
 
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertNull(getThreadLocalTransaction());
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
     }
 
@@ -106,7 +106,7 @@ public class GammaLongRef_incrementAndGet1Test {
         assertIsCommitted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertSame(tx, getThreadLocalTransaction());
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
     }
 
@@ -129,7 +129,7 @@ public class GammaLongRef_incrementAndGet1Test {
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertSame(tx, getThreadLocalTransaction());
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
     }
 
@@ -149,7 +149,7 @@ public class GammaLongRef_incrementAndGet1Test {
         assertEquals(initialValue + amount, result);
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertRefHasWriteLock(ref, tx);
     }
 
@@ -166,7 +166,7 @@ public class GammaLongRef_incrementAndGet1Test {
         assertEquals(11, result);
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertRefHasCommitLock(ref, tx);
     }
 
@@ -191,7 +191,7 @@ public class GammaLongRef_incrementAndGet1Test {
 
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, version, 10);
     }
@@ -213,7 +213,7 @@ public class GammaLongRef_incrementAndGet1Test {
 
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertSurplus(2, ref);
+        assertSurplus(ref, 2);
         assertRefHasWriteLock(ref, otherTx);
         assertSame(version, ref.getVersion());
         assertEquals(10, ref.atomicWeakGet());
@@ -226,7 +226,7 @@ public class GammaLongRef_incrementAndGet1Test {
 
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertRefHasWriteLock(ref, otherTx);
         assertSame(version, ref.getVersion());
         assertEquals(10, ref.atomicWeakGet());

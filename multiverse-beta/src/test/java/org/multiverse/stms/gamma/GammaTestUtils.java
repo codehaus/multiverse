@@ -147,7 +147,7 @@ public class GammaTestUtils implements GammaConstants {
         assertEquals(lockMode, orec.atomicGetLockModeAsInt());
     }
 
-    public static void assertSurplus(int expectedSurplus, AbstractGammaObject orec) {
+    public static void assertSurplus(AbstractGammaObject orec, int expectedSurplus) {
         assertEquals(expectedSurplus, orec.getSurplus());
     }
 

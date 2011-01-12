@@ -25,7 +25,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_COMMIT);
 
         assertTrue(result);
-        assertSurplus(1, orec);
+        assertSurplus(orec, 1);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
         assertLockMode(orec, LOCKMODE_COMMIT);
@@ -42,7 +42,7 @@ public class Orec_tryLockAfterNormalArriveTest {
 
         }
 
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
         assertLockMode(orec, LOCKMODE_NONE);
@@ -57,7 +57,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_COMMIT);
 
         assertFalse(result);
-        assertSurplus(2, orec);
+        assertSurplus(orec, 2);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
         assertLockMode(orec, LOCKMODE_WRITE);
@@ -72,7 +72,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_COMMIT);
 
         assertFalse(result);
-        assertSurplus(2, orec);
+        assertSurplus(orec, 2);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
         assertLockMode(orec, LOCKMODE_COMMIT);
@@ -87,7 +87,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_COMMIT);
 
         assertFalse(result);
-        assertSurplus(2, orec);
+        assertSurplus(orec, 2);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
         assertReadLockCount(orec, 1);
@@ -102,7 +102,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_WRITE);
 
         assertTrue(result);
-        assertSurplus(1, orec);
+        assertSurplus(orec, 1);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
         assertLockMode(orec, LOCKMODE_WRITE);
@@ -119,7 +119,7 @@ public class Orec_tryLockAfterNormalArriveTest {
 
         }
 
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
         assertLockMode(orec, LOCKMODE_NONE);
@@ -134,7 +134,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_WRITE);
 
         assertFalse(result);
-        assertSurplus(2, orec);
+        assertSurplus(orec, 2);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
         assertLockMode(orec, LOCKMODE_WRITE);
@@ -149,7 +149,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_WRITE);
 
         assertFalse(result);
-        assertSurplus(2, orec);
+        assertSurplus(orec, 2);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
         assertLockMode(orec, LOCKMODE_COMMIT);
@@ -164,7 +164,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_WRITE);
 
         assertFalse(result);
-        assertSurplus(2, orec);
+        assertSurplus(orec, 2);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
         assertReadLockCount(orec, 1);
@@ -183,7 +183,7 @@ public class Orec_tryLockAfterNormalArriveTest {
 
         }
 
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
         assertLockMode(orec, LOCKMODE_NONE);
@@ -197,7 +197,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_READ);
 
         assertTrue(result);
-        assertSurplus(1, orec);
+        assertSurplus(orec, 1);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
         assertReadLockCount(orec, 1);
@@ -212,7 +212,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_READ);
 
         assertFalse(result);
-        assertSurplus(2, orec);
+        assertSurplus(orec, 2);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
         assertLockMode(orec, LOCKMODE_WRITE);
@@ -227,7 +227,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_READ);
 
         assertFalse(result);
-        assertSurplus(2, orec);
+        assertSurplus(orec, 2);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
         assertLockMode(orec, LOCKMODE_COMMIT);
@@ -242,7 +242,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_READ);
 
         assertTrue(result);
-        assertSurplus(2, orec);
+        assertSurplus(orec, 2);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
         assertReadLockCount(orec, 2);
@@ -260,7 +260,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         } catch (PanicError expected) {
         }
 
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
         assertLockMode(orec, LOCKMODE_NONE);
@@ -276,7 +276,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         } catch (PanicError expected) {
         }
 
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
         assertLockMode(orec, LOCKMODE_NONE);
@@ -292,7 +292,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         } catch (PanicError expected) {
         }
 
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
         assertLockMode(orec, LOCKMODE_NONE);

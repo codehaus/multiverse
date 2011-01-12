@@ -176,7 +176,7 @@ public class GammaLongRef_alterAndGet2Test {
           } catch (ReadWriteConflict expected) {
           }
 
-          assertSurplus(1, ref);
+          assertSurplus(ref, 1);
           assertIsAborted(tx);
           assertRefHasCommitLock(ref, otherTx);
           assertVersionAndValue(ref, version, initialValue);
@@ -202,7 +202,7 @@ public class GammaLongRef_alterAndGet2Test {
           }
 
           assertRefHasWriteLock(ref, otherTx);
-          assertSurplus(1, ref);
+          assertSurplus(ref, 1);
           assertIsActive(otherTx);
           assertIsAborted(tx);
           assertVersionAndValue(ref, version, 10);
@@ -247,5 +247,5 @@ public class GammaLongRef_alterAndGet2Test {
           assertEquals(101, ref.atomicGet());
           assertEquals(101, result);
       }
-    
+
 }

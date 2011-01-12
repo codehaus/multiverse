@@ -23,7 +23,7 @@ public class Orec_arriveTest implements GammaConstants {
         int result = orec.arrive(1);
 
         assertEquals(ARRIVE_NORMAL, result);
-        assertSurplus(1, orec);
+        assertSurplus(orec, 1);
         assertReadonlyCount(0, orec);
         assertUpdateBiased(orec);
         assertLockMode(orec, LOCKMODE_NONE);
@@ -39,7 +39,7 @@ public class Orec_arriveTest implements GammaConstants {
 
         assertEquals(ARRIVE_NORMAL, result);
         assertUpdateBiased(orec);
-        assertSurplus(3, orec);
+        assertSurplus(orec, 3);
         assertReadonlyCount(0, orec);
         assertLockMode(orec, LOCKMODE_NONE);
     }
@@ -52,7 +52,7 @@ public class Orec_arriveTest implements GammaConstants {
         int result = orec.arrive(1);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
-        assertSurplus(1, orec);
+        assertSurplus(orec, 1);
         assertReadonlyCount(0, orec);
         assertUpdateBiased(orec);
         assertLockMode(orec, LOCKMODE_COMMIT);
@@ -66,7 +66,7 @@ public class Orec_arriveTest implements GammaConstants {
         int result = orec.arrive(1);
 
         assertEquals(ARRIVE_NORMAL, result);
-        assertSurplus(2, orec);
+        assertSurplus(orec, 2);
         assertReadonlyCount(0, orec);
         assertUpdateBiased(orec);
         assertLockMode(orec, LOCKMODE_WRITE);
@@ -80,7 +80,7 @@ public class Orec_arriveTest implements GammaConstants {
 
         assertEquals(ARRIVE_UNREGISTERED, result);
         assertLockMode(orec, LOCKMODE_NONE);
-        assertSurplus(1, orec);
+        assertSurplus(orec, 1);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
     }
@@ -94,7 +94,7 @@ public class Orec_arriveTest implements GammaConstants {
 
         assertEquals(ARRIVE_UNREGISTERED, result);
         assertLockMode(orec, LOCKMODE_NONE);
-        assertSurplus(1, orec);
+        assertSurplus(orec, 1);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
     }

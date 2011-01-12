@@ -39,7 +39,7 @@ public class GammaLongRef_commute1Test {
         assertNotNull(commuting);
         assertTrue(commuting.isCommuting());
         assertFalse(commuting.isRead());
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
         assertEquals(0, commuting.long_value);
         assertIsActive(tx);
@@ -48,7 +48,7 @@ public class GammaLongRef_commute1Test {
 
         assertEquals(1, ref.atomicGet());
         assertIsCommitted(tx);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
         assertUpdateBiased(ref);
     }
@@ -66,7 +66,7 @@ public class GammaLongRef_commute1Test {
         assertNotNull(commuting);
         assertTrue(commuting.isCommuting());
         assertFalse(commuting.isRead());
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
         assertEquals(0, commuting.long_value);
         assertIsActive(tx);
@@ -76,7 +76,7 @@ public class GammaLongRef_commute1Test {
         assertEquals(0, ref.atomicGet());
         assertVersionAndValue(ref, version, 0);
         assertIsCommitted(tx);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
         assertUpdateBiased(ref);
     }
@@ -96,7 +96,7 @@ public class GammaLongRef_commute1Test {
 
 
         assertIsAborted(tx);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertUpdateBiased(ref);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 0);
@@ -116,7 +116,7 @@ public class GammaLongRef_commute1Test {
 
         }
 
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertUpdateBiased(ref);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -142,7 +142,7 @@ public class GammaLongRef_commute1Test {
 
         assertIsCommitted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertUpdateBiased(ref);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -168,7 +168,7 @@ public class GammaLongRef_commute1Test {
 
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertUpdateBiased(ref);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -193,7 +193,7 @@ public class GammaLongRef_commute1Test {
 
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertUpdateBiased(ref);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, version, 2);
@@ -217,12 +217,12 @@ public class GammaLongRef_commute1Test {
         assertEquals(3, tranlocal.long_value);
         assertIsActive(tx);
         assertRefHasWriteLock(ref, tx);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertUpdateBiased(ref);
 
         tx.commit();
 
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertIsCommitted(tx);
         assertRefHasNoLocks(ref);
         assertSame(tx, getThreadLocalTransaction());
@@ -246,7 +246,7 @@ public class GammaLongRef_commute1Test {
         assertEquals(3, tranlocal.long_value);
         assertIsActive(tx);
         assertRefHasCommitLock(ref, tx);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertUpdateBiased(ref);
 
         tx.commit();
@@ -255,7 +255,7 @@ public class GammaLongRef_commute1Test {
         assertRefHasNoLocks(ref);
         assertSame(tx, getThreadLocalTransaction());
         assertEquals(3, ref.atomicGet());
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
     }
 
     @Test
@@ -278,7 +278,7 @@ public class GammaLongRef_commute1Test {
         assertHasCommutingFunctions(tranlocal, function);
         assertIsActive(tx);
         assertRefHasWriteLock(ref, otherTx);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
 
         try {
             tx.commit();
@@ -290,7 +290,7 @@ public class GammaLongRef_commute1Test {
         assertSame(tx, getThreadLocalTransaction());
         assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, version, 2);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -313,7 +313,7 @@ public class GammaLongRef_commute1Test {
         assertHasCommutingFunctions(tranlocal, function);
         assertIsActive(tx);
         assertRefHasCommitLock(ref, otherTx);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
 
         try {
             tx.commit();
@@ -325,6 +325,6 @@ public class GammaLongRef_commute1Test {
         assertSame(tx, getThreadLocalTransaction());
         assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, version, 2);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 }

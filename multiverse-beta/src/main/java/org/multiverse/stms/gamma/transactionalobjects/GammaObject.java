@@ -31,6 +31,16 @@ public interface GammaObject extends GammaConstants {
 
     GammaTranlocal openForRead(MapGammaTransaction tx, int lockMode);
 
+    /**
+     * Tries to acquire a lock on a previous read/written tranlocal and checks for conflict.
+     *
+     * Call can safely
+     *
+     * @param spinCount
+     * @param tranlocal
+     * @param lockMode
+     * @return
+     */
     boolean tryLockAndCheckConflict(int spinCount, GammaTranlocal tranlocal, int lockMode);
 
     boolean hasReadConflict(GammaTranlocal tranlocal);

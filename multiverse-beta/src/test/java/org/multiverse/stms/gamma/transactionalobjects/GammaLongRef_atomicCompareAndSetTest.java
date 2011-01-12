@@ -42,7 +42,7 @@ public class GammaLongRef_atomicCompareAndSetTest {
         } catch (LockedException expected) {
         }
 
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -63,7 +63,7 @@ public class GammaLongRef_atomicCompareAndSetTest {
         } catch (LockedException expected) {
         }
 
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -83,7 +83,7 @@ public class GammaLongRef_atomicCompareAndSetTest {
 
         assertTrue(result);
         assertRefHasNoLocks(ref);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertVersionAndValue(ref, initialVersion + 1, newValue);
     }
 
@@ -98,7 +98,7 @@ public class GammaLongRef_atomicCompareAndSetTest {
         assertTrue(result);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasNoLocks(ref);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
     }
 
     @Test
@@ -112,7 +112,7 @@ public class GammaLongRef_atomicCompareAndSetTest {
 
         assertTrue(result);
         assertRefHasNoLocks(ref);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertVersionAndValue(ref, initialVersion + 1, newValue);
     }
 
@@ -127,7 +127,7 @@ public class GammaLongRef_atomicCompareAndSetTest {
         assertFalse(result);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasNoLocks(ref);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
     }
 
     @Test

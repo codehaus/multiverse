@@ -144,7 +144,7 @@ public class GammaLongRef_alterAndGet1Test {
 
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertNull(getThreadLocalTransaction());
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
     }
 
@@ -168,7 +168,7 @@ public class GammaLongRef_alterAndGet1Test {
 
         assertIsCommitted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -192,7 +192,7 @@ public class GammaLongRef_alterAndGet1Test {
 
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }

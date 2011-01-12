@@ -25,7 +25,7 @@ public class Orec_departAfterReadingAndUnlockTest implements GammaConstants {
 
         orec.departAfterReadingAndUnlock();
 
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertReadLockCount(orec, 0);
         assertLockMode(orec, LOCKMODE_NONE);
     }
@@ -39,7 +39,7 @@ public class Orec_departAfterReadingAndUnlockTest implements GammaConstants {
 
         orec.departAfterReadingAndUnlock();
 
-        assertSurplus(2, orec);
+        assertSurplus(orec, 2);
         assertReadLockCount(orec, 2);
         assertLockMode(orec, LOCKMODE_READ);
     }
@@ -51,7 +51,7 @@ public class Orec_departAfterReadingAndUnlockTest implements GammaConstants {
 
         orec.departAfterReadingAndUnlock();
 
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertReadLockCount(orec, 0);
         assertLockMode(orec, LOCKMODE_NONE);
     }
@@ -63,7 +63,7 @@ public class Orec_departAfterReadingAndUnlockTest implements GammaConstants {
 
         orec.departAfterReadingAndUnlock();
 
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertReadLockCount(orec, 0);
         assertLockMode(orec, LOCKMODE_NONE);
     }
@@ -78,7 +78,7 @@ public class Orec_departAfterReadingAndUnlockTest implements GammaConstants {
 
         orec.departAfterReadingAndUnlock();
 
-        assertSurplus(2, orec);
+        assertSurplus(orec, 2);
         assertLockMode(orec, LOCKMODE_NONE);
         assertUpdateBiased(orec);
         assertReadonlyCount(1, orec);
@@ -93,7 +93,7 @@ public class Orec_departAfterReadingAndUnlockTest implements GammaConstants {
 
         orec.departAfterReadingAndUnlock();
 
-        assertSurplus(2, orec);
+        assertSurplus(orec, 2);
         assertLockMode(orec, LOCKMODE_NONE);
         assertUpdateBiased(orec);
         assertReadonlyCount(1, orec);
@@ -109,7 +109,7 @@ public class Orec_departAfterReadingAndUnlockTest implements GammaConstants {
         } catch (PanicError expected) {
         }
 
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertLockMode(orec, LOCKMODE_NONE);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
@@ -127,7 +127,7 @@ public class Orec_departAfterReadingAndUnlockTest implements GammaConstants {
         } catch (PanicError expected) {
         }
 
-        assertSurplus(1, orec);
+        assertSurplus(orec, 1);
         assertLockMode(orec, LOCKMODE_COMMIT);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
@@ -144,7 +144,7 @@ public class Orec_departAfterReadingAndUnlockTest implements GammaConstants {
         } catch (PanicError expected) {
         }
 
-        assertSurplus(1, orec);
+        assertSurplus(orec, 1);
         assertLockMode(orec, LOCKMODE_NONE);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);

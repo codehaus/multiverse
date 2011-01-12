@@ -17,7 +17,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class GammaLongRef_get1Test {
-    
+
     private GammaStm stm;
 
     @Before
@@ -54,7 +54,7 @@ public class GammaLongRef_get1Test {
 
         assertEquals(100, value);
         assertRefHasCommitLock(ref, tx);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertUpdateBiased(ref);
         assertIsActive(tx);
         assertEquals(version, ref.getVersion());
@@ -73,7 +73,7 @@ public class GammaLongRef_get1Test {
 
         assertEquals(100, value);
         assertRefHasWriteLock(ref, tx);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertUpdateBiased(ref);
         assertIsActive(tx);
         assertVersionAndValue(ref, version, 100);
@@ -96,7 +96,7 @@ public class GammaLongRef_get1Test {
         }
 
         assertRefHasCommitLock(ref, otherTx);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertUpdateBiased(ref);
         assertIsActive(otherTx);
         assertIsAborted(tx);
@@ -117,7 +117,7 @@ public class GammaLongRef_get1Test {
 
         assertEquals(100, value);
         assertRefHasWriteLock(ref, otherTx);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertUpdateBiased(ref);
         assertIsActive(otherTx);
         assertIsActive(tx);

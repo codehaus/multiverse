@@ -51,7 +51,7 @@ public class GammaLongRef_atomicAlterAndGetTest {
 
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasNoLocks(ref);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertNull(getThreadLocalTransaction());
     }
 
@@ -68,7 +68,7 @@ public class GammaLongRef_atomicAlterAndGetTest {
         }
 
         assertRefHasNoLocks(ref);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -84,7 +84,7 @@ public class GammaLongRef_atomicAlterAndGetTest {
 
         assertEquals(initialValue + 1, result);
         assertRefHasNoLocks(ref);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
     }
 
@@ -100,7 +100,7 @@ public class GammaLongRef_atomicAlterAndGetTest {
 
         assertEquals(initialValue, result);
         assertRefHasNoLocks(ref);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertVersionAndValue(ref, version, initialValue);
     }
 
@@ -120,7 +120,7 @@ public class GammaLongRef_atomicAlterAndGetTest {
 
         assertEquals(initialValue + 1, result);
         assertRefHasNoLocks(ref);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
@@ -143,7 +143,7 @@ public class GammaLongRef_atomicAlterAndGetTest {
         }
 
         verifyZeroInteractions(function);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertRefHasWriteLock(ref, otherTx);
         assertUpdateBiased(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -166,7 +166,7 @@ public class GammaLongRef_atomicAlterAndGetTest {
         }
 
         verifyZeroInteractions(function);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertRefHasCommitLock(ref, otherTx);
         assertUpdateBiased(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);

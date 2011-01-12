@@ -48,7 +48,7 @@ public class GammaLongRef_commute2Test {
         assertIsActive(tx);
         assertEquals(0, ref.atomicGet());
         assertRefHasNoLocks(ref);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertNull(getThreadLocalTransaction());
     }
 
@@ -70,7 +70,7 @@ public class GammaLongRef_commute2Test {
         } catch (ReadWriteConflict expected) {
         }
 
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertIsAborted(tx);
         assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -95,7 +95,7 @@ public class GammaLongRef_commute2Test {
         }
 
         assertIsAborted(tx);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }

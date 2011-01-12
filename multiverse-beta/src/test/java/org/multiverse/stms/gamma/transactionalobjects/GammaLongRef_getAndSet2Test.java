@@ -130,7 +130,7 @@ public class GammaLongRef_getAndSet2Test {
         assertIsCommitted(tx);
         assertEquals(10, ref.atomicGet());
         assertNull(getThreadLocalTransaction());
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertVersionAndValue(ref, version, 10);
     }
 

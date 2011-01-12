@@ -28,7 +28,7 @@ public class Orec_departAfterFailureAndUnlockTest {
         }
 
         assertLockMode(orec, LOCKMODE_NONE);
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertReadonlyCount(0, orec);
         assertUpdateBiased(orec);
     }
@@ -44,7 +44,7 @@ public class Orec_departAfterFailureAndUnlockTest {
         }
 
         assertLockMode(orec, LOCKMODE_NONE);
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertReadonlyCount(0, orec);
         assertReadBiased(orec);
     }
@@ -60,7 +60,7 @@ public class Orec_departAfterFailureAndUnlockTest {
         assertEquals(1, result);
         assertLockMode(orec, LOCKMODE_READ);
         assertReadLockCount(orec, 1);
-        assertSurplus(1, orec);
+        assertSurplus(orec, 1);
         assertReadonlyCount(0, orec);
         assertUpdateBiased(orec);
     }
@@ -74,7 +74,7 @@ public class Orec_departAfterFailureAndUnlockTest {
 
         assertEquals(0, result);
         assertLockMode(orec, LOCKMODE_NONE);
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertReadonlyCount(0, orec);
         assertUpdateBiased(orec);
         assertReadLockCount(orec, 0);
@@ -88,7 +88,7 @@ public class Orec_departAfterFailureAndUnlockTest {
         long result = orec.departAfterFailureAndUnlock();
         assertEquals(0, result);
         assertLockMode(orec, LOCKMODE_NONE);
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertReadonlyCount(0, orec);
         assertUpdateBiased(orec);
         assertReadLockCount(orec, 0);
@@ -102,7 +102,7 @@ public class Orec_departAfterFailureAndUnlockTest {
         long result = orec.departAfterFailureAndUnlock();
         assertEquals(0, result);
         assertLockMode(orec, LOCKMODE_NONE);
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertReadonlyCount(0, orec);
         assertUpdateBiased(orec);
         assertReadLockCount(orec, 0);

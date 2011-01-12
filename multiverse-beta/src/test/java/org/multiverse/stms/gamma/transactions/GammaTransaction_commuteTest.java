@@ -10,15 +10,16 @@ import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.GammaTestUtils;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.multiverse.TestUtils.LOCKMODE_NONE;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.gamma.GammaTestUtils.assertLockMode;
-import static org.multiverse.stms.gamma.GammaTestUtils.assertVersionAndValue;
+import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
 
@@ -100,9 +101,80 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
     }
 
     @Test
-    @Ignore
-    public void whenAlreadyOpenedForCommute() {
+    public void whenNotOpenedBefore() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
+        GammaTransaction tx = stm.startDefaultTransaction();
+        LongFunction function = mock(LongFunction.class);
+        ref.commute(tx, function);
+        GammaTranlocal tranlocal = tx.get(ref);
+
+        assertNotNull(tranlocal);
+        assertTrue(tranlocal.isCommuting());
+        assertSame(ref, tranlocal.owner);
+        assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
+        assertIsActive(tx);
+        GammaTestUtils.assertHasCommutingFunctions(tranlocal, function);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
+
+    @Test
+    public void whenAlreadyOpenedForCommute() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        LongFunction function1 = mock(LongFunction.class);
+        LongFunction function2 = mock(LongFunction.class);
+        ref.commute(tx, function1);
+        ref.commute(tx, function2);
+        GammaTranlocal tranlocal = tx.get(ref);
+
+        assertNotNull(tranlocal);
+        assertTrue(tranlocal.isCommuting());
+        assertSame(ref, tranlocal.owner);
+        assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
+        assertIsActive(tx);
+        GammaTestUtils.assertHasCommutingFunctions(tranlocal, function2, function1);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
+
+    @Test
+    public void lockedByOther() {
+        lockedByOther(LockMode.None);
+        lockedByOther(LockMode.Read);
+        lockedByOther(LockMode.Write);
+        lockedByOther(LockMode.Commit);
+    }
+
+    public void lockedByOther(LockMode otherLockMode) {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction otherTx = stm.startDefaultTransaction();
+        ref.getLock().acquire(otherTx, otherLockMode);
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        LongFunction function1 = mock(LongFunction.class);
+        LongFunction function2 = mock(LongFunction.class);
+        ref.commute(tx, function1);
+        ref.commute(tx, function2);
+        GammaTranlocal tranlocal = tx.get(ref);
+
+        assertNotNull(tranlocal);
+        assertTrue(tranlocal.isCommuting());
+        assertSame(ref, tranlocal.owner);
+        assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
+        assertIsActive(tx);
+        GammaTestUtils.assertHasCommutingFunctions(tranlocal, function2, function1);
+        assertRefHasLockMode(ref, otherTx, otherLockMode.asInt());
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test

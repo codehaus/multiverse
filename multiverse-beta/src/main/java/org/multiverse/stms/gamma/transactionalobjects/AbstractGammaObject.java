@@ -369,6 +369,16 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
     @Override
     public void releaseAfterFailure(GammaTranlocal tranlocal, GammaObjectPool pool) {
+        if (tranlocal.headCallable != null) {
+            CallableNode node = tranlocal.headCallable;
+            do {
+                CallableNode next = node.next;
+                pool.putCallableNode(node);
+                node = next;
+            } while (node != null);
+            tranlocal.headCallable = null;
+        }
+
         if (tranlocal.hasDepartObligation()) {
             if (tranlocal.getLockMode() != LOCKMODE_NONE) {
                 departAfterFailureAndUnlock();
@@ -377,6 +387,9 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 departAfterFailure();
             }
             tranlocal.setDepartObligation(false);
+        } else if (tranlocal.getLockMode() != LOCKMODE_NONE) {
+            unlockByReadBiased();
+            tranlocal.setLockMode(LOCKMODE_NONE);
         }
 
         tranlocal.owner = null;

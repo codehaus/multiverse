@@ -30,7 +30,7 @@ public class Orec_upgradeWriteLockToCommitLockTest implements GammaConstants {
 
         }
 
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertLockMode(ref, LOCKMODE_NONE);
     }
 
@@ -46,7 +46,7 @@ public class Orec_upgradeWriteLockToCommitLockTest implements GammaConstants {
 
         }
 
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertLockMode(ref, LOCKMODE_READ);
     }
 
@@ -57,7 +57,7 @@ public class Orec_upgradeWriteLockToCommitLockTest implements GammaConstants {
 
         ref.upgradeToCommitLock();
 
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertLockMode(ref, LOCKMODE_COMMIT);
     }
 
@@ -68,7 +68,7 @@ public class Orec_upgradeWriteLockToCommitLockTest implements GammaConstants {
 
         ref.upgradeToCommitLock();
 
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertLockMode(ref, LOCKMODE_COMMIT);
     }
 }

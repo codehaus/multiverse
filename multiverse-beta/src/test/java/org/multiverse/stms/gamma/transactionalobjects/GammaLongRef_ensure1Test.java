@@ -45,7 +45,7 @@ public class GammaLongRef_ensure1Test {
         assertIsCommitted(tx);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
     }
 
     @Test
@@ -69,7 +69,7 @@ public class GammaLongRef_ensure1Test {
         assertIsCommitted(tx);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
     }
 
     @Test
@@ -94,7 +94,7 @@ public class GammaLongRef_ensure1Test {
         assertRefHasNoLocks(ref);
         assertIsCommitted(tx);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
     }
 
     @Test

@@ -32,7 +32,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         boolean hasReadConflict = ref.hasReadConflict(read);
 
         assertFalse(hasReadConflict);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
     }
 
@@ -46,7 +46,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         boolean hasReadConflict = ref.hasReadConflict(write);
 
         assertFalse(hasReadConflict);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
     }
 
@@ -60,7 +60,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         boolean hasConflict = ref.hasReadConflict(read);
 
         assertFalse(hasConflict);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertRefHasCommitLock(ref, tx);
     }
 
@@ -74,7 +74,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         boolean hasConflict = ref.hasReadConflict(read);
 
         assertFalse(hasConflict);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertRefHasWriteLock(ref, tx);
     }
 
@@ -90,7 +90,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
 
         boolean hasConflict = ref.hasReadConflict(read);
         assertTrue(hasConflict);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
     }
 
@@ -126,7 +126,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         boolean hasConflict = ref.hasReadConflict(read);
 
         assertTrue(hasConflict);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertRefHasCommitLock(ref,otherTx);
     }
 
@@ -147,7 +147,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         boolean hasConflict = ref.hasReadConflict(read);
 
         assertTrue(hasConflict);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertRefHasWriteLock(ref, otherTx);
     }
 
@@ -179,7 +179,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         boolean hasConflict = ref.hasReadConflict(read);
 
         assertFalse(hasConflict);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
     }
 
@@ -196,7 +196,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         boolean hasConflict = ref.hasReadConflict(read);
 
         assertFalse(hasConflict);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
     }
 

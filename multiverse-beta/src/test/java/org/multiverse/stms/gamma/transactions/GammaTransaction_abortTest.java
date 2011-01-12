@@ -50,7 +50,7 @@ public abstract class GammaTransaction_abortTest<T extends GammaTransaction> imp
         assertIsAborted(tx);
 
         assertLockMode(ref, LOCKMODE_COMMIT);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertUpdateBiased(ref);
         assertVersionAndValue(ref, 0, 0);
         assertFalse(write.hasDepartObligation());

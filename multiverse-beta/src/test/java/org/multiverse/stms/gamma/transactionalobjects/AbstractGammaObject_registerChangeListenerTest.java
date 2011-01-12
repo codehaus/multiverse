@@ -88,7 +88,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         int result = ref.registerChangeListener(latch, read, pool, listenerEra);
 
         assertEquals(REGISTRATION_DONE, result);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertHasListeners(ref, latch);
         assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, version, 10);
@@ -111,7 +111,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         int result = ref.registerChangeListener(latch, read, pool, listenerEra);
 
         assertEquals(REGISTRATION_DONE, result);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertHasListeners(ref, latch);
         assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, version, 10);
@@ -138,7 +138,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         assertEquals(REGISTRATION_NOT_NEEDED, result);
         assertNull(getField(ref, "___listeners"));
         assertTrue(latch.isOpen());
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertHasNoListeners(ref);
         assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, version, 1);
@@ -164,7 +164,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         assertEquals(REGISTRATION_NOT_NEEDED, result);
         assertNull(getField(ref, "___listeners"));
         assertTrue(latch.isOpen());
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertHasNoListeners(ref);
         assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, version, 1);

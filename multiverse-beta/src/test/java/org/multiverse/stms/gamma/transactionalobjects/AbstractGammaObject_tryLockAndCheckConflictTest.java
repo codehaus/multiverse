@@ -36,7 +36,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
     }
 
     @Test
@@ -55,7 +55,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertRefHasReadLock(ref, tx);
         assertReadLockCount(ref, 1);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -73,7 +73,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_WRITE, tranlocal.getLockMode());
         assertRefHasWriteLock(ref, tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -91,7 +91,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
         assertRefHasCommitLock(ref, tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     // ==================== lock upgrade ========================
@@ -112,7 +112,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertRefHasReadLock(ref, tx);
         assertReadLockCount(ref, 1);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -131,7 +131,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertRefHasReadLock(ref, tx);
         assertReadLockCount(ref, 1);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -154,7 +154,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertRefHasReadLock(ref, tx);
         assertReadLockCount(ref, 2);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(2, ref);
+        assertSurplus(ref, 2);
     }
 
     @Test
@@ -173,7 +173,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_WRITE, tranlocal.getLockMode());
         assertRefHasWriteLock(ref, tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -196,7 +196,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertRefHasReadLock(ref, tx);
         assertReadLockCount(ref, 2);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(2, ref);
+        assertSurplus(ref, 2);
     }
 
     @Test
@@ -214,7 +214,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
         assertRefHasCommitLock(ref, tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -237,7 +237,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertRefHasReadLock(ref, tx);
         assertReadLockCount(ref, 2);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(2, ref);
+        assertSurplus(ref, 2);
     }
 
     @Test
@@ -255,7 +255,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_WRITE, tranlocal.getLockMode());
         assertRefHasWriteLock(ref, tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -273,7 +273,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_WRITE, tranlocal.getLockMode());
         assertRefHasWriteLock(ref, tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -291,7 +291,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_WRITE, tranlocal.getLockMode());
         assertRefHasWriteLock(ref, tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -309,7 +309,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
         assertRefHasCommitLock(ref, tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -327,7 +327,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
         assertRefHasCommitLock(ref, tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -345,7 +345,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
         assertRefHasCommitLock(ref, tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -363,7 +363,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
         assertRefHasCommitLock(ref, tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -381,7 +381,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
         assertRefHasCommitLock(ref, tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     // ===================== lock free ==================================
@@ -404,7 +404,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
     }
 
     @Test
@@ -425,7 +425,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
     }
 
     @Test
@@ -446,7 +446,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
     }
 
     @Test
@@ -467,7 +467,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
     }
 
     // ===================== lock not free ==================================
@@ -492,7 +492,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertRefHasReadLock(ref, otherTx);
         assertReadLockCount(ref, 1);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -515,7 +515,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertRefHasReadLock(ref, tx);
         assertReadLockCount(ref, 2);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(2, ref);
+        assertSurplus(ref, 2);
     }
 
     @Test
@@ -538,7 +538,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertRefHasReadLock(ref, otherTx);
         assertReadLockCount(ref, 1);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -561,7 +561,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertRefHasReadLock(ref, otherTx);
         assertReadLockCount(ref, 1);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -583,7 +583,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -605,7 +605,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -627,7 +627,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -649,7 +649,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -671,7 +671,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -693,7 +693,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -715,7 +715,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -737,6 +737,6 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 }
