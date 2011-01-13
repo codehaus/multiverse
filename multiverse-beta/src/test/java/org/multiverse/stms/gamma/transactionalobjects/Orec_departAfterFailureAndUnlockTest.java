@@ -3,13 +3,14 @@ package org.multiverse.stms.gamma.transactionalobjects;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PanicError;
+import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
-public class Orec_departAfterFailureAndUnlockTest {
+public class Orec_departAfterFailureAndUnlockTest implements GammaConstants {
 
     private GammaStm stm;
 
@@ -17,6 +18,7 @@ public class Orec_departAfterFailureAndUnlockTest {
     public void setUp() {
         stm = new GammaStm();
     }
+
 
     @Test
     public void whenUpdateBiasedNotLocked_thenPanicError() {

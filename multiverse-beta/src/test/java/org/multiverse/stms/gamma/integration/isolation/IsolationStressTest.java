@@ -61,6 +61,16 @@ public class IsolationStressTest implements GammaConstants {
     }
 
     @Test
+    public void withWriteLockingAndDirtyCheck() {
+        test(LockMode.Write, true);
+    }
+
+    @Test
+    public void withWriteLockAndNoDirtyCheck() {
+        test(LockMode.Write, false);
+    }
+
+    @Test
     public void withCommitLockAndDirtyCheck() {
         test(LockMode.Commit, true);
     }
@@ -70,15 +80,6 @@ public class IsolationStressTest implements GammaConstants {
         test(LockMode.Commit, false);
     }
 
-    @Test
-    public void withWriteLockingAndDirtyCheck() {
-        test(LockMode.Write, true);
-    }
-
-    @Test
-    public void withWriteLockAndNoDirtyCheck() {
-        test(LockMode.Write, false);
-    }
 
     @Test
     public void withMixedSettings() {
@@ -160,6 +161,7 @@ public class IsolationStressTest implements GammaConstants {
             AtomicBlock block = stm.createTransactionFactoryBuilder()
                     .setDirtyCheckEnabled(dirtyCheckEnabled)
                     .setSpeculativeConfigurationEnabled(false)
+                    .setWriteLockMode(lockMode)
                     .setMaxRetries(10000)
                     .buildAtomicBlock();
 
@@ -167,7 +169,8 @@ public class IsolationStressTest implements GammaConstants {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
-                    btx.openForWrite(ref, lockMode.asInt()).long_value++;
+                    btx.arriveEnabled = false;
+                    ref.openForWrite(btx, LOCKMODE_NONE).long_value++;
                 }
             };
 

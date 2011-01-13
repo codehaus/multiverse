@@ -879,7 +879,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             if (hasWriteOrCommitLock(current)) {
                 lockMode = -1;
             } else {
-                lockMode = getReadLockCount();
+                lockMode = getReadLockCount(current);
             }
 
             if (lockMode == 0) {
@@ -910,7 +910,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 next = setCommitLock(next, false);
                 next = setWriteLock(next, false);
             } else {
-                next = setReadLockCount(next, getReadLockCount() - 1);
+                next = setReadLockCount(next, lockMode - 1);
             }
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
@@ -965,7 +965,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             if (hasWriteOrCommitLock(current)) {
                 lockMode = -1;
             } else {
-                lockMode = getReadLockCount();
+                lockMode = getReadLockCount(current);
             }
 
             if (lockMode == 0) {
@@ -1016,7 +1016,6 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     public static boolean hasAnyLock(final long value) {
         return ((value & (BITMASK_COMMITLOCK + BITMASK_UPDATELOCK + BITMASK_READLOCKS)) != 0);
     }
-
 
     public static boolean hasCommitLock(final long value) {
         return (value & BITMASK_COMMITLOCK) != 0;

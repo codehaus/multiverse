@@ -38,8 +38,8 @@ public final class MapGammaTransaction extends GammaTransaction {
         return o.openForWrite(this, lockMode);
     }
 
-    public float getUsage(){
-        return (size * 1.0f)/array.length;
+    public float getUsage() {
+        return (size * 1.0f) / array.length;
     }
 
     public int size() {
@@ -136,14 +136,13 @@ public final class MapGammaTransaction extends GammaTransaction {
         status = TX_COMMITTED;
     }
 
-    private void commitArray() {
+      private void commitArray() {
         for (int k = 0; k < array.length; k++) {
             GammaTranlocal tranlocal = array[k];
 
             if (tranlocal == null) {
                 continue;
             }
-
 
             array[k] = null;
             if (tranlocal.isDirty) {
@@ -257,7 +256,7 @@ public final class MapGammaTransaction extends GammaTransaction {
     }
 
     public boolean isReadConsistent(GammaTranlocal justAdded) {
-        if(!needsConsistency){
+        if (!needsConsistency) {
             return true;
         }
 
@@ -276,7 +275,7 @@ public final class MapGammaTransaction extends GammaTransaction {
                 continue;
             }
 
-            if(tranlocal.owner.hasReadConflict(tranlocal)){
+            if (tranlocal.owner.hasReadConflict(tranlocal)) {
                 return false;
             }
         }
@@ -291,7 +290,7 @@ public final class MapGammaTransaction extends GammaTransaction {
 
     @Override
     public boolean softReset() {
-        if(attempt >= config.getMaxRetries()){
+        if (attempt >= config.getMaxRetries()) {
             return false;
         }
 
