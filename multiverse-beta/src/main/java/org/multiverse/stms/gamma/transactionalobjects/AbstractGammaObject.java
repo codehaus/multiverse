@@ -360,7 +360,6 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
     }
 
-
     private void yieldIfNeeded(int remainingSpins) {
         if (remainingSpins % ___SpinYield == 0 && remainingSpins > 0) {
             Thread.yield();
@@ -388,7 +387,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             }
             tranlocal.setDepartObligation(false);
         } else if (tranlocal.getLockMode() != LOCKMODE_NONE) {
-            unlockByReadBiased();
+            unlockWhenUnregistered();
             tranlocal.setLockMode(LOCKMODE_NONE);
         }
 
@@ -413,6 +412,9 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 departAfterReading();
             }
             tranlocal.setDepartObligation(false);
+        } else if (tranlocal.getLockMode() != LOCKMODE_NONE) {
+            unlockWhenUnregistered();
+            tranlocal.setLockMode(LOCKMODE_NONE);
         }
 
         tranlocal.owner = null;
@@ -435,7 +437,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         if (currentLockMode == LOCKMODE_NONE) {
             long expectedVersion = tranlocal.version;
 
-            //if the version already is different, we are since since the lock doesn't need to be acquired.
+            //if the version already is different, and there is a conflict, we are done since since the lock doesn't need to be acquired.
             if (expectedVersion != version) {
                 return false;
             }
@@ -705,7 +707,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
             if (getSurplus(current) == 0) {
                 throw new PanicError(
-                        "Can't acquire the updatelock is there is no surplus (so if it didn't do a read before)" +
+                        "Can't acquire any Lock is there is no surplus (so if it didn't do a read before)" +
                                 toOrecString(current));
             }
 
@@ -732,8 +734,8 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     public final void departAfterReading() {
         while (true) {
             final long current = ___orec;
-            long surplus = getSurplus(current);
 
+            long surplus = getSurplus(current);
             if (surplus == 0) {
                 throw new PanicError("Can't depart if there is no surplus " + toOrecString(current));
             }
@@ -767,8 +769,8 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     public final void departAfterReadingAndUnlock() {
         while (true) {
             final long current = ___orec;
-            long surplus = getSurplus(current);
 
+            long surplus = getSurplus(current);
             if (surplus == 0) {
                 throw new PanicError(
                         "Can't ___departAfterReadingAndUnlock if there is no surplus: " + toOrecString(current));
@@ -780,9 +782,6 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 throw new PanicError(
                         "Can't ___departAfterReadingAndUnlock if the lock is not acquired " + toOrecString(current));
             }
-            //if(readLockCount )
-
-            //todo: research if also read lcoks needs to be incldued
 
             boolean isReadBiased = isReadBiased(current);
             if (isReadBiased) {
@@ -952,27 +951,42 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
     }
 
-    public final void unlockByReadBiased() {
+    public final void unlockWhenUnregistered() {
         while (true) {
             final long current = ___orec;
 
+            //-1 indicates write or commit lock, value bigger than 0 indicates readlock
             if (!isReadBiased(current)) {
                 throw new PanicError(
                         "Can't ___unlockByReadBiased when it is not readbiased " + toOrecString(current));
             }
 
-            if (!hasWriteOrCommitLock(current)) {
+            int lockMode;
+            if (hasWriteOrCommitLock(current)) {
+                lockMode = -1;
+            } else {
+                lockMode = getReadLockCount();
+            }
+
+            if (lockMode == 0) {
                 throw new PanicError(
                         "Can't ___unlockByReadBiased if it isn't locked " + toOrecString(current));
             }
+
 
             if (getSurplus(current) > 1) {
                 throw new PanicError(
                         "Surplus for a readbiased orec never can be larger than 1 " + toOrecString(current));
             }
 
-            long next = setCommitLock(current, false);
-            next = setWriteLock(next, false);
+            long next = current;
+            if (lockMode > 0) {
+                next = setReadLockCount(next, lockMode - 1);
+            } else {
+                next = setCommitLock(next, false);
+                next = setWriteLock(next, false);
+            }
+
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
                 return;
             }

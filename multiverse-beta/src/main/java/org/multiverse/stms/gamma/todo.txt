@@ -2,6 +2,7 @@
                         to do
 --------------------------------------------------------------------
 
+-  readonly/readbiased
 
 - read consistency
 

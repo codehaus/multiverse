@@ -13,6 +13,10 @@ import static org.multiverse.stms.gamma.ThreadLocalGammaTransactionPool.getThrea
 
 public final class GammaStm implements Stm {
 
+    public static GammaStm createFast(){
+        return new GammaStm();
+    }
+
     public final int defaultMaxRetries;
     public final int spinCount;
     public final BackoffPolicy defaultBackoffPolicy;

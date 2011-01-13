@@ -816,7 +816,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
 
         if (oldValue == newValue) {
             if (arriveStatus == ARRIVE_UNREGISTERED) {
-                unlockByReadBiased();
+                unlockWhenUnregistered();
             } else {
                 departAfterReadingAndUnlock();
             }
@@ -879,7 +879,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
 
         if (oldValue == newValue) {
             if (arriveStatus == ARRIVE_UNREGISTERED) {
-                unlockByReadBiased();
+                unlockWhenUnregistered();
             } else {
                 departAfterReadingAndUnlock();
             }
@@ -992,7 +992,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
 
         if (expectedValue == newValue) {
             if (arriveStatus == ARRIVE_UNREGISTERED) {
-                unlockByReadBiased();
+                unlockWhenUnregistered();
             } else {
                 departAfterReadingAndUnlock();
             }
@@ -1054,7 +1054,7 @@ public class GammaLongRef extends AbstractGammaObject implements LongRef {
 
         if (amount == 0) {
             if (arriveStatus == ARRIVE_UNREGISTERED) {
-                unlockByReadBiased();
+                unlockWhenUnregistered();
             } else {
                 departAfterReadingAndUnlock();
             }
