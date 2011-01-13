@@ -4,6 +4,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionConfiguration;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.*;
+import org.multiverse.api.functions.Function;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.gamma.GammaConstants;
@@ -13,6 +14,7 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
 
 import static java.lang.String.format;
+import static org.multiverse.stms.gamma.GammaStmUtils.toDebugString;
 
 public abstract class GammaTransaction implements GammaConstants, Transaction {
 
@@ -32,6 +34,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public GammaTransaction(GammaTransactionConfiguration config, int transactionType) {
         this.config = config;
+        config.init();
         this.transactionType = transactionType;
     }
 
@@ -42,132 +45,155 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         return ReadWriteConflict.INSTANCE;
     }
 
-    public final ReadonlyException abortOpenForWriteOnReadonly() {
+    public final ReadonlyException abortOpenForWriteOnReadonly(GammaObject object) {
         abort();
-        return new ReadonlyException();
+        return new ReadonlyException(
+                format("[%s] Failed to Transaction.openForWrite '%s', reason: the transaction is readonly",
+                        config.familyName, toDebugString(object)));
     }
 
-    public final NullPointerException abortLocateOnNullArgument() {
+    public IllegalTransactionStateException abortRetryOnNoRetryPossible() {
         abort();
-        throw new NullPointerException();
+        throw new RetryNotPossibleException(
+                format("[%s] Failed to execute Transaction.retry, reason: there are no tracked reads",
+                        config.familyName));
     }
 
     public RetryNotAllowedException abortRetryOnNoBlockingAllowed() {
         abort();
-        return new RetryNotAllowedException("");
+        return new RetryNotAllowedException(
+                format("[%s] Failed to execute Transaction.retry, reason: the transaction doesn't allow blocking",
+                        config.familyName));
+
     }
 
     public IllegalTransactionStateException abortRetryOnBadStatus() {
         switch (status) {
+            case TX_PREPARED:
+                abort();
+                return new PreparedTransactionException(
+                        format("[%s] Failed to execute Transaction.retry, reason: the transaction is prepared",
+                                config.familyName));
             case TX_ABORTED:
-                return new DeadTransactionException();
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.retry, reason: the transaction is aborted",
+                                config.familyName));
             case TX_COMMITTED:
-                return new DeadTransactionException();
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.retry, reason: the transaction is committed",
+                                config.familyName));
             default:
                 throw new IllegalStateException();
-
         }
     }
 
-    public final IllegalTransactionStateException abortLocateOnBadStatus() {
+    public final IllegalTransactionStateException abortLocateOnBadStatus(GammaObject object) {
         switch (status) {
             case TX_PREPARED:
                 abort();
-                return new PreparedTransactionException();
+                return new PreparedTransactionException(
+                        format("[%s] Failed to execute Transaction.locate '%s' , reason: the transaction is prepared",
+                                toDebugString(object), config.familyName));
             case TX_ABORTED:
-                return new DeadTransactionException();
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.locate, '%s' reason: the transaction is aborted",
+                                toDebugString(object), config.familyName));
             case TX_COMMITTED:
-                return new DeadTransactionException();
-            default:
-                throw new IllegalStateException();
-
-        }
-    }
-
-    public final TransactionStatus getStatus() {
-        switch (status) {
-            case TX_ACTIVE:
-                return TransactionStatus.Active;
-            case TX_PREPARED:
-                return TransactionStatus.Prepared;
-            case TX_COMMITTED:
-                return TransactionStatus.Committed;
-            case TX_ABORTED:
-                return TransactionStatus.Aborted;
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.locate, '%s' reason: the transaction is committed",
+                                toDebugString(object), config.familyName));
             default:
                 throw new IllegalStateException();
         }
     }
 
-    public final SpeculativeConfigurationError abortOnTransactionTooSmall() {
+    public final NullPointerException abortLocateOnNullArgument() {
         abort();
-        return SpeculativeConfigurationError.INSTANCE;
+        return new NullPointerException(
+                format("[%s] Failed to execute Transaction.locate, reason: the reference is null",
+                        config.familyName));
+
     }
 
-    public final IllegalTransactionStateException abortOpenForWriteOnBadStatus() {
+    public final IllegalTransactionStateException abortOpenForWriteOnBadStatus(GammaObject o) {
         switch (status) {
-            case TX_ABORTED:
-                return new DeadTransactionException();
             case TX_PREPARED:
                 abort();
-                return new PreparedTransactionException();
+                return new PreparedTransactionException(
+                        format("[%s] Failed to execute Transaction.openForWrite '%s', reason: the transaction is prepared",
+                                config.familyName, toDebugString(o)));
+            case TX_ABORTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.openForWrite '%s', reason: the transaction is aborted",
+                                config.familyName, toDebugString(o)));
             case TX_COMMITTED:
-                return new DeadTransactionException();
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.openForWrite '%s', reason: the transaction is committed",
+                                config.familyName, toDebugString(o)));
             default:
                 throw new IllegalStateException();
+        }
+    }
 
+    public final IllegalTransactionStateException abortOpenForReadOnBadStatus(GammaObject object) {
+        switch (status) {
+            case TX_PREPARED:
+                abort();
+                return new PreparedTransactionException(
+                        format("[%s] Failed to execute Transaction.openForRead '%s', reason: the transaction is prepared",
+                                config.familyName, toDebugString(object)));
+            case TX_ABORTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.openForRead '%s', reason: the transaction is aborted",
+                                config.familyName, toDebugString(object)));
+            case TX_COMMITTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.openForRead '%s', reason: the transaction is committed",
+                                config.familyName, toDebugString(object)));
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+    public IllegalTransactionStateException abortCommuteOnBadStatus(final GammaObject object, final Function function) {
+        switch (status) {
+            case TX_PREPARED:
+                abort();
+                return new PreparedTransactionException(
+                        format("[%s] Failed to execute Transaction.commute '%s' with reference '%s', reason: the transaction is prepared",
+                                config.familyName, toDebugString(object), function));
+            case TX_ABORTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.commute '%s' with reference '%s', reason: the transaction is aborted",
+                                config.familyName, toDebugString(object), function));
+            case TX_COMMITTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.commute '%s' with reference '%s', reason: the transaction is prepared",
+                                config.familyName, toDebugString(object), function));
+            default:
+                throw new IllegalStateException();
         }
     }
 
     public final IllegalTransactionStateException abortPrepareOnBadStatus() {
         switch (status) {
             case TX_ABORTED:
-                return new DeadTransactionException();
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.prepare, reason: the transaction already is aborted",
+                                config.familyName));
             case TX_COMMITTED:
-                return new DeadTransactionException();
-            default:
-                throw new IllegalStateException();
-
-        }
-    }
-
-    public final IllegalTransactionStateException abortOpenForReadOnBadStatus() {
-        switch (status) {
-            case TX_ABORTED:
-                return new DeadTransactionException();
-            case TX_PREPARED:
-                abort();
-                return new PreparedTransactionException();
-            case TX_COMMITTED:
-                return new DeadTransactionException();
-            default:
-                throw new IllegalStateException();
-
-        }
-    }
-
-    public final IllegalTransactionStateException abortCommitOnBadStatus() {
-        switch (status) {
-            case TX_ABORTED:
-                return new DeadTransactionException();
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.prepare, reason: the transaction already is committed",
+                                config.familyName));
             default:
                 throw new IllegalStateException();
         }
     }
 
-    public IllegalTransactionStateException abortCommuteOnBadStatus() {
-        switch (status) {
-            case TX_ABORTED:
-                return new DeadTransactionException();
-            case TX_PREPARED:
-                abort();
-                return new PreparedTransactionException();
-            case TX_COMMITTED:
-                return new DeadTransactionException();
-            default:
-                throw new IllegalStateException();
-
-        }
+    public final IllegalTransactionStateException abortCommitOnBadStatus() {
+        return new DeadTransactionException(
+                format("[%s] Failed to execute BetaTransaction.commit, reason:the transaction already is aborted",
+                        config.familyName));
     }
 
     public IllegalTransactionStateException abortTryAcquireOnBadStatus() {
@@ -199,6 +225,30 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
         }
     }
+
+    public final SpeculativeConfigurationError abortOnTooSmallSize(int minimalSize) {
+        config.needsMinimalTransactionLength(minimalSize);
+        abort();
+        return SpeculativeConfigurationError.INSTANCE;
+    }
+
+    public NullPointerException abortTryAcquireOnNullLockMode() {
+        abort();
+        return new NullPointerException("LockMode can't be null");
+    }
+
+    public NullPointerException abortCommuteOnNullFunction(final GammaObject object) {
+        abort();
+        return new NullPointerException();
+    }
+
+    public ReadonlyException abortCommuteOnReadonly(final GammaObject object) {
+        abort();
+        return new ReadonlyException(
+                format("[%s] Failed to execute commute '%s', reason: the transaction is readonly",
+                        config.familyName, toDebugString(object)));
+    }
+
 
     public final boolean hasWrites() {
         return hasWrites;
@@ -238,11 +288,11 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                 return abortOnly;
             case TX_COMMITTED:
                 throw new DeadTransactionException(
-                        format("[%s] Failed to execute BetaTransaction.setAbortOnly, reason: the transaction is committed",
+                        format("[%s] Failed to execute Transaction.setAbortOnly, reason: the transaction is committed",
                                 config.familyName));
             case TX_ABORTED:
                 throw new DeadTransactionException(
-                        format("[%s] Failed to execute BetaTransaction.setAbortOnly, reason: the transaction is aborted",
+                        format("[%s] Failed to execute Transaction.setAbortOnly, reason: the transaction is aborted",
                                 config.familyName));
             default:
                 throw new IllegalStateException();
@@ -258,15 +308,15 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
             case TX_PREPARED:
                 abort();
                 throw new PreparedTransactionException(
-                        format("[%s] Failed to execute BetaTransaction.setAbortOnly, reason: the transaction is prepared",
+                        format("[%s] Failed to execute Transaction.setAbortOnly, reason: the transaction is prepared",
                                 config.familyName));
             case TX_COMMITTED:
                 throw new DeadTransactionException(
-                        format("[%s] Failed to execute BetaTransaction.setAbortOnly, reason: the transaction is committed",
+                        format("[%s] Failed to execute Transaction.setAbortOnly, reason: the transaction is committed",
                                 config.familyName));
             case TX_ABORTED:
                 throw new DeadTransactionException(
-                        format("[%s] Failed to execute BetaTransaction.setAbortOnly, reason: the transaction is aborted",
+                        format("[%s] Failed to execute Transaction.setAbortOnly, reason: the transaction is aborted",
                                 config.familyName));
             default:
                 throw new IllegalStateException();
@@ -320,21 +370,6 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         throw new TodoException();
     }
 
-    public NullPointerException abortTryAcquireOnNullLockMode() {
-        abort();
-        return new NullPointerException("LockMode can't be null");
-    }
-
-    public NullPointerException abortCommuteOnNullFunction() {
-        abort();
-        return new NullPointerException();
-    }
-
-    public ReadonlyException abortCommuteOnReadonly() {
-        abort();
-        return new ReadonlyException();
-    }
-
     public final void init(GammaTransactionConfiguration config) {
         if (config == null) {
             throw new NullPointerException();
@@ -344,4 +379,19 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public abstract boolean isReadConsistent(GammaTranlocal justAdded);
+
+    public final TransactionStatus getStatus() {
+        switch (status) {
+            case TX_ACTIVE:
+                return TransactionStatus.Active;
+            case TX_PREPARED:
+                return TransactionStatus.Prepared;
+            case TX_COMMITTED:
+                return TransactionStatus.Committed;
+            case TX_ABORTED:
+                return TransactionStatus.Aborted;
+            default:
+                throw new IllegalStateException();
+        }
+    }
 }

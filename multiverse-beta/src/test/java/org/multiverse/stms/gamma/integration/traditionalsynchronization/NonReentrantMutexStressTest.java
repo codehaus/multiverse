@@ -7,17 +7,16 @@ import org.multiverse.TestUtils;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRefTranlocal;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
 
 /**
  * A stresstest that checks if the NonReentrantMutex; a traditional synchronization structure, can be build
@@ -32,13 +31,13 @@ public class NonReentrantMutexStressTest {
 
     private int threadCount = processorCount() * 4;
     private ProtectedIntValue[] intValues;
-    private BetaStm stm;
+    private GammaStm stm;
     private boolean pessimistic;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = (BetaStm) getGlobalStmInstance();
+        stm = (GammaStm) getGlobalStmInstance();
         stop = false;
     }
 
@@ -125,7 +124,7 @@ public class NonReentrantMutexStressTest {
     }
 
     class NonReentrantMutex {
-        final BetaIntRef locked = newIntRef(stm, 0);
+        final GammaLongRef locked = new GammaLongRef(stm, 0);
         final AtomicBlock lockBlock = stm.createTransactionFactoryBuilder()
                 .buildAtomicBlock();
         final AtomicBlock unlockBlock = stm.createTransactionFactoryBuilder()
@@ -134,29 +133,29 @@ public class NonReentrantMutexStressTest {
         final AtomicVoidClosure lockClosure = new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                BetaTransaction btx = (BetaTransaction) tx;
+                GammaTransaction btx = (GammaTransaction) tx;
 
-                BetaIntRefTranlocal read = btx.openForRead(locked, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
-                if (read.value == 1) {
+                GammaTranlocal read = btx.openForRead(locked, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
+                if (read.long_value == 1) {
                     retry();
                 }
 
-                BetaIntRefTranlocal write = btx.openForWrite(locked, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
-                write.value = 1;
+                GammaTranlocal write = btx.openForWrite(locked, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
+                write.long_value = 1;
             }
         };
 
         final AtomicVoidClosure unlockClosure = new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                BetaTransaction btx = (BetaTransaction) tx;
+                GammaTransaction btx = (GammaTransaction) tx;
 
-                BetaIntRefTranlocal write = btx.openForWrite(locked, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
-                if (write.value == 0) {
+                GammaTranlocal write = locked.openForWrite(btx, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
+                if (write.long_value == 0) {
                     throw new IllegalStateException();
                 }
 
-                write.value = 0;
+                write.long_value = 0;
             }
         };
 

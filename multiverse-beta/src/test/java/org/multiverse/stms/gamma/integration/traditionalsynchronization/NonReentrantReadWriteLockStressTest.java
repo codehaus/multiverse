@@ -5,8 +5,8 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.api.references.IntRef;
-import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -22,14 +22,14 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  * @author Peter Veentjer.
  */
 public class NonReentrantReadWriteLockStressTest {
-    private BetaStm stm;
+    private GammaStm stm;
     private int threadCount = 10;
     private ReadWriteLock readWriteLock;
     private volatile boolean stop;
 
     @Before
     public void setUp() {
-        stm = (BetaStm) getGlobalStmInstance();
+        stm = (GammaStm) getGlobalStmInstance();
         clearThreadLocalTransaction();
         stop = false;
     }
@@ -76,7 +76,7 @@ public class NonReentrantReadWriteLockStressTest {
     }
 
     class ReadWriteLock {
-        final IntRef lock = newIntRef();
+        final GammaLongRef lock = new GammaLongRef(stm);
         final AtomicLong readers = new AtomicLong();
         final AtomicLong writers = new AtomicLong();
 

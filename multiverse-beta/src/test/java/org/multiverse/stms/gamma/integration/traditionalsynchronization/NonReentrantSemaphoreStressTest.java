@@ -8,15 +8,15 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.LockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.api.references.IntRef;
-import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.api.references.LongRef;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import static org.multiverse.api.StmUtils.newIntRef;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
@@ -25,7 +25,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  * using an STM.
  */
 public class NonReentrantSemaphoreStressTest {
-    private BetaStm stm;
+    private GammaStm stm;
     private volatile boolean stop;
     private int threadCount = 10;
     private int resourceCount = 5;
@@ -34,7 +34,7 @@ public class NonReentrantSemaphoreStressTest {
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = (BetaStm) getGlobalStmInstance();
+        stm = (GammaStm) getGlobalStmInstance();
         stop = false;
     }
 
@@ -102,13 +102,13 @@ public class NonReentrantSemaphoreStressTest {
 
     class Semaphore {
 
-        private IntRef ref;
+        private LongRef ref;
         private AtomicLong users = new AtomicLong();
         private AtomicBlock upBlock;
         private AtomicBlock downBlock;
 
         public Semaphore(int initial, LockLevel lockLevel) {
-            ref = newIntRef(initial);
+            ref = new GammaLongRef(stm,initial);
             upBlock = stm.createTransactionFactoryBuilder()
                     .setLockLevel(lockLevel).buildAtomicBlock();
             downBlock = stm.createTransactionFactoryBuilder()

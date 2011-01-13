@@ -7,30 +7,29 @@ import org.multiverse.TestUtils;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
 public class ReadConsistencyStressTest {
 
-    private BetaLongRef[] refs;
+    private GammaLongRef[] refs;
 
     private int readerCount = 10;
     private int writerCount = 2;
     private volatile boolean stop;
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
         stop = false;
-        stm = (BetaStm) getGlobalStmInstance();
+        stm = (GammaStm) getGlobalStmInstance();
     }
 
     @Test
@@ -105,9 +104,9 @@ public class ReadConsistencyStressTest {
 
     public void test(int refCount, boolean readtracking) {
 
-        refs = new BetaLongRef[refCount];
+        refs = new GammaLongRef[refCount];
         for (int k = 0; k < refs.length; k++) {
-            refs[k] = newLongRef(stm);
+            refs[k] = new GammaLongRef(stm);
         }
 
         ReadThread[] readerThreads = new ReadThread[readerCount];
@@ -137,12 +136,13 @@ public class ReadConsistencyStressTest {
         @Override
         public void doRun() throws Exception {
             AtomicBlock block = stm.createTransactionFactoryBuilder()
+                    .setSpeculativeConfigurationEnabled(false)
                     .buildAtomicBlock();
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-                    for (BetaLongRef ref : refs) {
+                    GammaTransaction btx = (GammaTransaction) tx;
+                    for (GammaLongRef ref : refs) {
                         ref.set(btx, ref.get(btx));
                     }
                 }
@@ -176,6 +176,7 @@ public class ReadConsistencyStressTest {
         public void doRun() throws Exception {
             AtomicBlock block = stm.createTransactionFactoryBuilder()
                     .setReadTrackingEnabled(readTracking)
+                    .setSpeculativeConfigurationEnabled(false)
                     .setBlockingAllowed(false)
                     .setReadonly(true)
                     .buildAtomicBlock();
@@ -183,7 +184,7 @@ public class ReadConsistencyStressTest {
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
+                    GammaTransaction btx = (GammaTransaction) tx;
 
                     long initial = refs[0].get(btx);
 

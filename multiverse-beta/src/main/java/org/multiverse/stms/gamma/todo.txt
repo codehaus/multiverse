@@ -28,6 +28,8 @@
                         done
 --------------------------------------------------------------------
 
+- race problem fixed with the readlocking
+
 - lock upgrade testing on open for write
 
 - lock upgrade testing on open for read

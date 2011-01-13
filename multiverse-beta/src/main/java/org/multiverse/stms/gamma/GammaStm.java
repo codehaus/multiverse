@@ -31,6 +31,8 @@ public final class GammaStm implements Stm {
     }
 
     public GammaStm(GammaStmConfiguration configuration) {
+        configuration.validate();
+
         this.defaultMaxRetries = configuration.maxRetries;
         this.spinCount = configuration.spinCount;
         this.defaultBackoffPolicy = configuration.backoffPolicy;
@@ -398,7 +400,6 @@ public final class GammaStm implements Stm {
 
                 tx.init(config);
                 return tx;
-
             }
         }
     }

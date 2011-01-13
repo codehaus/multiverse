@@ -49,7 +49,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         return o.openForWrite(this, lockMode);
     }
 
-     public boolean isReadConsistent(GammaTranlocal justAdded) {
+    public boolean isReadConsistent(GammaTranlocal justAdded) {
         if (!needsConsistency) {
             return true;
         }
@@ -182,7 +182,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         }
     }
 
-      @Override
+    @Override
     public GammaTranlocal get(GammaObject ref) {
         GammaTranlocal node = head;
         while (node != null) {
@@ -201,7 +201,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
 
     @Override
     public void retry() {
-        if (status != TX_ACTIVE && status != TX_PREPARED) {
+        if (status != TX_ACTIVE) {
             throw abortRetryOnBadStatus();
         }
 
@@ -209,6 +209,49 @@ public final class ArrayGammaTransaction extends GammaTransaction {
             throw abortRetryOnNoBlockingAllowed();
         }
 
+        if (size == 0) {
+            throw abortRetryOnNoRetryPossible();
+        }
+
+        /*
+        listener.reset();
+        final long listenerEra = listener.getEra();
+
+        boolean furtherRegistrationNeeded = true;
+        boolean atLeastOneRegistration = false;
+
+        for(int k=0; k < firstFreeIndex; k++){
+
+            final BetaTranlocal tranlocal = array[k];
+            final BetaTransactionalObject owner = tranlocal.owner;
+
+            if(furtherRegistrationNeeded){
+                switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
+                    case REGISTRATION_DONE:
+                         atLeastOneRegistration = true;
+                         break;
+                    case REGISTRATION_NOT_NEEDED:
+                         furtherRegistrationNeeded = false;
+                         atLeastOneRegistration = true;
+                         break;
+                    case REGISTRATION_NONE:
+                         break;
+                    default:
+                         throw new IllegalStateException();
+                }
+            }
+
+            owner.___abort(this, tranlocal, pool);
+            array[k]=null;
+        }
+
+        status = ABORTED;
+
+        if(!atLeastOneRegistration){
+            throw abortRetryOnNoRetryPossible();
+        }
+
+        throw Retry.INSTANCE;       */
         throw new TodoException();
     }
 
@@ -232,7 +275,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
     @Override
     public GammaTranlocal locate(GammaObject o) {
         if (status != TX_ACTIVE) {
-            throw abortLocateOnBadStatus();
+            throw abortLocateOnBadStatus(o);
         }
 
         if (o == null) {
@@ -254,7 +297,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
 
     @Override
     public boolean softReset() {
-        if(attempt >= config.getMaxRetries()){
+        if (attempt >= config.getMaxRetries()) {
             return false;
         }
 

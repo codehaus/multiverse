@@ -38,7 +38,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
     @Override
     public GammaTranlocal locate(GammaObject o) {
         if (status != TX_ACTIVE) {
-            throw abortLocateOnBadStatus();
+            throw abortLocateOnBadStatus(o);
         }
 
         if (o == null) {
