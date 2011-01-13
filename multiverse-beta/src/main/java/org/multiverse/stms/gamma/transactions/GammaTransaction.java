@@ -175,6 +175,13 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
+    public ReadonlyException abortCommuteOnReadonly(final GammaObject object) {
+        abort();
+        return new ReadonlyException(
+                format("[%s] Failed to execute commute '%s', reason: the transaction is readonly",
+                        config.familyName, toDebugString(object)));
+    }
+
     public final IllegalTransactionStateException abortPrepareOnBadStatus() {
         switch (status) {
             case TX_ABORTED:
@@ -192,24 +199,37 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public final IllegalTransactionStateException abortCommitOnBadStatus() {
         return new DeadTransactionException(
-                format("[%s] Failed to execute BetaTransaction.commit, reason:the transaction already is aborted",
+                format("[%s] Failed to execute Transaction.commit, reason: the transaction already is aborted",
                         config.familyName));
     }
 
-    public IllegalTransactionStateException abortTryAcquireOnBadStatus() {
+    public IllegalTransactionStateException abortTryAcquireOnBadStatus(GammaObject object) {
         switch (status) {
-            case TX_ABORTED:
-                return new DeadTransactionException();
             case TX_PREPARED:
                 abort();
-                return new PreparedTransactionException();
+                return new PreparedTransactionException(
+                        format("[%s] Failed to execute Transaction.commute '%s', reason: the transaction is prepared",
+                                config.familyName, toDebugString(object)));
+            case TX_ABORTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.commute '%s', reason: the transaction is aborted",
+                                config.familyName, toDebugString(object)));
             case TX_COMMITTED:
-                return new DeadTransactionException();
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.commute '%s', reason: the transaction is prepared",
+                                config.familyName, toDebugString(object)));
             default:
                 throw new IllegalStateException();
-
         }
     }
+
+    public NullPointerException abortTryAcquireOnNullLockMode(GammaObject object) {
+        abort();
+        return new NullPointerException(
+                format("[%s] Failed to execute Lock.tryAcquire '%s', reason: the lockMode is null",
+                        config.familyName, toDebugString(object)));
+    }
+
 
     public IllegalTransactionStateException abortEnsureOnBadStatus() {
         switch (status) {
@@ -232,23 +252,10 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         return SpeculativeConfigurationError.INSTANCE;
     }
 
-    public NullPointerException abortTryAcquireOnNullLockMode() {
-        abort();
-        return new NullPointerException("LockMode can't be null");
-    }
-
     public NullPointerException abortCommuteOnNullFunction(final GammaObject object) {
         abort();
         return new NullPointerException();
     }
-
-    public ReadonlyException abortCommuteOnReadonly(final GammaObject object) {
-        abort();
-        return new ReadonlyException(
-                format("[%s] Failed to execute commute '%s', reason: the transaction is readonly",
-                        config.familyName, toDebugString(object)));
-    }
-
 
     public final boolean hasWrites() {
         return hasWrites;

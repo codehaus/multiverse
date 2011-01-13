@@ -192,11 +192,11 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
 
         if (tx.status != TX_ACTIVE) {
-            throw tx.abortTryAcquireOnBadStatus();
+            throw tx.abortTryAcquireOnBadStatus(this);
         }
 
         if (desiredLockMode == null) {
-            throw tx.abortTryAcquireOnNullLockMode();
+            throw tx.abortTryAcquireOnNullLockMode(this);
         }
 
         GammaTranlocal tranlocal = tx.locate(this);
