@@ -26,7 +26,7 @@ public final class MapGammaTransaction extends GammaTransaction {
 
     @Override
     public void commute(GammaLongRef ref, LongFunction function) {
-        throw new TodoException();
+        ref.commute(function);
     }
 
     @Override
@@ -38,6 +38,12 @@ public final class MapGammaTransaction extends GammaTransaction {
     public GammaTranlocal openForWrite(GammaLongRef o, int lockMode) {
         return o.openForWrite(this, lockMode);
     }
+
+    @Override
+    public GammaTranlocal openForConstruction(GammaObject o) {
+        return o.openForConstruction(this);
+    }
+
 
     public float getUsage() {
         return (size * 1.0f) / array.length;
@@ -360,4 +366,6 @@ public final class MapGammaTransaction extends GammaTransaction {
         needsConsistency = false;
         abortOnly = false;
     }
+
+
 }

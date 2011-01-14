@@ -37,7 +37,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
 
     @Override
     public void commute(GammaLongRef ref, LongFunction function) {
-        throw new TodoException();
+        ref.commute(this, function);
     }
 
     @Override
@@ -48,6 +48,11 @@ public final class ArrayGammaTransaction extends GammaTransaction {
     @Override
     public GammaTranlocal openForWrite(GammaLongRef o, int lockMode) {
         return o.openForWrite(this, lockMode);
+    }
+
+    @Override
+    public GammaTranlocal openForConstruction(GammaObject o) {
+        return o.openForConstruction(this);
     }
 
     public boolean isReadConsistent(GammaTranlocal justAdded) {

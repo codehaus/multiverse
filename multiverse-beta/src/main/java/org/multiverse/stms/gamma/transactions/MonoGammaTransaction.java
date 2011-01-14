@@ -23,7 +23,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
 
     @Override
     public void commute(GammaLongRef ref, LongFunction function) {
-        throw new TodoException();
+        ref.commute(this, function);
     }
 
     @Override
@@ -34,6 +34,11 @@ public final class MonoGammaTransaction extends GammaTransaction {
     @Override
     public GammaTranlocal openForRead(GammaLongRef o, int lockMode) {
         return o.openForRead(this, lockMode);
+    }
+
+    @Override
+    public GammaTranlocal openForConstruction(GammaObject o) {
+        return o.openForConstruction(this);
     }
 
     @Override
@@ -191,7 +196,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
 
         status = TX_ABORTED;
 
-        if (!atLeastOneRegistration){
+        if (!atLeastOneRegistration) {
             throw abortRetryOnNoRetryPossible();
         }
 

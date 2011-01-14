@@ -31,6 +31,14 @@ public interface GammaObject extends GammaConstants {
 
     GammaTranlocal openForRead(MapGammaTransaction tx, int lockMode);
 
+    GammaTranlocal openForConstruction(GammaTransaction tx);
+
+    GammaTranlocal openForConstruction(MonoGammaTransaction tx);
+
+    GammaTranlocal openForConstruction(MapGammaTransaction tx);
+
+    GammaTranlocal openForConstruction(ArrayGammaTransaction tx);
+
     /**
      * Tries to acquire a lock on a previous read/written tranlocal and checks for conflict.
      *
@@ -60,4 +68,6 @@ public interface GammaObject extends GammaConstants {
     int registerChangeListener(RetryLatch latch, GammaTranlocal tranlocal, GammaObjectPool pool, long listenerEra);
 
     int identityHashCode();
+
+
 }

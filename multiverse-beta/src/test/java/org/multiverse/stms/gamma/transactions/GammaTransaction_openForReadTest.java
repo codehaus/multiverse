@@ -36,7 +36,27 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
     protected abstract T newTransaction(GammaTransactionConfiguration config);
 
     @Test
-    public void whenTransactionAbortOnly_thenReadStillPossible(){
+    public void whenStmMismatch() {
+        GammaStm otherStm = new GammaStm();
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(otherStm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+
+        try {
+            ref.openForRead(tx, LOCKMODE_NONE);
+            fail();
+        } catch (IllegalStateException expected) {
+        }
+
+        assertIsAborted(tx);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
+
+    @Test
+    public void whenTransactionAbortOnly_thenReadStillPossible() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -49,7 +69,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
     }
 
     @Test
-    public void whenTransactionAbortOnly_thenRereadStillPossible(){
+    public void whenTransactionAbortOnly_thenRereadStillPossible() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -64,16 +84,33 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
 
     @Test
     @Ignore
-    public void whenReadFirstAndThenLockedByOtherAndThenReread(){
+    public void whenReadFirstAndThenLockedByOtherAndThenReread() {
 
     }
 
     @Test
     @Ignore
-    public void whenReadFirstAndThenLockedByOtherAndThenLockUpgrade(){
+    public void whenReadFirstAndThenLockedByOtherAndThenLockUpgrade() {
 
     }
 
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForConstruction(){
+
+    }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForCommute(){
+
+    }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForCommuteAndLockingConflicts(){
+
+    }
 
     @Test
     public void whenOverflowing() {
@@ -137,26 +174,6 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
 
     @Test
     public void whenRefAlreadyOpenedForRead() {
-        long initialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, initialValue);
-        long initialVersion = ref.getVersion();
-
-        GammaTransaction tx = newTransaction();
-        GammaTranlocal first = ref.openForRead(tx, LOCKMODE_NONE);
-        GammaTranlocal second = ref.openForRead(tx, LOCKMODE_NONE);
-
-        assertSame(first, second);
-        assertNotNull(second);
-        assertSame(ref, second.owner);
-        assertEquals(initialVersion, second.version);
-        assertEquals(initialValue, second.long_value);
-        assertEquals(initialValue, second.long_oldValue);
-        assertTrue(second.isRead());
-        assertFalse(tx.hasWrites());
-    }
-
-    @Test
-    public void whenRefAlreadOpenedForRead() {
         whenRefAlreadyOpenedForRead(LockMode.None, LockMode.None, LockMode.None);
         whenRefAlreadyOpenedForRead(LockMode.None, LockMode.Read, LockMode.Read);
         whenRefAlreadyOpenedForRead(LockMode.None, LockMode.Write, LockMode.Write);
@@ -199,7 +216,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
     }
 
     @Test
-    public void whenRefAlreadOpenedForWrite() {
+    public void whenRefAlreadyOpenedForWrite() {
         whenRefAlreadyOpenedForWrite(LockMode.None, LockMode.None, LockMode.None);
         whenRefAlreadyOpenedForWrite(LockMode.None, LockMode.Read, LockMode.Read);
         whenRefAlreadyOpenedForWrite(LockMode.None, LockMode.Write, LockMode.Write);

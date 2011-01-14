@@ -5,7 +5,16 @@ import org.multiverse.api.TransactionConfiguration;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.blocking.RetryLatch;
-import org.multiverse.api.exceptions.*;
+import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.IllegalTransactionStateException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.exceptions.ReadWriteConflict;
+import org.multiverse.api.exceptions.ReadonlyException;
+import org.multiverse.api.exceptions.RetryNotAllowedException;
+import org.multiverse.api.exceptions.RetryNotPossibleException;
+import org.multiverse.api.exceptions.RetryTimeoutException;
+import org.multiverse.api.exceptions.SpeculativeConfigurationError;
+import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.Function;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
@@ -56,14 +65,14 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                         config.familyName, toDebugString(object)));
     }
 
-    public IllegalTransactionStateException abortRetryOnNoRetryPossible() {
+    public final IllegalTransactionStateException abortRetryOnNoRetryPossible() {
         abort();
         throw new RetryNotPossibleException(
                 format("[%s] Failed to execute Transaction.retry, reason: there are no tracked reads",
                         config.familyName));
     }
 
-    public RetryNotAllowedException abortRetryOnNoBlockingAllowed() {
+    public final RetryNotAllowedException abortRetryOnNoBlockingAllowed() {
         abort();
         return new RetryNotAllowedException(
                 format("[%s] Failed to execute Transaction.retry, reason: the transaction doesn't allow blocking",
@@ -71,7 +80,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     }
 
-    public IllegalTransactionStateException abortRetryOnBadStatus() {
+    public final IllegalTransactionStateException abortRetryOnBadStatus() {
         switch (status) {
             case TX_PREPARED:
                 abort();
@@ -139,6 +148,13 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
+    public final IllegalStateException abortOpenForWriteOnBadStm(GammaObject gammaLongRef) {
+        abort();
+        //todo: message
+        return new IllegalStateException("");
+    }
+
+
     public final IllegalTransactionStateException abortOpenForReadOnBadStatus(GammaObject object) {
         switch (status) {
             case TX_PREPARED:
@@ -157,6 +173,47 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
             default:
                 throw new IllegalStateException();
         }
+    }
+
+    public final IllegalStateException abortOpenForReadOnBadStm(GammaLongRef gammaLongRef) {
+        abort();
+        //todo: message
+        return new IllegalStateException("");
+    }
+
+
+    public final IllegalTransactionStateException abortOpenForConstructionOnBadStatus(GammaObject o) {
+        switch (status) {
+            case TX_PREPARED:
+                abort();
+                return new PreparedTransactionException(
+                        format("[%s] Failed to execute Transaction.openForConstruction '%s', reason: the transaction is prepared",
+                                config.familyName, toDebugString(o)));
+            case TX_ABORTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.openForConstruction '%s', reason: the transaction is aborted",
+                                config.familyName, toDebugString(o)));
+            case TX_COMMITTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.openForConstruction '%s', reason: the transaction is committed",
+                                config.familyName, toDebugString(o)));
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+    public final IllegalStateException abortOpenForConstructionOnBadStm(GammaObject o) {
+        abort();
+        //todo: message
+        return new IllegalStateException("");
+    }
+
+    public ReadonlyException abortOpenForConstructionOnReadonly(GammaObject o) {
+        abort();
+        return new ReadonlyException(
+                format("[%s] Failed to execute Transaction.openForConstruction '%s', reason: the transaction is readonly",
+                        config.familyName, toDebugString(o)));
+
     }
 
     public IllegalTransactionStateException abortCommuteOnBadStatus(final GammaObject object, final Function function) {
@@ -179,6 +236,12 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
+    public IllegalStateException abortCommuteOnBadStm(GammaLongRef gammaLongRef) {
+        abort();
+        //todo: message
+        return new IllegalStateException("");
+    }
+
     public ReadonlyException abortCommuteOnReadonly(final GammaObject object) {
         abort();
         return new ReadonlyException(
@@ -192,6 +255,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                 format("[%s] Failed to execute Transaction.commute '%s', reason: the function is null",
                         config.familyName, toDebugString(object)));
     }
+
 
     public final IllegalTransactionStateException abortPrepareOnBadStatus() {
         switch (status) {
@@ -276,6 +340,8 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public abstract GammaTranlocal openForRead(GammaLongRef o, int lockMode);
 
     public abstract GammaTranlocal openForWrite(GammaLongRef o, int lockMode);
+
+    public abstract GammaTranlocal openForConstruction(GammaObject o);
 
     @Override
     public final TransactionConfiguration getConfiguration() {
@@ -374,15 +440,15 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public final void awaitUpdate() {
-          final long lockEra = listener.getEra();
+        final long lockEra = listener.getEra();
 
-        if(config.timeoutNs == Long.MAX_VALUE){
+        if (config.timeoutNs == Long.MAX_VALUE) {
             if (config.isInterruptible()) {
                 listener.await(lockEra, config.familyName);
             } else {
                 listener.awaitUninterruptible(lockEra);
             }
-        }else{
+        } else {
             if (config.isInterruptible()) {
                 remainingTimeoutNs = listener.awaitNanos(lockEra, remainingTimeoutNs, config.familyName);
             } else {
@@ -391,17 +457,13 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
             if (remainingTimeoutNs < 0) {
                 throw new RetryTimeoutException(
-                    format("[%s] Transaction has timed out with a total timeout of %s ns",
-                        config.getFamilyName(),config.getTimeoutNs()));
+                        format("[%s] Transaction has timed out with a total timeout of %s ns",
+                                config.getFamilyName(), config.getTimeoutNs()));
             }
         }
     }
 
     public abstract void copyForSpeculativeFailure(GammaTransaction failingTx);
-
-    public GammaTranlocal openForConstruction(GammaObject o) {
-        throw new TodoException();
-    }
 
     public final void init(GammaTransactionConfiguration config) {
         if (config == null) {

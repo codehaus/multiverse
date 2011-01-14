@@ -34,6 +34,7 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
 
     protected abstract T newTransaction(GammaTransactionConfiguration config);
 
+
     @Test
     public void whenAlreadyOpenedForRead() {
         whenAlreadyOpenedForRead(LockMode.None);
@@ -254,6 +255,27 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertLockMode(ref, LOCKMODE_NONE);
+        verifyZeroInteractions(function);
+    }
+
+    @Test
+    public void whenStmMismatch() {
+        GammaStm otherStm = new GammaStm();
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(otherStm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        LongFunction function = mock(LongFunction.class);
+        try {
+            ref.commute(tx, function);
+            fail();
+        } catch (IllegalStateException expected) {
+        }
+
+        assertIsAborted(tx);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         verifyZeroInteractions(function);
     }
 
