@@ -7,29 +7,28 @@ import org.multiverse.TestUtils;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
 
 public class ReadonlyRepeatableReadStressTest {
 
     private volatile boolean stop;
-    private BetaIntRef ref;
+    private GammaLongRef ref;
     private int readThreadCount = 5;
     private int modifyThreadCount = 2;
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = (BetaStm) getGlobalStmInstance();
-        ref = newIntRef(stm);
+        stm = (GammaStm) getGlobalStmInstance();
+        ref = new GammaLongRef(stm);
         stop = false;
     }
 
@@ -66,7 +65,7 @@ public class ReadonlyRepeatableReadStressTest {
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
+                    GammaTransaction btx = (GammaTransaction) tx;
                     ref.getAndSet(btx, ref.get(btx));
                 }
             };
@@ -94,11 +93,11 @@ public class ReadonlyRepeatableReadStressTest {
         private final AtomicVoidClosure closure = new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                BetaTransaction btx = (BetaTransaction) tx;
+                GammaTransaction btx = (GammaTransaction) tx;
 
-                int firstTime = ref.get(btx);
+                long firstTime = ref.get(btx);
                 sleepRandomMs(2);
-                int secondTime = ref.get(btx);
+                long secondTime = ref.get(btx);
                 assertEquals(firstTime, secondTime);
             }
         };
