@@ -244,7 +244,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
 
         if (lockMode == null) {
-            throw tx.abortOnNullLockMode();
+            throw tx.abortAcquireOnNullLockMode(this);
         }
 
         openForRead(tx, lockMode.asInt());

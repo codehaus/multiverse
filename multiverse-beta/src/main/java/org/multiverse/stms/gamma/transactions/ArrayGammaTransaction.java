@@ -1,6 +1,7 @@
 package org.multiverse.stms.gamma.transactions;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaStm;
@@ -213,46 +214,43 @@ public final class ArrayGammaTransaction extends GammaTransaction {
             throw abortRetryOnNoRetryPossible();
         }
 
-        /*
         listener.reset();
         final long listenerEra = listener.getEra();
 
         boolean furtherRegistrationNeeded = true;
         boolean atLeastOneRegistration = false;
 
-        for(int k=0; k < firstFreeIndex; k++){
+        GammaTranlocal tranlocal = head;
+        do {
+            final GammaObject owner = tranlocal.owner;
 
-            final BetaTranlocal tranlocal = array[k];
-            final BetaTransactionalObject owner = tranlocal.owner;
-
-            if(furtherRegistrationNeeded){
-                switch(owner.___registerChangeListener(listener, tranlocal, pool, listenerEra)){
+            if (furtherRegistrationNeeded) {
+                switch (owner.registerChangeListener(listener, tranlocal, pool, listenerEra)) {
                     case REGISTRATION_DONE:
-                         atLeastOneRegistration = true;
-                         break;
+                        atLeastOneRegistration = true;
+                        break;
                     case REGISTRATION_NOT_NEEDED:
-                         furtherRegistrationNeeded = false;
-                         atLeastOneRegistration = true;
-                         break;
+                        furtherRegistrationNeeded = false;
+                        atLeastOneRegistration = true;
+                        break;
                     case REGISTRATION_NONE:
-                         break;
+                        break;
                     default:
-                         throw new IllegalStateException();
+                        throw new IllegalStateException();
                 }
             }
 
-            owner.___abort(this, tranlocal, pool);
-            array[k]=null;
-        }
+            owner.releaseAfterFailure(tranlocal, pool);
+            tranlocal = tranlocal.next;
+        } while (tranlocal != null && tranlocal.owner != null);
 
-        status = ABORTED;
+        status = TX_ABORTED;
 
-        if(!atLeastOneRegistration){
+        if (!atLeastOneRegistration) {
             throw abortRetryOnNoRetryPossible();
         }
 
-        throw Retry.INSTANCE;       */
-        throw new TodoException();
+        throw Retry.INSTANCE;
     }
 
     @Override

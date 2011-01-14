@@ -1,6 +1,7 @@
 package org.multiverse.stms.gamma.transactions;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaStm;
@@ -160,12 +161,46 @@ public final class MonoGammaTransaction extends GammaTransaction {
             throw abortRetryOnNoBlockingAllowed();
         }
 
-        throw new TodoException();
+        if (tranlocal == null) {
+            throw abortRetryOnNoRetryPossible();
+        }
+
+        final GammaObject owner = tranlocal.owner;
+        if (owner == null) {
+            throw abortRetryOnNoRetryPossible();
+        }
+
+        listener.reset();
+        final long listenerEra = listener.getEra();
+
+        boolean atLeastOneRegistration = false;
+        switch (tranlocal.owner.registerChangeListener(listener, tranlocal, pool, listenerEra)) {
+            case REGISTRATION_DONE:
+                atLeastOneRegistration = true;
+                break;
+            case REGISTRATION_NOT_NEEDED:
+                atLeastOneRegistration = true;
+                break;
+            case REGISTRATION_NONE:
+                break;
+            default:
+                throw new IllegalStateException();
+        }
+
+        owner.releaseAfterFailure(tranlocal, pool);
+
+        status = TX_ABORTED;
+
+        if (!atLeastOneRegistration){
+            throw abortRetryOnNoRetryPossible();
+        }
+
+        throw Retry.INSTANCE;
     }
 
     @Override
     public boolean softReset() {
-        if(attempt >= config.getMaxRetries()){
+        if (attempt >= config.getMaxRetries()) {
             return false;
         }
 
@@ -184,7 +219,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
         abortOnly = false;
     }
 
-    public boolean isReadConsistent(GammaTranlocal justAdded){
+    public boolean isReadConsistent(GammaTranlocal justAdded) {
         return true;
     }
 

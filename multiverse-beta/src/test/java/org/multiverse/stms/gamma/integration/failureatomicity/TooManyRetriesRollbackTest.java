@@ -7,9 +7,9 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -17,20 +17,19 @@ import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
 
 public class TooManyRetriesRollbackTest {
-    private BetaIntRef modifyRef;
-    private BetaIntRef retryRef;
+    private GammaLongRef modifyRef;
+    private GammaLongRef retryRef;
     private volatile boolean finished;
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = (BetaStm) getGlobalStmInstance();
-        modifyRef = newIntRef(stm);
-        retryRef = newIntRef(stm);
+        stm = (GammaStm) getGlobalStmInstance();
+        modifyRef = new GammaLongRef(stm);
+        retryRef = new GammaLongRef(stm);
         finished = false;
     }
 
@@ -58,7 +57,7 @@ public class TooManyRetriesRollbackTest {
         block.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                BetaTransaction btx = (BetaTransaction) tx;
+                GammaTransaction btx = (GammaTransaction) tx;
 
                 modifyRef.getAndSet(btx, value);
 
@@ -82,9 +81,9 @@ public class TooManyRetriesRollbackTest {
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
+                    GammaTransaction btx = (GammaTransaction) tx;
 
-                    int value = retryRef.get(btx);
+                    long value = retryRef.get(btx);
                     retryRef.getAndSet(btx, value + 2);
                 }
             };

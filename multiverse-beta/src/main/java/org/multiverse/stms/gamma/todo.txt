@@ -28,6 +28,10 @@
                         done
 --------------------------------------------------------------------
 
+- speculative stuff is in place.
+
+- transaction messages are fixed
+
 - race problem fixed with the readlocking
 
 - lock upgrade testing on open for write

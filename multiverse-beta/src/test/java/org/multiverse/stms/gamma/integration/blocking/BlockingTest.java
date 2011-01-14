@@ -39,7 +39,7 @@ public class BlockingTest {
         LongRefAwaitThread t = new LongRefAwaitThread(ref, 2);
         t.start();
 
-        sleepMs(10000);
+        sleepMs(2000);
         ref.atomicSet(1);
 
         sleepMs(1000);

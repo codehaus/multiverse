@@ -1,6 +1,7 @@
 package org.multiverse.stms.gamma.transactions;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaStm;
@@ -55,7 +56,7 @@ public final class MapGammaTransaction extends GammaTransaction {
             final int index = (hash + offset) % array.length;
 
             final GammaTranlocal current = array[index];
-            if (current == null) {
+            if (current == null||current.owner==null) {
                 return -1;
             }
 
@@ -136,7 +137,7 @@ public final class MapGammaTransaction extends GammaTransaction {
         status = TX_COMMITTED;
     }
 
-      private void commitArray() {
+    private void commitArray() {
         for (int k = 0; k < array.length; k++) {
             GammaTranlocal tranlocal = array[k];
 
@@ -252,7 +253,53 @@ public final class MapGammaTransaction extends GammaTransaction {
             throw abortRetryOnNoBlockingAllowed();
         }
 
-        throw new TodoException();
+        if (size == 0) {
+            throw abortRetryOnNoRetryPossible();
+        }
+
+        listener.reset();
+        final long listenerEra = listener.getEra();
+
+        boolean furtherRegistrationNeeded = true;
+        boolean atLeastOneRegistration = false;
+
+        for (int k = 0; k < array.length; k++) {
+            final GammaTranlocal tranlocal = array[k];
+            if (tranlocal == null) {
+                continue;
+
+            }
+            final GammaObject owner = tranlocal.owner;
+            if (owner == null) {
+                continue;
+            }
+
+            if (furtherRegistrationNeeded) {
+                switch (owner.registerChangeListener(listener, tranlocal, pool, listenerEra)) {
+                    case REGISTRATION_DONE:
+                        atLeastOneRegistration = true;
+                        break;
+                    case REGISTRATION_NOT_NEEDED:
+                        furtherRegistrationNeeded = false;
+                        atLeastOneRegistration = true;
+                        break;
+                    case REGISTRATION_NONE:
+                        break;
+                    default:
+                        throw new IllegalStateException();
+                }
+            }
+
+            owner.releaseAfterFailure(tranlocal, pool);
+        }
+
+        status = TX_ABORTED;
+
+        if (!atLeastOneRegistration) {
+            throw abortRetryOnNoRetryPossible();
+        }
+
+        throw Retry.INSTANCE;
     }
 
     public boolean isReadConsistent(GammaTranlocal justAdded) {

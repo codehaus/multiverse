@@ -3,6 +3,8 @@ package org.multiverse.stms.gamma.transactions;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionConfiguration;
 import org.multiverse.api.TransactionStatus;
+import org.multiverse.api.blocking.DefaultRetryLatch;
+import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.Function;
 import org.multiverse.api.functions.LongFunction;
@@ -31,6 +33,8 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public boolean arriveEnabled;
     public final int transactionType;
     public boolean abortOnly = false;
+    public final RetryLatch listener = new DefaultRetryLatch();
+
 
     public GammaTransaction(GammaTransactionConfiguration config, int transactionType) {
         this.config = config;
@@ -178,7 +182,14 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public ReadonlyException abortCommuteOnReadonly(final GammaObject object) {
         abort();
         return new ReadonlyException(
-                format("[%s] Failed to execute commute '%s', reason: the transaction is readonly",
+                format("[%s] Failed to execute Transaction.commute '%s', reason: the transaction is readonly",
+                        config.familyName, toDebugString(object)));
+    }
+
+    public NullPointerException abortCommuteOnNullFunction(final GammaObject object) {
+        abort();
+        return new NullPointerException(
+                format("[%s] Failed to execute Transaction.commute '%s', reason: the function is null",
                         config.familyName, toDebugString(object)));
     }
 
@@ -252,11 +263,6 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         return SpeculativeConfigurationError.INSTANCE;
     }
 
-    public NullPointerException abortCommuteOnNullFunction(final GammaObject object) {
-        abort();
-        return new NullPointerException();
-    }
-
     public final boolean hasWrites() {
         return hasWrites;
     }
@@ -295,11 +301,11 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                 return abortOnly;
             case TX_COMMITTED:
                 throw new DeadTransactionException(
-                        format("[%s] Failed to execute Transaction.setAbortOnly, reason: the transaction is committed",
+                        format("[%s] Failed to execute Transaction.isAbortOnly, reason: the transaction is committed",
                                 config.familyName));
             case TX_ABORTED:
                 throw new DeadTransactionException(
-                        format("[%s] Failed to execute Transaction.setAbortOnly, reason: the transaction is aborted",
+                        format("[%s] Failed to execute Transaction.isAbortOnly, reason: the transaction is aborted",
                                 config.familyName));
             default:
                 throw new IllegalStateException();
@@ -346,7 +352,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public abstract GammaTranlocal get(GammaObject ref);
 
-    public final NullPointerException abortOnNullLockMode() {
+    public final NullPointerException abortAcquireOnNullLockMode(GammaObject o) {
         switch (status) {
             case TX_ACTIVE:
                 abort();
@@ -368,7 +374,27 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public final void awaitUpdate() {
-        throw new TodoException();
+          final long lockEra = listener.getEra();
+
+        if(config.timeoutNs == Long.MAX_VALUE){
+            if (config.isInterruptible()) {
+                listener.await(lockEra, config.familyName);
+            } else {
+                listener.awaitUninterruptible(lockEra);
+            }
+        }else{
+            if (config.isInterruptible()) {
+                remainingTimeoutNs = listener.awaitNanos(lockEra, remainingTimeoutNs, config.familyName);
+            } else {
+                remainingTimeoutNs = listener.awaitNanosUninterruptible(lockEra, remainingTimeoutNs);
+            }
+
+            if (remainingTimeoutNs < 0) {
+                throw new RetryTimeoutException(
+                    format("[%s] Transaction has timed out with a total timeout of %s ns",
+                        config.getFamilyName(),config.getTimeoutNs()));
+            }
+        }
     }
 
     public abstract void copyForSpeculativeFailure(GammaTransaction failingTx);

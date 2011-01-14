@@ -7,15 +7,14 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
 
 /**
  * A Stresstest that check if the it is possible that a dirty read is done (this is not allowed).
@@ -23,19 +22,19 @@ import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
  * @author Peter Veentjer.
  */
 public class ReadCommittedStressTest {
-    private BetaIntRef ref;
+    private GammaLongRef ref;
 
     private int readThreadCount = 10;
     private int modifyThreadCount = 2;
 
     private volatile boolean stop;
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = (BetaStm) getGlobalStmInstance();
-        ref = newIntRef(stm);
+        stm = (GammaStm) getGlobalStmInstance();
+        ref = new GammaLongRef(stm);
         stop = false;
     }
 
@@ -71,7 +70,7 @@ public class ReadCommittedStressTest {
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
+                    GammaTransaction btx = (GammaTransaction) tx;
                     ref.getAndSet(btx, ref.get(btx));
                     btx.abort();
                 }
@@ -101,7 +100,7 @@ public class ReadCommittedStressTest {
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
+                    GammaTransaction btx = (GammaTransaction) tx;
 
                     if (ref.get(btx) % 2 != 0) {
                         fail();

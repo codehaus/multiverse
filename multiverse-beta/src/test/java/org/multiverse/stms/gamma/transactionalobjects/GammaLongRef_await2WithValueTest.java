@@ -1,6 +1,7 @@
 package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
@@ -19,6 +20,12 @@ public class GammaLongRef_await2WithValueTest {
     public void setUp() {
         stm = new GammaStm();
         clearThreadLocalTransaction();
+    }
+
+    @Test
+    @Ignore
+    public void whenSomeWaitingNeeded(){
+
     }
 
     @Test
