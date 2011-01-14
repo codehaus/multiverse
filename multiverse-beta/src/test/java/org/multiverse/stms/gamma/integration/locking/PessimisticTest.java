@@ -2,27 +2,27 @@ package org.multiverse.stms.gamma.integration.locking;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.assertRefHasCommitLock;
+import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasCommitLock;
 
 public class PessimisticTest {
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
-        stm = (BetaStm) getGlobalStmInstance();
+        stm = (GammaStm) getGlobalStmInstance();
         clearThreadLocalTransaction();
     }
 
     @Test
     public void constructedObjectAutomaticallyIsLocked() {
-        BetaTransaction tx = stm.startDefaultTransaction();
-        BetaLongRef ref = new BetaLongRef(tx);
+        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaLongRef ref = new GammaLongRef(tx);
         tx.openForConstruction(ref);
 
         assertRefHasCommitLock(ref, tx);

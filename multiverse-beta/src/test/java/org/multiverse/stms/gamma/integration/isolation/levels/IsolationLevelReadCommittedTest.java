@@ -5,24 +5,23 @@ import org.junit.Test;
 import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaTransactionFactory;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newReadBiasedLongRef;
+import static org.multiverse.stms.gamma.GammaTestUtils.makeReadBiased;
 
 public class IsolationLevelReadCommittedTest {
-    private BetaStm stm;
-    private BetaTransactionFactory transactionFactory;
+    private GammaStm stm;
+    private GammaTransactionFactory transactionFactory;
 
     @Before
     public void setUp() {
-        stm = (BetaStm) getGlobalStmInstance();
+        stm = (GammaStm) getGlobalStmInstance();
         clearThreadLocalTransaction();
         transactionFactory = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
@@ -32,7 +31,7 @@ public class IsolationLevelReadCommittedTest {
 
     @Test
     public void repeatableRead_whenTracked_thenNoInconsistentRead() {
-        final BetaLongRef ref = newLongRef(stm);
+        final GammaLongRef ref = new GammaLongRef(stm);
 
         transactionFactory = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
@@ -40,7 +39,7 @@ public class IsolationLevelReadCommittedTest {
                 .setIsolationLevel(IsolationLevel.ReadCommitted)
                 .build();
 
-        BetaTransaction tx = transactionFactory.newTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         ref.get(tx);
 
         ref.atomicIncrementAndGet(1);
@@ -51,7 +50,7 @@ public class IsolationLevelReadCommittedTest {
 
     @Test
     public void repeatableRead_whenNotTracked_thenInconsistentReadPossible() {
-        final BetaLongRef ref = newReadBiasedLongRef(stm);
+        final GammaLongRef ref = makeReadBiased(new GammaLongRef(stm));
 
         transactionFactory = stm.createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
@@ -60,7 +59,7 @@ public class IsolationLevelReadCommittedTest {
                 .setIsolationLevel(IsolationLevel.ReadCommitted)
                 .build();
 
-        BetaTransaction tx = transactionFactory.newTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         ref.get(tx);
 
         ref.atomicIncrementAndGet(1);
@@ -71,10 +70,10 @@ public class IsolationLevelReadCommittedTest {
 
     @Test
     public void causalConsistency_whenConflictingUpdate_thenNotDetected() {
-        final BetaLongRef ref1 = newLongRef(stm);
-        final BetaLongRef ref2 = newLongRef(stm);
+        final GammaLongRef ref1 = new GammaLongRef(stm);
+        final GammaLongRef ref2 = new GammaLongRef(stm);
 
-        BetaTransaction tx = transactionFactory.newTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
 
         ref1.get(tx);
 
@@ -93,10 +92,10 @@ public class IsolationLevelReadCommittedTest {
 
     @Test
     public void writeSkewPossible() {
-        final BetaLongRef ref1 = newLongRef(stm);
-        final BetaLongRef ref2 = newLongRef(stm);
+        final GammaLongRef ref1 = new GammaLongRef(stm);
+        final GammaLongRef ref2 = new GammaLongRef(stm);
 
-        BetaTransaction tx = transactionFactory.newTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         ref1.get(tx);
         ref2.incrementAndGet(tx, 1);
 

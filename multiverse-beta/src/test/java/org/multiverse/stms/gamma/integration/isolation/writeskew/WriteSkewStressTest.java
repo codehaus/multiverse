@@ -8,11 +8,11 @@ import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.LockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
-import org.multiverse.api.closures.AtomicIntClosure;
+import org.multiverse.api.closures.AtomicLongClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -47,12 +47,12 @@ public class WriteSkewStressTest {
     private Mode mode;
     private TransferThread[] threads;
     private AtomicBoolean writeSkewEncountered = new AtomicBoolean();
-    private BetaStm stm;
+    private GammaStm stm;
     private int threadCount = 8;
 
     @Before
     public void setUp() {
-        stm = (BetaStm) getGlobalStmInstance();
+        stm = (GammaStm) getGlobalStmInstance();
         clearThreadLocalTransaction();
         user1 = new User();
         user2 = new User();
@@ -64,9 +64,9 @@ public class WriteSkewStressTest {
             threads[k] = new TransferThread(k);
         }
 
-        BetaIntRef account = user1.getRandomAccount();
-        BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForWrite(account, LOCKMODE_NONE).value = 1000;
+        GammaLongRef account = user1.getRandomAccount();
+        GammaTransaction tx = stm.startDefaultTransaction();
+        tx.openForWrite(account, LOCKMODE_NONE).long_value = 1000;
         tx.commit();
     }
 
@@ -145,11 +145,11 @@ public class WriteSkewStressTest {
         System.out.println("User1: " + user1);
         System.out.println("User2: " + user2);
 
-        System.out.println("User1.account1: " + user1.account1.___toOrecString());
-        System.out.println("User1.account2: " + user1.account2.___toOrecString());
+        System.out.println("User1.account1: " + user1.account1.toDebugString());
+        System.out.println("User1.account2: " + user1.account2.toDebugString());
 
-        System.out.println("User2.account1: " + user2.account1.___toOrecString());
-        System.out.println("User2.account2: " + user2.account2.___toOrecString());
+        System.out.println("User2.account1: " + user2.account1.toDebugString());
+        System.out.println("User2.account2: " + user2.account2.toDebugString());
 
         assertTrue(writeSkewEncountered.get());
     }
@@ -234,7 +234,7 @@ public class WriteSkewStressTest {
             privatizedReadLevelBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
+                    GammaTransaction btx = (GammaTransaction) tx;
                     doIt(btx, false, false);
                 }
             });
@@ -244,7 +244,7 @@ public class WriteSkewStressTest {
             privatizedWriteLevelBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
+                    GammaTransaction btx = (GammaTransaction) tx;
                     doIt(btx, false, false);
                 }
             });
@@ -254,7 +254,7 @@ public class WriteSkewStressTest {
             serializedBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
+                    GammaTransaction btx = (GammaTransaction) tx;
                     doIt(btx, false, false);
                 }
             });
@@ -264,7 +264,7 @@ public class WriteSkewStressTest {
             snapshotBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
+                    GammaTransaction btx = (GammaTransaction) tx;
                     doIt(btx, false, false);
                 }
             });
@@ -274,7 +274,7 @@ public class WriteSkewStressTest {
             snapshotBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
+                    GammaTransaction btx = (GammaTransaction) tx;
                     doIt(btx, true, true);
                 }
             });
@@ -284,20 +284,20 @@ public class WriteSkewStressTest {
             snapshotBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
+                    GammaTransaction btx = (GammaTransaction) tx;
                     doIt(btx, false, true);
                 }
             });
         }
 
-        public void doIt(BetaTransaction tx, boolean pessimisticRead, boolean pessimisticWrite) {
+        public void doIt(GammaTransaction tx, boolean pessimisticRead, boolean pessimisticWrite) {
             int amount = randomInt(100);
 
             User from = random(user1, user2);
             User to = random(user1, user2);
 
-            int sum = tx.openForRead(from.account1, pessimisticRead ? LOCKMODE_COMMIT : LOCKMODE_NONE).value
-                    + tx.openForRead(from.account2, pessimisticRead ? LOCKMODE_COMMIT : LOCKMODE_NONE).value;
+            long sum = tx.openForRead(from.account1, pessimisticRead ? LOCKMODE_COMMIT : LOCKMODE_NONE).long_value
+                    + tx.openForRead(from.account2, pessimisticRead ? LOCKMODE_COMMIT : LOCKMODE_NONE).long_value;
 
             if (sum < 0) {
                 if (!writeSkewEncountered.get()) {
@@ -307,11 +307,11 @@ public class WriteSkewStressTest {
             }
 
             if (sum >= amount) {
-                BetaIntRef fromAccount = from.getRandomAccount();
-                tx.openForWrite(fromAccount, pessimisticWrite ? LOCKMODE_COMMIT : LOCKMODE_NONE).value -= amount;
+                GammaLongRef fromAccount = from.getRandomAccount();
+                tx.openForWrite(fromAccount, pessimisticWrite ? LOCKMODE_COMMIT : LOCKMODE_NONE).long_value -= amount;
 
-                BetaIntRef toAccount = to.getRandomAccount();
-                tx.openForWrite(toAccount, pessimisticWrite ? LOCKMODE_COMMIT : LOCKMODE_NONE).value += amount;
+                GammaLongRef toAccount = to.getRandomAccount();
+                tx.openForWrite(toAccount, pessimisticWrite ? LOCKMODE_COMMIT : LOCKMODE_NONE).long_value += amount;
             }
 
             sleepRandomUs(20);
@@ -327,18 +327,18 @@ public class WriteSkewStressTest {
                 .setReadonly(true)
                 .buildAtomicBlock();
 
-        private BetaIntRef account1 = new BetaIntRef(stm);
-        private BetaIntRef account2 = new BetaIntRef(stm);
+        private GammaLongRef account1 = new GammaLongRef(stm);
+        private GammaLongRef account2 = new GammaLongRef(stm);
 
-        public BetaIntRef getRandomAccount() {
+        public GammaLongRef getRandomAccount() {
             return randomBoolean() ? account1 : account2;
         }
 
-        public int getTotal() {
-            return getTotalBlock.execute(new AtomicIntClosure() {
+        public long getTotal() {
+            return getTotalBlock.execute(new AtomicLongClosure() {
                 @Override
-                public int execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
+                public long execute(Transaction tx) throws Exception {
+                    GammaTransaction btx = (GammaTransaction) tx;
                     return account1.get(btx) + account2.get(btx);
                 }
             });
@@ -348,7 +348,7 @@ public class WriteSkewStressTest {
             return stm.createTransactionFactoryBuilder().buildAtomicBlock().execute(new AtomicClosure<String>() {
                 @Override
                 public String execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
+                    GammaTransaction btx = (GammaTransaction) tx;
 
                     return format("User(account1 = %s, account2 = %s)",
                             account1.get(btx), account2.get(btx));
