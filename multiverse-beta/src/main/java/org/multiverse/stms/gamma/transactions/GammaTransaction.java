@@ -5,16 +5,7 @@ import org.multiverse.api.TransactionConfiguration;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.blocking.RetryLatch;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.IllegalTransactionStateException;
-import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.api.exceptions.ReadonlyException;
-import org.multiverse.api.exceptions.RetryNotAllowedException;
-import org.multiverse.api.exceptions.RetryNotPossibleException;
-import org.multiverse.api.exceptions.RetryTimeoutException;
-import org.multiverse.api.exceptions.SpeculativeConfigurationError;
-import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.Function;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
@@ -148,10 +139,10 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
-    public final IllegalStateException abortOpenForWriteOnBadStm(GammaObject gammaLongRef) {
+    public final StmMismatchException abortOpenForWriteOnBadStm(GammaObject gammaLongRef) {
         abort();
         //todo: message
-        return new IllegalStateException("");
+        return new StmMismatchException("");
     }
 
 
@@ -175,10 +166,10 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
-    public final IllegalStateException abortOpenForReadOnBadStm(GammaLongRef gammaLongRef) {
+    public final StmMismatchException abortOpenForReadOnBadStm(GammaLongRef gammaLongRef) {
         abort();
         //todo: message
-        return new IllegalStateException("");
+        return new StmMismatchException("");
     }
 
 
@@ -202,10 +193,10 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
-    public final IllegalStateException abortOpenForConstructionOnBadStm(GammaObject o) {
+    public final StmMismatchException abortOpenForConstructionOnBadStm(GammaObject o) {
         abort();
         //todo: message
-        return new IllegalStateException("");
+        return new StmMismatchException("");
     }
 
     public ReadonlyException abortOpenForConstructionOnReadonly(GammaObject o) {
@@ -236,10 +227,10 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
-    public IllegalStateException abortCommuteOnBadStm(GammaLongRef gammaLongRef) {
+    public StmMismatchException abortCommuteOnBadStm(GammaLongRef gammaLongRef) {
         abort();
         //todo: message
-        return new IllegalStateException("");
+        return new StmMismatchException("");
     }
 
     public ReadonlyException abortCommuteOnReadonly(final GammaObject object) {

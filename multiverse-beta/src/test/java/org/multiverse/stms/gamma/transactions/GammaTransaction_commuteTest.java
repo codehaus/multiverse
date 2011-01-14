@@ -7,6 +7,7 @@ import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadonlyException;
+import org.multiverse.api.exceptions.StmMismatchException;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaStm;
@@ -270,7 +271,7 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
         try {
             ref.commute(tx, function);
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (StmMismatchException expected) {
         }
 
         assertIsAborted(tx);

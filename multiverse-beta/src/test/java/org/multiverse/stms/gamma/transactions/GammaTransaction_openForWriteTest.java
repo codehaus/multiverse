@@ -5,11 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.TransactionStatus;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.api.exceptions.ReadonlyException;
-import org.multiverse.api.exceptions.SpeculativeConfigurationError;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
@@ -48,7 +44,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         try {
             ref.openForWrite(tx, LOCKMODE_NONE);
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (StmMismatchException expected) {
         }
 
         assertIsAborted(tx);

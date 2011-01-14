@@ -3,13 +3,21 @@ package org.multiverse.stms.gamma.transactions;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.ReadonlyException;
+import org.multiverse.api.exceptions.StmMismatchException;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 
-public abstract class GammaTransaction_openForConstructionTest<T extends GammaTransaction>{
+import static org.junit.Assert.fail;
+import static org.multiverse.TestUtils.assertIsAborted;
+import static org.multiverse.TestUtils.assertIsCommitted;
+
+public abstract class GammaTransaction_openForConstructionTest<T extends GammaTransaction> {
     protected GammaStm stm;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         stm = new GammaStm();
     }
 
@@ -18,62 +26,113 @@ public abstract class GammaTransaction_openForConstructionTest<T extends GammaTr
     protected abstract T newTransaction(GammaTransactionConfiguration config);
 
     @Test
+    public void whenReadonlyTransaction() {
+        GammaLongRef ref = new GammaLongRef(stm);
+
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                        .setReadonly(true);
+
+        GammaTransaction tx = newTransaction(config);
+        try {
+            ref.openForConstruction(tx);
+            fail();
+        } catch (ReadonlyException expected) {
+        }
+
+        assertIsAborted(tx);
+    }
+
+    @Test
     @Ignore
-    public void whenReadonlyTransaction(){
+    public void whenSuccess() {
 
     }
 
     @Test
     @Ignore
-    public void whenSuccess(){
+    public void whenAlreadyOpenedForConstruction() {
 
     }
 
     @Test
     @Ignore
-    public void whenAlreadyOpenedForConstruction(){
+    public void whenOpenedForRead() {
 
     }
 
     @Test
     @Ignore
-    public void whenOpenedForRead(){
+    public void whenOpenedForWrite() {
 
     }
 
     @Test
     @Ignore
-    public void whenOpenedForWrite(){
+    public void whenOpenedForCommute() {
 
     }
 
     @Test
-    @Ignore
-    public void whenOpenedForCommute(){
+    public void whenStmMismatch() {
+        GammaStm otherStm = new GammaStm();
+        GammaLongRef ref = new GammaLongRef(otherStm);
 
+        GammaTransaction tx = newTransaction();
+        try {
+            ref.openForConstruction(tx);
+            fail();
+        } catch (StmMismatchException expected) {
+        }
+
+        assertIsAborted(tx);
     }
 
     @Test
     @Ignore
-    public void whenStmMismatch(){
+    public void whenTransactionAlreadyPrepared() {
+        GammaTransaction tx = newTransaction();
+        tx.prepare();
 
+        GammaLongRef ref = new GammaLongRef(stm);
+
+        try {
+            ref.openForConstruction(tx);
+            fail();
+        } catch (DeadTransactionException expected) {
+        }
+
+        assertIsAborted(tx);
     }
 
     @Test
-    @Ignore
-    public void whenTransactionAlreadyPrepared(){
+    public void whenTransactionAlreadyAborted() {
+        GammaTransaction tx = newTransaction();
+        tx.abort();
 
+        GammaLongRef ref = new GammaLongRef(stm);
+
+        try {
+            ref.openForConstruction(tx);
+            fail();
+        } catch (DeadTransactionException expected) {
+        }
+
+        assertIsAborted(tx);
     }
 
     @Test
-    @Ignore
-    public void whenTransactionAlreadyAborted(){
+    public void whenTransactionAlreadyCommitted() {
+        GammaTransaction tx = newTransaction();
+        tx.commit();
 
-    }
+        GammaLongRef ref = new GammaLongRef(stm);
 
-    @Test
-    @Ignore
-    public void whenTransactionAlreadyCommitted(){
+        try {
+            ref.openForConstruction(tx);
+            fail();
+        } catch (DeadTransactionException expected) {
+        }
 
+        assertIsCommitted(tx);
     }
 }
