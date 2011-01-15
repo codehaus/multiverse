@@ -30,7 +30,6 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
         openForConstruction(tx);
     }
 
-
     @Override
     public long getAndSet(final long value) {
         return getAndSet(getRequiredThreadLocalGammaTransaction(), value);
@@ -73,27 +72,12 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
     }
 
     public long get(final GammaTransaction tx) {
-        final GammaRefTranlocal tranlocal = openForRead(tx, LOCKMODE_NONE);
-        return tranlocal.long_value;
+        return openForRead(tx, LOCKMODE_NONE).long_value;
     }
 
     @Override
     public long atomicGet() {
-        int attempt = 1;
-        do {
-            if (!hasCommitLock()) {
-
-                long read = long_value;
-
-                if (!hasCommitLock()) {
-                    return read;
-                }
-            }
-            stm.defaultBackoffPolicy.delayedUninterruptible(attempt);
-            attempt++;
-        } while (attempt <= stm.spinCount);
-
-        throw new LockedException();
+        return atomicLongGet();
     }
 
     @Override

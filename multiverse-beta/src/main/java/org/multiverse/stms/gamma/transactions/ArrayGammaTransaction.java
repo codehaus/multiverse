@@ -125,11 +125,13 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         GammaRefTranlocal node = head;
 
         do {
-            if (node.owner == null) {
+            final AbstractGammaRef owner = node.owner;
+
+            if (owner == null) {
                 return true;
             }
 
-            if (!node.prepare(config)) {
+            if (!owner.prepare(config, node)) {
                 return false;
             }
 

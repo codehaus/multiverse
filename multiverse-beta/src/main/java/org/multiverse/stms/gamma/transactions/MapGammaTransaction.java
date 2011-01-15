@@ -196,7 +196,7 @@ public final class MapGammaTransaction extends GammaTransaction {
             GammaRefTranlocal tranlocal = array[k];
 
             if (tranlocal != null) {
-                if (!tranlocal.prepare(config)) {
+                if (!tranlocal.owner.prepare(config, tranlocal)) {
                     return false;
                 }
             }

@@ -16,6 +16,7 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
 
     public GammaBooleanRef(GammaStm stm, boolean b) {
         super(stm, -1);
+        //todo
         throw new TodoException();
     }
 
@@ -30,7 +31,8 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     }
 
     public final boolean set(final GammaTransaction tx, final boolean value) {
-        throw new TodoException();
+        openForWrite(tx, LOCKMODE_NONE).long_value = asLong(value);
+        return value;
     }
 
     @Override
@@ -44,26 +46,28 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     }
 
     public final boolean get(final GammaTransaction tx) {
-        throw new TodoException();
+        return asBoolean(openForRead(tx, LOCKMODE_NONE).long_value);
     }
 
     @Override
     public final boolean atomicGet() {
-        throw new TodoException();
+        return asBoolean(atomicLongGet());
     }
 
     @Override
     public final boolean atomicWeakGet() {
-        throw new TodoException();
+        return asBoolean(long_value);
     }
 
     @Override
     public final boolean atomicSet(final boolean newValue) {
-        throw new TodoException();
+        atomicGetAndSet(newValue);
+        return newValue;
     }
 
     @Override
     public final boolean atomicGetAndSet(final boolean newValue) {
+        //todo:
         throw new TodoException();
     }
 
@@ -78,7 +82,10 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     }
 
     public final boolean getAndSet(final GammaTransaction tx, final boolean value) {
-        throw new TodoException();
+        GammaRefTranlocal tranlocal = openForWrite(tx, LOCKMODE_NONE);
+        boolean oldValue = asBoolean(tranlocal.long_value);
+        tranlocal.long_value = asLong(value);
+        return oldValue;
     }
 
     @Override
@@ -91,31 +98,8 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
         commute(asGammaTransaction(tx), function);
     }
 
-    public final void commute(final GammaTransaction tx, final BooleanFunction function){
-        throw new TodoException();
-    }
-
-    @Override
-    public final boolean atomicAlterAndGet(final BooleanFunction function) {
-        throw new TodoException();
-    }
-
-    @Override
-    public final boolean alterAndGet(final BooleanFunction function) {
-        return alterAndGet(getRequiredThreadLocalGammaTransaction(), function);
-    }
-
-    @Override
-    public final boolean alterAndGet(final Transaction tx, final BooleanFunction function) {
-        return alterAndGet(asGammaTransaction(tx),function);
-    }
-
-    public final boolean alterAndGet(final GammaTransaction tx, final BooleanFunction function){
-        throw new TodoException();
-    }
-
-    @Override
-    public final boolean atomicGetAndAlter(final BooleanFunction function) {
+    public final void commute(final GammaTransaction tx, final BooleanFunction function) {
+        //todo:
         throw new TodoException();
     }
 
@@ -130,11 +114,45 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     }
 
     public final boolean getAndAlter(final GammaTransaction tx, final BooleanFunction function) {
+        return alter(tx, function, true);
+    }
+
+    @Override
+    public final boolean alterAndGet(final BooleanFunction function) {
+        return alterAndGet(getRequiredThreadLocalGammaTransaction(), function);
+    }
+
+    @Override
+    public final boolean alterAndGet(final Transaction tx, final BooleanFunction function) {
+        return alterAndGet(asGammaTransaction(tx), function);
+    }
+
+    public final boolean alterAndGet(final GammaTransaction tx, final BooleanFunction function) {
+        return alter(tx, function, false);
+    }
+
+    public final boolean alter(final GammaTransaction tx, final BooleanFunction function, final boolean returnOld) {
+        throw new TodoException();
+    }
+
+    @Override
+    public final boolean atomicAlterAndGet(final BooleanFunction function) {
+        return atomicAlter(function, false);
+    }
+
+    @Override
+    public final boolean atomicGetAndAlter(final BooleanFunction function) {
+        return atomicAlter(function, true);
+    }
+
+    public final boolean atomicAlter(final BooleanFunction function, boolean returnOld) {
+        //todo
         throw new TodoException();
     }
 
     @Override
     public final boolean atomicCompareAndSet(final boolean expectedValue, final boolean newValue) {
+        //todo:
         throw new TodoException();
     }
 
@@ -149,7 +167,9 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     }
 
     public final void await(final GammaTransaction tx, final boolean value) {
-        throw new TodoException();
+        if (asBoolean(openForRead(tx, LOCKMODE_NONE).long_value) != value) {
+            tx.retry();
+        }
     }
 
     @Override
@@ -163,11 +183,21 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     }
 
     public final void await(final GammaTransaction tx, final BooleanPredicate predicate) {
+        //todo
         throw new TodoException();
     }
 
     @Override
-    public final String toDebugString() {
-        throw new TodoException();
+    public String toDebugString() {
+        return String.format("GammaBooleanRef{orec=%s, version=%s, value=%s, hasListeners=%s)",
+                ___toOrecString(), version, asBoolean(long_value), listeners != null);
+    }
+
+    public static boolean asBoolean(long value) {
+        return value == 1;
+    }
+
+    public static long asLong(boolean b) {
+        return b ? 1 : 0;
     }
 }

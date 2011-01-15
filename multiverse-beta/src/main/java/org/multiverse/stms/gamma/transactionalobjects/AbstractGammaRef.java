@@ -1,6 +1,7 @@
 package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.multiverse.api.Transaction;
+import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaObjectPool;
@@ -19,7 +20,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         this.type = type;
     }
 
-    public int getType() {
+    public final int getType() {
         return type;
     }
 
@@ -839,7 +840,49 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         ensure(asGammaTransaction(self));
     }
 
-    public final void ensure(final GammaTransaction self){
+    public final void ensure(final GammaTransaction self) {
         throw new TodoException();
+    }
+
+    public boolean prepare(final GammaTransactionConfiguration config, final GammaRefTranlocal tranlocal) {
+        //todo: commuting stuff
+
+        if(tranlocal.isConstructing()){
+            return true;
+        }
+
+        if (!tranlocal.isWrite()) {
+            return true;
+        }
+
+        if (!tranlocal.isDirty()) {
+            boolean isDirty = long_value != tranlocal.long_oldValue;
+
+            if (!isDirty) {
+                return true;
+            }
+
+            tranlocal.setDirty(true);
+        }
+
+        return tryLockAndCheckConflict(config.spinCount, tranlocal, LOCKMODE_COMMIT);
+    }
+
+    public final long atomicLongGet() {
+        int attempt = 1;
+        do {
+            if (!hasCommitLock()) {
+
+                long read = long_value;
+
+                if (!hasCommitLock()) {
+                    return read;
+                }
+            }
+            stm.defaultBackoffPolicy.delayedUninterruptible(attempt);
+            attempt++;
+        } while (attempt <= stm.spinCount);
+
+        throw new LockedException();
     }
 }

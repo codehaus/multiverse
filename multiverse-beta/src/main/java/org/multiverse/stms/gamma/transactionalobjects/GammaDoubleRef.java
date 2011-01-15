@@ -29,7 +29,8 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
     }
 
     public final double set(final GammaTransaction tx, final double value) {
-        throw new TodoException();
+        openForWrite(tx, LOCKMODE_NONE).long_value = asLong(value);
+        return value;
     }
 
     @Override
@@ -43,26 +44,31 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
     }
 
     public final double get(final GammaTransaction tx) {
-        throw new TodoException();
+        return asDouble(openForRead(tx, LOCKMODE_NONE).long_value);
     }
 
     @Override
     public final double atomicGet() {
-        throw new TodoException();
+        return asDouble(atomicLongGet());
     }
 
     @Override
     public final double atomicWeakGet() {
-        throw new TodoException();
+        return asDouble(long_value);
     }
 
     @Override
     public final double atomicSet(final double newValue) {
-        throw new TodoException();
+        return atomicGetAndSetSupport(newValue, false);
     }
 
     @Override
     public final double atomicGetAndSet(final double newValue) {
+        return atomicGetAndSetSupport(newValue, true);
+    }
+
+    private double atomicGetAndSetSupport(final double newValue, boolean returnOld) {
+        //todo
         throw new TodoException();
     }
 
@@ -77,7 +83,10 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
     }
 
     public final double getAndSet(final GammaTransaction tx, final double value) {
-        throw new TodoException();
+        GammaRefTranlocal tranlocal = openForWrite(tx, LOCKMODE_NONE);
+        double oldValue = asDouble(tranlocal.long_value);
+        tranlocal.long_value = asLong(value);
+        return oldValue;
     }
 
     @Override
@@ -91,11 +100,7 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
     }
 
     public final void commute(final GammaTransaction tx, final DoubleFunction function) {
-        throw new TodoException();
-    }
-
-    @Override
-    public final double atomicAlterAndGet(final DoubleFunction function) {
+        //todo
         throw new TodoException();
     }
 
@@ -106,15 +111,26 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
 
     @Override
     public final double alterAndGet(final Transaction tx, final DoubleFunction function) {
-        return alterAndGet(asGammaTransaction(tx),function);
+        return alterAndGet(asGammaTransaction(tx), function);
     }
 
     public final double alterAndGet(final GammaTransaction tx, final DoubleFunction function) {
-       throw new TodoException();
+        //todo
+        throw new TodoException();
+    }
+
+    @Override
+    public final double atomicAlterAndGet(final DoubleFunction function) {
+        return atomicAlterSupport(function, false);
     }
 
     @Override
     public final double atomicGetAndAlter(final DoubleFunction function) {
+        return atomicAlterSupport(function, true);
+    }
+
+    public final double atomicAlterSupport(final DoubleFunction function, boolean returnOld) {
+        //todo:
         throw new TodoException();
     }
 
@@ -125,20 +141,23 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
 
     @Override
     public final double getAndAlter(final Transaction tx, final DoubleFunction function) {
-        return getAndAlter(asGammaTransaction(tx),function);
+        return getAndAlter(asGammaTransaction(tx), function);
     }
 
-    public final double getAndAlter(final GammaTransaction tx, final DoubleFunction function){
-         throw new TodoException();
+    public final double getAndAlter(final GammaTransaction tx, final DoubleFunction function) {
+        //todo:
+        throw new TodoException();
     }
 
     @Override
     public final boolean atomicCompareAndSet(final double expectedValue, final double newValue) {
+        //todo
         throw new TodoException();
     }
 
     @Override
     public final double atomicGetAndIncrement(final double amount) {
+        //todo
         throw new TodoException();
     }
 
@@ -152,12 +171,16 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
         return getAndIncrement(asGammaTransaction(tx), amount);
     }
 
-    public final double getAndIncrement(final GammaTransaction tx, final double amount){
-        throw new TodoException();
+    public final double getAndIncrement(final GammaTransaction tx, final double amount) {
+        GammaRefTranlocal tranlocal = openForWrite(tx, LOCKMODE_NONE);
+        double oldValue = asDouble(tranlocal.long_value);
+        tranlocal.long_value = asLong(oldValue + amount);
+        return oldValue;
     }
 
     @Override
     public final double atomicIncrementAndGet(final double amount) {
+        //todo
         throw new TodoException();
     }
 
@@ -168,11 +191,14 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
 
     @Override
     public final double incrementAndGet(final Transaction tx, final double amount) {
-        return incrementAndGet(asGammaTransaction(tx),amount);
+        return incrementAndGet(asGammaTransaction(tx), amount);
     }
 
-    public final double incrementAndGet(final GammaTransaction tx, final double amount){
-        throw new TodoException();
+    public final double incrementAndGet(final GammaTransaction tx, final double amount) {
+        GammaRefTranlocal tranlocal = openForWrite(tx, LOCKMODE_NONE);
+        double result = asDouble(tranlocal.long_value) + amount;
+        tranlocal.long_value = asLong(result);
+        return result;
     }
 
     @Override
@@ -182,11 +208,13 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
 
     @Override
     public final void await(final Transaction tx, final double value) {
-        await(asGammaTransaction(tx),value);
+        await(asGammaTransaction(tx), value);
     }
 
-    public final void await(final GammaTransaction tx, final double value){
-        throw new TodoException();
+    public final void await(final GammaTransaction tx, final double value) {
+        if (asDouble(openForRead(tx, LOCKMODE_NONE).long_value) != value) {
+            tx.retry();
+        }
     }
 
     @Override
@@ -196,15 +224,25 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
 
     @Override
     public final void await(final Transaction tx, final DoublePredicate predicate) {
-        await(asGammaTransaction(tx),predicate);
+        await(asGammaTransaction(tx), predicate);
     }
 
-    public final void await(final GammaTransaction tx, final DoublePredicate predicate){
+    public final void await(final GammaTransaction tx, final DoublePredicate predicate) {
+        //todo
         throw new TodoException();
     }
 
     @Override
     public String toDebugString() {
-        throw new TodoException();
+        return String.format("GammaDoubleRef{orec=%s, version=%s, value=%s, hasListeners=%s)",
+                ___toOrecString(), version, asDouble(long_value), listeners != null);
+    }
+
+    public static double asDouble(long value) {
+        return Double.longBitsToDouble(value);
+    }
+
+    public static long asLong(double value) {
+        return Double.doubleToLongBits(value);
     }
 }

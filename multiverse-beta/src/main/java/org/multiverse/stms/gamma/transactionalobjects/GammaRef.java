@@ -60,16 +60,18 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
 
     @Override
     public final E atomicWeakGet() {
-        throw new TodoException();
+        return (E) ref_value;
     }
 
     @Override
     public final E atomicSet(final E newValue) {
-        throw new TodoException();
+        atomicGetAndSet(newValue);
+        return newValue;
     }
 
     @Override
     public final E atomicGetAndSet(final E newValue) {
+        //todo:
         throw new TodoException();
     }
 
@@ -101,11 +103,22 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     public final void commute(final GammaTransaction tx, final Function<E> function) {
+        //todo:
         throw new TodoException();
     }
 
     @Override
     public final E atomicAlterAndGet(final Function<E> function) {
+        return atomicAlter(function, false);
+    }
+
+    @Override
+    public final E atomicGetAndAlter(final Function<E> function) {
+        return atomicAlter(function, true);
+    }
+
+    private E atomicAlter(final Function<E> function, final boolean returnOld){
+        //todo
         throw new TodoException();
     }
 
@@ -120,12 +133,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     public final E alterAndGet(final GammaTransaction tx, final Function<E> function) {
-        throw new TodoException();
-    }
-
-    @Override
-    public final E atomicGetAndAlter(final Function<E> eFunction) {
-        throw new TodoException();
+        return alter(tx, function, false);
     }
 
     @Override
@@ -138,12 +146,18 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
         return getAndAlter(asGammaTransaction(tx), function);
     }
 
-    public final E getAndAlter(final GammaTransaction tx, final Function<E> function) {
+    public final E getAndAlter(final GammaTransaction tx, final Function<E> function){
+        return alter(tx, function, true);
+    }
+
+    private final E alter(final GammaTransaction tx, final Function<E> function, final boolean returnOld) {
+        //todo:
         throw new TodoException();
     }
 
     @Override
     public final boolean atomicCompareAndSet(final E expectedValue, final E newValue) {
+        //todo:
         throw new TodoException();
     }
 
@@ -158,13 +172,12 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     public final boolean isNull(final GammaTransaction tx) {
-        GammaRefTranlocal tranlocal = openForRead(tx, LOCKMODE_NONE);
-        return tranlocal.ref_value == null;
+        return openForRead(tx, LOCKMODE_NONE).ref_value == null;
     }
 
     @Override
     public final boolean atomicIsNull() {
-        throw new TodoException();
+        return atomicGet() == null;
     }
 
     @Override
@@ -178,7 +191,13 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     public final E awaitNotNullAndGet(final GammaTransaction tx) {
-        throw new TodoException();
+        final GammaRefTranlocal tranlocal = openForRead(tx, LOCKMODE_NONE);
+
+        if(tranlocal.ref_value==null){
+            tx.retry();
+        }
+
+        return (E) tranlocal.ref_value;
     }
 
     @Override
@@ -206,7 +225,9 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     public final void await(final GammaTransaction tx, final E value) {
-        throw new TodoException();
+        if (openForRead(tx, LOCKMODE_NONE).ref_value != value) {
+            tx.retry();
+        }
     }
 
     @Override
@@ -216,15 +237,17 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
 
     @Override
     public final void await(final Transaction tx, final Predicate predicate) {
-        await(asGammaTransaction(tx),predicate);
+        await(asGammaTransaction(tx), predicate);
     }
 
-    public final void await(final GammaTransaction tx, final Predicate predicate){
+    public final void await(final GammaTransaction tx, final Predicate predicate) {
+        //todo
         throw new TodoException();
     }
 
     @Override
     public String toDebugString() {
-        throw new TodoException();
+        return String.format("GammaRef{orec=%s, version=%s, value=%s, hasListeners=%s)",
+                ___toOrecString(), version, ref_value, listeners != null);
     }
 }

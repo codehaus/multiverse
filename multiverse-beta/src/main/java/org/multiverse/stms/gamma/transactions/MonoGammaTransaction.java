@@ -110,8 +110,9 @@ public final class MonoGammaTransaction extends GammaTransaction {
             throw abortPrepareOnBadStatus();
         }
 
-        if (tranlocal.owner != null) {
-            if (!tranlocal.prepare(config)) {
+        final AbstractGammaRef owner = tranlocal.owner;
+        if (owner != null) {
+            if (!owner.prepare(config, tranlocal)) {
                 throw abortOnReadWriteConflict();
             }
         }

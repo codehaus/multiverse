@@ -3,14 +3,11 @@ package org.multiverse.stms.gamma.transactionalobjects;
 import org.multiverse.api.functions.Function;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaObjectPool;
-import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
 public final class GammaRefTranlocal<E> implements GammaConstants {
 
     public long long_value;
     public long long_oldValue;
-    public double double_value;
-    public double double_oldValue;
     public E ref_value;
     public E ref_oldValue;
 
@@ -71,24 +68,6 @@ public final class GammaRefTranlocal<E> implements GammaConstants {
         headCallable = newHead;
     }
 
-    public boolean prepare(GammaTransactionConfiguration config) {
-        if (!isWrite()) {
-            return true;
-        }
-
-        if (!isDirty()) {
-            boolean isDirty = long_value != long_oldValue;
-
-            if (!isDirty) {
-                return true;
-            }
-
-            setDirty(true);
-        }
-
-        return owner.tryLockAndCheckConflict(config.spinCount, this, LOCKMODE_COMMIT);
-    }
-
     public int getMode() {
         return mode;
     }
@@ -96,6 +75,4 @@ public final class GammaRefTranlocal<E> implements GammaConstants {
     public boolean isConflictCheckNeeded() {
         return false;
     }
-
-
 }
