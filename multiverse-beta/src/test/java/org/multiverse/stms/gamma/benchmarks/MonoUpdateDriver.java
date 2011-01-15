@@ -68,7 +68,7 @@ public class MonoUpdateDriver implements GammaConstants {
 
         System.out.printf("Performance is %s transactions/second/thread\n", s);
 
-        assertEquals(txCount, ref.value);
+        assertEquals(txCount, ref.long_value);
         assertEquals(txCount+initialVersion, ref.version);
     }
 }

@@ -189,7 +189,7 @@ public final class BetaIntRef
             System.out.println("hello");
         }
 
-        //todo: JMM problem here, the volatile read of ___listeners could jump in front of the volatile write of
+        //todo: JMM problem here, the volatile read of listeners could jump in front of the volatile write of
         //version, meaning that it could lead to not picking up the listeners that is done after the write. And
         //this could lead to a deadlock.
         Listeners listenersAfterWrite = ___listeners;

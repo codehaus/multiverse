@@ -11,39 +11,56 @@ import org.multiverse.api.references.LongRef;
 import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
-import org.multiverse.stms.gamma.transactions.ArrayGammaTransaction;
-import org.multiverse.stms.gamma.transactions.GammaTransaction;
-import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
-import org.multiverse.stms.gamma.transactions.MapGammaTransaction;
-import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
+import org.multiverse.stms.gamma.transactions.*;
 
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLocalGammaObjectPool;
 
-public final class GammaLongRef extends AbstractGammaObject implements LongRef {
+public final class GammaLongRef extends AbstractGammaRef implements LongRef {
 
-    public volatile long value;
+    public volatile long long_value;
 
     public GammaLongRef(GammaStm stm) {
         this(stm, 0);
     }
 
     public GammaLongRef(GammaStm stm, long initialValue) {
-        super(stm);
-        this.value = initialValue;
+        super(stm, TYPE_LONG);
+        this.long_value = initialValue;
         this.version = VERSION_UNCOMMITTED + 1;
     }
 
     public GammaLongRef(GammaTransaction tx) {
-        super(tx.config.stm);
-        tx.openForConstruction(this);
+        super(tx.config.stm, TYPE_LONG);
+        openForConstruction(tx);
+    }
+
+    @Override
+    public Listeners safe(GammaTranlocal tranlocal, GammaObjectPool pool) {
+        if (!tranlocal.isDirty) {
+            releaseAfterReading(tranlocal, pool);
+            return null;
+        }
+
+        long_value = tranlocal.long_value;
+        version = tranlocal.version + 1;
+
+        Listeners listenerAfterWrite = listeners;
+
+        if (listenerAfterWrite != null) {
+            listenerAfterWrite = ___removeListenersAfterWrite();
+        }
+
+        releaseAfterUpdate(tranlocal, pool);
+
+        return listenerAfterWrite;
     }
 
     public boolean load(final GammaTranlocal tranlocal, final int lockMode, int spinCount, final boolean arriveNeeded) {
         if (lockMode == LOCKMODE_NONE) {
             while (true) {
                 //JMM: nothing can jump behind the following statement
-                final long readValue = value;
+                final long readValue = long_value;
                 final long readVersion = version;
 
                 //JMM: the read for the arrive can't jump over the read of the active.
@@ -66,7 +83,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
                 //jump in front of the read or orec-value (volatile read happens before rule).
                 //This means that it isn't possible that a locked value illegally is seen as unlocked.
 
-                if (readVersion == version && readValue == value) {
+                if (readVersion == version && readValue == long_value) {
                     //at this point we are sure that the read was unlocked.
                     tranlocal.owner = this;
                     tranlocal.version = readVersion;
@@ -91,7 +108,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
 
             tranlocal.owner = this;
             tranlocal.version = version;
-            final long v = value;
+            final long v = long_value;
             tranlocal.long_value = v;
             tranlocal.long_oldValue = v;
             tranlocal.setLockMode(lockMode);
@@ -102,16 +119,16 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
 
     @Override
     public GammaTranlocal openForConstruction(GammaTransaction tx) {
-        if(tx == null){
+        if (tx == null) {
             throw new NullPointerException();
         }
 
-        if(tx instanceof MonoGammaTransaction){
-            return openForConstruction((MonoGammaTransaction)tx);
-        }else if(tx instanceof ArrayGammaTransaction){
-            return openForConstruction((ArrayGammaTransaction)tx);
-        }else{
-            return openForConstruction((MapGammaTransaction)tx);
+        if (tx instanceof MonoGammaTransaction) {
+            return openForConstruction((MonoGammaTransaction) tx);
+        } else if (tx instanceof ArrayGammaTransaction) {
+            return openForConstruction((ArrayGammaTransaction) tx);
+        } else {
+            return openForConstruction((MapGammaTransaction) tx);
         }
     }
 
@@ -123,7 +140,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
 
         final GammaTransactionConfiguration config = tx.config;
 
-        if (config.stm != ___stm) {
+        if (config.stm != stm) {
             throw tx.abortOpenForConstructionOnBadStm(this);
         }
 
@@ -142,7 +159,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
 
         final GammaTransactionConfiguration config = tx.config;
 
-        if (config.stm != ___stm) {
+        if (config.stm != stm) {
             throw tx.abortOpenForConstructionOnBadStm(this);
         }
 
@@ -161,7 +178,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
 
         final GammaTransactionConfiguration config = tx.config;
 
-        if (config.stm != ___stm) {
+        if (config.stm != stm) {
             throw tx.abortOpenForConstructionOnBadStm(this);
         }
 
@@ -170,6 +187,198 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
         }
 
         throw new TodoException();
+    }
+
+    @Override
+    public GammaTranlocal openForRead(final GammaTransaction tx, final int lockMode) {
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        if (tx instanceof MonoGammaTransaction) {
+            return openForRead((MonoGammaTransaction) tx, lockMode);
+        } else if (tx instanceof ArrayGammaTransaction) {
+            return openForRead((ArrayGammaTransaction) tx, lockMode);
+        } else {
+            return openForRead((MapGammaTransaction) tx, lockMode);
+        }
+    }
+
+    @Override
+    public GammaTranlocal openForRead(final MonoGammaTransaction tx, int lockMode) {
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortOpenForReadOnBadStatus(this);
+        }
+
+        final GammaTransactionConfiguration config = tx.config;
+
+        if (config.stm != stm) {
+            throw tx.abortOpenForReadOnBadStm(this);
+        }
+
+        lockMode = config.readLockModeAsInt <= lockMode ? lockMode : config.readLockModeAsInt;
+
+        final GammaTranlocal tranlocal = tx.tranlocal;
+
+        if (tranlocal.owner == this) {
+            if (tranlocal.isCommuting()) {
+                if (!flattenCommute(tx, tranlocal, lockMode)) {
+                    throw tx.abortOnReadWriteConflict();
+                }
+
+                return tranlocal;
+            }
+
+            if (lockMode > tranlocal.getLockMode()) {
+                if (!tryLockAndCheckConflict(config.spinCount, tranlocal, lockMode)) {
+                    throw tx.abortOnReadWriteConflict();
+                }
+            }
+
+            return tranlocal;
+        }
+
+        if (tranlocal.owner != null) {
+            throw tx.abortOnTooSmallSize(1);
+        }
+
+        if (!load(tranlocal, lockMode, config.spinCount, tx.arriveEnabled)) {
+            throw tx.abortOnReadWriteConflict();
+        }
+
+        tranlocal.mode = TRANLOCAL_READ;
+        return tranlocal;
+    }
+
+    @Override
+    public GammaTranlocal openForRead(final ArrayGammaTransaction tx, int lockMode) {
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortOpenForReadOnBadStatus(this);
+        }
+
+        final GammaTransactionConfiguration config = tx.config;
+
+        if (config.stm != stm) {
+            throw tx.abortOpenForReadOnBadStm(this);
+        }
+
+        GammaTranlocal found = null;
+        GammaTranlocal newNode = null;
+        GammaTranlocal node = tx.head;
+        while (true) {
+            if (node == null) {
+                break;
+            } else if (node.owner == this) {
+                found = node;
+                break;
+            } else if (node.owner == null) {
+                newNode = node;
+                break;
+            } else {
+                node = node.next;
+            }
+        }
+
+        lockMode = config.readLockModeAsInt <= lockMode ? lockMode : config.readLockModeAsInt;
+
+        if (found != null) {
+            if (found.isCommuting()) {
+                if (!flattenCommute(tx, found, lockMode)) {
+                    throw tx.abortOnReadWriteConflict();
+                }
+
+                return found;
+            }
+
+            if (lockMode > found.getLockMode()) {
+                if (!tryLockAndCheckConflict(config.spinCount, found, lockMode)) {
+                    throw tx.abortOnReadWriteConflict();
+                }
+            }
+
+            tx.shiftInFront(found);
+            return found;
+        }
+
+        if (newNode == null) {
+            throw tx.abortOnTooSmallSize(config.arrayTransactionSize);
+        }
+
+        newNode.mode = TRANLOCAL_READ;
+
+        if (!load(newNode, lockMode, config.spinCount, tx.arriveEnabled)) {
+            throw tx.abortOnReadWriteConflict();
+        }
+
+        tx.size++;
+        tx.shiftInFront(newNode);
+
+        if (tx.needsConsistency) {
+            if (!tx.isReadConsistent(newNode)) {
+                throw tx.abortOnReadWriteConflict();
+            }
+        } else {
+            tx.needsConsistency = true;
+        }
+
+        return newNode;
+    }
+
+    @Override
+    public GammaTranlocal openForRead(final MapGammaTransaction tx, int lockMode) {
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortOpenForReadOnBadStatus(this);
+        }
+
+        final GammaTransactionConfiguration config = tx.config;
+
+        if (config.stm != stm) {
+            throw tx.abortOpenForReadOnBadStm(this);
+        }
+
+        lockMode = config.readLockModeAsInt <= lockMode ? lockMode : config.readLockModeAsInt;
+
+        final int identityHash = identityHashCode();
+        final int indexOf = tx.indexOf(this, identityHash);
+
+        if (indexOf > -1) {
+            final GammaTranlocal tranlocal = tx.array[indexOf];
+
+            if (tranlocal.isCommuting()) {
+                if (!flattenCommute(tx, tranlocal, lockMode)) {
+                    throw tx.abortOnReadWriteConflict();
+                }
+
+                return tranlocal;
+            }
+
+            if (lockMode > tranlocal.getLockMode()) {
+                if (!tryLockAndCheckConflict(config.spinCount, tranlocal, lockMode)) {
+                    throw tx.abortOnReadWriteConflict();
+                }
+            }
+
+            return tranlocal;
+        }
+
+        final GammaTranlocal tranlocal = tx.pool.take(this);
+        tranlocal.mode = TRANLOCAL_READ;
+        tx.attach(tranlocal, identityHash);
+        tx.size++;
+
+        if (!load(tranlocal, lockMode, config.spinCount, tx.arriveEnabled)) {
+            throw tx.abortOnReadWriteConflict();
+        }
+
+        if (tx.needsConsistency) {
+            if (!tx.isReadConsistent(tranlocal)) {
+                throw tx.abortOnReadWriteConflict();
+            }
+        } else {
+            tx.needsConsistency = true;
+        }
+
+        return tranlocal;
     }
 
     @Override
@@ -232,7 +441,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
 
         final GammaTransactionConfiguration config = tx.config;
 
-        if (config.stm != ___stm) {
+        if (config.stm != stm) {
             throw tx.abortOpenForWriteOnBadStm(this);
         }
 
@@ -298,7 +507,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
 
         final GammaTransactionConfiguration config = tx.config;
 
-        if (config.stm != ___stm) {
+        if (config.stm != stm) {
             throw tx.abortOpenForWriteOnBadStm(this);
         }
 
@@ -352,7 +561,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
 
         final GammaTransactionConfiguration config = tx.config;
 
-        if (config.stm != ___stm) {
+        if (config.stm != stm) {
             throw tx.abortOpenForWriteOnBadStm(this);
         }
 
@@ -402,7 +611,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
         }
 
         if (newNode == null) {
-            throw tx.abortOnTooSmallSize(config.maxArrayTransactionSize);
+            throw tx.abortOnTooSmallSize(config.arrayTransactionSize);
         }
 
         if (!load(newNode, lockMode, config.spinCount, tx.arriveEnabled)) {
@@ -424,198 +633,6 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
         tx.size++;
         tx.shiftInFront(newNode);
         return newNode;
-    }
-
-    @Override
-    public GammaTranlocal openForRead(final GammaTransaction tx, final int lockMode) {
-        if (tx == null) {
-            throw new NullPointerException();
-        }
-
-        if (tx instanceof MonoGammaTransaction) {
-            return openForRead((MonoGammaTransaction) tx, lockMode);
-        } else if (tx instanceof ArrayGammaTransaction) {
-            return openForRead((ArrayGammaTransaction) tx, lockMode);
-        } else {
-            return openForRead((MapGammaTransaction) tx, lockMode);
-        }
-    }
-
-    @Override
-    public GammaTranlocal openForRead(final MonoGammaTransaction tx, int lockMode) {
-        if (tx.status != TX_ACTIVE) {
-            throw tx.abortOpenForReadOnBadStatus(this);
-        }
-
-        final GammaTransactionConfiguration config = tx.config;
-
-        if (config.stm != ___stm) {
-            throw tx.abortOpenForReadOnBadStm(this);
-        }
-
-        lockMode = config.readLockModeAsInt <= lockMode ? lockMode : config.readLockModeAsInt;
-
-        final GammaTranlocal tranlocal = tx.tranlocal;
-
-        if (tranlocal.owner == this) {
-            if (tranlocal.isCommuting()) {
-                if (!flattenCommute(tx, tranlocal, lockMode)) {
-                    throw tx.abortOnReadWriteConflict();
-                }
-
-                return tranlocal;
-            }
-
-            if (lockMode > tranlocal.getLockMode()) {
-                if (!tryLockAndCheckConflict(config.spinCount, tranlocal, lockMode)) {
-                    throw tx.abortOnReadWriteConflict();
-                }
-            }
-
-            return tranlocal;
-        }
-
-        if (tranlocal.owner != null) {
-            throw tx.abortOnTooSmallSize(1);
-        }
-
-        if (!load(tranlocal, lockMode, config.spinCount, tx.arriveEnabled)) {
-            throw tx.abortOnReadWriteConflict();
-        }
-
-        tranlocal.mode = TRANLOCAL_READ;
-        return tranlocal;
-    }
-
-    @Override
-    public GammaTranlocal openForRead(final ArrayGammaTransaction tx, int lockMode) {
-        if (tx.status != TX_ACTIVE) {
-            throw tx.abortOpenForReadOnBadStatus(this);
-        }
-
-        final GammaTransactionConfiguration config = tx.config;
-
-        if (config.stm != ___stm) {
-            throw tx.abortOpenForReadOnBadStm(this);
-        }
-
-        GammaTranlocal found = null;
-        GammaTranlocal newNode = null;
-        GammaTranlocal node = tx.head;
-        while (true) {
-            if (node == null) {
-                break;
-            } else if (node.owner == this) {
-                found = node;
-                break;
-            } else if (node.owner == null) {
-                newNode = node;
-                break;
-            } else {
-                node = node.next;
-            }
-        }
-
-        lockMode = config.readLockModeAsInt <= lockMode ? lockMode : config.readLockModeAsInt;
-
-        if (found != null) {
-            if (found.isCommuting()) {
-                if (!flattenCommute(tx, found, lockMode)) {
-                    throw tx.abortOnReadWriteConflict();
-                }
-
-                return found;
-            }
-
-            if (lockMode > found.getLockMode()) {
-                if (!tryLockAndCheckConflict(config.spinCount, found, lockMode)) {
-                    throw tx.abortOnReadWriteConflict();
-                }
-            }
-
-            tx.shiftInFront(found);
-            return found;
-        }
-
-        if (newNode == null) {
-            throw tx.abortOnTooSmallSize(config.maxArrayTransactionSize);
-        }
-
-        newNode.mode = TRANLOCAL_READ;
-
-        if (!load(newNode, lockMode, config.spinCount, tx.arriveEnabled)) {
-            throw tx.abortOnReadWriteConflict();
-        }
-
-        tx.size++;
-        tx.shiftInFront(newNode);
-
-        if (tx.needsConsistency) {
-            if (!tx.isReadConsistent(newNode)) {
-                throw tx.abortOnReadWriteConflict();
-            }
-        } else {
-            tx.needsConsistency = true;
-        }
-
-        return newNode;
-    }
-
-    @Override
-    public GammaTranlocal openForRead(final MapGammaTransaction tx, int lockMode) {
-        if (tx.status != TX_ACTIVE) {
-            throw tx.abortOpenForReadOnBadStatus(this);
-        }
-
-        final GammaTransactionConfiguration config = tx.config;
-
-        if (config.stm != ___stm) {
-            throw tx.abortOpenForReadOnBadStm(this);
-        }
-
-        lockMode = config.readLockModeAsInt <= lockMode ? lockMode : config.readLockModeAsInt;
-
-        final int identityHash = identityHashCode();
-        final int indexOf = tx.indexOf(this, identityHash);
-
-        if (indexOf > -1) {
-            final GammaTranlocal tranlocal = tx.array[indexOf];
-
-            if (tranlocal.isCommuting()) {
-                if (!flattenCommute(tx, tranlocal, lockMode)) {
-                    throw tx.abortOnReadWriteConflict();
-                }
-
-                return tranlocal;
-            }
-
-            if (lockMode > tranlocal.getLockMode()) {
-                if (!tryLockAndCheckConflict(config.spinCount, tranlocal, lockMode)) {
-                    throw tx.abortOnReadWriteConflict();
-                }
-            }
-
-            return tranlocal;
-        }
-
-        final GammaTranlocal tranlocal = tx.pool.take(this);
-        tranlocal.mode = TRANLOCAL_READ;
-        tx.attach(tranlocal, identityHash);
-        tx.size++;
-
-        if (!load(tranlocal, lockMode, config.spinCount, tx.arriveEnabled)) {
-            throw tx.abortOnReadWriteConflict();
-        }
-
-        if (tx.needsConsistency) {
-            if (!tx.isReadConsistent(tranlocal)) {
-                throw tx.abortOnReadWriteConflict();
-            }
-        } else {
-            tx.needsConsistency = true;
-        }
-
-        return tranlocal;
     }
 
     @Override
@@ -648,7 +665,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
 
         final GammaTransactionConfiguration config = tx.config;
 
-        if (config.stm != ___stm) {
+        if (config.stm != stm) {
             throw tx.abortCommuteOnBadStm(this);
         }
 
@@ -707,7 +724,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
 
         final GammaTransactionConfiguration config = tx.config;
 
-        if (config.stm != ___stm) {
+        if (config.stm != stm) {
             throw tx.abortCommuteOnBadStm(this);
         }
 
@@ -738,6 +755,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
                 return;
             }
 
+            //todo: write lock should be applied?
             if (found.isRead()) {
                 found.mode = TRANLOCAL_WRITE;
                 tx.hasWrites = true;
@@ -756,7 +774,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
         }
 
         if (newNode == null) {
-            throw tx.abortOnTooSmallSize(config.maxArrayTransactionSize);
+            throw tx.abortOnTooSmallSize(config.arrayTransactionSize);
         }
 
         tx.size++;
@@ -783,7 +801,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
 
         final GammaTransactionConfiguration config = tx.config;
 
-        if (config.stm != ___stm) {
+        if (config.stm != stm) {
             throw tx.abortCommuteOnBadStm(this);
         }
 
@@ -896,22 +914,22 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
         do {
             if (!hasCommitLock()) {
 
-                long read = value;
+                long read = long_value;
 
                 if (!hasCommitLock()) {
                     return read;
                 }
             }
-            ___stm.defaultBackoffPolicy.delayedUninterruptible(attempt);
+            stm.defaultBackoffPolicy.delayedUninterruptible(attempt);
             attempt++;
-        } while (attempt <= ___stm.spinCount);
+        } while (attempt <= stm.spinCount);
 
         throw new LockedException();
     }
 
     @Override
     public long atomicWeakGet() {
-        return value;
+        return long_value;
     }
 
     @Override
@@ -928,7 +946,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
             throw new LockedException();
         }
 
-        final long oldValue = value;
+        final long oldValue = long_value;
 
         if (oldValue == newValue) {
             if (arriveStatus == ARRIVE_UNREGISTERED) {
@@ -940,7 +958,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
             return newValue;
         }
 
-        value = newValue;
+        long_value = newValue;
         version++;
 
         final Listeners listeners = ___removeListenersAfterWrite();
@@ -981,7 +999,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
             throw new LockedException();
         }
 
-        final long oldValue = value;
+        final long oldValue = long_value;
         long newValue;
         boolean abort = true;
         try {
@@ -1003,7 +1021,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
             return oldValue;
         }
 
-        value = newValue;
+        long_value = newValue;
         version++;
 
         final Listeners listeners = ___removeListenersAfterWrite();
@@ -1099,7 +1117,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
             throw new LockedException();
         }
 
-        final long currentValue = value;
+        final long currentValue = long_value;
 
         if (currentValue != expectedValue) {
             departAfterFailureAndUnlock();
@@ -1116,7 +1134,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
             return true;
         }
 
-        value = newValue;
+        long_value = newValue;
         version++;
         final Listeners listeners = ___removeListenersAfterWrite();
 
@@ -1166,7 +1184,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
             throw new LockedException();
         }
 
-        final long oldValue = value;
+        final long oldValue = long_value;
 
         if (amount == 0) {
             if (arriveStatus == ARRIVE_UNREGISTERED) {
@@ -1179,7 +1197,7 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
         }
 
         final long newValue = oldValue + amount;
-        value = newValue;
+        long_value = newValue;
         version++;
 
         final Listeners listeners = ___removeListenersAfterWrite();
@@ -1362,6 +1380,6 @@ public final class GammaLongRef extends AbstractGammaObject implements LongRef {
     @Override
     public String toDebugString() {
         return String.format("GammaLongRef{orec=%s, version=%s, value=%s, hasListeners=%s)",
-                ___toOrecString(), version, value, ___listeners != null);
+                ___toOrecString(), version, long_value, listeners != null);
     }
 }

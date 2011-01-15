@@ -3,8 +3,8 @@ package org.multiverse.stms.gamma.transactions;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
@@ -19,26 +19,6 @@ public final class MonoGammaTransaction extends GammaTransaction {
 
     public MonoGammaTransaction(GammaTransactionConfiguration config) {
         super(config, POOL_TRANSACTIONTYPE_MONO);
-    }
-
-    @Override
-    public void commute(GammaLongRef ref, LongFunction function) {
-        ref.commute(this, function);
-    }
-
-    @Override
-    public GammaTranlocal openForWrite(GammaLongRef o, int lockMode) {
-        return o.openForWrite(this, lockMode);
-    }
-
-    @Override
-    public GammaTranlocal openForRead(GammaLongRef o, int lockMode) {
-        return o.openForRead(this, lockMode);
-    }
-
-    @Override
-    public GammaTranlocal openForConstruction(GammaObject o) {
-        return o.openForConstruction(this);
     }
 
     @Override
@@ -88,23 +68,11 @@ public final class MonoGammaTransaction extends GammaTransaction {
                     if (!ref.tryLockAndCheckConflict(config.spinCount, tranlocal, LOCKMODE_COMMIT)) {
                         throw abortOnReadWriteConflict();
                     }
-
-
-                    //if (!tranlocal.prepare(config)) {
-                    //
-                    //}
                 }
 
-                if (tranlocal.isDirty()) {
-                    ref.version = tranlocal.version + 1;
-                    ref.value = tranlocal.long_value;
-                    //ref.releaseAfterUpdate(tranlocal, pool);
-                    ref.departAfterUpdateAndUnlock();
-                    tranlocal.setLockMode(LOCKMODE_NONE);
-                    tranlocal.owner = null;
-                    tranlocal.setDepartObligation(false);
-                } else {
-                    owner.releaseAfterReading(tranlocal, pool);
+                Listeners listeners = owner.safe(tranlocal, pool);
+                if (listeners != null) {
+                    listeners.openAll(pool);
                 }
             } else {
                 throw new TodoException();
@@ -226,10 +194,5 @@ public final class MonoGammaTransaction extends GammaTransaction {
 
     public boolean isReadConsistent(GammaTranlocal justAdded) {
         return true;
-    }
-
-    @Override
-    public void copyForSpeculativeFailure(GammaTransaction failingTx) {
-        throw new TodoException();
     }
 }

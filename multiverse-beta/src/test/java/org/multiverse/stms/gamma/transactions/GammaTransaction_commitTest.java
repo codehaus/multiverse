@@ -6,6 +6,7 @@ import org.multiverse.api.LockMode;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
+import org.multiverse.api.exceptions.Retry;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
@@ -14,6 +15,7 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
+import static org.multiverse.TestUtils.getField;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public abstract class GammaTransaction_commitTest<T extends GammaTransaction> implements GammaConstants {
@@ -30,6 +32,31 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
     protected abstract T newTransaction(GammaTransactionConfiguration config);
 
     protected abstract void assertCleaned(T transaction);
+
+    @Test
+    public void whenContainsListener() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction listeningTx = newTransaction();
+        ref.openForRead(listeningTx, LOCKMODE_NONE);
+
+        try {
+            listeningTx.retry();
+            fail();
+        } catch (Retry retry) {
+        }
+
+        GammaTransaction tx = newTransaction();
+        ref.openForWrite(tx, LOCKMODE_NONE).long_value++;
+        tx.commit();
+
+        assertTrue(listeningTx.listener.isOpen());
+        assertNull(getField(ref, "listeners"));
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion+1, initialValue+1);
+    }
 
     @Test
     public void whenUnused() {
@@ -63,7 +90,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
         }
 
         assertEquals(TransactionStatus.Aborted, tx.getStatus());
-        assertEquals(initialValue + 1, ref.value);
+        assertEquals(initialValue + 1, ref.long_value);
         assertEquals(initialVersion + 1, ref.version);
         assertCleaned(tx);
     }
@@ -84,7 +111,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
 
         assertNull(tranlocal.owner);
         assertEquals(TransactionStatus.Committed, tx.getStatus());
-        assertEquals(initialValue + 1, ref.value);
+        assertEquals(initialValue + 1, ref.long_value);
         assertEquals(initialVersion + 1, ref.version);
         assertCleaned(tx);
     }
@@ -102,7 +129,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
             tx.commit();
         }
 
-        assertEquals(initialValue + txCount, ref.value);
+        assertEquals(initialValue + txCount, ref.long_value);
         assertEquals(initialVersion + txCount, ref.version);
     }
 
@@ -120,7 +147,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
             tx.hardReset();
         }
 
-        assertEquals(initialValue + txCount, ref.value);
+        assertEquals(initialValue + txCount, ref.long_value);
         assertEquals(initialVersion + txCount, ref.version);
     }
 
@@ -138,7 +165,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
 
         assertNull(tranlocal.owner);
         assertEquals(TransactionStatus.Committed, tx.getStatus());
-        assertEquals(initialValue, ref.value);
+        assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.version);
         assertCleaned(tx);
     }
@@ -158,7 +185,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
 
         assertNull(tranlocal.owner);
         assertEquals(TransactionStatus.Committed, tx.getStatus());
-        assertEquals(initialValue + 1, ref.value);
+        assertEquals(initialValue + 1, ref.long_value);
         assertEquals(initialVersion + 1, ref.version);
         assertCleaned(tx);
     }
@@ -167,12 +194,12 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
 
     @Test
     public void whenContainsRead() {
-        whenContainsRead(true,LockMode.None);
+        whenContainsRead(true, LockMode.None);
         whenContainsRead(true, LockMode.Read);
         whenContainsRead(true, LockMode.Write);
         whenContainsRead(true, LockMode.Commit);
 
-        whenContainsRead(false,LockMode.None);
+        whenContainsRead(false, LockMode.None);
         whenContainsRead(false, LockMode.Read);
         whenContainsRead(false, LockMode.Write);
         whenContainsRead(false, LockMode.Commit);
@@ -221,7 +248,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
 
         assertNull(tranlocal.owner);
         assertEquals(TransactionStatus.Committed, tx.getStatus());
-        assertEquals(initialValue, ref.value);
+        assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion + 1, ref.version);
         assertCleaned(tx);
         assertRefHasNoLocks(ref);
@@ -251,7 +278,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
 
         assertNull(tranlocal.owner);
         assertEquals(TransactionStatus.Committed, tx.getStatus());
-        assertEquals(initialValue + 1, ref.value);
+        assertEquals(initialValue + 1, ref.long_value);
         assertEquals(initialVersion + 1, ref.version);
         assertCleaned(tx);
         assertRefHasNoLocks(ref);
@@ -279,7 +306,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
 
         assertNull(tranlocal.owner);
         assertEquals(TransactionStatus.Committed, tx.getStatus());
-        assertEquals(initialValue, ref.value);
+        assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.version);
         assertCleaned(tx);
         assertRefHasNoLocks(ref);
@@ -308,7 +335,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
 
         assertNull(tranlocal.owner);
         assertEquals(TransactionStatus.Committed, tx.getStatus());
-        assertEquals(initialValue + 1, ref.value);
+        assertEquals(initialValue + 1, ref.long_value);
         assertEquals(initialVersion + 1, ref.version);
         assertCleaned(tx);
         assertRefHasNoLocks(ref);

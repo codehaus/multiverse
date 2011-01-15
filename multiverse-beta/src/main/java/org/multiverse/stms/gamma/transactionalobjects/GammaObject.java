@@ -5,6 +5,7 @@ import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactions.ArrayGammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.MapGammaTransaction;
@@ -14,6 +15,7 @@ public interface GammaObject extends GammaConstants {
 
     int VERSION_UNCOMMITTED = 0;
 
+    Listeners safe(GammaTranlocal tranlocal, GammaObjectPool pool);
 
     GammaTranlocal openForWrite(GammaTransaction tx, int lockMode);
 

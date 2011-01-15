@@ -121,9 +121,7 @@ public class MultipleReadsRetryStressTest implements BetaStmConstants {
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-
-                    if (stopRef.get() < 0) {
+                     if (stopRef.get() < 0) {
                         throw new StopException();
                     }
 

@@ -32,7 +32,7 @@ public class GammaTestUtils implements GammaConstants {
         Set<RetryLatch> expected = new HashSet<RetryLatch>(Arrays.asList(listeners));
 
         Set<RetryLatch> found = new HashSet<RetryLatch>();
-        Listeners l = (Listeners) getField(ref, "___listeners");
+        Listeners l = (Listeners) getField(ref, "listeners");
         while (l != null) {
             found.add(l.listener);
             l = l.next;
@@ -124,7 +124,7 @@ public class GammaTestUtils implements GammaConstants {
 
     public static void assertVersionAndValue(GammaLongRef ref, long version, long value) {
         Assert.assertEquals("version doesn't match", version, ref.getVersion());
-        Assert.assertEquals("value doesn't match", value, ref.value);
+        Assert.assertEquals("value doesn't match", value, ref.long_value);
     }
 
     //public static void assertVersionAndValue(GammaRef ref, long version, Object value) {

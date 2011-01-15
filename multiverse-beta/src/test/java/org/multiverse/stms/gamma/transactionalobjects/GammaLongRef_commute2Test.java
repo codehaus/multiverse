@@ -174,7 +174,7 @@ public class GammaLongRef_commute2Test {
         LongFunction function = Functions.newIncLongFunction(1);
         GammaTransaction tx = stm.startDefaultTransaction();
         GammaLongRef ref = new GammaLongRef(tx);
-        tx.openForConstruction(ref);
+        ref.openForConstruction(tx);
         ref.commute(tx, function);
 
         GammaTranlocal commute = tx.get(ref);
@@ -328,11 +328,11 @@ public class GammaLongRef_commute2Test {
         GammaLongRef ref2 = new GammaLongRef(stm, 10);
 
         GammaTransaction tx1 = stm.startDefaultTransaction();
-        tx1.openForWrite(ref1, LOCKMODE_NONE).long_value++;
-        tx1.commute(ref2, Functions.newIncLongFunction(1));
+        ref1.openForWrite(tx1, LOCKMODE_NONE).long_value++;
+        ref2.commute(tx1, Functions.newIncLongFunction(1));
 
         GammaTransaction tx2 = stm.startDefaultTransaction();
-        tx2.openForWrite(ref2, LOCKMODE_NONE).long_value++;
+        ref2.openForWrite(tx2, LOCKMODE_NONE).long_value++;
         tx2.commit();
 
         tx1.commit();

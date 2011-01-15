@@ -23,7 +23,7 @@ public class PessimisticTest {
     public void constructedObjectAutomaticallyIsLocked() {
         GammaTransaction tx = stm.startDefaultTransaction();
         GammaLongRef ref = new GammaLongRef(tx);
-        tx.openForConstruction(ref);
+        ref.openForConstruction(tx);
 
         assertRefHasCommitLock(ref, tx);
     }

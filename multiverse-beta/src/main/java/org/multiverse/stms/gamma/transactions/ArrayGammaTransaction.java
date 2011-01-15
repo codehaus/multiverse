@@ -2,10 +2,8 @@ package org.multiverse.stms.gamma.transactions;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.Retry;
-import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaStm;
-import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
 
@@ -14,6 +12,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
     public GammaTranlocal head;
     public int size = 0;
     public boolean needsConsistency = false;
+    public Listeners[] listenersArray;
 
     public ArrayGammaTransaction(GammaStm stm) {
         this(new GammaTransactionConfiguration(stm));
@@ -22,8 +21,10 @@ public final class ArrayGammaTransaction extends GammaTransaction {
     public ArrayGammaTransaction(GammaTransactionConfiguration config) {
         super(config, POOL_TRANSACTIONTYPE_ARRAY);
 
+        listenersArray = new Listeners[config.arrayTransactionSize];
+
         GammaTranlocal h = null;
-        for (int k = 0; k < config.maxArrayTransactionSize; k++) {
+        for (int k = 0; k < config.arrayTransactionSize; k++) {
             GammaTranlocal newNode = new GammaTranlocal();
             if (h != null) {
                 h.previous = newNode;
@@ -33,26 +34,6 @@ public final class ArrayGammaTransaction extends GammaTransaction {
             h = newNode;
         }
         head = h;
-    }
-
-    @Override
-    public void commute(GammaLongRef ref, LongFunction function) {
-        ref.commute(this, function);
-    }
-
-    @Override
-    public GammaTranlocal openForRead(GammaLongRef o, int lockMode) {
-        return o.openForRead(this, lockMode);
-    }
-
-    @Override
-    public GammaTranlocal openForWrite(GammaLongRef o, int lockMode) {
-        return o.openForWrite(this, lockMode);
-    }
-
-    @Override
-    public GammaTranlocal openForConstruction(GammaObject o) {
-        return o.openForConstruction(this);
     }
 
     public boolean isReadConsistent(GammaTranlocal justAdded) {
@@ -107,7 +88,10 @@ public final class ArrayGammaTransaction extends GammaTransaction {
                     }
                 }
 
-                commitChain();
+                Listeners[] listenersArray = commitChain();
+                if (listenersArray != null) {
+                    Listeners.openAll(listenersArray, pool);
+                }
             } else {
                 releaseChain(true);
             }
@@ -116,25 +100,25 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         status = TX_COMMITTED;
     }
 
-    private void commitChain() {
+    private Listeners[] commitChain() {
+        int listenersIndex = 0;
+
         GammaTranlocal node = head;
         do {
             GammaObject owner = node.owner;
             if (owner == null) {
-                return;
+                return listenersArray;
             }
 
-            if (node.isDirty()) {
-                GammaLongRef ref = (GammaLongRef) owner;
-                ref.value = node.long_value;
-                ref.version++;
-                ref.releaseAfterUpdate(node, pool);
-            } else {
-                owner.releaseAfterReading(node, pool);
+            Listeners listeners = owner.safe(node, pool);
+            if (listeners != null) {
+                listenersArray[listenersIndex] = listeners;
+                listenersIndex++;
             }
-
             node = node.next;
         } while (node != null);
+
+        return listenersArray;
     }
 
     private boolean prepareChainForCommit() {
@@ -326,10 +310,5 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         newHead.next = head;
         newHead.previous = null;
         head = newHead;
-    }
-
-    @Override
-    public void copyForSpeculativeFailure(GammaTransaction failingTx) {
-        throw new TodoException();
     }
 }

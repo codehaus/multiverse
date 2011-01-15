@@ -71,7 +71,7 @@ public class ReadonlyTest {
             public void execute(Transaction tx) throws Exception {
                 GammaTransaction btx = (GammaTransaction) tx;
                 GammaLongRef ref = new GammaLongRef(btx);
-                btx.openForConstruction(ref).long_value = value;
+                ref.openForConstruction(btx).long_value = value;
             }
         });
     }
@@ -135,7 +135,7 @@ public class ReadonlyTest {
             public GammaLongRef execute(Transaction tx) throws Exception {
                 GammaTransaction btx = (GammaTransaction) tx;
                 GammaLongRef ref = new GammaLongRef(btx);
-                btx.openForConstruction(ref).long_value = value;
+                ref.openForConstruction(btx).long_value = value;
                 return ref;
             }
         });

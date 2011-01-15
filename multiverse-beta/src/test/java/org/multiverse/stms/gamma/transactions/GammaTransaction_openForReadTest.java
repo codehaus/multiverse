@@ -681,7 +681,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         }
 
         assertIsAborted(tx);
-        assertEquals(initialValue, ref.value);
+        assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.version);
     }
 
@@ -701,7 +701,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         } catch (DeadTransactionException expected) {
         }
 
-        assertEquals(initialValue, ref.value);
+        assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.version);
     }
 
@@ -721,7 +721,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         } catch (DeadTransactionException expected) {
         }
 
-        assertEquals(initialValue, ref.value);
+        assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.version);
     }
 }

@@ -2,10 +2,8 @@ package org.multiverse.stms.gamma.transactions;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.Retry;
-import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaStm;
-import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
 
@@ -24,27 +22,6 @@ public final class MapGammaTransaction extends GammaTransaction {
         this.array = new GammaTranlocal[config.minimalArrayTreeSize];
     }
 
-    @Override
-    public void commute(GammaLongRef ref, LongFunction function) {
-        ref.commute(function);
-    }
-
-    @Override
-    public GammaTranlocal openForRead(GammaLongRef o, int lockMode) {
-        return o.openForRead(this, lockMode);
-    }
-
-    @Override
-    public GammaTranlocal openForWrite(GammaLongRef o, int lockMode) {
-        return o.openForWrite(this, lockMode);
-    }
-
-    @Override
-    public GammaTranlocal openForConstruction(GammaObject o) {
-        return o.openForConstruction(this);
-    }
-
-
     public float getUsage() {
         return (size * 1.0f) / array.length;
     }
@@ -62,7 +39,7 @@ public final class MapGammaTransaction extends GammaTransaction {
             final int index = (hash + offset) % array.length;
 
             final GammaTranlocal current = array[index];
-            if (current == null||current.owner==null) {
+            if (current == null || current.owner == null) {
                 return -1;
             }
 
@@ -135,15 +112,25 @@ public final class MapGammaTransaction extends GammaTransaction {
                     }
                 }
 
-                commitArray();
+                Listeners[] listenersArray = commitArray();
+
+                if (listenersArray != null) {
+                    Listeners.openAll(listenersArray, pool);
+                    pool.putListenersArray(listenersArray);
+                }
+            } else {
+                releaseArray(true);
             }
-            releaseArray(true);
         }
 
         status = TX_COMMITTED;
     }
 
-    private void commitArray() {
+    private Listeners[] commitArray() {
+        Listeners[] listenersArray = null;
+
+        int listenersIndex = 0;
+        int itemCount = 0;
         for (int k = 0; k < array.length; k++) {
             GammaTranlocal tranlocal = array[k];
 
@@ -151,17 +138,22 @@ public final class MapGammaTransaction extends GammaTransaction {
                 continue;
             }
 
+            itemCount++;
             array[k] = null;
-            if (tranlocal.isDirty) {
-                GammaLongRef ref = (GammaLongRef) tranlocal.owner;
-                ref.version++;
-                ref.value = tranlocal.long_value;
-                ref.releaseAfterUpdate(tranlocal, pool);
-            } else {
-                tranlocal.owner.releaseAfterReading(tranlocal, pool);
+
+            GammaObject owner = tranlocal.owner;
+            Listeners listeners = owner.safe(tranlocal, pool);
+            if(listeners!=null){
+                if(listenersArray == null){
+                    listenersArray = pool.takeListenersArray(size-itemCount);
+                }
+                listenersArray[listenersIndex]=listeners;
+                listenersIndex++;
             }
             pool.put(tranlocal);
         }
+
+        return listenersArray;
     }
 
     private void releaseArray(boolean success) {
@@ -337,11 +329,6 @@ public final class MapGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public void copyForSpeculativeFailure(GammaTransaction failingTx) {
-        throw new TodoException();
-    }
-
-    @Override
     public boolean softReset() {
         if (attempt >= config.getMaxRetries()) {
             return false;
@@ -366,6 +353,4 @@ public final class MapGammaTransaction extends GammaTransaction {
         needsConsistency = false;
         abortOnly = false;
     }
-
-
 }

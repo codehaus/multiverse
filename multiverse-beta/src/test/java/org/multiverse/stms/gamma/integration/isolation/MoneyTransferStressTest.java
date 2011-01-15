@@ -127,11 +127,11 @@ public class MoneyTransferStressTest {
                     GammaLongRef to = accounts[randomInt(accounts.length)];
                     int amount = randomInt(100);
 
-                    btx.openForWrite(to, !optimistic ? LOCKMODE_NONE : LOCKMODE_COMMIT).long_value += amount;
+                    to.openForWrite(btx, !optimistic ? LOCKMODE_NONE : LOCKMODE_COMMIT).long_value += amount;
 
                     sleepRandomMs(10);
 
-                    GammaTranlocal toTranlocal = btx.openForWrite(from, !optimistic ? LOCKMODE_NONE : LOCKMODE_COMMIT);
+                    GammaTranlocal toTranlocal = from.openForWrite(btx, !optimistic ? LOCKMODE_NONE : LOCKMODE_COMMIT);
                     if (toTranlocal.long_value < 0) {
                         throw new NotEnoughMoneyException();
                     }

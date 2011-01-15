@@ -3,13 +3,16 @@ package org.multiverse.stms.gamma.transactionalobjects;
 import org.multiverse.api.functions.Function;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaObjectPool;
-import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
-public final class GammaTranlocal implements GammaConstants {
+public final class GammaTranlocal<E> implements GammaConstants {
 
     public long long_value;
     public long long_oldValue;
+    public double double_value;
+    public double double_oldValue;
+    public E ref_value;
+    public E ref_oldValue;
 
     public long version;
     private int lockMode;

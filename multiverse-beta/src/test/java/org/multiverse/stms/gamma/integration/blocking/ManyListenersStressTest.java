@@ -26,7 +26,6 @@ public class ManyListenersStressTest {
         stop = false;
 
         threads = new StressThread[threadCount];
-
         for (int k = 0; k < threadCount; k++) {
             threads[k] = new StressThread(k + 1, k == threadCount - 1 ? 1 : k + 2);
         }

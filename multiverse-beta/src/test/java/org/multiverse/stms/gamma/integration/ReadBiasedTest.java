@@ -28,7 +28,7 @@ public class ReadBiasedTest implements GammaConstants {
         for (int k = 0; k < 10000; k++) {
             GammaTransaction tx = stm.startDefaultTransaction();
             tx.arriveEnabled = true;
-            tx.openForRead(ref, LOCKMODE_NONE);
+            ref.openForRead(tx, LOCKMODE_NONE);
             tx.commit();
         }
 

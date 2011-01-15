@@ -88,7 +88,7 @@ public class CommuteStressTest {
                 public long execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
                     for (int k = 0; k < refs.length; k++) {
-                        btx.commute(refs[k], Functions.newIncLongFunction(1));
+                        refs[k].commute(btx,Functions.newIncLongFunction(1));
                     }
                     return refs.length;
                 }
@@ -99,7 +99,7 @@ public class CommuteStressTest {
                 public long execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
                     for (int k = 0; k < refs.length; k++) {
-                        btx.openForWrite(refs[k], LOCKMODE_NONE).long_value++;
+                        refs[k].openForWrite(btx, LOCKMODE_NONE).long_value++;
                     }
                     return refs.length;
                 }

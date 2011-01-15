@@ -7,7 +7,6 @@ import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.Function;
-import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaObjectPool;
@@ -41,8 +40,6 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         config.init();
         this.transactionType = transactionType;
     }
-
-    public abstract void commute(GammaLongRef ref, LongFunction function);
 
     public final ReadWriteConflict abortOnReadWriteConflict() {
         abort();
@@ -328,12 +325,6 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public abstract GammaTranlocal locate(GammaObject o);
 
-    public abstract GammaTranlocal openForRead(GammaLongRef o, int lockMode);
-
-    public abstract GammaTranlocal openForWrite(GammaLongRef o, int lockMode);
-
-    public abstract GammaTranlocal openForConstruction(GammaObject o);
-
     @Override
     public final TransactionConfiguration getConfiguration() {
         return config;
@@ -454,7 +445,10 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
-    public abstract void copyForSpeculativeFailure(GammaTransaction failingTx);
+    public final void copyForSpeculativeFailure(GammaTransaction failingTx){
+        remainingTimeoutNs = failingTx.getRemainingTimeoutNs();
+        attempt = failingTx.getAttempt();
+    }
 
     public final void init(GammaTransactionConfiguration config) {
         if (config == null) {

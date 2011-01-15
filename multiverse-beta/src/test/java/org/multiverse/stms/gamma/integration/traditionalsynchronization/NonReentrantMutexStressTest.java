@@ -135,12 +135,12 @@ public class NonReentrantMutexStressTest {
             public void execute(Transaction tx) throws Exception {
                 GammaTransaction btx = (GammaTransaction) tx;
 
-                GammaTranlocal read = btx.openForRead(locked, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
+                GammaTranlocal read = locked.openForRead(btx, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
                 if (read.long_value == 1) {
                     retry();
                 }
 
-                GammaTranlocal write = btx.openForWrite(locked, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
+                GammaTranlocal write = locked.openForWrite(btx, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
                 write.long_value = 1;
             }
         };

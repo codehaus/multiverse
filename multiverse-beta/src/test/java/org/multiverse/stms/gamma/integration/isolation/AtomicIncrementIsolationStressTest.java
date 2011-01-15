@@ -29,7 +29,7 @@ public class AtomicIncrementIsolationStressTest {
         int threadCount = 2;
         UpdateThread[] threads = new UpdateThread[threadCount];
         GammaLongRef ref = new GammaLongRef(stm, 0);
-        long transactionsPerThread = 500 * 1000 * 1000;
+        long transactionsPerThread = 200 * 1000 * 1000;
 
         for (int k = 0; k < threads.length; k++) {
             threads[k] = new UpdateThread(k, ref, transactionsPerThread);

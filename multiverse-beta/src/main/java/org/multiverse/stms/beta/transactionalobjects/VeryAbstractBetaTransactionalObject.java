@@ -67,9 +67,9 @@ public abstract class VeryAbstractBetaTransactionalObject
     static {
         try {
             listenersOffset = ___unsafe.objectFieldOffset(
-                    VeryAbstractBetaTransactionalObject.class.getDeclaredField("___listeners"));
+                    VeryAbstractBetaTransactionalObject.class.getDeclaredField("listeners"));
             valueOffset = ___unsafe.objectFieldOffset(
-                    VeryAbstractBetaTransactionalObject.class.getDeclaredField("___orec"));
+                    VeryAbstractBetaTransactionalObject.class.getDeclaredField("orec"));
         } catch (Exception ex) {
             throw new Error(ex);
         }

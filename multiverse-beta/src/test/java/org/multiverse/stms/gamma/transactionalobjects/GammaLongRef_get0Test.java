@@ -61,7 +61,7 @@ public class GammaLongRef_get0Test {
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertEquals(version, ref.getVersion());
-        assertEquals(100, ref.value);
+        assertEquals(100, ref.long_value);
     }
 
     @Test

@@ -93,7 +93,7 @@ public abstract class GammaTransaction_abortTest<T extends GammaTransaction> imp
         tx.abort();
 
         assertEquals(TransactionStatus.Aborted, tx.getStatus());
-        assertEquals(initialValue, ref.value);
+        assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.getVersion());
         assertCleaned(tx);
     }
@@ -116,7 +116,7 @@ public abstract class GammaTransaction_abortTest<T extends GammaTransaction> imp
         tx.abort();
 
         assertEquals(TransactionStatus.Aborted, tx.getStatus());
-        assertEquals(initialValue, ref.value);
+        assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.getVersion());
         assertCleaned(tx);
     }

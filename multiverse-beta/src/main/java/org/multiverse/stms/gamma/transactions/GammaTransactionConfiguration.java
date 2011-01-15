@@ -45,7 +45,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
     public boolean blockingAllowed = true;
     public int maxRetries;
     public boolean speculativeConfigEnabled = true;
-    public int maxArrayTransactionSize;
+    public int arrayTransactionSize;
     public BackoffPolicy backoffPolicy;
     public long timeoutNs = Long.MAX_VALUE;
     public TraceLevel traceLevel = TraceLevel.None;
@@ -84,7 +84,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         this.blockingAllowed = configuration.blockingAllowed;
         this.maxRetries = configuration.maxRetries;
         this.speculativeConfigEnabled = configuration.speculativeConfigEnabled;
-        this.maxArrayTransactionSize = configuration.maxArrayTransactionSize;
+        this.arrayTransactionSize = configuration.maxArrayTransactionSize;
         this.backoffPolicy = configuration.backoffPolicy;
         this.timeoutNs = configuration.timeoutNs;
         this.traceLevel = configuration.traceLevel;
@@ -97,9 +97,9 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         this.globalConflictCounter = stm.getGlobalConflictCounter();
     }
 
-    public GammaTransactionConfiguration(GammaStm stm, int maxArrayTransactionSize) {
+    public GammaTransactionConfiguration(GammaStm stm, int arrayTransactionSize) {
         this(stm);
-        this.maxArrayTransactionSize = maxArrayTransactionSize;
+        this.arrayTransactionSize = arrayTransactionSize;
     }
 
     @Override
@@ -145,8 +145,8 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         return backoffPolicy;
     }
 
-    public int getMaxArrayTransactionSize() {
-        return maxArrayTransactionSize;
+    public int getArrayTransactionSize() {
+        return arrayTransactionSize;
     }
 
     @Override
@@ -303,7 +303,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         config.blockingAllowed = blockingAllowed;
         config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.arrayTransactionSize = arrayTransactionSize;
         config.backoffPolicy = backoffPolicy;
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
@@ -334,7 +334,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         config.blockingAllowed = blockingAllowed;
         config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.arrayTransactionSize = arrayTransactionSize;
         config.backoffPolicy = backoffPolicy;
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
@@ -364,7 +364,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         config.blockingAllowed = blockingAllowed;
         config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.arrayTransactionSize = arrayTransactionSize;
         config.backoffPolicy = backoffPolicy;
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
@@ -391,7 +391,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         config.blockingAllowed = blockingAllowed;
         config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.arrayTransactionSize = arrayTransactionSize;
         config.backoffPolicy = backoffPolicy;
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
@@ -418,7 +418,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         config.blockingAllowed = blockingAllowed;
         config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.arrayTransactionSize = arrayTransactionSize;
         config.backoffPolicy = backoffPolicy;
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
@@ -445,7 +445,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         config.blockingAllowed = blockingAllowed;
         config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.arrayTransactionSize = arrayTransactionSize;
         config.backoffPolicy = backoffPolicy;
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
@@ -472,7 +472,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         config.blockingAllowed = blockingAllowed;
         config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.arrayTransactionSize = arrayTransactionSize;
         config.backoffPolicy = backoffPolicy;
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
@@ -499,7 +499,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         config.blockingAllowed = blockingEnabled;
         config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.arrayTransactionSize = arrayTransactionSize;
         config.backoffPolicy = backoffPolicy;
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
@@ -526,7 +526,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         config.blockingAllowed = blockingAllowed;
         config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.arrayTransactionSize = arrayTransactionSize;
         config.backoffPolicy = backoffPolicy;
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
@@ -557,7 +557,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         config.blockingAllowed = blockingAllowed;
         config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.arrayTransactionSize = arrayTransactionSize;
         config.backoffPolicy = backoffPolicy;
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
@@ -592,7 +592,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         config.blockingAllowed = blockingAllowed;
         config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.arrayTransactionSize = arrayTransactionSize;
         config.backoffPolicy = backoffPolicy;
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
@@ -623,7 +623,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         config.blockingAllowed = blockingAllowed;
         config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.arrayTransactionSize = arrayTransactionSize;
         config.backoffPolicy = backoffPolicy;
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
@@ -654,7 +654,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         config.blockingAllowed = blockingAllowed;
         config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.arrayTransactionSize = arrayTransactionSize;
         config.backoffPolicy = backoffPolicy;
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
@@ -686,7 +686,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         config.blockingAllowed = blockingAllowed;
         config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.arrayTransactionSize = arrayTransactionSize;
         config.backoffPolicy = backoffPolicy;
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
@@ -717,7 +717,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         config.blockingAllowed = blockingAllowed;
         config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.arrayTransactionSize = arrayTransactionSize;
         config.backoffPolicy = backoffPolicy;
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
@@ -748,7 +748,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         config.blockingAllowed = blockingAllowed;
         config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.arrayTransactionSize = arrayTransactionSize;
         config.backoffPolicy = backoffPolicy;
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
@@ -786,7 +786,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         config.blockingAllowed = blockingAllowed;
         config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxArrayTransactionSize = maxArrayTransactionSize;
+        config.arrayTransactionSize = arrayTransactionSize;
         config.backoffPolicy = backoffPolicy;
         config.interruptible = interruptible;
         config.timeoutNs = timeoutNs;
@@ -816,7 +816,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
                 ", trackReads=" + trackReads +
                 ", maxRetries=" + maxRetries +
                 ", speculativeConfigEnabled=" + speculativeConfigEnabled +
-                ", maxArrayTransactionSize=" + maxArrayTransactionSize +
+                ", maxArrayTransactionSize=" + arrayTransactionSize +
                 ", isAnonymous=" + isAnonymous +
                 ", backoffPolicy=" + backoffPolicy +
                 ", blockingAllowed=" + blockingAllowed +

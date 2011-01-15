@@ -41,7 +41,7 @@ public class WriteConflictTest implements BetaStmConstants {
                 .setDirtyCheckEnabled(true)
                 .build()
                 .newTransaction();
-        GammaTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        GammaTranlocal write = ref.openForWrite(tx, LOCKMODE_NONE);
         write.long_value++;
 
         ref.atomicIncrementAndGet(1);
@@ -68,7 +68,7 @@ public class WriteConflictTest implements BetaStmConstants {
                 .build()
                 .newTransaction();
 
-        tx.openForWrite(ref, LOCKMODE_NONE);
+        ref.openForWrite(tx,LOCKMODE_NONE);
 
         ref.atomicIncrementAndGet(1);
         long version = ref.getVersion();
@@ -89,7 +89,7 @@ public class WriteConflictTest implements BetaStmConstants {
                 .setDirtyCheckEnabled(false)
                 .build()
                 .newTransaction();
-        GammaTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        GammaTranlocal write = ref.openForWrite(tx, LOCKMODE_NONE);
         write.long_value++;
 
         ref.atomicIncrementAndGet(1);
@@ -114,7 +114,7 @@ public class WriteConflictTest implements BetaStmConstants {
                 .setDirtyCheckEnabled(false)
                 .build()
                 .newTransaction();
-        GammaTranlocal write = tx.openForWrite(ref, LOCKMODE_NONE);
+        GammaTranlocal write = ref.openForWrite(tx, LOCKMODE_NONE);
         write.long_value++;
 
         ref.atomicIncrementAndGet(1);

@@ -58,7 +58,7 @@ public class GammaLongRef_get1Test {
         assertUpdateBiased(ref);
         assertIsActive(tx);
         assertEquals(version, ref.getVersion());
-        assertEquals(100, ref.value);
+        assertEquals(100, ref.long_value);
     }
 
     @Test

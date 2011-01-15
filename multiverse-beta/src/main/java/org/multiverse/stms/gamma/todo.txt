@@ -2,6 +2,8 @@
                         to do
 --------------------------------------------------------------------
 
+- listeners need to be retrieved after commit
+
 - mono gamma transaction: release listeners after write
 
 - array gamma transaction: release listeners after write
@@ -39,6 +41,8 @@
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- removed all the openForRead/openForWrite/commute/openForConstruction on the transaction
 
 - speculative stuff is in place.
 

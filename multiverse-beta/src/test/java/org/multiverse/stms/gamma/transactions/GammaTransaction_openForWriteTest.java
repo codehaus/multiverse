@@ -149,7 +149,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         }
 
         assertEquals(TransactionStatus.Aborted, tx.getStatus());
-        assertEquals(initialValue, ref.value);
+        assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.version);
     }
 
@@ -684,7 +684,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         }
 
         assertIsAborted(tx);
-        assertEquals(initialValue, ref.value);
+        assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.version);
     }
 
@@ -703,7 +703,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         } catch (DeadTransactionException expected) {
         }
 
-        assertEquals(initialValue, ref.value);
+        assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.version);
     }
 
@@ -722,7 +722,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         } catch (DeadTransactionException expected) {
         }
 
-        assertEquals(initialValue, ref.value);
+        assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.version);
     }
 }

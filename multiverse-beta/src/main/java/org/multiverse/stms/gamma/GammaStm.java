@@ -382,7 +382,7 @@ public final class GammaStm implements Stm {
                 tx.init(config);
                 return tx;
 
-            } else if (length <= config.maxArrayTransactionSize) {
+            } else if (length <= config.arrayTransactionSize) {
 
                 final ArrayGammaTransaction tx = pool.takeArrayGammaTransaction();
                 if (tx == null) {
