@@ -13,7 +13,7 @@ import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.GammaTestUtils;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -50,7 +50,7 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
         long initialVersion = ref.version;
 
         GammaTransaction tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForRead(tx, lockMode.asInt());
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, lockMode.asInt());
         LongFunction incFunction = Functions.newIncLongFunction();
         ref.commute(tx, incFunction);
 
@@ -83,7 +83,7 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
         long initialVersion = ref.version;
 
         GammaTransaction tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, lockMode.asInt());
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, lockMode.asInt());
         LongFunction incFunction = Functions.newIncLongFunction();
         ref.commute(tx, incFunction);
 
@@ -111,7 +111,7 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
         GammaTransaction tx = stm.startDefaultTransaction();
         LongFunction function = mock(LongFunction.class);
         ref.commute(tx, function);
-        GammaTranlocal tranlocal = tx.get(ref);
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
 
         assertNotNull(tranlocal);
         assertTrue(tranlocal.isCommuting());
@@ -134,7 +134,7 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
         LongFunction function2 = mock(LongFunction.class);
         ref.commute(tx, function1);
         ref.commute(tx, function2);
-        GammaTranlocal tranlocal = tx.get(ref);
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
 
         assertNotNull(tranlocal);
         assertTrue(tranlocal.isCommuting());
@@ -167,7 +167,7 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
         LongFunction function2 = mock(LongFunction.class);
         ref.commute(tx, function1);
         ref.commute(tx, function2);
-        GammaTranlocal tranlocal = tx.get(ref);
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
 
         assertNotNull(tranlocal);
         assertTrue(tranlocal.isCommuting());

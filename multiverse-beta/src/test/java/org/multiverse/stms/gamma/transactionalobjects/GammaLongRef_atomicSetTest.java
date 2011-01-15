@@ -56,7 +56,7 @@ public class GammaLongRef_atomicSetTest {
         long result = ref.atomicSet(newValue);
 
         assertIsActive(tx);
-        assert (tx.get(ref) == null);
+        assert (tx.getRefTranlocal(ref) == null);
         assertEquals(newValue, result);
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(ref, 0);

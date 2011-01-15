@@ -45,7 +45,7 @@ public class Orec_tryLockAndCheckConflictTest implements GammaConstants {
     public void updateBiased_whenOtherHasLocked(LockMode otherLockMode, LockMode thisLockMode, boolean success) {
         GammaLongRef ref = new GammaLongRef(stm);
         //tx.arriveEnabled = arriveNeeded;
-        GammaTranlocal tranlocal = ref.openForRead(stm.startDefaultTransaction(), LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForRead(stm.startDefaultTransaction(), LOCKMODE_NONE);
 
         ref.openForRead(stm.startDefaultTransaction(), otherLockMode.asInt());
 
@@ -108,7 +108,7 @@ public class Orec_tryLockAndCheckConflictTest implements GammaConstants {
         GammaLongRef ref = new GammaLongRef(stm);
         GammaTransaction tx = stm.startDefaultTransaction();
         tx.arriveEnabled = arriveNeeded;
-        GammaTranlocal tranlocal = ref.openForRead(tx, firstLockMode.asInt());
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, firstLockMode.asInt());
 
         boolean result = ref.tryLockAndCheckConflict(1, tranlocal, secondLockMode.asInt());
 
@@ -145,7 +145,7 @@ public class Orec_tryLockAndCheckConflictTest implements GammaConstants {
         GammaLongRef ref = makeReadBiased(new GammaLongRef(stm));
         GammaTransaction tx = stm.startDefaultTransaction();
         tx.arriveEnabled = true;
-        GammaTranlocal tranlocal = ref.openForRead(tx, firstLockMode.asInt());
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, firstLockMode.asInt());
 
         boolean result = ref.tryLockAndCheckConflict(1, tranlocal, secondLockMode.asInt());
 

@@ -9,7 +9,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.assertEquals;
@@ -135,12 +135,12 @@ public class NonReentrantMutexStressTest {
             public void execute(Transaction tx) throws Exception {
                 GammaTransaction btx = (GammaTransaction) tx;
 
-                GammaTranlocal read = locked.openForRead(btx, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
+                GammaRefTranlocal read = locked.openForRead(btx, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
                 if (read.long_value == 1) {
                     retry();
                 }
 
-                GammaTranlocal write = locked.openForWrite(btx, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
+                GammaRefTranlocal write = locked.openForWrite(btx, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
                 write.long_value = 1;
             }
         };
@@ -150,7 +150,7 @@ public class NonReentrantMutexStressTest {
             public void execute(Transaction tx) throws Exception {
                 GammaTransaction btx = (GammaTransaction) tx;
 
-                GammaTranlocal write = locked.openForWrite(btx, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
+                GammaRefTranlocal write = locked.openForWrite(btx, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
                 if (write.long_value == 0) {
                     throw new IllegalStateException();
                 }

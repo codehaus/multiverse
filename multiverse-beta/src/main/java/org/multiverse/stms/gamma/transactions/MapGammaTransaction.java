@@ -4,12 +4,12 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
-import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 public final class MapGammaTransaction extends GammaTransaction {
 
-    public GammaTranlocal[] array;
+    public GammaRefTranlocal[] array;
     public int size = 0;
     public boolean needsConsistency = false;
 
@@ -19,7 +19,7 @@ public final class MapGammaTransaction extends GammaTransaction {
 
     public MapGammaTransaction(GammaTransactionConfiguration config) {
         super(config, POOL_TRANSACTIONTYPE_MAP);
-        this.array = new GammaTranlocal[config.minimalArrayTreeSize];
+        this.array = new GammaRefTranlocal[config.minimalArrayTreeSize];
     }
 
     public float getUsage() {
@@ -30,7 +30,7 @@ public final class MapGammaTransaction extends GammaTransaction {
         return size;
     }
 
-    public int indexOf(final GammaObject ref, final int hash) {
+    public int indexOf(final AbstractGammaRef ref, final int hash) {
         int jump = 0;
         boolean goLeft = true;
 
@@ -38,7 +38,7 @@ public final class MapGammaTransaction extends GammaTransaction {
             final int offset = goLeft ? -jump : jump;
             final int index = (hash + offset) % array.length;
 
-            final GammaTranlocal current = array[index];
+            final GammaRefTranlocal current = array[index];
             if (current == null || current.owner == null) {
                 return -1;
             }
@@ -55,7 +55,7 @@ public final class MapGammaTransaction extends GammaTransaction {
         return -1;
     }
 
-    public void attach(final GammaTranlocal tranlocal, final int hash) {
+    public void attach(final GammaRefTranlocal tranlocal, final int hash) {
         int jump = 0;
         boolean goLeft = true;
 
@@ -63,7 +63,7 @@ public final class MapGammaTransaction extends GammaTransaction {
             final int offset = goLeft ? -jump : jump;
             final int index = (hash + offset) % array.length;
 
-            GammaTranlocal current = array[index];
+            GammaRefTranlocal current = array[index];
             if (current == null) {
                 array[index] = tranlocal;
                 return;
@@ -79,12 +79,12 @@ public final class MapGammaTransaction extends GammaTransaction {
     }
 
     private void expand() {
-        GammaTranlocal[] oldArray = array;
+        GammaRefTranlocal[] oldArray = array;
         int newSize = oldArray.length * 2;
         array = pool.takeTranlocalArray(newSize);
 
         for (int k = 0; k < oldArray.length; k++) {
-            final GammaTranlocal tranlocal = oldArray[k];
+            final GammaRefTranlocal tranlocal = oldArray[k];
 
             if (tranlocal != null) {
                 attach(tranlocal, tranlocal.owner.identityHashCode());
@@ -132,7 +132,7 @@ public final class MapGammaTransaction extends GammaTransaction {
         int listenersIndex = 0;
         int itemCount = 0;
         for (int k = 0; k < array.length; k++) {
-            GammaTranlocal tranlocal = array[k];
+            GammaRefTranlocal tranlocal = array[k];
 
             if (tranlocal == null) {
                 continue;
@@ -141,7 +141,7 @@ public final class MapGammaTransaction extends GammaTransaction {
             itemCount++;
             array[k] = null;
 
-            GammaObject owner = tranlocal.owner;
+            AbstractGammaRef owner = tranlocal.owner;
             Listeners listeners = owner.safe(tranlocal, pool);
             if(listeners!=null){
                 if(listenersArray == null){
@@ -158,7 +158,7 @@ public final class MapGammaTransaction extends GammaTransaction {
 
     private void releaseArray(boolean success) {
         for (int k = 0; k < array.length; k++) {
-            GammaTranlocal tranlocal = array[k];
+            GammaRefTranlocal tranlocal = array[k];
 
             if (tranlocal != null) {
                 if (success) {
@@ -193,7 +193,7 @@ public final class MapGammaTransaction extends GammaTransaction {
 
     private boolean doPrepare() {
         for (int k = 0; k < array.length; k++) {
-            GammaTranlocal tranlocal = array[k];
+            GammaRefTranlocal tranlocal = array[k];
 
             if (tranlocal != null) {
                 if (!tranlocal.prepare(config)) {
@@ -223,7 +223,7 @@ public final class MapGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public GammaTranlocal locate(GammaObject o) {
+    public GammaRefTranlocal locate(AbstractGammaRef o) {
         if (status != TX_ACTIVE) {
             throw abortLocateOnBadStatus(o);
         }
@@ -232,11 +232,11 @@ public final class MapGammaTransaction extends GammaTransaction {
             throw abortLocateOnNullArgument();
         }
 
-        return get(o);
+        return getRefTranlocal(o);
     }
 
     @Override
-    public GammaTranlocal get(GammaObject ref) {
+    public GammaRefTranlocal getRefTranlocal(AbstractGammaRef ref) {
         int indexOf = indexOf(ref, ref.identityHashCode());
         return indexOf == -1 ? null : array[indexOf];
     }
@@ -262,12 +262,12 @@ public final class MapGammaTransaction extends GammaTransaction {
         boolean atLeastOneRegistration = false;
 
         for (int k = 0; k < array.length; k++) {
-            final GammaTranlocal tranlocal = array[k];
+            final GammaRefTranlocal tranlocal = array[k];
             if (tranlocal == null) {
                 continue;
 
             }
-            final GammaObject owner = tranlocal.owner;
+            final AbstractGammaRef owner = tranlocal.owner;
             if (owner == null) {
                 continue;
             }
@@ -300,7 +300,7 @@ public final class MapGammaTransaction extends GammaTransaction {
         throw Retry.INSTANCE;
     }
 
-    public boolean isReadConsistent(GammaTranlocal justAdded) {
+    public boolean isReadConsistent(GammaRefTranlocal justAdded) {
         if (!needsConsistency) {
             return true;
         }
@@ -315,7 +315,7 @@ public final class MapGammaTransaction extends GammaTransaction {
 
         //doing a full conflict scan
         for (int k = 0; k < array.length; k++) {
-            GammaTranlocal tranlocal = array[k];
+            GammaRefTranlocal tranlocal = array[k];
             if (tranlocal == null || tranlocal == justAdded) {
                 continue;
             }

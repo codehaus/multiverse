@@ -1,9 +1,9 @@
 package org.multiverse.stms.gamma;
 
 import org.multiverse.api.blocking.DefaultRetryLatch;
+import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.CallableNode;
-import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 import java.util.ArrayList;
 
@@ -53,7 +53,7 @@ public final class GammaObjectPool {
     private final boolean arrayListPoolingEnabled;
     private final boolean callableNodePoolingEnabled;
 
-    private final GammaTranlocal[] tranlocalsGammaRef = new GammaTranlocal[100];
+    private final GammaRefTranlocal[] tranlocalsGammaRef = new GammaRefTranlocal[100];
     private int lastUsedGammaRef = -1;
     private TranlocalPool[] pools = new TranlocalPool[100];
 
@@ -85,18 +85,18 @@ public final class GammaObjectPool {
      * @return the pooled tranlocal, or null if none is found.
      * @throws NullPointerException if owner is null.
      */
-    public GammaTranlocal take(final GammaObject owner) {
+    public GammaRefTranlocal take(final AbstractGammaRef owner) {
         if (owner == null) {
             throw new NullPointerException();
         }
 
         if (lastUsedGammaRef == -1) {
-            GammaTranlocal tranlocal = new GammaTranlocal();
+            GammaRefTranlocal tranlocal = new GammaRefTranlocal();
             tranlocal.owner = owner;
             return tranlocal;
         }
 
-        GammaTranlocal tranlocal = tranlocalsGammaRef[lastUsedGammaRef];
+        GammaRefTranlocal tranlocal = tranlocalsGammaRef[lastUsedGammaRef];
         tranlocal.owner = owner;
         tranlocalsGammaRef[lastUsedGammaRef] = null;
         lastUsedGammaRef--;
@@ -110,7 +110,7 @@ public final class GammaObjectPool {
      *
      * @param tranlocal the GammaRefTranlocal to pool.
      */
-    public void put(final GammaTranlocal tranlocal) {
+    public void put(final GammaRefTranlocal tranlocal) {
         if (!tranlocalPoolingEnabled) {
             return;
         }
@@ -125,10 +125,10 @@ public final class GammaObjectPool {
 
     static class TranlocalPool{
         int lastUsed = -1;
-        GammaTranlocal[] tranlocals = new GammaTranlocal[100];
+        GammaRefTranlocal[] tranlocals = new GammaRefTranlocal[100];
     }
 
-    private GammaTranlocal[][] tranlocalArrayPool = new GammaTranlocal[8193][];
+    private GammaRefTranlocal[][] tranlocalArrayPool = new GammaRefTranlocal[8193][];
 
     /**
      * Puts a GammaTranlocal array in the pool.
@@ -136,7 +136,7 @@ public final class GammaObjectPool {
      * @param array the GammaTranlocal array to put in the pool.
      * @throws NullPointerException is array is null.
      */
-    public void putTranlocalArray(final GammaTranlocal[] array){
+    public void putTranlocalArray(final GammaRefTranlocal[] array){
         if(array == null){
             throw new NullPointerException();
         }
@@ -170,26 +170,26 @@ public final class GammaObjectPool {
      * @return the GammaTranlocal array taken from the pool, or null if none available.
      * @throws IllegalArgumentException if size smaller than 0.
      */
-    public GammaTranlocal[] takeTranlocalArray(final int size){
+    public GammaRefTranlocal[] takeTranlocalArray(final int size){
         if(size<0){
             throw new IllegalArgumentException();
         }
 
         if(!tranlocalArrayPoolingEnabled){
-            return new GammaTranlocal[size];
+            return new GammaRefTranlocal[size];
         }
 
         int index = size;
 
         if(index >= tranlocalArrayPool.length){
-            return new GammaTranlocal[size];
+            return new GammaRefTranlocal[size];
         }
 
         if(tranlocalArrayPool[index]==null){
-            return new GammaTranlocal[size];
+            return new GammaRefTranlocal[size];
         }
 
-        GammaTranlocal[] array = tranlocalArrayPool[index];
+        GammaRefTranlocal[] array = tranlocalArrayPool[index];
         tranlocalArrayPool[index]=null;
         return array;
     }

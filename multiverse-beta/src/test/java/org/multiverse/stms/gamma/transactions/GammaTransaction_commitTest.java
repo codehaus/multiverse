@@ -10,7 +10,7 @@ import org.multiverse.api.exceptions.Retry;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsAborted;
@@ -74,7 +74,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
         tranlocal.long_value++;
 
         //a conflicting write.
@@ -105,7 +105,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
         tranlocal.long_value++;
         tx.commit();
 
@@ -158,7 +158,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
         tx.prepare();
 
         tx.commit();
@@ -177,7 +177,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
         tranlocal.long_value++;
         tx.prepare();
 
@@ -239,7 +239,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm);
         config.dirtyCheck = false;
         T tx = newTransaction(config);
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
 
         if (prepareFirst) {
             tx.prepare();
@@ -268,7 +268,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm);
         config.dirtyCheck = false;
         T tx = newTransaction(config);
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
         tranlocal.long_value++;
 
         if (prepareFirst) {
@@ -298,7 +298,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm);
         config.dirtyCheck = true;
         T tx = newTransaction(config);
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
         if (prepareFirst) {
             tx.prepare();
         }
@@ -326,7 +326,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm);
         config.dirtyCheck = true;
         T tx = newTransaction(config);
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
         tranlocal.long_value++;
         if (prepareFirst) {
             tx.prepare();
@@ -351,7 +351,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
         tranlocal.long_value++;
 
         T otherTx = newTransaction();
@@ -376,7 +376,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
         tranlocal.long_value++;
 
         T otherTx = newTransaction();
@@ -400,7 +400,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
         tranlocal.long_value++;
 
         T otherTx = newTransaction();

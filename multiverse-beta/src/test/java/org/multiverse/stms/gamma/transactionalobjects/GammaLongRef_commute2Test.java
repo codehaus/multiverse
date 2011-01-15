@@ -43,7 +43,7 @@ public class GammaLongRef_commute2Test {
         GammaTransaction tx = stm.startDefaultTransaction();
         ref.commute(tx, function);
 
-        assertHasCommutingFunctions(tx.get(ref), function);
+        assertHasCommutingFunctions(tx.getRefTranlocal(ref), function);
 
         assertIsActive(tx);
         assertEquals(0, ref.atomicGet());
@@ -110,7 +110,7 @@ public class GammaLongRef_commute2Test {
         GammaTransaction tx = stm.startDefaultTransaction();
         ref.commute(tx, function);
 
-        GammaTranlocal commute = tx.get(ref);
+        GammaRefTranlocal commute = tx.getRefTranlocal(ref);
         assertTrue(commute.isCommuting());
         assertEquals(0, commute.long_value);
         tx.commit();
@@ -128,7 +128,7 @@ public class GammaLongRef_commute2Test {
         GammaTransaction tx = stm.startDefaultTransaction();
         ref.commute(tx, function);
 
-        GammaTranlocal commute = tx.get(ref);
+        GammaRefTranlocal commute = tx.getRefTranlocal(ref);
         assertTrue(commute.isCommuting());
         assertEquals(0, commute.long_value);
         tx.commit();
@@ -161,7 +161,7 @@ public class GammaLongRef_commute2Test {
         ref.get(tx);
         ref.commute(tx, function);
 
-        GammaTranlocal commute = tx.get(ref);
+        GammaRefTranlocal commute = tx.getRefTranlocal(ref);
         assertFalse(commute.isCommuting());
         assertEquals(11, commute.long_value);
         tx.commit();
@@ -177,7 +177,7 @@ public class GammaLongRef_commute2Test {
         ref.openForConstruction(tx);
         ref.commute(tx, function);
 
-        GammaTranlocal commute = tx.get(ref);
+        GammaRefTranlocal commute = tx.getRefTranlocal(ref);
         assertFalse(commute.isCommuting());
         assertEquals(1, commute.long_value);
         tx.commit();
@@ -194,7 +194,7 @@ public class GammaLongRef_commute2Test {
         ref.set(tx, 11);
         ref.commute(tx, function);
 
-        GammaTranlocal commute = tx.get(ref);
+        GammaRefTranlocal commute = tx.getRefTranlocal(ref);
         assertFalse(commute.isCommuting());
         assertEquals(12, commute.long_value);
         tx.commit();
@@ -214,7 +214,7 @@ public class GammaLongRef_commute2Test {
         ref.commute(tx, function1);
         ref.commute(tx, function2);
 
-        GammaTranlocal commute = tx.get(ref);
+        GammaRefTranlocal commute = tx.getRefTranlocal(ref);
         assertTrue(commute.isCommuting());
         assertEquals(0, commute.long_value);
         tx.commit();

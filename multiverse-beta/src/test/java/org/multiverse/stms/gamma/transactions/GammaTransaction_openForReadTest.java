@@ -9,7 +9,7 @@ import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
@@ -58,7 +58,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
 
         GammaTransaction tx = stm.startDefaultTransaction();
         tx.setAbortOnly();
-        GammaTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
 
         assertNotNull(tranlocal);
         assertTrue(tx.isAbortOnly());
@@ -70,9 +70,9 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
         tx.setAbortOnly();
-        GammaTranlocal reread = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal reread = ref.openForRead(tx, LOCKMODE_NONE);
 
         assertSame(read, reread);
         assertTrue(tx.isAbortOnly());
@@ -140,7 +140,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm);
         config.readonly = true;
         GammaTransaction tx = newTransaction(config);
-        GammaTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
 
         assertNotNull(tranlocal);
         assertSame(ref, tranlocal.owner);
@@ -158,7 +158,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
 
         assertNotNull(tranlocal);
         assertSame(ref, tranlocal.owner);
@@ -198,8 +198,8 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = newTransaction();
-        GammaTranlocal first = ref.openForWrite(tx, firstReadLockMode.asInt());
-        GammaTranlocal second = ref.openForRead(tx, secondReadLockMode.asInt());
+        GammaRefTranlocal first = ref.openForWrite(tx, firstReadLockMode.asInt());
+        GammaRefTranlocal second = ref.openForRead(tx, secondReadLockMode.asInt());
 
         assertSame(first, second);
         assertNotNull(second);
@@ -241,8 +241,8 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = newTransaction();
-        GammaTranlocal first = ref.openForWrite(tx, writeLockMode.asInt());
-        GammaTranlocal second = ref.openForRead(tx, readLockMode.asInt());
+        GammaRefTranlocal first = ref.openForWrite(tx, writeLockMode.asInt());
+        GammaRefTranlocal second = ref.openForRead(tx, readLockMode.asInt());
 
         assertSame(first, second);
         assertSame(ref, second.owner);
@@ -308,7 +308,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm);
         config.readLockModeAsInt = transactionReadLockMode;
         GammaTransaction tx = newTransaction(config);
-        GammaTranlocal tranlocal = ref.openForRead(tx, readLockMode);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, readLockMode);
 
         assertEquals(expectedReadLockMode, tranlocal.getLockMode());
         assertEquals(TRANLOCAL_READ, tranlocal.getMode());
@@ -349,7 +349,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
 
         GammaTransaction tx = newTransaction();
         ref.openForRead(tx, firstMode);
-        GammaTranlocal tranlocal = ref.openForRead(tx, secondLockMode);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, secondLockMode);
 
         assertEquals(expectedLockMode, tranlocal.getLockMode());
         assertEquals(TRANLOCAL_READ, tranlocal.getMode());
@@ -370,7 +370,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         ref.getLock().acquire(otherTx, LockMode.Read);
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
 
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertIsActive(tx);
@@ -391,7 +391,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
 
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertIsActive(tx);
@@ -429,7 +429,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_READ);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_READ);
 
         assertEquals(LOCKMODE_READ, tranlocal.getLockMode());
         assertVersionAndValue(ref, initialVersion, intitialValue);
@@ -449,7 +449,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         ref.getLock().acquire(otherTx, LockMode.Read);
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_READ);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_READ);
 
         assertEquals(LOCKMODE_READ, tranlocal.getLockMode());
         assertIsActive(tx);
@@ -510,7 +510,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_WRITE);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_WRITE);
 
         assertEquals(LOCKMODE_WRITE, tranlocal.getLockMode());
         assertVersionAndValue(ref, initialVersion, intitialValue);
@@ -590,7 +590,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_COMMIT);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_COMMIT);
 
         assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
         assertVersionAndValue(ref, initialVersion, intitialValue);

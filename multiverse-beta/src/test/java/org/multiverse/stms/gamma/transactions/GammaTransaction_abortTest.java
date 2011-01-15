@@ -10,7 +10,7 @@ import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -44,7 +44,7 @@ public abstract class GammaTransaction_abortTest<T extends GammaTransaction> imp
     public void locking_whenHasConstructed_thenRemainLocked() {
         GammaTransaction tx = newTransaction();
         GammaLongRef ref = new GammaLongRef(tx);
-        GammaTranlocal write = tx.get(ref);
+        GammaRefTranlocal write = tx.getRefTranlocal(ref);
         tx.abort();
 
         assertIsAborted(tx);
@@ -66,7 +66,7 @@ public abstract class GammaTransaction_abortTest<T extends GammaTransaction> imp
         T tx = newTransaction();
         LongFunction function = mock(LongFunction.class);
         ref.commute(tx, function);
-        GammaTranlocal tranlocal = tx.get(ref);
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         tx.abort();
 
         assertIsAborted(tx);
@@ -89,7 +89,7 @@ public abstract class GammaTransaction_abortTest<T extends GammaTransaction> imp
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForRead(tx, readLockMode.asInt());
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, readLockMode.asInt());
         tx.abort();
 
         assertEquals(TransactionStatus.Aborted, tx.getStatus());
@@ -112,7 +112,7 @@ public abstract class GammaTransaction_abortTest<T extends GammaTransaction> imp
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, writeLockMode.asInt());
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, writeLockMode.asInt());
         tx.abort();
 
         assertEquals(TransactionStatus.Aborted, tx.getStatus());

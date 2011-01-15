@@ -7,7 +7,7 @@ import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.fail;
@@ -41,7 +41,7 @@ public class WriteConflictTest implements BetaStmConstants {
                 .setDirtyCheckEnabled(true)
                 .build()
                 .newTransaction();
-        GammaTranlocal write = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal write = ref.openForWrite(tx, LOCKMODE_NONE);
         write.long_value++;
 
         ref.atomicIncrementAndGet(1);
@@ -89,7 +89,7 @@ public class WriteConflictTest implements BetaStmConstants {
                 .setDirtyCheckEnabled(false)
                 .build()
                 .newTransaction();
-        GammaTranlocal write = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal write = ref.openForWrite(tx, LOCKMODE_NONE);
         write.long_value++;
 
         ref.atomicIncrementAndGet(1);
@@ -114,7 +114,7 @@ public class WriteConflictTest implements BetaStmConstants {
                 .setDirtyCheckEnabled(false)
                 .build()
                 .newTransaction();
-        GammaTranlocal write = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal write = ref.openForWrite(tx, LOCKMODE_NONE);
         write.long_value++;
 
         ref.atomicIncrementAndGet(1);

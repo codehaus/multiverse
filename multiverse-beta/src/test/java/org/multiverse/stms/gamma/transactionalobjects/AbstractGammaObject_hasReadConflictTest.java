@@ -27,7 +27,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
 
         boolean hasReadConflict = ref.hasReadConflict(read);
 
@@ -41,7 +41,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal write = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal write = ref.openForWrite(tx, LOCKMODE_NONE);
 
         boolean hasReadConflict = ref.hasReadConflict(write);
 
@@ -55,7 +55,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = ref.openForRead(tx, LOCKMODE_COMMIT);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_COMMIT);
 
         boolean hasConflict = ref.hasReadConflict(read);
 
@@ -69,7 +69,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = ref.openForRead(tx, LOCKMODE_WRITE);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_WRITE);
 
         boolean hasConflict = ref.hasReadConflict(read);
 
@@ -83,7 +83,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
 
         //conflicting update
         ref.atomicIncrementAndGet(1);
@@ -114,7 +114,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
 
         //do the conflicting update
         ref.atomicIncrementAndGet(1);
@@ -135,7 +135,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
 
         //do the conflicting update
         ref.atomicIncrementAndGet(1);
@@ -156,7 +156,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
         ref.openForRead(otherTx, LOCKMODE_COMMIT);
@@ -174,7 +174,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         ref.get(tx);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        GammaTranlocal read = ref.openForRead(otherTx, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(otherTx, LOCKMODE_NONE);
 
         boolean hasConflict = ref.hasReadConflict(read);
 
@@ -191,7 +191,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         ref.set(tx, 200);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        GammaTranlocal read = ref.openForRead(otherTx, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(otherTx, LOCKMODE_NONE);
 
         boolean hasConflict = ref.hasReadConflict(read);
 

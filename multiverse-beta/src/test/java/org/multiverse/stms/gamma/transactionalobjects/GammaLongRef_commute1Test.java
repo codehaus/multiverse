@@ -35,7 +35,7 @@ public class GammaLongRef_commute1Test {
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
-        GammaTranlocal commuting = tx.get(ref);
+        GammaRefTranlocal commuting = tx.getRefTranlocal(ref);
         assertNotNull(commuting);
         assertTrue(commuting.isCommuting());
         assertFalse(commuting.isRead());
@@ -62,7 +62,7 @@ public class GammaLongRef_commute1Test {
         LongFunction function = Functions.newIdentityLongFunction();
         ref.commute(function);
 
-        GammaTranlocal commuting = (GammaTranlocal) tx.get(ref);
+        GammaRefTranlocal commuting = (GammaRefTranlocal) tx.getRefTranlocal(ref);
         assertNotNull(commuting);
         assertTrue(commuting.isCommuting());
         assertFalse(commuting.isRead());
@@ -211,7 +211,7 @@ public class GammaLongRef_commute1Test {
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
-        GammaTranlocal tranlocal =  tx.get(ref);
+        GammaRefTranlocal tranlocal =  tx.getRefTranlocal(ref);
         assertNotNull(tranlocal);
         assertFalse(tranlocal.isCommuting());
         assertEquals(3, tranlocal.long_value);
@@ -240,7 +240,7 @@ public class GammaLongRef_commute1Test {
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
-        GammaTranlocal tranlocal = tx.get(ref);
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         assertNotNull(tranlocal);
         assertFalse(tranlocal.isCommuting());
         assertEquals(3, tranlocal.long_value);
@@ -272,7 +272,7 @@ public class GammaLongRef_commute1Test {
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
-        GammaTranlocal tranlocal = tx.get(ref);
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         assertNotNull(tranlocal);
         assertTrue(tranlocal.isCommuting());
         assertHasCommutingFunctions(tranlocal, function);
@@ -307,7 +307,7 @@ public class GammaLongRef_commute1Test {
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
-        GammaTranlocal tranlocal = tx.get(ref);
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         assertNotNull(tranlocal);
         assertTrue(tranlocal.isCommuting());
         assertHasCommutingFunctions(tranlocal, function);

@@ -52,7 +52,7 @@ public interface LongRef extends TransactionalObject {
      *
      * @param tx    the transaction used to do the set.
      * @param value the new value
-     * @return the old value
+     * @return the new value
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError

@@ -92,7 +92,7 @@ public class Lock_tryAcquire1Test {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal tranlocal = ref.openForRead(tx, initialLockMode.asInt());
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, initialLockMode.asInt());
         boolean result = ref.getLock().tryAcquire(tx, desiredLockMode);
 
         assertTrue(result);

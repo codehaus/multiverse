@@ -1,6 +1,6 @@
 package org.multiverse.stms.gamma.transactions;
 
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 import static org.junit.Assert.assertNull;
 
@@ -8,7 +8,7 @@ public class ArrayGammaTransaction_commitTest extends GammaTransaction_commitTes
 
     @Override
     protected void assertCleaned(ArrayGammaTransaction tx) {
-        GammaTranlocal node = tx.head;
+        GammaRefTranlocal node = tx.head;
         while (node != null) {
             assertNull(node.owner);
             node = node.next;

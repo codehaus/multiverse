@@ -59,7 +59,7 @@ public class GammaLongRef_ensure1Test {
         ref.getLock().acquire(tx, LockMode.Write);
         ref.ensure(tx);
 
-        GammaTranlocal tranlocal = tx.get(ref);
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         assertIsActive(tx);
         assertTrue(tranlocal.isConflictCheckNeeded());
         assertEquals(LOCKMODE_WRITE, tranlocal.getLockMode());
@@ -83,7 +83,7 @@ public class GammaLongRef_ensure1Test {
         ref.getLock().acquire(tx, LockMode.Commit);
         ref.ensure(tx);
 
-        GammaTranlocal tranlocal = tx.get(ref);
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         assertIsActive(tx);
         assertTrue(tranlocal.isConflictCheckNeeded());
         assertRefHasCommitLock(ref, tx);
@@ -110,7 +110,7 @@ public class GammaLongRef_ensure1Test {
         ref.set(tx, initialValue + 1);
         ref.ensure(tx);
 
-        GammaTranlocal tranlocal =  tx.get(ref);
+        GammaRefTranlocal tranlocal =  tx.getRefTranlocal(ref);
         assertIsActive(tx);
         assertTrue(tranlocal.isConflictCheckNeeded());
         assertRefHasWriteLock(ref, otherTx);

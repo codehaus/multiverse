@@ -42,7 +42,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
 
         RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
-        GammaTranlocal tranlocal = tx.get(ref);
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         int result = ref.registerChangeListener(latch, tranlocal, pool, listenerEra);
 
         assertEquals(REGISTRATION_NONE, result);
@@ -56,10 +56,10 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        GammaTranlocal write = ref.openForWrite(otherTx, LOCKMODE_NONE);
+        GammaRefTranlocal write = ref.openForWrite(otherTx, LOCKMODE_NONE);
         write.long_value++;
         otherTx.commit();
 
@@ -78,7 +78,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         long version = ref.getVersion();
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Commit);
@@ -101,7 +101,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         long version = ref.getVersion();
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
@@ -123,7 +123,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
 
         ref.atomicIncrementAndGet(1);
         long version = ref.getVersion();
@@ -149,7 +149,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
 
         ref.atomicIncrementAndGet(1);
         long version = ref.getVersion();
@@ -193,7 +193,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
 
         RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
@@ -213,14 +213,14 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx1 = stm.startDefaultTransaction();
-        GammaTranlocal read1 = ref.openForRead(tx1, LOCKMODE_NONE);
+        GammaRefTranlocal read1 = ref.openForRead(tx1, LOCKMODE_NONE);
 
         RetryLatch latch1 = new DefaultRetryLatch();
         long listenerEra1 = latch1.getEra();
         ref.registerChangeListener(latch1, read1, pool, listenerEra1);
 
         GammaTransaction tx2 = stm.startDefaultTransaction();
-        GammaTranlocal read2 = ref.openForRead(tx2, LOCKMODE_NONE);
+        GammaRefTranlocal read2 = ref.openForRead(tx2, LOCKMODE_NONE);
 
         RetryLatch latch2 = new DefaultRetryLatch();
         long listenerEra2 = latch2.getEra();

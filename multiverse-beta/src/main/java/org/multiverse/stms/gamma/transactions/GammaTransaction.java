@@ -10,9 +10,9 @@ import org.multiverse.api.functions.Function;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaObjectPool;
-import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 import static java.lang.String.format;
 import static org.multiverse.stms.gamma.GammaStmUtils.toDebugString;
@@ -163,7 +163,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
-    public final StmMismatchException abortOpenForReadOnBadStm(GammaLongRef gammaLongRef) {
+    public final StmMismatchException abortOpenForReadOnBadStm(GammaObject o) {
         abort();
         //todo: message
         return new StmMismatchException("");
@@ -224,7 +224,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
-    public StmMismatchException abortCommuteOnBadStm(GammaLongRef gammaLongRef) {
+    public StmMismatchException abortCommuteOnBadStm(GammaObject gammaLongRef) {
         abort();
         //todo: message
         return new StmMismatchException("");
@@ -323,7 +323,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public abstract void abort();
 
-    public abstract GammaTranlocal locate(GammaObject o);
+    public abstract GammaRefTranlocal locate(AbstractGammaRef o);
 
     @Override
     public final TransactionConfiguration getConfiguration() {
@@ -398,7 +398,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public abstract boolean softReset();
 
-    public abstract GammaTranlocal get(GammaObject ref);
+    public abstract GammaRefTranlocal getRefTranlocal(AbstractGammaRef ref);
 
     public final NullPointerException abortAcquireOnNullLockMode(GammaObject o) {
         switch (status) {
@@ -458,7 +458,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         hardReset();
     }
 
-    public abstract boolean isReadConsistent(GammaTranlocal justAdded);
+    public abstract boolean isReadConsistent(GammaRefTranlocal justAdded);
 
     public final TransactionStatus getStatus() {
         switch (status) {

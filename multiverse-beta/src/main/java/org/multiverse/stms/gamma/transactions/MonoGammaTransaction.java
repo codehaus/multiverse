@@ -5,13 +5,13 @@ import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
+import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 public final class MonoGammaTransaction extends GammaTransaction {
 
-    public final GammaTranlocal tranlocal = new GammaTranlocal();
+    public final GammaRefTranlocal tranlocal = new GammaRefTranlocal();
 
     public MonoGammaTransaction(GammaStm stm) {
         this(new GammaTransactionConfiguration(stm));
@@ -22,7 +22,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public GammaTranlocal locate(GammaObject o) {
+    public GammaRefTranlocal locate(AbstractGammaRef o) {
         if (status != TX_ACTIVE) {
             throw abortLocateOnBadStatus(o);
         }
@@ -31,7 +31,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
             throw abortLocateOnNullArgument();
         }
 
-        return get(o);
+        return getRefTranlocal(o);
     }
 
     @Override
@@ -48,7 +48,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
             //throw new AbortOn
         }
 
-        GammaObject owner = tranlocal.owner;
+        AbstractGammaRef owner = tranlocal.owner;
 
         if (owner != null) {
             if (tranlocal.mode == TRANLOCAL_READ) {
@@ -94,7 +94,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
         }
 
         status = TX_ABORTED;
-        GammaObject owner = tranlocal.owner;
+        AbstractGammaRef owner = tranlocal.owner;
         if (owner != null) {
             owner.releaseAfterFailure(tranlocal, pool);
         }
@@ -120,7 +120,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public GammaTranlocal get(GammaObject ref) {
+    public GammaRefTranlocal getRefTranlocal(AbstractGammaRef ref) {
         return tranlocal.owner == ref ? tranlocal : null;
     }
 
@@ -138,7 +138,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
             throw abortRetryOnNoRetryPossible();
         }
 
-        final GammaObject owner = tranlocal.owner;
+        final AbstractGammaRef owner = tranlocal.owner;
         if (owner == null) {
             throw abortRetryOnNoRetryPossible();
         }
@@ -192,7 +192,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
         abortOnly = false;
     }
 
-    public boolean isReadConsistent(GammaTranlocal justAdded) {
+    public boolean isReadConsistent(GammaRefTranlocal justAdded) {
         return true;
     }
 }

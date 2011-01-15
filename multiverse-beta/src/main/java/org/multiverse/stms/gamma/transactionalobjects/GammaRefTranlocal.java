@@ -5,7 +5,7 @@ import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
-public final class GammaTranlocal<E> implements GammaConstants {
+public final class GammaRefTranlocal<E> implements GammaConstants {
 
     public long long_value;
     public long long_oldValue;
@@ -16,11 +16,11 @@ public final class GammaTranlocal<E> implements GammaConstants {
 
     public long version;
     private int lockMode;
-    public GammaObject owner;
+    public AbstractGammaRef owner;
     public int mode;
     private boolean hasDepartObligation;
-    public GammaTranlocal next;
-    public GammaTranlocal previous;
+    public GammaRefTranlocal next;
+    public GammaRefTranlocal previous;
     public boolean isDirty = false;
     public CallableNode headCallable;
 

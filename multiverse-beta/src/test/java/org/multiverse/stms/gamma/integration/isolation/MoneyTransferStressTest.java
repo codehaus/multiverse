@@ -8,7 +8,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.assertEquals;
@@ -131,7 +131,7 @@ public class MoneyTransferStressTest {
 
                     sleepRandomMs(10);
 
-                    GammaTranlocal toTranlocal = from.openForWrite(btx, !optimistic ? LOCKMODE_NONE : LOCKMODE_COMMIT);
+                    GammaRefTranlocal toTranlocal = from.openForWrite(btx, !optimistic ? LOCKMODE_NONE : LOCKMODE_COMMIT);
                     if (toTranlocal.long_value < 0) {
                         throw new NotEnoughMoneyException();
                     }
