@@ -25,13 +25,21 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     }
 
     @Override
-    public final Listeners safe(GammaRefTranlocal tranlocal, GammaObjectPool pool) {
+    public final Listeners safe(final GammaRefTranlocal tranlocal, final GammaObjectPool pool) {
         if (!tranlocal.isDirty) {
             releaseAfterReading(tranlocal, pool);
             return null;
         }
 
-        long_value = tranlocal.long_value;
+        if (type == TYPE_REF) {
+            ref_value = tranlocal.ref_value;
+            //we need to set them to null to prevent memory leaks.
+            tranlocal.ref_value = null;
+            tranlocal.ref_oldValue = null;
+        } else {
+            long_value = tranlocal.long_value;
+        }
+
         version = tranlocal.version + 1;
 
         Listeners listenerAfterWrite = listeners;
@@ -40,16 +48,52 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             listenerAfterWrite = ___removeListenersAfterWrite();
         }
 
+        //todo: content of this method can be inlined here.
         releaseAfterUpdate(tranlocal, pool);
-
         return listenerAfterWrite;
     }
+
+    public boolean prepare(final GammaTransactionConfiguration config, final GammaRefTranlocal tranlocal) {
+        //todo: commuting stuff
+
+        if (tranlocal.isConstructing()) {
+            return true;
+        }
+
+        if (!tranlocal.isWrite()) {
+            return true;
+        }
+
+        if (!tranlocal.isDirty()) {
+            boolean isDirty;
+            if (type == TYPE_REF) {
+                isDirty = tranlocal.ref_value != tranlocal.ref_oldValue;
+            } else {
+                isDirty = tranlocal.long_value != tranlocal.long_oldValue;
+            }
+
+            if (!isDirty) {
+                return true;
+            }
+
+            tranlocal.setDirty(true);
+        }
+
+        return tryLockAndCheckConflict(config.spinCount, tranlocal, LOCKMODE_COMMIT);
+    }
+
 
     public final boolean load(final GammaRefTranlocal tranlocal, final int lockMode, int spinCount, final boolean arriveNeeded) {
         if (lockMode == LOCKMODE_NONE) {
             while (true) {
                 //JMM: nothing can jump behind the following statement
-                final long readValue = long_value;
+                long readLong = 0;
+                Object readRef = null;
+                if (type == TYPE_REF) {
+                    readRef = ref_value;
+                } else {
+                    readLong = long_value;
+                }
                 final long readVersion = version;
 
                 //JMM: the read for the arrive can't jump over the read of the active.
@@ -72,15 +116,28 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 //jump in front of the read or orec-value (volatile read happens before rule).
                 //This means that it isn't possible that a locked value illegally is seen as unlocked.
 
-                if (readVersion == version && readValue == long_value) {
-                    //at this point we are sure that the read was unlocked.
-                    tranlocal.owner = this;
-                    tranlocal.version = readVersion;
-                    tranlocal.long_value = readValue;
-                    tranlocal.long_oldValue = readValue;
-                    tranlocal.setLockMode(LOCKMODE_NONE);
-                    tranlocal.setDepartObligation(arriveStatus == ARRIVE_NORMAL);
-                    return true;
+                if (type == TYPE_REF) {
+                    if (readVersion == version && readRef == ref_value) {
+                        //at this point we are sure that the read was unlocked.
+                        tranlocal.owner = this;
+                        tranlocal.version = readVersion;
+                        tranlocal.ref_value = readRef;
+                        tranlocal.ref_oldValue = readRef;
+                        tranlocal.setLockMode(LOCKMODE_NONE);
+                        tranlocal.setDepartObligation(arriveStatus == ARRIVE_NORMAL);
+                        return true;
+                    }
+                } else {
+                    if (readVersion == version && readLong == long_value) {
+                        //at this point we are sure that the read was unlocked.
+                        tranlocal.owner = this;
+                        tranlocal.version = readVersion;
+                        tranlocal.long_value = readLong;
+                        tranlocal.long_oldValue = readLong;
+                        tranlocal.setLockMode(LOCKMODE_NONE);
+                        tranlocal.setDepartObligation(arriveStatus == ARRIVE_NORMAL);
+                        return true;
+                    }
                 }
 
                 //we are not lucky, the value has changed. But before retrying, we need to depart if the arrive was normal
@@ -97,9 +154,15 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
             tranlocal.owner = this;
             tranlocal.version = version;
-            final long v = long_value;
-            tranlocal.long_value = v;
-            tranlocal.long_oldValue = v;
+            if (type == TYPE_REF) {
+                final Object v = ref_value;
+                tranlocal.ref_value = v;
+                tranlocal.ref_oldValue = v;
+            } else {
+                final long v = long_value;
+                tranlocal.long_value = v;
+                tranlocal.long_oldValue = v;
+            }
             tranlocal.setLockMode(lockMode);
             tranlocal.setDepartObligation(arriveStatus == ARRIVE_NORMAL);
             return true;
@@ -844,36 +907,35 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         throw new TodoException();
     }
 
-    public boolean prepare(final GammaTransactionConfiguration config, final GammaRefTranlocal tranlocal) {
-        //todo: commuting stuff
-
-        if(tranlocal.isConstructing()){
-            return true;
-        }
-
-        if (!tranlocal.isWrite()) {
-            return true;
-        }
-
-        if (!tranlocal.isDirty()) {
-            boolean isDirty = long_value != tranlocal.long_oldValue;
-
-            if (!isDirty) {
-                return true;
-            }
-
-            tranlocal.setDirty(true);
-        }
-
-        return tryLockAndCheckConflict(config.spinCount, tranlocal, LOCKMODE_COMMIT);
-    }
 
     public final long atomicLongGet() {
+        assert type != TYPE_REF;
+
         int attempt = 1;
         do {
             if (!hasCommitLock()) {
 
                 long read = long_value;
+
+                if (!hasCommitLock()) {
+                    return read;
+                }
+            }
+            stm.defaultBackoffPolicy.delayedUninterruptible(attempt);
+            attempt++;
+        } while (attempt <= stm.spinCount);
+
+        throw new LockedException();
+    }
+
+    public final Object atomicObjectGet() {
+        assert type == TYPE_REF;
+
+        int attempt = 1;
+        do {
+            if (!hasCommitLock()) {
+
+                Object read = ref_value;
 
                 if (!hasCommitLock()) {
                     return read;

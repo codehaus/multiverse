@@ -15,7 +15,9 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     }
 
     public GammaIntRef(GammaStm stm, int value) {
-        super(stm, 0);//todo: type
+        super(stm, TYPE_INT);
+        this.long_value = value;
+        this.version = VERSION_UNCOMMITTED + 1;
     }
 
     @Override

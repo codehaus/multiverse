@@ -15,9 +15,9 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     }
 
     public GammaBooleanRef(GammaStm stm, boolean b) {
-        super(stm, -1);
-        //todo
-        throw new TodoException();
+        super(stm, TYPE_BOOLEAN);
+        this.long_value = asLong(b);
+        this.version = VERSION_UNCOMMITTED + 1;
     }
 
     @Override

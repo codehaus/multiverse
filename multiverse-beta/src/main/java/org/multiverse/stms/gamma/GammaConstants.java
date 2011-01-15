@@ -23,7 +23,9 @@ public interface GammaConstants extends MultiverseConstants {
     int TX_ABORTED = 3;
     int TX_COMMITTED = 4;
 
-    int TYPE_LONG = 1;
-    int TYPE_DOUBLE = 2;
-    int TYPE_REF = 3;
+    int TYPE_INT = 1;
+    int TYPE_LONG = 2;
+    int TYPE_DOUBLE = 3;
+    int TYPE_BOOLEAN = 4;
+    int TYPE_REF = 5;
 }

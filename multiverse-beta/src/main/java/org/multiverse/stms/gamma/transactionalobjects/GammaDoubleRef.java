@@ -15,7 +15,9 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
     }
 
     public GammaDoubleRef(GammaStm stm, double value) {
-        super(stm, TYPE_LONG);
+        super(stm, TYPE_DOUBLE);
+        this.long_value = asLong(value);
+        this.version = VERSION_UNCOMMITTED + 1;
     }
 
     @Override

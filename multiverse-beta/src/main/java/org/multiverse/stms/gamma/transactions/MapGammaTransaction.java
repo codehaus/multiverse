@@ -132,7 +132,7 @@ public final class MapGammaTransaction extends GammaTransaction {
         int listenersIndex = 0;
         int itemCount = 0;
         for (int k = 0; k < array.length; k++) {
-            GammaRefTranlocal tranlocal = array[k];
+            final GammaRefTranlocal tranlocal = array[k];
 
             if (tranlocal == null) {
                 continue;
@@ -141,8 +141,8 @@ public final class MapGammaTransaction extends GammaTransaction {
             itemCount++;
             array[k] = null;
 
-            AbstractGammaRef owner = tranlocal.owner;
-            Listeners listeners = owner.safe(tranlocal, pool);
+            final AbstractGammaRef owner = tranlocal.owner;
+            final Listeners listeners = owner.safe(tranlocal, pool);
             if(listeners!=null){
                 if(listenersArray == null){
                     listenersArray = pool.takeListenersArray(size-itemCount);
@@ -158,7 +158,7 @@ public final class MapGammaTransaction extends GammaTransaction {
 
     private void releaseArray(boolean success) {
         for (int k = 0; k < array.length; k++) {
-            GammaRefTranlocal tranlocal = array[k];
+            final GammaRefTranlocal tranlocal = array[k];
 
             if (tranlocal != null) {
                 if (success) {
@@ -265,8 +265,8 @@ public final class MapGammaTransaction extends GammaTransaction {
             final GammaRefTranlocal tranlocal = array[k];
             if (tranlocal == null) {
                 continue;
-
             }
+
             final AbstractGammaRef owner = tranlocal.owner;
             if (owner == null) {
                 continue;
@@ -315,7 +315,7 @@ public final class MapGammaTransaction extends GammaTransaction {
 
         //doing a full conflict scan
         for (int k = 0; k < array.length; k++) {
-            GammaRefTranlocal tranlocal = array[k];
+            final GammaRefTranlocal tranlocal = array[k];
             if (tranlocal == null || tranlocal == justAdded) {
                 continue;
             }

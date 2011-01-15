@@ -12,7 +12,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
     public GammaRefTranlocal head;
     public int size = 0;
     public boolean needsConsistency = false;
-    public Listeners[] listenersArray;
+    public final Listeners[] listenersArray;
 
     public ArrayGammaTransaction(GammaStm stm) {
         this(new GammaTransactionConfiguration(stm));
@@ -88,7 +88,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
                     }
                 }
 
-                Listeners[] listenersArray = commitChain();
+                final Listeners[] listenersArray = commitChain();
                 if (listenersArray != null) {
                     Listeners.openAll(listenersArray, pool);
                 }
@@ -105,12 +105,12 @@ public final class ArrayGammaTransaction extends GammaTransaction {
 
         GammaRefTranlocal node = head;
         do {
-            AbstractGammaRef owner = node.owner;
+            final AbstractGammaRef owner = node.owner;
             if (owner == null) {
                 return listenersArray;
             }
 
-            Listeners listeners = owner.safe(node, pool);
+            final Listeners listeners = owner.safe(node, pool);
             if (listeners != null) {
                 listenersArray[listenersIndex] = listeners;
                 listenersIndex++;
@@ -158,7 +158,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
     private void releaseChain(boolean success) {
         GammaRefTranlocal node = head;
         while (node != null) {
-            AbstractGammaRef owner = node.owner;
+            final AbstractGammaRef owner = node.owner;
 
             if (owner == null) {
                 return;

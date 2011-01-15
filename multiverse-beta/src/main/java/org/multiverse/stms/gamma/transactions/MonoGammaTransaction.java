@@ -48,7 +48,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
             //throw new AbortOn
         }
 
-        AbstractGammaRef owner = tranlocal.owner;
+        final AbstractGammaRef owner = tranlocal.owner;
 
         if (owner != null) {
             if (tranlocal.mode == TRANLOCAL_READ) {

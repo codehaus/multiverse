@@ -55,7 +55,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
 
     @Override
     public final E atomicGet() {
-        throw new TodoException();
+        return (E) atomicObjectGet();
     }
 
     @Override
@@ -117,7 +117,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
         return atomicAlter(function, true);
     }
 
-    private E atomicAlter(final Function<E> function, final boolean returnOld){
+    private E atomicAlter(final Function<E> function, final boolean returnOld) {
         //todo
         throw new TodoException();
     }
@@ -146,7 +146,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
         return getAndAlter(asGammaTransaction(tx), function);
     }
 
-    public final E getAndAlter(final GammaTransaction tx, final Function<E> function){
+    public final E getAndAlter(final GammaTransaction tx, final Function<E> function) {
         return alter(tx, function, true);
     }
 
@@ -193,7 +193,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     public final E awaitNotNullAndGet(final GammaTransaction tx) {
         final GammaRefTranlocal tranlocal = openForRead(tx, LOCKMODE_NONE);
 
-        if(tranlocal.ref_value==null){
+        if (tranlocal.ref_value == null) {
             tx.retry();
         }
 
