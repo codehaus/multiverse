@@ -43,6 +43,7 @@ public final class MapGammaTransaction extends GammaTransaction {
                 return -1;
             }
 
+            //noinspection ObjectEquality
             if (current.owner == ref) {
                 return index;
             }
@@ -191,6 +192,7 @@ public final class MapGammaTransaction extends GammaTransaction {
         status = TX_PREPARED;
     }
 
+    @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     private boolean doPrepare() {
         for (int k = 0; k < array.length; k++) {
             GammaRefTranlocal tranlocal = array[k];
@@ -316,6 +318,7 @@ public final class MapGammaTransaction extends GammaTransaction {
         //doing a full conflict scan
         for (int k = 0; k < array.length; k++) {
             final GammaRefTranlocal tranlocal = array[k];
+            //noinspection ObjectEquality
             if (tranlocal == null || tranlocal == justAdded) {
                 continue;
             }

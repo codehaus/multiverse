@@ -20,6 +20,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
         super(stm, TYPE_REF);
 
         this.ref_value = value;
+        //noinspection PointlessArithmeticExpression
         this.version = VERSION_UNCOMMITTED + 1;
     }
 
@@ -103,8 +104,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     public final void commute(final GammaTransaction tx, final Function<E> function) {
-        //todo:
-        throw new TodoException();
+        openForCommute(tx, function);
     }
 
     @Override
@@ -150,9 +150,30 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
         return alter(tx, function, true);
     }
 
-    private final E alter(final GammaTransaction tx, final Function<E> function, final boolean returnOld) {
-        //todo:
-        throw new TodoException();
+    private E alter(final GammaTransaction tx, final Function<E> function, final boolean returnOld) {
+         if(tx == null){
+            throw new NullPointerException();
+        }
+
+        if (function == null) {
+            tx.abort();
+            throw new NullPointerException("Function can't be null");
+        }
+
+        final GammaRefTranlocal write = openForWrite(tx, LOCKMODE_NONE);
+
+        boolean abort = true;
+
+        try {
+            E oldValue = (E)write.ref_value;
+            write.ref_value = function.call(oldValue);
+            abort = false;
+            return returnOld?oldValue:(E)write.ref_value;
+        } finally {
+            if (abort) {
+                tx.abort();
+            }
+        }
     }
 
     @Override
@@ -225,24 +246,35 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     public final void await(final GammaTransaction tx, final E value) {
+        //noinspection ObjectEquality
         if (openForRead(tx, LOCKMODE_NONE).ref_value != value) {
             tx.retry();
         }
     }
 
     @Override
-    public final void await(final Predicate predicate) {
+    public final void await(final Predicate<E> predicate) {
         await(getRequiredThreadLocalTransaction(), predicate);
     }
 
     @Override
-    public final void await(final Transaction tx, final Predicate predicate) {
+    public final void await(final Transaction tx, final Predicate<E> predicate) {
         await(asGammaTransaction(tx), predicate);
     }
 
-    public final void await(final GammaTransaction tx, final Predicate predicate) {
-        //todo
-        throw new TodoException();
+    public final void await(final GammaTransaction tx, final Predicate<E> predicate) {
+        final GammaRefTranlocal tranlocal = openForRead(tx, LOCKMODE_NONE);
+        boolean abort = true;
+        try {
+            if (!predicate.evaluate((E)tranlocal.ref_value)) {
+                tx.retry();
+            }
+            abort = false;
+        } finally {
+            if (abort) {
+                tx.abort();
+            }
+        }
     }
 
     @Override

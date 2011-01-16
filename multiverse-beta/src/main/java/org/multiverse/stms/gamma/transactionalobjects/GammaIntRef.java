@@ -2,11 +2,14 @@ package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.IntFunction;
 import org.multiverse.api.predicates.IntPredicate;
 import org.multiverse.api.references.IntRef;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
+
+import static org.multiverse.api.StmUtils.retry;
 
 public final class GammaIntRef extends AbstractGammaRef implements IntRef {
 
@@ -17,6 +20,7 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     public GammaIntRef(GammaStm stm, int value) {
         super(stm, TYPE_INT);
         this.long_value = value;
+        //noinspection PointlessArithmeticExpression
         this.version = VERSION_UNCOMMITTED + 1;
     }
 
@@ -52,7 +56,7 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
 
     @Override
     public final int atomicGet() {
-        return (int)atomicLongGet();
+        return (int) atomicGetLong();
     }
 
     @Override
@@ -62,14 +66,12 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
 
     @Override
     public final int atomicSet(final int newValue) {
-        atomicGetAndSet(newValue);
-        return newValue;
+        return (int)atomicSetLong(newValue,false);
     }
 
     @Override
     public final int atomicGetAndSet(final int newValue) {
-        //todo
-        throw new TodoException();
+        return (int)atomicSetLong(newValue,true);
     }
 
     @Override
@@ -100,8 +102,7 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     }
 
     public final void commute(final GammaTransaction tx, final IntFunction function) {
-        //todo
-        throw new TodoException();
+        openForCommute(tx, function);
     }
 
     @Override
@@ -148,14 +149,34 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     }
 
     private int alter(final GammaTransaction tx, final IntFunction function, final boolean returnOld) {
-        //todo
-        throw new TodoException();
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        if (function == null) {
+            tx.abort();
+            throw new NullPointerException("Function can't be null");
+        }
+
+        final GammaRefTranlocal write = openForWrite(tx, LOCKMODE_NONE);
+
+        boolean abort = true;
+
+        try {
+            int oldValue = (int) write.long_value;
+            write.long_value = function.call(oldValue);
+            abort = false;
+            return returnOld?oldValue:(int)write.long_value;
+        } finally {
+            if (abort) {
+                tx.abort();
+            }
+        }
     }
 
     @Override
     public final boolean atomicCompareAndSet(final int expectedValue, final int newValue) {
-        //todo
-        throw new TodoException();
+        return atomicCompareAndSetLong(expectedValue, newValue);
     }
 
     @Override
@@ -202,8 +223,10 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     }
 
     private int increment(final GammaTransaction tx, final int amount, final boolean returnOld){
-        //todo
-        throw new TodoException();
+        GammaRefTranlocal tranlocal = openForWrite(tx, LOCKMODE_NONE);
+        int oldValue = (int) tranlocal.long_value;
+        tranlocal.long_value+=amount;
+        return returnOld?oldValue:(int)tranlocal.long_value;
     }
 
     @Override
@@ -227,8 +250,7 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     }
 
     public final void increment(final GammaTransaction tx, final int amount) {
-        //todo
-        throw new TodoException();
+        commute(tx, Functions.newIncIntFunction(amount));
     }
 
     @Override
@@ -262,8 +284,9 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     }
 
     public final void await(final GammaTransaction tx, final int value) {
-        //todo
-        throw new TodoException();
+        if(get(tx)!=value){
+            retry();
+        }
     }
 
     @Override
@@ -277,8 +300,18 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     }
 
     public final void await(final GammaTransaction tx, final IntPredicate predicate) {
-        //todo:
-        throw new TodoException();
+        final GammaRefTranlocal tranlocal = openForRead(tx, LOCKMODE_NONE);
+        boolean abort = true;
+        try {
+            if (!predicate.evaluate((int)tranlocal.long_value)) {
+                tx.retry();
+            }
+            abort = false;
+        } finally {
+            if (abort) {
+                tx.abort();
+            }
+        }
     }
 
     @Override

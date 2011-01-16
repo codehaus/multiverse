@@ -57,6 +57,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
             }
 
             //lets skip the one we just added
+            //noinspection ObjectEquality
             if (node != justAdded) {
                 //if there is a read conflict, we are doe
                 if (node.owner.hasReadConflict(node)) {
@@ -121,6 +122,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         return listenersArray;
     }
 
+    @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     private boolean prepareChainForCommit() {
         GammaRefTranlocal node = head;
 
@@ -178,6 +180,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
     public GammaRefTranlocal getRefTranlocal(AbstractGammaRef ref) {
         GammaRefTranlocal node = head;
         while (node != null) {
+            //noinspection ObjectEquality
             if (node.owner == ref) {
                 return node;
             }
@@ -300,6 +303,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
     }
 
     public void shiftInFront(GammaRefTranlocal newHead) {
+        //noinspection ObjectEquality
         if (newHead == head) {
             return;
         }

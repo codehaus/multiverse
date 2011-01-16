@@ -359,7 +359,7 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
-    void await(Predicate predicate);
+    void await(Predicate<E> predicate);
 
     /**
      * Awaits until the predicate holds.  If the value already evaluates to true, the call continues
@@ -373,5 +373,5 @@ public interface Ref<E> extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
-    void await(Transaction tx, Predicate predicate);
+    void await(Transaction tx, Predicate<E> predicate);
 }

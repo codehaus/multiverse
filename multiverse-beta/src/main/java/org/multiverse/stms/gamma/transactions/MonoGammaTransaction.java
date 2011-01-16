@@ -6,7 +6,6 @@ import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 public final class MonoGammaTransaction extends GammaTransaction {
@@ -54,18 +53,8 @@ public final class MonoGammaTransaction extends GammaTransaction {
             if (tranlocal.mode == TRANLOCAL_READ) {
                 owner.releaseAfterReading(tranlocal, pool);
             } else if (tranlocal.mode == TRANLOCAL_WRITE) {
-                GammaLongRef ref = (GammaLongRef) owner;
-
                 if (status == TX_ACTIVE) {
-                    if (!tranlocal.isDirty()) {
-                        boolean isDirty = tranlocal.long_value != tranlocal.long_oldValue;
-
-                        if (isDirty) {
-                            tranlocal.setDirty(true);
-                        }
-                    }
-
-                    if (!ref.tryLockAndCheckConflict(config.spinCount, tranlocal, LOCKMODE_COMMIT)) {
+                    if(!owner.prepare(config, tranlocal)){
                         throw abortOnReadWriteConflict();
                     }
                 }
@@ -122,6 +111,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
 
     @Override
     public GammaRefTranlocal getRefTranlocal(AbstractGammaRef ref) {
+        //noinspection ObjectEquality
         return tranlocal.owner == ref ? tranlocal : null;
     }
 

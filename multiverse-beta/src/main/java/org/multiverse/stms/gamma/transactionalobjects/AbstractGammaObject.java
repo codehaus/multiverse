@@ -46,15 +46,17 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
     public final GammaStm stm;
 
+    @SuppressWarnings({"UnusedDeclaration"})
     protected volatile Listeners listeners;
 
+    @SuppressWarnings({"VolatileLongOrDoubleField"})
     public volatile long version;
 
+    @SuppressWarnings({"VolatileLongOrDoubleField"})
     public volatile long orec;
 
     //This field has a controlled JMM problem (just like the hashcode of String).
     protected int identityHashCode;
-    private final boolean isRef;
 
     public static GammaTransaction getRequiredThreadLocalGammaTransaction() {
         Transaction tx = getThreadLocalTransaction();
@@ -80,14 +82,8 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 format("Expected Transaction of class %s, found %s", GammaTransaction.class.getName(), tx.getClass().getName()));
     }
 
-    public AbstractGammaObject(GammaStm stm, boolean isRef) {
+    public AbstractGammaObject(GammaStm stm) {
         this.stm = stm;
-        this.isRef = isRef;
-    }
-
-    @Override
-    public boolean isRef() {
-        return isRef;
     }
 
     @Override
@@ -142,7 +138,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         //But it could be that the registration completes after the write has happened.
 
         Listeners update = pool.takeListeners();
-        update.threadName = Thread.currentThread().getName();
+        //update.threadName = Thread.currentThread().getName();
         update.listener = latch;
         update.listenerEra = listenerEra;
 
@@ -282,6 +278,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         openForRead(tx, lockMode.asInt());
     }
 
+    @SuppressWarnings({"SimplifiableIfStatement"})
     @Override
     public final boolean hasReadConflict(final GammaRefTranlocal tranlocal) {
         if (tranlocal.getLockMode() != LOCKMODE_NONE) {
@@ -394,65 +391,14 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
     }
 
-    private void yieldIfNeeded(final int remainingSpins) {
+    private static void yieldIfNeeded(final int remainingSpins) {
         if (remainingSpins % ___SpinYield == 0 && remainingSpins > 0) {
+            //noinspection CallToThreadYield
             Thread.yield();
         }
     }
 
-    @Override
-    public final void releaseAfterFailure(final GammaRefTranlocal tranlocal, final GammaObjectPool pool) {
-        if (tranlocal.headCallable != null) {
-            CallableNode node = tranlocal.headCallable;
-            do {
-                CallableNode next = node.next;
-                pool.putCallableNode(node);
-                node = next;
-            } while (node != null);
-            tranlocal.headCallable = null;
-        }
 
-        if (tranlocal.hasDepartObligation()) {
-            if (tranlocal.getLockMode() != LOCKMODE_NONE) {
-                departAfterFailureAndUnlock();
-                tranlocal.setLockMode(LOCKMODE_NONE);
-            } else {
-                departAfterFailure();
-            }
-            tranlocal.setDepartObligation(false);
-        } else if (tranlocal.getLockMode() != LOCKMODE_NONE) {
-            unlockWhenUnregistered();
-            tranlocal.setLockMode(LOCKMODE_NONE);
-        }
-
-        tranlocal.owner = null;
-    }
-
-    @Override
-    public final void releaseAfterUpdate(final GammaRefTranlocal tranlocal, final GammaObjectPool pool) {
-        departAfterUpdateAndUnlock();
-        tranlocal.setLockMode(LOCKMODE_NONE);
-        tranlocal.owner = null;
-        tranlocal.setDepartObligation(false);
-    }
-
-    @Override
-    public final void releaseAfterReading(final GammaRefTranlocal tranlocal, final GammaObjectPool pool) {
-        if (tranlocal.hasDepartObligation()) {
-            if (tranlocal.getLockMode() != LOCKMODE_NONE) {
-                departAfterReadingAndUnlock();
-                tranlocal.setLockMode(LOCKMODE_NONE);
-            } else {
-                departAfterReading();
-            }
-            tranlocal.setDepartObligation(false);
-        } else if (tranlocal.getLockMode() != LOCKMODE_NONE) {
-            unlockWhenUnregistered();
-            tranlocal.setLockMode(LOCKMODE_NONE);
-        }
-
-        tranlocal.owner = null;
-    }
 
     @Override
     public final boolean tryLockAndCheckConflict(
@@ -462,7 +408,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
         final int currentLockMode = tranlocal.getLockMode();
 
-        //if the currentlock mode is higher or equal than the desired lockmode, we are done.
+        //if the currentLockMode mode is higher or equal than the desired lockmode, we are done.
         if (currentLockMode >= desiredLockMode) {
             return true;
         }

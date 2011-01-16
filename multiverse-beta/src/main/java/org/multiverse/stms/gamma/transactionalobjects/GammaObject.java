@@ -46,8 +46,8 @@ public interface GammaObject extends GammaConstants {
      *
      * Call can safely
      *
-     * @param spinCount
-     * @param tranlocal
+     * @param spinCount the maximum number of times to spin
+     * @param tranlocal the tranlocal
      * @param lockMode
      * @return
      */
@@ -55,13 +55,7 @@ public interface GammaObject extends GammaConstants {
 
     boolean hasReadConflict(GammaRefTranlocal tranlocal);
 
-    void releaseAfterFailure(GammaRefTranlocal tranlocal, GammaObjectPool pool);
-
-    void releaseAfterUpdate(GammaRefTranlocal tranlocal, GammaObjectPool pool);
-
-    void releaseAfterReading(GammaRefTranlocal tranlocal, GammaObjectPool pool);
-
-    long getVersion();
+     long getVersion();
 
     GammaStm getStm();
 
@@ -70,6 +64,4 @@ public interface GammaObject extends GammaConstants {
     int registerChangeListener(RetryLatch latch, GammaRefTranlocal tranlocal, GammaObjectPool pool, long listenerEra);
 
     int identityHashCode();
-
-    boolean isRef();
 }
