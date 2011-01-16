@@ -9,13 +9,10 @@ import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
-import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
+import org.multiverse.stms.gamma.transactionalobjects.*;
 
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.assertIsAborted;
-import static org.multiverse.TestUtils.assertIsCommitted;
-import static org.multiverse.TestUtils.getField;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public abstract class GammaTransaction_commitTest<T extends GammaTransaction> implements GammaConstants {
@@ -32,6 +29,77 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
     protected abstract T newTransaction(GammaTransactionConfiguration config);
 
     protected abstract void assertCleaned(T transaction);
+
+    @Test
+    public void whenBooleanRef() {
+        boolean initialValue = false;
+        GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction tx = newTransaction();
+        ref.set(tx, true);
+        tx.commit();
+
+        assertVersionAndValue(ref, initialVersion + 1, true);
+        assertRefHasNoLocks(ref);
+    }
+
+    @Test
+    public void whenIntRef() {
+        int initialValue = 10;
+        GammaIntRef ref = new GammaIntRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction tx = newTransaction();
+        ref.set(tx, initialValue + 1);
+        tx.commit();
+
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
+        assertRefHasNoLocks(ref);
+    }
+
+    @Test
+    public void whenLongRef() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction tx = newTransaction();
+        ref.set(tx, initialValue + 1);
+        tx.commit();
+
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
+        assertRefHasNoLocks(ref);
+    }
+
+    @Test
+    public void whenDoubleRef() {
+        double initialValue = 10;
+        GammaDoubleRef ref = new GammaDoubleRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction tx = newTransaction();
+        ref.set(tx, initialValue + 1);
+        tx.commit();
+
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
+        assertRefHasNoLocks(ref);
+    }
+
+    @Test
+    public void whenRef() {
+        String initialValue = "foo";
+        GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction tx = newTransaction();
+        String newValue = "bar";
+        ref.set(tx, newValue);
+        tx.commit();
+
+        assertVersionAndValue(ref, initialVersion + 1, "bar");
+        assertRefHasNoLocks(ref);
+    }
 
     @Test
     public void whenContainsListener() {
@@ -55,7 +123,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
         assertTrue(listeningTx.listener.isOpen());
         assertNull(getField(ref, "listeners"));
         assertRefHasNoLocks(ref);
-        assertVersionAndValue(ref, initialVersion+1, initialValue+1);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
     }
 
     @Test

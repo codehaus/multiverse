@@ -1,6 +1,7 @@
 package org.multiverse.stms.gamma;
 
 import org.junit.Assert;
+import org.multiverse.TestUtils;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.functions.Function;
@@ -124,12 +125,27 @@ public class GammaTestUtils implements GammaConstants {
 
     public static void assertVersionAndValue(GammaLongRef ref, long version, long value) {
         Assert.assertEquals("version doesn't match", version, ref.getVersion());
-        Assert.assertEquals("value doesn't match", value, ref.long_value);
+        Assert.assertEquals("value doesn't match", value, ref.atomicWeakGet());
+    }
+
+    public static void assertVersionAndValue(GammaBooleanRef ref, long version, boolean value) {
+        Assert.assertEquals("version doesn't match", version, ref.getVersion());
+        Assert.assertEquals("value doesn't match", value, ref.atomicWeakGet());
+    }
+
+    public static void assertVersionAndValue(GammaIntRef ref, long version, int value) {
+        Assert.assertEquals("version doesn't match", version, ref.getVersion());
+        Assert.assertEquals("value doesn't match", value, ref.atomicWeakGet());
+    }
+
+      public static void assertVersionAndValue(GammaDoubleRef ref, long version, double value) {
+        Assert.assertEquals("version doesn't match", version, ref.getVersion());
+        TestUtils.assertEqualsDouble("value doesn't match", value, ref.atomicWeakGet());
     }
 
     public static <E> void assertVersionAndValue(GammaRef<E> ref, long version, E value) {
         Assert.assertEquals("version doesn't match", version, ref.getVersion());
-        Assert.assertSame("value doesn't match", value, ref.ref_value);
+        Assert.assertSame("value doesn't match", value, ref.atomicWeakGet());
     }
 
 

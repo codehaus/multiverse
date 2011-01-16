@@ -4,17 +4,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicIntClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRefTranlocal;
-import org.multiverse.stms.beta.transactionalobjects.BetaRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaRefTranlocal;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaIntRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -23,8 +21,6 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newRef;
 
 /**
  * A StressTest that simulates a database connection pool. The code is quite ugly, but that is because
@@ -32,40 +28,46 @@ import static org.multiverse.stms.beta.BetaStmTestUtils.newRef;
  *
  * @author Peter Veentjer.
  */
-public class ConnectionPoolStressTest implements BetaStmConstants {
+public class ConnectionPoolStressTest implements GammaConstants {
     private int poolsize = processorCount();
     private int threadCount = processorCount() * 2;
     private volatile boolean stop;
 
     private ConnectionPool pool;
-    private BetaStm stm;
-    private int lockMode;
+    private GammaStm stm;
+    private LockMode lockMode;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = (BetaStm) getGlobalStmInstance();
-        pool = new ConnectionPool(poolsize);
+        stm = (GammaStm) getGlobalStmInstance();
         stop = false;
     }
 
     @Test
-    public void testEnsured() {
-        test(LOCKMODE_WRITE);
-    }
-
-    @Test
-    public void testPrivatized() {
-        test(LOCKMODE_COMMIT);
-    }
-
-    @Test
     public void testNoLocking() {
-        test(LOCKMODE_NONE);
+        test(LockMode.None);
     }
 
-    public void test(int lockMode) {
+    @Test
+    public void testReadLockMode() {
+        test(LockMode.Read);
+    }
+
+    @Test
+    public void testWriteLockMode() {
+        test(LockMode.Write);
+    }
+
+    @Test
+    public void testCommitLockMode() {
+        test(LockMode.Commit);
+    }
+
+    public void test(LockMode lockMode) {
         this.lockMode = lockMode;
+
+        pool = new ConnectionPool(poolsize);
         WorkerThread[] threads = createThreads();
 
         startAll(threads);
@@ -79,29 +81,30 @@ public class ConnectionPoolStressTest implements BetaStmConstants {
 
     class ConnectionPool {
         final AtomicBlock takeConnectionBlock = stm.createTransactionFactoryBuilder()
+                .setWriteLockMode(lockMode)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
 
         final AtomicBlock returnConnectionBlock = stm.createTransactionFactoryBuilder()
+                .setWriteLockMode(lockMode)
                 .buildAtomicBlock();
 
         final AtomicBlock sizeBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
 
-        final BetaIntRef size = newIntRef(stm);
-        final BetaRef<Node<Connection>> head = newRef(stm);
+        final GammaIntRef size = new GammaIntRef(stm);
+        final GammaRef<Node<Connection>> head = new GammaRef<Node<Connection>>(stm);
 
         ConnectionPool(final int poolsize) {
             stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
+                    size.set(poolsize);
 
-                    BetaRefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, lockMode);
-
-                    for (int k = 0; k < poolsize; k++) {
-                        headTranlocal.value = new Node(headTranlocal.value, new Connection());
-                        btx.openForWrite(size, lockMode).value++;
+                    Node<Connection> h = null;
+                    for(int k=0;k<poolsize;k++){
+                        h = new Node<Connection>(h, new Connection());
                     }
+                    head.set(h);
                 }
             });
         }
@@ -110,19 +113,15 @@ public class ConnectionPoolStressTest implements BetaStmConstants {
             return takeConnectionBlock.execute(new AtomicClosure<Connection>() {
                 @Override
                 public Connection execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-
-                    BetaIntRefTranlocal sizeTranlocal = btx.openForWrite(size, lockMode);
-                    if (sizeTranlocal.value == 0) {
+                    if (size.get() == 0) {
                         retry();
                     }
 
-                    sizeTranlocal.value--;
+                    size.increment();
 
-                    BetaRefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, lockMode);
-                    Node<Connection> oldHead = headTranlocal.value;
-                    headTranlocal.value = oldHead.next;
-                    return oldHead.item;
+                    Node<Connection> current = head.get();
+                    head.set(current.next);
+                    return current.item;
                 }
             });
         }
@@ -131,14 +130,10 @@ public class ConnectionPoolStressTest implements BetaStmConstants {
             returnConnectionBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
+                    size.increment();
 
-                    btx.openForWrite(size, lockMode).value++;
-
-                    BetaRefTranlocal<Node<Connection>> headTranlocal = btx.openForWrite(head, lockMode);
-
-                    Node<Connection> oldHead = headTranlocal.value;
-                    headTranlocal.value = new Node<Connection>(oldHead, c);
+                    Node<Connection> oldHead = head.get();
+                    head.set(new Node<Connection>(oldHead, c));
                 }
             });
         }
@@ -147,8 +142,7 @@ public class ConnectionPoolStressTest implements BetaStmConstants {
             return sizeBlock.execute(new AtomicIntClosure() {
                 @Override
                 public int execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-                    return btx.openForRead(size, LOCKMODE_NONE).value;
+                    return size.get();
                 }
             });
         }

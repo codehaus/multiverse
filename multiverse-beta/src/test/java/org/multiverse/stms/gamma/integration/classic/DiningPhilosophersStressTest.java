@@ -10,9 +10,9 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.BooleanRef;
 import org.multiverse.api.references.RefFactory;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmConfiguration;
-import org.multiverse.stms.beta.BetaStmConstants;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.GammaStmConfiguration;
 
 import static org.junit.Assert.assertFalse;
 import static org.multiverse.TestUtils.*;
@@ -23,7 +23,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 /**
  * http://en.wikipedia.org/wiki/Dining_philosophers_problem
  */
-public class DiningPhilosophersStressTest implements BetaStmConstants {
+public class DiningPhilosophersStressTest implements GammaConstants {
 
     private int philosopherCount = 10;
     private volatile boolean stop;
@@ -36,9 +36,9 @@ public class DiningPhilosophersStressTest implements BetaStmConstants {
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        BetaStmConfiguration config = new BetaStmConfiguration();
+        GammaStmConfiguration config = new GammaStmConfiguration();
         //config.backoffPolicy = new SpinningBackoffPolicy();
-        stm = new BetaStm(config);
+        stm = new GammaStm(config);
         refFactory = stm.getRefFactoryBuilder().build();
         stop = false;
     }

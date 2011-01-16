@@ -16,6 +16,8 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
+//todo: testing of different lock modes
+//todo: testing if multiple transfers are done
 public class MoneyTransferStressTest {
 
     private volatile boolean stop;
