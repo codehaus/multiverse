@@ -43,6 +43,7 @@ public final class MapGammaTransaction extends GammaTransaction {
                 return -1;
             }
 
+            //noinspection ObjectEquality
             if (current.owner == ref) {
                 return index;
             }
@@ -86,9 +87,12 @@ public final class MapGammaTransaction extends GammaTransaction {
         for (int k = 0; k < oldArray.length; k++) {
             final GammaRefTranlocal tranlocal = oldArray[k];
 
-            if (tranlocal != null) {
-                attach(tranlocal, tranlocal.owner.identityHashCode());
+            if (tranlocal == null) {
+                continue;
             }
+
+            oldArray[k] = null;
+            attach(tranlocal, tranlocal.owner.identityHashCode());
         }
 
         pool.putTranlocalArray(oldArray);
@@ -138,19 +142,20 @@ public final class MapGammaTransaction extends GammaTransaction {
                 continue;
             }
 
-            itemCount++;
             array[k] = null;
 
             final AbstractGammaRef owner = tranlocal.owner;
             final Listeners listeners = owner.safe(tranlocal, pool);
-            if(listeners!=null){
-                if(listenersArray == null){
-                    listenersArray = pool.takeListenersArray(size-itemCount);
+            if (listeners != null) {
+                if (listenersArray == null) {
+                    listenersArray = pool.takeListenersArray(size - itemCount);
                 }
-                listenersArray[listenersIndex]=listeners;
+
+                listenersArray[listenersIndex] = listeners;
                 listenersIndex++;
             }
             pool.put(tranlocal);
+            itemCount++;
         }
 
         return listenersArray;
@@ -161,13 +166,13 @@ public final class MapGammaTransaction extends GammaTransaction {
             final GammaRefTranlocal tranlocal = array[k];
 
             if (tranlocal != null) {
+                array[k] = null;
                 if (success) {
                     tranlocal.owner.releaseAfterReading(tranlocal, pool);
                 } else {
                     tranlocal.owner.releaseAfterFailure(tranlocal, pool);
                 }
                 pool.put(tranlocal);
-                array[k] = null;
             }
         }
     }
@@ -191,14 +196,17 @@ public final class MapGammaTransaction extends GammaTransaction {
         status = TX_PREPARED;
     }
 
+    @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     private boolean doPrepare() {
         for (int k = 0; k < array.length; k++) {
-            GammaRefTranlocal tranlocal = array[k];
+            final GammaRefTranlocal tranlocal = array[k];
 
-            if (tranlocal != null) {
-                if (!tranlocal.owner.prepare(config, tranlocal)) {
-                    return false;
-                }
+            if (tranlocal == null) {
+                continue;
+            }
+
+            if (!tranlocal.owner.prepare(this, tranlocal)) {
+                return false;
             }
         }
 
@@ -267,10 +275,9 @@ public final class MapGammaTransaction extends GammaTransaction {
                 continue;
             }
 
+            array[k] = null;
+
             final AbstractGammaRef owner = tranlocal.owner;
-            if (owner == null) {
-                continue;
-            }
 
             if (furtherRegistrationNeeded) {
                 switch (owner.registerChangeListener(listener, tranlocal, pool, listenerEra)) {
@@ -289,6 +296,7 @@ public final class MapGammaTransaction extends GammaTransaction {
             }
 
             owner.releaseAfterFailure(tranlocal, pool);
+            pool.put(tranlocal);
         }
 
         status = TX_ABORTED;
@@ -316,6 +324,7 @@ public final class MapGammaTransaction extends GammaTransaction {
         //doing a full conflict scan
         for (int k = 0; k < array.length; k++) {
             final GammaRefTranlocal tranlocal = array[k];
+            //noinspection ObjectEquality
             if (tranlocal == null || tranlocal == justAdded) {
                 continue;
             }

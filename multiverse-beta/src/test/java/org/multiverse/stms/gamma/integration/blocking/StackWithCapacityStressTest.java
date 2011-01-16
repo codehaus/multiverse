@@ -4,16 +4,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRefTranlocal;
-import org.multiverse.stms.beta.transactionalobjects.BetaRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaRefTranlocal;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaIntRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -24,8 +22,6 @@ import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newRef;
 
 /**
  * The test is not very efficient since a lot of temporary objects like the transaction template are created.
@@ -33,38 +29,45 @@ import static org.multiverse.stms.beta.BetaStmTestUtils.newRef;
  *
  * @author Peter Veentjer.
  */
-public class StackWithCapacityStressTest implements BetaStmConstants {
+public class StackWithCapacityStressTest implements GammaConstants {
 
-    private BetaStm stm;
+    private GammaStm stm;
     private int itemCount = 2 * 1000 * 1000;
     private Stack<Integer> stack;
     private int maxCapacity = 1000;
-    private int lockMode;
+    private LockMode lockMode;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = (BetaStm) getGlobalStmInstance();
-        stack = new Stack<Integer>();
+        stm = (GammaStm) getGlobalStmInstance();
     }
 
     @Test
-    public void testPrivatized() {
-        test(LOCKMODE_COMMIT);
+    public void testWithNoLocks() {
+        test(LockMode.None);
     }
 
     @Test
-    public void testEnsured() {
-        test(LOCKMODE_WRITE);
+    public void testWithReadLock() {
+        test(LockMode.Read);
     }
 
     @Test
-    public void testOptimistic() {
-        test(LOCKMODE_NONE);
+    public void testWithWriteLock() {
+        test(LockMode.Write);
     }
 
-    public void test(int lockMode) {
+    @Test
+    public void testWithCommitLock() {
+        test(LockMode.Commit);
+    }
+
+
+    public void test(LockMode lockMode) {
         this.lockMode = lockMode;
+
+        stack = new Stack<Integer>();
 
         ProduceThread produceThread = new ProduceThread();
         ConsumeThread consumeThread = new ConsumeThread();
@@ -123,26 +126,25 @@ public class StackWithCapacityStressTest implements BetaStmConstants {
     }
 
     class Stack<E> {
-        private final BetaRef<Node<E>> head = newRef(stm);
-        private final BetaIntRef size = newIntRef(stm);
-        private final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
-        private final AtomicBlock popBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
+        private final GammaRef<Node<E>> head = new GammaRef<Node<E>>(stm);
+        private final GammaIntRef size = new GammaIntRef(stm);
+        private final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder()
+                .setReadLockMode(lockMode)
+                .buildAtomicBlock();
+        private final AtomicBlock popBlock = stm.createTransactionFactoryBuilder()
+                .setReadLockMode(lockMode)
+                .buildAtomicBlock();
 
         public void push(final E item) {
             pushBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-
-                    BetaIntRefTranlocal sizeTranlocal = btx.openForWrite(size, lockMode);
-
-                    if (sizeTranlocal.value >= maxCapacity) {
+                    if (size.get() >= maxCapacity) {
                         retry();
                     }
 
-                    sizeTranlocal.value++;
-                    BetaRefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, lockMode);
-                    headTranlocal.value = new Node<E>(item, headTranlocal.value);
+                    size.increment();
+                    head.set(new Node<E>(item, head.get()));
                 }
             });
         }
@@ -151,20 +153,14 @@ public class StackWithCapacityStressTest implements BetaStmConstants {
             return popBlock.execute(new AtomicClosure<E>() {
                 @Override
                 public E execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-
-                    BetaRefTranlocal<Node<E>> headTranlocal = btx.openForWrite(head, lockMode);
-
-                    if (headTranlocal.value == null) {
+                    if (head.isNull()) {
                         retry();
                     }
 
-                    BetaIntRefTranlocal sizeTranlocal = btx.openForWrite(size, lockMode);
-                    sizeTranlocal.value--;
-
-                    E value = headTranlocal.value.item;
-                    headTranlocal.value = headTranlocal.value.next;
-                    return value;
+                    size.decrement();
+                    Node<E> node = head.get();
+                    head.set(node.next);
+                    return node.item;
                 }
             });
         }

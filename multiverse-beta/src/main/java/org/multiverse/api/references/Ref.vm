@@ -538,7 +538,7 @@ public interface ${transactionalObject.referenceInterface}${transactionalObject.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
-    void await(${transactionalObject.predicateClass} predicate);
+    void await(${transactionalObject.predicateClass}${transactionalObject.typeParameter} predicate);
 
     /**
      * Awaits until the predicate holds.  If the value already evaluates to true, the call continues
@@ -552,5 +552,5 @@ public interface ${transactionalObject.referenceInterface}${transactionalObject.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
-    void await(Transaction tx, ${transactionalObject.predicateClass} predicate);
+    void await(Transaction tx, ${transactionalObject.predicateClass}${transactionalObject.typeParameter} predicate);
 }

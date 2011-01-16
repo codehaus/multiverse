@@ -128,6 +128,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         }
 
         assertEquals(TransactionStatus.Aborted, tx.getStatus());
+        assertEquals(maxCapacity+1, tx.getConfiguration().getSpeculativeConfiguration().minimalLength);
     }
 
     @Test

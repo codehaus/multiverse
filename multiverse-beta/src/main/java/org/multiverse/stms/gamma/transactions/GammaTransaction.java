@@ -1,7 +1,6 @@
 package org.multiverse.stms.gamma.transactions;
 
 import org.multiverse.api.Transaction;
-import org.multiverse.api.TransactionConfiguration;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.blocking.RetryLatch;
@@ -326,7 +325,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public abstract GammaRefTranlocal locate(AbstractGammaRef o);
 
     @Override
-    public final TransactionConfiguration getConfiguration() {
+    public final GammaTransactionConfiguration getConfiguration() {
         return config;
     }
 
@@ -446,8 +445,8 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public final void copyForSpeculativeFailure(GammaTransaction failingTx){
-        remainingTimeoutNs = failingTx.getRemainingTimeoutNs();
-        attempt = failingTx.getAttempt();
+        remainingTimeoutNs = failingTx.remainingTimeoutNs;
+        attempt = failingTx.attempt;
     }
 
     public final void init(GammaTransactionConfiguration config) {
@@ -458,6 +457,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         hardReset();
     }
 
+    @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     public abstract boolean isReadConsistent(GammaRefTranlocal justAdded);
 
     public final TransactionStatus getStatus() {

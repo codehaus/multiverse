@@ -9,6 +9,7 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 import static junit.framework.Assert.assertSame;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.multiverse.TestUtils.assertIsActive;
 
 public class MapGammaTransaction_openingManyItemsTest implements GammaConstants{
@@ -49,6 +50,7 @@ public class MapGammaTransaction_openingManyItemsTest implements GammaConstants{
         for (int k = 0; k < refCount; k++) {
             GammaLongRef ref = refs[k];
             GammaRefTranlocal found = reading ? ref.openForRead(tx, LOCKMODE_NONE) : ref.openForWrite(tx, LOCKMODE_NONE);
+            assertNotNull(found);
             assertSame(ref, found.owner);
             assertSame("tranlocal is incorrect at " + k, tranlocals[k], found);
         }

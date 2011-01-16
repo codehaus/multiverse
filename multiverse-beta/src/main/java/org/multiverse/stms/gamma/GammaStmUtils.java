@@ -7,7 +7,7 @@ public class GammaStmUtils {
         if (o == null) {
             return "null";
         } else {
-            return o.getClass().getName() + "@" + System.identityHashCode(o);
+            return o.getClass().getName() + '@' + System.identityHashCode(o);
         }
     }
 }

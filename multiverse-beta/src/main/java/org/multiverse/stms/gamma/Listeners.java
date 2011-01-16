@@ -16,10 +16,10 @@ import org.multiverse.api.blocking.RetryLatch;
  * @author Peter Veentjer
  */
 public class Listeners {
-      public Listeners next;
+    public Listeners next;
     public RetryLatch listener;
     public long listenerEra;
-    public String threadName;
+    //public String threadName;
 
     /**
      * Prepares this Listeners object for pooling. This is done by:
@@ -81,11 +81,8 @@ public class Listeners {
             if (listeners == null) {
                 break;
             }
-
-            listeners.openAll(pool);
-
-            //lets remove the listeners (needed for pooling).
             listenersArray[k] = null;
+            listeners.openAll(pool);
         }
     }
 }

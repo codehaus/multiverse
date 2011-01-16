@@ -7,7 +7,6 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 
 public class GammaRef_atomicGetAndSetTest {
 
-
     private GammaStm stm;
 
     @Before

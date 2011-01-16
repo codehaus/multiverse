@@ -2,14 +2,6 @@
                         to do
 --------------------------------------------------------------------
 
-- listeners need to be retrieved after commit
-
-- mono gamma transaction: release listeners after write
-
-- array gamma transaction: release listeners after write
-
-- map gamma transaction: release listeners after write
-
 - stm conflict detection
 
 - commute: while commuting, no transaction accessed allowed.
@@ -19,8 +11,6 @@
 - readonly/readbiased
 
 - read consistency
-
-- different types
 
 - write skew
 
@@ -32,15 +22,43 @@
 
 - transaction template.
 
+- commute for int ref
+
+- commute for boolean ref
+
+- commute for double ref
+
+- commute for ref
+
+- open for construction
+
+--------------------------------------------------------------------
+                        done
+--------------------------------------------------------------------
+
+- mono tx comit and different types
+
 - mono transaction and retry
 
 - array transaction and retry
 
 - map transaction and retry
 
---------------------------------------------------------------------
-                        done
---------------------------------------------------------------------
+- ref
+
+- doubleref
+
+- intref
+
+- booleanref
+
+- listeners need to be retrieved after commit
+
+- mono gamma transaction: release listeners after write
+
+- array gamma transaction: release listeners after write
+
+- map gamma transaction: release listeners after write
 
 - removed all the openForRead/openForWrite/commute/openForConstruction on the transaction
 
@@ -98,7 +116,7 @@
 
 - gamma long ref now implements the longref interface
 
-- gamma transaction now implement transacton interface
+- gamma transaction now implement transaction interface
 
 - gamma transaction config now implement transactionconfig interface
 

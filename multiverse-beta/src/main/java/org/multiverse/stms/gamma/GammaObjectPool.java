@@ -1,6 +1,5 @@
 package org.multiverse.stms.gamma;
 
-import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.CallableNode;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
@@ -29,22 +28,22 @@ public final class GammaObjectPool {
         System.getProperty("org.multiverse.stm,beta.BetaObjectPool.enabled","true"));
 
     private final static boolean TRANLOCAL_POOLING_ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.tranlocalPooling",""+ENABLED));
+        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.tranlocalPooling", String.valueOf(ENABLED)));
 
     private final static boolean TRANLOCALARRAY_POOLING_ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.tranlocalArrayPooling",""+ENABLED));
+        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.tranlocalArrayPooling", String.valueOf(ENABLED)));
 
     private final static boolean LISTENER_POOLING_ENABLED  = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.listenersPooling",""+ENABLED));
+        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.listenersPooling", String.valueOf(ENABLED)));
 
     private final static boolean LISTENERSARRAY_POOLING_ENABLED  = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.listenersArrayPooling",""+ENABLED));
+        System.getProperty("org.multiverse.stm.beta.BetaObjectPool.listenersArrayPooling", String.valueOf(ENABLED)));
 
     private final static boolean ARRAYLIST_POOLING_ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.GammaObjectPool.arrayListPooling",""+ENABLED));
+        System.getProperty("org.multiverse.stm.beta.GammaObjectPool.arrayListPooling", String.valueOf(ENABLED)));
 
     private final static boolean CALLABLENODE_POOLING_ENABLED = Boolean.parseBoolean(
-        System.getProperty("org.multiverse.stm.beta.GammaObjectPool.callableNodePooling",""+ENABLED));
+        System.getProperty("org.multiverse.stm.beta.GammaObjectPool.callableNodePooling", String.valueOf(ENABLED)));
 
     private final boolean tranlocalPoolingEnabled;
     private final boolean tranlocalArrayPoolingEnabled;
@@ -55,10 +54,6 @@ public final class GammaObjectPool {
 
     private final GammaRefTranlocal[] tranlocalsGammaRef = new GammaRefTranlocal[100];
     private int lastUsedGammaRef = -1;
-    private TranlocalPool[] pools = new TranlocalPool[100];
-
-    private DefaultRetryLatch[] defaultRetryLatchPool = new DefaultRetryLatch[10];
-    private int defaultRetryLatchPoolIndex = -1;
 
     private Listeners[] listenersPool = new Listeners[100];
     private int listenersPoolIndex = -1;
@@ -123,11 +118,6 @@ public final class GammaObjectPool {
         tranlocalsGammaRef[lastUsedGammaRef] = tranlocal;
     }
 
-    static class TranlocalPool{
-        int lastUsed = -1;
-        GammaRefTranlocal[] tranlocals = new GammaRefTranlocal[100];
-    }
-
     private GammaRefTranlocal[][] tranlocalArrayPool = new GammaRefTranlocal[8193][];
 
     /**
@@ -179,18 +169,16 @@ public final class GammaObjectPool {
             return new GammaRefTranlocal[size];
         }
 
-        int index = size;
-
-        if(index >= tranlocalArrayPool.length){
+        if(size >= tranlocalArrayPool.length){
             return new GammaRefTranlocal[size];
         }
 
-        if(tranlocalArrayPool[index]==null){
+        if(tranlocalArrayPool[size]==null){
             return new GammaRefTranlocal[size];
         }
 
-        GammaRefTranlocal[] array = tranlocalArrayPool[index];
-        tranlocalArrayPool[index]=null;
+        GammaRefTranlocal[] array = tranlocalArrayPool[size];
+        tranlocalArrayPool[size]=null;
         return array;
     }
 

@@ -4,6 +4,7 @@ import org.multiverse.api.*;
 
 import static java.lang.String.format;
 
+@SuppressWarnings({"CanBeFinal"})
 public class GammaStmConfiguration {
     public PropagationLevel propagationLevel = PropagationLevel.Requires;
     public IsolationLevel isolationLevel = IsolationLevel.Snapshot;

@@ -13,6 +13,7 @@ import static org.multiverse.stms.gamma.ThreadLocalGammaTransactionPool.getThrea
 
 public final class GammaStm implements Stm {
 
+    @SuppressWarnings({"UnusedDeclaration"})
     public static GammaStm createFast(){
         return new GammaStm();
     }
@@ -163,6 +164,7 @@ public final class GammaStm implements Stm {
 
         @Override
         public GammaTransactionFactoryBuilder setBackoffPolicy(final BackoffPolicy backoffPolicy) {
+            //noinspection ObjectEquality
             if (backoffPolicy == config.backoffPolicy) {
                 return this;
             }

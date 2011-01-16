@@ -9,7 +9,7 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.BooleanRef;
 import org.multiverse.api.references.IntRef;
 import org.multiverse.api.references.Ref;
-import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.gamma.GammaStm;
 
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
@@ -18,13 +18,13 @@ import static org.multiverse.api.StmUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class ConditionVariableStressTest {
-    private BetaStm stm;
+    private GammaStm stm;
     private Stack stack;
     private int itemCount = 10000000;
 
     @Before
     public void setUp() {
-        stm = (BetaStm) getGlobalStmInstance();
+        stm = (GammaStm) getGlobalStmInstance();
         clearThreadLocalTransaction();
         stack = new Stack(100);
     }

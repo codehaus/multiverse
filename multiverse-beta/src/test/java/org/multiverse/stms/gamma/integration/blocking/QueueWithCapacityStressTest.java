@@ -4,16 +4,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRefTranlocal;
-import org.multiverse.stms.beta.transactionalobjects.BetaRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaRefTranlocal;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaIntRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import java.util.LinkedList;
 
@@ -23,38 +22,46 @@ import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newIntRef;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newRef;
 
-public class QueueWithCapacityStressTest implements BetaStmConstants {
+public class QueueWithCapacityStressTest implements GammaConstants {
 
-    private boolean pessimistic;
-
-    private BetaStm stm;
+    private GammaStm stm;
     private Queue<Integer> queue;
     private int itemCount = 2 * 1000 * 1000;
     private int maxCapacity = 1000;
+    private LockMode lockMode;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = (BetaStm) getGlobalStmInstance();
+        stm = (GammaStm) getGlobalStmInstance();
+    }
+
+    @Test
+    public void testLockModeNone() {
+        test(LockMode.None);
+    }
+
+    @Test
+    public void testLockModeRead() {
+        test(LockMode.Read);
+    }
+
+    @Test
+    public void testLockModeWrite() {
+        test(LockMode.Write);
+    }
+
+    @Test
+    public void testLockModeCommit() {
+        test(LockMode.Commit);
+    }
+
+
+    public void test(LockMode lockMode) {
+        this.lockMode = lockMode;
+
         queue = new Queue<Integer>();
-    }
-
-    @Test
-    public void testPessimistic() {
-        test(true);
-    }
-
-    @Test
-    public void testOptimistic() {
-        test(false);
-    }
-
-    public void test(boolean pessimistic) {
-        this.pessimistic = pessimistic;
-
         ProduceThread produceThread = new ProduceThread();
         ConsumeThread consumeThread = new ConsumeThread();
 
@@ -110,9 +117,13 @@ public class QueueWithCapacityStressTest implements BetaStmConstants {
     class Queue<E> {
         final Stack<E> pushedStack = new Stack<E>();
         final Stack<E> readyToPopStack = new Stack<E>();
-        final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
-        final AtomicBlock popBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
-        final BetaIntRef size = newIntRef(stm);
+        final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder()
+                .setReadLockMode(lockMode)
+                .buildAtomicBlock();
+        final AtomicBlock popBlock = stm.createTransactionFactoryBuilder()
+                .setReadLockMode(lockMode)
+                .buildAtomicBlock();
+        final GammaIntRef size = new GammaIntRef(stm);
 
         public void push(final E item) {
             pushBlock.execute(new AtomicVoidClosure() {
@@ -122,7 +133,7 @@ public class QueueWithCapacityStressTest implements BetaStmConstants {
                         retry();
                     }
 
-                    BetaTransaction btx = (BetaTransaction) tx;
+                    GammaTransaction btx = (GammaTransaction) tx;
                     size.incrementAndGet(1);
                     pushedStack.push(btx, item);
                 }
@@ -133,12 +144,10 @@ public class QueueWithCapacityStressTest implements BetaStmConstants {
             return popBlock.execute(new AtomicClosure<E>() {
                 @Override
                 public E execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-
-                    BetaIntRefTranlocal sizeTranlocal = btx.openForWrite(size, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
+                    GammaTransaction btx = (GammaTransaction) tx;
 
                     if (!readyToPopStack.isEmpty(btx)) {
-                        sizeTranlocal.value--;
+                        size.decrement();
                         return readyToPopStack.pop(btx);
                     }
 
@@ -148,7 +157,7 @@ public class QueueWithCapacityStressTest implements BetaStmConstants {
                     }
 
                     if (!readyToPopStack.isEmpty(btx)) {
-                        sizeTranlocal.value--;
+                        size.decrement();
                         return readyToPopStack.pop(btx);
                     }
 
@@ -160,27 +169,27 @@ public class QueueWithCapacityStressTest implements BetaStmConstants {
     }
 
     class Stack<E> {
-        final BetaRef<Node<E>> head = newRef(stm);
+        final GammaRef<Node<E>> head = new GammaRef<Node<E>>(stm);
 
-        void push(BetaTransaction tx, E item) {
-            BetaRefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
-            headTranlocal.value = new Node<E>(item, headTranlocal.value);
+        void push(GammaTransaction tx, E item) {
+            head.set(tx, new Node<E>(item, head.get(tx)));
         }
 
-        boolean isEmpty(BetaTransaction tx) {
-            BetaRefTranlocal<Node<E>> headTranlocal = tx.openForRead(head, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
-            return headTranlocal.value == null;
+        boolean isEmpty(GammaTransaction tx) {
+            return head.isNull(tx);
         }
 
-        E pop(BetaTransaction tx) {
-            BetaRefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
-            Node<E> node = headTranlocal.value;
+        E pop(GammaTransaction tx) {
+            Node<E> node = head.get();
+            if (node == null) {
+                tx.retry();
+            }
 
             if (node == null) {
                 retry();
             }
 
-            headTranlocal.value = node.next;
+            head.set(tx, node.next);
             return node.item;
         }
     }

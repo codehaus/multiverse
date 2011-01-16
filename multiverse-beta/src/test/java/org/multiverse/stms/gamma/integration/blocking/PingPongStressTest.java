@@ -7,10 +7,9 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicBooleanClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.*;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.*;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
 
 import static java.lang.Math.abs;
 import static org.junit.Assert.assertEquals;
@@ -18,55 +17,54 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
 
 public class PingPongStressTest {
 
     private volatile boolean stop = false;
-    private BetaLongRef ref;
-    private BetaStm stm;
+    private GammaLongRef ref;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = (BetaStm) getGlobalStmInstance();
-        ref = newLongRef(stm);
+        stm = (GammaStm) getGlobalStmInstance();
+        ref = new GammaLongRef(stm);
         stop = false;
     }
 
     @Test
     public void withMonoTransactionAnd2Threads() throws InterruptedException {
-        test(new FatMonoBetaTransactionFactory(stm), 2);
+        test(new MonoGammaTransactionFactory(stm), 2);
     }
 
     @Test
     public void withArrayTransactionAnd2Threads() throws InterruptedException {
-        test(new FatArrayBetaTransactionFactory(stm), 2);
+        test(new ArrayGammaTransactionFactory(stm), 2);
     }
 
     @Test
-    public void withArrayTreeTransactionAnd2Threads() throws InterruptedException {
-        test(new FatArrayTreeBetaTransactionFactory(stm), 2);
+    public void withMapTransactionAnd2Threads() throws InterruptedException {
+        test(new MapGammaTransactionFactory(stm), 2);
     }
 
     @Test
     public void withMonoTransactionAnd10Threads() throws InterruptedException {
-        test(new FatMonoBetaTransactionFactory(stm), 10);
+        test(new MonoGammaTransactionFactory(stm), 10);
     }
 
     @Test
     public void withArrayTransactionAnd10Threads() throws InterruptedException {
-        test(new FatArrayBetaTransactionFactory(stm), 10);
+        test(new ArrayGammaTransactionFactory(stm), 10);
     }
 
     @Test
-    public void withArrayTreeTransactionAnd10Threads() throws InterruptedException {
-        test(new FatArrayTreeBetaTransactionFactory(stm), 10);
+    public void withMapTransactionAnd10Threads() throws InterruptedException {
+        test(new MapGammaTransactionFactory(stm), 10);
     }
 
-    public void test(BetaTransactionFactory transactionFactory, int threadCount) throws InterruptedException {
-        AtomicBlock block = new LeanBetaAtomicBlock(transactionFactory);
+    public void test(GammaTransactionFactory transactionFactory, int threadCount) throws InterruptedException {
+        AtomicBlock block = new LeanGammaAtomicBlock(transactionFactory);
         PingPongThread[] threads = createThreads(block, threadCount);
 
         startAll(threads);
@@ -77,9 +75,7 @@ public class PingPongStressTest {
         stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                BetaTransaction btx = (BetaTransaction) tx;
-                BetaLongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
-                write.value = -abs(write.value);
+                ref.set(-abs(ref.get()));
             }
         });
 
@@ -123,18 +119,15 @@ public class PingPongStressTest {
             AtomicBooleanClosure closure = new AtomicBooleanClosure() {
                 @Override
                 public boolean execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-                    BetaLongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
-
-                    if (write.value < 0) {
+                    if (ref.get() < 0) {
                         return false;
                     }
 
-                    if (write.value % threadCount != id) {
+                    if (ref.get() % threadCount != id) {
                         retry();
                     }
 
-                    write.value++;
+                    ref.increment();
                     return true;
                 }
             };

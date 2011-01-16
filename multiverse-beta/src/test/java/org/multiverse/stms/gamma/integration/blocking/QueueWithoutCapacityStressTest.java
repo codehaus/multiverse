@@ -4,14 +4,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.transactionalobjects.BetaRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaRefTranlocal;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import java.util.LinkedList;
 
@@ -20,40 +20,44 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newRef;
 
 public class QueueWithoutCapacityStressTest implements BetaStmConstants {
 
-    private int lockMode;
+    private LockMode lockMode;
 
-    private BetaStm stm;
+    private GammaStm stm;
     private Queue<Integer> queue;
     private int itemCount = 10 * 1000 * 1000;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = (BetaStm) getGlobalStmInstance();
-        queue = new Queue<Integer>();
+        stm = (GammaStm) getGlobalStmInstance();
     }
 
     @Test
-    public void testPrivatized() {
-        test(LOCKMODE_COMMIT);
+    public void testLockModeNone() {
+        test(LockMode.None);
     }
 
     @Test
-    public void testEnsured() {
-        test(LOCKMODE_WRITE);
+    public void testLockModeRead() {
+        test(LockMode.Read);
     }
 
     @Test
-    public void testOptimistic() {
-        test(LOCKMODE_NONE);
+    public void testLockModeWrite() {
+        test(LockMode.Write);
     }
 
-    public void test(int lockMode) {
+    @Test
+    public void testLockModeCommit() {
+        test(LockMode.Commit);
+    }
+
+    public void test(LockMode lockMode) {
         this.lockMode = lockMode;
+        queue = new Queue<Integer>();
 
         ProduceThread produceThread = new ProduceThread();
         ConsumeThread consumeThread = new ConsumeThread();
@@ -111,14 +115,18 @@ public class QueueWithoutCapacityStressTest implements BetaStmConstants {
     class Queue<E> {
         final Stack<E> pushedStack = new Stack<E>();
         final Stack<E> readyToPopStack = new Stack<E>();
-        final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
-        final AtomicBlock popBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
+        final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder()
+                .setReadLockMode(lockMode)
+                .buildAtomicBlock();
+        final AtomicBlock popBlock = stm.createTransactionFactoryBuilder()
+                .setReadLockMode(lockMode)
+                .buildAtomicBlock();
 
         public void push(final E item) {
             pushBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
+                    GammaTransaction btx = (GammaTransaction) tx;
                     pushedStack.push(btx, item);
                 }
             });
@@ -128,7 +136,7 @@ public class QueueWithoutCapacityStressTest implements BetaStmConstants {
             return popBlock.execute(new AtomicClosure<E>() {
                 @Override
                 public E execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
+                    GammaTransaction btx = (GammaTransaction) tx;
 
                     if (!readyToPopStack.isEmpty(btx)) {
                         return readyToPopStack.pop(btx);
@@ -146,27 +154,25 @@ public class QueueWithoutCapacityStressTest implements BetaStmConstants {
     }
 
     class Stack<E> {
-        final BetaRef<Node<E>> head = newRef(stm);
+        final GammaRef<Node<E>> head = new GammaRef<Node<E>>(stm);
 
-        void push(BetaTransaction tx, E item) {
-            BetaRefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, lockMode);
-            headTranlocal.value = new Node<E>(item, headTranlocal.value);
+        void push(GammaTransaction tx, E item) {
+            Node<E> newHead = new Node<E>(item, head.get());
+            head.set(newHead);
         }
 
-        boolean isEmpty(BetaTransaction tx) {
-            BetaRefTranlocal<Node<E>> headTranlocal = tx.openForRead(head, lockMode);
-            return headTranlocal.value == null;
+        boolean isEmpty(GammaTransaction tx) {
+            return head.isNull();
         }
 
-        E pop(BetaTransaction tx) {
-            BetaRefTranlocal<Node<E>> headTranlocal = tx.openForWrite(head, lockMode);
-            Node<E> node = headTranlocal.value;
+        E pop(GammaTransaction tx) {
+            Node<E> node = head.get();
 
             if (node == null) {
                 retry();
             }
 
-            headTranlocal.value = node.next;
+            head.set(node.next);
             return node.item;
         }
     }

@@ -129,6 +129,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         }
 
         assertEquals(TransactionStatus.Aborted, tx.getStatus());
+        assertEquals(maxCapacity+1, tx.getConfiguration().getSpeculativeConfiguration().minimalLength);
     }
 
     @Test
