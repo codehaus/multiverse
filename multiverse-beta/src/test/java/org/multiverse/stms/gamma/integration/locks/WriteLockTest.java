@@ -1,7 +1,6 @@
 package org.multiverse.stms.gamma.integration.locks;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.ReadWriteConflict;
@@ -27,11 +26,22 @@ public class WriteLockTest {
     }
 
     @Test
-    public void whenAlreadyPrivatizedByOther_thenEnsureIsNotPossible() {
+    public void whenUnlocked() {
+        GammaLongRef ref = new GammaLongRef(stm, 10);
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        ref.getLock().acquire(tx, LockMode.Write);
+
+        assertIsActive(tx);
+        assertRefHasWriteLock(ref, tx);
+    }
+
+    @Test
+    public void whenReadLockAlreadyAcquiredByOther_thenWriteLockFails() {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Read);
 
         GammaTransaction tx = stm.startDefaultTransaction();
         try {
@@ -42,11 +52,12 @@ public class WriteLockTest {
         }
 
         assertIsAborted(tx);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasReadLock(ref, otherTx);
+        assertReadLockCount(ref, 1);
     }
 
     @Test
-    public void whenAlreadyEnsuredByOther_thenEnsureIsNotPossible() {
+    public void whenWriteLockAlreadyAcquiredOther_thenWriteLockFails() {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
@@ -65,7 +76,27 @@ public class WriteLockTest {
     }
 
     @Test
-    public void whenEnsuredByOther_thenReadStillAllowed() {
+    public void whenCommitLockAlreadyAcquiredByOther_thenWriteLockFails() {
+        GammaLongRef ref = new GammaLongRef(stm);
+
+        GammaTransaction otherTx = stm.startDefaultTransaction();
+        ref.getLock().acquire(otherTx, LockMode.Commit);
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        try {
+            ref.getLock().acquire(tx, LockMode.Write);
+            fail();
+        } catch (ReadWriteConflict expected) {
+
+        }
+
+        assertIsAborted(tx);
+        assertRefHasCommitLock(ref, otherTx);
+    }
+
+
+    @Test
+    public void whenWriteLockAcquiredByOther_thenReadStillAllowed() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
@@ -120,7 +151,7 @@ public class WriteLockTest {
     }
 
     @Test
-    public void whenEnsuredByOther_thenWriteAllowedButCommitFails() {
+    public void whenWriteLockAcquired_thenWriteAllowedButCommitFails() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
@@ -140,7 +171,53 @@ public class WriteLockTest {
     }
 
     @Test
-    public void whenAlreadyPrivatizedBySelf_thenEnsureSuccessful() {
+    public void whenReadLockAlreadyAcquiredBySelf_thenWriteLockAcquired() {
+        GammaLongRef ref = new GammaLongRef(stm, 5);
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        ref.getLock().acquire(tx, LockMode.Read);
+        ref.getLock().acquire(tx, LockMode.Write);
+
+        assertIsActive(tx);
+        assertRefHasWriteLock(ref, tx);
+    }
+
+    @Test
+    public void whenReadLockAlsoAcquiredByOther_thenWriteLockFails() {
+        GammaLongRef ref = new GammaLongRef(stm, 5);
+
+        GammaTransaction otherTx = stm.startDefaultTransaction();
+        ref.getLock().acquire(otherTx, LockMode.Read);
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        ref.getLock().acquire(tx, LockMode.Read);
+
+        try {
+            ref.getLock().acquire(tx, LockMode.Write);
+            fail();
+        } catch (ReadWriteConflict expected) {
+
+        }
+
+        assertIsAborted(tx);
+        assertRefHasReadLock(ref, otherTx);
+        assertReadLockCount(ref, 1);
+    }
+
+    @Test
+    public void whenWriteLockAlreadyAcquiredBySelf_thenSuccess() {
+        GammaLongRef ref = new GammaLongRef(stm, 5);
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        ref.getLock().acquire(tx, LockMode.Write);
+        ref.getLock().acquire(tx, LockMode.Write);
+
+        assertIsActive(tx);
+        assertRefHasWriteLock(ref, tx);
+    }
+
+    @Test
+    public void whenCommitLockAlreadyAcquiredBySelf_thenCommitLockRemains() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -152,7 +229,7 @@ public class WriteLockTest {
     }
 
     @Test
-    public void whenTransactionCommits_thenEnsureIsEnded() {
+    public void whenTransactionCommits_thenWriteLockIsReleased() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -164,7 +241,7 @@ public class WriteLockTest {
     }
 
     @Test
-    public void whenTransactionIsPrepared_thenEnsureIsNotEnded() {
+    public void whenTransactionIsPrepared_thenWriteLockRemains() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -176,7 +253,7 @@ public class WriteLockTest {
     }
 
     @Test
-    public void whenTransactionAborts_thenEnsureIsEnded() {
+    public void whenTransactionAborts_thenWriteLockReleased() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -188,19 +265,7 @@ public class WriteLockTest {
     }
 
     @Test
-    public void whenEnsureIsReentrant() {
-        GammaLongRef ref = new GammaLongRef(stm, 5);
-
-        GammaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Write);
-        ref.getLock().acquire(tx, LockMode.Write);
-
-        assertIsActive(tx);
-        assertRefHasWriteLock(ref, tx);
-    }
-
-    @Test
-    public void whenReadConflict_thenEnsureFails() {
+    public void whenReadConflict_thenAcquireWriteLockFails() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -216,11 +281,5 @@ public class WriteLockTest {
 
         assertRefHasNoLocks(ref);
         assertIsAborted(tx);
-    }
-
-    @Test
-    @Ignore
-    public void testReadLock(){
-
     }
 }

@@ -1,7 +1,6 @@
 package org.multiverse.stms.gamma.integration.locks;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.ReadWriteConflict;
@@ -26,7 +25,37 @@ public class CommitLockTest {
     }
 
     @Test
-    public void whenAlreadyPrivatizedByOther_thenPrivatizationIsNotPossible() {
+    public void whenUnlocked(){
+         GammaLongRef ref = new GammaLongRef(stm, 10);
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        ref.getLock().acquire(tx, LockMode.Commit);
+
+        assertIsActive(tx);
+        assertRefHasCommitLock(ref, tx);
+    }
+
+    @Test
+    public void whenReadLockAlreadyAcquiredByOther_thenCommitLockNotPossible() {
+        GammaLongRef ref = new GammaLongRef(stm);
+
+        GammaTransaction otherTx = stm.startDefaultTransaction();
+        ref.getLock().acquire(otherTx, LockMode.Read);
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        try {
+            ref.getLock().acquire(tx, LockMode.Commit);
+            fail();
+        } catch (ReadWriteConflict expected) {
+
+        }
+
+        assertIsAborted(tx);
+        assertRefHasReadLock(ref, otherTx);
+    }
+
+    @Test
+    public void whenCommitLockAlreadyAcquiredByOther_thenCommitLockNotPossible() {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
@@ -45,7 +74,7 @@ public class CommitLockTest {
     }
 
     @Test
-    public void whenAlreadyEnsuredByOther_thenPrivatizationIsNotPossible() {
+    public void whenWriteLockAlreadyAcquiredByOther_thenCommitLockNotPossible() {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
@@ -64,7 +93,7 @@ public class CommitLockTest {
     }
 
     @Test
-    public void whenPrivatizedThenReadNotAllowed() {
+    public void whenCommitLockAcquiredByOther_thenReadNotPossible() {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -115,7 +144,7 @@ public class CommitLockTest {
     }
 
     @Test
-    public void whenPrivatizedBuOtherThenWriteNotAllowed() {
+    public void whenCommitLockAcquiredByOtherThenWriteNotAllowed() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
@@ -145,11 +174,46 @@ public class CommitLockTest {
     }
 
     @Test
-    public void whenTransactionCommits_thenPrivatizationIsEnded() {
+    public void whenReadLockAcquired_thenUpgradableToCommitLock() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx,LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Read);
+        ref.getLock().acquire(tx, LockMode.Commit);
+
+        assertIsActive(tx);
+        assertRefHasCommitLock(ref, tx);
+    }
+
+    @Test
+    public void whenReadLockAlsoAcquiredByOther_thenNotUpgradableToCommitLock() {
+        GammaLongRef ref = new GammaLongRef(stm, 5);
+
+        GammaTransaction otherTx = stm.startDefaultTransaction();
+        ref.getLock().acquire(otherTx, LockMode.Read);
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        ref.getLock().acquire(tx, LockMode.Read);
+
+        try {
+            ref.getLock().acquire(tx, LockMode.Commit);
+            fail();
+        } catch (ReadWriteConflict expected) {
+
+        }
+
+        assertIsAborted(tx);
+        assertRefHasReadLock(ref, otherTx);
+        assertReadLockCount(ref, 1);
+    }
+
+
+    @Test
+    public void whenTransactionCommits_thenCommitLockReleased() {
+        GammaLongRef ref = new GammaLongRef(stm, 5);
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        ref.getLock().acquire(tx, LockMode.Commit);
         tx.commit();
 
         assertIsCommitted(tx);
@@ -157,7 +221,7 @@ public class CommitLockTest {
     }
 
     @Test
-    public void whenTransactionIsPrepared_thenPrivatizationIsNotEnded() {
+    public void whenTransactionIsPrepared_thenCommitLockRemains() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -169,7 +233,7 @@ public class CommitLockTest {
     }
 
     @Test
-    public void whenTransactionAborts_thenPrivatizationIsEnded() {
+    public void whenTransactionAborts_thenCommitLockIsReleased() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -181,7 +245,7 @@ public class CommitLockTest {
     }
 
     @Test
-    public void whenPrivatizeIsReentrant() {
+    public void whenCommitLockAlreadyIsAcquired_thenReentrantCommitLockIsSuccess() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -189,11 +253,11 @@ public class CommitLockTest {
         ref.getLock().acquire(tx, LockMode.Commit);
 
         assertIsActive(tx);
-        assertRefHasCommitLock(ref,tx);
+        assertRefHasCommitLock(ref, tx);
     }
 
     @Test
-    public void whenReadConflict_thenPrivatizationFails() {
+    public void whenReadConflict_thenCommitLockFails() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -211,9 +275,4 @@ public class CommitLockTest {
         assertIsAborted(tx);
     }
 
-    @Test
-    @Ignore
-    public void whenReadLock(){
-
-    }
 }
