@@ -73,13 +73,13 @@ public class GammaLongRef_ensure1Test {
         assertSurplus(ref, 0);
     }
 
-       @Test
+    @Test
     public void whenReadLockAcquiredBySelf() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx =transactionFactory.newTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         ref.set(tx, initialValue + 1);
         ref.getLock().acquire(tx, LockMode.Read);
         ref.ensure(tx);
@@ -103,7 +103,7 @@ public class GammaLongRef_ensure1Test {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx =transactionFactory.newTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         ref.set(tx, initialValue + 1);
         ref.getLock().acquire(tx, LockMode.Write);
         ref.ensure(tx);
@@ -146,7 +146,7 @@ public class GammaLongRef_ensure1Test {
         assertSurplus(ref, 0);
     }
 
-        @Test
+    @Test
     public void whenReadLockAcquiredByOther() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
@@ -159,7 +159,7 @@ public class GammaLongRef_ensure1Test {
         ref.set(tx, initialValue + 1);
         ref.ensure(tx);
 
-        GammaRefTranlocal tranlocal =  tx.getRefTranlocal(ref);
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         assertIsActive(tx);
         assertTrue(tranlocal.isConflictCheckNeeded());
         assertRefHasWriteLock(ref, otherTx);
@@ -180,7 +180,7 @@ public class GammaLongRef_ensure1Test {
         ref.set(tx, initialValue + 1);
         ref.ensure(tx);
 
-        GammaRefTranlocal tranlocal =  tx.getRefTranlocal(ref);
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         assertIsActive(tx);
         assertTrue(tranlocal.isConflictCheckNeeded());
         assertRefHasWriteLock(ref, otherTx);

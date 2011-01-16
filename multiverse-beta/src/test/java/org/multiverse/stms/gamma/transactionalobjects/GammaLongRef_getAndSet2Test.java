@@ -25,7 +25,7 @@ import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 @RunWith(Parameterized.class)
 public class GammaLongRef_getAndSet2Test {
-   private final GammaTransactionFactory transactionFactory;
+    private final GammaTransactionFactory transactionFactory;
     private final GammaStm stm;
 
     public GammaLongRef_getAndSet2Test(GammaTransactionFactory transactionFactory) {

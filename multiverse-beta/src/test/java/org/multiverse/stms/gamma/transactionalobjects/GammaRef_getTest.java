@@ -27,25 +27,25 @@ public class GammaRef_getTest {
 
     @Test
     @Ignore
-    public void locked(){
+    public void locked() {
 
     }
 
     @Test
     @Ignore
-    public void locked_writeLockAcquired(){
+    public void locked_writeLockAcquired() {
 
     }
 
     @Test
     @Ignore
-    public void locked_readLockAcquired(){
+    public void locked_readLockAcquired() {
 
     }
 
     @Test
     @Ignore
-    public void locked_commitLockAcquired(){
+    public void locked_commitLockAcquired() {
 
     }
 

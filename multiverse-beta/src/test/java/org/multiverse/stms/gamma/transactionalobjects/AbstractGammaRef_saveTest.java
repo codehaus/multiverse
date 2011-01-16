@@ -417,7 +417,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertNull(tranlocal.owner);
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
-         assertNull(tranlocal.ref_value);
+        assertNull(tranlocal.ref_value);
         assertNull(tranlocal.ref_oldValue);
     }
 

@@ -40,7 +40,7 @@ public class GammaLongRef_atomicSetTest {
         assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
         assertUpdateBiased(ref);
-        assertVersionAndValue(ref, initialVersion+1, newValue);
+        assertVersionAndValue(ref, initialVersion + 1, newValue);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class GammaLongRef_atomicSetTest {
         assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
         assertUpdateBiased(ref);
-        assertVersionAndValue(ref, initialVersion+1,newValue);
+        assertVersionAndValue(ref, initialVersion + 1, newValue);
     }
 
     @Test

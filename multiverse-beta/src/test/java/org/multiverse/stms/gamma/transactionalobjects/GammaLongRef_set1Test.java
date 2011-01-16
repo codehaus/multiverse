@@ -120,7 +120,7 @@ public class GammaLongRef_set1Test {
 
         otherTx.abort();
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertSurplus(ref,0);
+        assertSurplus(ref, 0);
         assertUpdateBiased(ref);
         assertRefHasNoLocks(ref);
         assertSame(tx, getThreadLocalTransaction());
@@ -191,7 +191,7 @@ public class GammaLongRef_set1Test {
         GammaLongRef ref = new GammaLongRef(stm, 100);
         long version = ref.getVersion();
 
-        GammaTransaction tx =transactionFactory.newTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
 
         ref.getLock().acquire(LockMode.Write);
@@ -237,7 +237,7 @@ public class GammaLongRef_set1Test {
         GammaLongRef ref = new GammaLongRef(stm, 100);
         long version = ref.getVersion();
 
-        GammaTransaction tx =transactionFactory.newTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
 
         GammaTransaction otherTx = transactionFactory.newTransaction();

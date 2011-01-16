@@ -104,7 +104,7 @@ public class GammaLongRef_get1Test {
         assertVersionAndValue(ref, version, 100);
     }
 
-     @Test
+    @Test
     public void whenLockedForReadBySelf() {
         GammaLongRef ref = new GammaLongRef(stm, 100);
         long version = ref.getVersion();

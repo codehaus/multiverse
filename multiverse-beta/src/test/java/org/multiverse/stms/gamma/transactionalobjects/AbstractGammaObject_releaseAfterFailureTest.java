@@ -14,7 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasNoLocks;
 import static org.multiverse.stms.gamma.GammaTestUtils.assertVersionAndValue;
 
-public class AbstractGammaObject_releaseAfterFailureTest implements GammaConstants{
+public class AbstractGammaObject_releaseAfterFailureTest implements GammaConstants {
 
     private GammaStm stm;
 
@@ -42,7 +42,7 @@ public class AbstractGammaObject_releaseAfterFailureTest implements GammaConstan
         assertNull(tranlocal.owner);
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertNull(tranlocal.headCallable);
-        assertVersionAndValue(ref,initialVersion,initialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test

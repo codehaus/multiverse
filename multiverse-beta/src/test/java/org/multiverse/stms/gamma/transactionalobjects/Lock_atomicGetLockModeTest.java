@@ -29,7 +29,7 @@ public class Lock_atomicGetLockModeTest {
     public void whenReadLocked() {
         GammaLongRef ref = new GammaLongRef(stm);
         GammaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx,LockMode.Read);
+        ref.getLock().acquire(tx, LockMode.Read);
 
         LockMode lockMode = ref.atomicGetLockMode();
         assertEquals(LockMode.Read, lockMode);

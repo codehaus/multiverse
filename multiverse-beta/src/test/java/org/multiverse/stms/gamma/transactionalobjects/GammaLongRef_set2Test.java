@@ -26,7 +26,7 @@ import static org.multiverse.stms.gamma.GammaTestUtils.assertVersionAndValue;
 
 @RunWith(Parameterized.class)
 public class GammaLongRef_set2Test {
-    
+
     private final GammaTransactionFactory transactionFactory;
     private final GammaStm stm;
 
@@ -48,6 +48,7 @@ public class GammaLongRef_set2Test {
                 new TransactionFactory[]{new MonoGammaTransactionFactory(new GammaStm())}
         );
     }
+
     @Test
     public void whenNullTransaction_thenNullPointerException() {
         GammaLongRef ref = new GammaLongRef(stm, 10);

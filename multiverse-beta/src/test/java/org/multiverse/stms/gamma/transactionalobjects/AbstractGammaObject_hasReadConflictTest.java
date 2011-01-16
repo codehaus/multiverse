@@ -127,7 +127,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
 
         assertTrue(hasConflict);
         assertSurplus(ref, 1);
-        assertRefHasCommitLock(ref,otherTx);
+        assertRefHasCommitLock(ref, otherTx);
     }
 
     @Test

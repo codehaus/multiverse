@@ -18,7 +18,7 @@ import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class GammaLongRef_decrement2Test {
 
-     private GammaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
@@ -34,7 +34,7 @@ public class GammaLongRef_decrement2Test {
 
         GammaTransaction tx = stm.startDefaultTransaction();
 
-        ref.decrement(tx,5);
+        ref.decrement(tx, 5);
 
         tx.commit();
 
@@ -56,7 +56,7 @@ public class GammaLongRef_decrement2Test {
                 .newTransaction();
 
         try {
-            ref.decrement(tx,5);
+            ref.decrement(tx, 5);
             fail();
         } catch (ReadonlyException expected) {
         }
@@ -77,7 +77,7 @@ public class GammaLongRef_decrement2Test {
 
         GammaTransaction tx = stm.startDefaultTransaction();
 
-        ref.decrement(tx,5);
+        ref.decrement(tx, 5);
 
         try {
             tx.commit();
@@ -101,7 +101,7 @@ public class GammaLongRef_decrement2Test {
 
         GammaTransaction tx = stm.startDefaultTransaction();
 
-        ref.decrement(tx,5);
+        ref.decrement(tx, 5);
 
         try {
             tx.commit();
@@ -124,7 +124,7 @@ public class GammaLongRef_decrement2Test {
         tx.commit();
 
         try {
-            ref.decrement(tx,5);
+            ref.decrement(tx, 5);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -144,7 +144,7 @@ public class GammaLongRef_decrement2Test {
         tx.abort();
 
         try {
-            ref.decrement(tx,5);
+            ref.decrement(tx, 5);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -164,7 +164,7 @@ public class GammaLongRef_decrement2Test {
         tx.prepare();
 
         try {
-            ref.decrement(tx,5);
+            ref.decrement(tx, 5);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -181,7 +181,7 @@ public class GammaLongRef_decrement2Test {
         long initialVersion = ref.getVersion();
 
         try {
-            ref.decrement(null,5);
+            ref.decrement(null, 5);
             fail();
         } catch (NullPointerException expected) {
         }

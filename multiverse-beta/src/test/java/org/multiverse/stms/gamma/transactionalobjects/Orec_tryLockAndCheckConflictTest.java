@@ -8,9 +8,7 @@ import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
-import static org.multiverse.stms.gamma.GammaTestUtils.assertLockMode;
 
 public class Orec_tryLockAndCheckConflictTest implements GammaConstants {
 

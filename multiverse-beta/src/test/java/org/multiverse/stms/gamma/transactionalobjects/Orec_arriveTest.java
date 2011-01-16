@@ -72,7 +72,7 @@ public class Orec_arriveTest implements GammaConstants {
         assertLockMode(orec, LOCKMODE_WRITE);
     }
 
-     @Test
+    @Test
     public void whenReadBiasedAndNoSurplus() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
 

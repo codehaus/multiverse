@@ -44,7 +44,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
         assertRefHasNoLocks(ref);
         assertUpdateBiased(ref);
         assertSurplus(ref, 0);
-        assertVersionAndValue(ref, initialVersion+1, initialValue+1);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
     }
 
     @Test
@@ -84,7 +84,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
         assertRefHasNoLocks(ref);
         assertUpdateBiased(ref);
         assertSurplus(ref, 0);
-        assertVersionAndValue(ref, initialVersion+1, initialValue+1);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
     }
 
     @Test

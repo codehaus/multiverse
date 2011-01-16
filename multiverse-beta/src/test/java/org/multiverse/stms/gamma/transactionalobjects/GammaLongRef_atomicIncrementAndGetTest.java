@@ -14,7 +14,7 @@ import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class GammaLongRef_atomicIncrementAndGetTest {
 
-     private GammaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
@@ -53,7 +53,7 @@ public class GammaLongRef_atomicIncrementAndGetTest {
         long amount = 1;
         long result = ref.atomicIncrementAndGet(amount);
 
-        assertEquals(initialValue+amount, result);
+        assertEquals(initialValue + amount, result);
         assertRefHasNoLocks(ref);
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, initialVersion + 1, initialValue + amount);

@@ -43,9 +43,9 @@ public class GammaLongRef_loadTest implements GammaConstants {
         );
     }
 
-    public GammaLongRef newLongRef(long initialValue){
+    public GammaLongRef newLongRef(long initialValue) {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
-        if(readBiased){
+        if (readBiased) {
             ref = GammaTestUtils.makeReadBiased(ref);
         }
         return ref;
@@ -71,9 +71,9 @@ public class GammaLongRef_loadTest implements GammaConstants {
         assertEquals(initialValue, tranlocal.long_value);
         assertEquals(initialValue, tranlocal.long_oldValue);
         assertEquals(initialVersion, tranlocal.version);
-        assertEquals(arriveNeeded && !readBiased,tranlocal.hasDepartObligation());
+        assertEquals(arriveNeeded && !readBiased, tranlocal.hasDepartObligation());
         assertLockMode(ref, LockMode.None);
-        assertSurplus(ref, arriveNeeded?1:0);
+        assertSurplus(ref, arriveNeeded ? 1 : 0);
         assertReadonlyCount(0, ref);
         assertReadBiased(ref, readBiased);
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -124,7 +124,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         assertEquals(initialValue, tranlocal.long_value);
         assertEquals(initialValue, tranlocal.long_oldValue);
         assertEquals(initialVersion, tranlocal.version);
-        assertEquals(!readBiased,tranlocal.hasDepartObligation());
+        assertEquals(!readBiased, tranlocal.hasDepartObligation());
         assertLockMode(ref, LockMode.Write);
         assertSurplus(ref, 1);
         assertReadonlyCount(0, ref);
@@ -150,7 +150,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         assertEquals(initialValue, tranlocal.long_value);
         assertEquals(initialValue, tranlocal.long_oldValue);
         assertEquals(initialVersion, tranlocal.version);
-        assertEquals(!readBiased,tranlocal.hasDepartObligation());
+        assertEquals(!readBiased, tranlocal.hasDepartObligation());
         assertLockMode(ref, LockMode.Commit);
         assertSurplus(ref, 1);
         assertReadonlyCount(0, ref);
@@ -178,7 +178,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         assertEquals(initialVersion, tranlocal.version);
         assertEquals(!readBiased && arriveNeeded, tranlocal.hasDepartObligation());
         assertLockMode(ref, LockMode.Read);
-        assertSurplus(ref, !readBiased && arriveNeeded?2:1);
+        assertSurplus(ref, !readBiased && arriveNeeded ? 2 : 1);
         assertReadLockCount(ref, 1);
         assertReadonlyCount(0, ref);
         assertReadBiased(ref, readBiased);
@@ -203,9 +203,9 @@ public class GammaLongRef_loadTest implements GammaConstants {
         assertEquals(initialValue, tranlocal.long_value);
         assertEquals(initialValue, tranlocal.long_oldValue);
         assertEquals(initialVersion, tranlocal.version);
-        assertEquals(!readBiased,tranlocal.hasDepartObligation());
+        assertEquals(!readBiased, tranlocal.hasDepartObligation());
         assertLockMode(ref, LockMode.Read);
-        assertSurplus(ref, readBiased?1:2);
+        assertSurplus(ref, readBiased ? 1 : 2);
         assertReadLockCount(ref, 2);
         assertReadonlyCount(0, ref);
         assertReadBiased(ref, readBiased);
@@ -276,9 +276,9 @@ public class GammaLongRef_loadTest implements GammaConstants {
         assertEquals(initialValue, tranlocal.long_value);
         assertEquals(initialValue, tranlocal.long_oldValue);
         assertEquals(initialVersion, tranlocal.version);
-        assertEquals(arriveNeeded && !readBiased,tranlocal.hasDepartObligation());
+        assertEquals(arriveNeeded && !readBiased, tranlocal.hasDepartObligation());
         assertLockMode(ref, LockMode.Write);
-        assertSurplus(ref, arriveNeeded && !readBiased?2:1);
+        assertSurplus(ref, arriveNeeded && !readBiased ? 2 : 1);
         assertReadBiased(ref, readBiased);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }

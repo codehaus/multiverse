@@ -34,7 +34,7 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
         assertSurplus(ref, 0);
     }
 
-     @Test
+    @Test
     public void whenNoLockAcquiredAndUpgradeToCommitLock_thenPanicError() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 

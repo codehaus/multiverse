@@ -5,12 +5,12 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.predicates.LongPredicate;
 
-public class LongRefAwaitThread  extends TestThread {
+public class LongRefAwaitThread extends TestThread {
     private final GammaLongRef ref;
     private final LongPredicate predicate;
 
-    public LongRefAwaitThread(GammaLongRef ref, final long awaitValue){
-        this(ref, new LongPredicate(){
+    public LongRefAwaitThread(GammaLongRef ref, final long awaitValue) {
+        this(ref, new LongPredicate() {
             @Override
             public boolean evaluate(long current) {
                 return current == awaitValue;
@@ -28,9 +28,9 @@ public class LongRefAwaitThread  extends TestThread {
         ref.getStm().getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                System.out.println("Starting wait and ref.value found: "+ref.get());
+                System.out.println("Starting wait and ref.value found: " + ref.get());
                 ref.await(predicate);
-                System.out.println("Finished wait and ref.value found: "+ref.get());
+                System.out.println("Finished wait and ref.value found: " + ref.get());
             }
         });
     }

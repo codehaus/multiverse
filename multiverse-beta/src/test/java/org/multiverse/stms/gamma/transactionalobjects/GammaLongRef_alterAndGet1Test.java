@@ -238,6 +238,6 @@ public class GammaLongRef_alterAndGet1Test {
 
         joinAll(thread);
 
-        assertVersionAndValue(ref, initialVersion+1,initialValue+1);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
     }
 }

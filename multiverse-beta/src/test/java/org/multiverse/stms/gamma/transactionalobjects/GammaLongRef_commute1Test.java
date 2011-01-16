@@ -52,6 +52,7 @@ public class GammaLongRef_commute1Test {
                 new TransactionFactory[]{new MonoGammaTransactionFactory(new GammaStm())}
         );
     }
+
     @Test
     public void whenActiveTransactionAvailable() {
         GammaLongRef ref = new GammaLongRef(stm);
@@ -88,7 +89,7 @@ public class GammaLongRef_commute1Test {
         LongFunction function = Functions.newIdentityLongFunction();
         ref.commute(function);
 
-        GammaRefTranlocal commuting =  tx.getRefTranlocal(ref);
+        GammaRefTranlocal commuting = tx.getRefTranlocal(ref);
         assertNotNull(commuting);
         assertTrue(commuting.isCommuting());
         assertFalse(commuting.isRead());
@@ -237,7 +238,7 @@ public class GammaLongRef_commute1Test {
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
-        GammaRefTranlocal tranlocal =  tx.getRefTranlocal(ref);
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         assertNotNull(tranlocal);
         assertFalse(tranlocal.isCommuting());
         assertEquals(3, tranlocal.long_value);
@@ -259,7 +260,7 @@ public class GammaLongRef_commute1Test {
     public void whenAlreadyPrivatizedBySelf_thenNoCommute() {
         GammaLongRef ref = new GammaLongRef(stm, 2);
 
-        GammaTransaction tx =transactionFactory.newTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
 
         ref.getLock().acquire(LockMode.Commit);
@@ -286,7 +287,7 @@ public class GammaLongRef_commute1Test {
 
     @Test
     @Ignore
-    public void whenReadLockAcquiredByOther(){
+    public void whenReadLockAcquiredByOther() {
 
     }
 

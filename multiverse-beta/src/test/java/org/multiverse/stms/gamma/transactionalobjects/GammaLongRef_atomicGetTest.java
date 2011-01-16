@@ -14,7 +14,7 @@ import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class GammaLongRef_atomicGetTest {
 
-     private GammaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
@@ -78,7 +78,7 @@ public class GammaLongRef_atomicGetTest {
         long version = ref.getVersion();
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx,LockMode.Write);
+        ref.getLock().acquire(otherTx, LockMode.Write);
 
         long result = ref.atomicGet();
 
@@ -105,7 +105,7 @@ public class GammaLongRef_atomicGetTest {
         long version = ref.getVersion();
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx,LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
         try {
             ref.atomicGet();
@@ -126,7 +126,7 @@ public class GammaLongRef_atomicGetTest {
         long version = ref.getVersion();
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx,LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
         long result = ref.atomicGet();
 

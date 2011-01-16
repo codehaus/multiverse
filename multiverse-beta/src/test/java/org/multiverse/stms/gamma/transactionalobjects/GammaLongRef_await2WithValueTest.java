@@ -24,7 +24,7 @@ public class GammaLongRef_await2WithValueTest {
 
     @Test
     @Ignore
-    public void whenSomeWaitingNeeded(){
+    public void whenSomeWaitingNeeded() {
 
     }
 

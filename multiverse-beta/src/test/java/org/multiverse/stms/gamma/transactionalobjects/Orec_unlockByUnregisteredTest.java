@@ -30,7 +30,7 @@ public class Orec_unlockByUnregisteredTest {
         }
 
         assertUpdateBiased(orec);
-        assertSurplus(orec,0);
+        assertSurplus(orec, 0);
         assertLockMode(orec, LockMode.None);
     }
 
@@ -47,7 +47,7 @@ public class Orec_unlockByUnregisteredTest {
         }
 
         assertUpdateBiased(orec);
-        assertSurplus(orec,1);
+        assertSurplus(orec, 1);
         assertLockMode(orec, LockMode.None);
     }
 
