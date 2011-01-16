@@ -45,7 +45,7 @@ public final class NaiveTransactionalCollectionFactory implements TransactionalC
     }
 
     @Override
-    public <E> TransactionalStack<E> newHashSet() {
+    public <E> TransactionalSet<E> newHashSet() {
         return new NaiveTransactionalHashSet<E>(stm);
     }
 
