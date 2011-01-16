@@ -159,7 +159,7 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
     @Override
     public TransactionalCollection<E> map(Transaction tx, Function<E> function) {
         TransactionalIterator<E> it = iterator(tx);
-        TransactionalCollection<E> collection = buildNew(tx);
+        TransactionalCollection<E> collection = buildNew();
         while (it.hasNext(tx)){
             E item = it.next(tx);
             collection.add(tx, function.call(item));
@@ -175,7 +175,7 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
     @Override
     public TransactionalCollection<E> filter(Transaction tx, final Predicate<E> predicate) {
         TransactionalIterator<E> it = iterator(tx);
-        TransactionalCollection<E> collection = buildNew(tx);
+        TransactionalCollection<E> collection = buildNew();
         while (it.hasNext(tx)){
             E item = it.next(tx);
             if(predicate.evaluate(item)){
@@ -207,8 +207,7 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
         }
 
         if(isEmpty(tx)){
-            //Fix this
-            throw new  RuntimeException();
+            throw new  RuntimeException("Collection can't be null");
         }
 
         TransactionalIterator<E> iterator = iterator(tx);
@@ -227,6 +226,13 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
 
     @Override
     public E foldRight(Transaction tx, BinaryFunction<E> function, E initial) {
+        if (function == null) {
+            throw new NullPointerException("function can't be null");
+        }
+
+        if(isEmpty(tx)){
+            throw new  RuntimeException("Collection can't be null");
+        }
         throw new TodoException();
     }
 
@@ -238,7 +244,7 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
     @Override
     public void foreach(Transaction tx, Function<E> function) {
         TransactionalIterator<E> it = iterator(tx);
-        TransactionalCollection<E> collection = buildNew(tx);
+        TransactionalCollection<E> collection = buildNew();
         while (it.hasNext(tx)){
             E item = it.next(tx);
             collection.add(tx, function.call(item));
@@ -279,7 +285,18 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
 
     @Override
     public TransactionalCollection<E> drop(Transaction tx, int numToDrop) {
-        throw new TodoException();
+        TransactionalIterator<E> it = iterator(tx);
+        TransactionalCollection<E> collection = buildNew();
+        for(int i=0; i<= numToDrop; i++){
+            if(it.hasNext(tx)){
+                it.next(tx);
+            }
+        }
+        while (it.hasNext(tx)){
+            E item = it.next(tx);
+            collection.add(tx, item);
+        }
+        return collection;
     }
 
     @Override
@@ -289,6 +306,15 @@ public abstract class AbstractTransactionalCollection<E> implements Transactiona
 
     @Override
     public TransactionalCollection<E> dropWhile(Transaction tx, Predicate<E> predicate) {
-        throw new TodoException();
+        TransactionalIterator<E> it = iterator(tx);
+        TransactionalCollection<E> collection = buildNew();
+        while (it.hasNext(tx)){
+            E item = it.next(tx);
+            collection.add(tx, item);
+            if(!predicate.evaluate(item)){
+                break;
+            }
+        }
+        return collection;
     }
 }

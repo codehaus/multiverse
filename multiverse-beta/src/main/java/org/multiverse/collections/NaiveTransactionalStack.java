@@ -225,7 +225,7 @@ public final class NaiveTransactionalStack<E> extends AbstractTransactionalColle
     }
 
     @Override
-    public TransactionalCollection<E> buildNew(Transaction tx) {
+    public TransactionalCollection<E> buildNew() {
         return new NaiveTransactionalStack(stm);
     }
 

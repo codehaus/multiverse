@@ -2,6 +2,7 @@ package org.multiverse.collections;
 
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.collections.TransactionalCollection;
 import org.multiverse.api.collections.TransactionalIterator;
 import org.multiverse.api.collections.TransactionalSet;
 import org.multiverse.api.exceptions.TodoException;
@@ -88,5 +89,10 @@ public final class NaiveTransactionalHashSet<E>
     @Override
     public String toString(Transaction tx) {
         throw new TodoException();
+    }
+
+    @Override
+    public TransactionalCollection<E> buildNew() {
+        return new NaiveTransactionalHashSet(stm);
     }
 }

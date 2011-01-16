@@ -270,5 +270,5 @@ public interface TransactionalCollection<E> extends TransactionalIterable<E>, Co
 
     void foreach(Transaction tx, Function<E> function);
 
-    TransactionalCollection<E> buildNew(Transaction tx);
+    TransactionalCollection<E> buildNew();
 }

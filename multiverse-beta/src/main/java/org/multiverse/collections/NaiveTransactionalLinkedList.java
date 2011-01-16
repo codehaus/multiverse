@@ -2,6 +2,7 @@ package org.multiverse.collections;
 
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.collections.TransactionalCollection;
 import org.multiverse.api.collections.TransactionalDeque;
 import org.multiverse.api.collections.TransactionalIterator;
 import org.multiverse.api.collections.TransactionalList;
@@ -149,6 +150,11 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
     @Override
     public boolean contains(Transaction tx, Object o) {
         return indexOf(tx, o) != -1;
+    }
+
+    @Override
+    public boolean remove(Transaction tx, Object o) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -632,6 +638,11 @@ public final class NaiveTransactionalLinkedList<E> extends AbstractTransactional
         } while (node != null);
         sb.append(']');
         return sb.toString();
+    }
+
+    @Override
+    public TransactionalCollection<E> buildNew() {
+        return new NaiveTransactionalLinkedList(stm);
     }
 
     static class Entry<E> {
