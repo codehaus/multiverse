@@ -2,22 +2,49 @@ package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.multiverse.api.LockMode;
+import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.stms.gamma.ArrayGammaTransactionFactory;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.MapGammaTransactionFactory;
+import org.multiverse.stms.gamma.MonoGammaTransactionFactory;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
 
+import java.util.Collection;
+
+import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
+@RunWith(Parameterized.class)
 public class Lock_getLockMode1Test {
 
-    private GammaStm stm;
+    private final GammaTransactionFactory transactionFactory;
+    private final GammaStm stm;
+
+    public Lock_getLockMode1Test(GammaTransactionFactory transactionFactory) {
+        this.transactionFactory = transactionFactory;
+        this.stm = transactionFactory.getTransactionConfiguration().getStm();
+    }
 
     @Before
     public void setUp() {
-        stm = new GammaStm();
+        clearThreadLocalTransaction();
+    }
+
+    @Parameterized.Parameters
+    public static Collection<TransactionFactory[]> configs() {
+        return asList(
+                new TransactionFactory[]{new MapGammaTransactionFactory(new GammaStm())},
+                new TransactionFactory[]{new ArrayGammaTransactionFactory(new GammaStm())},
+                new TransactionFactory[]{new MonoGammaTransactionFactory(new GammaStm())}
+        );
     }
 
     @Test(expected = NullPointerException.class)
@@ -30,10 +57,10 @@ public class Lock_getLockMode1Test {
     @Test
     public void other_whenLockedForReadByOther() {
         GammaLongRef ref = new GammaLongRef(stm);
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = transactionFactory.newTransaction();
         ref.getLock().acquire(otherTx, LockMode.Read);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         LockMode result = ref.getLock().getLockMode(tx);
 
         assertEquals(LockMode.None, result);
@@ -42,10 +69,10 @@ public class Lock_getLockMode1Test {
     @Test
     public void other_whenLockedForWriteByOther() {
         GammaLongRef ref = new GammaLongRef(stm);
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = transactionFactory.newTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         LockMode result = ref.getLock().getLockMode(tx);
 
         assertEquals(LockMode.None, result);
@@ -54,10 +81,10 @@ public class Lock_getLockMode1Test {
     @Test
     public void other_whenLockForCommitByOther() {
         GammaLongRef ref = new GammaLongRef(stm);
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = transactionFactory.newTransaction();
         ref.getLock().acquire(otherTx, LockMode.Commit);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         LockMode result = ref.getLock().getLockMode(tx);
 
         assertEquals(LockMode.None, result);
@@ -67,7 +94,7 @@ public class Lock_getLockMode1Test {
     public void self_whenNotReadBySelf() {
         GammaLongRef ref = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         LockMode lockMode = ref.getLock().getLockMode(tx);
 
         assertEquals(LockMode.None, lockMode);
@@ -79,7 +106,7 @@ public class Lock_getLockMode1Test {
     public void self_whenNotLockedBySelf() {
         GammaLongRef ref = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         ref.get(tx);
         LockMode lockMode = ref.getLock().getLockMode(tx);
 
@@ -91,7 +118,7 @@ public class Lock_getLockMode1Test {
     public void self_whenReadLockedByself() {
         GammaLongRef ref = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         ref.getLock().acquire(tx, LockMode.Read);
         LockMode lockMode = ref.getLock().getLockMode(tx);
 
@@ -103,7 +130,7 @@ public class Lock_getLockMode1Test {
     public void self_whenWriteLockedBySelf() {
         GammaLongRef ref = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         ref.getLock().acquire(tx, LockMode.Write);
         LockMode lockMode = ref.getLock().getLockMode(tx);
 
@@ -115,7 +142,7 @@ public class Lock_getLockMode1Test {
     public void self_whenCommitLockedBySelf() {
         GammaLongRef ref = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         ref.getLock().acquire(tx, LockMode.Commit);
         LockMode lockMode = ref.getLock().getLockMode(tx);
 
@@ -129,7 +156,7 @@ public class Lock_getLockMode1Test {
     public void whenTransactionPrepared_thenPreparedTransactionException() {
         GammaLongRef ref = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         tx.prepare();
 
         try {
@@ -146,7 +173,7 @@ public class Lock_getLockMode1Test {
     public void whenTransactionAborted_thenDeadTransactionException() {
         GammaLongRef ref = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         tx.abort();
 
         try {
@@ -163,7 +190,7 @@ public class Lock_getLockMode1Test {
     public void whenTransactionCommitted_thenDeadTransactionException() {
         GammaLongRef ref = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         tx.commit();
 
         try {
