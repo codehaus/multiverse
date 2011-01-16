@@ -444,6 +444,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOnReadWriteConflict();
         }
 
+        tranlocal.isDirty = false;
         tranlocal.mode = TRANLOCAL_READ;
         return tranlocal;
     }
@@ -505,6 +506,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         newNode.mode = TRANLOCAL_READ;
+        newNode.isDirty = false;
 
         if (!load(newNode, lockMode, config.spinCount, tx.arriveEnabled)) {
             throw tx.abortOnReadWriteConflict();
@@ -564,6 +566,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         final GammaRefTranlocal tranlocal = tx.pool.take(this);
         tranlocal.mode = TRANLOCAL_READ;
+        tranlocal.isDirty = false;
         tx.attach(tranlocal, identityHash);
         tx.size++;
 

@@ -4,7 +4,6 @@ import org.multiverse.api.*;
 import org.multiverse.api.collections.TransactionalCollectionsFactory;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.api.references.*;
 import org.multiverse.stms.gamma.transactionalobjects.*;
 import org.multiverse.stms.gamma.transactions.*;
 
@@ -23,7 +22,8 @@ public final class GammaStm implements Stm {
     public final BackoffPolicy defaultBackoffPolicy;
 
     public final GlobalConflictCounter globalConflictCounter = new GlobalConflictCounter();
-    public final GammaRefFactory defaultRefFactory = new GammaRefFactory();
+    public final GammaRefFactoryImpl defaultRefFactory = new GammaRefFactoryImpl();
+    public final GammaRefFactoryBuilder refFactoryBuilder = new RefFactoryBuilderImpl();
     public final GammaAtomicBlock defaultAtomicBlock;
     public final GammaTransactionConfiguration defaultConfig;
 
@@ -265,24 +265,24 @@ public final class GammaStm implements Stm {
         return defaultRefFactory;
     }
 
-    class GammaRefFactory implements RefFactory {
+    class GammaRefFactoryImpl implements GammaRefFactory {
         @Override
-        public <E> Ref<E> newRef(E value) {
+        public <E> GammaRef<E> newRef(E value) {
             return new GammaRef<E>(GammaStm.this, value);
         }
 
         @Override
-        public IntRef newIntRef(int value) {
+        public GammaIntRef newIntRef(int value) {
             return new GammaIntRef(GammaStm.this, value);
         }
 
         @Override
-        public BooleanRef newBooleanRef(boolean value) {
+        public GammaBooleanRef newBooleanRef(boolean value) {
             return new GammaBooleanRef(GammaStm.this, value);
         }
 
         @Override
-        public DoubleRef newDoubleRef(double value) {
+        public GammaDoubleRef newDoubleRef(double value) {
             return new GammaDoubleRef(GammaStm.this, value);
         }
 
@@ -304,8 +304,15 @@ public final class GammaStm implements Stm {
     }
 
     @Override
-    public RefFactoryBuilder getRefFactoryBuilder() {
-        throw new TodoException();
+    public GammaRefFactoryBuilder getRefFactoryBuilder() {
+        return refFactoryBuilder;
+    }
+
+    public final class RefFactoryBuilderImpl implements GammaRefFactoryBuilder{
+        @Override
+        public GammaRefFactory build() {
+               return new GammaRefFactoryImpl();
+        }
     }
 
     public final class NonSpeculativeGammaTransactionFactory implements GammaTransactionFactory {

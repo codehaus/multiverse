@@ -3,10 +3,7 @@ package org.multiverse.stms.gamma.integration.classic;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
-import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.LockLevel;
-import org.multiverse.api.Stm;
-import org.multiverse.api.Transaction;
+import org.multiverse.api.*;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.BooleanRef;
 import org.multiverse.api.references.RefFactory;
@@ -29,7 +26,7 @@ public class DiningPhilosophersStressTest implements GammaConstants {
     private volatile boolean stop;
 
     private BooleanRef[] forks;
-    private LockLevel lockLevel;
+    private LockMode lockMode;
     private Stm stm;
     private RefFactory refFactory;
 
@@ -45,31 +42,26 @@ public class DiningPhilosophersStressTest implements GammaConstants {
 
     @Test
     public void whenLockNone() {
-        test(LockLevel.LockNone);
+        test(LockMode.None);
     }
 
     @Test
-    public void testPrivatizeReads() {
-        test(LockLevel.CommitLockReads);
+    public void testReadLock() {
+        test(LockMode.Read);
     }
 
     @Test
-    public void testPrivatizeWrite() {
-        test(LockLevel.CommitLockWrites);
+    public void testWriteLock() {
+        test(LockMode.Write);
     }
 
     @Test
-    public void testEnsureReads() {
-        test(LockLevel.WriteLockReads);
+    public void testCommitLock() {
+        test(LockMode.Commit);
     }
 
-    @Test
-    public void testEnsureWrite() {
-        test(LockLevel.WriteLockWrites);
-    }
-
-    public void test(LockLevel lockLevel) {
-        this.lockLevel = lockLevel;
+    public void test(LockMode lockLevel) {
+        this.lockMode = lockLevel;
         createForks();
 
         PhilosopherThread[] philosopherThreads = createPhilosopherThreads();
@@ -116,10 +108,10 @@ public class DiningPhilosophersStressTest implements GammaConstants {
         private final BooleanRef leftFork;
         private final BooleanRef rightFork;
         private final AtomicBlock releaseForksBlock = stm.createTransactionFactoryBuilder()
-                .setLockLevel(lockLevel)
+                .setReadLockMode(lockMode)
                 .buildAtomicBlock();
         private final AtomicBlock takeForksBlock = stm.createTransactionFactoryBuilder()
-                .setLockLevel(lockLevel)
+                .setReadLockMode(lockMode)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
 

@@ -35,8 +35,8 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
 
     public GammaTransaction(GammaTransactionConfiguration config, int transactionType) {
-        this.config = config;
         config.init();
+        init(config);
         this.transactionType = transactionType;
     }
 

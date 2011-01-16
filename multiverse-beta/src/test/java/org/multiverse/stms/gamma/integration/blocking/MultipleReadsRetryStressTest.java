@@ -7,64 +7,62 @@ import org.multiverse.TestUtils;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.*;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
+import org.multiverse.stms.gamma.*;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
-public class MultipleReadsRetryStressTest implements BetaStmConstants {
-    private BetaStm stm;
-    private BetaLongRef[] refs;
-    private BetaLongRef stopRef;
+public class MultipleReadsRetryStressTest implements GammaConstants {
+    private GammaStm stm;
+    private GammaLongRef[] refs;
+    private GammaLongRef stopRef;
     private volatile boolean stop;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = (BetaStm) getGlobalStmInstance();
+        stm = (GammaStm) getGlobalStmInstance();
         stop = false;
-        stopRef = newLongRef(stm, 0);
+        stopRef = new GammaLongRef(stm, 0);
     }
 
     @Test
-    public void withArrayTreeTransactionAnd2Threads() throws InterruptedException {
-        FatArrayTreeBetaTransactionFactory txFactory = new FatArrayTreeBetaTransactionFactory(stm);
-        test(new LeanBetaAtomicBlock(txFactory), 10, 2);
+    public void withMapTransactionAnd2Threads() throws InterruptedException {
+        MapGammaTransactionFactory txFactory = new MapGammaTransactionFactory(stm);
+        test(new LeanGammaAtomicBlock(txFactory), 10, 2);
     }
 
     @Test
     public void withArrayTransactionAnd2Threads() throws InterruptedException {
         int refCount = 10;
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, refCount + 1);
-        FatArrayBetaTransactionFactory txFactory = new FatArrayBetaTransactionFactory(config);
-        test(new LeanBetaAtomicBlock(txFactory), refCount, 2);
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, refCount + 1);
+        ArrayGammaTransactionFactory txFactory = new ArrayGammaTransactionFactory(config);
+        test(new LeanGammaAtomicBlock(txFactory), refCount, 2);
     }
 
     @Test
-    public void withArrayTreeTransactionAnd5Threads() throws InterruptedException {
-        FatArrayTreeBetaTransactionFactory txFactory = new FatArrayTreeBetaTransactionFactory(stm);
-        test(new LeanBetaAtomicBlock(txFactory), 10, 5);
+    public void withMapTransactionAnd5Threads() throws InterruptedException {
+        MapGammaTransactionFactory txFactory = new MapGammaTransactionFactory(stm);
+        test(new LeanGammaAtomicBlock(txFactory), 10, 5);
     }
 
     @Test
     public void withArrayTransactionAnd5Threads() throws InterruptedException {
         int refCount = 10;
-        BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, refCount + 1);
-        FatArrayBetaTransactionFactory txFactory = new FatArrayBetaTransactionFactory(config);
-        test(new LeanBetaAtomicBlock(txFactory), refCount, 5);
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, refCount + 1);
+        ArrayGammaTransactionFactory txFactory = new ArrayGammaTransactionFactory(config);
+        test(new LeanGammaAtomicBlock(txFactory), refCount, 5);
     }
 
     public void test(AtomicBlock atomicBlock, int refCount, int threadCount) throws InterruptedException {
-        refs = new BetaLongRef[refCount];
+        refs = new GammaLongRef[refCount];
         for (int k = 0; k < refs.length; k++) {
-            refs[k] = newLongRef(stm);
+            refs[k] = new GammaLongRef(stm);
         }
 
         UpdateThread[] threads = new UpdateThread[threadCount];
@@ -88,7 +86,7 @@ public class MultipleReadsRetryStressTest implements BetaStmConstants {
 
     private long sumRefs() {
         long result = 0;
-        for (BetaLongRef ref : refs) {
+        for (GammaLongRef ref : refs) {
             result += ref.atomicGet();
         }
         return result;
@@ -120,13 +118,13 @@ public class MultipleReadsRetryStressTest implements BetaStmConstants {
         public void doRun() {
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
-                public void execute(Transaction tx) throws Exception {
+                public void execute(Transaction tx)  {
                      if (stopRef.get() < 0) {
                         throw new StopException();
                     }
 
                     long sum = 0;
-                    for (BetaLongRef ref : refs) {
+                    for (GammaLongRef ref : refs) {
                         sum += ref.get();
                     }
 
@@ -134,7 +132,7 @@ public class MultipleReadsRetryStressTest implements BetaStmConstants {
                         retry();
                     }
 
-                    BetaLongRef ref = refs[TestUtils.randomInt(refs.length)];
+                    GammaLongRef ref = refs[TestUtils.randomInt(refs.length)];
                     ref.incrementAndGet(1);
                 }
 

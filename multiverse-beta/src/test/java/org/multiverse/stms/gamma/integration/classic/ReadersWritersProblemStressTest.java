@@ -3,10 +3,7 @@ package org.multiverse.stms.gamma.integration.classic;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
-import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.LockLevel;
-import org.multiverse.api.Stm;
-import org.multiverse.api.Transaction;
+import org.multiverse.api.*;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.LongRef;
 
@@ -42,31 +39,26 @@ public class ReadersWritersProblemStressTest {
 
     @Test
     public void whenNoLocks() {
-        test(LockLevel.LockNone);
+        test(LockMode.None);
     }
 
     @Test
-    public void whenEnsureReads() {
-        test(LockLevel.WriteLockReads);
+    public void whenReadLock() {
+        test(LockMode.Read);
     }
 
     @Test
-    public void whenEnsureWrites() {
-        test(LockLevel.WriteLockWrites);
+    public void whenWriteLock() {
+        test(LockMode.Write);
     }
 
     @Test
-    public void whenPrivatizeReads() {
-        test(LockLevel.CommitLockReads);
+    public void whenCommitLock() {
+        test(LockMode.Commit);
     }
 
-    @Test
-    public void whenPrivatizedWrites() {
-        test(LockLevel.CommitLockWrites);
-    }
-
-    public void test(LockLevel lockLevel) {
-        readWriteLock = new ReadersWritersLock(lockLevel);
+    public void test(LockMode lockMode) {
+        readWriteLock = new ReadersWritersLock(lockMode);
 
         ReaderThread[] readers = createReaderThreads();
         WriterThread[] writers = createWriterThreads();
@@ -179,14 +171,14 @@ public class ReadersWritersProblemStressTest {
         private AtomicBlock acquireReadLockBlock;
         private AtomicBlock acquireWriteLockBlock;
 
-        public ReadersWritersLock(LockLevel lockLevel) {
+        public ReadersWritersLock(LockMode lockMode) {
             acquireReadLockBlock = stm.createTransactionFactoryBuilder()
-                    .setLockLevel(lockLevel)
+                    .setReadLockMode(lockMode)
                     .setMaxRetries(10000)
                     .buildAtomicBlock();
 
             acquireWriteLockBlock = stm.createTransactionFactoryBuilder()
-                    .setLockLevel(lockLevel)
+                    .setReadLockMode(lockMode)
                     .setMaxRetries(10000)
                     .buildAtomicBlock();
         }

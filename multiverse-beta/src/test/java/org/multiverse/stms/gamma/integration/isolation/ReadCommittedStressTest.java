@@ -1,4 +1,4 @@
-package org.multiverse.stms.gamma.integration.classic;
+package org.multiverse.stms.gamma.integration.isolation;
 
 import org.junit.Before;
 import org.junit.Test;
