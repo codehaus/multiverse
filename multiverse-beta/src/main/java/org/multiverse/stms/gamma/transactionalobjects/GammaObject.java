@@ -5,6 +5,7 @@ import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactions.ArrayGammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.MapGammaTransaction;
@@ -14,32 +15,51 @@ public interface GammaObject extends GammaConstants {
 
     int VERSION_UNCOMMITTED = 0;
 
+    Listeners safe(GammaRefTranlocal tranlocal, GammaObjectPool pool);
 
-    GammaTranlocal openForWrite(GammaTransaction tx, int lockMode);
+    GammaRefTranlocal openForWrite(GammaTransaction tx, int lockMode);
 
-    GammaTranlocal openForWrite(MonoGammaTransaction tx, int lockMode);
+    GammaRefTranlocal openForWrite(MonoGammaTransaction tx, int lockMode);
 
-    GammaTranlocal openForWrite(ArrayGammaTransaction tx, int lockMode);
+    GammaRefTranlocal openForWrite(ArrayGammaTransaction tx, int lockMode);
 
-    GammaTranlocal openForWrite(MapGammaTransaction tx, int lockMode);
+    GammaRefTranlocal openForWrite(MapGammaTransaction tx, int lockMode);
 
-    GammaTranlocal openForRead(GammaTransaction tx, int lockMode);
+    GammaRefTranlocal openForRead(GammaTransaction tx, int lockMode);
 
-    GammaTranlocal openForRead(MonoGammaTransaction tx, int lockMode);
+    GammaRefTranlocal openForRead(MonoGammaTransaction tx, int lockMode);
 
-    GammaTranlocal openForRead(ArrayGammaTransaction tx, int lockMode);
+    GammaRefTranlocal openForRead(ArrayGammaTransaction tx, int lockMode);
 
-    GammaTranlocal openForRead(MapGammaTransaction tx, int lockMode);
+    GammaRefTranlocal openForRead(MapGammaTransaction tx, int lockMode);
 
-    boolean tryLockAndCheckConflict(int spinCount, GammaTranlocal tranlocal, int lockMode);
+    GammaRefTranlocal openForConstruction(GammaTransaction tx);
 
-    boolean hasReadConflict(GammaTranlocal tranlocal);
+    GammaRefTranlocal openForConstruction(MonoGammaTransaction tx);
 
-    void releaseAfterFailure(GammaTranlocal tranlocal, GammaObjectPool pool);
+    GammaRefTranlocal openForConstruction(MapGammaTransaction tx);
 
-    void releaseAfterUpdate(GammaTranlocal tranlocal, GammaObjectPool pool);
+    GammaRefTranlocal openForConstruction(ArrayGammaTransaction tx);
 
-    void releaseAfterReading(GammaTranlocal tranlocal, GammaObjectPool pool);
+    /**
+     * Tries to acquire a lock on a previous read/written tranlocal and checks for conflict.
+     *
+     * Call can safely
+     *
+     * @param spinCount
+     * @param tranlocal
+     * @param lockMode
+     * @return
+     */
+    boolean tryLockAndCheckConflict(int spinCount, GammaRefTranlocal tranlocal, int lockMode);
+
+    boolean hasReadConflict(GammaRefTranlocal tranlocal);
+
+    void releaseAfterFailure(GammaRefTranlocal tranlocal, GammaObjectPool pool);
+
+    void releaseAfterUpdate(GammaRefTranlocal tranlocal, GammaObjectPool pool);
+
+    void releaseAfterReading(GammaRefTranlocal tranlocal, GammaObjectPool pool);
 
     long getVersion();
 
@@ -47,7 +67,9 @@ public interface GammaObject extends GammaConstants {
 
     Lock getLock();
 
-    int registerChangeListener(RetryLatch latch, GammaTranlocal tranlocal, GammaObjectPool pool, long listenerEra);
+    int registerChangeListener(RetryLatch latch, GammaRefTranlocal tranlocal, GammaObjectPool pool, long listenerEra);
 
     int identityHashCode();
+
+    boolean isRef();
 }

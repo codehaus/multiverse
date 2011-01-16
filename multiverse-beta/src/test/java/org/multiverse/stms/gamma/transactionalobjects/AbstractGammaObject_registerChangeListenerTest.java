@@ -38,15 +38,15 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
 
         LongFunction function = mock(LongFunction.class);
         GammaTransaction tx = stm.startDefaultTransaction();
-        tx.commute(ref, function);
+        ref.commute(tx, function);
 
         RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
-        GammaTranlocal tranlocal = tx.get(ref);
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         int result = ref.registerChangeListener(latch, tranlocal, pool, listenerEra);
 
         assertEquals(REGISTRATION_NONE, result);
-        assertNull(getField(ref, "___listeners"));
+        assertNull(getField(ref, "listeners"));
         assertFalse(latch.isOpen());
         verifyZeroInteractions(function);
     }
@@ -56,10 +56,10 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        GammaTranlocal write = otherTx.openForWrite(ref, LOCKMODE_NONE);
+        GammaRefTranlocal write = ref.openForWrite(otherTx, LOCKMODE_NONE);
         write.long_value++;
         otherTx.commit();
 
@@ -68,7 +68,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         int result = ref.registerChangeListener(latch, read, pool, listenerEra);
 
         assertEquals(REGISTRATION_NOT_NEEDED, result);
-        assertNull(getField(ref, "___listeners"));
+        assertNull(getField(ref, "listeners"));
         assertTrue(latch.isOpen());
     }
 
@@ -78,7 +78,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         long version = ref.getVersion();
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Commit);
@@ -88,7 +88,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         int result = ref.registerChangeListener(latch, read, pool, listenerEra);
 
         assertEquals(REGISTRATION_DONE, result);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertHasListeners(ref, latch);
         assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, version, 10);
@@ -101,7 +101,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         long version = ref.getVersion();
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
@@ -111,7 +111,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         int result = ref.registerChangeListener(latch, read, pool, listenerEra);
 
         assertEquals(REGISTRATION_DONE, result);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertHasListeners(ref, latch);
         assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, version, 10);
@@ -123,7 +123,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
 
         ref.atomicIncrementAndGet(1);
         long version = ref.getVersion();
@@ -136,9 +136,9 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         int result = ref.registerChangeListener(latch, read, pool, listenerEra);
 
         assertEquals(REGISTRATION_NOT_NEEDED, result);
-        assertNull(getField(ref, "___listeners"));
+        assertNull(getField(ref, "listeners"));
         assertTrue(latch.isOpen());
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertHasNoListeners(ref);
         assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, version, 1);
@@ -149,7 +149,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
 
         ref.atomicIncrementAndGet(1);
         long version = ref.getVersion();
@@ -162,9 +162,9 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         int result = ref.registerChangeListener(latch, read, pool, listenerEra);
 
         assertEquals(REGISTRATION_NOT_NEEDED, result);
-        assertNull(getField(ref, "___listeners"));
+        assertNull(getField(ref, "listeners"));
         assertTrue(latch.isOpen());
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertHasNoListeners(ref);
         assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, version, 1);
@@ -193,14 +193,14 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = tx.openForRead(ref, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
 
         RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
         int result = ref.registerChangeListener(latch, read, pool, listenerEra);
 
         assertEquals(REGISTRATION_DONE, result);
-        Listeners listeners = (Listeners) getField(ref, "___listeners");
+        Listeners listeners = (Listeners) getField(ref, "listeners");
         assertNotNull(listeners);
         assertSame(latch, listeners.listener);
         assertNull(listeners.next);
@@ -213,21 +213,21 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx1 = stm.startDefaultTransaction();
-        GammaTranlocal read1 = tx1.openForRead(ref, LOCKMODE_NONE);
+        GammaRefTranlocal read1 = ref.openForRead(tx1, LOCKMODE_NONE);
 
         RetryLatch latch1 = new DefaultRetryLatch();
         long listenerEra1 = latch1.getEra();
         ref.registerChangeListener(latch1, read1, pool, listenerEra1);
 
         GammaTransaction tx2 = stm.startDefaultTransaction();
-        GammaTranlocal read2 = tx2.openForRead(ref, LOCKMODE_NONE);
+        GammaRefTranlocal read2 = ref.openForRead(tx2, LOCKMODE_NONE);
 
         RetryLatch latch2 = new DefaultRetryLatch();
         long listenerEra2 = latch2.getEra();
         int result = ref.registerChangeListener(latch2, read2, pool, listenerEra2);
 
         assertEquals(REGISTRATION_DONE, result);
-        Listeners listeners = (Listeners) getField(ref, "___listeners");
+        Listeners listeners = (Listeners) getField(ref, "listeners");
         assertNotNull(listeners);
         assertSame(latch2, listeners.listener);
         assertEquals(listenerEra2, listeners.listenerEra);

@@ -9,11 +9,11 @@ import static org.junit.Assert.fail;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class Orec_departAfterReadingTest {
-    
-     private GammaStm stm;
+
+    private GammaStm stm;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         stm = new GammaStm();
     }
 
@@ -27,10 +27,10 @@ public class Orec_departAfterReadingTest {
         } catch (PanicError expected) {
         }
 
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertReadonlyCount(0, orec);
         assertUpdateBiased(orec);
-        assertLockMode(orec,LOCKMODE_NONE);
+        assertLockMode(orec, LOCKMODE_NONE);
     }
 
     @Test
@@ -41,11 +41,26 @@ public class Orec_departAfterReadingTest {
 
         orec.departAfterReading();
 
-        assertSurplus(1, orec);
+        assertSurplus(orec, 1);
         assertReadonlyCount(1, orec);
         assertUpdateBiased(orec);
         assertLockMode(orec, LOCKMODE_NONE);
 
+    }
+
+    @Test
+    public void whenLockedForRead() {
+        AbstractGammaObject orec = new GammaLongRef(stm);
+        orec.arrive(1);
+        orec.arrive(1);
+        orec.tryLockAfterNormalArrive(1, LOCKMODE_READ);
+
+        orec.departAfterReading();
+
+        assertSurplus(orec, 1);
+        assertUpdateBiased(orec);
+        assertReadonlyCount(1, orec);
+        assertLockMode(orec, LOCKMODE_READ);
     }
 
     @Test
@@ -57,7 +72,7 @@ public class Orec_departAfterReadingTest {
 
         orec.departAfterReading();
 
-        assertSurplus(1, orec);
+        assertSurplus(orec, 1);
         assertUpdateBiased(orec);
         assertReadonlyCount(1, orec);
         assertLockMode(orec, LOCKMODE_COMMIT);
@@ -72,7 +87,7 @@ public class Orec_departAfterReadingTest {
 
         orec.departAfterReading();
 
-        assertSurplus(1, orec);
+        assertSurplus(orec, 1);
         assertUpdateBiased(orec);
         assertReadonlyCount(1, orec);
         assertLockMode(orec, LOCKMODE_WRITE);
@@ -91,7 +106,7 @@ public class Orec_departAfterReadingTest {
         }
 
         assertLockMode(orec, LOCKMODE_COMMIT);
-        assertSurplus(1, orec);
+        assertSurplus(orec, 1);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
     }
@@ -108,7 +123,7 @@ public class Orec_departAfterReadingTest {
         }
 
         assertLockMode(orec, LOCKMODE_NONE);
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
     }

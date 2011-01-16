@@ -1,16 +1,15 @@
 package org.multiverse.stms.gamma.transactions;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.api.functions.LongFunction;
+import org.multiverse.api.exceptions.Retry;
 import org.multiverse.stms.gamma.GammaStm;
-import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.Listeners;
+import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 public final class MapGammaTransaction extends GammaTransaction {
 
-    public GammaTranlocal[] array;
+    public GammaRefTranlocal[] array;
     public int size = 0;
     public boolean needsConsistency = false;
 
@@ -20,33 +19,18 @@ public final class MapGammaTransaction extends GammaTransaction {
 
     public MapGammaTransaction(GammaTransactionConfiguration config) {
         super(config, POOL_TRANSACTIONTYPE_MAP);
-        this.array = new GammaTranlocal[config.minimalArrayTreeSize];
+        this.array = new GammaRefTranlocal[config.minimalArrayTreeSize];
     }
 
-    @Override
-    public void commute(GammaLongRef ref, LongFunction function) {
-        throw new TodoException();
-    }
-
-    @Override
-    public GammaTranlocal openForRead(GammaLongRef o, int lockMode) {
-        return o.openForRead(this, lockMode);
-    }
-
-    @Override
-    public GammaTranlocal openForWrite(GammaLongRef o, int lockMode) {
-        return o.openForWrite(this, lockMode);
-    }
-
-    public float getUsage(){
-        return (size * 1.0f)/array.length;
+    public float getUsage() {
+        return (size * 1.0f) / array.length;
     }
 
     public int size() {
         return size;
     }
 
-    public int indexOf(final GammaObject ref, final int hash) {
+    public int indexOf(final AbstractGammaRef ref, final int hash) {
         int jump = 0;
         boolean goLeft = true;
 
@@ -54,8 +38,8 @@ public final class MapGammaTransaction extends GammaTransaction {
             final int offset = goLeft ? -jump : jump;
             final int index = (hash + offset) % array.length;
 
-            final GammaTranlocal current = array[index];
-            if (current == null) {
+            final GammaRefTranlocal current = array[index];
+            if (current == null || current.owner == null) {
                 return -1;
             }
 
@@ -71,7 +55,7 @@ public final class MapGammaTransaction extends GammaTransaction {
         return -1;
     }
 
-    public void attach(final GammaTranlocal tranlocal, final int hash) {
+    public void attach(final GammaRefTranlocal tranlocal, final int hash) {
         int jump = 0;
         boolean goLeft = true;
 
@@ -79,7 +63,7 @@ public final class MapGammaTransaction extends GammaTransaction {
             final int offset = goLeft ? -jump : jump;
             final int index = (hash + offset) % array.length;
 
-            GammaTranlocal current = array[index];
+            GammaRefTranlocal current = array[index];
             if (current == null) {
                 array[index] = tranlocal;
                 return;
@@ -95,12 +79,12 @@ public final class MapGammaTransaction extends GammaTransaction {
     }
 
     private void expand() {
-        GammaTranlocal[] oldArray = array;
+        GammaRefTranlocal[] oldArray = array;
         int newSize = oldArray.length * 2;
         array = pool.takeTranlocalArray(newSize);
 
         for (int k = 0; k < oldArray.length; k++) {
-            final GammaTranlocal tranlocal = oldArray[k];
+            final GammaRefTranlocal tranlocal = oldArray[k];
 
             if (tranlocal != null) {
                 attach(tranlocal, tranlocal.owner.identityHashCode());
@@ -128,39 +112,53 @@ public final class MapGammaTransaction extends GammaTransaction {
                     }
                 }
 
-                commitArray();
+                Listeners[] listenersArray = commitArray();
+
+                if (listenersArray != null) {
+                    Listeners.openAll(listenersArray, pool);
+                    pool.putListenersArray(listenersArray);
+                }
+            } else {
+                releaseArray(true);
             }
-            releaseArray(true);
         }
 
         status = TX_COMMITTED;
     }
 
-    private void commitArray() {
+    private Listeners[] commitArray() {
+        Listeners[] listenersArray = null;
+
+        int listenersIndex = 0;
+        int itemCount = 0;
         for (int k = 0; k < array.length; k++) {
-            GammaTranlocal tranlocal = array[k];
+            final GammaRefTranlocal tranlocal = array[k];
 
             if (tranlocal == null) {
                 continue;
             }
 
-
+            itemCount++;
             array[k] = null;
-            if (tranlocal.isDirty) {
-                GammaLongRef ref = (GammaLongRef) tranlocal.owner;
-                ref.version++;
-                ref.value = tranlocal.long_value;
-                ref.releaseAfterUpdate(tranlocal, pool);
-            } else {
-                tranlocal.owner.releaseAfterReading(tranlocal, pool);
+
+            final AbstractGammaRef owner = tranlocal.owner;
+            final Listeners listeners = owner.safe(tranlocal, pool);
+            if(listeners!=null){
+                if(listenersArray == null){
+                    listenersArray = pool.takeListenersArray(size-itemCount);
+                }
+                listenersArray[listenersIndex]=listeners;
+                listenersIndex++;
             }
             pool.put(tranlocal);
         }
+
+        return listenersArray;
     }
 
     private void releaseArray(boolean success) {
         for (int k = 0; k < array.length; k++) {
-            GammaTranlocal tranlocal = array[k];
+            final GammaRefTranlocal tranlocal = array[k];
 
             if (tranlocal != null) {
                 if (success) {
@@ -195,10 +193,10 @@ public final class MapGammaTransaction extends GammaTransaction {
 
     private boolean doPrepare() {
         for (int k = 0; k < array.length; k++) {
-            GammaTranlocal tranlocal = array[k];
+            GammaRefTranlocal tranlocal = array[k];
 
             if (tranlocal != null) {
-                if (!tranlocal.prepare(config)) {
+                if (!tranlocal.owner.prepare(config, tranlocal)) {
                     return false;
                 }
             }
@@ -225,20 +223,20 @@ public final class MapGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public GammaTranlocal locate(GammaObject o) {
+    public GammaRefTranlocal locate(AbstractGammaRef o) {
         if (status != TX_ACTIVE) {
-            throw abortLocateOnBadStatus();
+            throw abortLocateOnBadStatus(o);
         }
 
         if (o == null) {
             throw abortLocateOnNullArgument();
         }
 
-        return get(o);
+        return getRefTranlocal(o);
     }
 
     @Override
-    public GammaTranlocal get(GammaObject ref) {
+    public GammaRefTranlocal getRefTranlocal(AbstractGammaRef ref) {
         int indexOf = indexOf(ref, ref.identityHashCode());
         return indexOf == -1 ? null : array[indexOf];
     }
@@ -253,11 +251,57 @@ public final class MapGammaTransaction extends GammaTransaction {
             throw abortRetryOnNoBlockingAllowed();
         }
 
-        throw new TodoException();
+        if (size == 0) {
+            throw abortRetryOnNoRetryPossible();
+        }
+
+        listener.reset();
+        final long listenerEra = listener.getEra();
+
+        boolean furtherRegistrationNeeded = true;
+        boolean atLeastOneRegistration = false;
+
+        for (int k = 0; k < array.length; k++) {
+            final GammaRefTranlocal tranlocal = array[k];
+            if (tranlocal == null) {
+                continue;
+            }
+
+            final AbstractGammaRef owner = tranlocal.owner;
+            if (owner == null) {
+                continue;
+            }
+
+            if (furtherRegistrationNeeded) {
+                switch (owner.registerChangeListener(listener, tranlocal, pool, listenerEra)) {
+                    case REGISTRATION_DONE:
+                        atLeastOneRegistration = true;
+                        break;
+                    case REGISTRATION_NOT_NEEDED:
+                        furtherRegistrationNeeded = false;
+                        atLeastOneRegistration = true;
+                        break;
+                    case REGISTRATION_NONE:
+                        break;
+                    default:
+                        throw new IllegalStateException();
+                }
+            }
+
+            owner.releaseAfterFailure(tranlocal, pool);
+        }
+
+        status = TX_ABORTED;
+
+        if (!atLeastOneRegistration) {
+            throw abortRetryOnNoRetryPossible();
+        }
+
+        throw Retry.INSTANCE;
     }
 
-    public boolean isReadConsistent(GammaTranlocal justAdded) {
-        if(!needsConsistency){
+    public boolean isReadConsistent(GammaRefTranlocal justAdded) {
+        if (!needsConsistency) {
             return true;
         }
 
@@ -271,12 +315,12 @@ public final class MapGammaTransaction extends GammaTransaction {
 
         //doing a full conflict scan
         for (int k = 0; k < array.length; k++) {
-            GammaTranlocal tranlocal = array[k];
+            final GammaRefTranlocal tranlocal = array[k];
             if (tranlocal == null || tranlocal == justAdded) {
                 continue;
             }
 
-            if(tranlocal.owner.hasReadConflict(tranlocal)){
+            if (tranlocal.owner.hasReadConflict(tranlocal)) {
                 return false;
             }
         }
@@ -285,17 +329,8 @@ public final class MapGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public void copyForSpeculativeFailure(GammaTransaction failingTx) {
-        throw new TodoException();
-    }
-
-    public void init(GammaTransactionConfiguration config) {
-        throw new TodoException();
-    }
-
-    @Override
     public boolean softReset() {
-        if(attempt >= config.getMaxRetries()){
+        if (attempt >= config.getMaxRetries()) {
             return false;
         }
 

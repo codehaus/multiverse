@@ -1,18 +1,18 @@
 package org.multiverse.stms.gamma.transactions;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.api.functions.LongFunction;
+import org.multiverse.api.exceptions.Retry;
 import org.multiverse.stms.gamma.GammaStm;
-import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.Listeners;
+import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 public final class ArrayGammaTransaction extends GammaTransaction {
 
-    public GammaTranlocal head;
+    public GammaRefTranlocal head;
     public int size = 0;
     public boolean needsConsistency = false;
+    public final Listeners[] listenersArray;
 
     public ArrayGammaTransaction(GammaStm stm) {
         this(new GammaTransactionConfiguration(stm));
@@ -21,9 +21,11 @@ public final class ArrayGammaTransaction extends GammaTransaction {
     public ArrayGammaTransaction(GammaTransactionConfiguration config) {
         super(config, POOL_TRANSACTIONTYPE_ARRAY);
 
-        GammaTranlocal h = null;
-        for (int k = 0; k < config.maxArrayTransactionSize; k++) {
-            GammaTranlocal newNode = new GammaTranlocal();
+        listenersArray = new Listeners[config.arrayTransactionSize];
+
+        GammaRefTranlocal h = null;
+        for (int k = 0; k < config.arrayTransactionSize; k++) {
+            GammaRefTranlocal newNode = new GammaRefTranlocal();
             if (h != null) {
                 h.previous = newNode;
                 newNode.next = h;
@@ -34,22 +36,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         head = h;
     }
 
-    @Override
-    public void commute(GammaLongRef ref, LongFunction function) {
-        throw new TodoException();
-    }
-
-    @Override
-    public GammaTranlocal openForRead(GammaLongRef o, int lockMode) {
-        return o.openForRead(this, lockMode);
-    }
-
-    @Override
-    public GammaTranlocal openForWrite(GammaLongRef o, int lockMode) {
-        return o.openForWrite(this, lockMode);
-    }
-
-     public boolean isReadConsistent(GammaTranlocal justAdded) {
+    public boolean isReadConsistent(GammaRefTranlocal justAdded) {
         if (!needsConsistency) {
             return true;
         }
@@ -62,7 +49,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
 
         }
 
-        GammaTranlocal node = head;
+        GammaRefTranlocal node = head;
         while (node != null) {
             //if we are at the end, we are done.
             if (node.owner == null) {
@@ -101,7 +88,10 @@ public final class ArrayGammaTransaction extends GammaTransaction {
                     }
                 }
 
-                commitChain();
+                final Listeners[] listenersArray = commitChain();
+                if (listenersArray != null) {
+                    Listeners.openAll(listenersArray, pool);
+                }
             } else {
                 releaseChain(true);
             }
@@ -110,36 +100,38 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         status = TX_COMMITTED;
     }
 
-    private void commitChain() {
-        GammaTranlocal node = head;
+    private Listeners[] commitChain() {
+        int listenersIndex = 0;
+
+        GammaRefTranlocal node = head;
         do {
-            GammaObject owner = node.owner;
+            final AbstractGammaRef owner = node.owner;
             if (owner == null) {
-                return;
+                return listenersArray;
             }
 
-            if (node.isDirty()) {
-                GammaLongRef ref = (GammaLongRef) owner;
-                ref.value = node.long_value;
-                ref.version++;
-                ref.releaseAfterUpdate(node, pool);
-            } else {
-                owner.releaseAfterReading(node, pool);
+            final Listeners listeners = owner.safe(node, pool);
+            if (listeners != null) {
+                listenersArray[listenersIndex] = listeners;
+                listenersIndex++;
             }
-
             node = node.next;
         } while (node != null);
+
+        return listenersArray;
     }
 
     private boolean prepareChainForCommit() {
-        GammaTranlocal node = head;
+        GammaRefTranlocal node = head;
 
         do {
-            if (node.owner == null) {
+            final AbstractGammaRef owner = node.owner;
+
+            if (owner == null) {
                 return true;
             }
 
-            if (!node.prepare(config)) {
+            if (!owner.prepare(config, node)) {
                 return false;
             }
 
@@ -164,9 +156,9 @@ public final class ArrayGammaTransaction extends GammaTransaction {
     }
 
     private void releaseChain(boolean success) {
-        GammaTranlocal node = head;
+        GammaRefTranlocal node = head;
         while (node != null) {
-            GammaObject owner = node.owner;
+            final AbstractGammaRef owner = node.owner;
 
             if (owner == null) {
                 return;
@@ -182,9 +174,9 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         }
     }
 
-      @Override
-    public GammaTranlocal get(GammaObject ref) {
-        GammaTranlocal node = head;
+    @Override
+    public GammaRefTranlocal getRefTranlocal(AbstractGammaRef ref) {
+        GammaRefTranlocal node = head;
         while (node != null) {
             if (node.owner == ref) {
                 return node;
@@ -201,7 +193,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
 
     @Override
     public void retry() {
-        if (status != TX_ACTIVE && status != TX_PREPARED) {
+        if (status != TX_ACTIVE) {
             throw abortRetryOnBadStatus();
         }
 
@@ -209,7 +201,47 @@ public final class ArrayGammaTransaction extends GammaTransaction {
             throw abortRetryOnNoBlockingAllowed();
         }
 
-        throw new TodoException();
+        if (size == 0) {
+            throw abortRetryOnNoRetryPossible();
+        }
+
+        listener.reset();
+        final long listenerEra = listener.getEra();
+
+        boolean furtherRegistrationNeeded = true;
+        boolean atLeastOneRegistration = false;
+
+        GammaRefTranlocal tranlocal = head;
+        do {
+            final AbstractGammaRef owner = tranlocal.owner;
+
+            if (furtherRegistrationNeeded) {
+                switch (owner.registerChangeListener(listener, tranlocal, pool, listenerEra)) {
+                    case REGISTRATION_DONE:
+                        atLeastOneRegistration = true;
+                        break;
+                    case REGISTRATION_NOT_NEEDED:
+                        furtherRegistrationNeeded = false;
+                        atLeastOneRegistration = true;
+                        break;
+                    case REGISTRATION_NONE:
+                        break;
+                    default:
+                        throw new IllegalStateException();
+                }
+            }
+
+            owner.releaseAfterFailure(tranlocal, pool);
+            tranlocal = tranlocal.next;
+        } while (tranlocal != null && tranlocal.owner != null);
+
+        status = TX_ABORTED;
+
+        if (!atLeastOneRegistration) {
+            throw abortRetryOnNoRetryPossible();
+        }
+
+        throw Retry.INSTANCE;
     }
 
     @Override
@@ -230,16 +262,16 @@ public final class ArrayGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public GammaTranlocal locate(GammaObject o) {
+    public GammaRefTranlocal locate(AbstractGammaRef o) {
         if (status != TX_ACTIVE) {
-            throw abortLocateOnBadStatus();
+            throw abortLocateOnBadStatus(o);
         }
 
         if (o == null) {
             throw abortLocateOnNullArgument();
         }
 
-        return get(o);
+        return getRefTranlocal(o);
     }
 
     public void hardReset() {
@@ -254,7 +286,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
 
     @Override
     public boolean softReset() {
-        if(attempt >= config.getMaxRetries()){
+        if (attempt >= config.getMaxRetries()) {
             return false;
         }
 
@@ -267,7 +299,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         return true;
     }
 
-    public void shiftInFront(GammaTranlocal newHead) {
+    public void shiftInFront(GammaRefTranlocal newHead) {
         if (newHead == head) {
             return;
         }
@@ -280,14 +312,5 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         newHead.next = head;
         newHead.previous = null;
         head = newHead;
-    }
-
-    @Override
-    public void copyForSpeculativeFailure(GammaTransaction failingTx) {
-        throw new TodoException();
-    }
-
-    public void init(GammaTransactionConfiguration config) {
-        throw new TodoException();
     }
 }

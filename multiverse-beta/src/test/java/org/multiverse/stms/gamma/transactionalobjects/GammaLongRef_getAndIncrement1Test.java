@@ -19,7 +19,7 @@ import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class GammaLongRef_getAndIncrement1Test implements GammaConstants{
-    
+
     private GammaStm stm;
 
        @Before
@@ -145,7 +145,7 @@ public class GammaLongRef_getAndIncrement1Test implements GammaConstants{
 
            }
 
-           assertSurplus(0, ref);
+           assertSurplus(ref, 0);
            assertRefHasNoLocks(ref);
            assertVersionAndValue(ref, initialVersion, initialValue);
            assertNull(getThreadLocalTransaction());
@@ -168,7 +168,7 @@ public class GammaLongRef_getAndIncrement1Test implements GammaConstants{
 
            }
 
-           assertSurplus(0, ref);
+           assertSurplus(ref, 0);
            assertRefHasNoLocks(ref);
            assertVersionAndValue(ref, initialVersion, initialValue);
            assertSame(tx, getThreadLocalTransaction());
@@ -191,11 +191,11 @@ public class GammaLongRef_getAndIncrement1Test implements GammaConstants{
            } catch (DeadTransactionException expected) {
            }
 
-           assertSurplus(0, ref);
+           assertSurplus(ref, 0);
            assertRefHasNoLocks(ref);
            assertVersionAndValue(ref, initialVersion, initialValue);
            assertSame(tx, getThreadLocalTransaction());
            assertIsAborted(tx);
        }
-    
+
 }

@@ -2,6 +2,21 @@
                         to do
 --------------------------------------------------------------------
 
+- listeners need to be retrieved after commit
+
+- mono gamma transaction: release listeners after write
+
+- array gamma transaction: release listeners after write
+
+- map gamma transaction: release listeners after write
+
+- stm conflict detection
+
+- commute: while commuting, no transaction accessed allowed.
+
+- transaction: copy for speculative failure
+
+- readonly/readbiased
 
 - read consistency
 
@@ -26,6 +41,14 @@
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- removed all the openForRead/openForWrite/commute/openForConstruction on the transaction
+
+- speculative stuff is in place.
+
+- transaction messages are fixed
+
+- race problem fixed with the readlocking
 
 - lock upgrade testing on open for write
 

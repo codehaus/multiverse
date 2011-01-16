@@ -1,17 +1,17 @@
 package org.multiverse.stms.gamma.transactions;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.Listeners;
+import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
-import org.omg.PortableInterceptor.ACTIVE;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 public final class MonoGammaTransaction extends GammaTransaction {
 
-    public final GammaTranlocal tranlocal = new GammaTranlocal();
+    public final GammaRefTranlocal tranlocal = new GammaRefTranlocal();
 
     public MonoGammaTransaction(GammaStm stm) {
         this(new GammaTransactionConfiguration(stm));
@@ -22,31 +22,16 @@ public final class MonoGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public void commute(GammaLongRef ref, LongFunction function) {
-        throw new TodoException();
-    }
-
-    @Override
-    public GammaTranlocal openForWrite(GammaLongRef o, int lockMode) {
-        return o.openForWrite(this, lockMode);
-    }
-
-    @Override
-    public GammaTranlocal openForRead(GammaLongRef o, int lockMode) {
-        return o.openForRead(this, lockMode);
-    }
-
-    @Override
-    public GammaTranlocal locate(GammaObject o) {
+    public GammaRefTranlocal locate(AbstractGammaRef o) {
         if (status != TX_ACTIVE) {
-            throw abortLocateOnBadStatus();
+            throw abortLocateOnBadStatus(o);
         }
 
         if (o == null) {
             throw abortLocateOnNullArgument();
         }
 
-        return get(o);
+        return getRefTranlocal(o);
     }
 
     @Override
@@ -63,7 +48,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
             //throw new AbortOn
         }
 
-        GammaObject owner = tranlocal.owner;
+        final AbstractGammaRef owner = tranlocal.owner;
 
         if (owner != null) {
             if (tranlocal.mode == TRANLOCAL_READ) {
@@ -83,23 +68,11 @@ public final class MonoGammaTransaction extends GammaTransaction {
                     if (!ref.tryLockAndCheckConflict(config.spinCount, tranlocal, LOCKMODE_COMMIT)) {
                         throw abortOnReadWriteConflict();
                     }
-
-
-                    //if (!tranlocal.prepare(config)) {
-                    //
-                    //}
                 }
 
-                if (tranlocal.isDirty()) {
-                    ref.version = tranlocal.version + 1;
-                    ref.value = tranlocal.long_value;
-                    //ref.releaseAfterUpdate(tranlocal, pool);
-                    ref.departAfterUpdateAndUnlock();
-                    tranlocal.setLockMode(LOCKMODE_NONE);
-                    tranlocal.owner = null;
-                    tranlocal.setDepartObligation(false);
-                } else {
-                    owner.releaseAfterReading(tranlocal, pool);
+                Listeners listeners = owner.safe(tranlocal, pool);
+                if (listeners != null) {
+                    listeners.openAll(pool);
                 }
             } else {
                 throw new TodoException();
@@ -121,7 +94,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
         }
 
         status = TX_ABORTED;
-        GammaObject owner = tranlocal.owner;
+        AbstractGammaRef owner = tranlocal.owner;
         if (owner != null) {
             owner.releaseAfterFailure(tranlocal, pool);
         }
@@ -137,8 +110,9 @@ public final class MonoGammaTransaction extends GammaTransaction {
             throw abortPrepareOnBadStatus();
         }
 
-        if (tranlocal.owner != null) {
-            if (!tranlocal.prepare(config)) {
+        final AbstractGammaRef owner = tranlocal.owner;
+        if (owner != null) {
+            if (!owner.prepare(config, tranlocal)) {
                 throw abortOnReadWriteConflict();
             }
         }
@@ -147,7 +121,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public GammaTranlocal get(GammaObject ref) {
+    public GammaRefTranlocal getRefTranlocal(AbstractGammaRef ref) {
         return tranlocal.owner == ref ? tranlocal : null;
     }
 
@@ -161,12 +135,46 @@ public final class MonoGammaTransaction extends GammaTransaction {
             throw abortRetryOnNoBlockingAllowed();
         }
 
-        throw new TodoException();
+        if (tranlocal == null) {
+            throw abortRetryOnNoRetryPossible();
+        }
+
+        final AbstractGammaRef owner = tranlocal.owner;
+        if (owner == null) {
+            throw abortRetryOnNoRetryPossible();
+        }
+
+        listener.reset();
+        final long listenerEra = listener.getEra();
+
+        boolean atLeastOneRegistration = false;
+        switch (tranlocal.owner.registerChangeListener(listener, tranlocal, pool, listenerEra)) {
+            case REGISTRATION_DONE:
+                atLeastOneRegistration = true;
+                break;
+            case REGISTRATION_NOT_NEEDED:
+                atLeastOneRegistration = true;
+                break;
+            case REGISTRATION_NONE:
+                break;
+            default:
+                throw new IllegalStateException();
+        }
+
+        owner.releaseAfterFailure(tranlocal, pool);
+
+        status = TX_ABORTED;
+
+        if (!atLeastOneRegistration) {
+            throw abortRetryOnNoRetryPossible();
+        }
+
+        throw Retry.INSTANCE;
     }
 
     @Override
     public boolean softReset() {
-        if(attempt >= config.getMaxRetries()){
+        if (attempt >= config.getMaxRetries()) {
             return false;
         }
 
@@ -185,12 +193,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
         abortOnly = false;
     }
 
-    public void init(GammaTransactionConfiguration config) {
-        throw new TodoException();
-    }
-
-    @Override
-    public void copyForSpeculativeFailure(GammaTransaction failingTx) {
-        throw new TodoException();
+    public boolean isReadConsistent(GammaRefTranlocal justAdded) {
+        return true;
     }
 }

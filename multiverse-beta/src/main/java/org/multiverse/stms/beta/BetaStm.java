@@ -42,6 +42,7 @@ public final class BetaStm implements Stm {
         this.globalConflictCounter = new GlobalConflictCounter(1);
         this.defaultConfig = new BetaTransactionConfiguration(this, configuration)
                 .setSpinCount(spinCount);
+        this.defaultConfig.init();
         this.defaultAtomicBlock = createTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .buildAtomicBlock();

@@ -55,7 +55,7 @@ public class BetaLongRef_commitDirtyTest implements BetaStmConstants {
         assertNull(listeners.next);
         assertEquals(listenerEra, listeners.listenerEra);
         assertSame(latch, listeners.listener);
-        assertNull(getField(ref, "___listeners"));
+        assertNull(getField(ref, "listeners"));
         assertEquals(oldConflictCount, globalConflictCounter.count());
         assertRefHasNoLocks(ref);
         assertSurplus(0, ref);

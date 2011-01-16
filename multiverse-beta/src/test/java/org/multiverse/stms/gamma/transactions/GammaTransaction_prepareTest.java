@@ -3,14 +3,15 @@ package org.multiverse.stms.gamma.transactions;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
@@ -25,108 +26,166 @@ public abstract class GammaTransaction_prepareTest<T extends GammaTransaction> i
 
     protected abstract T newTransaction();
 
+    protected abstract T newTransaction(GammaTransactionConfiguration config);
+
     @Test
-    public void whenContainsNormalRead() {
+    @Ignore
+    public void whenAbortOnly() {
+
+    }
+
+    @Test
+    public void whenContainsRead() {
+        whenContainsRead(LockMode.None);
+        whenContainsRead(LockMode.Read);
+        whenContainsRead(LockMode.Write);
+        whenContainsRead(LockMode.Commit);
+    }
+
+    public void whenContainsRead(LockMode readLockMode) {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaTransaction tx = stm.startDefaultTransaction();
+        ref.openForRead(tx, readLockMode.asInt());
         tx.prepare();
 
         assertIsPrepared(tx);
-        assertRefHasNoLocks(ref);
+        assertLockMode(ref, readLockMode);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
-    @Test
+     @Test
     @Ignore
-    public void whenAbortOnly(){
-
-    }
-
-    @Test
-     @Ignore
-     public void whenContainsReadLockedRead() {
-
-     }
-
-    @Test
-    @Ignore
-    public void whenContainsWriteLockedRead() {
+    public void writeSkew() {
 
     }
 
     @Test
     @Ignore
-    public void whenContainsCommitLockedRead() {
+    public void whenContainsCommute() {
 
     }
 
     @Test
     @Ignore
-    public void writeSkew(){
+    public void whenContainsCommuteThatConflicts() {
 
     }
 
     @Test
     @Ignore
-    public void whenContainsCommute(){
-
-    }
-
-    @Test
-    @Ignore
-    public void whenContainsCommuteThatConflicts(){
-
-    }
-
-    @Test
-    @Ignore
-    public void whenContainsConstructed(){}
-
-    @Test
-    public void whenContainsDirtyWrite() {
-        long initialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, initialValue);
-        long initialVersion = ref.getVersion();
-
-        T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
-        tranlocal.long_value++;
-        tx.prepare();
-
-        assertIsPrepared(tx);
-        assertRefHasCommitLock(ref, tx);
-        assertVersionAndValue(ref, initialVersion, initialValue);
-    }
-
-    @Test
-    @Ignore
-    public void whenContainsDirtyAndWriteLockedWrite() {
-
-    }
-
-    @Test
-    @Ignore
-    public void whenContainsDirtyAndCommitLockedWrite() {
-
-    }
-
-    @Test
-    @Ignore
-    public void whenContainsDirtyAndReadLockedWrite() {
-
-    }
-
-    @Test
-    @Ignore
-    public void whenPreparedAndContainsDirtyWrite() {
-
+    public void whenContainsConstructed() {
     }
 
     // =============================== dirty check =================================
+
+    @Test
+    public void dirtyCheckDisabled_whenNotDirty_thenLockedForCommit() {
+        dirtyCheckDisabled_whenNotDirty_thenLockedForCommit(LockMode.None);
+        dirtyCheckDisabled_whenNotDirty_thenLockedForCommit(LockMode.Read);
+        dirtyCheckDisabled_whenNotDirty_thenLockedForCommit(LockMode.Write);
+        dirtyCheckDisabled_whenNotDirty_thenLockedForCommit(LockMode.None);
+    }
+
+    public void dirtyCheckDisabled_whenNotDirty_thenLockedForCommit(LockMode writeLockMode) {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .setDirtyCheckEnabled(false);
+
+        GammaTransaction tx = newTransaction(config);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, writeLockMode.asInt());
+        tx.prepare();
+
+        assertTrue(tranlocal.isDirty());
+        assertEquals(LockMode.Commit.asInt(), tranlocal.getLockMode());
+        assertLockMode(ref, LockMode.Commit);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
+
+    @Test
+    public void dirtyCheckDisabled_whenDirty_thenLockedForCommit() {
+        dirtyCheckDisabled_whenDirty_thenLockedForCommit(LockMode.None);
+        dirtyCheckDisabled_whenDirty_thenLockedForCommit(LockMode.Read);
+        dirtyCheckDisabled_whenDirty_thenLockedForCommit(LockMode.Write);
+        dirtyCheckDisabled_whenDirty_thenLockedForCommit(LockMode.None);
+    }
+
+    public void dirtyCheckDisabled_whenDirty_thenLockedForCommit(LockMode writeLockMode) {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .setDirtyCheckEnabled(false);
+
+        GammaTransaction tx = newTransaction(config);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, writeLockMode.asInt());
+        tranlocal.long_value++;
+        tx.prepare();
+
+        assertTrue(tranlocal.isDirty());
+        assertEquals(LockMode.Commit.asInt(), tranlocal.getLockMode());
+        assertLockMode(ref, LockMode.Commit);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
+
+    @Test
+    public void dirtyCheckEnabled_whenNotDirty_thenNothingHappens() {
+        dirtyCheckDisabled_whenNotDirty_thenLockedForCommit(LockMode.None);
+        dirtyCheckDisabled_whenNotDirty_thenLockedForCommit(LockMode.Read);
+        dirtyCheckDisabled_whenNotDirty_thenLockedForCommit(LockMode.Write);
+        dirtyCheckDisabled_whenNotDirty_thenLockedForCommit(LockMode.Commit);
+    }
+
+    public void dirtyCheckEnabled_whenNotDirty_nothingHappens(LockMode writeLockMode) {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .setDirtyCheckEnabled(true);
+
+        GammaTransaction tx = newTransaction(config);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, writeLockMode.asInt());
+        tx.prepare();
+
+        assertFalse(tranlocal.isDirty());
+        assertEquals(writeLockMode.asInt(), tranlocal.getLockMode());
+        assertLockMode(ref, writeLockMode);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
+
+    @Test
+    public void dirtyCheckEnabled_whenDirty_thenLockedForCommit() {
+        dirtyCheckEnabled_whenDirty_thenLockedForCommit(LockMode.None);
+        dirtyCheckEnabled_whenDirty_thenLockedForCommit(LockMode.Read);
+        dirtyCheckEnabled_whenDirty_thenLockedForCommit(LockMode.Write);
+        dirtyCheckEnabled_whenDirty_thenLockedForCommit(LockMode.Commit);
+    }
+
+    public void dirtyCheckEnabled_whenDirty_thenLockedForCommit(LockMode writeLockMode) {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .setDirtyCheckEnabled(true);
+
+        GammaTransaction tx = newTransaction(config);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, writeLockMode.asInt());
+        tranlocal.long_value++;
+        tx.prepare();
+
+        assertTrue(tranlocal.isDirty());
+        assertEquals(LockMode.Commit.asInt(), tranlocal.getLockMode());
+        assertLockMode(ref, LockMode.Commit);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
 
     // =============================== locked by other =============================
 
@@ -137,7 +196,7 @@ public abstract class GammaTransaction_prepareTest<T extends GammaTransaction> i
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
         tranlocal.long_value++;
 
         T otherTx = newTransaction();
@@ -150,8 +209,8 @@ public abstract class GammaTransaction_prepareTest<T extends GammaTransaction> i
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, initialVersion,initialValue);
-        assertRefHasReadLock(ref,otherTx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertRefHasReadLock(ref, otherTx);
         assertReadLockCount(ref, 1);
     }
 
@@ -162,7 +221,7 @@ public abstract class GammaTransaction_prepareTest<T extends GammaTransaction> i
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
         tranlocal.long_value++;
 
         T otherTx = newTransaction();
@@ -175,7 +234,7 @@ public abstract class GammaTransaction_prepareTest<T extends GammaTransaction> i
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, initialVersion,initialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasWriteLock(ref, otherTx);
     }
 
@@ -186,7 +245,7 @@ public abstract class GammaTransaction_prepareTest<T extends GammaTransaction> i
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
         tranlocal.long_value++;
 
         T otherTx = newTransaction();
@@ -199,7 +258,7 @@ public abstract class GammaTransaction_prepareTest<T extends GammaTransaction> i
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, initialVersion,initialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasCommitLock(ref, otherTx);
     }
 

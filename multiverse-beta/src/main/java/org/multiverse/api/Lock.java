@@ -20,11 +20,16 @@ package org.multiverse.api;
  * Locks atm are acquired for the remaining duration of the transaction and only will be released once
  * the transaction commits/aborts. This is essentially the same behavior you get with Oracle once a update/
  * delete/insert is done, or when the record is locked manually by executing the 'lock for update'.
- *
+ * <p/>
  * <h2>Blocking</h2>
  * Atm it isn't possible to block on a lock. So what happens is that some spinning is done and then some retries
  * in combination with backoffs. In the 0.8 release blocking will be added as well. The exact behavior will be
  * made configurable by some LockAcquisition policy.
+ *
+ * Important:
+ * It is up the the Lock implementation to select a higher LockMode than the specified LockMode. Example,
+ * the Lock could be implemented using a openForRead in combination with a LockMode. If the readLockMode is
+ *
  *
  * @author Peter Veentjer.
  */
@@ -32,21 +37,88 @@ public interface Lock {
 
     /**
      * Returns the current LockMode. This call doesn't look at any running transaction, it shows the actual
-     * state of the Lock.
+     * state of the Lock. The value could be stale as soon as it is received.
      *
      * @return the current LockMode.
      */
     LockMode atomicGetLockMode();
 
-    void acquire(LockMode lockMode);
-
-    void acquire(Transaction tx, LockMode lockMode);
-
+    /**
+     * Gets the LockMode the transaction stored in the the {@link ThreadLocalTransaction} has on this Lock.
+     *
+     * @return the LockMode.
+     */
     LockMode getLockMode();
 
+    /**
+     * Gets the LockMode the transaction has on the Lock. This call makes use of the tx.
+     *
+     * @param tx the Lock
+     * @return the LockMode the transaction has on the Lock.
+     */
     LockMode getLockMode(Transaction tx);
 
-    boolean tryAcquire(LockMode lockMode);
+    /**
+     * Acquires a Lock with the provided LockMode.
+     * <p/>
+     * If the lockMode is lower than the LockMode the transaction already has on this Lock, the call
+     * is ignored.
+     * <p/>
+     * If the Lock can't be acquired, a ReadWriteConflict is thrown.
+     *
+     * @param desiredLockMode the desired lockMode.
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     * @throws NullPointerException if desiredLockMode is null. If an active transaction is available, it will
+     *                              be aborted.
+     */
+    void acquire(LockMode desiredLockMode);
 
-    boolean tryAcquire(Transaction tx, LockMode lockMode);
+    /**
+     * Acquires a Lock with the provided LockMode.
+     * <p/>
+     * If the lockMode is lower than the LockMode the transaction already has on this Lock, the call
+     * is ignored.
+     * <p/>
+     * If the Lock can't be acquired, a ReadWriteConflict is thrown.
+     *
+     * @param tx the Transaction used for this operation.
+     * @param desiredLockMode the desired lockMode.
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     * @throws NullPointerException if desiredLockMode is null. If an active transaction is available, it will
+     *                              be aborted.
+     */
+    void acquire(Transaction tx, LockMode desiredLockMode);
+
+    /**
+     * Tries to acquire a lock.
+     *
+     * @param desiredLockMode the desired LockMode.
+     * @return true if the Lock was acquired successfully, false otherwise.
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     */
+    boolean tryAcquire(LockMode desiredLockMode);
+
+    /**
+     * Tries to acquire a lock.
+     *
+     * @param tx              the Transaction used for this operation.
+     * @param desiredLockMode the desired lockmode.
+     * @return true if the Lock was acquired successfully, false otherwise.
+     * @throws NullPointerException if tx or LockMode is null. If LockMode is null and an active
+     *                              transaction is available, it will be aborted.
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     */
+    boolean tryAcquire(Transaction tx, LockMode desiredLockMode);
 }

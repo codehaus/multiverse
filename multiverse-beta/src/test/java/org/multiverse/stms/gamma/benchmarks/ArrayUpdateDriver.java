@@ -44,7 +44,7 @@ public class ArrayUpdateDriver implements GammaConstants {
 
         System.out.printf("Performance is %s transactions/second/thread\n", s);
 
-        //assertEquals(txCount, ref.value);
+        //assertEquals(txCount, ref.volatile_value);
         //assertEquals(txCount+initialVersion, ref.version);
     }
 }

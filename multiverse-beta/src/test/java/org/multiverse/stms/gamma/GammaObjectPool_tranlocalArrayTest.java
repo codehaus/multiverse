@@ -3,7 +3,7 @@ package org.multiverse.stms.gamma;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.*;
@@ -20,7 +20,7 @@ public class GammaObjectPool_tranlocalArrayTest implements GammaConstants{
 
     @Test
     public void whenItemPutInPool_thenPreparedForPooling() {
-        GammaTranlocal[] array = new GammaTranlocal[2];
+        GammaRefTranlocal[] array = new GammaRefTranlocal[2];
         GammaTransaction tx = stm.startDefaultTransaction();
 
         array[0] = new GammaLongRef(stm).openForRead(tx, LOCKMODE_NONE);
@@ -58,13 +58,13 @@ public class GammaObjectPool_tranlocalArrayTest implements GammaConstants{
     }
 
     public void normalScenario(int size) {
-        GammaTranlocal[] array = new GammaTranlocal[size];
+        GammaRefTranlocal[] array = new GammaRefTranlocal[size];
         pool.putTranlocalArray(array);
 
-        GammaTranlocal[] result = pool.takeTranlocalArray(array.length);
+        GammaRefTranlocal[] result = pool.takeTranlocalArray(array.length);
         assertSame(array, result);
 
-        GammaTranlocal[] result2 = pool.takeTranlocalArray(array.length);
+        GammaRefTranlocal[] result2 = pool.takeTranlocalArray(array.length);
         assertNotNull(result2);
         assertNotSame(result, result2);
     }

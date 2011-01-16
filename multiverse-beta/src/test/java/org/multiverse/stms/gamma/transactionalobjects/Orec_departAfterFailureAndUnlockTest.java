@@ -3,13 +3,14 @@ package org.multiverse.stms.gamma.transactionalobjects;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.PanicError;
+import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
-public class Orec_departAfterFailureAndUnlockTest {
+public class Orec_departAfterFailureAndUnlockTest implements GammaConstants {
 
     private GammaStm stm;
 
@@ -17,6 +18,7 @@ public class Orec_departAfterFailureAndUnlockTest {
     public void setUp() {
         stm = new GammaStm();
     }
+
 
     @Test
     public void whenUpdateBiasedNotLocked_thenPanicError() {
@@ -28,7 +30,7 @@ public class Orec_departAfterFailureAndUnlockTest {
         }
 
         assertLockMode(orec, LOCKMODE_NONE);
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertReadonlyCount(0, orec);
         assertUpdateBiased(orec);
     }
@@ -44,7 +46,7 @@ public class Orec_departAfterFailureAndUnlockTest {
         }
 
         assertLockMode(orec, LOCKMODE_NONE);
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertReadonlyCount(0, orec);
         assertReadBiased(orec);
     }
@@ -60,7 +62,7 @@ public class Orec_departAfterFailureAndUnlockTest {
         assertEquals(1, result);
         assertLockMode(orec, LOCKMODE_READ);
         assertReadLockCount(orec, 1);
-        assertSurplus(1, orec);
+        assertSurplus(orec, 1);
         assertReadonlyCount(0, orec);
         assertUpdateBiased(orec);
     }
@@ -74,7 +76,7 @@ public class Orec_departAfterFailureAndUnlockTest {
 
         assertEquals(0, result);
         assertLockMode(orec, LOCKMODE_NONE);
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertReadonlyCount(0, orec);
         assertUpdateBiased(orec);
         assertReadLockCount(orec, 0);
@@ -88,7 +90,7 @@ public class Orec_departAfterFailureAndUnlockTest {
         long result = orec.departAfterFailureAndUnlock();
         assertEquals(0, result);
         assertLockMode(orec, LOCKMODE_NONE);
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertReadonlyCount(0, orec);
         assertUpdateBiased(orec);
         assertReadLockCount(orec, 0);
@@ -102,7 +104,7 @@ public class Orec_departAfterFailureAndUnlockTest {
         long result = orec.departAfterFailureAndUnlock();
         assertEquals(0, result);
         assertLockMode(orec, LOCKMODE_NONE);
-        assertSurplus(0, orec);
+        assertSurplus(orec, 0);
         assertReadonlyCount(0, orec);
         assertUpdateBiased(orec);
         assertReadLockCount(orec, 0);

@@ -13,7 +13,7 @@ import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class GammaLongRef_atomicIncrementAndGetTest {
-    
+
      private GammaStm stm;
 
     @Before
@@ -35,7 +35,7 @@ public class GammaLongRef_atomicIncrementAndGetTest {
 
         assertEquals(initialValue + amount, result);
         assertRefHasNoLocks(ref);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + amount);
         assertNull(getThreadLocalTransaction());
     }
@@ -69,7 +69,7 @@ public class GammaLongRef_atomicIncrementAndGetTest {
 
         assertEquals(initialValue, result);
         assertRefHasNoLocks(ref);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertNull(getThreadLocalTransaction());
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -89,7 +89,7 @@ public class GammaLongRef_atomicIncrementAndGetTest {
         } catch (LockedException expected) {
         }
 
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -109,7 +109,7 @@ public class GammaLongRef_atomicIncrementAndGetTest {
         } catch (LockedException expected) {
         }
 
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }

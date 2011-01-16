@@ -67,9 +67,9 @@ public abstract class VeryAbstractBetaTransactionalObject
     static {
         try {
             listenersOffset = ___unsafe.objectFieldOffset(
-                    VeryAbstractBetaTransactionalObject.class.getDeclaredField("___listeners"));
+                    VeryAbstractBetaTransactionalObject.class.getDeclaredField("listeners"));
             valueOffset = ___unsafe.objectFieldOffset(
-                    VeryAbstractBetaTransactionalObject.class.getDeclaredField("___orec"));
+                    VeryAbstractBetaTransactionalObject.class.getDeclaredField("orec"));
         } catch (Exception ex) {
             throw new Error(ex);
         }
@@ -815,12 +815,12 @@ public abstract class VeryAbstractBetaTransactionalObject
     }
 
     @Override
-    public void acquire(LockMode lockMode) {
+    public void acquire(LockMode desiredLockMode) {
         throw new TodoException();
     }
 
     @Override
-    public void acquire(Transaction tx, LockMode lockMode) {
+    public void acquire(Transaction tx, LockMode desiredLockMode) {
         throw new TodoException();
     }
 
@@ -838,12 +838,12 @@ public abstract class VeryAbstractBetaTransactionalObject
     }
 
     @Override
-    public boolean tryAcquire(LockMode lockMode) {
+    public boolean tryAcquire(LockMode desiredLockMode) {
         throw new TodoException();
     }
 
     @Override
-    public boolean tryAcquire(Transaction tx, LockMode lockMode) {
+    public boolean tryAcquire(Transaction tx, LockMode desiredLockMode) {
         throw new TodoException();
     }
 }

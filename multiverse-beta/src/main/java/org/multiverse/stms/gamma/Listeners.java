@@ -1,7 +1,6 @@
 package org.multiverse.stms.gamma;
 
 import org.multiverse.api.blocking.RetryLatch;
-import org.multiverse.stms.beta.BetaObjectPool;
 
 /**
  * A Listeners object contains all the Latches of blockingAllowed transactions that listen to a write on a
@@ -88,8 +87,5 @@ public class Listeners {
             //lets remove the listeners (needed for pooling).
             listenersArray[k] = null;
         }
-
-        //lets returns the listeners back to the pool.
-        pool.putListenersArray(listenersArray);
     }
 }

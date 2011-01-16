@@ -25,7 +25,7 @@ public final class GlobalStmInstance {
 
     private static final String KEY = GlobalStmInstance.class.getName() + ".factoryMethod";
 
-    private static final String DEFAULT_FACTORY_METHOD = "org.multiverse.stms.beta.BetaStm.createFast";
+    private static final String DEFAULT_FACTORY_METHOD = "org.multiverse.stms.gamma.GammaStm.createFast";
 
     private static final Logger logger = Logger.getLogger(GlobalStmInstance.class.getName());
 

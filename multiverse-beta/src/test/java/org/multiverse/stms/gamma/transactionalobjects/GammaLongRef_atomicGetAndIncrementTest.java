@@ -36,7 +36,7 @@ public class GammaLongRef_atomicGetAndIncrementTest {
         assertEquals(initialValue , result);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
         assertRefHasNoLocks(ref);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertNull(getThreadLocalTransaction());
     }
 
@@ -50,7 +50,7 @@ public class GammaLongRef_atomicGetAndIncrementTest {
 
         assertEquals(initialValue, result);
         assertRefHasNoLocks(ref);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertNull(getThreadLocalTransaction());
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -69,7 +69,7 @@ public class GammaLongRef_atomicGetAndIncrementTest {
 
         assertEquals(initialValue, result);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertSame(tx, getThreadLocalTransaction());
         assertIsActive(tx);
     }
@@ -89,7 +89,7 @@ public class GammaLongRef_atomicGetAndIncrementTest {
         } catch (LockedException expected) {
         }
 
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertRefHasCommitLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -109,7 +109,7 @@ public class GammaLongRef_atomicGetAndIncrementTest {
         } catch (LockedException expected) {
         }
 
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertRefHasWriteLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, 10);
     }

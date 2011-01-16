@@ -23,7 +23,7 @@ public class AbstractGammaObject_releaseAfterUpdateTest implements GammaConstant
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_COMMIT);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_COMMIT);
         tranlocal.isDirty = true;
 
         ref.releaseAfterUpdate(tranlocal,tx.pool);

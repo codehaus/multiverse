@@ -6,4 +6,9 @@ public class MapGammaTransaction_prepareTest extends GammaTransaction_prepareTes
     protected MapGammaTransaction newTransaction() {
         return new MapGammaTransaction(stm);
     }
+
+    @Override
+    protected MapGammaTransaction newTransaction(GammaTransactionConfiguration config) {
+        return new MapGammaTransaction(config);
+    }
 }

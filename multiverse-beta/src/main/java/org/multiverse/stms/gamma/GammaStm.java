@@ -5,13 +5,17 @@ import org.multiverse.api.collections.TransactionalCollectionsFactory;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.api.references.*;
-import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactionalobjects.*;
 import org.multiverse.stms.gamma.transactions.*;
 
 import static org.multiverse.stms.gamma.ThreadLocalGammaTransactionPool.getThreadLocalGammaTransactionPool;
 
 
 public final class GammaStm implements Stm {
+
+    public static GammaStm createFast(){
+        return new GammaStm();
+    }
 
     public final int defaultMaxRetries;
     public final int spinCount;
@@ -27,6 +31,8 @@ public final class GammaStm implements Stm {
     }
 
     public GammaStm(GammaStmConfiguration configuration) {
+        configuration.validate();
+
         this.defaultMaxRetries = configuration.maxRetries;
         this.spinCount = configuration.spinCount;
         this.defaultBackoffPolicy = configuration.backoffPolicy;
@@ -49,7 +55,7 @@ public final class GammaStm implements Stm {
 
     @Override
     public OrElseBlock createOrElseBlock() {
-        throw new TodoException();
+        return null;
     }
 
     public GlobalConflictCounter getGlobalConflictCounter() {
@@ -260,22 +266,22 @@ public final class GammaStm implements Stm {
     class GammaRefFactory implements RefFactory {
         @Override
         public <E> Ref<E> newRef(E value) {
-            throw new TodoException();
+            return new GammaRef<E>(GammaStm.this, value);
         }
 
         @Override
         public IntRef newIntRef(int value) {
-            throw new TodoException();
+            return new GammaIntRef(GammaStm.this, value);
         }
 
         @Override
         public BooleanRef newBooleanRef(boolean value) {
-            throw new TodoException();
+            return new GammaBooleanRef(GammaStm.this, value);
         }
 
         @Override
         public DoubleRef newDoubleRef(double value) {
-            throw new TodoException();
+            return new GammaDoubleRef(GammaStm.this, value);
         }
 
         @Override
@@ -292,7 +298,7 @@ public final class GammaStm implements Stm {
 
     @Override
     public TransactionalCollectionsFactory getDefaultTransactionalCollectionFactory() {
-        throw new TodoException();
+        return null;
     }
 
     @Override
@@ -376,7 +382,7 @@ public final class GammaStm implements Stm {
                 tx.init(config);
                 return tx;
 
-            } else if (length <= config.maxArrayTransactionSize) {
+            } else if (length <= config.arrayTransactionSize) {
 
                 final ArrayGammaTransaction tx = pool.takeArrayGammaTransaction();
                 if (tx == null) {
@@ -394,7 +400,6 @@ public final class GammaStm implements Stm {
 
                 tx.init(config);
                 return tx;
-
             }
         }
     }

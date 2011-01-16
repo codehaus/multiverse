@@ -53,7 +53,6 @@ public class MonoUpdateDriver implements GammaConstants {
         MonoGammaTransaction tx = new MonoGammaTransaction(
                 new GammaTransactionConfiguration(stm).setWriteLockMode(writeLockMode));
 
-
         GammaLongRef ref = new GammaLongRef(stm, 0);
         long initialVersion = ref.getVersion();
 
@@ -69,7 +68,7 @@ public class MonoUpdateDriver implements GammaConstants {
 
         System.out.printf("Performance is %s transactions/second/thread\n", s);
 
-        assertEquals(txCount, ref.value);
+        assertEquals(txCount, ref.long_value);
         assertEquals(txCount+initialVersion, ref.version);
     }
 }

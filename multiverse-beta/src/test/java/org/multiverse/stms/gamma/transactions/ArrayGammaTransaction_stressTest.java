@@ -68,10 +68,10 @@ public class ArrayGammaTransaction_stressTest implements GammaConstants {
 
             for (int k = 0; k < refs.length; k++) {
                 if (random.nextInt(3) == 1) {
-                    tx.openForWrite(refs[k], LOCKMODE_NONE).long_value++;
+                    refs[k].openForWrite(tx, LOCKMODE_NONE).long_value++;
                     created++;
                 } else {
-                    tx.openForWrite(refs[k], LOCKMODE_NONE);
+                    refs[k].openForWrite(tx, LOCKMODE_NONE);
                 }
             }
             tx.commit();

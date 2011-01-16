@@ -6,7 +6,7 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
@@ -44,7 +44,7 @@ public abstract class GammaTransaction_locateTest<T extends GammaTransaction> {
         GammaTransaction tx = newTransaction();
         ref.openForRead(tx, LOCKMODE_NONE);
 
-        GammaTranlocal found = tx.locate(otherRef);
+        GammaRefTranlocal found = tx.locate(otherRef);
         assertNull(found);
         assertIsActive(tx);
     }
@@ -54,9 +54,9 @@ public abstract class GammaTransaction_locateTest<T extends GammaTransaction> {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
 
-        GammaTranlocal found = tx.locate(ref);
+        GammaRefTranlocal found = tx.locate(ref);
         assertSame(tranlocal, found);
         assertIsActive(tx);
     }

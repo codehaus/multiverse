@@ -31,7 +31,7 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
 
         assertLockMode(ref, LOCKMODE_NONE);
         assertReadLockCount(ref, 0);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
     }
 
      @Test
@@ -46,7 +46,7 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
 
         assertLockMode(ref, LOCKMODE_NONE);
         assertReadLockCount(ref, 0);
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
         assertTrue(result);
         assertTrue(ref.hasWriteLock());
         assertReadLockCount(ref, 0);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -72,7 +72,7 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
         assertTrue(result);
         assertTrue(ref.hasCommitLock());
         assertReadLockCount(ref, 0);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -85,7 +85,7 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
         boolean result = ref.tryUpgradeFromReadLock(1, false);
         assertFalse(result);
         assertReadLockCount(ref, 2);
-        assertSurplus(2, ref);
+        assertSurplus(ref, 2);
     }
 
     @Test
@@ -98,7 +98,7 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
         boolean result = ref.tryUpgradeFromReadLock(1, true);
         assertFalse(result);
         assertReadLockCount(ref, 2);
-        assertSurplus(2, ref);
+        assertSurplus(ref, 2);
     }
 
     @Test
@@ -116,7 +116,7 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
 
         assertTrue(ref.hasWriteLock());
         assertReadLockCount(ref, 0);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 
     @Test
@@ -134,6 +134,6 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
 
         assertTrue(ref.hasCommitLock());
         assertReadLockCount(ref, 0);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
     }
 }

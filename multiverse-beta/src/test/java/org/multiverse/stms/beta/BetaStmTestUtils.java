@@ -42,7 +42,7 @@ public class BetaStmTestUtils implements BetaStmConstants {
     }
 
     public static RetryLatch getFirstListener(BetaLongRef ref) {
-        Listeners listeners = (Listeners) getField(ref, "___listeners");
+        Listeners listeners = (Listeners) getField(ref, "listeners");
         assertNotNull(listeners);
         RetryLatch latch = listeners.listener;
         assertNotNull(latch);

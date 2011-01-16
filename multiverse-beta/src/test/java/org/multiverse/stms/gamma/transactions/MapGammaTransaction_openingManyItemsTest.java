@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 import static junit.framework.Assert.assertSame;
 import static org.junit.Assert.assertEquals;
@@ -34,11 +34,11 @@ public class MapGammaTransaction_openingManyItemsTest implements GammaConstants{
 
         int refCount = 10000;
         GammaLongRef[] refs = new GammaLongRef[refCount];
-        GammaTranlocal[] tranlocals = new GammaTranlocal[refCount];
+        GammaRefTranlocal[] tranlocals = new GammaRefTranlocal[refCount];
         for (int k = 0; k < refCount; k++) {
             GammaLongRef ref = new GammaLongRef(stm);
             refs[k] = ref;
-            tranlocals[k] = reading ? tx.openForRead(ref, LOCKMODE_NONE) : tx.openForWrite(ref, LOCKMODE_NONE);
+            tranlocals[k] = reading ? ref.openForRead(tx, LOCKMODE_NONE) : ref.openForWrite(tx, LOCKMODE_NONE);
         }
 
         assertEquals(refCount, tx.size());
@@ -48,7 +48,7 @@ public class MapGammaTransaction_openingManyItemsTest implements GammaConstants{
 
         for (int k = 0; k < refCount; k++) {
             GammaLongRef ref = refs[k];
-            GammaTranlocal found = reading ? tx.openForRead(ref, LOCKMODE_NONE) : tx.openForWrite(ref, LOCKMODE_NONE);
+            GammaRefTranlocal found = reading ? ref.openForRead(tx, LOCKMODE_NONE) : ref.openForWrite(tx, LOCKMODE_NONE);
             assertSame(ref, found.owner);
             assertSame("tranlocal is incorrect at " + k, tranlocals[k], found);
         }

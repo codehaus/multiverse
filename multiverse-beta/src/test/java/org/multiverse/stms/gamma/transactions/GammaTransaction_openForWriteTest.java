@@ -9,7 +9,7 @@ import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaTranlocal;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
@@ -32,13 +32,51 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
     protected abstract int getMaxCapacity();
 
-       @Test
-    public void whenTransactionAbortOnly_thenReadStillPossible(){
+    @Test
+    public void whenStmMismatch() {
+        GammaStm otherStm = new GammaStm();
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(otherStm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+
+        try {
+            ref.openForWrite(tx, LOCKMODE_NONE);
+            fail();
+        } catch (StmMismatchException expected) {
+        }
+
+        assertIsAborted(tx);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForConstruction(){
+
+    }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForCommute(){
+
+    }
+
+    @Test
+    @Ignore
+    public void whenAlreadyOpenedForCommuteAndLockingConflicts(){
+
+    }
+
+    @Test
+    public void whenTransactionAbortOnly_thenReadStillPossible() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
         GammaTransaction tx = stm.startDefaultTransaction();
         tx.setAbortOnly();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
 
         assertNotNull(tranlocal);
         assertTrue(tx.isAbortOnly());
@@ -46,13 +84,13 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
     }
 
     @Test
-    public void whenTransactionAbortOnly_thenRereadStillPossible(){
+    public void whenTransactionAbortOnly_thenRereadStillPossible() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaTranlocal read = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal read = ref.openForWrite(tx, LOCKMODE_NONE);
         tx.setAbortOnly();
-        GammaTranlocal reread = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal reread = ref.openForWrite(tx, LOCKMODE_NONE);
 
         assertSame(read, reread);
         assertTrue(tx.isAbortOnly());
@@ -61,13 +99,13 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
     @Test
     @Ignore
-    public void whenReadWrittenAndThenLockedByOtherAndThenWritten(){
+    public void whenReadWrittenAndThenLockedByOtherAndThenWritten() {
 
     }
 
     @Test
     @Ignore
-    public void whenWritenFirstAndThenLockedByOtherAndThenLockUpgrade(){
+    public void whenWrittenFirstAndThenLockedByOtherAndThenLockUpgrade() {
 
     }
 
@@ -111,10 +149,9 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         }
 
         assertEquals(TransactionStatus.Aborted, tx.getStatus());
-        assertEquals(initialValue, ref.value);
+        assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.version);
     }
-
 
     @Test
     public void whenNotOpenedBefore() {
@@ -123,7 +160,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
 
         assertNotNull(tranlocal);
         assertSame(ref, tranlocal.owner);
@@ -136,26 +173,6 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
     @Test
     public void whenRefAlreadyOpenedForRead() {
-        long initialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, initialValue);
-        long initialVersion = ref.getVersion();
-
-        GammaTransaction tx = newTransaction();
-        GammaTranlocal first = ref.openForRead(tx, LOCKMODE_NONE);
-        GammaTranlocal second = ref.openForRead(tx, LOCKMODE_NONE);
-
-        assertSame(first, second);
-        assertNotNull(second);
-        assertSame(ref, second.owner);
-        assertEquals(initialVersion, second.version);
-        assertEquals(initialValue, second.long_value);
-        assertEquals(initialValue, second.long_oldValue);
-        assertTrue(second.isRead());
-        assertFalse(tx.hasWrites());
-    }
-
-    @Test
-    public void whenRefAlreadOpenedForRead() {
         whenRefAlreadyOpenedForRead(LockMode.None, LockMode.None, LockMode.None);
         whenRefAlreadyOpenedForRead(LockMode.None, LockMode.Read, LockMode.Read);
         whenRefAlreadyOpenedForRead(LockMode.None, LockMode.Write, LockMode.Write);
@@ -183,8 +200,8 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = newTransaction();
-        GammaTranlocal first = ref.openForRead(tx, readLockMode.asInt());
-        GammaTranlocal second = ref.openForWrite(tx, writeLockMode.asInt());
+        GammaRefTranlocal first = ref.openForRead(tx, readLockMode.asInt());
+        GammaRefTranlocal second = ref.openForWrite(tx, writeLockMode.asInt());
 
         assertSame(first, second);
         assertNotNull(second);
@@ -198,7 +215,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
     }
 
     @Test
-    public void whenRefAlreadOpenedForWrite() {
+    public void whenRefAlreadyOpenedForWrite() {
         whenRefAlreadyOpenedForWrite(LockMode.None, LockMode.None, LockMode.None);
         whenRefAlreadyOpenedForWrite(LockMode.None, LockMode.Read, LockMode.Read);
         whenRefAlreadyOpenedForWrite(LockMode.None, LockMode.Write, LockMode.Write);
@@ -226,8 +243,8 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = newTransaction();
-        GammaTranlocal first = ref.openForWrite(tx, firstWriteLockMode.asInt());
-        GammaTranlocal second = ref.openForWrite(tx, secondWriteLockMode.asInt());
+        GammaRefTranlocal first = ref.openForWrite(tx, firstWriteLockMode.asInt());
+        GammaRefTranlocal second = ref.openForWrite(tx, secondWriteLockMode.asInt());
 
         assertSame(first, second);
         assertSame(ref, second.owner);
@@ -293,7 +310,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm);
         config.writeLockModeAsInt = transactionWriteLockMode;
         GammaTransaction tx = newTransaction(config);
-        GammaTranlocal tranlocal = ref.openForWrite(tx, writeLockMode);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, writeLockMode);
 
         assertEquals(expectedLockMode, tranlocal.getLockMode());
         assertEquals(TRANLOCAL_WRITE, tranlocal.getMode());
@@ -334,7 +351,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
         GammaTransaction tx = newTransaction();
         ref.openForWrite(tx, firstMode);
-        GammaTranlocal tranlocal = ref.openForWrite(tx, secondLockMode);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, secondLockMode);
 
         assertEquals(expectedLockMode, tranlocal.getLockMode());
         assertEquals(TRANLOCAL_WRITE, tranlocal.getMode());
@@ -347,19 +364,19 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
     @Test
     public void locking_noLockRequired_whenLockedForReadByOther() {
-        long intitialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, intitialValue);
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         T otherTx = newTransaction();
         ref.getLock().acquire(otherTx, LockMode.Read);
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
 
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertIsActive(tx);
-        assertVersionAndValue(ref, initialVersion, intitialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasReadLock(ref, otherTx);
         assertReadLockCount(ref, 1);
         assertEquals(ref, tranlocal.owner);
@@ -368,18 +385,18 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
     @Test
     public void locking_noLockRequired_whenLockedForWriteByOther() {
-        long intitialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, intitialValue);
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         T otherTx = newTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
 
         assertIsActive(tx);
-        assertVersionAndValue(ref, initialVersion, intitialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasWriteLock(ref, otherTx);
         assertEquals(ref, tranlocal.owner);
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
@@ -388,8 +405,8 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
     @Test
     public void locking_noLockReqyired_whenLockedForCommitByOther() {
-        long intitialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, intitialValue);
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         T otherTx = newTransaction();
@@ -403,21 +420,21 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, initialVersion, intitialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasCommitLock(ref, otherTx);
     }
 
     @Test
     public void locking_readLockRequired_whenFree() {
-        long intitialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, intitialValue);
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_READ);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_READ);
 
         assertEquals(LOCKMODE_READ, tranlocal.getLockMode());
-        assertVersionAndValue(ref, initialVersion, intitialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasReadLock(ref, tx);
         assertReadLockCount(ref, 1);
         assertEquals(ref, tranlocal.owner);
@@ -426,19 +443,19 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
     @Test
     public void locking_readLockRequired_whenLockedForReadByOther() {
-        long intitialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, intitialValue);
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         T otherTx = newTransaction();
         ref.getLock().acquire(otherTx, LockMode.Read);
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_READ);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_READ);
 
         assertEquals(LOCKMODE_READ, tranlocal.getLockMode());
         assertIsActive(tx);
-        assertVersionAndValue(ref, initialVersion, intitialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasReadLock(ref, otherTx);
         assertReadLockCount(ref, 2);
         assertEquals(ref, tranlocal.owner);
@@ -447,8 +464,8 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
     @Test
     public void locking_readLockRequired_whenLockedForWriteByOther() {
-        long intitialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, intitialValue);
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         T otherTx = newTransaction();
@@ -462,14 +479,14 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, initialVersion, intitialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasWriteLock(ref, otherTx);
     }
 
     @Test
     public void locking_readLockReqyired_whenLockedForCommitByOther() {
-        long intitialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, intitialValue);
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         T otherTx = newTransaction();
@@ -483,21 +500,21 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, initialVersion, intitialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasCommitLock(ref, otherTx);
     }
 
     @Test
     public void locking_writeLockRequired_whenFree() {
-        long intitialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, intitialValue);
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_WRITE);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_WRITE);
 
         assertEquals(LOCKMODE_WRITE, tranlocal.getLockMode());
-        assertVersionAndValue(ref, initialVersion, intitialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasWriteLock(ref, tx);
         assertEquals(ref, tranlocal.owner);
         assertEquals(TRANLOCAL_WRITE, tranlocal.getMode());
@@ -505,8 +522,8 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
     @Test
     public void locking_writeLockRequired_whenLockedForReadByOther() {
-        long intitialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, intitialValue);
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         T otherTx = newTransaction();
@@ -521,15 +538,15 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, initialVersion, intitialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasReadLock(ref, otherTx);
         assertReadLockCount(ref, 1);
     }
 
     @Test
     public void locking_writeLockRequired_whenLockedForWriteByOther() {
-        long intitialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, intitialValue);
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         T otherTx = newTransaction();
@@ -543,14 +560,14 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, initialVersion, intitialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasWriteLock(ref, otherTx);
     }
 
     @Test
-    public void locking_writeLockReqyired_whenLockedForCommitByOther() {
-        long intitialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, intitialValue);
+    public void locking_writeLockRequired_whenLockedForCommitByOther() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         T otherTx = newTransaction();
@@ -564,22 +581,21 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, initialVersion, intitialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasCommitLock(ref, otherTx);
     }
 
-
     @Test
     public void locking_commitLockRequired_whenFree() {
-        long intitialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, intitialValue);
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_COMMIT);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_COMMIT);
 
         assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
-        assertVersionAndValue(ref, initialVersion, intitialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasCommitLock(ref, tx);
         assertEquals(ref, tranlocal.owner);
         assertEquals(TRANLOCAL_WRITE, tranlocal.getMode());
@@ -587,8 +603,8 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
     @Test
     public void locking_commitLockRequired_whenLockedForReadByOther() {
-        long intitialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, intitialValue);
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         T otherTx = newTransaction();
@@ -602,15 +618,15 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, initialVersion, intitialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasReadLock(ref, otherTx);
         assertReadLockCount(ref, 1);
     }
 
     @Test
     public void locking_commitLockRequired_whenLockedForWriteByOther() {
-        long intitialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, intitialValue);
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         T otherTx = newTransaction();
@@ -624,14 +640,14 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, initialVersion, intitialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasWriteLock(ref, otherTx);
     }
 
     @Test
     public void locking_commitLockReqyired_whenLockedForCommitByOther() {
-        long intitialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, intitialValue);
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         T otherTx = newTransaction();
@@ -645,7 +661,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         }
 
         assertIsAborted(tx);
-        assertVersionAndValue(ref, initialVersion, intitialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasCommitLock(ref, otherTx);
     }
 
@@ -668,7 +684,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         }
 
         assertIsAborted(tx);
-        assertEquals(initialValue, ref.value);
+        assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.version);
     }
 
@@ -687,7 +703,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         } catch (DeadTransactionException expected) {
         }
 
-        assertEquals(initialValue, ref.value);
+        assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.version);
     }
 
@@ -706,7 +722,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         } catch (DeadTransactionException expected) {
         }
 
-        assertEquals(initialValue, ref.value);
+        assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.version);
     }
 }

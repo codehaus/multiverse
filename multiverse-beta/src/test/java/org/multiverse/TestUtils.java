@@ -130,7 +130,7 @@ public class TestUtils implements MultiverseConstants {
         Set<RetryLatch> expected = new HashSet<RetryLatch>(Arrays.asList(listeners));
 
         Set<RetryLatch> found = new HashSet<RetryLatch>();
-        Listeners l = (Listeners) getField(ref, "___listeners");
+        Listeners l = (Listeners) getField(ref, "listeners");
         while (l != null) {
             found.add(l.listener);
             l = l.next;

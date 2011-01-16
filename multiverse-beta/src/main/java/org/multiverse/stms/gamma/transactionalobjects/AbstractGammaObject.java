@@ -36,27 +36,58 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     static {
         try {
             listenersOffset = ___unsafe.objectFieldOffset(
-                    AbstractGammaObject.class.getDeclaredField("___listeners"));
+                    AbstractGammaObject.class.getDeclaredField("listeners"));
             valueOffset = ___unsafe.objectFieldOffset(
-                    AbstractGammaObject.class.getDeclaredField("___orec"));
+                    AbstractGammaObject.class.getDeclaredField("orec"));
         } catch (Exception ex) {
             throw new Error(ex);
         }
     }
 
-    public final GammaStm ___stm;
+    public final GammaStm stm;
 
-    protected volatile Listeners ___listeners;
+    protected volatile Listeners listeners;
 
     public volatile long version;
 
-    private volatile long ___orec;
+    public volatile long orec;
 
     //This field has a controlled JMM problem (just like the hashcode of String).
-    protected int ___identityHashCode;
+    protected int identityHashCode;
+    private final boolean isRef;
 
-    public AbstractGammaObject(GammaStm stm) {
-        this.___stm = stm;
+    public static GammaTransaction getRequiredThreadLocalGammaTransaction() {
+        Transaction tx = getThreadLocalTransaction();
+
+        if (tx == null) {
+            throw new TransactionRequiredException();
+        }
+
+        return asGammaTransaction(tx);
+    }
+
+    public static GammaTransaction asGammaTransaction(Transaction tx) {
+        if (tx instanceof GammaTransaction) {
+            return (GammaTransaction) tx;
+        }
+
+        if(tx == null){
+            throw new NullPointerException("Transaction can't be null");
+        }
+
+        tx.abort();
+        throw new ClassCastException(
+                format("Expected Transaction of class %s, found %s", GammaTransaction.class.getName(), tx.getClass().getName()));
+    }
+
+    public AbstractGammaObject(GammaStm stm, boolean isRef) {
+        this.stm = stm;
+        this.isRef = isRef;
+    }
+
+    @Override
+    public boolean isRef() {
+        return isRef;
     }
 
     @Override
@@ -66,7 +97,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
     @Override
     public final GammaStm getStm() {
-        return ___stm;
+        return stm;
     }
 
     @Override
@@ -75,13 +106,13 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     }
 
     protected final Listeners ___removeListenersAfterWrite() {
-        if (___listeners == null) {
+        if (listeners == null) {
             return null;
         }
 
         Listeners removedListeners;
         while (true) {
-            removedListeners = ___listeners;
+            removedListeners = listeners;
             if (___unsafe.compareAndSwapObject(this, listenersOffset, removedListeners, null)) {
                 return removedListeners;
             }
@@ -91,7 +122,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     @Override
     public final int registerChangeListener(
             final RetryLatch latch,
-            final GammaTranlocal tranlocal,
+            final GammaRefTranlocal tranlocal,
             final GammaObjectPool pool,
             final long listenerEra) {
 
@@ -126,7 +157,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
             //the listeners object is mutable, but as long as it isn't yet registered, this calling
             //thread has full ownership of it.
-            final Listeners current = ___listeners;
+            final Listeners current = listeners;
             update.next = current;
 
             //lets try to register our listeners.
@@ -154,7 +185,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             //if it is, it should be removed and the listeners notified. If the listeners already has changed,
             //it is the task for the other to do the listener cleanup and notify them
             while (true) {
-                update = ___listeners;
+                update = listeners;
                 final boolean removed = ___unsafe.compareAndSwapObject(this, listenersOffset, update, null);
 
                 if (!removed) {
@@ -170,90 +201,89 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
     }
 
-    public final int ___tryCommitLockAndArrive(int spinCount) {
-        do {
-            final long current = ___orec;
-
-            if (hasAnyLock(current)) {
-                spinCount--;
-                yieldIfNeeded(spinCount);
-                continue;
-            }
-
-            long surplus = getSurplus(current);
-            boolean isReadBiased = isReadBiased(current);
-
-            if (isReadBiased) {
-                if (surplus == 0) {
-                    surplus = 1;
-                }// else if (surplus > 1) {
-                //   throw new PanicError(
-                //           "Can't arriveAndLockForUpdate; surplus is larger than 2: " + ___toOrecString(current));
-                //}
-            } else {
-                surplus++;
-            }
-
-            long next = setSurplus(current, surplus);
-            next = setCommitLock(next, true);
-
-            if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
-                return isReadBiased ? ARRIVE_UNREGISTERED : ARRIVE_NORMAL;
-            }
-        } while (spinCount >= 0);
-
-        return ARRIVE_LOCK_NOT_FREE;
-    }
-
     @Override
-    public boolean tryAcquire(LockMode lockMode) {
-        GammaTransaction tx = (GammaTransaction) getThreadLocalTransaction();
+    public final boolean tryAcquire(final LockMode desiredLockMode) {
+        final GammaTransaction tx = (GammaTransaction) getThreadLocalTransaction();
 
         if (tx == null) {
             throw new TransactionRequiredException();
         }
 
-        return tryAcquire(tx, lockMode);
+        return tryAcquire(tx, desiredLockMode);
     }
 
     @Override
-    public boolean tryAcquire(Transaction tx, LockMode lockMode) {
-        return tryAcquire((GammaTransaction) tx, lockMode);
+    public final boolean tryAcquire(final Transaction tx, final LockMode desiredLockMode) {
+        return tryAcquire((GammaTransaction) tx, desiredLockMode);
     }
 
-    public boolean tryAcquire(GammaTransaction tx, LockMode lockMode) {
+    public final boolean tryAcquire(final GammaTransaction tx, final LockMode desiredLockMode) {
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortTryAcquireOnBadStatus(this);
+        }
+
+        if (desiredLockMode == null) {
+            throw tx.abortTryAcquireOnNullLockMode(this);
+        }
+
+        final GammaRefTranlocal tranlocal = tx.locate((AbstractGammaRef) this);
+
+        final int currentLockMode = tranlocal == null ? LOCKMODE_NONE : tranlocal.getLockMode();
+
+        if (currentLockMode >= desiredLockMode.asInt()) {
+            return true;
+        }
+
+        switch (currentLockMode) {
+            case LOCKMODE_NONE:
+                break;
+            case LOCKMODE_READ:
+                break;
+            case LOCKMODE_WRITE:
+                break;
+            case LOCKMODE_COMMIT:
+                return true;
+            default:
+                throw new IllegalStateException();
+        }
+
         throw new TodoException();
     }
 
     @Override
-    public void acquire(LockMode lockMode) {
-        GammaTransaction tx = (GammaTransaction) getThreadLocalTransaction();
+    public final void acquire(final LockMode desiredLockMode) {
+        final GammaTransaction tx = (GammaTransaction) getThreadLocalTransaction();
+
         if (tx == null) {
             throw new TransactionRequiredException();
         }
 
-        acquire(tx, lockMode);
+        acquire(tx, desiredLockMode);
     }
 
     @Override
-    public void acquire(Transaction tx, LockMode lockMode) {
-        acquire((GammaTransaction) tx, lockMode);
+    public final void acquire(final Transaction tx, final LockMode desiredLockMode) {
+        acquire((GammaTransaction) tx, desiredLockMode);
     }
 
-    public void acquire(GammaTransaction tx, LockMode lockMode) {
+    public final void acquire(final GammaTransaction tx, final LockMode lockMode) {
         if (tx == null) {
             throw new NullPointerException();
         }
 
         if (lockMode == null) {
-            throw tx.abortOnNullLockMode();
+            throw tx.abortAcquireOnNullLockMode(this);
         }
 
         openForRead(tx, lockMode.asInt());
     }
 
     @Override
-    public final boolean hasReadConflict(final GammaTranlocal tranlocal) {
+    public final boolean hasReadConflict(final GammaRefTranlocal tranlocal) {
         if (tranlocal.getLockMode() != LOCKMODE_NONE) {
             return false;
         }
@@ -266,14 +296,14 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     }
 
     protected final int arriveAndCommitLockOrBackoff() {
-        for (int k = 0; k <= ___stm.defaultMaxRetries; k++) {
-            final int arriveStatus = tryCommitLockAndArrive(___stm.spinCount);
+        for (int k = 0; k <= stm.defaultMaxRetries; k++) {
+            final int arriveStatus = tryCommitLockAndArrive(stm.spinCount);
 
             if (arriveStatus != ARRIVE_LOCK_NOT_FREE) {
                 return arriveStatus;
             }
 
-            ___stm.defaultBackoffPolicy.delayedUninterruptible(k + 1);
+            stm.defaultBackoffPolicy.delayedUninterruptible(k + 1);
         }
 
         return ARRIVE_LOCK_NOT_FREE;
@@ -283,18 +313,19 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     //this is the same as with the hashcode and String.
     @Override
     public final int identityHashCode() {
-        int tmp = ___identityHashCode;
+        int tmp = identityHashCode;
         if (tmp != 0) {
             return tmp;
         }
 
         tmp = System.identityHashCode(this);
-        ___identityHashCode = tmp;
+        identityHashCode = tmp;
         return tmp;
     }
 
-    public int atomicGetLockModeAsInt() {
-        long current = ___orec;
+    public final int atomicGetLockModeAsInt() {
+        final long current = orec;
+
         if (hasCommitLock(current)) {
             return LOCKMODE_COMMIT;
         }
@@ -311,7 +342,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     }
 
     @Override
-    public LockMode atomicGetLockMode() {
+    public final LockMode atomicGetLockMode() {
         switch (atomicGetLockModeAsInt()) {
             case LOCKMODE_NONE:
                 return LockMode.None;
@@ -327,8 +358,8 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     }
 
     @Override
-    public LockMode getLockMode() {
-        GammaTransaction tx = (GammaTransaction) getThreadLocalTransaction();
+    public final LockMode getLockMode() {
+        final GammaTransaction tx = (GammaTransaction) getThreadLocalTransaction();
 
         if (tx == null) {
             throw new TransactionRequiredException();
@@ -338,12 +369,13 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     }
 
     @Override
-    public LockMode getLockMode(Transaction tx) {
+    public final LockMode getLockMode(final Transaction tx) {
         return getLockMode((GammaTransaction) tx);
     }
 
-    public LockMode getLockMode(GammaTransaction tx) {
-        GammaTranlocal tranlocal = tx.locate(this);
+    public final LockMode getLockMode(final GammaTransaction tx) {
+        final GammaRefTranlocal tranlocal = tx.locate((AbstractGammaRef) this);
+
         if (tranlocal == null) {
             return LockMode.None;
         }
@@ -362,15 +394,24 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
     }
 
-
-    private void yieldIfNeeded(int remainingSpins) {
+    private void yieldIfNeeded(final int remainingSpins) {
         if (remainingSpins % ___SpinYield == 0 && remainingSpins > 0) {
             Thread.yield();
         }
     }
 
     @Override
-    public void releaseAfterFailure(GammaTranlocal tranlocal, GammaObjectPool pool) {
+    public final void releaseAfterFailure(final GammaRefTranlocal tranlocal, final GammaObjectPool pool) {
+        if (tranlocal.headCallable != null) {
+            CallableNode node = tranlocal.headCallable;
+            do {
+                CallableNode next = node.next;
+                pool.putCallableNode(node);
+                node = next;
+            } while (node != null);
+            tranlocal.headCallable = null;
+        }
+
         if (tranlocal.hasDepartObligation()) {
             if (tranlocal.getLockMode() != LOCKMODE_NONE) {
                 departAfterFailureAndUnlock();
@@ -379,13 +420,16 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 departAfterFailure();
             }
             tranlocal.setDepartObligation(false);
+        } else if (tranlocal.getLockMode() != LOCKMODE_NONE) {
+            unlockWhenUnregistered();
+            tranlocal.setLockMode(LOCKMODE_NONE);
         }
 
         tranlocal.owner = null;
     }
 
     @Override
-    public void releaseAfterUpdate(GammaTranlocal tranlocal, GammaObjectPool pool) {
+    public final void releaseAfterUpdate(final GammaRefTranlocal tranlocal, final GammaObjectPool pool) {
         departAfterUpdateAndUnlock();
         tranlocal.setLockMode(LOCKMODE_NONE);
         tranlocal.owner = null;
@@ -393,7 +437,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     }
 
     @Override
-    public void releaseAfterReading(GammaTranlocal tranlocal, GammaObjectPool pool) {
+    public final void releaseAfterReading(final GammaRefTranlocal tranlocal, final GammaObjectPool pool) {
         if (tranlocal.hasDepartObligation()) {
             if (tranlocal.getLockMode() != LOCKMODE_NONE) {
                 departAfterReadingAndUnlock();
@@ -402,6 +446,9 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 departAfterReading();
             }
             tranlocal.setDepartObligation(false);
+        } else if (tranlocal.getLockMode() != LOCKMODE_NONE) {
+            unlockWhenUnregistered();
+            tranlocal.setLockMode(LOCKMODE_NONE);
         }
 
         tranlocal.owner = null;
@@ -410,7 +457,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     @Override
     public final boolean tryLockAndCheckConflict(
             final int spinCount,
-            final GammaTranlocal tranlocal,
+            final GammaRefTranlocal tranlocal,
             final int desiredLockMode) {
 
         final int currentLockMode = tranlocal.getLockMode();
@@ -424,7 +471,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         if (currentLockMode == LOCKMODE_NONE) {
             long expectedVersion = tranlocal.version;
 
-            //if the version already is different, we are since since the lock doesn't need to be acquired.
+            //if the version already is different, and there is a conflict, we are done since since the lock doesn't need to be acquired.
             if (expectedVersion != version) {
                 return false;
             }
@@ -461,14 +508,14 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
 
         //so we have the write lock, its needs to be upgraded to a commit lock.
-        upgradeWriteLockToCommitLock();
+        upgradeToCommitLock();
         tranlocal.setLockMode(LOCKMODE_COMMIT);
         return true;
     }
 
     public final boolean waitForNoCommitLock(int spinCount) {
         do {
-            if (!hasCommitLock(___orec)) {
+            if (!hasCommitLock(orec)) {
                 return true;
             }
 
@@ -478,12 +525,12 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return false;
     }
 
-    public final boolean hasWriteLock(){
-        return hasWriteLock(___orec);
+    public final boolean hasWriteLock() {
+        return hasWriteLock(orec);
     }
 
     public final boolean hasCommitLock() {
-        return hasCommitLock(___orec);
+        return hasCommitLock(orec);
     }
 
     public final int getReadBiasedThreshold() {
@@ -491,24 +538,24 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     }
 
     public final long getSurplus() {
-        return getSurplus(___orec);
+        return getSurplus(orec);
     }
 
     public final boolean isReadBiased() {
-        return isReadBiased(___orec);
+        return isReadBiased(orec);
     }
 
     public final int getReadonlyCount() {
-        return getReadonlyCount(___orec);
+        return getReadonlyCount(orec);
     }
 
-    public int getReadLockCount() {
-        return getReadLockCount(___orec);
+    public final int getReadLockCount() {
+        return getReadLockCount(orec);
     }
 
     public final int arrive(int spinCount) {
         do {
-            final long current = ___orec;
+            final long current = orec;
 
             if (hasCommitLock(current)) {
                 spinCount--;
@@ -532,7 +579,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 surplus++;
             }
 
-            long next = setSurplus(current, surplus);
+            final long next = setSurplus(current, surplus);
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
                 return isReadBiased ? ARRIVE_UNREGISTERED : ARRIVE_NORMAL;
@@ -542,14 +589,15 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return ARRIVE_LOCK_NOT_FREE;
     }
 
-    public boolean tryUpgradeFromReadLock(int spinCount, boolean commitLock) {
+    public final boolean tryUpgradeFromReadLock(int spinCount, final boolean commitLock) {
         do {
-            final long current = ___orec;
+            final long current = orec;
 
             int readLockCount = getReadLockCount(current);
 
             if (readLockCount == 0) {
-                throw new PanicError();
+                throw new PanicError(format("Can't update from readlock to %s if no readlocks are acquired",
+                        commitLock ? "commitLock" : "writeLock"));
             }
 
             if (readLockCount > 1) {
@@ -573,9 +621,30 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return false;
     }
 
+    public final void upgradeToCommitLock() {
+        while (true) {
+            final long current = orec;
+
+            if (hasCommitLock(current)) {
+                return;
+            }
+
+            if (!hasWriteLock(current)) {
+                throw new PanicError("Can't upgradeToCommitLock is the updateLock is not acquired");
+            }
+
+            long next = setCommitLock(current, true);
+            next = setWriteLock(next, false);
+
+            if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
+                return;
+            }
+        }
+    }
+
     public final int tryLockAndArrive(int spinCount, final int lockMode) {
         do {
-            final long current = ___orec;
+            final long current = orec;
 
             boolean locked = lockMode == LOCKMODE_READ ? hasWriteOrCommitLock(current) : hasAnyLock(current);
 
@@ -621,7 +690,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
     public final int tryCommitLockAndArrive(int spinCount) {
         do {
-            final long current = ___orec;
+            final long current = orec;
 
             if (hasAnyLock(current)) {
                 spinCount--;
@@ -654,10 +723,9 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return ARRIVE_LOCK_NOT_FREE;
     }
 
-
     public final boolean tryLockAfterNormalArrive(int spinCount, final int lockMode) {
         do {
-            final long current = ___orec;
+            final long current = orec;
 
             if (isReadBiased(current)) {
                 throw new PanicError("Can't tryLockAfterNormalArrive of the orec is readbiased " + toOrecString(current));
@@ -673,7 +741,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
             if (getSurplus(current) == 0) {
                 throw new PanicError(
-                        "Can't acquire the updatelock is there is no surplus (so if it didn't do a read before)" +
+                        "Can't acquire any Lock is there is no surplus (so if it didn't do a read before)" +
                                 toOrecString(current));
             }
 
@@ -696,32 +764,11 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return false;
     }
 
-    public void upgradeWriteLockToCommitLock() {
-        while (true) {
-            final long current = ___orec;
-
-            if (hasCommitLock(current)) {
-                return;
-            }
-
-            if (!hasWriteLock(current)) {
-                throw new PanicError("Can't upgradeToCommitLock is the updateLock is not acquired");
-            }
-
-            long next = setCommitLock(current, true);
-            next = setWriteLock(next, false);
-
-            if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
-                return;
-            }
-        }
-    }
-
     public final void departAfterReading() {
         while (true) {
-            final long current = ___orec;
-            long surplus = getSurplus(current);
+            final long current = orec;
 
+            long surplus = getSurplus(current);
             if (surplus == 0) {
                 throw new PanicError("Can't depart if there is no surplus " + toOrecString(current));
             }
@@ -754,16 +801,17 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
     public final void departAfterReadingAndUnlock() {
         while (true) {
-            final long current = ___orec;
-            long surplus = getSurplus(current);
+            final long current = orec;
 
+            long surplus = getSurplus(current);
             if (surplus == 0) {
                 throw new PanicError(
                         "Can't ___departAfterReadingAndUnlock if there is no surplus: " + toOrecString(current));
             }
 
-            //todo: research if also read lcoks needs to be incldued
-            if (!hasWriteOrCommitLock(current)) {
+            int readLockCount = getReadLockCount(current);
+
+            if (readLockCount == 0 && !hasWriteOrCommitLock(current)) {
                 throw new PanicError(
                         "Can't ___departAfterReadingAndUnlock if the lock is not acquired " + toOrecString(current));
             }
@@ -787,8 +835,14 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 readonlyCount = 0;
             }
 
-            long next = setCommitLock(current, false);
-            next = setWriteLock(next, false);
+            long next = current;
+            if (readLockCount > 0) {
+                next = setReadLockCount(next, readLockCount - 1);
+            } else {
+                next = setCommitLock(next, false);
+                next = setWriteLock(next, false);
+            }
+
             next = setIsReadBiased(next, isReadBiased);
             next = setReadonlyCount(next, readonlyCount);
             next = setSurplus(next, surplus);
@@ -801,7 +855,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     public final long departAfterUpdateAndUnlock() {
         boolean conflictSend = false;
         while (true) {
-            final long current = ___orec;
+            final long current = orec;
 
             if (!hasCommitLock(current)) {
                 throw new PanicError(
@@ -831,12 +885,12 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             }
 
             if (conflict && !conflictSend) {
-                ___stm.globalConflictCounter.signalConflict(this);
+                stm.globalConflictCounter.signalConflict(this);
                 conflictSend = true;
             }
 
             if (surplus == 0) {
-                ___orec = 0;
+                orec = 0;
                 return surplus;
             }
 
@@ -850,7 +904,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
     public final long departAfterFailureAndUnlock() {
         while (true) {
-            final long current = ___orec;
+            final long current = orec;
 
             //-1 indicates write or commit lock, value bigger than 0 indicates readlock
             int lockMode;
@@ -858,7 +912,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             if (hasWriteOrCommitLock(current)) {
                 lockMode = -1;
             } else {
-                lockMode = getReadLockCount();
+                lockMode = getReadLockCount(current);
             }
 
             if (lockMode == 0) {
@@ -889,7 +943,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 next = setCommitLock(next, false);
                 next = setWriteLock(next, false);
             } else {
-                next = setReadLockCount(next, getReadLockCount() - 1);
+                next = setReadLockCount(next, lockMode - 1);
             }
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
@@ -900,7 +954,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
     public final void departAfterFailure() {
         while (true) {
-            final long current = ___orec;
+            final long current = orec;
 
             if (isReadBiased(current)) {
                 throw new PanicError("Can't departAfterFailure when orec is readbiased:" + toOrecString(current));
@@ -930,27 +984,42 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
     }
 
-    public final void unlockByReadBiased() {
+    public final void unlockWhenUnregistered() {
         while (true) {
-            final long current = ___orec;
+            final long current = orec;
 
+            //-1 indicates write or commit lock, value bigger than 0 indicates readlock
             if (!isReadBiased(current)) {
                 throw new PanicError(
                         "Can't ___unlockByReadBiased when it is not readbiased " + toOrecString(current));
             }
 
-            if (!hasWriteOrCommitLock(current)) {
+            int lockMode;
+            if (hasWriteOrCommitLock(current)) {
+                lockMode = -1;
+            } else {
+                lockMode = getReadLockCount(current);
+            }
+
+            if (lockMode == 0) {
                 throw new PanicError(
                         "Can't ___unlockByReadBiased if it isn't locked " + toOrecString(current));
             }
+
 
             if (getSurplus(current) > 1) {
                 throw new PanicError(
                         "Surplus for a readbiased orec never can be larger than 1 " + toOrecString(current));
             }
 
-            long next = setCommitLock(current, false);
-            next = setWriteLock(next, false);
+            long next = current;
+            if (lockMode > 0) {
+                next = setReadLockCount(next, lockMode - 1);
+            } else {
+                next = setCommitLock(next, false);
+                next = setWriteLock(next, false);
+            }
+
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
                 return;
             }
@@ -958,7 +1027,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     }
 
     public final String ___toOrecString() {
-        return toOrecString(___orec);
+        return toOrecString(orec);
     }
 
     public static long setReadLockCount(final long value, final long readLockCount) {
@@ -980,7 +1049,6 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     public static boolean hasAnyLock(final long value) {
         return ((value & (BITMASK_COMMITLOCK + BITMASK_UPDATELOCK + BITMASK_READLOCKS)) != 0);
     }
-
 
     public static boolean hasCommitLock(final long value) {
         return (value & BITMASK_COMMITLOCK) != 0;
@@ -1018,7 +1086,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return (value & BITMASK_SURPLUS) >> 10;
     }
 
-    private static String toOrecString(long value) {
+    private static String toOrecString(final long value) {
         return format(
                 "Orec(hasCommitLock=%s, hasUpdateLock=%s, readLocks=%s, surplus=%s, isReadBiased=%s, readonlyCount=%s)",
                 hasCommitLock(value),

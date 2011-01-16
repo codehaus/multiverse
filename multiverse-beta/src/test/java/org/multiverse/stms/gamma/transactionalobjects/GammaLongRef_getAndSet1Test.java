@@ -56,7 +56,7 @@ public class GammaLongRef_getAndSet1Test {
         assertEquals(initialValue, value);
         assertIsCommitted(tx);
         assertSame(tx, getThreadLocalTransaction());
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -74,7 +74,7 @@ public class GammaLongRef_getAndSet1Test {
         assertEquals(10, result);
         assertIsActive(tx);
         assertRefHasWriteLock(ref, tx);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, version, 10);
     }
@@ -93,7 +93,7 @@ public class GammaLongRef_getAndSet1Test {
         assertEquals(10, result);
         assertIsActive(tx);
         assertRefHasCommitLock(ref, tx);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, version, 10);
     }
@@ -114,7 +114,7 @@ public class GammaLongRef_getAndSet1Test {
         assertEquals(10, result);
         assertIsActive(tx);
         assertRefHasWriteLock(ref, otherTx);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertIsActive(otherTx);
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, version, 10);
@@ -128,7 +128,7 @@ public class GammaLongRef_getAndSet1Test {
         assertIsAborted(tx);
         assertIsActive(otherTx);
         assertRefHasWriteLock(ref, otherTx);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, version, 10);
     }
@@ -152,7 +152,7 @@ public class GammaLongRef_getAndSet1Test {
 
         assertIsAborted(tx);
         assertRefHasCommitLock(ref, otherTx);
-        assertSurplus(1, ref);
+        assertSurplus(ref, 1);
         assertIsActive(otherTx);
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, version, 10);
@@ -197,7 +197,7 @@ public class GammaLongRef_getAndSet1Test {
         } catch (TransactionRequiredException expected) {
         }
 
-        assertSurplus(0, ref);
+        assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
