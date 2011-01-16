@@ -293,7 +293,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
 
-    public IllegalTransactionStateException abortEnsureOnBadStatus() {
+    public IllegalTransactionStateException abortEnsureOnBadStatus(AbstractGammaRef abstractGammaRef) {
         switch (status) {
             case TX_ABORTED:
                 return new DeadTransactionException();

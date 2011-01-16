@@ -159,7 +159,6 @@ public class DeadLockStressTest {
             });
         }
 
-
         public void doIt(GammaTransaction tx) {
             for (int k = 0; k < refs.length; k++) {
                 if (!randomOneOf(10)) {

@@ -9,8 +9,8 @@ import org.multiverse.api.exceptions.RetryNotAllowedException;
 import org.multiverse.api.exceptions.RetryNotPossibleException;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.references.LongRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -62,9 +62,8 @@ public class NoBlockingTest {
             execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-                    BetaLongRef ref = new BetaLongRef(btx);
-                    btx.openForConstruction(ref);
+                    GammaTransaction btx = (GammaTransaction) tx;
+                    GammaLongRef ref = new GammaLongRef(btx);
                     retry();
                 }
             });

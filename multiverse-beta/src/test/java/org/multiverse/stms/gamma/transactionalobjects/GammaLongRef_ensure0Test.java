@@ -25,7 +25,7 @@ public class GammaLongRef_ensure0Test implements GammaConstants {
     }
 
     @Test
-    public void whenReadonlyAndConflictingWrite_thenCommitSucceeds(){
+    public void whenReadonlyAndConflictingWrite_thenCommitSucceeds() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -71,7 +71,60 @@ public class GammaLongRef_ensure0Test implements GammaConstants {
     }
 
     @Test
-    public void whenPrivatizedBySelf() {
+    public void whenReadLockAcquiredBySelf() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+        ref.set(initialValue + 1);
+        ref.getLock().acquire(LockMode.Read);
+        ref.ensure();
+
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
+        assertIsActive(tx);
+        assertTrue(tranlocal.isConflictCheckNeeded());
+        assertRefHasCommitLock(ref, tx);
+        assertEquals(LOCKMODE_READ, tranlocal.getLockMode());
+
+        tx.commit();
+
+        assertRefHasNoLocks(ref);
+        assertIsCommitted(tx);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
+        assertSurplus(ref, 0);
+    }
+
+    @Test
+    public void whenWriteLockAcquiredBySelf() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        setThreadLocalTransaction(tx);
+        ref.set(initialValue + 1);
+        ref.getLock().acquire(LockMode.Write);
+        ref.ensure();
+
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
+        assertIsActive(tx);
+        assertTrue(tranlocal.isConflictCheckNeeded());
+        assertRefHasCommitLock(ref, tx);
+        assertEquals(LOCKMODE_WRITE, tranlocal.getLockMode());
+
+        tx.commit();
+
+        assertRefHasNoLocks(ref);
+        assertIsCommitted(tx);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
+        assertSurplus(ref, 0);
+    }
+
+
+    @Test
+    public void whenCommitLockAcquiredBySelf() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -96,6 +149,7 @@ public class GammaLongRef_ensure0Test implements GammaConstants {
         assertSurplus(ref, 0);
     }
 
+
     @Test
     public void whenEnsuredByOther() {
         long initialValue = 10;
@@ -110,7 +164,7 @@ public class GammaLongRef_ensure0Test implements GammaConstants {
         ref.set(initialValue + 1);
         ref.ensure();
 
-        GammaRefTranlocal tranlocal =  tx.getRefTranlocal(ref);
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         assertIsActive(tx);
         assertTrue(tranlocal.isConflictCheckNeeded());
         assertRefHasWriteLock(ref, otherTx);
@@ -243,7 +297,7 @@ public class GammaLongRef_ensure0Test implements GammaConstants {
     }
 
     @Test
-    public void whenPossibleWriteSkew_thenCanBeDetectedWithDeferredEnsure() {
+    public void whenPossibleWriteSkew_thenCanBeDetectedWithEnsure() {
         GammaLongRef ref1 = new GammaLongRef(stm);
         GammaLongRef ref2 = new GammaLongRef(stm);
 

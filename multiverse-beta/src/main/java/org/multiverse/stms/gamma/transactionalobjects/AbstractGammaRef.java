@@ -446,6 +446,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         tranlocal.isDirty = false;
         tranlocal.mode = TRANLOCAL_READ;
+        tranlocal.writeSkewCheck = false;
         return tranlocal;
     }
 
@@ -507,6 +508,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         newNode.mode = TRANLOCAL_READ;
         newNode.isDirty = false;
+        newNode.writeSkewCheck = false;
 
         if (!load(newNode, lockMode, config.spinCount, tx.arriveEnabled)) {
             throw tx.abortOnReadWriteConflict();
@@ -567,6 +569,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         final GammaRefTranlocal tranlocal = tx.pool.take(this);
         tranlocal.mode = TRANLOCAL_READ;
         tranlocal.isDirty = false;
+        tranlocal.writeSkewCheck = false;
         tx.attach(tranlocal, identityHash);
         tx.size++;
 
@@ -656,6 +659,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         tranlocal.setDirty(!config.dirtyCheck);
         tranlocal.mode = TRANLOCAL_WRITE;
+        tranlocal.writeSkewCheck = false;
 
         if (tx.needsConsistency) {
             if (!tx.isReadConsistent(tranlocal)) {
@@ -719,6 +723,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         tranlocal.setDirty(!config.dirtyCheck);
+        tranlocal.writeSkewCheck = false;
         tranlocal.mode = TRANLOCAL_WRITE;
         tx.hasWrites = true;
         return tranlocal;
@@ -801,6 +806,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         newNode.mode = TRANLOCAL_WRITE;
         newNode.setDirty(!config.dirtyCheck);
+        newNode.writeSkewCheck = false;
         tx.needsConsistency = true;
         tx.hasWrites = true;
         tx.size++;
@@ -880,6 +886,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tranlocal.owner = this;
         tranlocal.mode = TRANLOCAL_COMMUTING;
         tranlocal.isDirty = !config.dirtyCheck;
+        tranlocal.writeSkewCheck = false;
         tranlocal.addCommutingFunction(tx.pool, function);
     }
 
@@ -959,6 +966,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         newNode.mode = TRANLOCAL_COMMUTING;
         newNode.isDirty = !config.dirtyCheck;
         newNode.owner = this;
+        newNode.writeSkewCheck = false;
         newNode.addCommutingFunction(tx.pool, function);
     }
 
@@ -1015,6 +1023,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         final GammaRefTranlocal tranlocal = tx.pool.take(this);
         tranlocal.mode = TRANLOCAL_COMMUTING;
+        tranlocal.writeSkewCheck = false;
         tx.hasWrites = true;
         tx.attach(tranlocal, identityHash);
         tx.size++;
@@ -1029,8 +1038,21 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         ensure(asGammaTransaction(self));
     }
 
-    public final void ensure(final GammaTransaction self) {
-        throw new TodoException();
+    public final void ensure(final GammaTransaction tx) {
+        if(tx == null){
+            throw new NullPointerException();
+        }
+
+        if(tx.status!=TX_ACTIVE){
+            throw tx.abortEnsureOnBadStatus(this);
+        }
+
+        if(tx.config.readonly){
+            return;
+        }
+
+        GammaRefTranlocal tranlocal = openForRead(tx, LOCKMODE_NONE);
+        tranlocal.writeSkewCheck = true;
     }
 
     public final long atomicGetLong() {

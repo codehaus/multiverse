@@ -64,7 +64,7 @@ public class ConnectionPoolStressTest implements GammaConstants {
     }
 
     @Test
-    public void basicTest() {
+    public void sanityTest() {
         lockMode = LockMode.None;
         ConnectionPool pool = new ConnectionPool(2);
 

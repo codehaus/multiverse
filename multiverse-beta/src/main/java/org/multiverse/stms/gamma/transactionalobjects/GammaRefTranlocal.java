@@ -20,6 +20,7 @@ public final class GammaRefTranlocal<E> implements GammaConstants {
     public GammaRefTranlocal previous;
     public boolean isDirty = false;
     public CallableNode headCallable;
+    public boolean writeSkewCheck = false;
 
     public boolean isDirty() {
         return isDirty;

@@ -1,251 +1,274 @@
 package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.multiverse.api.LockMode;
+import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
+import org.multiverse.stms.gamma.ArrayGammaTransactionFactory;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.MapGammaTransactionFactory;
+import org.multiverse.stms.gamma.MonoGammaTransactionFactory;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
 
+import java.util.Collection;
+
+import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
+import static org.multiverse.api.functions.Functions.newIncLongFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 
+@RunWith(Parameterized.class)
 public class GammaLongRef_alterAndGet2Test {
-    private GammaStm stm;
+    private final GammaTransactionFactory transactionFactory;
+    private final GammaStm stm;
 
-      @Before
-      public void setUp() {
-          stm = new GammaStm();
-          clearThreadLocalTransaction();
-      }
+    public GammaLongRef_alterAndGet2Test(GammaTransactionFactory transactionFactory) {
+        this.transactionFactory = transactionFactory;
+        this.stm = transactionFactory.getTransactionConfiguration().getStm();
+    }
 
-      @Test
-      public void whenNullTransaction_thenNullPointerException() {
-          int initialValue = 10;
-          GammaLongRef ref = new GammaLongRef(stm, initialValue);
-          long initialVersion = ref.getVersion();
+    @Before
+    public void setUp() {
+        clearThreadLocalTransaction();
+    }
 
-          LongFunction function = mock(LongFunction.class);
+    @Parameterized.Parameters
+    public static Collection<TransactionFactory[]> configs() {
+        return asList(
+                new TransactionFactory[]{new MapGammaTransactionFactory(new GammaStm())},
+                new TransactionFactory[]{new ArrayGammaTransactionFactory(new GammaStm())},
+                new TransactionFactory[]{new MonoGammaTransactionFactory(new GammaStm())}
+        );
+    }
 
-          try {
-              ref.alterAndGet(null, function);
-              fail();
-          } catch (NullPointerException expected) {
-          }
+    @Test
+    public void whenNullTransaction_thenNullPointerException() {
+        int initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
-          verifyZeroInteractions(function);
-          assertVersionAndValue(ref, initialVersion, initialValue);
-      }
+        LongFunction function = mock(LongFunction.class);
 
-      @Test
-      public void whenNullFunction_thenNullPointerException() {
-          int initialValue = 10;
-          GammaLongRef ref = new GammaLongRef(stm, initialValue);
-          long initialVersion = ref.getVersion();
+        try {
+            ref.alterAndGet(null, function);
+            fail();
+        } catch (NullPointerException expected) {
+        }
 
-          GammaTransaction tx = stm.startDefaultTransaction();
+        verifyZeroInteractions(function);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
 
-          try {
-              ref.alterAndGet(tx, null);
-              fail();
-          } catch (NullPointerException expected) {
-          }
+    @Test
+    public void whenNullFunction_thenNullPointerException() {
+        int initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
-          assertRefHasNoLocks(ref);
-          assertIsAborted(tx);
-          assertVersionAndValue(ref, initialVersion, initialValue);
-      }
+        GammaTransaction tx = transactionFactory.newTransaction();
 
-      @Test
-      public void whenCommittedTransaction_thenDeadTransactionException() {
-          int initialValue = 10;
-          GammaLongRef ref = new GammaLongRef(stm, initialValue);
-          long initialVersion = ref.getVersion();
+        try {
+            ref.alterAndGet(tx, null);
+            fail();
+        } catch (NullPointerException expected) {
+        }
 
-          GammaTransaction tx = stm.startDefaultTransaction();
-          tx.commit();
+        assertRefHasNoLocks(ref);
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
 
-          LongFunction function = mock(LongFunction.class);
+    @Test
+    public void whenCommittedTransaction_thenDeadTransactionException() {
+        int initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
-          try {
-              ref.alterAndGet(tx, function);
-              fail();
-          } catch (DeadTransactionException expected) {
-          }
+        GammaTransaction tx = transactionFactory.newTransaction();
+        tx.commit();
 
-          assertIsCommitted(tx);
-          assertRefHasNoLocks(ref);
-          assertVersionAndValue(ref, initialVersion, initialValue);
-      }
+        LongFunction function = mock(LongFunction.class);
 
-      @Test
-      public void whenPreparedTransaction_thenPreparedTransactionException() {
-          int initialValue = 10;
-          GammaLongRef ref = new GammaLongRef(stm, initialValue);
-          long initialVersion = ref.getVersion();
+        try {
+            ref.alterAndGet(tx, function);
+            fail();
+        } catch (DeadTransactionException expected) {
+        }
 
-          GammaTransaction tx = stm.startDefaultTransaction();
-          tx.prepare();
+        assertIsCommitted(tx);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
 
-          LongFunction function = mock(LongFunction.class);
+    @Test
+    public void whenPreparedTransaction_thenPreparedTransactionException() {
+        int initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
-          try {
-              ref.alterAndGet(tx, function);
-              fail();
-          } catch (PreparedTransactionException expected) {
-          }
+        GammaTransaction tx = transactionFactory.newTransaction();
+        tx.prepare();
 
-          assertRefHasNoLocks(ref);
-          assertIsAborted(tx);
-          assertVersionAndValue(ref, initialVersion, initialValue);
-      }
+        LongFunction function = mock(LongFunction.class);
 
-      @Test
-      public void whenAbortedTransaction() {
-          int initialValue = 10;
-          GammaLongRef ref = new GammaLongRef(stm, initialValue);
-          long initialVersion = ref.getVersion();
+        try {
+            ref.alterAndGet(tx, function);
+            fail();
+        } catch (PreparedTransactionException expected) {
+        }
 
-          GammaTransaction tx = stm.startDefaultTransaction();
-          tx.abort();
+        assertRefHasNoLocks(ref);
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
 
-          LongFunction function = mock(LongFunction.class);
+    @Test
+    public void whenAbortedTransaction() {
+        int initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
-          try {
-              ref.alterAndGet(tx, function);
-              fail();
-          } catch (DeadTransactionException expected) {
-          }
+        GammaTransaction tx = transactionFactory.newTransaction();
+        tx.abort();
 
-          assertRefHasNoLocks(ref);
-          assertIsAborted(tx);
-          assertVersionAndValue(ref, initialVersion, initialValue);
-      }
+        LongFunction function = mock(LongFunction.class);
 
-      @Test
-      public void whenFunctionCausesException() {
-          long initialValue = 10;
-          GammaLongRef ref = new GammaLongRef(stm, initialValue);
-          long initialVersion = ref.getVersion();
+        try {
+            ref.alterAndGet(tx, function);
+            fail();
+        } catch (DeadTransactionException expected) {
+        }
 
-          LongFunction function = mock(LongFunction.class);
-          RuntimeException ex = new RuntimeException();
-          when(function.call(anyLong())).thenThrow(ex);
+        assertRefHasNoLocks(ref);
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
 
-          GammaTransaction tx = stm.startDefaultTransaction();
+    @Test
+    public void whenFunctionCausesException() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
-          try {
-              ref.alterAndGet(tx, function);
-              fail();
-          } catch (RuntimeException found) {
-              assertSame(ex, found);
-          }
+        LongFunction function = mock(LongFunction.class);
+        RuntimeException ex = new RuntimeException();
+        when(function.call(anyLong())).thenThrow(ex);
 
-          assertRefHasNoLocks(ref);
-          assertIsAborted(tx);
-          assertNull(getThreadLocalTransaction());
-          assertVersionAndValue(ref, initialVersion, initialValue);
-      }
+        GammaTransaction tx = transactionFactory.newTransaction();
 
-      @Test
-      public void whenPrivatizedByOther() {
-          int initialValue = 10;
-          GammaLongRef ref = new GammaLongRef(stm, initialValue);
-          long version = ref.getVersion();
+        try {
+            ref.alterAndGet(tx, function);
+            fail();
+        } catch (RuntimeException found) {
+            assertSame(ex, found);
+        }
 
-          GammaTransaction otherTx = stm.startDefaultTransaction();
-          ref.getLock().acquire(otherTx, LockMode.Commit);
+        assertRefHasNoLocks(ref);
+        assertIsAborted(tx);
+        assertNull(getThreadLocalTransaction());
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
 
-          GammaTransaction tx = stm.startDefaultTransaction();
-          LongFunction function = mock(LongFunction.class);
+    @Test
+    public void whenPrivatizedByOther() {
+        int initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long version = ref.getVersion();
 
-          try {
-              ref.alterAndGet(tx, function);
-              fail();
-          } catch (ReadWriteConflict expected) {
-          }
+        GammaTransaction otherTx = transactionFactory.newTransaction();
+        ref.getLock().acquire(otherTx, LockMode.Commit);
 
-          assertSurplus(ref, 1);
-          assertIsAborted(tx);
-          assertRefHasCommitLock(ref, otherTx);
-          assertVersionAndValue(ref, version, initialValue);
-      }
+        GammaTransaction tx = transactionFactory.newTransaction();
+        LongFunction function = mock(LongFunction.class);
+
+        try {
+            ref.alterAndGet(tx, function);
+            fail();
+        } catch (ReadWriteConflict expected) {
+        }
+
+        assertSurplus(ref, 1);
+        assertIsAborted(tx);
+        assertRefHasCommitLock(ref, otherTx);
+        assertVersionAndValue(ref, version, initialValue);
+    }
 
 
-      @Test
-      public void whenEnsuredByOther_thenOperationSucceedsButCommitFails() {
-          GammaLongRef ref = new GammaLongRef(stm, 10);
-          long version = ref.getVersion();
+    @Test
+    public void whenEnsuredByOther_thenOperationSucceedsButCommitFails() {
+        GammaLongRef ref = new GammaLongRef(stm, 10);
+        long version = ref.getVersion();
 
-          GammaTransaction otherTx = stm.startDefaultTransaction();
-          ref.getLock().acquire(otherTx, LockMode.Write);
+        GammaTransaction otherTx = transactionFactory.newTransaction();
+        ref.getLock().acquire(otherTx, LockMode.Write);
 
-          GammaTransaction tx = stm.startDefaultTransaction();
-          LongFunction function = Functions.newIncLongFunction(1);
-          ref.alterAndGet(tx, function);
+        GammaTransaction tx = transactionFactory.newTransaction();
+        LongFunction function = Functions.newIncLongFunction(1);
+        ref.alterAndGet(tx, function);
 
-          try {
-              tx.commit();
-              fail();
-          } catch (ReadWriteConflict expected) {
-          }
+        try {
+            tx.commit();
+            fail();
+        } catch (ReadWriteConflict expected) {
+        }
 
-          assertRefHasWriteLock(ref, otherTx);
-          assertSurplus(ref, 1);
-          assertIsActive(otherTx);
-          assertIsAborted(tx);
-          assertVersionAndValue(ref, version, 10);
-      }
+        assertRefHasWriteLock(ref, otherTx);
+        assertSurplus(ref, 1);
+        assertIsActive(otherTx);
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, version, 10);
+    }
 
-      @Test
-      @Ignore
-      public void whenListenersAvailable_thenTheyAreNotified() {
-          /*
-          long initialValue = 10;
-          GammaLongRef ref = new GammaLongRef(stm, initialValue);
-          long initialVersion = ref.getVersion();
+    @Test
+    public void whenListenersAvailable_thenTheyAreNotified() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
-          LongRefAwaitThread thread = new LongRefAwaitThread(ref, initialValue + 1);
-          thread.start();
+        LongRefAwaitThread thread = new LongRefAwaitThread(ref, initialValue + 1);
+        thread.start();
 
-          sleepMs(500);
+        sleepMs(500);
 
-          GammaTransaction tx = stm.startDefaultTransaction();
-          ref.alterAndGet(tx, newIncLongFunction());
-          tx.commit();
+        GammaTransaction tx = transactionFactory.newTransaction();
+        ref.alterAndGet(tx, newIncLongFunction());
+        tx.commit();
 
-          joinAll(thread);
+        joinAll(thread);
 
-          assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);*/
-      }
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
+    }
 
-      @Test
-      public void whenSuccess() {
-          LongFunction function = new LongFunction() {
-              @Override
-              public long call(long current) {
-                  return current + 1;
-              }
-          };
+    @Test
+    public void whenSuccess() {
+        LongFunction function = new LongFunction() {
+            @Override
+            public long call(long current) {
+                return current + 1;
+            }
+        };
 
-          GammaLongRef ref = new GammaLongRef(stm, 100);
-          GammaTransaction tx = stm.startDefaultTransaction();
-          long result = ref.alterAndGet(tx, function);
-          tx.commit();
+        GammaLongRef ref = new GammaLongRef(stm, 100);
+        GammaTransaction tx = transactionFactory.newTransaction();
+        long result = ref.alterAndGet(tx, function);
+        tx.commit();
 
-          assertEquals(101, ref.atomicGet());
-          assertEquals(101, result);
-      }
+        assertEquals(101, ref.atomicGet());
+        assertEquals(101, result);
+    }
 
 }
