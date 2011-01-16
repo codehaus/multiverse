@@ -2,32 +2,57 @@ package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.LongRefAwaitThread;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.ArrayGammaTransactionFactory;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.MapGammaTransactionFactory;
+import org.multiverse.stms.gamma.MonoGammaTransactionFactory;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
 
+import java.util.Collection;
+
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.*;
+import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasNoLocks;
+import static org.multiverse.stms.gamma.GammaTestUtils.assertVersionAndValue;
 
+@RunWith(Parameterized.class)
 public class GammaLongRef_incrementAndGet2Test {
 
-    private BetaStm stm;
+    private final GammaTransactionFactory transactionFactory;
+    private final GammaStm stm;
+
+    public GammaLongRef_incrementAndGet2Test(GammaTransactionFactory transactionFactory) {
+        this.transactionFactory = transactionFactory;
+        this.stm = transactionFactory.getTransactionConfiguration().getStm();
+    }
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
         clearThreadLocalTransaction();
     }
 
+    @Parameterized.Parameters
+    public static Collection<TransactionFactory[]> configs() {
+        return asList(
+                new TransactionFactory[]{new MapGammaTransactionFactory(new GammaStm())},
+                new TransactionFactory[]{new ArrayGammaTransactionFactory(new GammaStm())},
+                new TransactionFactory[]{new MonoGammaTransactionFactory(new GammaStm())}
+        );
+    }
+
+
     @Test
     public void whenTransactionNull_thenNullPointerException() {
-        BetaLongRef ref = newLongRef(stm, 10);
+        GammaLongRef ref = new GammaLongRef(stm, 10);
         long version = ref.getVersion();
 
         try {
@@ -41,10 +66,10 @@ public class GammaLongRef_incrementAndGet2Test {
 
     @Test
     public void whenTransactionCommitted_thenDeadTransactionException() {
-        BetaLongRef ref = newLongRef(stm, 10);
+        GammaLongRef ref = new GammaLongRef(stm, 10);
         long version = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         tx.commit();
         try {
             ref.incrementAndGet(tx, 10);
@@ -58,10 +83,10 @@ public class GammaLongRef_incrementAndGet2Test {
 
     @Test
     public void whenTransactionAborted_thenDeadTransactionException() {
-        BetaLongRef ref = newLongRef(stm, 10);
+        GammaLongRef ref = new GammaLongRef(stm, 10);
         long version = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         tx.abort();
         try {
             ref.incrementAndGet(tx, 10);
@@ -75,10 +100,10 @@ public class GammaLongRef_incrementAndGet2Test {
 
     @Test
     public void whenTransactionPrepared_thenPreparedTransactionException() {
-        BetaLongRef ref = newLongRef(stm, 10);
+        GammaLongRef ref = new GammaLongRef(stm, 10);
         long version = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         tx.prepare();
         try {
             ref.incrementAndGet(tx, 10);
@@ -92,10 +117,10 @@ public class GammaLongRef_incrementAndGet2Test {
 
     @Test
     public void whenNoChange() {
-        BetaLongRef ref = newLongRef(stm, 10);
+        GammaLongRef ref = new GammaLongRef(stm, 10);
         long version = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         long result = ref.incrementAndGet(tx, 0);
         tx.commit();
 
@@ -106,10 +131,10 @@ public class GammaLongRef_incrementAndGet2Test {
 
     @Test
     public void whenSuccess() {
-        BetaLongRef ref = newLongRef(stm, 10);
+        GammaLongRef ref = new GammaLongRef(stm, 10);
         long version = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         long result = ref.incrementAndGet(tx, 20);
         tx.commit();
 
@@ -118,10 +143,10 @@ public class GammaLongRef_incrementAndGet2Test {
         assertVersionAndValue(ref, version + 1, 30);
     }
 
-     @Test
+    @Test
     public void whenListenersAvailable() {
         long initialValue = 10;
-        BetaLongRef ref = newLongRef(stm, initialValue);
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         long amount = 4;
@@ -130,13 +155,13 @@ public class GammaLongRef_incrementAndGet2Test {
 
         sleepMs(500);
 
-        BetaTransaction tx = stm.startDefaultTransaction();
-        long result = ref.incrementAndGet(tx,amount);
+        GammaTransaction tx = transactionFactory.newTransaction();
+        long result = ref.incrementAndGet(tx, amount);
         tx.commit();
 
         joinAll(thread);
 
-        assertEquals(initialValue+amount, result);
+        assertEquals(initialValue + amount, result);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + amount);
     }

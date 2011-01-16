@@ -2,13 +2,23 @@ package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.multiverse.api.LockMode;
+import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
+import org.multiverse.stms.gamma.ArrayGammaTransactionFactory;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.MapGammaTransactionFactory;
+import org.multiverse.stms.gamma.MonoGammaTransactionFactory;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
 
+import java.util.Collection;
+
+import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.LOCKMODE_COMMIT;
 import static org.multiverse.TestUtils.LOCKMODE_NONE;
@@ -17,14 +27,29 @@ import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
+@RunWith(Parameterized.class)
 public class GammaLongRef_ensure1Test {
 
-    private GammaStm stm;
+    private final GammaTransactionFactory transactionFactory;
+    private final GammaStm stm;
+
+    public GammaLongRef_ensure1Test(GammaTransactionFactory transactionFactory) {
+        this.transactionFactory = transactionFactory;
+        this.stm = transactionFactory.getTransactionConfiguration().getStm();
+    }
 
     @Before
     public void setUp() {
-        stm = new GammaStm();
         clearThreadLocalTransaction();
+    }
+
+    @Parameterized.Parameters
+    public static Collection<TransactionFactory[]> configs() {
+        return asList(
+                new TransactionFactory[]{new MapGammaTransactionFactory(new GammaStm())},
+                new TransactionFactory[]{new ArrayGammaTransactionFactory(new GammaStm())},
+                new TransactionFactory[]{new MonoGammaTransactionFactory(new GammaStm())}
+        );
     }
 
     @Test
@@ -33,7 +58,7 @@ public class GammaLongRef_ensure1Test {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
         ref.get(tx);
         ref.ensure(tx);
@@ -48,13 +73,37 @@ public class GammaLongRef_ensure1Test {
         assertSurplus(ref, 0);
     }
 
-    @Test
-    public void whenEnsuredBySelf() {
+       @Test
+    public void whenReadLockAcquiredBySelf() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx =transactionFactory.newTransaction();
+        ref.set(tx, initialValue + 1);
+        ref.getLock().acquire(tx, LockMode.Read);
+        ref.ensure(tx);
+
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
+        assertIsActive(tx);
+        assertTrue(tranlocal.isConflictCheckNeeded());
+        assertEquals(LOCKMODE_WRITE, tranlocal.getLockMode());
+
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
+        assertSurplus(ref, 0);
+    }
+
+    @Test
+    public void whenWriteLockAcquiredBySelf() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction tx =transactionFactory.newTransaction();
         ref.set(tx, initialValue + 1);
         ref.getLock().acquire(tx, LockMode.Write);
         ref.ensure(tx);
@@ -73,12 +122,12 @@ public class GammaLongRef_ensure1Test {
     }
 
     @Test
-    public void whenPrivatizedBySelf() {
+    public void whenCommitLockAcquiredBySelf() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         ref.set(tx, initialValue + 1);
         ref.getLock().acquire(tx, LockMode.Commit);
         ref.ensure(tx);
@@ -97,16 +146,37 @@ public class GammaLongRef_ensure1Test {
         assertSurplus(ref, 0);
     }
 
-    @Test
-    public void whenEnsuredByOther() {
+        @Test
+    public void whenReadLockAcquiredByOther() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = transactionFactory.newTransaction();
+        ref.getLock().acquire(otherTx, LockMode.Read);
+
+        GammaTransaction tx = transactionFactory.newTransaction();
+        ref.set(tx, initialValue + 1);
+        ref.ensure(tx);
+
+        GammaRefTranlocal tranlocal =  tx.getRefTranlocal(ref);
+        assertIsActive(tx);
+        assertTrue(tranlocal.isConflictCheckNeeded());
+        assertRefHasWriteLock(ref, otherTx);
+        assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
+
+    @Test
+    public void whenWriteLockAcquiredByOther() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction otherTx = transactionFactory.newTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         ref.set(tx, initialValue + 1);
         ref.ensure(tx);
 
@@ -124,10 +194,10 @@ public class GammaLongRef_ensure1Test {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = transactionFactory.newTransaction();
         ref.getLock().acquire(otherTx, LockMode.Commit);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         try {
             ref.ensure(tx);
             fail();
@@ -158,7 +228,7 @@ public class GammaLongRef_ensure1Test {
 
     @Test
     public void state_whenAlreadyPrepared_thenPreparedTransactionException() {
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         tx.prepare();
 
         long initialValue = 10;
@@ -179,7 +249,7 @@ public class GammaLongRef_ensure1Test {
 
     @Test
     public void state_whenAlreadyAborted_thenDeadTransactionException() {
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         tx.abort();
 
         long initialValue = 10;
@@ -200,7 +270,7 @@ public class GammaLongRef_ensure1Test {
 
     @Test
     public void state_whenAlreadyCommitted_thenDeadTransactionException() {
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         tx.commit();
 
         long initialValue = 10;
@@ -224,11 +294,11 @@ public class GammaLongRef_ensure1Test {
         GammaLongRef ref1 = new GammaLongRef(stm);
         GammaLongRef ref2 = new GammaLongRef(stm);
 
-        GammaTransaction tx1 = stm.startDefaultTransaction();
+        GammaTransaction tx1 = transactionFactory.newTransaction();
         ref1.get(tx1);
         ref2.incrementAndGet(tx1, 1);
 
-        GammaTransaction tx2 = stm.startDefaultTransaction();
+        GammaTransaction tx2 = transactionFactory.newTransaction();
         ref1.incrementAndGet(tx2, 1);
         ref2.get(tx2);
         ref2.ensure(tx2);

@@ -2,11 +2,21 @@ package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.multiverse.api.LockMode;
+import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.*;
+import org.multiverse.stms.gamma.ArrayGammaTransactionFactory;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.MapGammaTransactionFactory;
+import org.multiverse.stms.gamma.MonoGammaTransactionFactory;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
 
+import java.util.Collection;
+
+import static java.util.Arrays.asList;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
@@ -14,14 +24,29 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
+@RunWith(Parameterized.class)
 public class GammaLongRef_decrement1WithAmountTest {
 
-     private GammaStm stm;
+    private final GammaTransactionFactory transactionFactory;
+    private final GammaStm stm;
+
+    public GammaLongRef_decrement1WithAmountTest(GammaTransactionFactory transactionFactory) {
+        this.transactionFactory = transactionFactory;
+        this.stm = transactionFactory.getTransactionConfiguration().getStm();
+    }
 
     @Before
     public void setUp() {
-        stm = new GammaStm();
         clearThreadLocalTransaction();
+    }
+
+    @Parameterized.Parameters
+    public static Collection<TransactionFactory[]> configs() {
+        return asList(
+                new TransactionFactory[]{new MapGammaTransactionFactory(new GammaStm())},
+                new TransactionFactory[]{new ArrayGammaTransactionFactory(new GammaStm())},
+                new TransactionFactory[]{new MonoGammaTransactionFactory(new GammaStm())}
+        );
     }
 
     @Test
@@ -30,7 +55,7 @@ public class GammaLongRef_decrement1WithAmountTest {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
 
         ref.decrement(5);
@@ -67,15 +92,40 @@ public class GammaLongRef_decrement1WithAmountTest {
     }
 
     @Test
-    public void whenEnsuredByOther_thenDecrementSucceedsButCommitFails() {
+    public void whenReadLockAcquiredByOther_thenDecrementSucceedsButCommitFails() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = transactionFactory.newTransaction();
+        ref.getLock().acquire(otherTx, LockMode.Read);
+
+        GammaTransaction tx = transactionFactory.newTransaction();
+        setThreadLocalTransaction(tx);
+
+        ref.decrement(5);
+
+        try {
+            tx.commit();
+            fail();
+        } catch (ReadWriteConflict expected) {
+        }
+
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertRefHasReadLock(ref, otherTx);
+    }
+
+    @Test
+    public void whenWriteLockAcquiredByOther_thenDecrementSucceedsButCommitFails() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction otherTx = transactionFactory.newTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
 
         ref.decrement(5);
@@ -97,10 +147,10 @@ public class GammaLongRef_decrement1WithAmountTest {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = transactionFactory.newTransaction();
         ref.getLock().acquire(otherTx, LockMode.Commit);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx =  transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
 
         ref.decrement(5);
@@ -122,7 +172,7 @@ public class GammaLongRef_decrement1WithAmountTest {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx =  transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
         tx.commit();
 
@@ -143,7 +193,7 @@ public class GammaLongRef_decrement1WithAmountTest {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx =  transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
         tx.abort();
 
@@ -164,7 +214,7 @@ public class GammaLongRef_decrement1WithAmountTest {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx =  transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
         tx.prepare();
 
