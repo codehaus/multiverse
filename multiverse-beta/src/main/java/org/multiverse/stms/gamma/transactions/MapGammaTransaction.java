@@ -87,11 +87,12 @@ public final class MapGammaTransaction extends GammaTransaction {
         for (int k = 0; k < oldArray.length; k++) {
             final GammaRefTranlocal tranlocal = oldArray[k];
 
-            if (tranlocal != null) {
-                attach(tranlocal, tranlocal.owner.identityHashCode());
-            } else {
-                array[k] = null;
+            if (tranlocal == null) {
+                continue;
             }
+
+            oldArray[k] = null;
+            attach(tranlocal, tranlocal.owner.identityHashCode());
         }
 
         pool.putTranlocalArray(oldArray);
@@ -204,7 +205,7 @@ public final class MapGammaTransaction extends GammaTransaction {
                 continue;
             }
 
-            if (!tranlocal.owner.prepare(config, tranlocal)) {
+            if (!tranlocal.owner.prepare(this, tranlocal)) {
                 return false;
             }
         }
@@ -274,7 +275,7 @@ public final class MapGammaTransaction extends GammaTransaction {
                 continue;
             }
 
-            array[k]=null;
+            array[k] = null;
 
             final AbstractGammaRef owner = tranlocal.owner;
 

@@ -1,7 +1,6 @@
 package org.multiverse.stms.gamma.transactions;
 
 import org.multiverse.api.Transaction;
-import org.multiverse.api.TransactionConfiguration;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.blocking.RetryLatch;
@@ -326,7 +325,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public abstract GammaRefTranlocal locate(AbstractGammaRef o);
 
     @Override
-    public final TransactionConfiguration getConfiguration() {
+    public final GammaTransactionConfiguration getConfiguration() {
         return config;
     }
 

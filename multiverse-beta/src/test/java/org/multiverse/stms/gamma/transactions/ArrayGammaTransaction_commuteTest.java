@@ -11,4 +11,9 @@ public class ArrayGammaTransaction_commuteTest extends GammaTransaction_commuteT
     protected ArrayGammaTransaction newTransaction(GammaTransactionConfiguration config) {
         return new ArrayGammaTransaction(config);
     }
+
+    @Override
+    protected int getMaxCapacity() {
+        return new GammaTransactionConfiguration(stm).arrayTransactionSize;
+    }
 }

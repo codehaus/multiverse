@@ -122,15 +122,19 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     }
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
-    public boolean prepare(final GammaTransactionConfiguration config, final GammaRefTranlocal tranlocal) {
-        //todo: commuting stuff
-
-        if (tranlocal.isConstructing()) {
+    public boolean prepare(final GammaTransaction tx, final GammaRefTranlocal tranlocal) {
+       if (tranlocal.isConstructing()) {
             return true;
         }
 
-        if (!tranlocal.isWrite()) {
+        if (tranlocal.isRead()) {
             return true;
+        }
+
+        if(tranlocal.isCommuting()){
+            if(!flattenCommute(tx,tranlocal,LOCKMODE_COMMIT)){
+                return false;
+            }
         }
 
         if (!tranlocal.isDirty()) {
@@ -149,7 +153,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             tranlocal.setDirty(true);
         }
 
-        return tryLockAndCheckConflict(config.spinCount, tranlocal, LOCKMODE_COMMIT);
+        return tryLockAndCheckConflict(tx.config.spinCount, tranlocal, LOCKMODE_COMMIT);
     }
 
     public final void releaseAfterFailure(final GammaRefTranlocal tranlocal, final GammaObjectPool pool) {
@@ -433,7 +437,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (tranlocal.owner != null) {
-            throw tx.abortOnTooSmallSize(1);
+            throw tx.abortOnTooSmallSize(2);
         }
 
         if (!load(tranlocal, lockMode, config.spinCount, tx.arriveEnabled)) {
@@ -497,7 +501,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (newNode == null) {
-            throw tx.abortOnTooSmallSize(config.arrayTransactionSize);
+            throw tx.abortOnTooSmallSize(config.arrayTransactionSize+1);
         }
 
         newNode.mode = TRANLOCAL_READ;
@@ -704,7 +708,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (tranlocal.owner != null) {
-            throw tx.abortOnTooSmallSize(1);
+            throw tx.abortOnTooSmallSize(2);
         }
 
         if (!load(tranlocal, lockMode, config.spinCount, tx.arriveEnabled)) {
@@ -777,7 +781,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (newNode == null) {
-            throw tx.abortOnTooSmallSize(config.arrayTransactionSize);
+            throw tx.abortOnTooSmallSize(config.arrayTransactionSize+1);
         }
 
         if (!load(newNode, lockMode, config.spinCount, tx.arriveEnabled)) {
@@ -866,7 +870,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (tranlocal.owner != null) {
-            throw tx.abortOnTooSmallSize(1);
+            throw tx.abortOnTooSmallSize(2);
         }
 
         tx.hasWrites = true;
@@ -943,7 +947,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (newNode == null) {
-            throw tx.abortOnTooSmallSize(config.arrayTransactionSize);
+            throw tx.abortOnTooSmallSize(config.arrayTransactionSize+1);
         }
 
         tx.size++;

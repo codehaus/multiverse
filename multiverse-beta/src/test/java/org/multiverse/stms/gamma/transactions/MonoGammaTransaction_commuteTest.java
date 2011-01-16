@@ -11,4 +11,9 @@ public class MonoGammaTransaction_commuteTest extends GammaTransaction_commuteTe
     protected MonoGammaTransaction newTransaction(GammaTransactionConfiguration config) {
         return new MonoGammaTransaction(config);
     }
+
+    @Override
+    protected int getMaxCapacity() {
+        return 1;
+    }
 }

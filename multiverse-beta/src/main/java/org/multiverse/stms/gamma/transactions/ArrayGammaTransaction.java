@@ -133,7 +133,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
                 return true;
             }
 
-            if (!owner.prepare(config, node)) {
+            if (!owner.prepare(this, node)) {
                 return false;
             }
 

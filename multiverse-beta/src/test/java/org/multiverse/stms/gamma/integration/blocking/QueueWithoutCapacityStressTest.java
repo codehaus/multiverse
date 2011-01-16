@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
@@ -22,7 +23,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 
 public class QueueWithoutCapacityStressTest implements BetaStmConstants {
 
-    private int lockMode;
+    private LockMode lockMode;
 
     private GammaStm stm;
     private Queue<Integer> queue;
@@ -32,26 +33,31 @@ public class QueueWithoutCapacityStressTest implements BetaStmConstants {
     public void setUp() {
         clearThreadLocalTransaction();
         stm = (GammaStm) getGlobalStmInstance();
-        queue = new Queue<Integer>();
     }
 
     @Test
-    public void testPrivatized() {
-        test(LOCKMODE_COMMIT);
+    public void testLockModeNone() {
+        test(LockMode.None);
     }
 
     @Test
-    public void testEnsured() {
-        test(LOCKMODE_WRITE);
+    public void testLockModeRead() {
+        test(LockMode.Read);
     }
 
     @Test
-    public void testOptimistic() {
-        test(LOCKMODE_NONE);
+    public void testLockModeWrite() {
+        test(LockMode.Write);
     }
 
-    public void test(int lockMode) {
+    @Test
+    public void testLockModeCommit() {
+        test(LockMode.Commit);
+    }
+
+    public void test(LockMode lockMode) {
         this.lockMode = lockMode;
+        queue = new Queue<Integer>();
 
         ProduceThread produceThread = new ProduceThread();
         ConsumeThread consumeThread = new ConsumeThread();
@@ -109,8 +115,12 @@ public class QueueWithoutCapacityStressTest implements BetaStmConstants {
     class Queue<E> {
         final Stack<E> pushedStack = new Stack<E>();
         final Stack<E> readyToPopStack = new Stack<E>();
-        final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
-        final AtomicBlock popBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
+        final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder()
+                .setReadLockMode(lockMode)
+                .buildAtomicBlock();
+        final AtomicBlock popBlock = stm.createTransactionFactoryBuilder()
+                .setReadLockMode(lockMode)
+                .buildAtomicBlock();
 
         public void push(final E item) {
             pushBlock.execute(new AtomicVoidClosure() {
@@ -147,7 +157,7 @@ public class QueueWithoutCapacityStressTest implements BetaStmConstants {
         final GammaRef<Node<E>> head = new GammaRef<Node<E>>(stm);
 
         void push(GammaTransaction tx, E item) {
-            Node<E> newHead = new Node<E>(item,head.get());
+            Node<E> newHead = new Node<E>(item, head.get());
             head.set(newHead);
         }
 

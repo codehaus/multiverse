@@ -11,4 +11,9 @@ public class MapGammaTransaction_commuteTest extends GammaTransaction_commuteTes
     protected MapGammaTransaction newTransaction(GammaTransactionConfiguration config) {
         return new MapGammaTransaction(config);
     }
+
+    @Override
+    protected int getMaxCapacity() {
+        return Integer.MAX_VALUE;
+    }
 }

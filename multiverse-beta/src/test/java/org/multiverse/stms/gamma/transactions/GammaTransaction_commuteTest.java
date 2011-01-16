@@ -4,10 +4,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.ReadonlyException;
-import org.multiverse.api.exceptions.StmMismatchException;
+import org.multiverse.api.TransactionStatus;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaStm;
@@ -16,6 +14,8 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.LOCKMODE_NONE;
@@ -35,6 +35,7 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
 
     protected abstract T newTransaction(GammaTransactionConfiguration config);
 
+    protected abstract int getMaxCapacity();
 
     @Test
     public void whenAlreadyOpenedForRead() {
@@ -189,6 +190,28 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
     @Ignore
     public void whenAlreadyOpenedForConstructionAndFunctionCausesProblem() {
 
+    }
+
+     @Test
+    public void whenOverflowing() {
+        int maxCapacity = getMaxCapacity();
+        assumeTrue(maxCapacity < Integer.MAX_VALUE);
+
+        GammaTransaction tx = newTransaction();
+        for (int k = 0; k < maxCapacity; k++) {
+            GammaLongRef ref = new GammaLongRef(stm, 0);
+            ref.openForRead(tx, LOCKMODE_NONE);
+        }
+
+        GammaLongRef ref = new GammaLongRef(stm, 0);
+        try {
+            ref.commute(tx, Functions.newIncLongFunction());
+            fail();
+        } catch (SpeculativeConfigurationError expected) {
+        }
+
+        assertEquals(TransactionStatus.Aborted, tx.getStatus());
+        assertEquals(maxCapacity+1, tx.getConfiguration().getSpeculativeConfiguration().minimalLength);
     }
 
     @Test

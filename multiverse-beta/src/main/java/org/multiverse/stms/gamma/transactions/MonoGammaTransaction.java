@@ -54,7 +54,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
                 owner.releaseAfterReading(tranlocal, pool);
             } else if (tranlocal.mode == TRANLOCAL_WRITE) {
                 if (status == TX_ACTIVE) {
-                    if(!owner.prepare(config, tranlocal)){
+                    if(!owner.prepare(this, tranlocal)){
                         throw abortOnReadWriteConflict();
                     }
                 }
@@ -101,7 +101,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
 
         final AbstractGammaRef owner = tranlocal.owner;
         if (owner != null) {
-            if (!owner.prepare(config, tranlocal)) {
+            if (!owner.prepare(this, tranlocal)) {
                 throw abortOnReadWriteConflict();
             }
         }

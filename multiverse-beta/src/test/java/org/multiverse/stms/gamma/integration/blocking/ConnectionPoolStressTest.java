@@ -19,7 +19,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
@@ -64,6 +63,24 @@ public class ConnectionPoolStressTest implements GammaConstants {
         test(LockMode.Commit);
     }
 
+    @Test
+    public void basicTest() {
+        lockMode = LockMode.None;
+        ConnectionPool pool = new ConnectionPool(2);
+
+        Connection c1 = pool.takeConnection();
+        assertEquals(1, pool.size());
+
+        Connection c2 = pool.takeConnection();
+        assertEquals(0, pool.size());
+
+        pool.returnConnection(c1);
+        assertEquals(1, pool.size());
+
+        pool.returnConnection(c2);
+        assertEquals(2,pool.size());
+    }
+
     public void test(LockMode lockMode) {
         this.lockMode = lockMode;
 
@@ -71,10 +88,8 @@ public class ConnectionPoolStressTest implements GammaConstants {
         WorkerThread[] threads = createThreads();
 
         startAll(threads);
-
         sleepMs(30 * 1000);
         stop = true;
-
         joinAll(threads);
         assertEquals(poolsize, pool.size());
     }
@@ -97,11 +112,11 @@ public class ConnectionPoolStressTest implements GammaConstants {
         ConnectionPool(final int poolsize) {
             stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
                 @Override
-                public void execute(Transaction tx) throws Exception {
+                public void execute(Transaction tx) {
                     size.set(poolsize);
 
                     Node<Connection> h = null;
-                    for(int k=0;k<poolsize;k++){
+                    for (int k = 0; k < poolsize; k++) {
                         h = new Node<Connection>(h, new Connection());
                     }
                     head.set(h);
@@ -112,12 +127,11 @@ public class ConnectionPoolStressTest implements GammaConstants {
         Connection takeConnection() {
             return takeConnectionBlock.execute(new AtomicClosure<Connection>() {
                 @Override
-                public Connection execute(Transaction tx) throws Exception {
+                public Connection execute(Transaction tx) {
                     if (size.get() == 0) {
-                        retry();
+                        tx.retry();
                     }
-
-                    size.increment();
+                    size.decrement();
 
                     Node<Connection> current = head.get();
                     head.set(current.next);
@@ -130,7 +144,7 @@ public class ConnectionPoolStressTest implements GammaConstants {
             returnConnectionBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    size.increment();
+                    size.incrementAndGet(1);
 
                     Node<Connection> oldHead = head.get();
                     head.set(new Node<Connection>(oldHead, c));
