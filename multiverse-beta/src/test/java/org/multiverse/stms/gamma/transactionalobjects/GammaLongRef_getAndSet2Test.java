@@ -1,28 +1,50 @@
 package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.stms.gamma.ArrayGammaTransactionFactory;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.MapGammaTransactionFactory;
+import org.multiverse.stms.gamma.MonoGammaTransactionFactory;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
 
+import java.util.Collection;
+
+import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.assertIsAborted;
-import static org.multiverse.TestUtils.assertIsCommitted;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.stms.gamma.GammaTestUtils.assertSurplus;
-import static org.multiverse.stms.gamma.GammaTestUtils.assertVersionAndValue;
+import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
+@RunWith(Parameterized.class)
 public class GammaLongRef_getAndSet2Test {
-    private GammaStm stm;
+   private final GammaTransactionFactory transactionFactory;
+    private final GammaStm stm;
+
+    public GammaLongRef_getAndSet2Test(GammaTransactionFactory transactionFactory) {
+        this.transactionFactory = transactionFactory;
+        this.stm = transactionFactory.getTransactionConfiguration().getStm();
+    }
 
     @Before
     public void setUp() {
-        stm = new GammaStm();
         clearThreadLocalTransaction();
+    }
+
+    @Parameterized.Parameters
+    public static Collection<TransactionFactory[]> configs() {
+        return asList(
+                new TransactionFactory[]{new MapGammaTransactionFactory(new GammaStm())},
+                new TransactionFactory[]{new ArrayGammaTransactionFactory(new GammaStm())},
+                new TransactionFactory[]{new MonoGammaTransactionFactory(new GammaStm())}
+        );
     }
 
     @Test
@@ -44,7 +66,7 @@ public class GammaLongRef_getAndSet2Test {
         GammaLongRef ref = new GammaLongRef(stm, 10);
         long version = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         tx.prepare();
 
         try {
@@ -61,7 +83,7 @@ public class GammaLongRef_getAndSet2Test {
     public void whenAbortedTransaction_thenDeadTransactionException() {
         GammaLongRef ref = new GammaLongRef(stm, 10);
         long version = ref.getVersion();
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         tx.abort();
 
         try {
@@ -78,7 +100,7 @@ public class GammaLongRef_getAndSet2Test {
     public void whenCommittedTransaction_thenCommittedTransactionException() {
         GammaLongRef ref = new GammaLongRef(stm, 10);
         long version = ref.getVersion();
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         tx.commit();
 
         try {
@@ -96,7 +118,7 @@ public class GammaLongRef_getAndSet2Test {
         GammaLongRef ref = new GammaLongRef(stm, 10);
         long version = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         long result = ref.getAndSet(tx, 20);
         tx.commit();
 
@@ -109,7 +131,7 @@ public class GammaLongRef_getAndSet2Test {
         GammaLongRef ref = new GammaLongRef(stm, 10);
         long version = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         long result = ref.getAndSet(tx, 20);
         tx.commit();
 
@@ -122,7 +144,7 @@ public class GammaLongRef_getAndSet2Test {
         GammaLongRef ref = new GammaLongRef(stm, 10);
         long version = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         long value = ref.getAndSet(tx, 10);
         tx.commit();
 
@@ -135,9 +157,7 @@ public class GammaLongRef_getAndSet2Test {
     }
 
     @Test
-    @Ignore
     public void whenListenersAvailable() {
-        /*
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -148,7 +168,7 @@ public class GammaLongRef_getAndSet2Test {
 
         sleepMs(500);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = transactionFactory.newTransaction();
         long result = ref.getAndSet(tx, newValue);
         tx.commit();
 
@@ -156,6 +176,6 @@ public class GammaLongRef_getAndSet2Test {
 
         assertEquals(initialValue, result);
         assertRefHasNoLocks(ref);
-        assertVersionAndValue(ref, initialVersion + 1, newValue);   */
+        assertVersionAndValue(ref, initialVersion + 1, newValue);
     }
 }
