@@ -81,11 +81,8 @@ public class Listeners {
             if (listeners == null) {
                 break;
             }
-
-            listeners.openAll(pool);
-
-            //lets remove the listeners (needed for pooling).
             listenersArray[k] = null;
+            listeners.openAll(pool);
         }
     }
 }
