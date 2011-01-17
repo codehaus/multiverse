@@ -48,8 +48,9 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             CallableNode node = tranlocal.headCallable;
             while (node != null) {
                 evaluate(tranlocal, node.function);
+                CallableNode newNext = node.next;
                 tx.pool.putCallableNode(node);
-                node = node.next;
+                node = newNext;
             }
             tranlocal.headCallable = null;
 

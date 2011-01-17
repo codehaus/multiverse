@@ -74,6 +74,6 @@ public final class GammaRefTranlocal<E> implements GammaConstants {
     }
 
     public boolean isConflictCheckNeeded() {
-        return false;
+        return writeSkewCheck;
     }
 }
