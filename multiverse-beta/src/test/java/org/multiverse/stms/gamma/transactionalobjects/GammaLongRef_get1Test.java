@@ -78,7 +78,7 @@ public class GammaLongRef_get1Test {
         long value = ref.get(tx);
 
         assertEquals(100, value);
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
         assertSurplus(ref, 1);
         assertUpdateBiased(ref);
         assertIsActive(tx);
@@ -138,7 +138,7 @@ public class GammaLongRef_get1Test {
         } catch (ReadWriteConflict expected) {
         }
 
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
         assertSurplus(ref, 1);
         assertUpdateBiased(ref);
         assertIsActive(otherTx);

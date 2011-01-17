@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.LockLevel;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.LongRef;
@@ -39,32 +39,27 @@ public class NonReentrantSemaphoreStressTest {
     }
 
     @Test
-    public void whenNoLocking() {
-        test(LockLevel.LockNone);
+    public void testNoLocking() {
+        test(LockMode.None);
     }
 
     @Test
-    public void whenWriteLockReads() {
-        test(LockLevel.WriteLockReads);
+    public void testReadLock() {
+        test(LockMode.Read);
     }
 
     @Test
-    public void whenWriteLockWrites() {
-        test(LockLevel.WriteLockWrites);
+    public void testWriteLock() {
+        test(LockMode.Write);
     }
 
     @Test
-    public void whenCommitLockReads() {
-        test(LockLevel.CommitLockReads);
+    public void testExclusiveLock() {
+        test(LockMode.Exclusive);
     }
 
-    @Test
-    public void whenCommitLockWrites() {
-        test(LockLevel.CommitLockWrites);
-    }
-
-    public void test(LockLevel lockLevel) {
-        semaphore = new Semaphore(resourceCount, lockLevel);
+    public void test(LockMode lockMode) {
+        semaphore = new Semaphore(resourceCount, lockMode);
 
         WorkerThread[] workers = new WorkerThread[threadCount];
         for (int k = 0; k < threadCount; k++) {
@@ -107,12 +102,14 @@ public class NonReentrantSemaphoreStressTest {
         private AtomicBlock upBlock;
         private AtomicBlock downBlock;
 
-        public Semaphore(int initial, LockLevel lockLevel) {
-            ref = new GammaLongRef(stm,initial);
+        public Semaphore(int initial, LockMode lockMode) {
+            ref = new GammaLongRef(stm, initial);
             upBlock = stm.newTransactionFactoryBuilder()
-                    .setLockLevel(lockLevel).buildAtomicBlock();
+                    .setReadLockMode(lockMode)
+                    .buildAtomicBlock();
             downBlock = stm.newTransactionFactoryBuilder()
-                    .setLockLevel(lockLevel).buildAtomicBlock();
+                    .setReadLockMode(lockMode)
+                    .buildAtomicBlock();
         }
 
         public void up() {

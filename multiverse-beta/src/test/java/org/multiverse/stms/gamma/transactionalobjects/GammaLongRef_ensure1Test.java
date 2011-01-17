@@ -135,7 +135,7 @@ public class GammaLongRef_ensure1Test {
         GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         assertIsActive(tx);
         assertTrue(tranlocal.isConflictCheckNeeded());
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
         assertEquals(LOCKMODE_EXCLUSIVE, tranlocal.getLockMode());
 
         tx.commit();
@@ -205,7 +205,7 @@ public class GammaLongRef_ensure1Test {
         }
 
         assertIsAborted(tx);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 

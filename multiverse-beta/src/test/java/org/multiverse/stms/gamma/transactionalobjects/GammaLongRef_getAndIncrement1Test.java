@@ -144,7 +144,7 @@ public class GammaLongRef_getAndIncrement1Test implements GammaConstants {
         assertIsAborted(tx);
         assertVersionAndValue(ref, version, initialValue);
         assertSurplus(ref, 1);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
     }
 
     @Test

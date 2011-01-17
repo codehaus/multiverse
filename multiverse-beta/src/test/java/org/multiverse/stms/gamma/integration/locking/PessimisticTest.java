@@ -8,7 +8,7 @@ import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasCommitLock;
+import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasExclusiveLock;
 
 public class PessimisticTest {
     private GammaStm stm;
@@ -25,6 +25,6 @@ public class PessimisticTest {
         GammaLongRef ref = new GammaLongRef(tx);
         ref.openForConstruction(tx);
 
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
     }
 }

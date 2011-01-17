@@ -55,7 +55,7 @@ public class ReadLockTest {
 
 
     @Test
-    public void whenWriteLockAlreadyAcquiredByOther_thenCommitLockNotPossible() {
+    public void whenWriteLockAlreadyAcquiredByOther_thenReadLockNotPossible() {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
@@ -74,7 +74,7 @@ public class ReadLockTest {
     }
 
     @Test
-    public void whenCommitLockAlreadyAcquiredByOther_thenCommitLockNotPossible() {
+    public void whenExclusiveLockAlreadyAcquiredByOther_thenReadLockNotPossible() {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
@@ -89,7 +89,7 @@ public class ReadLockTest {
         }
 
         assertIsAborted(tx);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
     }
 
     @Test
@@ -127,7 +127,7 @@ public class ReadLockTest {
     }
 
     @Test
-    public void whenReadLockAcquiredByOtherAndDirtyTransaction_thenCommitFails() {
+    public void whenReadLockAcquiredByOtherAndDirtyTransaction_thenReadFails() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
 
@@ -210,7 +210,7 @@ public class ReadLockTest {
     }
 
     @Test
-    public void whenCommitLockAcquired_thenUpgradableToReadLockIgnored() {
+    public void whenExclusiveLockAcquired_thenUpgradableToReadLockIgnored() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -218,7 +218,7 @@ public class ReadLockTest {
         ref.getLock().acquire(tx, LockMode.Read);
 
         assertIsActive(tx);
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
     }
 
     @Test

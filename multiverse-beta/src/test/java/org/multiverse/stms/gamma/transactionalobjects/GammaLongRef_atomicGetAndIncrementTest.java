@@ -90,7 +90,7 @@ public class GammaLongRef_atomicGetAndIncrementTest {
         }
 
         assertSurplus(ref, 1);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 

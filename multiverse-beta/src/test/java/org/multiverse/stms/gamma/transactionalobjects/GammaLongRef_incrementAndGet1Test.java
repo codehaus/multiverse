@@ -212,7 +212,7 @@ public class GammaLongRef_incrementAndGet1Test {
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(ref, 1);
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
     }
 
     @Test
@@ -237,7 +237,7 @@ public class GammaLongRef_incrementAndGet1Test {
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(ref, 1);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
         assertVersionAndValue(ref, version, 10);
     }
 

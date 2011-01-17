@@ -78,7 +78,7 @@ public class GammaTestUtils implements GammaConstants {
         assertReadLockCount(ref, 0);
     }
 
-    public static void assertRefHasCommitLock(AbstractGammaRef ref, GammaTransaction lockOwner) {
+    public static void assertRefHasExclusiveLock(AbstractGammaRef ref, GammaTransaction lockOwner) {
         GammaRefTranlocal tranlocal = lockOwner.getRefTranlocal(ref);
         if (tranlocal == null) {
             fail("A tranlocal should have been stored in the transaction for the ref");
@@ -100,7 +100,7 @@ public class GammaTestUtils implements GammaConstants {
                 assertRefHasWriteLock(ref, lockOwner);
                 break;
             case LOCKMODE_EXCLUSIVE:
-                assertRefHasCommitLock(ref, lockOwner);
+                assertRefHasExclusiveLock(ref, lockOwner);
                 break;
             default:
                 throw new IllegalArgumentException();

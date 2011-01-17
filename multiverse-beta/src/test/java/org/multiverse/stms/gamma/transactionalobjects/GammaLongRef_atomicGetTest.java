@@ -68,7 +68,7 @@ public class GammaLongRef_atomicGetTest {
 
         assertSurplus(ref, 1);
         assertUpdateBiased(ref);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
         assertVersionAndValue(ref, version, 100);
     }
 
@@ -115,7 +115,7 @@ public class GammaLongRef_atomicGetTest {
 
         assertSurplus(ref, 1);
         assertReadBiased(ref);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
         assertVersionAndValue(ref, version, 100);
     }
 

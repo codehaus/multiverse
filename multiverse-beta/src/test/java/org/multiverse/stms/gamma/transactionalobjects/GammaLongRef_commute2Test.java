@@ -98,7 +98,7 @@ public class GammaLongRef_commute2Test {
 
         assertSurplus(ref, 1);
         assertIsAborted(tx);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 

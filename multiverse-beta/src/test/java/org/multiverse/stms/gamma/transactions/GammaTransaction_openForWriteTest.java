@@ -422,7 +422,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
     }
 
     @Test
@@ -502,7 +502,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
     }
 
     @Test
@@ -583,7 +583,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
     }
 
     @Test
@@ -597,7 +597,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
         assertEquals(LOCKMODE_EXCLUSIVE, tranlocal.getLockMode());
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
         assertEquals(ref, tranlocal.owner);
         assertEquals(TRANLOCAL_WRITE, tranlocal.getMode());
     }
@@ -663,7 +663,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
     }
 
     // ================================================================

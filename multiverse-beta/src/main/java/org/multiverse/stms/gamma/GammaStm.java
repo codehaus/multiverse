@@ -318,7 +318,7 @@ public final class GammaStm implements Stm {
         }
     }
 
-    public final class NonSpeculativeGammaTransactionFactory implements GammaTransactionFactory {
+    public static final class NonSpeculativeGammaTransactionFactory implements GammaTransactionFactory {
 
         private final GammaTransactionConfiguration config;
 
@@ -355,7 +355,7 @@ public final class GammaStm implements Stm {
         }
     }
 
-    public final class SpeculativeGammaTransactionFactory implements GammaTransactionFactory {
+    public static final class SpeculativeGammaTransactionFactory implements GammaTransactionFactory {
 
         private final GammaTransactionConfiguration config;
 

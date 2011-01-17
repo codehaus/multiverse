@@ -133,7 +133,7 @@ public class GammaLongRef_increment1WithTransactionTest {
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
     }
 
     @Test

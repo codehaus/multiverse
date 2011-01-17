@@ -90,7 +90,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         assertEquals(REGISTRATION_DONE, result);
         assertSurplus(ref, 1);
         assertHasListeners(ref, latch);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
         assertVersionAndValue(ref, version, 10);
         assertFalse(latch.isOpen());
     }
@@ -140,7 +140,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         assertTrue(latch.isOpen());
         assertSurplus(ref, 1);
         assertHasNoListeners(ref);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
         assertVersionAndValue(ref, version, 1);
     }
 

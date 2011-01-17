@@ -203,7 +203,7 @@ public class GammaLongRef_alterAndGet2Test {
 
         assertSurplus(ref, 1);
         assertIsAborted(tx);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
         assertVersionAndValue(ref, version, initialValue);
     }
 

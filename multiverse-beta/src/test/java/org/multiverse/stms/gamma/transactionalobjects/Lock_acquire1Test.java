@@ -137,7 +137,7 @@ public class Lock_acquire1Test {
         ref.getLock().acquire(tx, LockMode.Exclusive);
 
         assertIsActive(tx);
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -182,7 +182,7 @@ public class Lock_acquire1Test {
         ref.getLock().acquire(tx, LockMode.Read);
         ref.getLock().acquire(tx, LockMode.Exclusive);
 
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
         assertIsActive(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -242,7 +242,7 @@ public class Lock_acquire1Test {
         ref.getLock().acquire(tx, LockMode.Write);
         ref.getLock().acquire(tx, LockMode.Exclusive);
 
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
         assertIsActive(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -257,7 +257,7 @@ public class Lock_acquire1Test {
         ref.getLock().acquire(tx, LockMode.Exclusive);
         ref.getLock().acquire(tx, LockMode.None);
 
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
         assertIsActive(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -272,7 +272,7 @@ public class Lock_acquire1Test {
         ref.getLock().acquire(tx, LockMode.Exclusive);
         ref.getLock().acquire(tx, LockMode.Read);
 
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
         assertIsActive(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -287,7 +287,7 @@ public class Lock_acquire1Test {
         ref.getLock().acquire(tx, LockMode.Exclusive);
         ref.getLock().acquire(tx, LockMode.Write);
 
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
         assertIsActive(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -302,7 +302,7 @@ public class Lock_acquire1Test {
         ref.getLock().acquire(tx, LockMode.Exclusive);
         ref.getLock().acquire(tx, LockMode.Exclusive);
 
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
         assertIsActive(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -492,7 +492,7 @@ public class Lock_acquire1Test {
 
         }
 
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -514,7 +514,7 @@ public class Lock_acquire1Test {
 
         }
 
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -536,7 +536,7 @@ public class Lock_acquire1Test {
 
         }
 
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -558,7 +558,7 @@ public class Lock_acquire1Test {
 
         }
 
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }

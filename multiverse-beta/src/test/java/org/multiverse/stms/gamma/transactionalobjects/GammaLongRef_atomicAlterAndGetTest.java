@@ -167,7 +167,7 @@ public class GammaLongRef_atomicAlterAndGetTest {
 
         verifyZeroInteractions(function);
         assertSurplus(ref, 1);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
         assertUpdateBiased(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }

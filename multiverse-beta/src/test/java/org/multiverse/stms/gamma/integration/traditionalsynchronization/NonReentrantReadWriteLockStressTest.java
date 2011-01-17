@@ -3,6 +3,8 @@ package org.multiverse.stms.gamma.integration.traditionalsynchronization;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.gamma.GammaStm;
@@ -13,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import static org.multiverse.api.StmUtils.*;
+import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
@@ -26,6 +28,7 @@ public class NonReentrantReadWriteLockStressTest {
     private int threadCount = 10;
     private ReadWriteLock readWriteLock;
     private volatile boolean stop;
+    private LockMode lockMode;
 
     @Before
     public void setUp() {
@@ -35,7 +38,27 @@ public class NonReentrantReadWriteLockStressTest {
     }
 
     @Test
-    public void test() {
+    public void testNoLocking() {
+        test(LockMode.None);
+    }
+
+    @Test
+    public void testReadLock() {
+        test(LockMode.Read);
+    }
+
+    @Test
+    public void testWriteLock() {
+        test(LockMode.Write);
+    }
+
+    @Test
+    public void testExclusiveLock() {
+        test(LockMode.Exclusive);
+    }
+
+    public void test(LockMode lockMode) {
+        this.lockMode = lockMode;
         readWriteLock = new ReadWriteLock();
 
         StressThread[] threads = new StressThread[threadCount];
@@ -79,9 +102,22 @@ public class NonReentrantReadWriteLockStressTest {
         final GammaLongRef lock = new GammaLongRef(stm);
         final AtomicLong readers = new AtomicLong();
         final AtomicLong writers = new AtomicLong();
+        final AtomicBlock acquireReadLockBlock = stm.newTransactionFactoryBuilder()
+                .setReadLockMode(lockMode)
+                .buildAtomicBlock();
+        final AtomicBlock releaseReadLockBlock = stm.newTransactionFactoryBuilder()
+                .setReadLockMode(lockMode)
+                .buildAtomicBlock();
+        final AtomicBlock acquireWriteLockBlock = stm.newTransactionFactoryBuilder()
+                .setReadLockMode(lockMode)
+                .buildAtomicBlock();
+        final AtomicBlock releaseWriteLockBlock = stm.newTransactionFactoryBuilder()
+                .setReadLockMode(lockMode)
+                .buildAtomicBlock();
+
 
         public void acquireReadLock() {
-            execute(new AtomicVoidClosure() {
+            acquireReadLockBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     if (lock.get() < 0) {
@@ -101,7 +137,7 @@ public class NonReentrantReadWriteLockStressTest {
             readers.decrementAndGet();
             assertEquals(0, writers.get());
 
-            execute(new AtomicVoidClosure() {
+            releaseReadLockBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     if (lock.get() <= 0) {
@@ -114,7 +150,7 @@ public class NonReentrantReadWriteLockStressTest {
         }
 
         public void acquireWriteLock() {
-            execute(new AtomicVoidClosure() {
+            acquireWriteLockBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     if (lock.get() != 0) {
@@ -133,7 +169,7 @@ public class NonReentrantReadWriteLockStressTest {
             writers.decrementAndGet();
             assertEquals(0, readers.get());
 
-            execute(new AtomicVoidClosure() {
+            releaseWriteLockBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     if (lock.get() != -1) {

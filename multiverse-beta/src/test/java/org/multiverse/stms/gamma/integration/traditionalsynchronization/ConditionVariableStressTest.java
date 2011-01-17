@@ -3,6 +3,8 @@ package org.multiverse.stms.gamma.integration.traditionalsynchronization;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
@@ -21,16 +23,38 @@ public class ConditionVariableStressTest {
     private GammaStm stm;
     private Stack stack;
     private int itemCount = 10000000;
+    private LockMode lockMode;
 
     @Before
     public void setUp() {
         stm = (GammaStm) getGlobalStmInstance();
         clearThreadLocalTransaction();
-        stack = new Stack(100);
     }
 
     @Test
-    public void test() {
+    public void testNoLocking() {
+        test(LockMode.None);
+    }
+
+    @Test
+    public void testReadLock() {
+        test(LockMode.Read);
+    }
+
+    @Test
+    public void testWriteLock() {
+        test(LockMode.Write);
+    }
+
+    @Test
+    public void testExclusiveLock() {
+        test(LockMode.Exclusive);
+    }
+
+    public void test(LockMode lockMode) {
+        this.lockMode = lockMode;
+        stack = new Stack(100);
+
         PushThread pushThread = new PushThread();
         PopThread popThread = new PopThread();
 
@@ -75,13 +99,19 @@ public class ConditionVariableStressTest {
         Ref<Node> head = newRef();
         IntRef size = newIntRef();
         final int capacity;
+        final AtomicBlock pushBlock = stm.newTransactionFactoryBuilder()
+                .setReadLockMode(lockMode)
+                .buildAtomicBlock();
+        final AtomicBlock popBlock = stm.newTransactionFactoryBuilder()
+                .setReadLockMode(lockMode)
+                .buildAtomicBlock();
 
         Stack(int capacity) {
             this.capacity = capacity;
         }
 
         void push(final String item) {
-            execute(new AtomicVoidClosure() {
+            pushBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     isNotFull.awaitTrue();
@@ -98,7 +128,7 @@ public class ConditionVariableStressTest {
         }
 
         String pop() {
-            return execute(new AtomicClosure<String>() {
+            return popBlock.execute(new AtomicClosure<String>() {
                 @Override
                 public String execute(Transaction tx) throws Exception {
                     isNotEmpty.awaitTrue();

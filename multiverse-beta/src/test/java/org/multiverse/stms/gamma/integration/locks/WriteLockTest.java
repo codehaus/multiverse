@@ -76,7 +76,7 @@ public class WriteLockTest {
     }
 
     @Test
-    public void whenCommitLockAlreadyAcquiredByOther_thenWriteLockFails() {
+    public void whenExclusiveLockAlreadyAcquiredByOther_thenWriteLockFails() {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
@@ -91,7 +91,7 @@ public class WriteLockTest {
         }
 
         assertIsAborted(tx);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
     }
 
 
@@ -217,7 +217,7 @@ public class WriteLockTest {
     }
 
     @Test
-    public void whenCommitLockAlreadyAcquiredBySelf_thenCommitLockRemains() {
+    public void whenExclusiveLockAlreadyAcquiredBySelf_thenExclusiveLockRemains() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -225,7 +225,7 @@ public class WriteLockTest {
         ref.getLock().acquire(tx, LockMode.Write);
 
         assertIsActive(tx);
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
     }
 
     @Test

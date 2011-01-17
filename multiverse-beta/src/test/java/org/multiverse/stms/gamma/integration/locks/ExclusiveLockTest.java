@@ -15,7 +15,7 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
-public class CommitLockTest {
+public class ExclusiveLockTest {
     private GammaStm stm;
 
     @Before
@@ -32,11 +32,11 @@ public class CommitLockTest {
         ref.getLock().acquire(tx, LockMode.Exclusive);
 
         assertIsActive(tx);
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
     }
 
     @Test
-    public void whenReadLockAlreadyAcquiredByOther_thenCommitLockNotPossible() {
+    public void whenReadLockAlreadyAcquiredByOther_thenExclusiveLockNotPossible() {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
@@ -55,7 +55,7 @@ public class CommitLockTest {
     }
 
     @Test
-    public void whenCommitLockAlreadyAcquiredByOther_thenCommitLockNotPossible() {
+    public void whenExclusiveLockAlreadyAcquiredByOther_thenExclusiveLockNotPossible() {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
@@ -70,11 +70,11 @@ public class CommitLockTest {
         }
 
         assertIsAborted(tx);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
     }
 
     @Test
-    public void whenWriteLockAlreadyAcquiredByOther_thenCommitLockNotPossible() {
+    public void whenWriteLockAlreadyAcquiredByOther_thenExclusiveLockNotPossible() {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
@@ -93,7 +93,7 @@ public class CommitLockTest {
     }
 
     @Test
-    public void whenCommitLockAcquiredByOther_thenReadNotPossible() {
+    public void whenExclusiveLockAcquiredByOther_thenReadNotPossible() {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -122,7 +122,7 @@ public class CommitLockTest {
     }
 
     @Test
-    public void whenPreviouslyReadByOtherThread_thenWriteSuccessButCommitFails() {
+    public void whenPreviouslyReadByOtherThread_thenWriteSuccessButExclusiveFails() {
         GammaLongRef ref = new GammaLongRef(stm, 10);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -140,11 +140,11 @@ public class CommitLockTest {
         }
 
         assertIsAborted(tx);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
     }
 
     @Test
-    public void whenCommitLockAcquiredByOtherThenWriteNotAllowed() {
+    public void whenExclusiveLockAcquiredByOther_thenWriteNotAllowed() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
@@ -158,11 +158,11 @@ public class CommitLockTest {
         }
 
         assertIsAborted(tx);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
     }
 
     @Test
-    public void writeLockIsUpgradableToCommitLock() {
+    public void writeLockIsUpgradableToExclusiveLock() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -170,11 +170,11 @@ public class CommitLockTest {
         ref.getLock().acquire(tx, LockMode.Exclusive);
 
         assertIsActive(tx);
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
     }
 
     @Test
-    public void whenReadLockAcquired_thenUpgradableToCommitLock() {
+    public void whenReadLockAcquired_thenUpgradableToExclusiveLock() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -182,11 +182,11 @@ public class CommitLockTest {
         ref.getLock().acquire(tx, LockMode.Exclusive);
 
         assertIsActive(tx);
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
     }
 
     @Test
-    public void whenReadLockAlsoAcquiredByOther_thenNotUpgradableToCommitLock() {
+    public void whenReadLockAlsoAcquiredByOther_thenNotUpgradableToExclusiveLock() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
@@ -209,7 +209,7 @@ public class CommitLockTest {
 
 
     @Test
-    public void whenTransactionCommits_thenCommitLockReleased() {
+    public void whenTransactionCommits_thenExclusiveLockReleased() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -221,7 +221,7 @@ public class CommitLockTest {
     }
 
     @Test
-    public void whenTransactionIsPrepared_thenCommitLockRemains() {
+    public void whenTransactionIsPrepared_thenExclusiveLockRemains() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -229,11 +229,11 @@ public class CommitLockTest {
         tx.prepare();
 
         assertIsPrepared(tx);
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
     }
 
     @Test
-    public void whenTransactionAborts_thenCommitLockIsReleased() {
+    public void whenTransactionAborts_thenExclusiveLockIsReleased() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -245,7 +245,7 @@ public class CommitLockTest {
     }
 
     @Test
-    public void whenCommitLockAlreadyIsAcquired_thenReentrantCommitLockIsSuccess() {
+    public void whenExclusiveLockAlreadyIsAcquired_thenReentrantExclusiveLockIsSuccess() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -253,11 +253,11 @@ public class CommitLockTest {
         ref.getLock().acquire(tx, LockMode.Exclusive);
 
         assertIsActive(tx);
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasExclusiveLock(ref, tx);
     }
 
     @Test
-    public void whenReadConflict_thenCommitLockFails() {
+    public void whenReadConflict_thenExclusiveLockFails() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();

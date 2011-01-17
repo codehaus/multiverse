@@ -3,10 +3,12 @@ package org.multiverse.stms.gamma.integration.traditionalsynchronization;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.IntRef;
 import org.multiverse.api.references.Ref;
+import org.multiverse.stms.gamma.GammaAtomicBlock;
 import org.multiverse.stms.gamma.GammaStm;
 
 import static org.multiverse.TestUtils.*;
@@ -28,8 +30,27 @@ public class ReentrantMutexStressTest {
     }
 
     @Test
-    public void test() {
-        mutex = new ReentrantMutex();
+    public void testNoLocking() {
+        test(LockMode.None);
+    }
+
+    @Test
+    public void testReadLock() {
+        test(LockMode.Read);
+    }
+
+    @Test
+    public void testWriteLock() {
+        test(LockMode.Write);
+    }
+
+    @Test
+    public void testExclusiveLock() {
+        test(LockMode.Exclusive);
+    }
+
+    public void test(LockMode lockMode) {
+        mutex = new ReentrantMutex(lockMode);
         StressThread[] threads = new StressThread[threadCount];
         for (int k = 0; k < threads.length; k++) {
             threads[k] = new StressThread(k);
@@ -53,14 +74,14 @@ public class ReentrantMutexStressTest {
                 mutex.lock(this);
 
                 boolean nested = randomOneOf(3);
-                if(nested){
+                if (nested) {
                     mutex.lock(this);
                 }
 
                 sleepRandomMs(100);
                 mutex.unlock(this);
 
-                if(nested){
+                if (nested) {
                     mutex.unlock(this);
                 }
 
@@ -75,9 +96,20 @@ public class ReentrantMutexStressTest {
     class ReentrantMutex {
         private final Ref<Thread> owner = newRef();
         private final IntRef count = newIntRef();
+        private final GammaAtomicBlock lockBlock;
+        private final GammaAtomicBlock unlockBlock;
+
+        ReentrantMutex(LockMode readLockMode) {
+            lockBlock = stm.newTransactionFactoryBuilder()
+                    .setReadLockMode(readLockMode)
+                    .buildAtomicBlock();
+            unlockBlock = stm.newTransactionFactoryBuilder()
+                    .setReadLockMode(readLockMode)
+                    .buildAtomicBlock();
+        }
 
         public void lock(final Thread thread) {
-            execute(new AtomicVoidClosure() {
+            lockBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     if (owner.get() == null) {
@@ -97,7 +129,7 @@ public class ReentrantMutexStressTest {
         }
 
         public void unlock(final Thread thread) {
-            execute(new AtomicVoidClosure() {
+            unlockBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     if (owner.get() != thread) {

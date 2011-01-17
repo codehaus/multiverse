@@ -482,7 +482,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
     }
 
     // ========================= states ==================================
