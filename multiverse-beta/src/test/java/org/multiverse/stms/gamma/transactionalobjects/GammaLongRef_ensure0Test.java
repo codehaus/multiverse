@@ -81,7 +81,7 @@ public class GammaLongRef_ensure0Test implements GammaConstants {
         GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         assertIsActive(tx);
         assertTrue(tranlocal.isConflictCheckNeeded());
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasReadLock(ref, tx);
         assertEquals(LOCKMODE_READ, tranlocal.getLockMode());
 
         tx.commit();
@@ -107,7 +107,7 @@ public class GammaLongRef_ensure0Test implements GammaConstants {
         GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         assertIsActive(tx);
         assertTrue(tranlocal.isConflictCheckNeeded());
-        assertRefHasCommitLock(ref, tx);
+        assertRefHasWriteLock(ref, tx);
         assertEquals(LOCKMODE_WRITE, tranlocal.getLockMode());
 
         tx.commit();
