@@ -97,7 +97,7 @@ public class GammaLongRef_decrement2Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaTransaction tx = stm.startDefaultTransaction();
 

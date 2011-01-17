@@ -142,16 +142,16 @@ public class GammaLongRef_loadTest implements GammaConstants {
         ref.getLock().acquire(otherTx, LockMode.None);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        boolean result = ref.load(tranlocal, LOCKMODE_COMMIT, 1, arriveNeeded);
+        boolean result = ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, arriveNeeded);
 
         assertTrue(result);
-        assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
+        assertEquals(LOCKMODE_EXCLUSIVE, tranlocal.getLockMode());
         assertSame(ref, tranlocal.owner);
         assertEquals(initialValue, tranlocal.long_value);
         assertEquals(initialValue, tranlocal.long_oldValue);
         assertEquals(initialVersion, tranlocal.version);
         assertEquals(!readBiased, tranlocal.hasDepartObligation());
-        assertLockMode(ref, LockMode.Commit);
+        assertLockMode(ref, LockMode.Exclusive);
         assertSurplus(ref, 1);
         assertReadonlyCount(0, ref);
         assertReadBiased(ref, readBiased);
@@ -245,7 +245,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         ref.getLock().acquire(otherTx, LockMode.Read);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        boolean result = ref.load(tranlocal, LOCKMODE_COMMIT, 1, arriveNeeded);
+        boolean result = ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, arriveNeeded);
 
         assertFalse(result);
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
@@ -335,7 +335,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        boolean result = ref.load(tranlocal, LOCKMODE_COMMIT, 1, arriveNeeded);
+        boolean result = ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, arriveNeeded);
 
         assertFalse(result);
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
@@ -353,7 +353,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         long initialVersion = ref.getVersion();
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
         boolean result = ref.load(tranlocal, LOCKMODE_NONE, 1, arriveNeeded);
@@ -361,7 +361,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         assertFalse(result);
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertNull(tranlocal.owner);
-        assertLockMode(ref, LockMode.Commit);
+        assertLockMode(ref, LockMode.Exclusive);
         assertSurplus(ref, 1);
         assertReadBiased(ref, readBiased);
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -374,7 +374,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         long initialVersion = ref.getVersion();
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
         boolean result = ref.load(tranlocal, LOCKMODE_READ, 1, arriveNeeded);
@@ -382,7 +382,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         assertFalse(result);
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertNull(tranlocal.owner);
-        assertLockMode(ref, LockMode.Commit);
+        assertLockMode(ref, LockMode.Exclusive);
         assertSurplus(ref, 1);
         assertReadBiased(ref, readBiased);
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -395,7 +395,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         long initialVersion = ref.getVersion();
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
         boolean result = ref.load(tranlocal, LOCKMODE_WRITE, 1, arriveNeeded);
@@ -403,7 +403,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         assertFalse(result);
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertNull(tranlocal.owner);
-        assertLockMode(ref, LockMode.Commit);
+        assertLockMode(ref, LockMode.Exclusive);
         assertSurplus(ref, 1);
         assertReadBiased(ref, readBiased);
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -416,15 +416,15 @@ public class GammaLongRef_loadTest implements GammaConstants {
         long initialVersion = ref.getVersion();
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        boolean result = ref.load(tranlocal, LOCKMODE_COMMIT, 1, arriveNeeded);
+        boolean result = ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, arriveNeeded);
 
         assertFalse(result);
         assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertNull(tranlocal.owner);
-        assertLockMode(ref, LockMode.Commit);
+        assertLockMode(ref, LockMode.Exclusive);
         assertSurplus(ref, 1);
         assertReadBiased(ref, readBiased);
         assertVersionAndValue(ref, initialVersion, initialValue);

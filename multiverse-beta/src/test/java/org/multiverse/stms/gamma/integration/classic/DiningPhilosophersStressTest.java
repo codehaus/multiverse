@@ -57,7 +57,7 @@ public class DiningPhilosophersStressTest implements GammaConstants {
 
     @Test
     public void testCommitLock() {
-        test(LockMode.Commit);
+        test(LockMode.Exclusive);
     }
 
     public void test(LockMode lockLevel) {

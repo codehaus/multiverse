@@ -171,7 +171,7 @@ public abstract class BetaTransaction_abortTest {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         tx.abort();
 
@@ -209,7 +209,7 @@ public abstract class BetaTransaction_abortTest {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         tx.abort();
 

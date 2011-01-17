@@ -42,7 +42,7 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
         whenAlreadyOpenedForRead(LockMode.None);
         whenAlreadyOpenedForRead(LockMode.Read);
         whenAlreadyOpenedForRead(LockMode.Write);
-        whenAlreadyOpenedForRead(LockMode.Commit);
+        whenAlreadyOpenedForRead(LockMode.Exclusive);
     }
 
     public void whenAlreadyOpenedForRead(LockMode lockMode) {
@@ -75,7 +75,7 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
         whenAlreadyOpenedForWrite(LockMode.None);
         whenAlreadyOpenedForWrite(LockMode.Read);
         whenAlreadyOpenedForWrite(LockMode.Write);
-        whenAlreadyOpenedForWrite(LockMode.Commit);
+        whenAlreadyOpenedForWrite(LockMode.Exclusive);
     }
 
     public void whenAlreadyOpenedForWrite(LockMode lockMode) {
@@ -152,7 +152,7 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
         lockedByOther(LockMode.None);
         lockedByOther(LockMode.Read);
         lockedByOther(LockMode.Write);
-        lockedByOther(LockMode.Commit);
+        lockedByOther(LockMode.Exclusive);
     }
 
     public void lockedByOther(LockMode otherLockMode) {

@@ -81,7 +81,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
@@ -129,7 +129,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
         long version = ref.getVersion();
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();

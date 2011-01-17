@@ -58,17 +58,17 @@ public class Orec_upgradeWriteLockToCommitLockTest implements GammaConstants {
         ref.upgradeToCommitLock();
 
         assertSurplus(ref, 1);
-        assertLockMode(ref, LOCKMODE_COMMIT);
+        assertLockMode(ref, LOCKMODE_EXCLUSIVE);
     }
 
     @Test
     public void whenCommitLocked() {
         GammaLongRef ref = new GammaLongRef(stm);
-        ref.tryLockAndArrive(1, LOCKMODE_COMMIT);
+        ref.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
 
         ref.upgradeToCommitLock();
 
         assertSurplus(ref, 1);
-        assertLockMode(ref, LOCKMODE_COMMIT);
+        assertLockMode(ref, LOCKMODE_EXCLUSIVE);
     }
 }

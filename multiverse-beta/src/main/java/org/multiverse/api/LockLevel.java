@@ -14,13 +14,13 @@ public enum LockLevel implements MultiverseConstants {
      * A LockLevel that commit locks all writes. Once the commit lock is acquired, it isn't readable
      * by any other transaction.
      */
-    CommitLockWrites(LOCKMODE_NONE, LOCKMODE_COMMIT),
+    CommitLockWrites(LOCKMODE_NONE, LOCKMODE_EXCLUSIVE),
 
     /**
      * A LockLevel that commit locks reads (and therefor all writes). It is the most
      * strict LockLevel. Once the commit lock is acquired, it isn't readable or writable by any other transaction.
      */
-    CommitLockReads(LOCKMODE_COMMIT, LOCKMODE_COMMIT),
+    CommitLockReads(LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE),
 
     /**
      * A LockLevel that write locks all writes. This is the default behavior you get when Oracle is used where

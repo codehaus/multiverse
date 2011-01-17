@@ -241,7 +241,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 break;
             case LOCKMODE_WRITE:
                 break;
-            case LOCKMODE_COMMIT:
+            case LOCKMODE_EXCLUSIVE:
                 return true;
             default:
                 throw new IllegalStateException();
@@ -324,7 +324,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         final long current = orec;
 
         if (hasCommitLock(current)) {
-            return LOCKMODE_COMMIT;
+            return LOCKMODE_EXCLUSIVE;
         }
 
         if (hasWriteLock(current)) {
@@ -347,8 +347,8 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 return LockMode.Read;
             case LOCKMODE_WRITE:
                 return LockMode.Write;
-            case LOCKMODE_COMMIT:
-                return LockMode.Commit;
+            case LOCKMODE_EXCLUSIVE:
+                return LockMode.Exclusive;
             default:
                 throw new IllegalStateException();
         }
@@ -384,8 +384,8 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 return LockMode.Read;
             case LOCKMODE_WRITE:
                 return LockMode.Write;
-            case LOCKMODE_COMMIT:
-                return LockMode.Commit;
+            case LOCKMODE_EXCLUSIVE:
+                return LockMode.Exclusive;
             default:
                 throw new IllegalStateException();
         }
@@ -445,7 +445,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
         //if a readlock is acquired, we need to upgrade it.
         if (currentLockMode == LOCKMODE_READ) {
-            if (!tryUpgradeFromReadLock(spinCount, desiredLockMode == LOCKMODE_COMMIT)) {
+            if (!tryUpgradeFromReadLock(spinCount, desiredLockMode == LOCKMODE_EXCLUSIVE)) {
                 return false;
             }
 
@@ -455,7 +455,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
         //so we have the write lock, its needs to be upgraded to a commit lock.
         upgradeToCommitLock();
-        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setLockMode(LOCKMODE_EXCLUSIVE);
         return true;
     }
 
@@ -621,7 +621,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                     next = setReadLockCount(next, getReadLockCount(current) + 1);
                 } else if (lockMode == LOCKMODE_WRITE) {
                     next = setWriteLock(next, true);
-                } else if (lockMode == LOCKMODE_COMMIT) {
+                } else if (lockMode == LOCKMODE_EXCLUSIVE) {
                     next = setCommitLock(next, true);
                 }
             }
@@ -695,7 +695,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             if (lockMode != LOCKMODE_NONE) {
                 if (lockMode == LOCKMODE_READ) {
                     next = setReadLockCount(next, getReadLockCount(current) + 1);
-                } else if (lockMode == LOCKMODE_COMMIT) {
+                } else if (lockMode == LOCKMODE_EXCLUSIVE) {
                     next = setCommitLock(next, true);
                 } else {
                     next = setWriteLock(current, true);

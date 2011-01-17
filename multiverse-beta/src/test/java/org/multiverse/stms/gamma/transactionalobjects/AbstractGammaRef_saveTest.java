@@ -30,7 +30,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         long initialVersion = ref.version;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         int newValue = 20;
 
@@ -52,7 +52,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         long initialVersion = ref.version;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         tranlocal.setDirty(false);
         Listeners listeners = ref.safe(tranlocal, pool);
@@ -73,7 +73,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         ref.listeners = listeners;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         int newValue = 20;
 
@@ -99,7 +99,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         ref.listeners = listeners;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         tranlocal.setDirty(false);
         Listeners result = ref.safe(tranlocal, pool);
@@ -118,7 +118,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         long initialVersion = ref.version;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         boolean newValue = false;
 
@@ -141,7 +141,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         long initialVersion = ref.version;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         tranlocal.setDirty(false);
         Listeners listeners = ref.safe(tranlocal, pool);
@@ -163,7 +163,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         ref.listeners = listeners;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         boolean newValue = false;
 
@@ -189,7 +189,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         ref.listeners = listeners;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         tranlocal.setDirty(false);
         Listeners result = ref.safe(tranlocal, pool);
@@ -208,7 +208,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         long initialVersion = ref.version;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         double newValue = 20;
 
@@ -230,7 +230,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         long initialVersion = ref.version;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         tranlocal.setDirty(false);
         Listeners listeners = ref.safe(tranlocal, pool);
@@ -251,7 +251,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         ref.listeners = listeners;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         double newValue = 20;
 
@@ -277,7 +277,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         ref.listeners = listeners;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         tranlocal.setDirty(false);
         Listeners result = ref.safe(tranlocal, pool);
@@ -296,7 +296,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         long initialVersion = ref.version;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         long newValue = 20;
 
@@ -318,7 +318,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         long initialVersion = ref.version;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         tranlocal.setDirty(false);
         Listeners listeners = ref.safe(tranlocal, pool);
@@ -339,7 +339,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         ref.listeners = listeners;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         long newValue = 20;
 
@@ -365,7 +365,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         ref.listeners = listeners;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         tranlocal.setDirty(false);
         Listeners result = ref.safe(tranlocal, pool);
@@ -385,7 +385,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         long initialVersion = ref.version;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         String newValue = "bar";
 
@@ -408,7 +408,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         long initialVersion = ref.version;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         tranlocal.setDirty(false);
         Listeners listeners = ref.safe(tranlocal, pool);
@@ -431,7 +431,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         ref.listeners = listeners;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         String newValue = "bar";
 
@@ -459,7 +459,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
         ref.listeners = listeners;
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
-        ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+        ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
 
         tranlocal.setDirty(false);
         Listeners result = ref.safe(tranlocal, pool);

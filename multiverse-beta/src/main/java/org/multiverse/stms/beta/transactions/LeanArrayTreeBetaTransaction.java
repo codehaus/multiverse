@@ -1,17 +1,12 @@
 package org.multiverse.stms.beta.transactions;
 
-import java.util.*;
-
 import org.multiverse.api.*;
-import org.multiverse.api.blocking.*;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.*;
-import org.multiverse.api.lifecycle.*;
 import org.multiverse.stms.beta.*;
 import org.multiverse.stms.beta.transactionalobjects.*;
 import org.multiverse.stms.beta.conflictcounters.*;
 
-import java.util.concurrent.atomic.AtomicLong;
 import static java.lang.String.format;
 
 
@@ -133,7 +128,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             BetaRefTranlocal<E> tranlocal = (BetaRefTranlocal<E>)array[index];
 
             if(tranlocal.getLockMode() < lockMode
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_EXCLUSIVE)){
                 throw abortOnReadConflict();
             }
 
@@ -197,7 +192,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             BetaRefTranlocal<E> tranlocal = (BetaRefTranlocal<E>)array[index];
 
             if(tranlocal.getLockMode() < lockMode
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_EXCLUSIVE)){
                 throw abortOnReadConflict();
             }
 
@@ -271,7 +266,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         BetaRefTranlocal<E> tranlocal =  pool.take(ref);
 
         tranlocal.tx = this;
-        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setLockMode(LOCKMODE_EXCLUSIVE);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
 
@@ -345,7 +340,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             BetaIntRefTranlocal tranlocal = (BetaIntRefTranlocal)array[index];
 
             if(tranlocal.getLockMode() < lockMode
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_EXCLUSIVE)){
                 throw abortOnReadConflict();
             }
 
@@ -409,7 +404,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             BetaIntRefTranlocal tranlocal = (BetaIntRefTranlocal)array[index];
 
             if(tranlocal.getLockMode() < lockMode
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_EXCLUSIVE)){
                 throw abortOnReadConflict();
             }
 
@@ -483,7 +478,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         BetaIntRefTranlocal tranlocal =  pool.take(ref);
 
         tranlocal.tx = this;
-        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setLockMode(LOCKMODE_EXCLUSIVE);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
 
@@ -557,7 +552,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             BetaBooleanRefTranlocal tranlocal = (BetaBooleanRefTranlocal)array[index];
 
             if(tranlocal.getLockMode() < lockMode
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_EXCLUSIVE)){
                 throw abortOnReadConflict();
             }
 
@@ -621,7 +616,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             BetaBooleanRefTranlocal tranlocal = (BetaBooleanRefTranlocal)array[index];
 
             if(tranlocal.getLockMode() < lockMode
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_EXCLUSIVE)){
                 throw abortOnReadConflict();
             }
 
@@ -695,7 +690,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         BetaBooleanRefTranlocal tranlocal =  pool.take(ref);
 
         tranlocal.tx = this;
-        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setLockMode(LOCKMODE_EXCLUSIVE);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
 
@@ -769,7 +764,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             BetaDoubleRefTranlocal tranlocal = (BetaDoubleRefTranlocal)array[index];
 
             if(tranlocal.getLockMode() < lockMode
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_EXCLUSIVE)){
                 throw abortOnReadConflict();
             }
 
@@ -833,7 +828,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             BetaDoubleRefTranlocal tranlocal = (BetaDoubleRefTranlocal)array[index];
 
             if(tranlocal.getLockMode() < lockMode
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_EXCLUSIVE)){
                 throw abortOnReadConflict();
             }
 
@@ -907,7 +902,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         BetaDoubleRefTranlocal tranlocal =  pool.take(ref);
 
         tranlocal.tx = this;
-        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setLockMode(LOCKMODE_EXCLUSIVE);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
 
@@ -981,7 +976,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal)array[index];
 
             if(tranlocal.getLockMode() < lockMode
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_EXCLUSIVE)){
                 throw abortOnReadConflict();
             }
 
@@ -1045,7 +1040,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal)array[index];
 
             if(tranlocal.getLockMode() < lockMode
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_EXCLUSIVE)){
                 throw abortOnReadConflict();
             }
 
@@ -1119,7 +1114,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         BetaLongRefTranlocal tranlocal =  pool.take(ref);
 
         tranlocal.tx = this;
-        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setLockMode(LOCKMODE_EXCLUSIVE);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
 
@@ -1163,7 +1158,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             BetaTranlocal tranlocal = (BetaTranlocal)array[index];
 
             if(tranlocal.getLockMode() < lockMode
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_COMMIT)){
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount,tranlocal, lockMode == LOCKMODE_EXCLUSIVE)){
                 throw abortOnReadConflict();
             }
 
@@ -1227,7 +1222,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             BetaTranlocal tranlocal = (BetaTranlocal)array[index];
 
             if(tranlocal.getLockMode() < lockMode
-                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_COMMIT)){
+                && !ref.___tryLockAndCheckConflict(this, config.spinCount, tranlocal, lockMode == LOCKMODE_EXCLUSIVE)){
                 throw abortOnReadConflict();
             }
 
@@ -1301,7 +1296,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         BetaTranlocal tranlocal =  pool.take(ref);
 
         tranlocal.tx = this;
-        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setLockMode(LOCKMODE_EXCLUSIVE);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.setDirty(true);
 
@@ -1494,7 +1489,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         if(size > 0){
             final boolean needsPrepare = status == ACTIVE
                 && hasUpdates
-                && config.readLockMode != LOCKMODE_COMMIT;
+                && config.readLockMode != LOCKMODE_EXCLUSIVE;
 
             if(config.dirtyCheck){
                 if(needsPrepare && !doPrepareDirty()){
@@ -1602,7 +1597,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
             throw abortOnWriteConflict();
         }
 
-        if(hasUpdates && config.readLockMode != LOCKMODE_COMMIT){
+        if(hasUpdates && config.readLockMode != LOCKMODE_EXCLUSIVE){
             final boolean success = config.dirtyCheck ? doPrepareDirty() : doPrepareAll();
             if(!success){
                 throw abortOnWriteConflict();

@@ -135,12 +135,12 @@ public class NonReentrantMutexStressTest {
             public void execute(Transaction tx) throws Exception {
                 GammaTransaction btx = (GammaTransaction) tx;
 
-                GammaRefTranlocal read = locked.openForRead(btx, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
+                GammaRefTranlocal read = locked.openForRead(btx, pessimistic ? LOCKMODE_EXCLUSIVE : LOCKMODE_NONE);
                 if (read.long_value == 1) {
                     retry();
                 }
 
-                GammaRefTranlocal write = locked.openForWrite(btx, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
+                GammaRefTranlocal write = locked.openForWrite(btx, pessimistic ? LOCKMODE_EXCLUSIVE : LOCKMODE_NONE);
                 write.long_value = 1;
             }
         };
@@ -150,7 +150,7 @@ public class NonReentrantMutexStressTest {
             public void execute(Transaction tx) throws Exception {
                 GammaTransaction btx = (GammaTransaction) tx;
 
-                GammaRefTranlocal write = locked.openForWrite(btx, pessimistic ? LOCKMODE_COMMIT : LOCKMODE_NONE);
+                GammaRefTranlocal write = locked.openForWrite(btx, pessimistic ? LOCKMODE_EXCLUSIVE : LOCKMODE_NONE);
                 if (write.long_value == 0) {
                     throw new IllegalStateException();
                 }

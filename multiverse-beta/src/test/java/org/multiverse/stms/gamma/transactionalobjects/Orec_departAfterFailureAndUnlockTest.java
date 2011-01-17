@@ -99,7 +99,7 @@ public class Orec_departAfterFailureAndUnlockTest implements GammaConstants {
     @Test
     public void whenUpdateBiasedAndHasCommitLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
-        orec.tryLockAndArrive(1, LOCKMODE_COMMIT);
+        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
 
         long result = orec.departAfterFailureAndUnlock();
         assertEquals(0, result);

@@ -265,12 +265,12 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
         whenContainsRead(true, LockMode.None);
         whenContainsRead(true, LockMode.Read);
         whenContainsRead(true, LockMode.Write);
-        whenContainsRead(true, LockMode.Commit);
+        whenContainsRead(true, LockMode.Exclusive);
 
         whenContainsRead(false, LockMode.None);
         whenContainsRead(false, LockMode.Read);
         whenContainsRead(false, LockMode.Write);
-        whenContainsRead(false, LockMode.Commit);
+        whenContainsRead(false, LockMode.Exclusive);
     }
 
     public void whenContainsRead(boolean prepareFirst, LockMode readLockMode) {
@@ -472,7 +472,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
         tranlocal.long_value++;
 
         T otherTx = newTransaction();
-        ref.openForRead(otherTx, LOCKMODE_COMMIT);
+        ref.openForRead(otherTx, LOCKMODE_EXCLUSIVE);
 
         try {
             tx.commit();

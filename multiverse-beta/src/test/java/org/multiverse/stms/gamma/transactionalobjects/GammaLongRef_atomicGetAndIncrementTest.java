@@ -81,7 +81,7 @@ public class GammaLongRef_atomicGetAndIncrementTest {
         long initialVersion = ref.getVersion();
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         try {
             ref.atomicCompareAndSet(0, 1);

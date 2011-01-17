@@ -233,7 +233,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
         ref.get(tx);
         BetaLongRefTranlocal tranlocal = (BetaLongRefTranlocal) tx.get(ref);
         tranlocal.prepareAllUpdates(pool, tx, 1);
@@ -255,7 +255,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
         BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tranlocal.value = updateValue;
         tranlocal.prepareAllUpdates(pool, tx, 1);
@@ -276,7 +276,7 @@ public class BetaLongRef_commitAllTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx,LockMode.Commit);
+        ref.getLock().acquire(tx,LockMode.Exclusive);
         BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
         tranlocal.value = initialValue;
         tranlocal.prepareAllUpdates(pool, tx, 1);

@@ -316,7 +316,7 @@ public abstract class BetaTransaction_commuteTest implements BetaStmConstants {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         LongFunction function = mock(LongFunction.class);
         BetaTransaction tx = newTransaction();

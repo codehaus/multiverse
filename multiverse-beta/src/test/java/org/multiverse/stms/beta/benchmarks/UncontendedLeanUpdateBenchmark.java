@@ -105,7 +105,7 @@ public class UncontendedLeanUpdateBenchmark implements BetaStmConstants {
                             .setDirtyCheckEnabled(false));
             long startMs = System.currentTimeMillis();
             for (long k = 0; k < transactionCount; k++) {
-                tx.openForWrite(ref, LOCKMODE_COMMIT).value++;
+                tx.openForWrite(ref, LOCKMODE_EXCLUSIVE).value++;
                 tx.commit();
                 tx.hardReset();
 

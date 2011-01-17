@@ -263,7 +263,7 @@ public class GammaLongRef_commute1Test {
         GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.getLock().acquire(LockMode.Commit);
+        ref.getLock().acquire(LockMode.Exclusive);
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);
 
@@ -335,7 +335,7 @@ public class GammaLongRef_commute1Test {
         setThreadLocalTransaction(tx);
 
         GammaTransaction otherTx = transactionFactory.newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         LongFunction function = Functions.newIncLongFunction(1);
         ref.commute(function);

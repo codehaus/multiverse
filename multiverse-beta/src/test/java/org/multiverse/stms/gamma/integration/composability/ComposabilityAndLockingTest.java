@@ -61,8 +61,8 @@ public class ComposabilityAndLockingTest {
                 StmUtils.execute(new AtomicVoidClosure() {
                     @Override
                     public void execute(Transaction tx) throws Exception {
-                        ref.getLock().acquire(LockMode.Commit);
-                        assertEquals(LockMode.Commit, ref.getLock().getLockMode());
+                        ref.getLock().acquire(LockMode.Exclusive);
+                        assertEquals(LockMode.Exclusive, ref.getLock().getLockMode());
                     }
                 });
             }
@@ -80,13 +80,13 @@ public class ComposabilityAndLockingTest {
         StmUtils.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                ref.getLock().acquire(LockMode.Commit);
+                ref.getLock().acquire(LockMode.Exclusive);
 
                 StmUtils.execute(new AtomicVoidClosure() {
                     @Override
                     public void execute(Transaction tx) throws Exception {
                         ref.getLock().acquire(LockMode.Write);
-                        assertEquals(LockMode.Commit, ref.getLock().getLockMode());
+                        assertEquals(LockMode.Exclusive, ref.getLock().getLockMode());
                     }
                 });
             }
@@ -104,13 +104,13 @@ public class ComposabilityAndLockingTest {
         StmUtils.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                ref.getLock().acquire(LockMode.Commit);
+                ref.getLock().acquire(LockMode.Exclusive);
 
                 StmUtils.execute(new AtomicVoidClosure() {
                     @Override
                     public void execute(Transaction tx) throws Exception {
-                        ref.getLock().acquire(LockMode.Commit);
-                        assertEquals(LockMode.Commit, ref.getLock().getLockMode());
+                        ref.getLock().acquire(LockMode.Exclusive);
+                        assertEquals(LockMode.Exclusive, ref.getLock().getLockMode());
                     }
                 });
             }

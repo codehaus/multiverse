@@ -134,7 +134,7 @@ public class Lock_acquire1Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         assertIsActive(tx);
         assertRefHasCommitLock(ref, tx);
@@ -180,7 +180,7 @@ public class Lock_acquire1Test {
 
         GammaTransaction tx = stm.startDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Read);
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         assertRefHasCommitLock(ref, tx);
         assertIsActive(tx);
@@ -240,7 +240,7 @@ public class Lock_acquire1Test {
 
         GammaTransaction tx = stm.startDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Write);
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         assertRefHasCommitLock(ref, tx);
         assertIsActive(tx);
@@ -254,7 +254,7 @@ public class Lock_acquire1Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
         ref.getLock().acquire(tx, LockMode.None);
 
         assertRefHasCommitLock(ref, tx);
@@ -269,7 +269,7 @@ public class Lock_acquire1Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
         ref.getLock().acquire(tx, LockMode.Read);
 
         assertRefHasCommitLock(ref, tx);
@@ -284,7 +284,7 @@ public class Lock_acquire1Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
         ref.getLock().acquire(tx, LockMode.Write);
 
         assertRefHasCommitLock(ref, tx);
@@ -299,8 +299,8 @@ public class Lock_acquire1Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         assertRefHasCommitLock(ref, tx);
         assertIsActive(tx);
@@ -380,7 +380,7 @@ public class Lock_acquire1Test {
 
         GammaTransaction tx = stm.startDefaultTransaction();
         try {
-            ref.getLock().acquire(tx, LockMode.Commit);
+            ref.getLock().acquire(tx, LockMode.Exclusive);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -464,7 +464,7 @@ public class Lock_acquire1Test {
 
         GammaTransaction tx = stm.startDefaultTransaction();
         try {
-            ref.getLock().acquire(tx, LockMode.Commit);
+            ref.getLock().acquire(tx, LockMode.Exclusive);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -482,7 +482,7 @@ public class Lock_acquire1Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaTransaction tx = stm.startDefaultTransaction();
         try {
@@ -504,7 +504,7 @@ public class Lock_acquire1Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaTransaction tx = stm.startDefaultTransaction();
         try {
@@ -526,7 +526,7 @@ public class Lock_acquire1Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaTransaction tx = stm.startDefaultTransaction();
         try {
@@ -548,11 +548,11 @@ public class Lock_acquire1Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaTransaction tx = stm.startDefaultTransaction();
         try {
-            ref.getLock().acquire(tx, LockMode.Commit);
+            ref.getLock().acquire(tx, LockMode.Exclusive);
             fail();
         } catch (ReadWriteConflict expected) {
 

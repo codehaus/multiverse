@@ -31,18 +31,18 @@ public class DeadLockTest implements GammaConstants {
         GammaTransaction tx1 = stm.startDefaultTransaction();
         GammaTransaction tx2 = stm.startDefaultTransaction();
 
-        ref1.openForWrite(tx1,LOCKMODE_COMMIT).long_value++;
-        ref2.openForWrite(tx2, LOCKMODE_COMMIT).long_value++;
+        ref1.openForWrite(tx1, LOCKMODE_EXCLUSIVE).long_value++;
+        ref2.openForWrite(tx2, LOCKMODE_EXCLUSIVE).long_value++;
 
         try {
-            ref2.openForWrite(tx1, LOCKMODE_COMMIT);
+            ref2.openForWrite(tx1, LOCKMODE_EXCLUSIVE);
             fail();
         } catch (ReadWriteConflict expected) {
         }
 
         assertIsAborted(tx1);
 
-        ref1.openForWrite(tx2, LOCKMODE_COMMIT).long_value++;
+        ref1.openForWrite(tx2, LOCKMODE_EXCLUSIVE).long_value++;
         tx2.commit();
 
         assertEquals(1, ref1.atomicGet());

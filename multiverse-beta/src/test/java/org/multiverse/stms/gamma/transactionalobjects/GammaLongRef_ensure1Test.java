@@ -20,7 +20,7 @@ import java.util.Collection;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.LOCKMODE_COMMIT;
+import static org.multiverse.TestUtils.LOCKMODE_EXCLUSIVE;
 import static org.multiverse.TestUtils.LOCKMODE_NONE;
 import static org.multiverse.TestUtils.LOCKMODE_WRITE;
 import static org.multiverse.TestUtils.*;
@@ -129,14 +129,14 @@ public class GammaLongRef_ensure1Test {
 
         GammaTransaction tx = transactionFactory.newTransaction();
         ref.set(tx, initialValue + 1);
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
         ref.ensure(tx);
 
         GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         assertIsActive(tx);
         assertTrue(tranlocal.isConflictCheckNeeded());
         assertRefHasCommitLock(ref, tx);
-        assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
+        assertEquals(LOCKMODE_EXCLUSIVE, tranlocal.getLockMode());
 
         tx.commit();
 
@@ -195,7 +195,7 @@ public class GammaLongRef_ensure1Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction otherTx = transactionFactory.newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaTransaction tx = transactionFactory.newTransaction();
         try {

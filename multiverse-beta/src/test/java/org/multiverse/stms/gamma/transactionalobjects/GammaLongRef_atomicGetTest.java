@@ -58,7 +58,7 @@ public class GammaLongRef_atomicGetTest {
         long version = ref.getVersion();
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         try {
             ref.atomicGet();
@@ -105,7 +105,7 @@ public class GammaLongRef_atomicGetTest {
         long version = ref.getVersion();
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         try {
             ref.atomicGet();
@@ -126,7 +126,7 @@ public class GammaLongRef_atomicGetTest {
         long version = ref.getVersion();
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         long result = ref.atomicGet();
 

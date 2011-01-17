@@ -122,7 +122,7 @@ public class FatMonoBetaTransaction_softResetTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_EXCLUSIVE);
 
         boolean result = tx.softReset();
 

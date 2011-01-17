@@ -10,7 +10,7 @@ public enum LockMode implements MultiverseConstants{
 
     Write(LOCKMODE_WRITE),
 
-    Commit(LOCKMODE_COMMIT);
+    Exclusive(LOCKMODE_EXCLUSIVE);
 
     private int lockMode;
 

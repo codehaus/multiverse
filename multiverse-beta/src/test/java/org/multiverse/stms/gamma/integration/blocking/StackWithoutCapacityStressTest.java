@@ -57,7 +57,7 @@ public class StackWithoutCapacityStressTest implements GammaConstants {
 
     @Test
     public void testLockModeCommit() {
-        test(LockMode.Commit);
+        test(LockMode.Exclusive);
     }
 
     public void test(LockMode lockMode) {

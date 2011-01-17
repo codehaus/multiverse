@@ -82,7 +82,7 @@ public class Lock_getLockMode1Test {
     public void other_whenLockForCommitByOther() {
         GammaLongRef ref = new GammaLongRef(stm);
         GammaTransaction otherTx = transactionFactory.newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaTransaction tx = transactionFactory.newTransaction();
         LockMode result = ref.getLock().getLockMode(tx);
@@ -143,10 +143,10 @@ public class Lock_getLockMode1Test {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
         LockMode lockMode = ref.getLock().getLockMode(tx);
 
-        assertEquals(LockMode.Commit, lockMode);
+        assertEquals(LockMode.Exclusive, lockMode);
         assertIsActive(tx);
     }
 

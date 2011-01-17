@@ -60,7 +60,7 @@ public class ConnectionPoolStressTest implements GammaConstants {
 
     @Test
     public void testCommitLockMode() {
-        test(LockMode.Commit);
+        test(LockMode.Exclusive);
     }
 
     @Test

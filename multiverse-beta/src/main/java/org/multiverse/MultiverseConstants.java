@@ -36,5 +36,5 @@ public interface MultiverseConstants {
     final int LOCKMODE_NONE = 0;
     final int LOCKMODE_READ = 1;
     final int LOCKMODE_WRITE = 2;
-    final int LOCKMODE_COMMIT = 3;
+    final int LOCKMODE_EXCLUSIVE = 3;
 }

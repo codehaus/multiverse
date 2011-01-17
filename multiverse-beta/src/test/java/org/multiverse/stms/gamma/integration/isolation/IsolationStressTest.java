@@ -72,12 +72,12 @@ public class IsolationStressTest implements GammaConstants {
 
     @Test
     public void withCommitLockAndDirtyCheck() {
-        test(LockMode.Commit, true);
+        test(LockMode.Exclusive, true);
     }
 
     @Test
     public void withCommitLockNoDirtyCheck() {
-        test(LockMode.Commit, false);
+        test(LockMode.Exclusive, false);
     }
 
 
@@ -94,8 +94,8 @@ public class IsolationStressTest implements GammaConstants {
         threads[3] = new UpdateThread(1, ref, LockMode.Read, false);
         threads[4] = new UpdateThread(2, ref, LockMode.Write, true);
         threads[5] = new UpdateThread(3, ref, LockMode.Write, false);
-        threads[6] = new UpdateThread(4, ref, LockMode.Commit, true);
-        threads[7] = new UpdateThread(5, ref, LockMode.Commit, false);
+        threads[6] = new UpdateThread(4, ref, LockMode.Exclusive, true);
+        threads[7] = new UpdateThread(5, ref, LockMode.Exclusive, false);
 
         startAll(threads);
 

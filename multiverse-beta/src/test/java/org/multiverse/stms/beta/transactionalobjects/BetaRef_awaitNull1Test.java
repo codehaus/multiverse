@@ -53,7 +53,7 @@ public class BetaRef_awaitNull1Test {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         BetaTransaction tx = stm.startDefaultTransaction();
         try {

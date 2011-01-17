@@ -64,7 +64,7 @@ public class FatMonoBetaTransaction_initTest {
         BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        tx.openForWrite(ref, LOCKMODE_COMMIT);
+        tx.openForWrite(ref, LOCKMODE_EXCLUSIVE);
         tx.prepare();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);

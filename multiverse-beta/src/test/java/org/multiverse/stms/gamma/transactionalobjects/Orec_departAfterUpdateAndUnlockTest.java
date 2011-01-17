@@ -64,7 +64,7 @@ public class Orec_departAfterUpdateAndUnlockTest {
     public void whenLockedAndNoAdditionalSurplus() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
-        orec.tryLockAfterNormalArrive(1, LOCKMODE_COMMIT);
+        orec.tryLockAfterNormalArrive(1, LOCKMODE_EXCLUSIVE);
 
         long oldConflictCount = globalConflictCounter.count();
 
@@ -84,7 +84,7 @@ public class Orec_departAfterUpdateAndUnlockTest {
         orec.arrive(1);
         orec.arrive(1);
         orec.arrive(1);
-        orec.tryLockAfterNormalArrive(1, LOCKMODE_COMMIT);
+        orec.tryLockAfterNormalArrive(1, LOCKMODE_EXCLUSIVE);
 
         long oldConflictCount = globalConflictCounter.count();
 

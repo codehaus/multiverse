@@ -205,7 +205,7 @@ public class GammaLongRef_incrementAndGet1Test {
         GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.getLock().acquire(LockMode.Commit);
+        ref.getLock().acquire(LockMode.Exclusive);
         long result = ref.incrementAndGet(1);
 
         assertEquals(11, result);
@@ -225,7 +225,7 @@ public class GammaLongRef_incrementAndGet1Test {
 
         GammaTransaction otherTx = transactionFactory.newTransaction();
 
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         try {
             ref.incrementAndGet(1);

@@ -29,7 +29,7 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
         BetaRef<String> ref = newRef(stm, null);
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         ref.atomicIsNull();
     }
@@ -96,7 +96,7 @@ public class BetaRef_atomicIsNullTest implements BetaStmConstants {
         BetaRef<String> ref = newRef(stm, "foo");
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         try {
             ref.atomicIsNull();

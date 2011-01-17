@@ -190,7 +190,7 @@ public class GammaLongRef_alterAndGet2Test {
         long version = ref.getVersion();
 
         GammaTransaction otherTx = transactionFactory.newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaTransaction tx = transactionFactory.newTransaction();
         LongFunction function = mock(LongFunction.class);

@@ -2,7 +2,6 @@ package org.multiverse.stms.beta.transactionalobjects;
 
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.*;
-import org.multiverse.api.predicates.*;
 import org.multiverse.stms.beta.*;
 import org.multiverse.stms.beta.transactions.BetaTransaction;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
@@ -55,7 +54,7 @@ public final class BetaLongRefTranlocal extends BetaTranlocal{
             }
             case STATUS_COMMUTING: {
                 final boolean loadSuccess = ((BetaLongRef)owner).___load(
-                config.spinCount, tx, LOCKMODE_COMMIT, this);
+                config.spinCount, tx, LOCKMODE_EXCLUSIVE, this);
 
                 if (!loadSuccess) {
                     tx.abort();
@@ -69,7 +68,7 @@ public final class BetaLongRefTranlocal extends BetaTranlocal{
                 BetaLongRef o = (BetaLongRef)owner;
                 if (getLockMode() < desiredLockMode) {
                     boolean loadSuccess = o.___tryLockAndCheckConflict(
-                        tx, config.spinCount, this, desiredLockMode == LOCKMODE_COMMIT);
+                        tx, config.spinCount, this, desiredLockMode == LOCKMODE_EXCLUSIVE);
 
                     if (!loadSuccess) {
                         tx.abort();
@@ -116,7 +115,7 @@ public final class BetaLongRefTranlocal extends BetaTranlocal{
             }
             case STATUS_COMMUTING: {
                 final boolean loadSuccess = ((BetaLongRef)owner).___load(
-                config.spinCount, tx, LOCKMODE_COMMIT, this);
+                config.spinCount, tx, LOCKMODE_EXCLUSIVE, this);
 
                 if (!loadSuccess) {
                     tx.abort();
@@ -135,7 +134,7 @@ public final class BetaLongRefTranlocal extends BetaTranlocal{
                 tx.hasUpdates = true;
                 if (getLockMode() < desiredLockMode) {
                     boolean loadSuccess = o.___tryLockAndCheckConflict(
-                        tx, config.spinCount, this, desiredLockMode == LOCKMODE_COMMIT);
+                        tx, config.spinCount, this, desiredLockMode == LOCKMODE_EXCLUSIVE);
 
                     if (!loadSuccess) {
                         tx.abort();

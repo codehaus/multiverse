@@ -124,7 +124,7 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        ref.openForRead(tx, LOCKMODE_COMMIT);
+        ref.openForRead(tx, LOCKMODE_EXCLUSIVE);
 
         try {
             ref.tryUpgradeFromReadLock(1, true);

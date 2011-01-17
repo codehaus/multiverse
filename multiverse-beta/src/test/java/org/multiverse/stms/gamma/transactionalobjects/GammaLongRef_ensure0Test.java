@@ -128,14 +128,14 @@ public class GammaLongRef_ensure0Test implements GammaConstants {
         GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
         ref.set(initialValue + 1);
-        ref.getLock().acquire(LockMode.Commit);
+        ref.getLock().acquire(LockMode.Exclusive);
         ref.ensure();
 
         GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         assertIsActive(tx);
         assertTrue(tranlocal.isConflictCheckNeeded());
         assertRefHasCommitLock(ref, tx);
-        assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
+        assertEquals(LOCKMODE_EXCLUSIVE, tranlocal.getLockMode());
 
         tx.commit();
 
@@ -175,7 +175,7 @@ public class GammaLongRef_ensure0Test implements GammaConstants {
         long initialVersion = ref.getVersion();
 
         GammaTransaction otherTx = transactionFactory.newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);

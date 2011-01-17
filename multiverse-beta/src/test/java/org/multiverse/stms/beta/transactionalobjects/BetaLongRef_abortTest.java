@@ -81,7 +81,7 @@ public class BetaLongRef_abortTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        BetaTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_COMMIT);
+        BetaTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_EXCLUSIVE);
 
         ref.___abort(tx, tranlocal, pool);
 
@@ -121,7 +121,7 @@ public class BetaLongRef_abortTest implements BetaStmConstants {
         BetaLongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         ref.___abort(tx, tranlocal, pool);
 
@@ -140,7 +140,7 @@ public class BetaLongRef_abortTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_EXCLUSIVE);
         ref.___abort(tx, tranlocal, pool);
 
         assertRefHasNoLocks(ref);
@@ -178,7 +178,7 @@ public class BetaLongRef_abortTest implements BetaStmConstants {
         BetaLongRefTranlocal tranlocal = tx.openForWrite(ref, LOCKMODE_NONE);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         ref.___abort(tx, tranlocal, pool);
 

@@ -33,7 +33,7 @@ public class GammaLongRef_atomicCompareAndSetTest {
         long initialVersion = ref.getVersion();
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         long newValue = 2;
         try {

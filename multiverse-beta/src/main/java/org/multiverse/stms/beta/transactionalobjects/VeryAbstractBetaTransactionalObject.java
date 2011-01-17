@@ -212,7 +212,7 @@ public abstract class VeryAbstractBetaTransactionalObject
 
         if (currentLockMode != LOCKMODE_NONE) {
             if (commitLock && currentLockMode == LOCKMODE_WRITE) {
-                tranlocal.setLockMode(LOCKMODE_COMMIT);
+                tranlocal.setLockMode(LOCKMODE_EXCLUSIVE);
                 ___upgradeToCommitLock();
             }
             return true;
@@ -241,7 +241,7 @@ public abstract class VeryAbstractBetaTransactionalObject
         }
 
         //the lock was acquired successfully.
-        tranlocal.setLockMode(commitLock ? LOCKMODE_COMMIT : LOCKMODE_WRITE);
+        tranlocal.setLockMode(commitLock ? LOCKMODE_EXCLUSIVE : LOCKMODE_WRITE);
         return expectedVersion == ___version;
     }
 

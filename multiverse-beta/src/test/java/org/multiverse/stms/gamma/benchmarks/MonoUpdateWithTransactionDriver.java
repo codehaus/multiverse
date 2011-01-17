@@ -46,7 +46,7 @@ public class MonoUpdateWithTransactionDriver implements GammaConstants {
 
     @Test
     public void testCommitLock() {
-        test(LockMode.Commit);
+        test(LockMode.Exclusive);
     }
 
     public void test(LockMode writeLockMode) {

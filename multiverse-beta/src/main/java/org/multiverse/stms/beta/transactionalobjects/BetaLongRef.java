@@ -132,7 +132,7 @@ public final class BetaLongRef
                 }
             }
         }else{
-            final boolean commitLock = lockMode == LOCKMODE_COMMIT;
+            final boolean commitLock = lockMode == LOCKMODE_EXCLUSIVE;
 
             if(newLockOwner == null){
                 throw new PanicError();
@@ -149,7 +149,7 @@ public final class BetaLongRef
             tranlocal.version = ___version;
             tranlocal.value = value;
             tranlocal.oldValue = value;
-            tranlocal.setLockMode(commitLock ? LOCKMODE_COMMIT: LOCKMODE_WRITE);
+            tranlocal.setLockMode(commitLock ? LOCKMODE_EXCLUSIVE : LOCKMODE_WRITE);
             tranlocal.setDepartObligation(arriveStatus == ARRIVE_NORMAL);
             return true;
         }
@@ -498,7 +498,7 @@ public final class BetaLongRef
     }
 
     public final void acquireCommitLock(BetaTransaction tx){
-        tx.openForRead(this, LOCKMODE_COMMIT);
+        tx.openForRead(this, LOCKMODE_EXCLUSIVE);
     }
 
     @Override

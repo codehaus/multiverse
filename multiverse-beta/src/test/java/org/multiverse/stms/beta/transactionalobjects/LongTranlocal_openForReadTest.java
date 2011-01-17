@@ -34,7 +34,7 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
 
     @Test
     public void selfUpgrade_whenNoLockAndUpgradeToPrivatize() {
-        self_upgrade(LOCKMODE_NONE, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+        self_upgrade(LOCKMODE_NONE, LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE);
     }
 
     @Test
@@ -49,22 +49,22 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
 
     @Test
     public void selfUpgrade_whenEnsuredAndUpgradeToPrivatize() {
-        self_upgrade(LOCKMODE_WRITE, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+        self_upgrade(LOCKMODE_WRITE, LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE);
     }
 
     @Test
     public void selfUpgrade_whenPrivatizedAndUpgradeToNone() {
-        self_upgrade(LOCKMODE_COMMIT, LOCKMODE_NONE, LOCKMODE_COMMIT);
+        self_upgrade(LOCKMODE_EXCLUSIVE, LOCKMODE_NONE, LOCKMODE_EXCLUSIVE);
     }
 
     @Test
     public void selfUpgrade_whenPrivatizeAndUpgradeToEnsure() {
-        self_upgrade(LOCKMODE_COMMIT, LOCKMODE_WRITE, LOCKMODE_COMMIT);
+        self_upgrade(LOCKMODE_EXCLUSIVE, LOCKMODE_WRITE, LOCKMODE_EXCLUSIVE);
     }
 
     @Test
     public void selfUpgrade_whenNoPrivatizeAndUpgradeToPrivatize() {
-        self_upgrade(LOCKMODE_COMMIT, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+        self_upgrade(LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE);
     }
 
     public void self_upgrade(int firstTimeLockMode, int secondTimeLockMode, int expected) {
@@ -108,7 +108,7 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         BetaTransaction tx = stm.startDefaultTransaction();
 
@@ -147,7 +147,7 @@ public class LongTranlocal_openForReadTest implements BetaStmConstants {
         long initialVersion = ref.getVersion();
 
         BetaTransaction tx = stm.startDefaultTransaction();
-        BetaLongRefTranlocal tranlocal = tx.openForRead(ref,LOCKMODE_COMMIT);
+        BetaLongRefTranlocal tranlocal = tx.openForRead(ref, LOCKMODE_EXCLUSIVE);
 
 
         assertHasVersionAndValue(tranlocal, initialVersion, initialValue);

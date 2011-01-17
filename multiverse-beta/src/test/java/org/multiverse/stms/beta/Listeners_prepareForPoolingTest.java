@@ -78,7 +78,7 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     public void whenHasCommitLock() {
         BetaLongRef ref = newLongRef(stm);
         BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setLockMode(LOCKMODE_EXCLUSIVE);
         tranlocal.value = 100;
         tranlocal.oldValue = 100;
         tranlocal.version = 10;
@@ -107,7 +107,7 @@ public class Listeners_prepareForPoolingTest implements BetaStmConstants {
     public void whenConstructed() {
         BetaLongRef ref = newLongRef(stm);
         BetaLongRefTranlocal tranlocal = ref.___newTranlocal();
-        tranlocal.setLockMode(LOCKMODE_COMMIT);
+        tranlocal.setLockMode(LOCKMODE_EXCLUSIVE);
         tranlocal.setStatus(STATUS_CONSTRUCTING);
         tranlocal.value = 100;
         tranlocal.oldValue = 0;

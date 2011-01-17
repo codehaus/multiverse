@@ -70,7 +70,7 @@ public class FatArrayBetaTransaction_initTest {
         BetaLongRef ref = newLongRef(stm);
 
         FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm);
-        tx.openForWrite(ref, LOCKMODE_COMMIT);
+        tx.openForWrite(ref, LOCKMODE_EXCLUSIVE);
         tx.prepare();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);

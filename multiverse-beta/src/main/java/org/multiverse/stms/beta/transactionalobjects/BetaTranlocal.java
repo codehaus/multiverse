@@ -171,7 +171,7 @@ public abstract class BetaTranlocal implements BetaStmConstants {
         final BetaTransactionConfiguration config = tx.config;
 
         final boolean lockSuccess = owner.___tryLockAndCheckConflict(
-                tx, config.spinCount, this, desiredLockMode == LOCKMODE_COMMIT);
+                tx, config.spinCount, this, desiredLockMode == LOCKMODE_EXCLUSIVE);
 
         if (!lockSuccess) {
             throw ReadWriteConflict.INSTANCE;
@@ -233,7 +233,7 @@ public abstract class BetaTranlocal implements BetaStmConstants {
             case STATUS_CONSTRUCTING:
                 return true;
             case STATUS_COMMUTING:
-                if (!owner.___load(spinCount, tx, LOCKMODE_COMMIT, this)) {
+                if (!owner.___load(spinCount, tx, LOCKMODE_EXCLUSIVE, this)) {
                     return false;
                 }
 
@@ -263,7 +263,7 @@ public abstract class BetaTranlocal implements BetaStmConstants {
                     return owner.___tryLockAndCheckConflict(tx, spinCount, this, false);
                 }
 
-                if (lockMode == LOCKMODE_COMMIT) {
+                if (lockMode == LOCKMODE_EXCLUSIVE) {
                     return true;
                 }
 
@@ -282,7 +282,7 @@ public abstract class BetaTranlocal implements BetaStmConstants {
             case STATUS_CONSTRUCTING:
                 return true;
             case STATUS_COMMUTING:
-                if (!owner.___load(spinCount, tx, LOCKMODE_COMMIT, this)) {
+                if (!owner.___load(spinCount, tx, LOCKMODE_EXCLUSIVE, this)) {
                     return false;
                 }
 
@@ -299,7 +299,7 @@ public abstract class BetaTranlocal implements BetaStmConstants {
 
                 return owner.___tryLockAndCheckConflict(tx, spinCount, this, false);
             case STATUS_UPDATE:
-                if (lockMode == LOCKMODE_COMMIT) {
+                if (lockMode == LOCKMODE_EXCLUSIVE) {
                     return true;
                 }
 

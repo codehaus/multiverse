@@ -106,7 +106,7 @@ public class GammaLongRef_set1Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction otherTx = transactionFactory.newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
@@ -174,7 +174,7 @@ public class GammaLongRef_set1Test {
         GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
 
-        ref.getLock().acquire(LockMode.Commit);
+        ref.getLock().acquire(LockMode.Exclusive);
         long value = ref.set(200);
 
         assertEquals(200, value);
@@ -215,7 +215,7 @@ public class GammaLongRef_set1Test {
         setThreadLocalTransaction(tx);
 
         GammaTransaction otherTx = transactionFactory.newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         try {
             ref.set(200);

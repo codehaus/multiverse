@@ -44,7 +44,7 @@ public class RawUpdateDriver implements GammaConstants {
 
     @Test
     public void testWriteCommit() {
-        test(LockMode.Commit);
+        test(LockMode.Exclusive);
     }
 
     public void test(LockMode writeLockMode) {
@@ -61,9 +61,9 @@ public class RawUpdateDriver implements GammaConstants {
         final long initialVersion = ref.getVersion();
 
         final long startMs = System.currentTimeMillis();
-        if (lockMode == LOCKMODE_COMMIT) {
+        if (lockMode == LOCKMODE_EXCLUSIVE) {
             for (long k = 0; k < txCount; k++) {
-                ref.load(tranlocal, LOCKMODE_COMMIT, 1, false);
+                ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
                 ref.orec = 0;
                 //ref.releaseAfterUpdate(tranlocal, pool);
             }
@@ -71,7 +71,7 @@ public class RawUpdateDriver implements GammaConstants {
         } else {
             for (long k = 0; k < txCount; k++) {
                 ref.load(tranlocal, lockMode, 1, false);
-                ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_COMMIT);
+                ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_EXCLUSIVE);
                 //ref.releaseAfterUpdate(tranlocal, pool);
                 ref.orec = 0;
             }

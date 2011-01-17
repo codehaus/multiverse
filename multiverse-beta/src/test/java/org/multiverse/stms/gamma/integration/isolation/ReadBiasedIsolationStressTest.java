@@ -70,12 +70,12 @@ public class ReadBiasedIsolationStressTest {
 
     @Test
     public void commit_and_dirtyCheckEnabled() {
-        test(LockMode.Commit, true);
+        test(LockMode.Exclusive, true);
     }
 
     @Test
     public void commit_and_dirtyCheckDisabled() {
-        test(LockMode.Commit, false);
+        test(LockMode.Exclusive, false);
     }
 
 

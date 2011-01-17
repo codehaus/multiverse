@@ -83,8 +83,8 @@ public class GammaTestUtils implements GammaConstants {
         if (tranlocal == null) {
             fail("A tranlocal should have been stored in the transaction for the ref");
         }
-        Assert.assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
-        assertLockMode(ref, LOCKMODE_COMMIT);
+        Assert.assertEquals(LOCKMODE_EXCLUSIVE, tranlocal.getLockMode());
+        assertLockMode(ref, LOCKMODE_EXCLUSIVE);
         assertReadLockCount(ref, 0);
     }
 
@@ -99,7 +99,7 @@ public class GammaTestUtils implements GammaConstants {
             case LOCKMODE_WRITE:
                 assertRefHasWriteLock(ref, lockOwner);
                 break;
-            case LOCKMODE_COMMIT:
+            case LOCKMODE_EXCLUSIVE:
                 assertRefHasCommitLock(ref, lockOwner);
                 break;
             default:

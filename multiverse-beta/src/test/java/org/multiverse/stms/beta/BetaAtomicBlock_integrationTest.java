@@ -61,7 +61,7 @@ public class BetaAtomicBlock_integrationTest implements BetaStmConstants {
         final BetaLongRef ref = newLongRef(stm);
 
         FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        otherTx.openForWrite(ref, LOCKMODE_COMMIT);
+        otherTx.openForWrite(ref, LOCKMODE_EXCLUSIVE);
 
         try {
             AtomicBlock block = stm.createTransactionFactoryBuilder()

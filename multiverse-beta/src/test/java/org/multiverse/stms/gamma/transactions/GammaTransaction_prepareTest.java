@@ -39,7 +39,7 @@ public abstract class GammaTransaction_prepareTest<T extends GammaTransaction> i
         whenContainsRead(LockMode.None);
         whenContainsRead(LockMode.Read);
         whenContainsRead(LockMode.Write);
-        whenContainsRead(LockMode.Commit);
+        whenContainsRead(LockMode.Exclusive);
     }
 
     public void whenContainsRead(LockMode readLockMode) {
@@ -102,8 +102,8 @@ public abstract class GammaTransaction_prepareTest<T extends GammaTransaction> i
         tx.prepare();
 
         assertTrue(tranlocal.isDirty());
-        assertEquals(LockMode.Commit.asInt(), tranlocal.getLockMode());
-        assertLockMode(ref, LockMode.Commit);
+        assertEquals(LockMode.Exclusive.asInt(), tranlocal.getLockMode());
+        assertLockMode(ref, LockMode.Exclusive);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -129,8 +129,8 @@ public abstract class GammaTransaction_prepareTest<T extends GammaTransaction> i
         tx.prepare();
 
         assertTrue(tranlocal.isDirty());
-        assertEquals(LockMode.Commit.asInt(), tranlocal.getLockMode());
-        assertLockMode(ref, LockMode.Commit);
+        assertEquals(LockMode.Exclusive.asInt(), tranlocal.getLockMode());
+        assertLockMode(ref, LockMode.Exclusive);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -139,7 +139,7 @@ public abstract class GammaTransaction_prepareTest<T extends GammaTransaction> i
         dirtyCheckDisabled_whenNotDirty_thenLockedForCommit(LockMode.None);
         dirtyCheckDisabled_whenNotDirty_thenLockedForCommit(LockMode.Read);
         dirtyCheckDisabled_whenNotDirty_thenLockedForCommit(LockMode.Write);
-        dirtyCheckDisabled_whenNotDirty_thenLockedForCommit(LockMode.Commit);
+        dirtyCheckDisabled_whenNotDirty_thenLockedForCommit(LockMode.Exclusive);
     }
 
     public void dirtyCheckEnabled_whenNotDirty_nothingHappens(LockMode writeLockMode) {
@@ -165,7 +165,7 @@ public abstract class GammaTransaction_prepareTest<T extends GammaTransaction> i
         dirtyCheckEnabled_whenDirty_thenLockedForCommit(LockMode.None);
         dirtyCheckEnabled_whenDirty_thenLockedForCommit(LockMode.Read);
         dirtyCheckEnabled_whenDirty_thenLockedForCommit(LockMode.Write);
-        dirtyCheckEnabled_whenDirty_thenLockedForCommit(LockMode.Commit);
+        dirtyCheckEnabled_whenDirty_thenLockedForCommit(LockMode.Exclusive);
     }
 
     public void dirtyCheckEnabled_whenDirty_thenLockedForCommit(LockMode writeLockMode) {
@@ -182,8 +182,8 @@ public abstract class GammaTransaction_prepareTest<T extends GammaTransaction> i
         tx.prepare();
 
         assertTrue(tranlocal.isDirty());
-        assertEquals(LockMode.Commit.asInt(), tranlocal.getLockMode());
-        assertLockMode(ref, LockMode.Commit);
+        assertEquals(LockMode.Exclusive.asInt(), tranlocal.getLockMode());
+        assertLockMode(ref, LockMode.Exclusive);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -249,7 +249,7 @@ public abstract class GammaTransaction_prepareTest<T extends GammaTransaction> i
         tranlocal.long_value++;
 
         T otherTx = newTransaction();
-        ref.openForRead(otherTx, LOCKMODE_COMMIT);
+        ref.openForRead(otherTx, LOCKMODE_EXCLUSIVE);
 
         try {
             tx.prepare();

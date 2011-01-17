@@ -49,7 +49,7 @@ public abstract class GammaTransaction_abortTest<T extends GammaTransaction> imp
 
         assertIsAborted(tx);
 
-        assertLockMode(ref, LOCKMODE_COMMIT);
+        assertLockMode(ref, LOCKMODE_EXCLUSIVE);
         assertSurplus(ref, 1);
         assertUpdateBiased(ref);
         assertVersionAndValue(ref, 0, 0);
@@ -80,7 +80,7 @@ public abstract class GammaTransaction_abortTest<T extends GammaTransaction> imp
         whenHasRead(LockMode.None);
         whenHasRead(LockMode.Read);
         whenHasRead(LockMode.Write);
-        whenHasRead(LockMode.Commit);
+        whenHasRead(LockMode.Exclusive);
     }
 
     public void whenHasRead(LockMode readLockMode) {
@@ -103,7 +103,7 @@ public abstract class GammaTransaction_abortTest<T extends GammaTransaction> imp
         whenHasWrite(LockMode.None);
         whenHasWrite(LockMode.Read);
         whenHasWrite(LockMode.Write);
-        whenHasWrite(LockMode.Commit);
+        whenHasWrite(LockMode.Exclusive);
     }
 
     public void whenHasWrite(LockMode writeLockMode) {

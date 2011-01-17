@@ -177,22 +177,22 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         whenRefAlreadyOpenedForRead(LockMode.None, LockMode.None, LockMode.None);
         whenRefAlreadyOpenedForRead(LockMode.None, LockMode.Read, LockMode.Read);
         whenRefAlreadyOpenedForRead(LockMode.None, LockMode.Write, LockMode.Write);
-        whenRefAlreadyOpenedForRead(LockMode.None, LockMode.Commit, LockMode.Commit);
+        whenRefAlreadyOpenedForRead(LockMode.None, LockMode.Exclusive, LockMode.Exclusive);
 
         whenRefAlreadyOpenedForRead(LockMode.Read, LockMode.None, LockMode.Read);
         whenRefAlreadyOpenedForRead(LockMode.Read, LockMode.Read, LockMode.Read);
         whenRefAlreadyOpenedForRead(LockMode.Read, LockMode.Write, LockMode.Write);
-        whenRefAlreadyOpenedForRead(LockMode.Read, LockMode.Commit, LockMode.Commit);
+        whenRefAlreadyOpenedForRead(LockMode.Read, LockMode.Exclusive, LockMode.Exclusive);
 
         whenRefAlreadyOpenedForRead(LockMode.Write, LockMode.None, LockMode.Write);
         whenRefAlreadyOpenedForRead(LockMode.Write, LockMode.Read, LockMode.Write);
         whenRefAlreadyOpenedForRead(LockMode.Write, LockMode.Write, LockMode.Write);
-        whenRefAlreadyOpenedForRead(LockMode.Write, LockMode.Commit, LockMode.Commit);
+        whenRefAlreadyOpenedForRead(LockMode.Write, LockMode.Exclusive, LockMode.Exclusive);
 
-        whenRefAlreadyOpenedForRead(LockMode.Commit, LockMode.None, LockMode.Commit);
-        whenRefAlreadyOpenedForRead(LockMode.Commit, LockMode.Read, LockMode.Commit);
-        whenRefAlreadyOpenedForRead(LockMode.Commit, LockMode.Write, LockMode.Commit);
-        whenRefAlreadyOpenedForRead(LockMode.Commit, LockMode.Commit, LockMode.Commit);
+        whenRefAlreadyOpenedForRead(LockMode.Exclusive, LockMode.None, LockMode.Exclusive);
+        whenRefAlreadyOpenedForRead(LockMode.Exclusive, LockMode.Read, LockMode.Exclusive);
+        whenRefAlreadyOpenedForRead(LockMode.Exclusive, LockMode.Write, LockMode.Exclusive);
+        whenRefAlreadyOpenedForRead(LockMode.Exclusive, LockMode.Exclusive, LockMode.Exclusive);
     }
 
     public void whenRefAlreadyOpenedForRead(LockMode readLockMode, LockMode writeLockMode, LockMode expectedLockMode) {
@@ -220,22 +220,22 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         whenRefAlreadyOpenedForWrite(LockMode.None, LockMode.None, LockMode.None);
         whenRefAlreadyOpenedForWrite(LockMode.None, LockMode.Read, LockMode.Read);
         whenRefAlreadyOpenedForWrite(LockMode.None, LockMode.Write, LockMode.Write);
-        whenRefAlreadyOpenedForWrite(LockMode.None, LockMode.Commit, LockMode.Commit);
+        whenRefAlreadyOpenedForWrite(LockMode.None, LockMode.Exclusive, LockMode.Exclusive);
 
         whenRefAlreadyOpenedForWrite(LockMode.Read, LockMode.None, LockMode.Read);
         whenRefAlreadyOpenedForWrite(LockMode.Read, LockMode.Read, LockMode.Read);
         whenRefAlreadyOpenedForWrite(LockMode.Read, LockMode.Write, LockMode.Write);
-        whenRefAlreadyOpenedForWrite(LockMode.Read, LockMode.Commit, LockMode.Commit);
+        whenRefAlreadyOpenedForWrite(LockMode.Read, LockMode.Exclusive, LockMode.Exclusive);
 
         whenRefAlreadyOpenedForWrite(LockMode.Write, LockMode.None, LockMode.Write);
         whenRefAlreadyOpenedForWrite(LockMode.Write, LockMode.Read, LockMode.Write);
         whenRefAlreadyOpenedForWrite(LockMode.Write, LockMode.Write, LockMode.Write);
-        whenRefAlreadyOpenedForWrite(LockMode.Write, LockMode.Commit, LockMode.Commit);
+        whenRefAlreadyOpenedForWrite(LockMode.Write, LockMode.Exclusive, LockMode.Exclusive);
 
-        whenRefAlreadyOpenedForWrite(LockMode.Commit, LockMode.None, LockMode.Commit);
-        whenRefAlreadyOpenedForWrite(LockMode.Commit, LockMode.Read, LockMode.Commit);
-        whenRefAlreadyOpenedForWrite(LockMode.Commit, LockMode.Write, LockMode.Commit);
-        whenRefAlreadyOpenedForWrite(LockMode.Commit, LockMode.Commit, LockMode.Commit);
+        whenRefAlreadyOpenedForWrite(LockMode.Exclusive, LockMode.None, LockMode.Exclusive);
+        whenRefAlreadyOpenedForWrite(LockMode.Exclusive, LockMode.Read, LockMode.Exclusive);
+        whenRefAlreadyOpenedForWrite(LockMode.Exclusive, LockMode.Write, LockMode.Exclusive);
+        whenRefAlreadyOpenedForWrite(LockMode.Exclusive, LockMode.Exclusive, LockMode.Exclusive);
     }
 
     public void whenRefAlreadyOpenedForWrite(LockMode firstWriteLockMode, LockMode secondWriteLockMode, LockMode expectedLockMode) {
@@ -285,22 +285,22 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         lockLevel(LOCKMODE_NONE, LOCKMODE_NONE, LOCKMODE_NONE);
         lockLevel(LOCKMODE_NONE, LOCKMODE_READ, LOCKMODE_READ);
         lockLevel(LOCKMODE_NONE, LOCKMODE_WRITE, LOCKMODE_WRITE);
-        lockLevel(LOCKMODE_NONE, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+        lockLevel(LOCKMODE_NONE, LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE);
 
         lockLevel(LOCKMODE_READ, LOCKMODE_NONE, LOCKMODE_READ);
         lockLevel(LOCKMODE_READ, LOCKMODE_READ, LOCKMODE_READ);
         lockLevel(LOCKMODE_READ, LOCKMODE_WRITE, LOCKMODE_WRITE);
-        lockLevel(LOCKMODE_READ, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+        lockLevel(LOCKMODE_READ, LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE);
 
         lockLevel(LOCKMODE_WRITE, LOCKMODE_NONE, LOCKMODE_WRITE);
         lockLevel(LOCKMODE_WRITE, LOCKMODE_READ, LOCKMODE_WRITE);
         lockLevel(LOCKMODE_WRITE, LOCKMODE_WRITE, LOCKMODE_WRITE);
-        lockLevel(LOCKMODE_WRITE, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+        lockLevel(LOCKMODE_WRITE, LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE);
 
-        lockLevel(LOCKMODE_COMMIT, LOCKMODE_NONE, LOCKMODE_COMMIT);
-        lockLevel(LOCKMODE_COMMIT, LOCKMODE_READ, LOCKMODE_COMMIT);
-        lockLevel(LOCKMODE_COMMIT, LOCKMODE_WRITE, LOCKMODE_COMMIT);
-        lockLevel(LOCKMODE_COMMIT, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+        lockLevel(LOCKMODE_EXCLUSIVE, LOCKMODE_NONE, LOCKMODE_EXCLUSIVE);
+        lockLevel(LOCKMODE_EXCLUSIVE, LOCKMODE_READ, LOCKMODE_EXCLUSIVE);
+        lockLevel(LOCKMODE_EXCLUSIVE, LOCKMODE_WRITE, LOCKMODE_EXCLUSIVE);
+        lockLevel(LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE);
     }
 
     public void lockLevel(int transactionWriteLockMode, int writeLockMode, int expectedLockMode) {
@@ -327,22 +327,22 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         lockUpgrade(LOCKMODE_NONE, LOCKMODE_NONE, LOCKMODE_NONE);
         lockUpgrade(LOCKMODE_NONE, LOCKMODE_READ, LOCKMODE_READ);
         lockUpgrade(LOCKMODE_NONE, LOCKMODE_WRITE, LOCKMODE_WRITE);
-        lockUpgrade(LOCKMODE_NONE, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+        lockUpgrade(LOCKMODE_NONE, LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE);
 
         lockUpgrade(LOCKMODE_READ, LOCKMODE_NONE, LOCKMODE_READ);
         lockUpgrade(LOCKMODE_READ, LOCKMODE_READ, LOCKMODE_READ);
         lockUpgrade(LOCKMODE_READ, LOCKMODE_WRITE, LOCKMODE_WRITE);
-        lockUpgrade(LOCKMODE_READ, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+        lockUpgrade(LOCKMODE_READ, LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE);
 
         lockUpgrade(LOCKMODE_WRITE, LOCKMODE_NONE, LOCKMODE_WRITE);
         lockUpgrade(LOCKMODE_WRITE, LOCKMODE_READ, LOCKMODE_WRITE);
         lockUpgrade(LOCKMODE_WRITE, LOCKMODE_WRITE, LOCKMODE_WRITE);
-        lockUpgrade(LOCKMODE_WRITE, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+        lockUpgrade(LOCKMODE_WRITE, LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE);
 
-        lockUpgrade(LOCKMODE_COMMIT, LOCKMODE_NONE, LOCKMODE_COMMIT);
-        lockUpgrade(LOCKMODE_COMMIT, LOCKMODE_READ, LOCKMODE_COMMIT);
-        lockUpgrade(LOCKMODE_COMMIT, LOCKMODE_WRITE, LOCKMODE_COMMIT);
-        lockUpgrade(LOCKMODE_COMMIT, LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+        lockUpgrade(LOCKMODE_EXCLUSIVE, LOCKMODE_NONE, LOCKMODE_EXCLUSIVE);
+        lockUpgrade(LOCKMODE_EXCLUSIVE, LOCKMODE_READ, LOCKMODE_EXCLUSIVE);
+        lockUpgrade(LOCKMODE_EXCLUSIVE, LOCKMODE_WRITE, LOCKMODE_EXCLUSIVE);
+        lockUpgrade(LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE);
     }
 
     public void lockUpgrade(int firstMode, int secondLockMode, int expectedLockMode) {
@@ -411,7 +411,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         long initialVersion = ref.getVersion();
 
         T otherTx = newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         T tx = newTransaction();
         try {
@@ -491,7 +491,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         long initialVersion = ref.getVersion();
 
         T otherTx = newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         T tx = newTransaction();
         try {
@@ -572,7 +572,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         long initialVersion = ref.getVersion();
 
         T otherTx = newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         T tx = newTransaction();
         try {
@@ -593,9 +593,9 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_COMMIT);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_EXCLUSIVE);
 
-        assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
+        assertEquals(LOCKMODE_EXCLUSIVE, tranlocal.getLockMode());
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasCommitLock(ref, tx);
         assertEquals(ref, tranlocal.owner);
@@ -613,7 +613,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
         T tx = newTransaction();
         try {
-            ref.openForWrite(tx, LOCKMODE_COMMIT);
+            ref.openForWrite(tx, LOCKMODE_EXCLUSIVE);
             fail();
         } catch (ReadWriteConflict expected) {
         }
@@ -635,7 +635,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
 
         T tx = newTransaction();
         try {
-            ref.openForWrite(tx, LOCKMODE_COMMIT);
+            ref.openForWrite(tx, LOCKMODE_EXCLUSIVE);
             fail();
         } catch (ReadWriteConflict expected) {
         }
@@ -652,11 +652,11 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         long initialVersion = ref.getVersion();
 
         T otherTx = newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         T tx = newTransaction();
         try {
-            ref.openForWrite(tx, LOCKMODE_COMMIT);
+            ref.openForWrite(tx, LOCKMODE_EXCLUSIVE);
             fail();
         } catch (ReadWriteConflict expected) {
         }

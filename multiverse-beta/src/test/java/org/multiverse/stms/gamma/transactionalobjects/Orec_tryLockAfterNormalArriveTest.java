@@ -22,13 +22,13 @@ public class Orec_tryLockAfterNormalArriveTest {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
 
-        boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_COMMIT);
+        boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_EXCLUSIVE);
 
         assertTrue(result);
         assertSurplus(orec, 1);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
-        assertLockMode(orec, LOCKMODE_COMMIT);
+        assertLockMode(orec, LOCKMODE_EXCLUSIVE);
     }
 
     @Test
@@ -36,7 +36,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         AbstractGammaObject orec = new GammaLongRef(stm);
 
         try {
-            orec.tryLockAfterNormalArrive(1, LOCKMODE_COMMIT);
+            orec.tryLockAfterNormalArrive(1, LOCKMODE_EXCLUSIVE);
             fail();
         } catch (PanicError expected) {
 
@@ -54,7 +54,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         orec.tryLockAndArrive(1, LOCKMODE_WRITE);
 
         orec.arrive(1);
-        boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_COMMIT);
+        boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_EXCLUSIVE);
 
         assertFalse(result);
         assertSurplus(orec, 2);
@@ -67,15 +67,15 @@ public class Orec_tryLockAfterNormalArriveTest {
     public void updateBiased_acquireCommitLock_whenCommitLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
-        orec.tryLockAndArrive(1, LOCKMODE_COMMIT);
+        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
 
-        boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_COMMIT);
+        boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_EXCLUSIVE);
 
         assertFalse(result);
         assertSurplus(orec, 2);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
-        assertLockMode(orec, LOCKMODE_COMMIT);
+        assertLockMode(orec, LOCKMODE_EXCLUSIVE);
     }
 
     @Test
@@ -84,7 +84,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         orec.arrive(1);
         orec.tryLockAndArrive(1, LOCKMODE_READ);
 
-        boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_COMMIT);
+        boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_EXCLUSIVE);
 
         assertFalse(result);
         assertSurplus(orec, 2);
@@ -144,7 +144,7 @@ public class Orec_tryLockAfterNormalArriveTest {
     public void updateBiased_acquireWriteLock_whenCommitLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
-        orec.tryLockAndArrive(1, LOCKMODE_COMMIT);
+        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
 
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_WRITE);
 
@@ -152,7 +152,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         assertSurplus(orec, 2);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
-        assertLockMode(orec, LOCKMODE_COMMIT);
+        assertLockMode(orec, LOCKMODE_EXCLUSIVE);
     }
 
     @Test
@@ -222,7 +222,7 @@ public class Orec_tryLockAfterNormalArriveTest {
     public void updateBiased_acquireReadLock_whenCommitLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
-        orec.tryLockAndArrive(1, LOCKMODE_COMMIT);
+        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
 
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_READ);
 
@@ -230,7 +230,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         assertSurplus(orec, 2);
         assertUpdateBiased(orec);
         assertReadonlyCount(0, orec);
-        assertLockMode(orec, LOCKMODE_COMMIT);
+        assertLockMode(orec, LOCKMODE_EXCLUSIVE);
     }
 
     @Test
@@ -255,7 +255,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
 
         try {
-            orec.tryLockAfterNormalArrive(1, LOCKMODE_COMMIT);
+            orec.tryLockAfterNormalArrive(1, LOCKMODE_EXCLUSIVE);
             fail();
         } catch (PanicError expected) {
         }

@@ -145,7 +145,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (mode == TRANLOCAL_COMMUTING) {
-            if (!flattenCommute(tx, tranlocal, LOCKMODE_COMMIT)) {
+            if (!flattenCommute(tx, tranlocal, LOCKMODE_EXCLUSIVE)) {
                 return false;
             }
         }
@@ -167,7 +167,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             tranlocal.setDirty(true);
         }
 
-        return tryLockAndCheckConflict(tx.config.spinCount, tranlocal, LOCKMODE_COMMIT);
+        return tryLockAndCheckConflict(tx.config.spinCount, tranlocal, LOCKMODE_EXCLUSIVE);
     }
 
     public final void releaseAfterFailure(final GammaRefTranlocal tranlocal, final GammaObjectPool pool) {

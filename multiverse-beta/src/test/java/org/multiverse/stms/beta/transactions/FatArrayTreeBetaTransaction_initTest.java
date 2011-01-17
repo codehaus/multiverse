@@ -65,7 +65,7 @@ public class FatArrayTreeBetaTransaction_initTest {
         BetaLongRef ref = newLongRef(stm);
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        tx.openForWrite(ref, LOCKMODE_COMMIT);
+        tx.openForWrite(ref, LOCKMODE_EXCLUSIVE);
         tx.prepare();
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);

@@ -54,7 +54,7 @@ public class ReadersWritersProblemStressTest {
 
     @Test
     public void whenCommitLock() {
-        test(LockMode.Commit);
+        test(LockMode.Exclusive);
     }
 
     public void test(LockMode lockMode) {

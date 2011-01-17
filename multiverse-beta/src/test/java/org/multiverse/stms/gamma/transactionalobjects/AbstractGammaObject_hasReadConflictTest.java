@@ -55,7 +55,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_COMMIT);
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_EXCLUSIVE);
 
         boolean hasConflict = ref.hasReadConflict(read);
 
@@ -121,7 +121,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
 
         //privatize it
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         boolean hasConflict = ref.hasReadConflict(read);
 
@@ -159,7 +159,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.openForRead(otherTx, LOCKMODE_COMMIT);
+        ref.openForRead(otherTx, LOCKMODE_EXCLUSIVE);
 
         boolean hasReadConflict = ref.hasReadConflict(tranlocal);
 

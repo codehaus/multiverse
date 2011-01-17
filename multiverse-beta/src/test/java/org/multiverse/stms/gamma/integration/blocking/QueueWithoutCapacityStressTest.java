@@ -52,7 +52,7 @@ public class QueueWithoutCapacityStressTest implements BetaStmConstants {
 
     @Test
     public void testLockModeCommit() {
-        test(LockMode.Commit);
+        test(LockMode.Exclusive);
     }
 
     public void test(LockMode lockMode) {

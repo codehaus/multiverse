@@ -26,7 +26,7 @@ public class LongTranlocal_prepareAllUpdatesTest implements BetaStmConstants {
     public void readonly_whenCheckConflictAndNoConflict(){
         readonly_whenCheckConflictAndNoConflict(LOCKMODE_NONE, LOCKMODE_WRITE);
         readonly_whenCheckConflictAndNoConflict(LOCKMODE_WRITE, LOCKMODE_WRITE);
-        readonly_whenCheckConflictAndNoConflict(LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+        readonly_whenCheckConflictAndNoConflict(LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE);
     }
 
     public void readonly_whenCheckConflictAndNoConflict(int lockMode, int resultingLockMode){
@@ -49,10 +49,10 @@ public class LongTranlocal_prepareAllUpdatesTest implements BetaStmConstants {
     public void readonly_notLockedByOther() {
         readonly_notLockedByOther(false, LOCKMODE_NONE);
         readonly_notLockedByOther(false, LOCKMODE_WRITE);
-        readonly_notLockedByOther(false, LOCKMODE_COMMIT);
+        readonly_notLockedByOther(false, LOCKMODE_EXCLUSIVE);
         readonly_notLockedByOther(true, LOCKMODE_NONE);
         readonly_notLockedByOther(true, LOCKMODE_WRITE);
-        readonly_notLockedByOther(true, LOCKMODE_COMMIT);
+        readonly_notLockedByOther(true, LOCKMODE_EXCLUSIVE);
     }
 
     public void readonly_notLockedByOther(boolean readBiased, int lockMode) {
@@ -73,9 +73,9 @@ public class LongTranlocal_prepareAllUpdatesTest implements BetaStmConstants {
     @Test
     public void readonly_lockedByOther() {
         readonly_lockedByOther(false, LOCKMODE_WRITE);
-        readonly_lockedByOther(false, LOCKMODE_COMMIT);
+        readonly_lockedByOther(false, LOCKMODE_EXCLUSIVE);
         readonly_lockedByOther(true, LOCKMODE_WRITE);
-        readonly_lockedByOther(true, LOCKMODE_COMMIT);
+        readonly_lockedByOther(true, LOCKMODE_EXCLUSIVE);
     }
 
     public void readonly_lockedByOther(boolean readBiased, int otherLockMode) {
@@ -121,16 +121,16 @@ public class LongTranlocal_prepareAllUpdatesTest implements BetaStmConstants {
     public void update_notLockedByOther() {
         update_notLockedByOther(true, true, LOCKMODE_NONE);
         update_notLockedByOther(true, true, LOCKMODE_WRITE);
-        update_notLockedByOther(true, true, LOCKMODE_COMMIT);
+        update_notLockedByOther(true, true, LOCKMODE_EXCLUSIVE);
         update_notLockedByOther(true, false, LOCKMODE_NONE);
         update_notLockedByOther(true, false, LOCKMODE_WRITE);
-        update_notLockedByOther(true, false, LOCKMODE_COMMIT);
+        update_notLockedByOther(true, false, LOCKMODE_EXCLUSIVE);
         update_notLockedByOther(false, true, LOCKMODE_NONE);
         update_notLockedByOther(false, true, LOCKMODE_WRITE);
-        update_notLockedByOther(false, true, LOCKMODE_COMMIT);
+        update_notLockedByOther(false, true, LOCKMODE_EXCLUSIVE);
         update_notLockedByOther(false, false, LOCKMODE_NONE);
         update_notLockedByOther(false, false, LOCKMODE_WRITE);
-        update_notLockedByOther(false, false, LOCKMODE_COMMIT);
+        update_notLockedByOther(false, false, LOCKMODE_EXCLUSIVE);
     }
 
     public void update_notLockedByOther(boolean readBiased, boolean dirty, int lockMode) {
@@ -188,13 +188,13 @@ public class LongTranlocal_prepareAllUpdatesTest implements BetaStmConstants {
     @Test
     public void update_andLockedByOther_thenConflict() {
         update_lockedByOther_thenConflict(false, false, LOCKMODE_WRITE);
-        update_lockedByOther_thenConflict(false, false, LOCKMODE_COMMIT);
+        update_lockedByOther_thenConflict(false, false, LOCKMODE_EXCLUSIVE);
         update_lockedByOther_thenConflict(false, true, LOCKMODE_WRITE);
-        update_lockedByOther_thenConflict(false, true, LOCKMODE_COMMIT);
+        update_lockedByOther_thenConflict(false, true, LOCKMODE_EXCLUSIVE);
         update_lockedByOther_thenConflict(true, false, LOCKMODE_WRITE);
-        update_lockedByOther_thenConflict(true, false, LOCKMODE_COMMIT);
+        update_lockedByOther_thenConflict(true, false, LOCKMODE_EXCLUSIVE);
         update_lockedByOther_thenConflict(true, true, LOCKMODE_WRITE);
-        update_lockedByOther_thenConflict(true, true, LOCKMODE_COMMIT);
+        update_lockedByOther_thenConflict(true, true, LOCKMODE_EXCLUSIVE);
     }
 
     public void update_lockedByOther_thenConflict(boolean readBiased, boolean dirty, int otherLockMode) {

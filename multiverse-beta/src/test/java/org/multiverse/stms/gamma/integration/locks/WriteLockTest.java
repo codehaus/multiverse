@@ -45,7 +45,7 @@ public class WriteLockTest {
 
         GammaTransaction tx = stm.startDefaultTransaction();
         try {
-            ref.getLock().acquire(tx, LockMode.Commit);
+            ref.getLock().acquire(tx, LockMode.Exclusive);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -80,7 +80,7 @@ public class WriteLockTest {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaTransaction tx = stm.startDefaultTransaction();
         try {
@@ -221,7 +221,7 @@ public class WriteLockTest {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
         ref.getLock().acquire(tx, LockMode.Write);
 
         assertIsActive(tx);

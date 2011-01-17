@@ -120,7 +120,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
 
         BetaTransaction tx = newTransaction();
         ref.get(tx);
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         try {
             tx.openForConstruction(ref);
@@ -164,7 +164,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
 
         BetaTransaction tx = newTransaction();
         ref.set(tx, initialValue + 1);
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         try {
             tx.openForConstruction(ref);
@@ -208,7 +208,7 @@ public abstract class BetaTransaction_openForConstructionTest implements BetaStm
         long initialVersion = ref.getVersion();
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         BetaTransaction tx = newTransaction();
 

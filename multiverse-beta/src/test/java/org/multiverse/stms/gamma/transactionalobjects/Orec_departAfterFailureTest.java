@@ -51,13 +51,13 @@ public class Orec_departAfterFailureTest {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
         orec.arrive(1);
-        orec.tryLockAfterNormalArrive(1, LOCKMODE_COMMIT);
+        orec.tryLockAfterNormalArrive(1, LOCKMODE_EXCLUSIVE);
 
         orec.departAfterFailure();
 
         assertSurplus(orec, 1);
         assertUpdateBiased(orec);
-        assertLockMode(orec, LOCKMODE_COMMIT);
+        assertLockMode(orec, LOCKMODE_EXCLUSIVE);
         assertReadonlyCount(0, orec);
     }
 
@@ -81,7 +81,7 @@ public class Orec_departAfterFailureTest {
     public void whenReadBiasedAndLockedForCommit_thenPanicError() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
 
-        orec.tryLockAndArrive(1, LOCKMODE_COMMIT);
+        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
 
         try {
             orec.departAfterFailure();
@@ -89,7 +89,7 @@ public class Orec_departAfterFailureTest {
         } catch (PanicError expected) {
         }
 
-        assertLockMode(orec, LOCKMODE_COMMIT);
+        assertLockMode(orec, LOCKMODE_EXCLUSIVE);
         assertSurplus(orec, 1);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);

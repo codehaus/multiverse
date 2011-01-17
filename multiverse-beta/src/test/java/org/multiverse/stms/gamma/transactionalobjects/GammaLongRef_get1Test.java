@@ -73,7 +73,7 @@ public class GammaLongRef_get1Test {
 
         GammaTransaction tx = transactionFactory.newTransaction();
 
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         long value = ref.get(tx);
 
@@ -130,7 +130,7 @@ public class GammaLongRef_get1Test {
         GammaTransaction tx = transactionFactory.newTransaction();
 
         GammaTransaction otherTx = transactionFactory.newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         try {
             ref.get(tx);

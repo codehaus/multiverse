@@ -107,7 +107,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
         ref.incrementAndGet(tx, 1);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         try {
             tx.ensureWrites();
@@ -137,7 +137,7 @@ public abstract class BetaTransaction_ensureWritesTest implements BetaStmConstan
 
         BetaTransaction tx = newTransaction();
         ref.incrementAndGet(tx, 1);
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
         tx.ensureWrites();
 
         assertIsActive(tx);

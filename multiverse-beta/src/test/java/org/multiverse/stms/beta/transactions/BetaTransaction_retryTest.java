@@ -167,7 +167,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = newTransaction();
-        BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal read = tx.openForRead(ref, LOCKMODE_EXCLUSIVE);
 
         try {
             tx.retry();
@@ -210,7 +210,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         BetaLongRef ref = newLongRef(stm);
 
         BetaTransaction tx = newTransaction();
-        tx.openForWrite(ref, LOCKMODE_COMMIT);
+        tx.openForWrite(ref, LOCKMODE_EXCLUSIVE);
 
         try {
             tx.retry();

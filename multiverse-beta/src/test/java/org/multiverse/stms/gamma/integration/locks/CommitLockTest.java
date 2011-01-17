@@ -29,7 +29,7 @@ public class CommitLockTest {
          GammaLongRef ref = new GammaLongRef(stm, 10);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         assertIsActive(tx);
         assertRefHasCommitLock(ref, tx);
@@ -44,7 +44,7 @@ public class CommitLockTest {
 
         GammaTransaction tx = stm.startDefaultTransaction();
         try {
-            ref.getLock().acquire(tx, LockMode.Commit);
+            ref.getLock().acquire(tx, LockMode.Exclusive);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -59,11 +59,11 @@ public class CommitLockTest {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaTransaction tx = stm.startDefaultTransaction();
         try {
-            ref.getLock().acquire(tx, LockMode.Commit);
+            ref.getLock().acquire(tx, LockMode.Exclusive);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -82,7 +82,7 @@ public class CommitLockTest {
 
         GammaTransaction tx = stm.startDefaultTransaction();
         try {
-            ref.getLock().acquire(tx, LockMode.Commit);
+            ref.getLock().acquire(tx, LockMode.Exclusive);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -97,7 +97,7 @@ public class CommitLockTest {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
         try {
@@ -115,7 +115,7 @@ public class CommitLockTest {
         ref.get(otherTx);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         long result = ref.get(otherTx);
         assertEquals(10, result);
@@ -129,7 +129,7 @@ public class CommitLockTest {
         ref.get(tx);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         ref.set(tx, 100);
 
@@ -148,7 +148,7 @@ public class CommitLockTest {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaTransaction tx = stm.startDefaultTransaction();
         try {
@@ -167,7 +167,7 @@ public class CommitLockTest {
 
         GammaTransaction tx = stm.startDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Write);
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         assertIsActive(tx);
         assertRefHasCommitLock(ref, tx);
@@ -179,7 +179,7 @@ public class CommitLockTest {
 
         GammaTransaction tx = stm.startDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Read);
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         assertIsActive(tx);
         assertRefHasCommitLock(ref, tx);
@@ -196,7 +196,7 @@ public class CommitLockTest {
         ref.getLock().acquire(tx, LockMode.Read);
 
         try {
-            ref.getLock().acquire(tx, LockMode.Commit);
+            ref.getLock().acquire(tx, LockMode.Exclusive);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -213,7 +213,7 @@ public class CommitLockTest {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
         tx.commit();
 
         assertIsCommitted(tx);
@@ -225,7 +225,7 @@ public class CommitLockTest {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
         tx.prepare();
 
         assertIsPrepared(tx);
@@ -237,7 +237,7 @@ public class CommitLockTest {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
         tx.abort();
 
         assertIsAborted(tx);
@@ -249,8 +249,8 @@ public class CommitLockTest {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         assertIsActive(tx);
         assertRefHasCommitLock(ref, tx);
@@ -266,7 +266,7 @@ public class CommitLockTest {
         ref.atomicIncrementAndGet(1);
 
         try {
-            ref.getLock().acquire(tx, LockMode.Commit);
+            ref.getLock().acquire(tx, LockMode.Exclusive);
             fail();
         } catch (ReadWriteConflict expected) {
         }

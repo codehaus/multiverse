@@ -71,22 +71,22 @@ public class Lock_tryAcquire1Test {
         whenLockedByOther(LockMode.None, LockMode.None, true, LockMode.None);
         whenLockedByOther(LockMode.None, LockMode.Read, true, LockMode.Read);
         whenLockedByOther(LockMode.None, LockMode.Write, true, LockMode.Write);
-        whenLockedByOther(LockMode.None, LockMode.Commit, true, LockMode.Commit);
+        whenLockedByOther(LockMode.None, LockMode.Exclusive, true, LockMode.Exclusive);
 
         whenLockedByOther(LockMode.Read, LockMode.None, true, LockMode.None);
         whenLockedByOther(LockMode.Read, LockMode.Read, true, LockMode.Read);
         whenLockedByOther(LockMode.Read, LockMode.Write, false, LockMode.Read);
-        whenLockedByOther(LockMode.Read, LockMode.Commit, false, LockMode.Read);
+        whenLockedByOther(LockMode.Read, LockMode.Exclusive, false, LockMode.Read);
 
         whenLockedByOther(LockMode.Write, LockMode.None, false, LockMode.Write);
         whenLockedByOther(LockMode.Write, LockMode.Read, false, LockMode.Write);
         whenLockedByOther(LockMode.Write, LockMode.Write, false, LockMode.Write);
-        whenLockedByOther(LockMode.Write, LockMode.Commit, false, LockMode.Write);
+        whenLockedByOther(LockMode.Write, LockMode.Exclusive, false, LockMode.Write);
 
-        whenLockedByOther(LockMode.Commit, LockMode.None, false, LockMode.Commit);
-        whenLockedByOther(LockMode.Commit, LockMode.Read, false, LockMode.Commit);
-        whenLockedByOther(LockMode.Commit, LockMode.Write, false, LockMode.Commit);
-        whenLockedByOther(LockMode.Commit, LockMode.Commit, false, LockMode.Commit);
+        whenLockedByOther(LockMode.Exclusive, LockMode.None, false, LockMode.Exclusive);
+        whenLockedByOther(LockMode.Exclusive, LockMode.Read, false, LockMode.Exclusive);
+        whenLockedByOther(LockMode.Exclusive, LockMode.Write, false, LockMode.Exclusive);
+        whenLockedByOther(LockMode.Exclusive, LockMode.Exclusive, false, LockMode.Exclusive);
     }
 
     public void whenLockedByOther(LockMode otherLockMode, LockMode selfLockMode, boolean success, LockMode expectedLockMode) {
@@ -98,22 +98,22 @@ public class Lock_tryAcquire1Test {
         whenNotLockedByOther(LockMode.None, LockMode.None, LockMode.None);
         whenNotLockedByOther(LockMode.None, LockMode.Read, LockMode.Read);
         whenNotLockedByOther(LockMode.None, LockMode.Write, LockMode.Write);
-        whenNotLockedByOther(LockMode.None, LockMode.Commit, LockMode.Commit);
+        whenNotLockedByOther(LockMode.None, LockMode.Exclusive, LockMode.Exclusive);
 
         whenNotLockedByOther(LockMode.Read, LockMode.None, LockMode.Read);
         whenNotLockedByOther(LockMode.Read, LockMode.Read, LockMode.Read);
         whenNotLockedByOther(LockMode.Read, LockMode.Write, LockMode.Write);
-        whenNotLockedByOther(LockMode.Read, LockMode.Commit, LockMode.Commit);
+        whenNotLockedByOther(LockMode.Read, LockMode.Exclusive, LockMode.Exclusive);
 
         whenNotLockedByOther(LockMode.Write, LockMode.None, LockMode.Write);
         whenNotLockedByOther(LockMode.Write, LockMode.Read, LockMode.Write);
         whenNotLockedByOther(LockMode.Write, LockMode.Write, LockMode.Write);
-        whenNotLockedByOther(LockMode.Write, LockMode.Commit, LockMode.Commit);
+        whenNotLockedByOther(LockMode.Write, LockMode.Exclusive, LockMode.Exclusive);
 
-        whenNotLockedByOther(LockMode.Commit, LockMode.None, LockMode.Commit);
-        whenNotLockedByOther(LockMode.Commit, LockMode.Read, LockMode.Commit);
-        whenNotLockedByOther(LockMode.Commit, LockMode.Write, LockMode.Commit);
-        whenNotLockedByOther(LockMode.Commit, LockMode.Commit, LockMode.Commit);
+        whenNotLockedByOther(LockMode.Exclusive, LockMode.None, LockMode.Exclusive);
+        whenNotLockedByOther(LockMode.Exclusive, LockMode.Read, LockMode.Exclusive);
+        whenNotLockedByOther(LockMode.Exclusive, LockMode.Write, LockMode.Exclusive);
+        whenNotLockedByOther(LockMode.Exclusive, LockMode.Exclusive, LockMode.Exclusive);
     }
 
     public void whenNotLockedByOther(LockMode initialLockMode, LockMode desiredLockMode, LockMode expectedLockMode) {

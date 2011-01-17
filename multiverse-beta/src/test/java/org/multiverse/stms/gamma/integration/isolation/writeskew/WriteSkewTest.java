@@ -164,7 +164,7 @@ public class WriteSkewTest {
                 .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
-        ref2.getLock().acquire(tx, LockMode.Commit);
+        ref2.getLock().acquire(tx, LockMode.Exclusive);
         ref2.get(tx);
 
         BetaTransaction otherTx = stm.startDefaultTransaction();

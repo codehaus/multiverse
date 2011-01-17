@@ -296,8 +296,8 @@ public class WriteSkewStressTest {
             User from = random(user1, user2);
             User to = random(user1, user2);
 
-            long sum = from.account1.openForRead(tx, pessimisticRead ? LOCKMODE_COMMIT : LOCKMODE_NONE).long_value
-                    + from.account2.openForRead(tx, pessimisticRead ? LOCKMODE_COMMIT : LOCKMODE_NONE).long_value;
+            long sum = from.account1.openForRead(tx, pessimisticRead ? LOCKMODE_EXCLUSIVE : LOCKMODE_NONE).long_value
+                    + from.account2.openForRead(tx, pessimisticRead ? LOCKMODE_EXCLUSIVE : LOCKMODE_NONE).long_value;
 
             if (sum < 0) {
                 if (!writeSkewEncountered.get()) {
@@ -308,10 +308,10 @@ public class WriteSkewStressTest {
 
             if (sum >= amount) {
                 GammaLongRef fromAccount = from.getRandomAccount();
-                fromAccount.openForWrite(tx, pessimisticWrite ? LOCKMODE_COMMIT : LOCKMODE_NONE).long_value -= amount;
+                fromAccount.openForWrite(tx, pessimisticWrite ? LOCKMODE_EXCLUSIVE : LOCKMODE_NONE).long_value -= amount;
 
                 GammaLongRef toAccount = to.getRandomAccount();
-                toAccount.openForWrite(tx, pessimisticWrite ? LOCKMODE_COMMIT : LOCKMODE_NONE).long_value += amount;
+                toAccount.openForWrite(tx, pessimisticWrite ? LOCKMODE_EXCLUSIVE : LOCKMODE_NONE).long_value += amount;
             }
 
             sleepRandomUs(20);

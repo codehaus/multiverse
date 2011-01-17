@@ -31,7 +31,7 @@ public class LongTranlocal_prepareDirtyUpdatesTest {
     public void readonly_whenCheckConflictAndNoConflict() {
         readonly_whenCheckConflictAndNoConflict(LOCKMODE_NONE, LOCKMODE_WRITE);
         readonly_whenCheckConflictAndNoConflict(LOCKMODE_WRITE, LOCKMODE_WRITE);
-        readonly_whenCheckConflictAndNoConflict(LOCKMODE_COMMIT, LOCKMODE_COMMIT);
+        readonly_whenCheckConflictAndNoConflict(LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE);
     }
 
     public void readonly_whenCheckConflictAndNoConflict(int lockMode, int resultingLockMode) {
@@ -54,10 +54,10 @@ public class LongTranlocal_prepareDirtyUpdatesTest {
     public void readonly_notLockedByOther() {
         readonly_notLockedByOther(false, LOCKMODE_NONE);
         readonly_notLockedByOther(false, LOCKMODE_WRITE);
-        readonly_notLockedByOther(false, LOCKMODE_COMMIT);
+        readonly_notLockedByOther(false, LOCKMODE_EXCLUSIVE);
         readonly_notLockedByOther(true, LOCKMODE_NONE);
         readonly_notLockedByOther(true, LOCKMODE_WRITE);
-        readonly_notLockedByOther(true, LOCKMODE_COMMIT);
+        readonly_notLockedByOther(true, LOCKMODE_EXCLUSIVE);
     }
 
     public void readonly_notLockedByOther(boolean readBiased, int lockMode) {
@@ -78,9 +78,9 @@ public class LongTranlocal_prepareDirtyUpdatesTest {
     @Test
     public void readonly_lockedByOther() {
         readonly_lockedByOther(false, LOCKMODE_WRITE);
-        readonly_lockedByOther(false, LOCKMODE_COMMIT);
+        readonly_lockedByOther(false, LOCKMODE_EXCLUSIVE);
         readonly_lockedByOther(true, LOCKMODE_WRITE);
-        readonly_lockedByOther(true, LOCKMODE_COMMIT);
+        readonly_lockedByOther(true, LOCKMODE_EXCLUSIVE);
     }
 
     public void readonly_lockedByOther(boolean readBiased, int otherLockMode) {
@@ -124,9 +124,9 @@ public class LongTranlocal_prepareDirtyUpdatesTest {
     @Test
     public void update_lockedByOtherAndDirty_thenConflict() {
         update_lockedByOtherAndDirty_thenConflict(false, LOCKMODE_WRITE);
-        update_lockedByOtherAndDirty_thenConflict(false, LOCKMODE_COMMIT);
+        update_lockedByOtherAndDirty_thenConflict(false, LOCKMODE_EXCLUSIVE);
         update_lockedByOtherAndDirty_thenConflict(true, LOCKMODE_WRITE);
-        update_lockedByOtherAndDirty_thenConflict(true, LOCKMODE_COMMIT);
+        update_lockedByOtherAndDirty_thenConflict(true, LOCKMODE_EXCLUSIVE);
     }
 
     public void update_lockedByOtherAndDirty_thenConflict(boolean readBiased, int otherLockMode) {
@@ -157,9 +157,9 @@ public class LongTranlocal_prepareDirtyUpdatesTest {
     @Test
     public void update_lockedByOtherAndNotDirty_thenNoConflict() {
         update_lockedByOtherAndNotDirty_thenNoConflict(false, LOCKMODE_WRITE);
-        update_lockedByOtherAndNotDirty_thenNoConflict(false, LOCKMODE_COMMIT);
+        update_lockedByOtherAndNotDirty_thenNoConflict(false, LOCKMODE_EXCLUSIVE);
         update_lockedByOtherAndNotDirty_thenNoConflict(true, LOCKMODE_WRITE);
-        update_lockedByOtherAndNotDirty_thenNoConflict(true, LOCKMODE_COMMIT);
+        update_lockedByOtherAndNotDirty_thenNoConflict(true, LOCKMODE_EXCLUSIVE);
     }
 
     public void update_lockedByOtherAndNotDirty_thenNoConflict(boolean readBiased, int otherLockMode) {

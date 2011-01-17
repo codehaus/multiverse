@@ -30,7 +30,7 @@ public class AbstractGammaObject_prepareTest implements GammaConstants {
         whenNormalRead(LockMode.None);
         whenNormalRead(LockMode.Read);
         whenNormalRead(LockMode.Write);
-        whenNormalRead(LockMode.Commit);
+        whenNormalRead(LockMode.Exclusive);
     }
 
     public void whenNormalRead(LockMode lockMode) {
@@ -55,7 +55,7 @@ public class AbstractGammaObject_prepareTest implements GammaConstants {
         whenNonDirtyWriteAndDirtyCheckEnabled(LockMode.None);
         whenNonDirtyWriteAndDirtyCheckEnabled(LockMode.Read);
         whenNonDirtyWriteAndDirtyCheckEnabled(LockMode.Write);
-        whenNonDirtyWriteAndDirtyCheckEnabled(LockMode.Commit);
+        whenNonDirtyWriteAndDirtyCheckEnabled(LockMode.Exclusive);
     }
 
      public void whenNonDirtyWriteAndDirtyCheckEnabled(LockMode lockMode) {
@@ -84,7 +84,7 @@ public class AbstractGammaObject_prepareTest implements GammaConstants {
         whenNormalDirtyWrite(LockMode.None, true);
         whenNormalDirtyWrite(LockMode.Read, true);
         whenNormalDirtyWrite(LockMode.Write, true);
-        whenNormalDirtyWrite(LockMode.Commit, true);
+        whenNormalDirtyWrite(LockMode.Exclusive, true);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class AbstractGammaObject_prepareTest implements GammaConstants {
         whenNormalDirtyWrite(LockMode.None, false);
         whenNormalDirtyWrite(LockMode.Read, false);
         whenNormalDirtyWrite(LockMode.Write, false);
-        whenNormalDirtyWrite(LockMode.Commit, false);
+        whenNormalDirtyWrite(LockMode.Exclusive, false);
     }
 
     public void whenNormalDirtyWrite(LockMode lockMode, boolean dirtyCheck) {
@@ -110,7 +110,7 @@ public class AbstractGammaObject_prepareTest implements GammaConstants {
 
         assertTrue(success);
         assertSame(ref, tranlocal.owner);
-        assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
+        assertEquals(LOCKMODE_EXCLUSIVE, tranlocal.getLockMode());
         assertEquals(TRANLOCAL_WRITE, tranlocal.mode);
         assertTrue(tranlocal.isDirty);
         assertFalse(tranlocal.writeSkewCheck);
@@ -122,7 +122,7 @@ public class AbstractGammaObject_prepareTest implements GammaConstants {
         whenNonDirtyWrite(LockMode.None);
         whenNonDirtyWrite(LockMode.Read);
         whenNonDirtyWrite(LockMode.Write);
-        whenNonDirtyWrite(LockMode.Commit);
+        whenNonDirtyWrite(LockMode.Exclusive);
     }
 
     public void whenNonDirtyWrite(LockMode lockMode) {
@@ -139,7 +139,7 @@ public class AbstractGammaObject_prepareTest implements GammaConstants {
 
         assertTrue(success);
         assertSame(ref, tranlocal.owner);
-        assertEquals(LOCKMODE_COMMIT, tranlocal.getLockMode());
+        assertEquals(LOCKMODE_EXCLUSIVE, tranlocal.getLockMode());
         assertEquals(TRANLOCAL_WRITE, tranlocal.mode);
         assertTrue(tranlocal.isDirty);
         assertFalse(tranlocal.writeSkewCheck);

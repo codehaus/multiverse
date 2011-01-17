@@ -54,7 +54,7 @@ public class QueueWithCapacityStressTest implements GammaConstants {
 
     @Test
     public void testLockModeCommit() {
-        test(LockMode.Commit);
+        test(LockMode.Exclusive);
     }
 
 

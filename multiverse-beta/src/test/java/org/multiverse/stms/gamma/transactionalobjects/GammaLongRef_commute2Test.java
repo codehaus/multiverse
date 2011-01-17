@@ -85,7 +85,7 @@ public class GammaLongRef_commute2Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction otherTx = transactionFactory.newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Commit);
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaTransaction tx = transactionFactory.newTransaction();
         ref.commute(tx, newIncLongFunction());

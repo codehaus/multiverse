@@ -59,7 +59,7 @@ public class Orec_departAfterReadingAndUnlockTest implements GammaConstants {
     @Test
     public void updateBiased_whenCommitLock() {
         AbstractGammaObject orec = new GammaLongRef(stm);
-        orec.tryLockAndArrive(1, LOCKMODE_COMMIT);
+        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
 
         orec.departAfterReadingAndUnlock();
 
@@ -74,7 +74,7 @@ public class Orec_departAfterReadingAndUnlockTest implements GammaConstants {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
         orec.arrive(2);
-        orec.tryLockAndArrive(1, LOCKMODE_COMMIT);
+        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
 
         orec.departAfterReadingAndUnlock();
 
@@ -119,7 +119,7 @@ public class Orec_departAfterReadingAndUnlockTest implements GammaConstants {
     @Test
     public void whenLockedAndReadBiased() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
-        orec.tryLockAndArrive(1, LOCKMODE_COMMIT);
+        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
 
         try {
             orec.departAfterReadingAndUnlock();
@@ -128,7 +128,7 @@ public class Orec_departAfterReadingAndUnlockTest implements GammaConstants {
         }
 
         assertSurplus(orec, 1);
-        assertLockMode(orec, LOCKMODE_COMMIT);
+        assertLockMode(orec, LOCKMODE_EXCLUSIVE);
         assertReadBiased(orec);
         assertReadonlyCount(0, orec);
     }

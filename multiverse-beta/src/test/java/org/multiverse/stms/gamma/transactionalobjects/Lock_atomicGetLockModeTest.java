@@ -49,9 +49,9 @@ public class Lock_atomicGetLockModeTest {
     public void whenCommitLocked() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
         GammaTransaction tx = stm.startDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         LockMode lockMode = ref.atomicGetLockMode();
-        assertEquals(LockMode.Commit, lockMode);
+        assertEquals(LockMode.Exclusive, lockMode);
     }
 }

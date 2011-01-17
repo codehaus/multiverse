@@ -11,7 +11,7 @@ import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.multiverse.TestUtils.LOCKMODE_COMMIT;
+import static org.multiverse.TestUtils.LOCKMODE_EXCLUSIVE;
 import static org.multiverse.TestUtils.LOCKMODE_NONE;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.beta.BetaStmTestUtils.*;
@@ -125,7 +125,7 @@ public class FatArrayTreeBetaTransaction_softResetTest {
         long version = ref.getVersion();
 
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_EXCLUSIVE);
 
         boolean result = tx.softReset();
 

@@ -867,7 +867,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         tx.commute(ref, newIncLongFunction(1));
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForRead(ref, LOCKMODE_COMMIT);
+        otherTx.openForRead(ref, LOCKMODE_EXCLUSIVE);
 
         try {
             tx.commit();
@@ -889,7 +889,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
 
         tx.commit();
 
@@ -926,7 +926,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        tx.openForRead(ref, LOCKMODE_COMMIT);
+        tx.openForRead(ref, LOCKMODE_EXCLUSIVE);
         tx.commit();
 
         assertVersionAndValue(ref, version, 100);
@@ -944,7 +944,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         int oldReadonlyCount = ref.___getReadonlyCount();
 
         BetaTransaction tx = newTransaction();
-        ref.getLock().acquire(tx, LockMode.Commit);
+        ref.getLock().acquire(tx, LockMode.Exclusive);
         ref.incrementAndGet(tx, 1);
         tx.commit();
 
@@ -981,7 +981,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         long version = ref.getVersion();
 
         BetaTransaction tx = newTransaction();
-        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_COMMIT);
+        BetaLongRefTranlocal write = tx.openForWrite(ref, LOCKMODE_EXCLUSIVE);
         tx.commit();
 
         assertIsCommitted(tx);
@@ -1003,7 +1003,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         write.value++;
 
         BetaTransaction otherTx = stm.startDefaultTransaction();
-        otherTx.openForRead(ref, LOCKMODE_COMMIT);
+        otherTx.openForRead(ref, LOCKMODE_EXCLUSIVE);
 
         try {
             tx.commit();
