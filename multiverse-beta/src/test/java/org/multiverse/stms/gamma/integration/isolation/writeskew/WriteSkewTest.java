@@ -5,26 +5,24 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.IsolationLevel;
-import org.multiverse.api.LockLevel;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
 public class WriteSkewTest {
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = (BetaStm) getGlobalStmInstance();
+        stm = (GammaStm) getGlobalStmInstance();
     }
 
     @After
@@ -33,17 +31,11 @@ public class WriteSkewTest {
     }
 
     @Test
-    @Ignore
-    public void whenSerializedIsolationLevel_thenWriteSkewNotPossible() {
-
-    }
-
-    @Test
     public void whenWriteSkewAllowed_thenNotDetected() {
-        BetaLongRef ref1 = newLongRef(stm);
-        BetaLongRef ref2 = newLongRef(stm);
+        GammaLongRef ref1 = new GammaLongRef(stm);
+        GammaLongRef ref2 = new GammaLongRef(stm);
 
-        BetaTransaction tx = stm.newTransactionFactoryBuilder()
+        GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .build()
@@ -59,14 +51,21 @@ public class WriteSkewTest {
     }
 
     @Test
-    public void whenPrivatizeWritesLockLevel_thenWriteSkewNotDetected() {
-        BetaLongRef ref1 = newLongRef(stm);
-        BetaLongRef ref2 = newLongRef(stm);
+    public void whenWritesLocked_thenWriteSkewNotDetected() {
+        whenWritesLocked_thenWriteSkewNotDetected(LockMode.None);
+        whenWritesLocked_thenWriteSkewNotDetected(LockMode.Read);
+        whenWritesLocked_thenWriteSkewNotDetected(LockMode.Write);
+        whenWritesLocked_thenWriteSkewNotDetected(LockMode.Exclusive);
+    }
 
-        BetaTransaction tx = stm.newTransactionFactoryBuilder()
+    public void whenWritesLocked_thenWriteSkewNotDetected(LockMode writeLockMode) {
+        GammaLongRef ref1 = new GammaLongRef(stm);
+        GammaLongRef ref2 = new GammaLongRef(stm);
+
+        GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
-                .setLockLevel(LockLevel.CommitLockWrites)
+                .setWriteLockMode(writeLockMode)
                 .build()
                 .newTransaction();
 
@@ -80,42 +79,27 @@ public class WriteSkewTest {
     }
 
     @Test
-    public void whenEnsureWritesLockLevel_thenWriteSkewNotDetected() {
-        BetaLongRef ref1 = newLongRef(stm);
-        BetaLongRef ref2 = newLongRef(stm);
-
-        BetaTransaction tx = stm.newTransactionFactoryBuilder()
-                .setSpeculativeConfigurationEnabled(false)
-                .setIsolationLevel(IsolationLevel.Snapshot)
-                .setLockLevel(LockLevel.WriteLockWrites)
-                .build()
-                .newTransaction();
-
-        ref1.incrementAndGet(tx, 1);
-        ref2.get(tx);
-
-        ref2.atomicIncrementAndGet(1);
-
-        tx.commit();
-        assertEquals(1, ref1.atomicGet());
+    public void whenReadsLocked_thenWriteSkewNotPossible() {
+        whenReadsLocked_thenWriteSkewNotPossible(LockMode.Read);
+        whenReadsLocked_thenWriteSkewNotPossible(LockMode.Write);
+        whenReadsLocked_thenWriteSkewNotPossible(LockMode.Exclusive);
     }
 
-    @Test
-    public void whenEnsureReadsLockLevel_thenWriteSkewNotPossible() {
-        BetaLongRef ref1 = newLongRef(stm);
-        BetaLongRef ref2 = newLongRef(stm);
+    public void whenReadsLocked_thenWriteSkewNotPossible(LockMode readLockMode) {
+        GammaLongRef ref1 = new GammaLongRef(stm);
+        GammaLongRef ref2 = new GammaLongRef(stm);
 
-        BetaTransaction tx = stm.newTransactionFactoryBuilder()
+        GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
-                .setLockLevel(LockLevel.WriteLockReads)
+                .setReadLockMode(readLockMode)
                 .build()
                 .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
         ref2.get(tx);
 
-        BetaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.startDefaultTransaction();
         ref2.incrementAndGet(otherTx, 1);
 
         try {
@@ -127,37 +111,14 @@ public class WriteSkewTest {
         tx.commit();
     }
 
-    @Test
-    public void whenPrivatizedReadsLockLevel_thenWriteSkewNotPossible() {
-        BetaLongRef ref1 = newLongRef(stm);
-        BetaLongRef ref2 = newLongRef(stm);
-
-        BetaTransaction tx = stm.newTransactionFactoryBuilder()
-                .setSpeculativeConfigurationEnabled(false)
-                .setIsolationLevel(IsolationLevel.Snapshot)
-                .setLockLevel(LockLevel.CommitLockReads)
-                .build()
-                .newTransaction();
-
-        ref1.incrementAndGet(tx, 1);
-        ref2.get(tx);
-
-        BetaTransaction otherTx = stm.startDefaultTransaction();
-        try {
-            ref2.incrementAndGet(otherTx, 1);
-            fail();
-        } catch (ReadWriteConflict expected) {
-        }
-
-        tx.commit();
-    }
 
     @Test
+    @Ignore
     public void whenPrivatized_thenWriteSkewNotPossible() {
-        BetaLongRef ref1 = newLongRef(stm);
-        BetaLongRef ref2 = newLongRef(stm);
+        GammaLongRef ref1 = new GammaLongRef(stm);
+        GammaLongRef ref2 = new GammaLongRef(stm);
 
-        BetaTransaction tx = stm.newTransactionFactoryBuilder()
+        GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .build()
@@ -167,7 +128,7 @@ public class WriteSkewTest {
         ref2.getLock().acquire(tx, LockMode.Exclusive);
         ref2.get(tx);
 
-        BetaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.startDefaultTransaction();
         try {
             ref2.incrementAndGet(otherTx, 1);
             fail();
@@ -179,11 +140,12 @@ public class WriteSkewTest {
     }
 
     @Test
+    @Ignore
     public void whenEnsured_thenWriteSkewNotPossible() {
-        BetaLongRef ref1 = newLongRef(stm);
-        BetaLongRef ref2 = newLongRef(stm);
+        GammaLongRef ref1 = new GammaLongRef(stm);
+        GammaLongRef ref2 = new GammaLongRef(stm);
 
-        BetaTransaction tx = stm.newTransactionFactoryBuilder()
+        GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .build()
@@ -193,7 +155,7 @@ public class WriteSkewTest {
         ref2.getLock().acquire(tx, LockMode.Write);
         ref2.get(tx);
 
-        BetaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.startDefaultTransaction();
         ref2.incrementAndGet(otherTx, 1);
 
         try {
@@ -206,11 +168,11 @@ public class WriteSkewTest {
     }
 
     @Test
-    public void whenWriteSkewNotAllowed_thenDetected() {
-        BetaLongRef ref1 = newLongRef(stm);
-        BetaLongRef ref2 = newLongRef(stm);
+    public void whenSerializedIsolationLevel_thenWriteSkewNotPossible() {
+        GammaLongRef ref1 = new GammaLongRef(stm);
+        GammaLongRef ref2 = new GammaLongRef(stm);
 
-        BetaTransaction tx = stm.newTransactionFactoryBuilder()
+        GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Serializable)
                 .build()
