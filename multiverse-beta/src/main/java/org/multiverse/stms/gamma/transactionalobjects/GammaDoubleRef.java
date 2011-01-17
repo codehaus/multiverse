@@ -62,12 +62,12 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
 
     @Override
     public final double atomicSet(final double newValue) {
-        return asDouble(atomicSetLong(asLong(newValue),false));
+        return asDouble(atomicSetLong(asLong(newValue), false));
     }
 
     @Override
     public final double atomicGetAndSet(final double newValue) {
-        return asDouble(atomicSetLong(asLong(newValue),true));
+        return asDouble(atomicSetLong(asLong(newValue), true));
     }
 
     @Override
@@ -145,7 +145,7 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
     }
 
     public final double alter(final GammaTransaction tx, final DoubleFunction function, boolean returnOld) {
-        if(tx == null){
+        if (tx == null) {
             throw new NullPointerException();
         }
 
@@ -162,7 +162,7 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
             double oldValue = asDouble(write.long_value);
             write.long_value = asLong(function.call(oldValue));
             abort = false;
-            return returnOld?oldValue:asDouble(write.long_value);
+            return returnOld ? oldValue : asDouble(write.long_value);
         } finally {
             if (abort) {
                 tx.abort();
@@ -173,7 +173,7 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
 
     @Override
     public final boolean atomicCompareAndSet(final double expectedValue, final double newValue) {
-       return atomicCompareAndSetLong(asLong(expectedValue),asLong(newValue));
+        return atomicCompareAndSetLong(asLong(expectedValue), asLong(newValue));
     }
 
     @Override

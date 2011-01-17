@@ -4,7 +4,7 @@ import org.multiverse.api.*;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.gamma.GammaAtomicBlock;
 
-public interface GammaTransactionFactoryBuilder extends TransactionFactoryBuilder{
+public interface GammaTransactionFactoryBuilder extends TransactionFactoryBuilder {
 
     @Override
     GammaTransactionConfiguration getTransactionConfiguration();

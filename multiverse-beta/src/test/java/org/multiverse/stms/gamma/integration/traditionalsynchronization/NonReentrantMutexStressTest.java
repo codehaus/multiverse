@@ -43,24 +43,24 @@ public class NonReentrantMutexStressTest {
     }
 
     @Test
-      public void testNoLocking() {
-          test(LockMode.None);
-      }
+    public void testNoLocking() {
+        test(LockMode.None);
+    }
 
-      @Test
-      public void testReadLock() {
-          test(LockMode.Read);
-      }
+    @Test
+    public void testReadLock() {
+        test(LockMode.Read);
+    }
 
-      @Test
-      public void testWriteLock() {
-          test(LockMode.Write);
-      }
+    @Test
+    public void testWriteLock() {
+        test(LockMode.Write);
+    }
 
-      @Test
-      public void testExclusiveLock() {
-          test(LockMode.Exclusive);
-      }
+    @Test
+    public void testExclusiveLock() {
+        test(LockMode.Exclusive);
+    }
 
 
     public void test(LockMode lockMode) {

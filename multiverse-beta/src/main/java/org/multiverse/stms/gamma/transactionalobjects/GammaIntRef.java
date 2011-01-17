@@ -66,12 +66,12 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
 
     @Override
     public final int atomicSet(final int newValue) {
-        return (int)atomicSetLong(newValue,false);
+        return (int) atomicSetLong(newValue, false);
     }
 
     @Override
     public final int atomicGetAndSet(final int newValue) {
-        return (int)atomicSetLong(newValue,true);
+        return (int) atomicSetLong(newValue, true);
     }
 
     @Override
@@ -149,7 +149,7 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     }
 
     private int alter(final GammaTransaction tx, final IntFunction function, final boolean returnOld) {
-        if(tx == null){
+        if (tx == null) {
             throw new NullPointerException();
         }
 
@@ -166,7 +166,7 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
             int oldValue = (int) write.long_value;
             write.long_value = function.call(oldValue);
             abort = false;
-            return returnOld?oldValue:(int)write.long_value;
+            return returnOld ? oldValue : (int) write.long_value;
         } finally {
             if (abort) {
                 tx.abort();
@@ -189,7 +189,7 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
         return atomicIncrement(amount, false);
     }
 
-    private int atomicIncrement(final int amount, boolean returnOld){
+    private int atomicIncrement(final int amount, boolean returnOld) {
         //todo
         throw new TodoException();
     }
@@ -222,11 +222,11 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
         return increment(tx, amount, false);
     }
 
-    private int increment(final GammaTransaction tx, final int amount, final boolean returnOld){
+    private int increment(final GammaTransaction tx, final int amount, final boolean returnOld) {
         GammaRefTranlocal tranlocal = openForWrite(tx, LOCKMODE_NONE);
         int oldValue = (int) tranlocal.long_value;
-        tranlocal.long_value+=amount;
-        return returnOld?oldValue:(int)tranlocal.long_value;
+        tranlocal.long_value += amount;
+        return returnOld ? oldValue : (int) tranlocal.long_value;
     }
 
     @Override
@@ -284,7 +284,7 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     }
 
     public final void await(final GammaTransaction tx, final int value) {
-        if(get(tx)!=value){
+        if (get(tx) != value) {
             retry();
         }
     }
@@ -303,7 +303,7 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
         final GammaRefTranlocal tranlocal = openForRead(tx, LOCKMODE_NONE);
         boolean abort = true;
         try {
-            if (!predicate.evaluate((int)tranlocal.long_value)) {
+            if (!predicate.evaluate((int) tranlocal.long_value)) {
                 tx.retry();
             }
             abort = false;
@@ -315,9 +315,9 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     }
 
     @Override
-       public String toDebugString() {
-           return String.format("GammaIntRef{orec=%s, version=%s, value=%s, hasListeners=%s)",
-                   ___toOrecString(), version, long_value, listeners != null);
-       }
+    public String toDebugString() {
+        return String.format("GammaIntRef{orec=%s, version=%s, value=%s, hasListeners=%s)",
+                ___toOrecString(), version, long_value, listeners != null);
+    }
 
 }

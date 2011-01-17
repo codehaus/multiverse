@@ -240,7 +240,7 @@ public class ComposabilityTest {
 
         assertEquals(initialValue + 3, ref.atomicGet());
     }
-        
+
     class MyException extends RuntimeException {
     }
 }

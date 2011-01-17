@@ -18,7 +18,7 @@ public class GammaTransactionPool {
         enabled = ENABLED;
     }
 
-   /**
+    /**
      * Takes a FatMonoGammaTransaction from the pool.
      *
      * @return the taken FatMonoGammaTransaction or null of none available.
@@ -33,7 +33,6 @@ public class GammaTransactionPool {
         poolMonoGammaTransactionIndex--;
         return tx;
     }
-
 
 
     /**

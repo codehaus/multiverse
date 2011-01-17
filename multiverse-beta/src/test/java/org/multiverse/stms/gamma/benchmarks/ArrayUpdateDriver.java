@@ -6,39 +6,39 @@ import org.junit.Test;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 import org.multiverse.stms.gamma.transactions.ArrayGammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
 public class ArrayUpdateDriver implements GammaConstants {
 
-     private GammaStm stm;
+    private GammaStm stm;
     private int refCount = 1;
 
     @Before
-    public void setUp(){
-         stm = new GammaStm();
+    public void setUp() {
+        stm = new GammaStm();
     }
 
     @Test
-    public void test(){
+    public void test() {
         final long txCount = 1000 * 1000 * 1000;
 
         ArrayGammaTransaction tx = new ArrayGammaTransaction(new GammaTransactionConfiguration(stm));
         GammaLongRef[] refs = new GammaLongRef[refCount];
-        for(int k=0;k<refs.length;k++){
-            refs[k]=new GammaLongRef(stm, 0);
+        for (int k = 0; k < refs.length; k++) {
+            refs[k] = new GammaLongRef(stm, 0);
         }
 
 
         long startMs = System.currentTimeMillis();
-        for(long k=0;k<txCount;k++){
-            for(int l=0;l<refs.length;l++){
-                refs[l].openForWrite(tx,LOCKMODE_NONE).long_value++;
+        for (long k = 0; k < txCount; k++) {
+            for (int l = 0; l < refs.length; l++) {
+                refs[l].openForWrite(tx, LOCKMODE_NONE).long_value++;
             }
             tx.commit();
             tx.hardReset();
         }
-        long durationMs = System.currentTimeMillis()-startMs;
+        long durationMs = System.currentTimeMillis() - startMs;
 
         String s = BenchyUtils.operationsPerSecondPerThreadAsString(txCount, durationMs, 1);
 

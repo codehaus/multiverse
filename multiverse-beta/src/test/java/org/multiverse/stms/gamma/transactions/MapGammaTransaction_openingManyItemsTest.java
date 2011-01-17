@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.multiverse.TestUtils.assertIsActive;
 
-public class MapGammaTransaction_openingManyItemsTest implements GammaConstants{
+public class MapGammaTransaction_openingManyItemsTest implements GammaConstants {
     private GammaStm stm;
 
     @Before

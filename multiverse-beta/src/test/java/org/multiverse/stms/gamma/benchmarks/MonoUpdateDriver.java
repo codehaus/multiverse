@@ -17,37 +17,37 @@ public class MonoUpdateDriver implements GammaConstants {
     private GammaStm stm;
 
     @Before
-    public void setUp(){
-         stm = new GammaStm();
+    public void setUp() {
+        stm = new GammaStm();
     }
 
-    public static void main(String[] srgs){
+    public static void main(String[] srgs) {
         MonoUpdateDriver driver = new MonoUpdateDriver();
         driver.setUp();
         driver.testNoLocking();
     }
 
     @Test
-    public void testNoLocking(){
+    public void testNoLocking() {
         test(LockMode.None);
     }
 
     @Test
-    public void testReadLock(){
+    public void testReadLock() {
         test(LockMode.Read);
     }
 
     @Test
-    public void testWriteLock(){
+    public void testWriteLock() {
         test(LockMode.Write);
     }
 
     @Test
-    public void testWriteCommit(){
+    public void testWriteCommit() {
         test(LockMode.Exclusive);
     }
 
-    public void test(LockMode writeLockMode){
+    public void test(LockMode writeLockMode) {
         final long txCount = 1000 * 1000 * 1000;
 
         final MonoGammaTransaction tx = new MonoGammaTransaction(
@@ -59,18 +59,18 @@ public class MonoUpdateDriver implements GammaConstants {
         long initialVersion = ref.getVersion();
 
         long startMs = System.currentTimeMillis();
-        for(long k=0;k<txCount;k++){
-            ref.openForWrite(tx,LOCKMODE_NONE).long_value++;
+        for (long k = 0; k < txCount; k++) {
+            ref.openForWrite(tx, LOCKMODE_NONE).long_value++;
             tx.commit();
             tx.hardReset();
         }
-        long durationMs = System.currentTimeMillis()-startMs;
+        long durationMs = System.currentTimeMillis() - startMs;
 
-        String s = BenchyUtils.operationsPerSecondPerThreadAsString(txCount, durationMs,1);
+        String s = BenchyUtils.operationsPerSecondPerThreadAsString(txCount, durationMs, 1);
 
         System.out.printf("Performance is %s transactions/second/thread\n", s);
 
         assertEquals(txCount, ref.long_value);
-        assertEquals(txCount+initialVersion, ref.version);
+        assertEquals(txCount + initialVersion, ref.version);
     }
 }

@@ -138,7 +138,7 @@ public class GammaTestUtils implements GammaConstants {
         Assert.assertEquals("value doesn't match", value, ref.atomicWeakGet());
     }
 
-      public static void assertVersionAndValue(GammaDoubleRef ref, long version, double value) {
+    public static void assertVersionAndValue(GammaDoubleRef ref, long version, double value) {
         Assert.assertEquals("version doesn't match", version, ref.getVersion());
         TestUtils.assertEqualsDouble("value doesn't match", value, ref.atomicWeakGet());
     }

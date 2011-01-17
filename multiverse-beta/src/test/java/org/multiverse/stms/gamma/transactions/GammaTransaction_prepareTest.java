@@ -56,7 +56,7 @@ public abstract class GammaTransaction_prepareTest<T extends GammaTransaction> i
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
-     @Test
+    @Test
     @Ignore
     public void writeSkew() {
 

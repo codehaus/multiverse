@@ -16,7 +16,7 @@ public abstract class GammaTransaction_retryTest<T extends GammaTransaction> {
     protected GammaStm stm;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         stm = new GammaStm();
     }
 
@@ -26,72 +26,72 @@ public abstract class GammaTransaction_retryTest<T extends GammaTransaction> {
 
     @Test
     @Ignore
-    public void whenContainsRead(){
+    public void whenContainsRead() {
 
     }
 
     @Test
     @Ignore
-    public void whenContainsWrite(){
+    public void whenContainsWrite() {
 
     }
 
     @Test
     @Ignore
-    public void whenContainsConstructed(){
+    public void whenContainsConstructed() {
 
     }
 
     @Test
     @Ignore
-    public void whenContainsCommute(){
+    public void whenContainsCommute() {
 
     }
 
     @Test
     @Ignore
-    public void whenUnused(){
+    public void whenUnused() {
 
     }
 
     @Test
-    public void whenNoRetryAllowed(){
+    public void whenNoRetryAllowed() {
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm);
         config.blockingAllowed = false;
 
         T tx = newTransaction(config);
-        try{
+        try {
             tx.retry();
             fail();
-        }catch(RetryNotAllowedException expected){
+        } catch (RetryNotAllowedException expected) {
         }
 
         assertIsAborted(tx);
     }
 
     @Test
-    public void whenAlreadyAborted(){
+    public void whenAlreadyAborted() {
         T tx = newTransaction();
         tx.abort();
 
-        try{
+        try {
             tx.retry();
             fail();
-        }catch(DeadTransactionException expected){
+        } catch (DeadTransactionException expected) {
         }
 
         assertIsAborted(tx);
     }
 
     @Test
-    public void whenAlreadyCommitted(){
+    public void whenAlreadyCommitted() {
         T tx = newTransaction();
         tx.commit();
 
-        try{
+        try {
             tx.retry();
             fail();
-        }catch(DeadTransactionException expected){
+        } catch (DeadTransactionException expected) {
         }
 
         assertIsCommitted(tx);

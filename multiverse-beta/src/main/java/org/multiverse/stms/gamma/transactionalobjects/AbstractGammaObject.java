@@ -73,7 +73,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             return (GammaTransaction) tx;
         }
 
-        if(tx == null){
+        if (tx == null) {
             throw new NullPointerException("Transaction can't be null");
         }
 

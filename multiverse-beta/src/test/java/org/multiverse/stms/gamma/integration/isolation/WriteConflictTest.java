@@ -68,7 +68,7 @@ public class WriteConflictTest implements BetaStmConstants {
                 .build()
                 .newTransaction();
 
-        ref.openForWrite(tx,LOCKMODE_NONE);
+        ref.openForWrite(tx, LOCKMODE_NONE);
 
         ref.atomicIncrementAndGet(1);
         long version = ref.getVersion();

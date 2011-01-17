@@ -118,8 +118,8 @@ public class MultipleReadsRetryStressTest implements GammaConstants {
         public void doRun() {
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
-                public void execute(Transaction tx)  {
-                     if (stopRef.get() < 0) {
+                public void execute(Transaction tx) {
+                    if (stopRef.get() < 0) {
                         throw new StopException();
                     }
 

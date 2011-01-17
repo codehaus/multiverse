@@ -93,19 +93,19 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
 
     @Test
     @Ignore
-    public void whenAlreadyOpenedForConstruction(){
+    public void whenAlreadyOpenedForConstruction() {
 
     }
 
     @Test
     @Ignore
-    public void whenAlreadyOpenedForCommute(){
+    public void whenAlreadyOpenedForCommute() {
 
     }
 
     @Test
     @Ignore
-    public void whenAlreadyOpenedForCommuteAndLockingConflicts(){
+    public void whenAlreadyOpenedForCommuteAndLockingConflicts() {
 
     }
 
@@ -128,7 +128,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
         }
 
         assertEquals(TransactionStatus.Aborted, tx.getStatus());
-        assertEquals(maxCapacity+1, tx.getConfiguration().getSpeculativeConfiguration().minimalLength);
+        assertEquals(maxCapacity + 1, tx.getConfiguration().getSpeculativeConfiguration().minimalLength);
     }
 
     @Test

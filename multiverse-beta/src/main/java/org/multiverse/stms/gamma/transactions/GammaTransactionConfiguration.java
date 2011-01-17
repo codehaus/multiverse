@@ -269,7 +269,7 @@ public class GammaTransactionConfiguration implements TransactionConfiguration, 
         }
 
         if (readLockMode != LockMode.None && !trackReads) {
-            String msg = format("[%s] If readLockMode is [%s] , read tracking should be enabled", familyName,readLockMode);
+            String msg = format("[%s] If readLockMode is [%s] , read tracking should be enabled", familyName, readLockMode);
             throw new IllegalTransactionFactoryException(msg);
         }
 

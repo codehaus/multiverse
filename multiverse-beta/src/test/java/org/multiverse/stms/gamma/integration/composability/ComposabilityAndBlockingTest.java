@@ -13,7 +13,7 @@ public class ComposabilityAndBlockingTest {
     }
 
     @Test
-    public void test(){
+    public void test() {
 
     }
 }

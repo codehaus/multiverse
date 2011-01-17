@@ -67,7 +67,7 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
 
     @Override
     public final boolean atomicGetAndSet(final boolean newValue) {
-        return asBoolean(atomicSetLong(asLong(newValue),true));
+        return asBoolean(atomicSetLong(asLong(newValue), true));
     }
 
     @Override
@@ -130,7 +130,7 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     }
 
     public final boolean alter(final GammaTransaction tx, final BooleanFunction function, final boolean returnOld) {
-        if(tx == null){
+        if (tx == null) {
             throw new NullPointerException();
         }
 
@@ -147,7 +147,7 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
             boolean oldValue = asBoolean(write.long_value);
             write.long_value = asLong(function.call(oldValue));
             abort = false;
-            return returnOld?oldValue:asBoolean(write.long_value);
+            return returnOld ? oldValue : asBoolean(write.long_value);
         } finally {
             if (abort) {
                 tx.abort();

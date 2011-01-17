@@ -128,7 +128,7 @@ public class CigaretteSmokersProblemStressTest {
                         throw new RuntimeException();
                 }
             }
-            block.execute(new AtomicVoidClosure(){
+            block.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     notifier.awaitNull();

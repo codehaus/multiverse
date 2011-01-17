@@ -78,7 +78,7 @@ public class ConnectionPoolStressTest implements GammaConstants {
         assertEquals(1, pool.size());
 
         pool.returnConnection(c2);
-        assertEquals(2,pool.size());
+        assertEquals(2, pool.size());
     }
 
     public void test(LockMode lockMode) {

@@ -1,7 +1,5 @@
 package org.multiverse.stms.gamma.transactions;
 
-import org.junit.Test;
-
 public class MapGammaTransaction_isAbortOnlyTest extends GammaTransaction_isAbortOnlyTest<MapGammaTransaction> {
 
     @Override

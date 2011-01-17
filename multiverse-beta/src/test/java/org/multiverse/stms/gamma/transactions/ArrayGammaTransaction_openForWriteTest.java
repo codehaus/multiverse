@@ -12,7 +12,7 @@ public class ArrayGammaTransaction_openForWriteTest extends GammaTransaction_ope
         return new ArrayGammaTransaction(stm);
     }
 
-     @Override
+    @Override
     protected int getMaxCapacity() {
         return new GammaTransactionConfiguration(stm).arrayTransactionSize;
     }

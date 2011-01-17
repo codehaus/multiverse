@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class GlobalConflictCounter {
 
-    private final AtomicLong counter = new AtomicLong();
+    private final AtomicLong counter = new AtomicLong(Long.MIN_VALUE);
 
     public void signalConflict(GammaObject object) {
         long count = counter.get();

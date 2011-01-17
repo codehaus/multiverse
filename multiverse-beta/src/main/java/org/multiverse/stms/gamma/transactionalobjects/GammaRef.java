@@ -151,7 +151,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     private E alter(final GammaTransaction tx, final Function<E> function, final boolean returnOld) {
-         if(tx == null){
+        if (tx == null) {
             throw new NullPointerException();
         }
 
@@ -165,10 +165,10 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
         boolean abort = true;
 
         try {
-            E oldValue = (E)write.ref_value;
+            E oldValue = (E) write.ref_value;
             write.ref_value = function.call(oldValue);
             abort = false;
-            return returnOld?oldValue:(E)write.ref_value;
+            return returnOld ? oldValue : (E) write.ref_value;
         } finally {
             if (abort) {
                 tx.abort();
@@ -266,7 +266,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
         final GammaRefTranlocal tranlocal = openForRead(tx, LOCKMODE_NONE);
         boolean abort = true;
         try {
-            if (!predicate.evaluate((E)tranlocal.ref_value)) {
+            if (!predicate.evaluate((E) tranlocal.ref_value)) {
                 tx.retry();
             }
             abort = false;

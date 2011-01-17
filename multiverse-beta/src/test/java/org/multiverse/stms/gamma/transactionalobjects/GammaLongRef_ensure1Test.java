@@ -22,6 +22,7 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.LOCKMODE_EXCLUSIVE;
 import static org.multiverse.TestUtils.LOCKMODE_NONE;
+import static org.multiverse.TestUtils.LOCKMODE_READ;
 import static org.multiverse.TestUtils.LOCKMODE_WRITE;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;

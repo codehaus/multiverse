@@ -8,8 +8,8 @@ public abstract class GammaTransaction_hardResetTest<T extends GammaTransaction>
     protected GammaStm stm;
 
     @Before
-    public void setUp(){
-           stm = new GammaStm();
+    public void setUp() {
+        stm = new GammaStm();
     }
 
     protected abstract T newTransaction();

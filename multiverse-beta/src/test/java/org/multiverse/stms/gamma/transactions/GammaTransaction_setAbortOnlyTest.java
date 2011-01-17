@@ -9,21 +9,21 @@ import org.multiverse.stms.gamma.GammaStm;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 
-public abstract class GammaTransaction_setAbortOnlyTest <T extends GammaTransaction>{
+public abstract class GammaTransaction_setAbortOnlyTest<T extends GammaTransaction> {
 
     protected GammaStm stm;
 
     @Before
-    public void setUp(){
-           stm = new GammaStm();
+    public void setUp() {
+        stm = new GammaStm();
     }
 
 
     abstract protected T newTransaction();
 
     abstract protected T newTransaction(GammaTransactionConfiguration config);
-    
-   @Test
+
+    @Test
     public void whenActive() {
         GammaTransaction tx = newTransaction();
 

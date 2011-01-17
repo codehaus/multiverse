@@ -51,14 +51,14 @@ public class AbstractGammaObject_prepareTest implements GammaConstants {
     }
 
     @Test
-    public void whenNonDirtyWriteAndDirtyCheckEnabled(){
+    public void whenNonDirtyWriteAndDirtyCheckEnabled() {
         whenNonDirtyWriteAndDirtyCheckEnabled(LockMode.None);
         whenNonDirtyWriteAndDirtyCheckEnabled(LockMode.Read);
         whenNonDirtyWriteAndDirtyCheckEnabled(LockMode.Write);
         whenNonDirtyWriteAndDirtyCheckEnabled(LockMode.Exclusive);
     }
 
-     public void whenNonDirtyWriteAndDirtyCheckEnabled(LockMode lockMode) {
+    public void whenNonDirtyWriteAndDirtyCheckEnabled(LockMode lockMode) {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()

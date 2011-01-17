@@ -43,7 +43,7 @@ public interface GammaObject extends GammaConstants {
 
     /**
      * Tries to acquire a lock on a previous read/written tranlocal and checks for conflict.
-     *
+     * <p/>
      * Call can safely
      *
      * @param spinCount the maximum number of times to spin
@@ -55,7 +55,7 @@ public interface GammaObject extends GammaConstants {
 
     boolean hasReadConflict(GammaRefTranlocal tranlocal);
 
-     long getVersion();
+    long getVersion();
 
     GammaStm getStm();
 

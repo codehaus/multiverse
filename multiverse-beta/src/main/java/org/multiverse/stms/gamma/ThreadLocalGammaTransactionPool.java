@@ -4,7 +4,7 @@ import org.multiverse.stms.gamma.transactions.GammaTransactionPool;
 
 public class ThreadLocalGammaTransactionPool {
 
-        private final static ThreadLocal<GammaTransactionPool> threadlocal = new ThreadLocal<GammaTransactionPool>() {
+    private final static ThreadLocal<GammaTransactionPool> threadlocal = new ThreadLocal<GammaTransactionPool>() {
         @Override
         protected GammaTransactionPool initialValue() {
             return new GammaTransactionPool();

@@ -49,7 +49,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
         final AbstractGammaRef owner = tranlocal.owner;
 
         if (owner != null) {
-            if (status == TX_ACTIVE){
+            if (status == TX_ACTIVE) {
                 if (!owner.prepare(this, tranlocal)) {
                     throw abortOnReadWriteConflict();
                 }

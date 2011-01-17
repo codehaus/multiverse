@@ -8,7 +8,7 @@ import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.*;
 
-public class GammaObjectPool_tranlocalArrayTest implements GammaConstants{
+public class GammaObjectPool_tranlocalArrayTest implements GammaConstants {
     private GammaObjectPool pool;
     private GammaStm stm;
 

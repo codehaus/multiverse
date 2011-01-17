@@ -11,7 +11,7 @@ public class MonoGammaTransaction_openForReadTest extends GammaTransaction_openF
         return new MonoGammaTransaction(new GammaTransactionConfiguration(stm));
     }
 
-     @Override
+    @Override
     protected int getMaxCapacity() {
         return 1;
     }

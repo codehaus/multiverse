@@ -7,5 +7,6 @@ public class ComposabilityAndReadConsistencyTest {
 
     @Test
     @Ignore
-    public void test(){}
+    public void test() {
+    }
 }

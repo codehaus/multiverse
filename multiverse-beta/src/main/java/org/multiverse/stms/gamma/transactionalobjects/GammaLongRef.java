@@ -195,8 +195,8 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
         return alter(tx, function, true);
     }
 
-     private long alter(final GammaTransaction tx, final LongFunction function, final boolean returnOld) {
-        if(tx == null){
+    private long alter(final GammaTransaction tx, final LongFunction function, final boolean returnOld) {
+        if (tx == null) {
             throw new NullPointerException();
         }
 
@@ -210,10 +210,10 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
         boolean abort = true;
 
         try {
-            long oldValue =  write.long_value;
+            long oldValue = write.long_value;
             write.long_value = function.call(oldValue);
             abort = false;
-            return returnOld?oldValue:write.long_value;
+            return returnOld ? oldValue : write.long_value;
         } finally {
             if (abort) {
                 tx.abort();
@@ -286,7 +286,7 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
     }
 
     @Override
-    public  final long incrementAndGet(final long amount) {
+    public final long incrementAndGet(final long amount) {
         return incrementAndGet(getRequiredThreadLocalGammaTransaction(), amount);
     }
 
@@ -356,7 +356,7 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
     }
 
     public final void await(final GammaTransaction tx, final long value) {
-        if(openForRead(tx, LOCKMODE_NONE).long_value!=value){
+        if (openForRead(tx, LOCKMODE_NONE).long_value != value) {
             tx.retry();
         }
     }

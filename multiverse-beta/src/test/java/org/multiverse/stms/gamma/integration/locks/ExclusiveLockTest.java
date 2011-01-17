@@ -25,8 +25,8 @@ public class ExclusiveLockTest {
     }
 
     @Test
-    public void whenUnlocked(){
-         GammaLongRef ref = new GammaLongRef(stm, 10);
+    public void whenUnlocked() {
+        GammaLongRef ref = new GammaLongRef(stm, 10);
 
         GammaTransaction tx = stm.startDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Exclusive);

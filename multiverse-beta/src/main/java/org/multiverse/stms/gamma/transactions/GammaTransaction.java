@@ -444,7 +444,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
-    public final void copyForSpeculativeFailure(GammaTransaction failingTx){
+    public final void copyForSpeculativeFailure(GammaTransaction failingTx) {
         remainingTimeoutNs = failingTx.remainingTimeoutNs;
         attempt = failingTx.attempt;
     }

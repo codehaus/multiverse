@@ -9,9 +9,7 @@ import org.multiverse.api.references.BooleanRef;
 import org.multiverse.api.references.IntRef;
 
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.StmUtils.execute;
-import static org.multiverse.api.StmUtils.newBooleanRef;
-import static org.multiverse.api.StmUtils.newIntRef;
+import static org.multiverse.api.StmUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
@@ -93,7 +91,7 @@ public class SleepingBarberStressTest {
                         return;
                     }
 
-                    if(barberShop.freeSeats.get()==0){
+                    if (barberShop.freeSeats.get() == 0) {
                         return;
                     }
 

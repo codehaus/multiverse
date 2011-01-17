@@ -14,7 +14,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 public class LeanGammaAtomicBlock_integrationTest {
-     private GammaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {

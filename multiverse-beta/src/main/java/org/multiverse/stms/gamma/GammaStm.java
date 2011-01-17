@@ -1,7 +1,7 @@
 package org.multiverse.stms.gamma;
 
 import org.multiverse.api.*;
-import org.multiverse.api.collections.*;
+import org.multiverse.api.collections.TransactionalCollectionsFactory;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.collections.NaiveTransactionalCollectionFactory;
@@ -14,7 +14,7 @@ import static org.multiverse.stms.gamma.ThreadLocalGammaTransactionPool.getThrea
 public final class GammaStm implements Stm {
 
     @SuppressWarnings({"UnusedDeclaration"})
-    public static GammaStm createFast(){
+    public static GammaStm createFast() {
         return new GammaStm();
     }
 
@@ -86,7 +86,7 @@ public final class GammaStm implements Stm {
 
         @Override
         public GammaTransactionFactoryBuilder setReadLockMode(LockMode lockMode) {
-            if(config.readLockMode==lockMode){
+            if (config.readLockMode == lockMode) {
                 return this;
             }
 
@@ -95,7 +95,7 @@ public final class GammaStm implements Stm {
 
         @Override
         public GammaTransactionFactoryBuilder setWriteLockMode(LockMode lockMode) {
-            if(config.writeLockMode==lockMode){
+            if (config.writeLockMode == lockMode) {
                 return this;
             }
 
@@ -311,10 +311,10 @@ public final class GammaStm implements Stm {
         return refFactoryBuilder;
     }
 
-    public final class RefFactoryBuilderImpl implements GammaRefFactoryBuilder{
+    public final class RefFactoryBuilderImpl implements GammaRefFactoryBuilder {
         @Override
         public GammaRefFactory build() {
-               return new GammaRefFactoryImpl();
+            return new GammaRefFactoryImpl();
         }
     }
 

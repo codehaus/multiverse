@@ -43,13 +43,13 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.startDefaultTransaction();
-        ref.commute(tx,Functions.newIncLongFunction());
-        ref.commute(tx,Functions.newIncLongFunction());
-        ref.commute(tx,Functions.newIncLongFunction());
+        ref.commute(tx, Functions.newIncLongFunction());
+        ref.commute(tx, Functions.newIncLongFunction());
+        ref.commute(tx, Functions.newIncLongFunction());
         tx.commit();
 
         assertRefHasNoLocks(ref);
-        assertVersionAndValue(ref, initialVersion+1, initialValue+3);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 3);
 
     }
 

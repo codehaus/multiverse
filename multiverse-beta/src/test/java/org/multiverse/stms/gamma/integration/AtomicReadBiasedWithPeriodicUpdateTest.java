@@ -8,9 +8,7 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasNoLocks;
-import static org.multiverse.stms.gamma.GammaTestUtils.assertSurplus;
-import static org.multiverse.stms.gamma.GammaTestUtils.assertUpdateBiased;
+import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class AtomicReadBiasedWithPeriodicUpdateTest {
 

@@ -73,7 +73,7 @@ public class UncontendedCommutePerformanceTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
-                    ref.openForWrite(btx,LOCKMODE_NONE).long_value++;
+                    ref.openForWrite(btx, LOCKMODE_NONE).long_value++;
                 }
             };
 

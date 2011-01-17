@@ -16,7 +16,6 @@ import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.StmUtils.execute;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.predicates.LongPredicate.newEqualsPredicate;
 import static org.multiverse.api.predicates.LongPredicate.newLargerThanOrEqualsPredicate;

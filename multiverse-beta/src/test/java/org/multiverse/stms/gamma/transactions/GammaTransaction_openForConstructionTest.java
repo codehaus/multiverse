@@ -30,7 +30,7 @@ public abstract class GammaTransaction_openForConstructionTest<T extends GammaTr
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
-                        .setReadonly(true);
+                .setReadonly(true);
 
         GammaTransaction tx = newTransaction(config);
         try {

@@ -8,8 +8,8 @@ public class ArrayGammaTransaction_abortTest extends GammaTransaction_abortTest<
 
     @Override
     protected void assertCleaned(ArrayGammaTransaction tx) {
-          GammaRefTranlocal node = tx.head;
-        while(node!=null){
+        GammaRefTranlocal node = tx.head;
+        while (node != null) {
             assertNull(node.owner);
             node = node.next;
         }

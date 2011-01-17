@@ -10,9 +10,7 @@ import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.gamma.GammaTestUtils.assertReadBiased;
-import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasNoLocks;
-import static org.multiverse.stms.gamma.GammaTestUtils.assertSurplus;
+import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class ReadBiasedWithPeriodicUpdateTest implements GammaConstants {
 
@@ -42,7 +40,7 @@ public class ReadBiasedWithPeriodicUpdateTest implements GammaConstants {
             }
         }
 
-        assertSurplus(ref,1);
+        assertSurplus(ref, 1);
         assertReadBiased(ref);
         assertRefHasNoLocks(ref);
 

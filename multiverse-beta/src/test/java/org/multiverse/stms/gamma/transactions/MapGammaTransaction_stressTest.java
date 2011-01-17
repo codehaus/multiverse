@@ -10,9 +10,9 @@ import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
-public class MapGammaTransaction_stressTest implements GammaConstants{
+public class MapGammaTransaction_stressTest implements GammaConstants {
 
-     private GammaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {

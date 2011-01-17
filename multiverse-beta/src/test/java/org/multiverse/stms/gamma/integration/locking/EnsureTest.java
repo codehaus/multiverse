@@ -78,7 +78,7 @@ public class EnsureTest {
 
         }
         assertIsAborted(tx);
-        assertEquals(initialValue+1, ref1.atomicGet());
+        assertEquals(initialValue + 1, ref1.atomicGet());
         assertEquals(initialValue, ref2.atomicGet());
     }
 }

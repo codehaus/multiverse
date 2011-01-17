@@ -39,7 +39,7 @@ public class ProducerConsumerStressTest {
         stop = true;
         joinAll(producerThread, consumerThread);
 
-        assertEquals(producerThread.produced, buffer.size.atomicGet()+consumerThread.consumed);
+        assertEquals(producerThread.produced, buffer.size.atomicGet() + consumerThread.consumed);
     }
 
     public class ProducerThread extends TestThread {

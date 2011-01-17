@@ -1,6 +1,6 @@
 package org.multiverse.stms.gamma.transactions;
 
-public class MonoGammaTransaction_openForWriteTest extends GammaTransaction_openForWriteTest{
+public class MonoGammaTransaction_openForWriteTest extends GammaTransaction_openForWriteTest {
 
     @Override
     protected GammaTransaction newTransaction(GammaTransactionConfiguration config) {
@@ -11,7 +11,7 @@ public class MonoGammaTransaction_openForWriteTest extends GammaTransaction_open
         return new MonoGammaTransaction(new GammaTransactionConfiguration(stm));
     }
 
-     @Override
+    @Override
     protected int getMaxCapacity() {
         return 1;
     }

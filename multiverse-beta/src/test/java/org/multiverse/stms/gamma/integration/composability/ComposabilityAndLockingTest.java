@@ -20,7 +20,7 @@ public class ComposabilityAndLockingTest {
 
     @Before
     public void setUp() {
-        stm = (GammaStm)getGlobalStmInstance();
+        stm = (GammaStm) getGlobalStmInstance();
         clearThreadLocalTransaction();
     }
 
@@ -51,7 +51,7 @@ public class ComposabilityAndLockingTest {
     @Test
     public void whenEnsuredInOuter_thenCanSafelyBePrivatizedInInner() {
         final int initialValue = 10;
-        final LongRef ref = new GammaLongRef(stm,initialValue);
+        final LongRef ref = new GammaLongRef(stm, initialValue);
 
         StmUtils.execute(new AtomicVoidClosure() {
             @Override
@@ -75,7 +75,7 @@ public class ComposabilityAndLockingTest {
     @Test
     public void whenPrivatizedInOuter_thenCanSafelyBeEnsuredInInner() {
         final int initialValue = 10;
-        final LongRef ref = new GammaLongRef(stm,initialValue);
+        final LongRef ref = new GammaLongRef(stm, initialValue);
 
         StmUtils.execute(new AtomicVoidClosure() {
             @Override
@@ -92,14 +92,14 @@ public class ComposabilityAndLockingTest {
             }
         });
 
-        assertEquals(LockMode.None,ref.getLock().atomicGetLockMode());
+        assertEquals(LockMode.None, ref.getLock().atomicGetLockMode());
         assertEquals(initialValue, ref.atomicGet());
     }
 
     @Test
     public void whenPrivatizedInOuter_thenCanSafelyBePrivatizedInInner() {
         final int initialValue = 10;
-        final LongRef ref = new GammaLongRef(stm,initialValue);
+        final LongRef ref = new GammaLongRef(stm, initialValue);
 
         StmUtils.execute(new AtomicVoidClosure() {
             @Override
