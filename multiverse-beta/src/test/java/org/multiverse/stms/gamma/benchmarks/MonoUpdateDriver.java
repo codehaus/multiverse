@@ -50,11 +50,12 @@ public class MonoUpdateDriver implements GammaConstants {
     public void test(LockMode writeLockMode){
         final long txCount = 1000 * 1000 * 1000;
 
-        MonoGammaTransaction tx = new MonoGammaTransaction(
+        final MonoGammaTransaction tx = new MonoGammaTransaction(
                 new GammaTransactionConfiguration(stm)
+                        .setDirtyCheckEnabled(false)
                         .setWriteLockMode(writeLockMode));
 
-        GammaLongRef ref = new GammaLongRef(stm, 0);
+        final GammaLongRef ref = new GammaLongRef(stm, 0);
         long initialVersion = ref.getVersion();
 
         long startMs = System.currentTimeMillis();

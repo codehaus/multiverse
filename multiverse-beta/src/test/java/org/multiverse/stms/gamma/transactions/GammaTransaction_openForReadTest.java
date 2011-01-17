@@ -687,7 +687,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
     }
 
     @Test
-    public void whenTransactionAlreadyAborted_thenDeadTransactionException() {
+    public void state_whenTransactionAlreadyAborted_thenDeadTransactionException() {
         GammaTransaction tx = newTransaction();
         tx.abort();
 
@@ -707,7 +707,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
     }
 
     @Test
-    public void whenTransactionAlreadyCommitted_thenDeadTransactionException() {
+    public void state_whenTransactionAlreadyCommitted_thenDeadTransactionException() {
         GammaTransaction tx = newTransaction();
         tx.commit();
 

@@ -1,13 +1,22 @@
 package org.multiverse.stms.gamma.transactionalobjects;
 
+import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.api.functions.*;
+import org.multiverse.api.functions.BooleanFunction;
+import org.multiverse.api.functions.DoubleFunction;
+import org.multiverse.api.functions.Function;
+import org.multiverse.api.functions.IntFunction;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
-import org.multiverse.stms.gamma.transactions.*;
+import org.multiverse.stms.gamma.transactions.ArrayGammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
+import org.multiverse.stms.gamma.transactions.MapGammaTransaction;
+import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
 
 import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLocalGammaObjectPool;
 
@@ -123,14 +132,16 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     }
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
-    public boolean prepare(final GammaTransaction tx, final GammaRefTranlocal tranlocal) {
-        int mode = tranlocal.getMode();
+    public final boolean prepare(final GammaTransaction tx, final GammaRefTranlocal tranlocal) {
+        final int mode = tranlocal.getMode();
+
         if (mode == TRANLOCAL_CONSTRUCTING) {
             return true;
         }
 
         if (mode == TRANLOCAL_READ) {
-            return true;
+            return !tranlocal.writeSkewCheck
+                    || tryLockAndCheckConflict(tx.config.spinCount, tranlocal, LOCKMODE_READ);
         }
 
         if (mode == TRANLOCAL_COMMUTING) {
@@ -149,7 +160,8 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             }
 
             if (!isDirty) {
-                return true;
+                return !tranlocal.writeSkewCheck ||
+                        tryLockAndCheckConflict(tx.config.spinCount, tranlocal, LOCKMODE_READ);
             }
 
             tranlocal.setDirty(true);
@@ -386,6 +398,9 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         throw new TodoException();
     }
+    // ============================================================================================
+    // =============================== open for read ==============================================
+    // ============================================================================================
 
     @Override
     public final GammaRefTranlocal openForRead(final GammaTransaction tx, final int lockMode) {
@@ -400,6 +415,12 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         } else {
             return openForRead((MapGammaTransaction) tx, lockMode);
         }
+    }
+
+    private static void initTranlocalForRead(final GammaTransactionConfiguration config, final GammaRefTranlocal tranlocal) {
+        tranlocal.isDirty = false;
+        tranlocal.mode = TRANLOCAL_READ;
+        tranlocal.writeSkewCheck = config.isolationLevel == IsolationLevel.Serializable;
     }
 
     @Override
@@ -421,7 +442,13 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         //noinspection ObjectEquality
         if (tranlocal.owner == this) {
-            if (tranlocal.isCommuting()) {
+            int mode = tranlocal.mode;
+
+            if (mode == TRANLOCAL_CONSTRUCTING) {
+                return tranlocal;
+            }
+
+            if (mode == TRANLOCAL_COMMUTING) {
                 if (!flattenCommute(tx, tranlocal, lockMode)) {
                     throw tx.abortOnReadWriteConflict();
                 }
@@ -442,18 +469,16 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOnTooSmallSize(2);
         }
 
+        initTranlocalForRead(config, tranlocal);
         if (!load(tranlocal, lockMode, config.spinCount, tx.arriveEnabled)) {
             throw tx.abortOnReadWriteConflict();
         }
 
-        tranlocal.isDirty = false;
-        tranlocal.mode = TRANLOCAL_READ;
-        tranlocal.writeSkewCheck = false;
         return tranlocal;
     }
 
     @Override
-    public final GammaRefTranlocal openForRead(final ArrayGammaTransaction tx, int lockMode) {
+    public final GammaRefTranlocal openForRead(final ArrayGammaTransaction tx, int desiredLockMode) {
         if (tx.status != TX_ACTIVE) {
             throw tx.abortOpenForReadOnBadStatus(this);
         }
@@ -471,31 +496,36 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         while (true) {
             if (node == null) {
                 break;
-            } else //noinspection ObjectEquality
-                if (node.owner == this) {
-                    found = node;
-                    break;
-                } else if (node.owner == null) {
-                    newNode = node;
-                    break;
-                } else {
-                    node = node.next;
-                }
+            } else if (node.owner == this) {
+                found = node;
+                break;
+            } else if (node.owner == null) {
+                newNode = node;
+                break;
+            } else {
+                node = node.next;
+            }
         }
 
-        lockMode = config.readLockModeAsInt <= lockMode ? lockMode : config.readLockModeAsInt;
+        desiredLockMode = config.readLockModeAsInt <= desiredLockMode ? desiredLockMode : config.readLockModeAsInt;
 
         if (found != null) {
-            if (found.isCommuting()) {
-                if (!flattenCommute(tx, found, lockMode)) {
+            final int mode = found.mode;
+
+            if (mode == TRANLOCAL_CONSTRUCTING) {
+                return found;
+            }
+
+            if (mode == TRANLOCAL_COMMUTING) {
+                if (!flattenCommute(tx, found, desiredLockMode)) {
                     throw tx.abortOnReadWriteConflict();
                 }
 
                 return found;
             }
 
-            if (lockMode > found.getLockMode()) {
-                if (!tryLockAndCheckConflict(config.spinCount, found, lockMode)) {
+            if (desiredLockMode > found.getLockMode()) {
+                if (!tryLockAndCheckConflict(config.spinCount, found, desiredLockMode)) {
                     throw tx.abortOnReadWriteConflict();
                 }
             }
@@ -508,11 +538,8 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOnTooSmallSize(config.arrayTransactionSize + 1);
         }
 
-        newNode.mode = TRANLOCAL_READ;
-        newNode.isDirty = false;
-        newNode.writeSkewCheck = false;
-
-        if (!load(newNode, lockMode, config.spinCount, tx.arriveEnabled)) {
+        initTranlocalForRead(config, newNode);
+        if (!load(newNode, desiredLockMode, config.spinCount, tx.arriveEnabled)) {
             throw tx.abortOnReadWriteConflict();
         }
 
@@ -531,7 +558,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     }
 
     @Override
-    public final GammaRefTranlocal openForRead(final MapGammaTransaction tx, int lockMode) {
+    public final GammaRefTranlocal openForRead(final MapGammaTransaction tx, int desiredLockMode) {
         if (tx.status != TX_ACTIVE) {
             throw tx.abortOpenForReadOnBadStatus(this);
         }
@@ -543,24 +570,29 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOpenForReadOnBadStm(this);
         }
 
-        lockMode = config.readLockModeAsInt <= lockMode ? lockMode : config.readLockModeAsInt;
+        desiredLockMode = config.readLockModeAsInt <= desiredLockMode ? desiredLockMode : config.readLockModeAsInt;
 
         final int identityHash = identityHashCode();
         final int indexOf = tx.indexOf(this, identityHash);
 
         if (indexOf > -1) {
             final GammaRefTranlocal tranlocal = tx.array[indexOf];
+            final int mode = tranlocal.mode;
 
-            if (tranlocal.isCommuting()) {
-                if (!flattenCommute(tx, tranlocal, lockMode)) {
+            if (mode == TRANLOCAL_CONSTRUCTING) {
+                return tranlocal;
+            }
+
+            if (mode == TRANLOCAL_COMMUTING) {
+                if (!flattenCommute(tx, tranlocal, desiredLockMode)) {
                     throw tx.abortOnReadWriteConflict();
                 }
 
                 return tranlocal;
             }
 
-            if (lockMode > tranlocal.getLockMode()) {
-                if (!tryLockAndCheckConflict(config.spinCount, tranlocal, lockMode)) {
+            if (desiredLockMode > tranlocal.getLockMode()) {
+                if (!tryLockAndCheckConflict(config.spinCount, tranlocal, desiredLockMode)) {
                     throw tx.abortOnReadWriteConflict();
                 }
             }
@@ -569,13 +601,11 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         final GammaRefTranlocal tranlocal = tx.pool.take(this);
-        tranlocal.mode = TRANLOCAL_READ;
-        tranlocal.isDirty = false;
-        tranlocal.writeSkewCheck = false;
+        initTranlocalForRead(config, tranlocal);
         tx.attach(tranlocal, identityHash);
         tx.size++;
 
-        if (!load(tranlocal, lockMode, config.spinCount, tx.arriveEnabled)) {
+        if (!load(tranlocal, desiredLockMode, config.spinCount, tx.arriveEnabled)) {
             throw tx.abortOnReadWriteConflict();
         }
 
@@ -589,6 +619,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         return tranlocal;
     }
+
+    // ============================================================================================
+    // =============================== open for write =============================================
+    // ============================================================================================
 
     @Override
     public final GammaRefTranlocal openForWrite(final GammaTransaction tx, final int lockMode) {
@@ -605,9 +639,14 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
     }
 
+    private static void initTranlocalForWrite(final GammaTransactionConfiguration config, final GammaRefTranlocal tranlocal) {
+        tranlocal.isDirty = !config.dirtyCheck;
+        tranlocal.mode = TRANLOCAL_WRITE;
+        tranlocal.writeSkewCheck = config.isolationLevel == IsolationLevel.Serializable;
+    }
 
     @Override
-    public final GammaRefTranlocal openForWrite(final MapGammaTransaction tx, int lockMode) {
+    public final GammaRefTranlocal openForWrite(final MapGammaTransaction tx, int desiredLockMode) {
         if (tx.status != TX_ACTIVE) {
             throw tx.abortOpenForWriteOnBadStatus(this);
         }
@@ -623,23 +662,28 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOpenForWriteOnReadonly(this);
         }
 
-        lockMode = config.writeLockModeAsInt <= lockMode ? lockMode : config.writeLockModeAsInt;
+        desiredLockMode = config.writeLockModeAsInt <= desiredLockMode ? desiredLockMode : config.writeLockModeAsInt;
 
         final int identityHash = identityHashCode();
 
         final int indexOf = tx.indexOf(this, identityHash);
         if (indexOf > -1) {
-            GammaRefTranlocal tranlocal = tx.array[indexOf];
+            final GammaRefTranlocal tranlocal = tx.array[indexOf];
+            final int mode = tranlocal.mode;
 
-            if (tranlocal.isCommuting()) {
-                if (!flattenCommute(tx, tranlocal, lockMode)) {
+            if (mode == TRANLOCAL_CONSTRUCTING) {
+                return tranlocal;
+            }
+
+            if (mode == TRANLOCAL_COMMUTING) {
+                if (!flattenCommute(tx, tranlocal, desiredLockMode)) {
                     throw tx.abortOnReadWriteConflict();
                 }
                 return tranlocal;
             }
 
-            if (lockMode > tranlocal.getLockMode()) {
-                if (!tryLockAndCheckConflict(config.spinCount, tranlocal, lockMode)) {
+            if (desiredLockMode > tranlocal.getLockMode()) {
+                if (!tryLockAndCheckConflict(config.spinCount, tranlocal, desiredLockMode)) {
                     throw tx.abortOnReadWriteConflict();
                 }
             }
@@ -655,13 +699,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tx.size++;
         tx.hasWrites = true;
 
-        if (!load(tranlocal, lockMode, config.spinCount, tx.arriveEnabled)) {
+        initTranlocalForWrite(config, tranlocal);
+        if (!load(tranlocal, desiredLockMode, config.spinCount, tx.arriveEnabled)) {
             throw tx.abortOnReadWriteConflict();
         }
-
-        tranlocal.setDirty(!config.dirtyCheck);
-        tranlocal.mode = TRANLOCAL_WRITE;
-        tranlocal.writeSkewCheck = false;
 
         if (tx.needsConsistency) {
             if (!tx.isReadConsistent(tranlocal)) {
@@ -675,7 +716,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     }
 
     @Override
-    public final GammaRefTranlocal openForWrite(final MonoGammaTransaction tx, int lockMode) {
+    public final GammaRefTranlocal openForWrite(final MonoGammaTransaction tx, int desiredLockMode) {
         if (tx.status != TX_ACTIVE) {
             throw tx.abortOpenForWriteOnBadStatus(this);
         }
@@ -691,21 +732,27 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOpenForWriteOnReadonly(this);
         }
 
-        lockMode = config.writeLockModeAsInt <= lockMode ? lockMode : config.writeLockModeAsInt;
+        desiredLockMode = config.writeLockModeAsInt <= desiredLockMode ? desiredLockMode : config.writeLockModeAsInt;
 
         final GammaRefTranlocal tranlocal = tx.tranlocal;
 
         //noinspection ObjectEquality
         if (tranlocal.owner == this) {
-            if (tranlocal.isCommuting()) {
-                if (!flattenCommute(tx, tranlocal, lockMode)) {
+            final int mode = tranlocal.mode;
+
+            if (mode == TRANLOCAL_CONSTRUCTING) {
+                return tranlocal;
+            }
+
+            if (mode == TRANLOCAL_COMMUTING) {
+                if (!flattenCommute(tx, tranlocal, desiredLockMode)) {
                     throw tx.abortOnReadWriteConflict();
                 }
                 return tranlocal;
             }
 
-            if (lockMode > tranlocal.getLockMode()) {
-                if (!tryLockAndCheckConflict(config.spinCount, tranlocal, lockMode)) {
+            if (desiredLockMode > tranlocal.getLockMode()) {
+                if (!tryLockAndCheckConflict(config.spinCount, tranlocal, desiredLockMode)) {
                     throw tx.abortOnReadWriteConflict();
                 }
             }
@@ -720,13 +767,11 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOnTooSmallSize(2);
         }
 
-        if (!load(tranlocal, lockMode, config.spinCount, tx.arriveEnabled)) {
+        initTranlocalForWrite(config, tranlocal);
+        if (!load(tranlocal, desiredLockMode, config.spinCount, tx.arriveEnabled)) {
             throw tx.abortOnReadWriteConflict();
         }
 
-        tranlocal.setDirty(!config.dirtyCheck);
-        tranlocal.writeSkewCheck = false;
-        tranlocal.mode = TRANLOCAL_WRITE;
         tx.hasWrites = true;
         return tranlocal;
     }
@@ -754,16 +799,15 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         while (true) {
             if (node == null) {
                 break;
-            } else //noinspection ObjectEquality
-                if (node.owner == this) {
-                    found = node;
-                    break;
-                } else if (node.owner == null) {
-                    newNode = node;
-                    break;
-                } else {
-                    node = node.next;
-                }
+            } else if (node.owner == this) {
+                found = node;
+                break;
+            } else if (node.owner == null) {
+                newNode = node;
+                break;
+            } else {
+                node = node.next;
+            }
         }
 
         lockMode = config.writeLockModeAsInt > lockMode ? config.writeLockModeAsInt : lockMode;
@@ -771,7 +815,13 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         if (found != null) {
             tx.shiftInFront(found);
 
-            if (found.isCommuting()) {
+            final int mode = found.mode;
+
+            if (mode == TRANLOCAL_CONSTRUCTING) {
+                return found;
+            }
+
+            if (mode == TRANLOCAL_COMMUTING) {
                 if (!flattenCommute(tx, found, lockMode)) {
                     throw tx.abortOnReadWriteConflict();
                 }
@@ -794,6 +844,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOnTooSmallSize(config.arrayTransactionSize + 1);
         }
 
+        initTranlocalForWrite(config, newNode);
         if (!load(newNode, lockMode, config.spinCount, tx.arriveEnabled)) {
             throw tx.abortOnReadWriteConflict();
         }
@@ -806,9 +857,6 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             tx.needsConsistency = true;
         }
 
-        newNode.mode = TRANLOCAL_WRITE;
-        newNode.setDirty(!config.dirtyCheck);
-        newNode.writeSkewCheck = false;
         tx.needsConsistency = true;
         tx.hasWrites = true;
         tx.size++;
@@ -816,11 +864,15 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         return newNode;
     }
 
-    public final void openForCommute(final Transaction tx, final Function function) {
-        openForCommute((GammaTransaction) tx, function);
-    }
+    // ============================================================================================
+    // ================================= open for commute =========================================
+    // ============================================================================================
 
     public final void openForCommute(final GammaTransaction tx, final Function function) {
+        if (tx == null) {
+            throw new NullPointerException("tx can't be null");
+        }
+
         if (tx instanceof MonoGammaTransaction) {
             openForCommute((MonoGammaTransaction) tx, function);
         } else if (tx instanceof ArrayGammaTransaction) {
@@ -828,6 +880,13 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         } else {
             openForCommute((MapGammaTransaction) tx, function);
         }
+    }
+
+    private void initTranlocalForCommute(final GammaTransactionConfiguration config, final GammaRefTranlocal tranlocal) {
+        tranlocal.owner = this;
+        tranlocal.mode = TRANLOCAL_COMMUTING;
+        tranlocal.isDirty = !config.dirtyCheck;
+        tranlocal.writeSkewCheck = false;
     }
 
     public final void openForCommute(final MonoGammaTransaction tx, final Function function) {
@@ -885,10 +944,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         tx.hasWrites = true;
-        tranlocal.owner = this;
-        tranlocal.mode = TRANLOCAL_COMMUTING;
-        tranlocal.isDirty = !config.dirtyCheck;
-        tranlocal.writeSkewCheck = false;
+        initTranlocalForCommute(config, tranlocal);
         tranlocal.addCommutingFunction(tx.pool, function);
     }
 
@@ -965,10 +1021,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tx.size++;
         tx.shiftInFront(newNode);
         tx.hasWrites = true;
-        newNode.mode = TRANLOCAL_COMMUTING;
-        newNode.isDirty = !config.dirtyCheck;
-        newNode.owner = this;
-        newNode.writeSkewCheck = false;
+        initTranlocalForCommute(config, newNode);
         newNode.addCommutingFunction(tx.pool, function);
     }
 
@@ -1001,6 +1054,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         if (indexOf > -1) {
             final GammaRefTranlocal tranlocal = tx.array[indexOf];
+
             if (tranlocal.isCommuting()) {
                 tranlocal.addCommutingFunction(tx.pool, function);
                 return;
@@ -1024,8 +1078,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         final GammaRefTranlocal tranlocal = tx.pool.take(this);
-        tranlocal.mode = TRANLOCAL_COMMUTING;
-        tranlocal.writeSkewCheck = false;
+        initTranlocalForCommute(config, tranlocal);
         tx.hasWrites = true;
         tx.attach(tranlocal, identityHash);
         tx.size++;
@@ -1063,7 +1116,6 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         int attempt = 1;
         do {
             if (!hasCommitLock()) {
-
                 long read = long_value;
 
                 if (!hasCommitLock()) {
@@ -1083,9 +1135,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         int attempt = 1;
         do {
             if (!hasCommitLock()) {
-
                 Object read = ref_value;
-
                 if (!hasCommitLock()) {
                     return read;
                 }

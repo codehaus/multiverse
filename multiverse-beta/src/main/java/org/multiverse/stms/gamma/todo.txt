@@ -2,25 +2,29 @@
                         to do
 --------------------------------------------------------------------
 
-- stm conflict detection
-
 - commute: while commuting, no transaction accessed allowed.
-
-- transaction: copy for speculative failure
 
 - readonly/readbiased
 
 - read consistency
 
-- write skew
-
 - speculative size for full conflict scan
 
 - add constructing state for tranlocal
 
-- add commuting state for tranlocal
-
 - transaction template.
+
+- open for construction
+
+- last readwrite conflict should show which transactional object caused it.
+
+--------------------------------------------------------------------
+                        done
+--------------------------------------------------------------------
+
+- transaction: copy for speculative failure
+
+- stm conflict detection
 
 - commute for int ref
 
@@ -30,11 +34,9 @@
 
 - commute for ref
 
-- open for construction
+- add commuting state for tranlocal
 
---------------------------------------------------------------------
-                        done
---------------------------------------------------------------------
+- write skew
 
 - mono tx comit and different types
 
