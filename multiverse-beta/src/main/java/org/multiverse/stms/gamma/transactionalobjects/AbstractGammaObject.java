@@ -398,8 +398,6 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
     }
 
-
-
     @Override
     public final boolean tryLockAndCheckConflict(
             final int spinCount,

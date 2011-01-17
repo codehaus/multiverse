@@ -14,7 +14,6 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -36,6 +35,23 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
     protected abstract T newTransaction(GammaTransactionConfiguration config);
 
     protected abstract int getMaxCapacity();
+
+    @Test
+    public void whenMultipleCommutesOnSingleRef() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        ref.commute(tx,Functions.newIncLongFunction());
+        ref.commute(tx,Functions.newIncLongFunction());
+        ref.commute(tx,Functions.newIncLongFunction());
+        tx.commit();
+
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion+1, initialValue+3);
+
+    }
 
     @Test
     public void whenAlreadyOpenedForRead() {
@@ -192,7 +208,7 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
 
     }
 
-     @Test
+    @Test
     public void whenOverflowing() {
         int maxCapacity = getMaxCapacity();
         assumeTrue(maxCapacity < Integer.MAX_VALUE);
@@ -211,7 +227,7 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
         }
 
         assertEquals(TransactionStatus.Aborted, tx.getStatus());
-        assertEquals(maxCapacity+1, tx.getConfiguration().getSpeculativeConfiguration().minimalLength);
+        assertEquals(maxCapacity + 1, tx.getConfiguration().getSpeculativeConfiguration().minimalLength);
     }
 
     @Test
