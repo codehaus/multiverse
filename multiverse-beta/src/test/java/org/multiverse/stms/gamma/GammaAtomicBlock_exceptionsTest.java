@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta;
+package org.multiverse.stms.gamma;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -6,26 +6,25 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.InvisibleCheckedException;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
-public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
-    private BetaStm stm;
+public class GammaAtomicBlock_exceptionsTest implements GammaConstants {
+    private GammaStm stm;
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = new GammaStm();
         clearThreadLocalTransaction();
     }
 
     @Test
     public void executeChecked_whenCheckedExceptionThrown() {
         AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
-        final BetaLongRef ref = newLongRef(stm, 10);
+        final GammaLongRef ref = new GammaLongRef(stm, 10);
 
         final Exception ex = new Exception();
 
@@ -33,8 +32,8 @@ public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
             block.executeChecked(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-                    btx.openForWrite(ref, LOCKMODE_NONE).value++;
+                    GammaTransaction btx = (GammaTransaction) tx;
+                    ref.openForWrite(btx, LOCKMODE_NONE).long_value++;
                     throw ex;
                 }
             });
@@ -49,7 +48,7 @@ public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
     @Test
     public void executeChecked_whenRuntimeExceptionThrown() throws Exception {
         AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
-        final BetaLongRef ref = newLongRef(stm, 10);
+        final GammaLongRef ref = new GammaLongRef(stm, 10);
 
         final RuntimeException ex = new RuntimeException();
 
@@ -57,8 +56,8 @@ public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
             block.executeChecked(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-                    btx.openForWrite(ref, LOCKMODE_NONE).value++;
+                    GammaTransaction btx = (GammaTransaction) tx;
+                    ref.openForWrite(btx, LOCKMODE_NONE).long_value++;
                     throw ex;
                 }
             });
@@ -74,7 +73,7 @@ public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
     @Test
     public void executeChecked_whenErrorThrown() throws Exception {
         AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
-        final BetaLongRef ref = newLongRef(stm, 10);
+        final GammaLongRef ref = new GammaLongRef(stm, 10);
 
         final Error ex = new Error();
 
@@ -82,8 +81,8 @@ public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
             block.executeChecked(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-                    btx.openForWrite(ref, LOCKMODE_NONE).value++;
+                    GammaTransaction btx = (GammaTransaction) tx;
+                    ref.openForWrite(btx, LOCKMODE_NONE).long_value++;
                     throw ex;
                 }
             });
@@ -98,7 +97,7 @@ public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
     @Test
     public void execute_whenCheckedExceptionThrown() {
         AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
-        final BetaLongRef ref = newLongRef(stm, 10);
+        final GammaLongRef ref = new GammaLongRef(stm, 10);
 
         final Exception ex = new Exception();
 
@@ -106,8 +105,8 @@ public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
             block.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-                    btx.openForWrite(ref, LOCKMODE_NONE).value++;
+                    GammaTransaction btx = (GammaTransaction) tx;
+                    ref.openForWrite(btx, LOCKMODE_NONE).long_value++;
                     throw ex;
                 }
             });
@@ -122,7 +121,7 @@ public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
     @Test
     public void execute_whenRuntimeExceptionThrown() {
         AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
-        final BetaLongRef ref = newLongRef(stm, 10);
+        final GammaLongRef ref = new GammaLongRef(stm, 10);
 
         final RuntimeException ex = new RuntimeException();
 
@@ -130,8 +129,8 @@ public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
             block.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-                    btx.openForWrite(ref, LOCKMODE_NONE).value++;
+                    GammaTransaction btx = (GammaTransaction) tx;
+                    ref.openForWrite(btx, LOCKMODE_NONE).long_value++;
                     throw ex;
                 }
             });
@@ -147,7 +146,7 @@ public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
     @Test
     public void execute_whenErrorThrown() {
         AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
-        final BetaLongRef ref = newLongRef(stm, 10);
+        final GammaLongRef ref = new GammaLongRef(stm, 10);
 
         final Error ex = new Error();
 
@@ -155,8 +154,8 @@ public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
             block.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-                    btx.openForWrite(ref, LOCKMODE_NONE).value++;
+                    GammaTransaction btx = (GammaTransaction) tx;
+                    ref.openForWrite(btx, LOCKMODE_NONE).long_value++;
                     throw ex;
                 }
             });

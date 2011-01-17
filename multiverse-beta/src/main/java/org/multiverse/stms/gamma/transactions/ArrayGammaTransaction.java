@@ -41,9 +41,11 @@ public final class ArrayGammaTransaction extends GammaTransaction {
             return true;
         }
 
-        if (config.writeLockModeAsInt > LOCKMODE_NONE) {
+        if (config.readLockModeAsInt > LOCKMODE_NONE) {
             return true;
         }
+
+        //if(config.isolationLevel)
 
         if (arriveEnabled) {
 

@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta;
+package org.multiverse.stms.gamma;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -7,32 +7,33 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicLongClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
 
 import static org.junit.Assert.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
-public class BetaAtomicBlock_integrationTest implements BetaStmConstants {
+public class GammaAtomicBlock_integrationTest implements GammaConstants {
 
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = new GammaStm();
+        clearThreadLocalTransaction();
     }
 
 
     @Test
     public void whenRead() {
-        final BetaLongRef ref = newLongRef(stm, 10);
+        final GammaLongRef ref = new GammaLongRef(stm, 10);
 
         AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
         long result = block.execute(new AtomicLongClosure() {
             @Override
             public long execute(Transaction tx) throws Exception {
-                assertSame(tx,getThreadLocalTransaction()) ;
+                assertSame(tx, getThreadLocalTransaction());
                 return ref.get(tx);
             }
         });
@@ -43,7 +44,7 @@ public class BetaAtomicBlock_integrationTest implements BetaStmConstants {
 
     @Test
     public void whenUpdate() {
-        final BetaLongRef ref = newLongRef(stm, 0);
+        final GammaLongRef ref = new GammaLongRef(stm, 0);
 
         AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
         block.execute(new AtomicVoidClosure() {
@@ -58,10 +59,10 @@ public class BetaAtomicBlock_integrationTest implements BetaStmConstants {
 
     @Test
     public void whenTooManyRetries() {
-        final BetaLongRef ref = newLongRef(stm);
+        final GammaLongRef ref = new GammaLongRef(stm);
 
-        FatMonoBetaTransaction otherTx = new FatMonoBetaTransaction(stm);
-        otherTx.openForWrite(ref, LOCKMODE_EXCLUSIVE);
+        MonoGammaTransaction otherTx = new MonoGammaTransaction(stm);
+        ref.openForWrite(otherTx, LOCKMODE_EXCLUSIVE);
 
         try {
             AtomicBlock block = stm.newTransactionFactoryBuilder()
@@ -82,7 +83,7 @@ public class BetaAtomicBlock_integrationTest implements BetaStmConstants {
 
     @Test
     public void whenMultipleUpdatesDoneInSingleTransaction() {
-        final BetaLongRef ref = newLongRef(stm);
+        final GammaLongRef ref = new GammaLongRef(stm);
 
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(false)

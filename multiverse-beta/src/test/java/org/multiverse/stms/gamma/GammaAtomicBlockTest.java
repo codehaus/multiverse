@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta;
+package org.multiverse.stms.gamma;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,15 +12,15 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class BetaAtomicBlockTest {
+public class GammaAtomicBlockTest {
 
-    private BetaStm stm;
+    private GammaStm stm;
     private AtomicBlock block;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = new BetaStm();
+        stm = new GammaStm();
         block = stm.newTransactionFactoryBuilder()
                 .buildAtomicBlock();
     }

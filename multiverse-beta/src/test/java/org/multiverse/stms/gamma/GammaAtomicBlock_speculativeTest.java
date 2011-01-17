@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta;
+package org.multiverse.stms.gamma;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -6,39 +6,38 @@ import org.junit.Test;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.api.functions.LongFunction;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactions.*;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.ArrayGammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactions.MapGammaTransaction;
+import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.multiverse.TestUtils.assertInstanceof;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
-public class BetaAtomicBlock_speculativeTest implements BetaStmConstants {
+public class GammaAtomicBlock_speculativeTest implements GammaConstants {
 
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = new GammaStm();
     }
 
     @Test
     public void whenTransactionGrowing() {
-        final BetaLongRef[] refs = new BetaLongRef[1000];
+        final GammaLongRef[] refs = new GammaLongRef[1000];
         for (int k = 0; k < refs.length; k++) {
-            refs[k] = newLongRef(stm);
+            refs[k] = new GammaLongRef(stm);
         }
 
-        final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
+        final List<GammaTransaction> transactions = new LinkedList<GammaTransaction>();
         final AtomicInteger attempt = new AtomicInteger(1);
 
         AtomicBlock block = stm.newTransactionFactoryBuilder()
@@ -49,31 +48,31 @@ public class BetaAtomicBlock_speculativeTest implements BetaStmConstants {
             @Override
             public void execute(Transaction tx) throws Exception {
                 assertSame(tx, getThreadLocalTransaction());
-                BetaTransaction btx = (BetaTransaction) tx;
+                GammaTransaction btx = (GammaTransaction) tx;
                 assertEquals(attempt.get(), tx.getAttempt());
                 attempt.incrementAndGet();
 
                 transactions.add(btx);
-                for (BetaLongRef ref : refs) {
-                    btx.openForWrite(ref, LOCKMODE_NONE).value = 1;
+                for (GammaLongRef ref : refs) {
+                    ref.openForWrite(btx, LOCKMODE_NONE).long_value = 1;
                 }
             }
         });
 
-        for (BetaLongRef ref : refs) {
+        for (GammaLongRef ref : refs) {
             assertEquals(1, ref.atomicGet());
         }
 
         assertEquals(3, transactions.size());
-        assertInstanceof(LeanMonoBetaTransaction.class, transactions.get(0));
-        assertInstanceof(LeanArrayBetaTransaction.class, transactions.get(1));
-        assertInstanceof(LeanArrayTreeBetaTransaction.class, transactions.get(2));
+        assertInstanceof(MonoGammaTransaction.class, transactions.get(0));
+        assertInstanceof(ArrayGammaTransaction.class, transactions.get(1));
+        assertInstanceof(MapGammaTransaction.class, transactions.get(2));
     }
 
     /*
     @Test
     public void whenPermanentListenerAdded() {
-        final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
+        final List<GammaTransaction> transactions = new LinkedList<GammaTransaction>();
         final AtomicBoolean added = new AtomicBoolean();
         final TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
 
@@ -84,7 +83,7 @@ public class BetaAtomicBlock_speculativeTest implements BetaStmConstants {
         block.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                BetaTransaction btx = (BetaTransaction) tx;
+                GammaTransaction btx = (GammaTransaction) tx;
                 transactions.add(btx);
                 if (!added.get()) {
                     btx.registerPermanent( listener);
@@ -93,14 +92,16 @@ public class BetaAtomicBlock_speculativeTest implements BetaStmConstants {
         });
 
         assertEquals(2, transactions.size());
-        assertTrue(transactions.get(0) instanceof LeanMonoBetaTransaction);
-        assertTrue(transactions.get(1) instanceof FatMonoBetaTransaction);
+        assertTrue(transactions.get(0) instanceof LeanMonoGammaTransaction);
+        assertTrue(transactions.get(1) instanceof FatMonoGammaTransaction);
     }           */
 
     @Test
+    @Ignore
     public void whenCommute() {
-        final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
-        final BetaLongRef ref = newLongRef(stm);
+        /*
+        final List<GammaTransaction> transactions = new LinkedList<GammaTransaction>();
+        final GammaLongRef ref = new GammaLongRef(stm);
         final LongFunction function = mock(LongFunction.class);
 
         AtomicBlock block = stm.newTransactionFactoryBuilder()
@@ -111,20 +112,23 @@ public class BetaAtomicBlock_speculativeTest implements BetaStmConstants {
             @Override
             public void execute(Transaction tx) throws Exception {
                 assertSame(tx, getThreadLocalTransaction());
-                BetaTransaction btx = (BetaTransaction) tx;
+                GammaTransaction btx = (GammaTransaction) tx;
                 transactions.add(btx);
                 btx.commute(ref, function);
             }
         });
 
         assertEquals(2, transactions.size());
-        assertTrue(transactions.get(0) instanceof LeanMonoBetaTransaction);
-        assertTrue(transactions.get(1) instanceof FatMonoBetaTransaction);
+        assertTrue(transactions.get(0) instanceof LeanMonoGammaTransaction);
+        assertTrue(transactions.get(1) instanceof FatMonoGammaTransaction);
+        */
     }
 
     @Test
+    @Ignore
     public void whenNormalListenerAdded() {
-        final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
+        /*
+        final List<GammaTransaction> transactions = new LinkedList<GammaTransaction>();
         final AtomicBoolean added = new AtomicBoolean();
         final TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
 
@@ -136,7 +140,7 @@ public class BetaAtomicBlock_speculativeTest implements BetaStmConstants {
             @Override
             public void execute(Transaction tx) throws Exception {
                 assertSame(tx, getThreadLocalTransaction());
-                BetaTransaction btx = (BetaTransaction) tx;
+                GammaTransaction btx = (GammaTransaction) tx;
                 transactions.add(btx);
 
                 if (!added.get()) {
@@ -147,8 +151,8 @@ public class BetaAtomicBlock_speculativeTest implements BetaStmConstants {
         });
 
         assertEquals(2, transactions.size());
-        assertTrue(transactions.get(0) instanceof LeanMonoBetaTransaction);
-        assertTrue(transactions.get(1) instanceof FatMonoBetaTransaction);
+        assertTrue(transactions.get(0) instanceof LeanMonoGammaTransaction);
+        assertTrue(transactions.get(1) instanceof FatMonoGammaTransaction);    */
     }
 
     @Test
@@ -159,10 +163,10 @@ public class BetaAtomicBlock_speculativeTest implements BetaStmConstants {
 
     @Test
     public void whenTimeoutAvailable_thenCopied() {
-        final BetaLongRef ref1 = newLongRef(stm);
-        final BetaLongRef ref2 = newLongRef(stm);
+        final GammaLongRef ref1 = new GammaLongRef(stm);
+        final GammaLongRef ref2 = new GammaLongRef(stm);
 
-        final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
+        final List<GammaTransaction> transactions = new LinkedList<GammaTransaction>();
 
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setTimeoutNs(1000)
@@ -173,17 +177,17 @@ public class BetaAtomicBlock_speculativeTest implements BetaStmConstants {
             @Override
             public void execute(Transaction tx) throws Exception {
                 assertSame(tx, getThreadLocalTransaction());
-                BetaTransaction btx = (BetaTransaction) tx;
+                GammaTransaction btx = (GammaTransaction) tx;
                 transactions.add(btx);
 
                 if (transactions.size() == 1) {
-                    btx.setRemainingTimeoutNs(500);
+                    btx.remainingTimeoutNs = 500;
                 } else {
                     assertEquals(500, btx.getRemainingTimeoutNs());
                 }
 
-                btx.openForWrite(ref1, LOCKMODE_NONE);
-                btx.openForWrite(ref2, LOCKMODE_NONE);
+                ref1.openForWrite(btx, LOCKMODE_NONE);
+                ref2.openForWrite(btx, LOCKMODE_NONE);
             }
         });
     }

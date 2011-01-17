@@ -1,33 +1,32 @@
-package org.multiverse.stms.beta;
+package org.multiverse.stms.gamma;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
-public class BetaAtomicBlock_blockingTest {
+public class GammaAtomicBlock_blockingTest {
 
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = new GammaStm();
         clearThreadLocalTransaction();
     }
 
     @Test
     public void test() {
-        final BetaLongRef ref = newLongRef(stm);
+        final GammaLongRef ref = new GammaLongRef(stm);
 
         WaitThread t = new WaitThread(ref);
         t.start();
@@ -38,9 +37,9 @@ public class BetaAtomicBlock_blockingTest {
         stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                BetaTransaction btx = (BetaTransaction) tx;
-                BetaLongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
-                write.value = 1;
+                GammaTransaction btx = (GammaTransaction) tx;
+                GammaRefTranlocal write = ref.openForWrite(btx, LOCKMODE_NONE);
+                write.long_value = 1;
             }
         });
 
@@ -49,9 +48,9 @@ public class BetaAtomicBlock_blockingTest {
     }
 
     class WaitThread extends TestThread {
-        final BetaLongRef ref;
+        final GammaLongRef ref;
 
-        public WaitThread(BetaLongRef ref) {
+        public WaitThread(GammaLongRef ref) {
             this.ref = ref;
         }
 
@@ -60,13 +59,13 @@ public class BetaAtomicBlock_blockingTest {
             stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-                    BetaLongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
-                    if (write.value == 0) {
+                    GammaTransaction btx = (GammaTransaction) tx;
+                    GammaRefTranlocal write = ref.openForWrite(btx, LOCKMODE_NONE);
+                    if (write.long_value == 0) {
                         retry();
                     }
 
-                    write.value++;
+                    write.long_value++;
                 }
             });
         }

@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta;
+package org.multiverse.stms.gamma;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -7,9 +7,9 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.RetryTimeoutException;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import java.util.concurrent.TimeUnit;
 
@@ -17,19 +17,18 @@ import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
-public class BetaAtomicBlock_timeoutTest {
+public class GammaAtomicBlock_timeoutTest {
 
-    private BetaStm stm;
-    private BetaLongRef ref;
+    private GammaStm stm;
+    private GammaLongRef ref;
     private long timeoutNs;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = new BetaStm();
-        ref = newLongRef(stm);
+        stm = new GammaStm();
+        ref = new GammaLongRef(stm);
         timeoutNs = TimeUnit.SECONDS.toNanos(2);
     }
 
@@ -64,8 +63,8 @@ public class BetaAtomicBlock_timeoutTest {
         stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                BetaTransaction btx = (BetaTransaction) tx;
-                btx.openForWrite(ref, LOCKMODE_NONE).value = 1;
+                GammaTransaction btx = (GammaTransaction) tx;
+                ref.openForWrite(btx, LOCKMODE_NONE).long_value = 1;
             }
         });
 
@@ -79,8 +78,8 @@ public class BetaAtomicBlock_timeoutTest {
         stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                BetaTransaction btx = (BetaTransaction) tx;
-                btx.openForWrite(ref, LOCKMODE_NONE).value = 1;
+                GammaTransaction btx = (GammaTransaction) tx;
+                ref.openForWrite(btx, LOCKMODE_NONE).long_value = 1;
             }
         });
 
@@ -110,14 +109,14 @@ public class BetaAtomicBlock_timeoutTest {
             block.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
+                    GammaTransaction btx = (GammaTransaction) tx;
 
-                    BetaLongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
-                    if (write.value == 0) {
+                    GammaRefTranlocal write = ref.openForWrite(btx, LOCKMODE_NONE);
+                    if (write.long_value == 0) {
                         retry();
                     }
 
-                    write.value = 2;
+                    write.long_value = 2;
                 }
             });
         }

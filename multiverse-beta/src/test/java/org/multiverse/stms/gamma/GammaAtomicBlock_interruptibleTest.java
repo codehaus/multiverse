@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta;
+package org.multiverse.stms.gamma;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -7,9 +7,10 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.RetryInterruptedException;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.beta.BetaStmConstants;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import java.util.concurrent.TimeUnit;
 
@@ -18,21 +19,20 @@ import static org.multiverse.TestUtils.assertAlive;
 import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
-public class BetaAtomicBlock_interruptibleTest implements BetaStmConstants {
+public class GammaAtomicBlock_interruptibleTest implements BetaStmConstants {
 
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = new BetaStm();
+        stm = new GammaStm();
     }
 
     @Test
     public void whenNoTimeoutAndInterruptible() throws InterruptedException {
-        final BetaLongRef ref = newLongRef(stm);
+        final GammaLongRef ref = new GammaLongRef(stm);
 
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setInterruptible(true)
@@ -55,7 +55,7 @@ public class BetaAtomicBlock_interruptibleTest implements BetaStmConstants {
 
     @Test
     public void whenTimeoutAndInterruptible() throws InterruptedException {
-        final BetaLongRef ref = newLongRef(stm);
+        final GammaLongRef ref = new GammaLongRef(stm);
 
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setTimeoutNs(TimeUnit.SECONDS.toNanos(10))
@@ -79,10 +79,10 @@ public class BetaAtomicBlock_interruptibleTest implements BetaStmConstants {
 
 
     class WaitWithoutTimeoutThread extends TestThread {
-        final BetaLongRef ref;
+        final GammaLongRef ref;
         private AtomicBlock block;
 
-        public WaitWithoutTimeoutThread(BetaLongRef ref, AtomicBlock block) {
+        public WaitWithoutTimeoutThread(GammaLongRef ref, AtomicBlock block) {
             this.ref = ref;
             this.block = block;
         }
@@ -92,13 +92,13 @@ public class BetaAtomicBlock_interruptibleTest implements BetaStmConstants {
             block.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    BetaTransaction btx = (BetaTransaction) tx;
-                    BetaLongRefTranlocal write = btx.openForWrite(ref, LOCKMODE_NONE);
-                    if (write.value == 0) {
+                    GammaTransaction btx = (GammaTransaction) tx;
+                    GammaRefTranlocal write = ref.openForWrite(btx, LOCKMODE_NONE);
+                    if (write.long_value == 0) {
                         retry();
                     }
 
-                    write.value = 100;
+                    write.long_value = 100;
                 }
             });
         }
