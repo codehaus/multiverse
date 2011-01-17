@@ -327,7 +327,7 @@ public class GammaLongRef_commute1Test {
     }
 
     @Test
-    public void whenCommitLockByOther_thenCommuteSucceedsButCommitFails() {
+    public void whenExclusiveLockByOther_thenCommuteSucceedsButCommitFails() {
         GammaLongRef ref = new GammaLongRef(stm, 2);
         long version = ref.getVersion();
 

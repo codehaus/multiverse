@@ -85,7 +85,7 @@ public class Orec_unlockByUnregisteredTest {
     }
 
     @Test
-    public void readBiased_whenCommitLockAcquired() {
+    public void readBiased_whenExclusiveLockAcquired() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
         orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
 

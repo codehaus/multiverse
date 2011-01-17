@@ -199,7 +199,7 @@ public class GammaLongRef_incrementAndGet1Test {
     }
 
     @Test
-    public void whenCommitLockAlreadyAcquiredBySelf_thenSuccess() {
+    public void whenExclusiveLockAlreadyAcquiredBySelf_thenSuccess() {
         GammaLongRef ref = new GammaLongRef(stm, 10);
 
         GammaTransaction tx = transactionFactory.newTransaction();
@@ -216,7 +216,7 @@ public class GammaLongRef_incrementAndGet1Test {
     }
 
     @Test
-    public void whenCommitLockAcquiredByOther_thenReadConflict() {
+    public void whenExclusiveLockAcquiredByOther_thenReadConflict() {
         GammaLongRef ref = new GammaLongRef(stm, 10);
         long version = ref.getVersion();
 

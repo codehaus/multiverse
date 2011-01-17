@@ -133,7 +133,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
     }
 
     @Test
-    public void locking_whenNotLockedByOtherAndCommitLockNeeded() {
+    public void locking_whenNotLockedByOtherAndExclusiveLockNeeded() {
         long initialValue = 10;
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
@@ -236,7 +236,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
     }
 
     @Test
-    public void locking_whenReadLockedByOtherAndCommitLockNeeded() {
+    public void locking_whenReadLockedByOtherAndExclusiveLockNeeded() {
         long initialValue = 10;
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
@@ -326,7 +326,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
     }
 
     @Test
-    public void locking_whenWriteLockedByOtherAndCommitLockNeeded() {
+    public void locking_whenWriteLockedByOtherAndExclusiveLockNeeded() {
         long initialValue = 10;
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
@@ -347,7 +347,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
     }
 
     @Test
-    public void locking_whenCommitLockedByOtherAndNoLockNeeded() {
+    public void locking_whenExclusiveLockedByOtherAndNoLockNeeded() {
         long initialValue = 10;
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
@@ -368,7 +368,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
     }
 
     @Test
-    public void locking_whenCommitLockedByOtherAndReadLockNeeded() {
+    public void locking_whenExclusiveLockedByOtherAndReadLockNeeded() {
         long initialValue = 10;
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
@@ -389,7 +389,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
     }
 
     @Test
-    public void locking_whenCommitLockedByOtherAndWriteLockNeeded() {
+    public void locking_whenExclusiveLockedByOtherAndWriteLockNeeded() {
         long initialValue = 10;
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
@@ -410,7 +410,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
     }
 
     @Test
-    public void locking_whenCommitLockedByOtherAndCommitLockNeeded() {
+    public void locking_whenExclusiveLockedByOtherAndExclusiveLockNeeded() {
         long initialValue = 10;
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();

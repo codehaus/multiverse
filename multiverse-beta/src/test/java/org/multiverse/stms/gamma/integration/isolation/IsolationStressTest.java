@@ -71,12 +71,12 @@ public class IsolationStressTest implements GammaConstants {
     }
 
     @Test
-    public void withCommitLockAndDirtyCheck() {
+    public void withExclusiveLockAndDirtyCheck() {
         test(LockMode.Exclusive, true);
     }
 
     @Test
-    public void withCommitLockNoDirtyCheck() {
+    public void withExclusiveLockNoDirtyCheck() {
         test(LockMode.Exclusive, false);
     }
 

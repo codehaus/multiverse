@@ -462,7 +462,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
     }
 
     @Test
-    public void conflict_dirty_whenCommitLockedByOther() {
+    public void conflict_dirty_whenExclusiveLockedByOther() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();

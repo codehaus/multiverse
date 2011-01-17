@@ -45,7 +45,7 @@ public class GammaRef_getTest {
 
     @Test
     @Ignore
-    public void locked_commitLockAcquired() {
+    public void locked_exclusiveLockAcquired() {
 
     }
 

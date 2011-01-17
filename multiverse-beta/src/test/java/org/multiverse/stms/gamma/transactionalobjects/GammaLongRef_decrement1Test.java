@@ -139,7 +139,7 @@ public class GammaLongRef_decrement1Test {
     }
 
     @Test
-    public void whenCommitLockAcquiredByOther_thenDecrementSucceedsButCommitFails() {
+    public void whenExclusiveLockAcquiredByOther_thenDecrementSucceedsButCommitFails() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();

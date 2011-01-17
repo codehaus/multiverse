@@ -122,7 +122,7 @@ public class GammaLongRef_ensure1Test {
     }
 
     @Test
-    public void whenCommitLockAcquiredBySelf() {
+    public void whenExclusiveLockAcquiredBySelf() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();

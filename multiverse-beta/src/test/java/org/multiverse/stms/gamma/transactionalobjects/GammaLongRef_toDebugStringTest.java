@@ -19,7 +19,7 @@ public class GammaLongRef_toDebugStringTest {
     public void test() {
         GammaLongRef ref = new GammaLongRef(stm);
         String s = ref.toDebugString();
-        assertEquals("GammaLongRef{orec=Orec(hasCommitLock=false, hasUpdateLock=false, readLocks=0, surplus=0, " +
+        assertEquals("GammaLongRef{orec=Orec(hasExclusiveLock=false, hasUpdateLock=false, readLocks=0, surplus=0, " +
                 "isReadBiased=false, readonlyCount=0), version=1, value=0, hasListeners=false)", s);
     }
 }

@@ -10,7 +10,7 @@ import static org.junit.Assert.fail;
 import static org.multiverse.stms.gamma.GammaTestUtils.assertLockMode;
 import static org.multiverse.stms.gamma.GammaTestUtils.assertSurplus;
 
-public class Orec_upgradeWriteLockToCommitLockTest implements GammaConstants {
+public class Orec_upgradeWriteLockToExclusiveLockTest implements GammaConstants {
 
     private GammaStm stm;
 
@@ -24,7 +24,7 @@ public class Orec_upgradeWriteLockToCommitLockTest implements GammaConstants {
         GammaLongRef ref = new GammaLongRef(stm);
 
         try {
-            ref.upgradeToCommitLock();
+            ref.upgradeToExclusiveLock();
             fail();
         } catch (PanicError expected) {
 
@@ -40,7 +40,7 @@ public class Orec_upgradeWriteLockToCommitLockTest implements GammaConstants {
         ref.tryLockAndArrive(1, LOCKMODE_READ);
 
         try {
-            ref.upgradeToCommitLock();
+            ref.upgradeToExclusiveLock();
             fail();
         } catch (PanicError expected) {
 
@@ -55,18 +55,18 @@ public class Orec_upgradeWriteLockToCommitLockTest implements GammaConstants {
         GammaLongRef ref = new GammaLongRef(stm);
         ref.tryLockAndArrive(1, LOCKMODE_WRITE);
 
-        ref.upgradeToCommitLock();
+        ref.upgradeToExclusiveLock();
 
         assertSurplus(ref, 1);
         assertLockMode(ref, LOCKMODE_EXCLUSIVE);
     }
 
     @Test
-    public void whenCommitLocked() {
+    public void whenExclusiveLocked() {
         GammaLongRef ref = new GammaLongRef(stm);
         ref.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
 
-        ref.upgradeToCommitLock();
+        ref.upgradeToExclusiveLock();
 
         assertSurplus(ref, 1);
         assertLockMode(ref, LOCKMODE_EXCLUSIVE);

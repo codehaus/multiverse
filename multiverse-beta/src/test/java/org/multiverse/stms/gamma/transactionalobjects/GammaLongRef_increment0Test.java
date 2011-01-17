@@ -139,7 +139,7 @@ public class GammaLongRef_increment0Test {
     }
 
     @Test
-    public void whenCommitLockAcquiredByOther_thenIncrementSucceedsButCommitFails() {
+    public void whenExclusiveLockAcquiredByOther_thenIncrementSucceedsButCommitFails() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();

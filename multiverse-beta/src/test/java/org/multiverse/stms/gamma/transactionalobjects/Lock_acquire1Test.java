@@ -248,7 +248,7 @@ public class Lock_acquire1Test {
     }
 
     @Test
-    public void selfLocked_whenCommitLockedAndUpgradeToNone() {
+    public void selfLocked_whenExclusiveLockedAndUpgradeToNone() {
         long initialValue = 10;
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
@@ -263,7 +263,7 @@ public class Lock_acquire1Test {
     }
 
     @Test
-    public void selfLocked_whenCommitLockedAndUpgradeToRead() {
+    public void selfLocked_whenExclusiveLockedAndUpgradeToRead() {
         long initialValue = 10;
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
@@ -278,7 +278,7 @@ public class Lock_acquire1Test {
     }
 
     @Test
-    public void selfLocked_whenCommitLockedAndUpgradeToWrite() {
+    public void selfLocked_whenExclusiveLockedAndUpgradeToWrite() {
         long initialValue = 10;
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
@@ -293,7 +293,7 @@ public class Lock_acquire1Test {
     }
 
     @Test
-    public void selfLocked_whenCommitLockedAndUpgradeToCommit() {
+    public void selfLocked_whenExclusiveLockedAndUpgradeToCommit() {
         long initialValue = 10;
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
@@ -370,7 +370,7 @@ public class Lock_acquire1Test {
     }
 
     @Test
-    public void otherLocked_whenOtherReadLockedAndCommitLockAcquired() {
+    public void otherLocked_whenOtherReadLockedAndExclusiveLockAcquired() {
         long initialValue = 10;
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
@@ -454,7 +454,7 @@ public class Lock_acquire1Test {
     }
 
     @Test
-    public void otherLocked_whenOtherWriteLockedAndCommitLockAcquired() {
+    public void otherLocked_whenOtherWriteLockedAndExclusiveLockAcquired() {
         long initialValue = 10;
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
@@ -476,7 +476,7 @@ public class Lock_acquire1Test {
     }
 
     @Test
-    public void otherLocked_whenOtherCommitLockedAndNoLockAcquired() {
+    public void otherLocked_whenOtherExclusiveLockedAndNoLockAcquired() {
         long initialValue = 10;
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
@@ -498,7 +498,7 @@ public class Lock_acquire1Test {
     }
 
     @Test
-    public void otherLocked_whenOtherCommitLockedAndReadLockAcquired() {
+    public void otherLocked_whenOtherExclusiveLockedAndReadLockAcquired() {
         long initialValue = 10;
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
@@ -520,7 +520,7 @@ public class Lock_acquire1Test {
     }
 
     @Test
-    public void otherLocked_whenOtherCommitLockedAndWriteLockAcquired() {
+    public void otherLocked_whenOtherExclusiveLockedAndWriteLockAcquired() {
         long initialValue = 10;
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
@@ -542,7 +542,7 @@ public class Lock_acquire1Test {
     }
 
     @Test
-    public void otherLocked_whenOtherCommitLockedAndCommitLockAcquired() {
+    public void otherLocked_whenOtherExclusiveLockedAndExclusiveLockAcquired() {
         long initialValue = 10;
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();

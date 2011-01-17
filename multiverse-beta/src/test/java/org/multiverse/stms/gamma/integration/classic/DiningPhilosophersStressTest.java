@@ -41,7 +41,7 @@ public class DiningPhilosophersStressTest implements GammaConstants {
     }
 
     @Test
-    public void whenLockNone() {
+    public void testNoLocking() {
         test(LockMode.None);
     }
 
@@ -56,7 +56,7 @@ public class DiningPhilosophersStressTest implements GammaConstants {
     }
 
     @Test
-    public void testCommitLock() {
+    public void testExclusiveLock() {
         test(LockMode.Exclusive);
     }
 

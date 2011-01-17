@@ -22,7 +22,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     //it is important that the maximum threshold is not larger than 1023 (there are 10 bits for the readonly count)
     private static final int READBIASED_THRESHOLD = 16;
 
-    private static final long BITMASK_COMMITLOCK = 0x8000000000000000L;
+    private static final long BITMASK_EXCLUSIVELOCK = 0x8000000000000000L;
     private static final long BITMASK_UPDATELOCK = 0x4000000000000000L;
     private static final long BITMASK_READBIASED = 0x2000000000000000L;
     private static final long BITMASK_READLOCKS = 0x1FFFFF0000000000L;
@@ -285,16 +285,16 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             return false;
         }
 
-        if (hasCommitLock()) {
+        if (hasExclusiveLock()) {
             return true;
         }
 
         return tranlocal.version != version;
     }
 
-    protected final int arriveAndCommitLockOrBackoff() {
+    protected final int arriveAndAcquireExclusiveLockOrBackoff() {
         for (int k = 0; k <= stm.defaultMaxRetries; k++) {
-            final int arriveStatus = tryCommitLockAndArrive(stm.spinCount);
+            final int arriveStatus = tryExclusiveLockAndArrive(stm.spinCount);
 
             if (arriveStatus != ARRIVE_LOCK_NOT_FREE) {
                 return arriveStatus;
@@ -323,7 +323,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     public final int atomicGetLockModeAsInt() {
         final long current = orec;
 
-        if (hasCommitLock(current)) {
+        if (hasExclusiveLock(current)) {
             return LOCKMODE_EXCLUSIVE;
         }
 
@@ -452,14 +452,14 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
 
         //so we have the write lock, its needs to be upgraded to a commit lock.
-        upgradeToCommitLock();
+        upgradeToExclusiveLock();
         tranlocal.setLockMode(LOCKMODE_EXCLUSIVE);
         return true;
     }
 
-    public final boolean waitForNoCommitLock(int spinCount) {
+    public final boolean waitForExclusiveLockToBecomeFree(int spinCount) {
         do {
-            if (!hasCommitLock(orec)) {
+            if (!hasExclusiveLock(orec)) {
                 return true;
             }
 
@@ -473,8 +473,8 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return hasWriteLock(orec);
     }
 
-    public final boolean hasCommitLock() {
-        return hasCommitLock(orec);
+    public final boolean hasExclusiveLock() {
+        return hasExclusiveLock(orec);
     }
 
     public final int getReadBiasedThreshold() {
@@ -501,7 +501,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         do {
             final long current = orec;
 
-            if (hasCommitLock(current)) {
+            if (hasExclusiveLock(current)) {
                 spinCount--;
                 yieldIfNeeded(spinCount);
                 continue;
@@ -533,7 +533,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return ARRIVE_LOCK_NOT_FREE;
     }
 
-    public final boolean tryUpgradeFromReadLock(int spinCount, final boolean commitLock) {
+    public final boolean tryUpgradeFromReadLock(int spinCount, final boolean exclusiveLock) {
         do {
             final long current = orec;
 
@@ -541,7 +541,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
             if (readLockCount == 0) {
                 throw new PanicError(format("Can't update from readlock to %s if no readlocks are acquired",
-                        commitLock ? "commitLock" : "writeLock"));
+                        exclusiveLock ? "exclusiveLock" : "writeLock"));
             }
 
             if (readLockCount > 1) {
@@ -551,8 +551,8 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             }
 
             long next = setReadLockCount(current, 0);
-            if (commitLock) {
-                next = setCommitLock(next, true);
+            if (exclusiveLock) {
+                next = setExclusiveLock(next, true);
             } else {
                 next = setWriteLock(next, true);
             }
@@ -565,19 +565,19 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return false;
     }
 
-    public final void upgradeToCommitLock() {
+    public final void upgradeToExclusiveLock() {
         while (true) {
             final long current = orec;
 
-            if (hasCommitLock(current)) {
+            if (hasExclusiveLock(current)) {
                 return;
             }
 
             if (!hasWriteLock(current)) {
-                throw new PanicError("Can't upgradeToCommitLock is the updateLock is not acquired");
+                throw new PanicError("Can't upgradeToExclusiveLock is the updateLock is not acquired");
             }
 
-            long next = setCommitLock(current, true);
+            long next = setExclusiveLock(current, true);
             next = setWriteLock(next, false);
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
@@ -590,7 +590,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         do {
             final long current = orec;
 
-            boolean locked = lockMode == LOCKMODE_READ ? hasWriteOrCommitLock(current) : hasAnyLock(current);
+            boolean locked = lockMode == LOCKMODE_READ ? hasWriteOrExclusiveLock(current) : hasAnyLock(current);
 
             if (locked) {
                 spinCount--;
@@ -620,7 +620,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 } else if (lockMode == LOCKMODE_WRITE) {
                     next = setWriteLock(next, true);
                 } else if (lockMode == LOCKMODE_EXCLUSIVE) {
-                    next = setCommitLock(next, true);
+                    next = setExclusiveLock(next, true);
                 }
             }
 
@@ -632,7 +632,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return ARRIVE_LOCK_NOT_FREE;
     }
 
-    public final int tryCommitLockAndArrive(int spinCount) {
+    public final int tryExclusiveLockAndArrive(int spinCount) {
         do {
             final long current = orec;
 
@@ -657,7 +657,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             }
 
             long next = setSurplus(current, surplus);
-            next = setCommitLock(next, true);
+            next = setExclusiveLock(next, true);
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
                 return isReadBiased ? ARRIVE_UNREGISTERED : ARRIVE_NORMAL;
@@ -675,7 +675,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 throw new PanicError("Can't tryLockAfterNormalArrive of the orec is readbiased " + toOrecString(current));
             }
 
-            boolean locked = lockMode == LOCKMODE_READ ? hasWriteOrCommitLock(current) : hasAnyLock(current);
+            boolean locked = lockMode == LOCKMODE_READ ? hasWriteOrExclusiveLock(current) : hasAnyLock(current);
 
             if (locked) {
                 spinCount--;
@@ -694,7 +694,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 if (lockMode == LOCKMODE_READ) {
                     next = setReadLockCount(next, getReadLockCount(current) + 1);
                 } else if (lockMode == LOCKMODE_EXCLUSIVE) {
-                    next = setCommitLock(next, true);
+                    next = setExclusiveLock(next, true);
                 } else {
                     next = setWriteLock(current, true);
                 }
@@ -728,8 +728,8 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             }
 
             surplus--;
-            final boolean hasCommitLock = hasCommitLock(current);
-            if (!hasCommitLock && surplus == 0 && readonlyCount == READBIASED_THRESHOLD) {
+            final boolean hasExclusiveLock = hasExclusiveLock(current);
+            if (!hasExclusiveLock && surplus == 0 && readonlyCount == READBIASED_THRESHOLD) {
                 isReadBiased = true;
                 readonlyCount = 0;
             }
@@ -755,7 +755,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
             int readLockCount = getReadLockCount(current);
 
-            if (readLockCount == 0 && !hasWriteOrCommitLock(current)) {
+            if (readLockCount == 0 && !hasWriteOrExclusiveLock(current)) {
                 throw new PanicError(
                         "Can't ___departAfterReadingAndUnlock if the lock is not acquired " + toOrecString(current));
             }
@@ -783,7 +783,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             if (readLockCount > 0) {
                 next = setReadLockCount(next, readLockCount - 1);
             } else {
-                next = setCommitLock(next, false);
+                next = setExclusiveLock(next, false);
                 next = setWriteLock(next, false);
             }
 
@@ -801,7 +801,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         while (true) {
             final long current = orec;
 
-            if (!hasCommitLock(current)) {
+            if (!hasExclusiveLock(current)) {
                 throw new PanicError(
                         "Can't ___departAfterUpdateAndUnlock is the commit lock is not acquired " + toOrecString(current));
             }
@@ -853,7 +853,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             //-1 indicates write or commit lock, value bigger than 0 indicates readlock
             int lockMode;
 
-            if (hasWriteOrCommitLock(current)) {
+            if (hasWriteOrExclusiveLock(current)) {
                 lockMode = -1;
             } else {
                 lockMode = getReadLockCount(current);
@@ -884,7 +884,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
             long next = setSurplus(current, surplus);
             if (lockMode == -1) {
-                next = setCommitLock(next, false);
+                next = setExclusiveLock(next, false);
                 next = setWriteLock(next, false);
             } else {
                 next = setReadLockCount(next, lockMode - 1);
@@ -906,7 +906,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
             long surplus = getSurplus(current);
 
-            if (hasCommitLock(current)) {
+            if (hasExclusiveLock(current)) {
                 if (surplus < 2) {
                     throw new PanicError(
                             "there must be at least 2 readers, the thread that acquired the lock, " +
@@ -939,7 +939,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             }
 
             int lockMode;
-            if (hasWriteOrCommitLock(current)) {
+            if (hasWriteOrExclusiveLock(current)) {
                 lockMode = -1;
             } else {
                 lockMode = getReadLockCount(current);
@@ -960,7 +960,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             if (lockMode > 0) {
                 next = setReadLockCount(next, lockMode - 1);
             } else {
-                next = setCommitLock(next, false);
+                next = setExclusiveLock(next, false);
                 next = setWriteLock(next, false);
             }
 
@@ -982,20 +982,20 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return (int) ((value & BITMASK_READLOCKS) >> 40);
     }
 
-    public static long setCommitLock(final long value, final boolean commitLock) {
-        return (value & ~BITMASK_COMMITLOCK) | ((commitLock ? 1L : 0L) << 63);
+    public static long setExclusiveLock(final long value, final boolean exclusiveLock) {
+        return (value & ~BITMASK_EXCLUSIVELOCK) | ((exclusiveLock ? 1L : 0L) << 63);
     }
 
-    public static boolean hasWriteOrCommitLock(final long value) {
-        return ((value & (BITMASK_COMMITLOCK + BITMASK_UPDATELOCK)) != 0);
+    public static boolean hasWriteOrExclusiveLock(final long value) {
+        return ((value & (BITMASK_EXCLUSIVELOCK + BITMASK_UPDATELOCK)) != 0);
     }
 
     public static boolean hasAnyLock(final long value) {
-        return ((value & (BITMASK_COMMITLOCK + BITMASK_UPDATELOCK + BITMASK_READLOCKS)) != 0);
+        return ((value & (BITMASK_EXCLUSIVELOCK + BITMASK_UPDATELOCK + BITMASK_READLOCKS)) != 0);
     }
 
-    public static boolean hasCommitLock(final long value) {
-        return (value & BITMASK_COMMITLOCK) != 0;
+    public static boolean hasExclusiveLock(final long value) {
+        return (value & BITMASK_EXCLUSIVELOCK) != 0;
     }
 
     public static boolean isReadBiased(final long value) {
@@ -1032,8 +1032,8 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
     private static String toOrecString(final long value) {
         return format(
-                "Orec(hasCommitLock=%s, hasUpdateLock=%s, readLocks=%s, surplus=%s, isReadBiased=%s, readonlyCount=%s)",
-                hasCommitLock(value),
+                "Orec(hasExclusiveLock=%s, hasUpdateLock=%s, readLocks=%s, surplus=%s, isReadBiased=%s, readonlyCount=%s)",
+                hasExclusiveLock(value),
                 hasWriteLock(value),
                 getReadonlyCount(value),
                 getSurplus(value),

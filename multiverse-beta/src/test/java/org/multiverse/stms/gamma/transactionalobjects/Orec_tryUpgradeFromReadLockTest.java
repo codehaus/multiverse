@@ -35,7 +35,7 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
     }
 
     @Test
-    public void whenNoLockAcquiredAndUpgradeToCommitLock_thenPanicError() {
+    public void whenNoLockAcquiredAndUpgradeToExclusiveLock_thenPanicError() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
         try {
@@ -63,14 +63,14 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
     }
 
     @Test
-    public void whenSingleReadLockAcquiredAndUpgradeToCommitLock_thenSuccess() {
+    public void whenSingleReadLockAcquiredAndUpgradeToExclusiveLock_thenSuccess() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
         ref.openForRead(stm.startDefaultTransaction(), LOCKMODE_READ);
 
         boolean result = ref.tryUpgradeFromReadLock(1, true);
         assertTrue(result);
-        assertTrue(ref.hasCommitLock());
+        assertTrue(ref.hasExclusiveLock());
         assertReadLockCount(ref, 0);
         assertSurplus(ref, 1);
     }
@@ -89,7 +89,7 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
     }
 
     @Test
-    public void whenMultipleReadLocksAcquired_thenUpgradeToCommitLockFailure() {
+    public void whenMultipleReadLocksAcquired_thenUpgradeToExclusiveLockFailure() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
         ref.openForRead(stm.startDefaultTransaction(), LOCKMODE_READ);
@@ -120,7 +120,7 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
     }
 
     @Test
-    public void whenCommitLockAcquired_thenPanicError() {
+    public void whenExclusiveLockAcquired_thenPanicError() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -132,7 +132,7 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
         } catch (PanicError expected) {
         }
 
-        assertTrue(ref.hasCommitLock());
+        assertTrue(ref.hasExclusiveLock());
         assertReadLockCount(ref, 0);
         assertSurplus(ref, 1);
     }

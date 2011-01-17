@@ -73,7 +73,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
     }
 
     @Test
-    public void whenCommitLockAndNoConflict_thenRegistered() {
+    public void whenExclusiveLockAndNoConflict_thenRegistered() {
         GammaLongRef ref = new GammaLongRef(stm, 10);
         long version = ref.getVersion();
 
@@ -119,7 +119,7 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
     }
 
     @Test
-    public void whenCommitLockAndInterestingChangeAlreadyHappened() {
+    public void whenExclusiveLockAndInterestingChangeAlreadyHappened() {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.startDefaultTransaction();

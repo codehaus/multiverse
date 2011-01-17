@@ -77,7 +77,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
     }
 
     @Test
-    public void lockFree_tryCommitLock() {
+    public void lockFree_tryExclusiveLock() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -200,7 +200,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
     }
 
     @Test
-    public void lockUpgrade_readLockAcquired_tryWriteCommitLock() {
+    public void lockUpgrade_readLockAcquired_tryExclusiveLock() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -218,7 +218,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
     }
 
     @Test
-    public void lockUpgrade_readLockAcquired_otherTransactionAlsoAcquiredReadLock_tryCommitLock() {
+    public void lockUpgrade_readLockAcquired_otherTransactionAlsoAcquiredReadLock_tryExclusiveLock() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -295,7 +295,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
     }
 
     @Test
-    public void lockAcquired_writeLockAcquired_tryCommitLock() {
+    public void lockAcquired_writeLockAcquired_tryExclusiveLock() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -313,7 +313,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
     }
 
     @Test
-    public void lockUpgrade_commitLockAcquired_tryNoLock() {
+    public void lockUpgrade_exclusiveLockAcquired_tryNoLock() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -331,7 +331,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
     }
 
     @Test
-    public void lockUpgrade_commitLockAcquired_tryReadLock() {
+    public void lockUpgrade_exclusiveLockAcquired_tryReadLock() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -349,7 +349,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
     }
 
     @Test
-    public void lockAcquired_commitLockAcquired_tryWriteLock() {
+    public void lockAcquired_exclusiveLockAcquired_tryWriteLock() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -367,7 +367,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
     }
 
     @Test
-    public void lockAcquired_commitLockAcquired_tryCommitLock() {
+    public void lockAcquired_exclusiveLockAcquired_tryExclusiveLock() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -450,7 +450,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
     }
 
     @Test
-    public void lockFreeButConflictingUpdate__tryCommitLock() {
+    public void lockFreeButConflictingUpdate__tryExclusiveLock() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -542,7 +542,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
     }
 
     @Test
-    public void lockNotFree_readLockAcquired_acquireCommitLock() {
+    public void lockNotFree_readLockAcquired_acquireExclusiveLock() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -631,7 +631,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
     }
 
     @Test
-    public void lockNotFree_writeLockAcquired_acquireCommitLock() {
+    public void lockNotFree_writeLockAcquired_acquireExclusiveLock() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -653,7 +653,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
     }
 
     @Test
-    public void lockNotFree_commitLockAcquired_acquireNoLock() {
+    public void lockNotFree_exclusiveLockAcquired_acquireNoLock() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -675,7 +675,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
     }
 
     @Test
-    public void lockNotFree_commitLockAcquired_acquireReadLock() {
+    public void lockNotFree_exclusiveLockAcquired_acquireReadLock() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -697,7 +697,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
     }
 
     @Test
-    public void lockNotFree_commitLockAcquired_acquireWriteLock() {
+    public void lockNotFree_exclusiveLockAcquired_acquireWriteLock() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -719,7 +719,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
     }
 
     @Test
-    public void lockNotFree_commitLockAcquired_acquireCommitLock() {
+    public void lockNotFree_exclusiveLockAcquired_acquireExclusiveLock() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();

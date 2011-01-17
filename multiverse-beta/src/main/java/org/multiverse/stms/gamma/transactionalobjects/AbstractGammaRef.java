@@ -256,7 +256,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 if (arriveNeeded) {
                     arriveStatus = arrive(spinCount);
                 } else {
-                    arriveStatus = waitForNoCommitLock(spinCount) ? ARRIVE_UNREGISTERED : ARRIVE_LOCK_NOT_FREE;
+                    arriveStatus = waitForExclusiveLockToBecomeFree(spinCount) ? ARRIVE_UNREGISTERED : ARRIVE_LOCK_NOT_FREE;
                 }
 
                 if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
@@ -1115,10 +1115,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         int attempt = 1;
         do {
-            if (!hasCommitLock()) {
+            if (!hasExclusiveLock()) {
                 long read = long_value;
 
-                if (!hasCommitLock()) {
+                if (!hasExclusiveLock()) {
                     return read;
                 }
             }
@@ -1134,9 +1134,9 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         int attempt = 1;
         do {
-            if (!hasCommitLock()) {
+            if (!hasExclusiveLock()) {
                 Object read = ref_value;
-                if (!hasCommitLock()) {
+                if (!hasExclusiveLock()) {
                     return read;
                 }
             }
@@ -1148,7 +1148,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     }
 
     public final long atomicSetLong(final long newValue, boolean returnOld) {
-        final int arriveStatus = arriveAndCommitLockOrBackoff();
+        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
 
         if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
             throw new LockedException();
@@ -1183,7 +1183,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     }
 
     public final boolean atomicCompareAndSetLong(final long expectedValue, final long newValue) {
-        final int arriveStatus = arriveAndCommitLockOrBackoff();
+        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
 
         if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
             throw new LockedException();

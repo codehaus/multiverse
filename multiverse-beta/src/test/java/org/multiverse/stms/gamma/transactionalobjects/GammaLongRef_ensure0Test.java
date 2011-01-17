@@ -118,9 +118,8 @@ public class GammaLongRef_ensure0Test implements GammaConstants {
         assertSurplus(ref, 0);
     }
 
-
     @Test
-    public void whenCommitLockAcquiredBySelf() {
+    public void whenExclusiveLockAcquiredBySelf() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();

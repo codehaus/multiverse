@@ -139,7 +139,7 @@ public class Lock_getLockMode1Test {
     }
 
     @Test
-    public void self_whenCommitLockedBySelf() {
+    public void self_whenExclusiveLockedBySelf() {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = transactionFactory.newTransaction();

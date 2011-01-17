@@ -79,7 +79,7 @@ public class GammaLongRef_commute2Test {
     }
 
     @Test
-    public void whenCommitLockAcquiredByOther_thenCommuteSucceedsButCommitFails() {
+    public void whenExclusiveLockAcquiredByOther_thenCommuteSucceedsButCommitFails() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();

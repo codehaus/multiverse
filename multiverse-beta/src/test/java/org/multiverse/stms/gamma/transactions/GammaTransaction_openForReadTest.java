@@ -585,7 +585,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
     }
 
     @Test
-    public void locking_commitLockRequired_whenFree() {
+    public void locking_exclusiveLockRequired_whenFree() {
         long intitialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, intitialValue);
         long initialVersion = ref.getVersion();
@@ -601,7 +601,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
     }
 
     @Test
-    public void locking_commitLockRequired_whenLockedForReadByOther() {
+    public void locking_exclusiveLockRequired_whenLockedForReadByOther() {
         long intitialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, intitialValue);
         long initialVersion = ref.getVersion();
@@ -623,7 +623,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
     }
 
     @Test
-    public void locking_commitLockRequired_whenLockedForWriteByOther() {
+    public void locking_exclusiveLockRequired_whenLockedForWriteByOther() {
         long intitialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, intitialValue);
         long initialVersion = ref.getVersion();
@@ -644,7 +644,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
     }
 
     @Test
-    public void locking_commitLockReqyired_whenLockedForCommitByOther() {
+    public void locking_exclusiveLockReqyired_whenLockedForCommitByOther() {
         long intitialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, intitialValue);
         long initialVersion = ref.getVersion();
