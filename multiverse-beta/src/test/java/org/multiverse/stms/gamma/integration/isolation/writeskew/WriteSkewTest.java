@@ -2,7 +2,6 @@ package org.multiverse.stms.gamma.integration.isolation.writeskew;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.LockMode;
@@ -111,10 +110,14 @@ public class WriteSkewTest {
         tx.commit();
     }
 
-
     @Test
-    @Ignore
-    public void whenPrivatized_thenWriteSkewNotPossible() {
+    public void whenLocked_thenWriteSkewNotPossible() {
+        whenLocked_thenWriteSkewNotPossible(LockMode.Read);
+        whenLocked_thenWriteSkewNotPossible(LockMode.Write);
+        whenLocked_thenWriteSkewNotPossible(LockMode.Exclusive);
+    }
+
+    public void whenLocked_thenWriteSkewNotPossible(LockMode lockMode) {
         GammaLongRef ref1 = new GammaLongRef(stm);
         GammaLongRef ref2 = new GammaLongRef(stm);
 
@@ -125,22 +128,23 @@ public class WriteSkewTest {
                 .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
-        ref2.getLock().acquire(tx, LockMode.Exclusive);
-        ref2.get(tx);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
+        ref2.incrementAndGet(otherTx, 1);
+
+        ref2.getLock().acquire(tx, lockMode);
+        ref2.get(tx);
+
         try {
-            ref2.incrementAndGet(otherTx, 1);
+            otherTx.commit();
             fail();
         } catch (ReadWriteConflict expected) {
-
         }
 
         tx.commit();
     }
 
     @Test
-    @Ignore
     public void whenEnsured_thenWriteSkewNotPossible() {
         GammaLongRef ref1 = new GammaLongRef(stm);
         GammaLongRef ref2 = new GammaLongRef(stm);
@@ -152,19 +156,15 @@ public class WriteSkewTest {
                 .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
-        ref2.getLock().acquire(tx, LockMode.Write);
-        ref2.get(tx);
+        ref2.ensure(tx);
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
-        ref2.incrementAndGet(otherTx, 1);
+        ref2.atomicIncrementAndGet(1);
 
         try {
-            otherTx.commit();
+            tx.commit();
             fail();
         } catch (ReadWriteConflict expected) {
         }
-
-        tx.commit();
     }
 
     @Test
