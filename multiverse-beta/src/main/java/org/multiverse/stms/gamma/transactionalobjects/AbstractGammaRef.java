@@ -83,7 +83,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 tranlocal.long_value = GammaDoubleRef.asLong(doubleResult);
                 break;
             case TYPE_BOOLEAN:
-                 BooleanFunction booleanFunction = (BooleanFunction) function;
+                BooleanFunction booleanFunction = (BooleanFunction) function;
                 boolean booleanResult = booleanFunction.call(GammaBooleanRef.asBoolean(tranlocal.long_value));
                 tranlocal.long_value = GammaBooleanRef.asLong(booleanResult);
                 break;
@@ -123,16 +123,17 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     public boolean prepare(final GammaTransaction tx, final GammaRefTranlocal tranlocal) {
-       if (tranlocal.isConstructing()) {
+        int mode = tranlocal.getMode();
+        if (mode == TRANLOCAL_CONSTRUCTING) {
             return true;
         }
 
-        if (tranlocal.isRead()) {
+        if (mode == TRANLOCAL_READ) {
             return true;
         }
 
-        if(tranlocal.isCommuting()){
-            if(!flattenCommute(tx,tranlocal,LOCKMODE_COMMIT)){
+        if (mode == TRANLOCAL_COMMUTING) {
+            if (!flattenCommute(tx, tranlocal, LOCKMODE_COMMIT)) {
                 return false;
             }
         }
@@ -503,7 +504,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (newNode == null) {
-            throw tx.abortOnTooSmallSize(config.arrayTransactionSize+1);
+            throw tx.abortOnTooSmallSize(config.arrayTransactionSize + 1);
         }
 
         newNode.mode = TRANLOCAL_READ;
@@ -789,7 +790,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (newNode == null) {
-            throw tx.abortOnTooSmallSize(config.arrayTransactionSize+1);
+            throw tx.abortOnTooSmallSize(config.arrayTransactionSize + 1);
         }
 
         if (!load(newNode, lockMode, config.spinCount, tx.arriveEnabled)) {
@@ -957,7 +958,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (newNode == null) {
-            throw tx.abortOnTooSmallSize(config.arrayTransactionSize+1);
+            throw tx.abortOnTooSmallSize(config.arrayTransactionSize + 1);
         }
 
         tx.size++;
@@ -1039,15 +1040,15 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     }
 
     public final void ensure(final GammaTransaction tx) {
-        if(tx == null){
+        if (tx == null) {
             throw new NullPointerException();
         }
 
-        if(tx.status!=TX_ACTIVE){
+        if (tx.status != TX_ACTIVE) {
             throw tx.abortEnsureOnBadStatus(this);
         }
 
-        if(tx.config.readonly){
+        if (tx.config.readonly) {
             return;
         }
 
@@ -1127,7 +1128,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             listeners.openAll(pool);
         }
 
-        return returnOld?oldValue:newValue;
+        return returnOld ? oldValue : newValue;
     }
 
     public final boolean atomicCompareAndSetLong(final long expectedValue, final long newValue) {

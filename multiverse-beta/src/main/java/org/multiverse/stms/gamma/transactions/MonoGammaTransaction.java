@@ -2,7 +2,6 @@ package org.multiverse.stms.gamma.transactions;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.Retry;
-import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
@@ -50,21 +49,14 @@ public final class MonoGammaTransaction extends GammaTransaction {
         final AbstractGammaRef owner = tranlocal.owner;
 
         if (owner != null) {
-            if (tranlocal.mode == TRANLOCAL_READ) {
-                owner.releaseAfterReading(tranlocal, pool);
-            } else if (tranlocal.mode == TRANLOCAL_WRITE) {
-                if (status == TX_ACTIVE) {
-                    if(!owner.prepare(this, tranlocal)){
-                        throw abortOnReadWriteConflict();
-                    }
+            if (status == TX_ACTIVE){
+                if (!owner.prepare(this, tranlocal)) {
+                    throw abortOnReadWriteConflict();
                 }
-
-                Listeners listeners = owner.safe(tranlocal, pool);
-                if (listeners != null) {
-                    listeners.openAll(pool);
-                }
-            } else {
-                throw new TodoException();
+            }
+            Listeners listeners = owner.safe(tranlocal, pool);
+            if (listeners != null) {
+                listeners.openAll(pool);
             }
         }
 
