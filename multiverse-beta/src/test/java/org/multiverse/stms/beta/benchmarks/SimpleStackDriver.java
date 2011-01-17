@@ -94,7 +94,7 @@ public class SimpleStackDriver extends BenchmarkDriver {
     class PushThread extends TestThread {
         private final Stack<String> stack;
         private long count;
-        private final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder()
+        private final AtomicBlock pushBlock = stm.newTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(dirtyCheck)
                 .setLockLevel(lockMode)
                 .buildAtomicBlock();
@@ -165,7 +165,7 @@ public class SimpleStackDriver extends BenchmarkDriver {
 
         private final Stack<String> stack;
         private long count;
-        private final AtomicBlock popBlock = stm.createTransactionFactoryBuilder()
+        private final AtomicBlock popBlock = stm.newTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(dirtyCheck)
                 .setLockLevel(lockMode)
                 .buildAtomicBlock();

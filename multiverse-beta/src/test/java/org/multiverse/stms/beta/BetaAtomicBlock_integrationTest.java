@@ -28,7 +28,7 @@ public class BetaAtomicBlock_integrationTest implements BetaStmConstants {
     public void whenRead() {
         final BetaLongRef ref = newLongRef(stm, 10);
 
-        AtomicBlock block = stm.createTransactionFactoryBuilder().buildAtomicBlock();
+        AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
         long result = block.execute(new AtomicLongClosure() {
             @Override
             public long execute(Transaction tx) throws Exception {
@@ -45,7 +45,7 @@ public class BetaAtomicBlock_integrationTest implements BetaStmConstants {
     public void whenUpdate() {
         final BetaLongRef ref = newLongRef(stm, 0);
 
-        AtomicBlock block = stm.createTransactionFactoryBuilder().buildAtomicBlock();
+        AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
         block.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
@@ -64,7 +64,7 @@ public class BetaAtomicBlock_integrationTest implements BetaStmConstants {
         otherTx.openForWrite(ref, LOCKMODE_EXCLUSIVE);
 
         try {
-            AtomicBlock block = stm.createTransactionFactoryBuilder()
+            AtomicBlock block = stm.newTransactionFactoryBuilder()
                     .setMaxRetries(100)
                     .buildAtomicBlock();
 
@@ -84,7 +84,7 @@ public class BetaAtomicBlock_integrationTest implements BetaStmConstants {
     public void whenMultipleUpdatesDoneInSingleTransaction() {
         final BetaLongRef ref = newLongRef(stm);
 
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(false)
                 .buildAtomicBlock();
         block.execute(new AtomicVoidClosure() {

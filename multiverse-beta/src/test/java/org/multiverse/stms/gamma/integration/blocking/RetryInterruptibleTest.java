@@ -57,7 +57,7 @@ public class RetryInterruptibleTest {
         }
 
         public void await() throws Exception {
-            AtomicBlock block = stm.createTransactionFactoryBuilder()
+            AtomicBlock block = stm.newTransactionFactoryBuilder()
                     .setInterruptible(true)
                     .buildAtomicBlock();
 

@@ -41,7 +41,7 @@ public class BetaAtomicBlock_speculativeTest implements BetaStmConstants {
         final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
         final AtomicInteger attempt = new AtomicInteger(1);
 
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(true)
                 .buildAtomicBlock();
 
@@ -103,7 +103,7 @@ public class BetaAtomicBlock_speculativeTest implements BetaStmConstants {
         final BetaLongRef ref = newLongRef(stm);
         final LongFunction function = mock(LongFunction.class);
 
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(true)
                 .buildAtomicBlock();
 
@@ -128,7 +128,7 @@ public class BetaAtomicBlock_speculativeTest implements BetaStmConstants {
         final AtomicBoolean added = new AtomicBoolean();
         final TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
 
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(true)
                 .buildAtomicBlock();
 
@@ -164,7 +164,7 @@ public class BetaAtomicBlock_speculativeTest implements BetaStmConstants {
 
         final List<BetaTransaction> transactions = new LinkedList<BetaTransaction>();
 
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setTimeoutNs(1000)
                 .setSpeculativeConfigurationEnabled(true)
                 .buildAtomicBlock();

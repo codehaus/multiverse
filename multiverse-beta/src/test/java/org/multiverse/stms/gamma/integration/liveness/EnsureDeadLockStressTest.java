@@ -57,7 +57,7 @@ public class EnsureDeadLockStressTest {
 
         @Override
         public void doRun() throws Exception {
-            AtomicBlock block = stm.createTransactionFactoryBuilder()
+            AtomicBlock block = stm.newTransactionFactoryBuilder()
                     .setSpinCount(1000)
                     .setMaxRetries(10000)
                     .buildAtomicBlock();

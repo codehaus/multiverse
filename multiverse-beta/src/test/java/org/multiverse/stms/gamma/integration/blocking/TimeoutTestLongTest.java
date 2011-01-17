@@ -74,7 +74,7 @@ public class TimeoutTestLongTest {
         @Override
         public void doRun() throws Exception {
             AtomicBlock block = getGlobalStmInstance()
-                    .createTransactionFactoryBuilder()
+                    .newTransactionFactoryBuilder()
                     .setTimeoutNs(TimeUnit.SECONDS.toNanos(5))
                     .buildAtomicBlock();
 

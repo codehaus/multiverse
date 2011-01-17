@@ -61,7 +61,7 @@ public class AbstractGammaObject_prepareTest implements GammaConstants {
      public void whenNonDirtyWriteAndDirtyCheckEnabled(LockMode lockMode) {
         GammaLongRef ref = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.createTransactionFactoryBuilder()
+        GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(true)
                 .build()
                 .newTransaction();
@@ -98,7 +98,7 @@ public class AbstractGammaObject_prepareTest implements GammaConstants {
     public void whenNormalDirtyWrite(LockMode lockMode, boolean dirtyCheck) {
         GammaLongRef ref = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.createTransactionFactoryBuilder()
+        GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(dirtyCheck)
                 .build()
                 .newTransaction();
@@ -128,7 +128,7 @@ public class AbstractGammaObject_prepareTest implements GammaConstants {
     public void whenNonDirtyWrite(LockMode lockMode) {
         GammaLongRef ref = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.createTransactionFactoryBuilder()
+        GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(false)
                 .build()
                 .newTransaction();

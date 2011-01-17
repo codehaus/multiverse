@@ -27,7 +27,7 @@ public class IsolationLevelSerializableTest {
     public void setUp() {
         stm = (GammaStm) getGlobalStmInstance();
         clearThreadLocalTransaction();
-        transactionFactory = stm.createTransactionFactoryBuilder()
+        transactionFactory = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Serializable)
                 .build();
@@ -37,7 +37,7 @@ public class IsolationLevelSerializableTest {
     public void repeatableRead_whenTracked_thenNoInconsistentRead() {
         final GammaLongRef ref = new GammaLongRef(stm);
 
-        transactionFactory = stm.createTransactionFactoryBuilder()
+        transactionFactory = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setReadTrackingEnabled(true)
                 .setIsolationLevel(IsolationLevel.Serializable)
@@ -57,7 +57,7 @@ public class IsolationLevelSerializableTest {
     public void repeatableRead_whenNotTrackedAndConflictingUpdate_thenReadConflict() {
         final GammaLongRef ref = makeReadBiased(new GammaLongRef(stm));
 
-        transactionFactory = stm.createTransactionFactoryBuilder()
+        transactionFactory = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setReadTrackingEnabled(false)
                 .setBlockingAllowed(false)

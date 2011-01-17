@@ -50,7 +50,7 @@ public class TooManyRetriesRollbackTest {
     }
 
     public void setAndAwaitUneven(final int value) {
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setMaxRetries(10)
                 .buildAtomicBlock();
 
@@ -76,7 +76,7 @@ public class TooManyRetriesRollbackTest {
 
         @Override
         public void doRun() throws Exception {
-            AtomicBlock block = stm.createTransactionFactoryBuilder()
+            AtomicBlock block = stm.newTransactionFactoryBuilder()
                     .buildAtomicBlock();
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override

@@ -61,7 +61,7 @@ public class FailureAtomicityStressTest {
     public class ModifyThread extends TestThread {
 
         long writeCount;
-        final AtomicBlock atomicBlock = stm.createTransactionFactoryBuilder()
+        final AtomicBlock atomicBlock = stm.newTransactionFactoryBuilder()
                 .buildAtomicBlock();
 
         public ModifyThread(int id) {

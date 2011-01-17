@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.LockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.functions.Functions;
@@ -66,7 +65,7 @@ public class UncontendedCommutePerformanceTest {
 
         @Override
         public void doRun() throws Exception {
-            AtomicBlock block = stm.createTransactionFactoryBuilder()
+            AtomicBlock block = stm.newTransactionFactoryBuilder()
                     .setDirtyCheckEnabled(false)
                     .buildAtomicBlock();
 
@@ -91,7 +90,7 @@ public class UncontendedCommutePerformanceTest {
 
         @Override
         public void doRun() throws Exception {
-            AtomicBlock block = stm.createTransactionFactoryBuilder()
+            AtomicBlock block = stm.newTransactionFactoryBuilder()
                     .buildAtomicBlock();
 
             AtomicVoidClosure closure = new AtomicVoidClosure() {

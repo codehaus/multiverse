@@ -49,7 +49,7 @@ public class GammaLongRef_decrement2Test {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.createTransactionFactoryBuilder()
+        GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setReadonly(true)
                 .setSpeculativeConfigurationEnabled(false)
                 .build()

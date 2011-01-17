@@ -152,9 +152,9 @@ public class AccountDriver extends BenchmarkDriver {
 
     class Bank {
         private final Account[] accounts;
-        private final AtomicBlock addInterrestBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
-        private final AtomicBlock computeTotalBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
-        private final AtomicBlock transferBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
+        private final AtomicBlock addInterrestBlock = stm.newTransactionFactoryBuilder().buildAtomicBlock();
+        private final AtomicBlock computeTotalBlock = stm.newTransactionFactoryBuilder().buildAtomicBlock();
+        private final AtomicBlock transferBlock = stm.newTransactionFactoryBuilder().buildAtomicBlock();
 
         public Bank(int accountCount) {
             accounts = new Account[accountCount];

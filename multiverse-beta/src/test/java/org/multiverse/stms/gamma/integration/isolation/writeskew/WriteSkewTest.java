@@ -43,7 +43,7 @@ public class WriteSkewTest {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 
-        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+        BetaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .build()
@@ -63,7 +63,7 @@ public class WriteSkewTest {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 
-        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+        BetaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setLockLevel(LockLevel.CommitLockWrites)
@@ -84,7 +84,7 @@ public class WriteSkewTest {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 
-        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+        BetaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setLockLevel(LockLevel.WriteLockWrites)
@@ -105,7 +105,7 @@ public class WriteSkewTest {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 
-        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+        BetaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setLockLevel(LockLevel.WriteLockReads)
@@ -132,7 +132,7 @@ public class WriteSkewTest {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 
-        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+        BetaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setLockLevel(LockLevel.CommitLockReads)
@@ -157,7 +157,7 @@ public class WriteSkewTest {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 
-        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+        BetaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .build()
@@ -183,7 +183,7 @@ public class WriteSkewTest {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 
-        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+        BetaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .build()
@@ -210,7 +210,7 @@ public class WriteSkewTest {
         BetaLongRef ref1 = newLongRef(stm);
         BetaLongRef ref2 = newLongRef(stm);
 
-        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+        BetaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Serializable)
                 .build()

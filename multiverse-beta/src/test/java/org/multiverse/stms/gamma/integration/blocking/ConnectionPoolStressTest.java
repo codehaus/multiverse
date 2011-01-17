@@ -95,16 +95,16 @@ public class ConnectionPoolStressTest implements GammaConstants {
     }
 
     class ConnectionPool {
-        final AtomicBlock takeConnectionBlock = stm.createTransactionFactoryBuilder()
+        final AtomicBlock takeConnectionBlock = stm.newTransactionFactoryBuilder()
                 .setWriteLockMode(lockMode)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
 
-        final AtomicBlock returnConnectionBlock = stm.createTransactionFactoryBuilder()
+        final AtomicBlock returnConnectionBlock = stm.newTransactionFactoryBuilder()
                 .setWriteLockMode(lockMode)
                 .buildAtomicBlock();
 
-        final AtomicBlock sizeBlock = stm.createTransactionFactoryBuilder().buildAtomicBlock();
+        final AtomicBlock sizeBlock = stm.newTransactionFactoryBuilder().buildAtomicBlock();
 
         final GammaIntRef size = new GammaIntRef(stm);
         final GammaRef<Node<Connection>> head = new GammaRef<Node<Connection>>(stm);

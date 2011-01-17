@@ -8,6 +8,7 @@ import org.multiverse.MultiverseConstants;
  *
  * @author Peter Veentjer.
  */
+@Deprecated
 public enum LockLevel implements MultiverseConstants {
 
     /**

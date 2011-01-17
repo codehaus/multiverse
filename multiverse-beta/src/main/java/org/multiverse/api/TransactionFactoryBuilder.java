@@ -43,8 +43,24 @@ public interface TransactionFactoryBuilder {
      */
     TransactionFactoryBuilder setPropagationLevel(PropagationLevel propagationLevel);
 
+    /**
+     * Sets the LockMode for all reads.
+     *
+     * @param lockMode  the LockMode to set.
+     * @return the updated TransactionFactoryBuilder.
+     * @throws NullPointerException if lockMode is null.
+     */
     TransactionFactoryBuilder setReadLockMode(LockMode lockMode);
 
+    /**
+     * Sets the LockMode for all writes. For a write, always a read needs to be done, so if the ReadLockMode is
+     *
+     * Freshly constructed objects that are not committed, automatically are locked with an Exclusive lock.
+     *
+     * @param lockMode the LockMode to set.
+     * @return the updated TransactionFactoryBuilder.
+     * @throws NullPointerException if lockMode is null.
+     */
     TransactionFactoryBuilder setWriteLockMode(LockMode lockMode);
 
     /**
@@ -55,6 +71,7 @@ public interface TransactionFactoryBuilder {
      * @return the updated TransactionFactoryBuilder
      * @throws NullPointerException if lockLevel is null.
      */
+    @Deprecated
     TransactionFactoryBuilder setLockLevel(LockLevel lockLevel);
 
     /**

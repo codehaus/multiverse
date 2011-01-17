@@ -21,7 +21,7 @@ public class BetaAtomicBlockTest {
     public void setUp() {
         clearThreadLocalTransaction();
         stm = new BetaStm();
-        block = stm.createTransactionFactoryBuilder()
+        block = stm.newTransactionFactoryBuilder()
                 .buildAtomicBlock();
     }
 

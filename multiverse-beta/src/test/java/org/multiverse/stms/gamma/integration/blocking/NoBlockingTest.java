@@ -77,7 +77,7 @@ public class NoBlockingTest {
         final LongRef ref = newLongRef();
 
         AtomicBlock block = getGlobalStmInstance()
-                .createTransactionFactoryBuilder()
+                .newTransactionFactoryBuilder()
                 .setBlockingAllowed(false)
                 .buildAtomicBlock();
 

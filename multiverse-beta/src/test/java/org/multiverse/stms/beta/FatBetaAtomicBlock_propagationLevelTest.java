@@ -31,7 +31,7 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
 
     @Test
     public void whenNeverAndTransactionAvailable_thenNoTransactionAllowedException() {
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Never)
                 .buildAtomicBlock();
 
@@ -53,7 +53,7 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
 
     @Test
     public void whenNeverAndNoTransactionAvailable() {
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Never)
                 .buildAtomicBlock();
 
@@ -73,7 +73,7 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
 
     @Test
     public void whenMandatoryAndNoTransactionAvailable_thenNoTransactionFoundException() {
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Mandatory)
                 .buildAtomicBlock();
 
@@ -91,7 +91,7 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
 
     @Test
     public void whenMandatoryAndTransactionAvailable_thenExistingTransactionUsed() {
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Mandatory)
                 .buildAtomicBlock();
 
@@ -115,7 +115,7 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
 
     @Test
     public void whenRequiresAndNoTransactionAvailable_thenNewTransactionUsed() {
-        BetaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
+        BetaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Requires)
                 .build();
 
@@ -140,7 +140,7 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
 
     @Test
     public void whenRequiresAndTransactionAvailable_thenExistingTransactionUsed() {
-        BetaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
+        BetaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Requires)
                 .build();
 
@@ -170,7 +170,7 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
 
     @Test
     public void whenRequiresNewAndNoTransactionAvailable_thenNewTransactionCreated() {
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.RequiresNew)
                 .buildAtomicBlock();
 
@@ -195,7 +195,7 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
 
     @Test
     public void whenRequiresNewAndTransactionAvailable_thenExistingTransactionSuspended() {
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.RequiresNew)
                 .buildAtomicBlock();
 
@@ -225,7 +225,7 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
 
     @Test
     public void whenSupportsAndTransactionAvailable() {
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Supports)
                 .buildAtomicBlock();
 
@@ -249,7 +249,7 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
 
     @Test
     public void whenSupportsAndNoTransactionAvailable() {
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Supports)
                 .buildAtomicBlock();
 

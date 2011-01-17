@@ -21,7 +21,7 @@ public interface Stm {
     /**
      * Starts a default Transaction that is useful for testing/experimentation purposes. This method is purely
      * for easy to use access, but doesn't provide any configuration options. See the
-     * {@link #createTransactionFactoryBuilder()} for something more configurable.
+     * {@link #newTransactionFactoryBuilder()} for something more configurable.
      * <p/>
      * Transactions returned by this method are not speculative.
      *
@@ -32,7 +32,7 @@ public interface Stm {
     /**
      * Returns the default atomic block that is useful for testing/experimentation purposes. This method is purely
      * for easy to use access, but it doesn't provide any configuration options. See the
-     * {@link #createTransactionFactoryBuilder()} for something more configurable.
+     * {@link #newTransactionFactoryBuilder()} for something more configurable.
      * <p/>
      * Transactions used in this Block are not speculative.
      *
@@ -45,7 +45,7 @@ public interface Stm {
      *
      * @return the created OrElseBlock.
      */
-    OrElseBlock createOrElseBlock();
+    OrElseBlock newOrElseBlock();
 
     /**
      * Returns the default reference factory that can be used for easy and cheap access to a reference factory
@@ -61,7 +61,7 @@ public interface Stm {
      *
      * @return the TransactionFactoryBuilder that needs to be used to execute transactions on this Stm.
      */
-    TransactionFactoryBuilder createTransactionFactoryBuilder();
+    TransactionFactoryBuilder newTransactionFactoryBuilder();
 
     TransactionalCollectionsFactory getDefaultTransactionalCollectionFactory();
 

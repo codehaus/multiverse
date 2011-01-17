@@ -1,6 +1,10 @@
 package org.multiverse.api.collections;
 
+import org.multiverse.api.Stm;
+
 public interface TransactionalCollectionsFactory {
+
+    Stm getStm();
 
     <E> TransactionalStack<E> newStack();
 

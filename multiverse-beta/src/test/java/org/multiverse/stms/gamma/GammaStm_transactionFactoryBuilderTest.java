@@ -49,12 +49,12 @@ public class GammaStm_transactionFactoryBuilderTest {
 
     @Test(expected = NullPointerException.class)
     public void whenNullPermanentListener_thenNullPointerException() {
-        stm.createTransactionFactoryBuilder().addPermanentListener(null);
+        stm.newTransactionFactoryBuilder().addPermanentListener(null);
     }
 
     @Test
     public void whenPermanentListenerAdded() {
-        GammaTransactionFactoryBuilder oldBuilder = stm.createTransactionFactoryBuilder();
+        GammaTransactionFactoryBuilder oldBuilder = stm.newTransactionFactoryBuilder();
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         GammaTransactionFactoryBuilder newBuilder = oldBuilder.addPermanentListener(listener);
 
@@ -64,7 +64,7 @@ public class GammaStm_transactionFactoryBuilderTest {
 
     @Test
     public void whenPermanentListenerAdded_thenNoCheckForDuplicates() {
-        GammaTransactionFactoryBuilder oldBuilder = stm.createTransactionFactoryBuilder();
+        GammaTransactionFactoryBuilder oldBuilder = stm.newTransactionFactoryBuilder();
         TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
         GammaTransactionFactoryBuilder newBuilder = oldBuilder.addPermanentListener(listener)
                 .addPermanentListener(listener);
@@ -74,7 +74,7 @@ public class GammaStm_transactionFactoryBuilderTest {
 
     @Test
     public void whenNoPermanentListenersAdded_thenEmptyList() {
-        GammaTransactionFactoryBuilder builder = stm.createTransactionFactoryBuilder();
+        GammaTransactionFactoryBuilder builder = stm.newTransactionFactoryBuilder();
         assertTrue(builder.getTransactionConfiguration().getPermanentListeners().isEmpty());
     }
 
@@ -82,7 +82,7 @@ public class GammaStm_transactionFactoryBuilderTest {
     public void whenMultipleListenersAdded_thenTheyAreAddedInOrder() {
         TransactionLifecycleListener listener1 = mock(TransactionLifecycleListener.class);
         TransactionLifecycleListener listener2 = mock(TransactionLifecycleListener.class);
-        GammaTransactionFactoryBuilder builder = stm.createTransactionFactoryBuilder()
+        GammaTransactionFactoryBuilder builder = stm.newTransactionFactoryBuilder()
                 .addPermanentListener(listener1)
                 .addPermanentListener(listener2);
 
@@ -92,7 +92,7 @@ public class GammaStm_transactionFactoryBuilderTest {
 
     @Test
     public void whenGetPermanentListenersCalled_immutableListReturned() {
-        GammaTransactionFactoryBuilder builder = stm.createTransactionFactoryBuilder()
+        GammaTransactionFactoryBuilder builder = stm.newTransactionFactoryBuilder()
                 .addPermanentListener(mock(TransactionLifecycleListener.class))
                 .addPermanentListener(mock(TransactionLifecycleListener.class));
 
@@ -108,7 +108,7 @@ public class GammaStm_transactionFactoryBuilderTest {
 
     @Test
     public void whenReadtrackingDisabled() {
-        GammaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
+        GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
                 .setReadTrackingEnabled(false)
                 .setBlockingAllowed(false)
                 .build();
@@ -118,7 +118,7 @@ public class GammaStm_transactionFactoryBuilderTest {
 
     @Test
     public void whenSpeculativeConfigEnabled() {
-        GammaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
+        GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(true)
                 .build();
 
@@ -129,7 +129,7 @@ public class GammaStm_transactionFactoryBuilderTest {
 
     @Test
     public void whenWriteSkewNotAllowed() {
-        GammaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
+        GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(true)
                 .setIsolationLevel(IsolationLevel.Serializable)
                 .build();
@@ -143,7 +143,7 @@ public class GammaStm_transactionFactoryBuilderTest {
     @Test
     @Ignore
     public void whenWriteSkewNotAllowedThenFatTransaction() {
-        GammaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
+        GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(true)
                 .setIsolationLevel(IsolationLevel.Serializable)
                 .build();

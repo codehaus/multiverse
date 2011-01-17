@@ -34,7 +34,7 @@ public class BetaAtomicBlock_interruptibleTest implements BetaStmConstants {
     public void whenNoTimeoutAndInterruptible() throws InterruptedException {
         final BetaLongRef ref = newLongRef(stm);
 
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setInterruptible(true)
                 .buildAtomicBlock();
 
@@ -57,7 +57,7 @@ public class BetaAtomicBlock_interruptibleTest implements BetaStmConstants {
     public void whenTimeoutAndInterruptible() throws InterruptedException {
         final BetaLongRef ref = newLongRef(stm);
 
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setTimeoutNs(TimeUnit.SECONDS.toNanos(10))
                 .setInterruptible(true)
                 .buildAtomicBlock();

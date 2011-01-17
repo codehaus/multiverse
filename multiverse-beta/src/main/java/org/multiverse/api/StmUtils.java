@@ -26,7 +26,7 @@ public class StmUtils {
     private final static AtomicBlock defaultAtomicBlock
         = getGlobalStmInstance().getDefaultAtomicBlock();
     private final static OrElseBlock orelseBlock
-        = getGlobalStmInstance().createOrElseBlock();
+        = getGlobalStmInstance().newOrElseBlock();
     private final static TransactionalCollectionsFactory transactionalCollectionsFactory
         = getGlobalStmInstance().getDefaultTransactionalCollectionFactory();
 

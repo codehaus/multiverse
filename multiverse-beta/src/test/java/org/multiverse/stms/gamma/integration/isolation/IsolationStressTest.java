@@ -158,7 +158,7 @@ public class IsolationStressTest implements GammaConstants {
 
         @Override
         public void doRun() {
-            AtomicBlock block = stm.createTransactionFactoryBuilder()
+            AtomicBlock block = stm.newTransactionFactoryBuilder()
                     .setDirtyCheckEnabled(dirtyCheckEnabled)
                     .setSpeculativeConfigurationEnabled(false)
                     .setWriteLockMode(lockMode)

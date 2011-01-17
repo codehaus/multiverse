@@ -113,6 +113,7 @@ public interface TransactionConfiguration {
      * @return the LockLevel.
      * @see org.multiverse.api.TransactionFactoryBuilder#setLockLevel(LockLevel)
      */
+    @Deprecated
     LockLevel getLockLevel();
 
     LockMode getReadLockMode();

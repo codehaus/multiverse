@@ -1,13 +1,13 @@
 package org.multiverse.collections;
 
+import org.multiverse.api.Stm;
 import org.multiverse.api.collections.*;
-import org.multiverse.stms.beta.BetaStm;
 
 public final class NaiveTransactionalCollectionFactory implements TransactionalCollectionsFactory {
 
-    private final BetaStm stm;
+    private final Stm stm;
 
-    public NaiveTransactionalCollectionFactory(BetaStm stm) {
+    public NaiveTransactionalCollectionFactory(Stm stm) {
         if (stm == null) {
             throw new NullPointerException();
         }
@@ -15,47 +15,52 @@ public final class NaiveTransactionalCollectionFactory implements TransactionalC
     }
 
     @Override
-    public <E> org.multiverse.api.collections.TransactionalStack newStack() {
+    public Stm getStm() {
+        return stm;
+    }
+
+    @Override
+    public <E> NaiveTransactionalStack<E> newStack() {
         return new NaiveTransactionalStack<E>(stm);
     }
 
     @Override
-    public <E> org.multiverse.api.collections.TransactionalStack newStack(int capacity) {
+    public <E> TransactionalStack<E> newStack(int capacity) {
         return new NaiveTransactionalStack<E>(stm, capacity);
     }
 
     @Override
-    public <E> TransactionalQueue<E> newQueue() {
+    public <E> NaiveTransactionalLinkedList<E> newQueue() {
         return new NaiveTransactionalLinkedList<E>(stm);
     }
 
     @Override
-    public <E> TransactionalQueue<E> newQueue(int capacity) {
+    public <E> NaiveTransactionalLinkedList<E> newQueue(int capacity) {
         return new NaiveTransactionalLinkedList<E>(stm, capacity);
     }
 
     @Override
-    public <E> TransactionalDeque<E> newDeque() {
+    public <E> NaiveTransactionalLinkedList<E> newDeque() {
         return new NaiveTransactionalLinkedList<E>(stm);
     }
 
     @Override
-    public <E> TransactionalDeque<E> newDeque(int capacity) {
+    public <E> NaiveTransactionalLinkedList<E> newDeque(int capacity) {
         return new NaiveTransactionalLinkedList<E>(stm, capacity);
     }
 
     @Override
-    public <E> TransactionalSet<E> newHashSet() {
+    public <E> NaiveTransactionalHashSet<E> newHashSet() {
         return new NaiveTransactionalHashSet<E>(stm);
     }
 
     @Override
-    public <K, V> TransactionalMap<K, V> newHashMap() {
+    public <K, V> NaiveTransactionalHashMap<K, V> newHashMap() {
         return new NaiveTransactionalHashMap<K, V>(stm);
     }
 
     @Override
-    public <E> TransactionalList<E> newLinkedList() {
+    public <E> NaiveTransactionalLinkedList<E> newLinkedList() {
         return new NaiveTransactionalLinkedList<E>(stm);
     }
 }

@@ -77,14 +77,14 @@ public class DeadLockStressTest {
 
     public class ChangeThread extends TestThread {
 
-        private final AtomicBlock normalBlock = stm.createTransactionFactoryBuilder()
+        private final AtomicBlock normalBlock = stm.newTransactionFactoryBuilder()
                 .buildAtomicBlock();
 
-        private final AtomicBlock pessimisticReadLevelBlock = stm.createTransactionFactoryBuilder()
+        private final AtomicBlock pessimisticReadLevelBlock = stm.newTransactionFactoryBuilder()
                 .setLockLevel(LockLevel.CommitLockReads)
                 .buildAtomicBlock();
 
-        private final AtomicBlock pessimisticWriteLevelBlock = stm.createTransactionFactoryBuilder()
+        private final AtomicBlock pessimisticWriteLevelBlock = stm.newTransactionFactoryBuilder()
                 .setLockLevel(LockLevel.CommitLockWrites)
                 .buildAtomicBlock();
 

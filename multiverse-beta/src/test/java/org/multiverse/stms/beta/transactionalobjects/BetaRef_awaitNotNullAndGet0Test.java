@@ -101,7 +101,7 @@ public class BetaRef_awaitNotNullAndGet0Test {
         BetaRef ref = newRef(stm);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction tx = stm.createTransactionFactoryBuilder()
+        BetaTransaction tx = stm.newTransactionFactoryBuilder()
                 .build()
                 .newTransaction();
 

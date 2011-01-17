@@ -35,7 +35,7 @@ public class BetaAtomicBlock_timeoutTest {
 
     @Test
     public void whenTimeout() throws InterruptedException {
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setTimeoutNs(timeoutNs)
                 .buildAtomicBlock();
 
@@ -50,7 +50,7 @@ public class BetaAtomicBlock_timeoutTest {
 
     @Test
     public void whenSuccess() {
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setTimeoutNs(timeoutNs)
                 .buildAtomicBlock();
 
@@ -84,7 +84,7 @@ public class BetaAtomicBlock_timeoutTest {
             }
         });
 
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setTimeoutNs(0)
                 .buildAtomicBlock();
 

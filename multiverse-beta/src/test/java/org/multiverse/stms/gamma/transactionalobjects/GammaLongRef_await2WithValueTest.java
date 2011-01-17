@@ -87,7 +87,7 @@ public class GammaLongRef_await2WithValueTest {
     @Test
     public void whenBlockingNotAllowed_thenRetryNotAllowedException() {
         GammaLongRef ref = new GammaLongRef(stm);
-        GammaTransaction tx = stm.createTransactionFactoryBuilder()
+        GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setBlockingAllowed(false)
                 .setSpeculativeConfigurationEnabled(false)
                 .build()

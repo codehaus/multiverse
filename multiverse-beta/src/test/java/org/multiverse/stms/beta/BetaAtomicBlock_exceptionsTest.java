@@ -24,7 +24,7 @@ public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
 
     @Test
     public void executeChecked_whenCheckedExceptionThrown() {
-        AtomicBlock block = stm.createTransactionFactoryBuilder().buildAtomicBlock();
+        AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
         final BetaLongRef ref = newLongRef(stm, 10);
 
         final Exception ex = new Exception();
@@ -48,7 +48,7 @@ public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
 
     @Test
     public void executeChecked_whenRuntimeExceptionThrown() throws Exception {
-        AtomicBlock block = stm.createTransactionFactoryBuilder().buildAtomicBlock();
+        AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
         final BetaLongRef ref = newLongRef(stm, 10);
 
         final RuntimeException ex = new RuntimeException();
@@ -73,7 +73,7 @@ public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
 
     @Test
     public void executeChecked_whenErrorThrown() throws Exception {
-        AtomicBlock block = stm.createTransactionFactoryBuilder().buildAtomicBlock();
+        AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
         final BetaLongRef ref = newLongRef(stm, 10);
 
         final Error ex = new Error();
@@ -97,7 +97,7 @@ public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
 
     @Test
     public void execute_whenCheckedExceptionThrown() {
-        AtomicBlock block = stm.createTransactionFactoryBuilder().buildAtomicBlock();
+        AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
         final BetaLongRef ref = newLongRef(stm, 10);
 
         final Exception ex = new Exception();
@@ -121,7 +121,7 @@ public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
 
     @Test
     public void execute_whenRuntimeExceptionThrown() {
-        AtomicBlock block = stm.createTransactionFactoryBuilder().buildAtomicBlock();
+        AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
         final BetaLongRef ref = newLongRef(stm, 10);
 
         final RuntimeException ex = new RuntimeException();
@@ -146,7 +146,7 @@ public class BetaAtomicBlock_exceptionsTest implements BetaStmConstants {
 
     @Test
     public void execute_whenErrorThrown() {
-        AtomicBlock block = stm.createTransactionFactoryBuilder().buildAtomicBlock();
+        AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
         final BetaLongRef ref = newLongRef(stm, 10);
 
         final Error ex = new Error();

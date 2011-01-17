@@ -109,9 +109,9 @@ public class NonReentrantSemaphoreStressTest {
 
         public Semaphore(int initial, LockLevel lockLevel) {
             ref = new GammaLongRef(stm,initial);
-            upBlock = stm.createTransactionFactoryBuilder()
+            upBlock = stm.newTransactionFactoryBuilder()
                     .setLockLevel(lockLevel).buildAtomicBlock();
-            downBlock = stm.createTransactionFactoryBuilder()
+            downBlock = stm.newTransactionFactoryBuilder()
                     .setLockLevel(lockLevel).buildAtomicBlock();
         }
 

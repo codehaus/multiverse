@@ -122,10 +122,10 @@ public class StackWithoutCapacityStressTest implements GammaConstants {
 
     class Stack<E> {
         private final GammaRef<Node<E>> head = new GammaRef<Node<E>>(stm);
-        private final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder()
+        private final AtomicBlock pushBlock = stm.newTransactionFactoryBuilder()
                 .setReadLockMode(lockMode)
                 .buildAtomicBlock();
-        private final AtomicBlock popBlock = stm.createTransactionFactoryBuilder()
+        private final AtomicBlock popBlock = stm.newTransactionFactoryBuilder()
                 .setReadLockMode(lockMode)
                 .buildAtomicBlock();
 

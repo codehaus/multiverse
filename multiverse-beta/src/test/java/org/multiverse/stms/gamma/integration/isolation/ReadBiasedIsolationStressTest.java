@@ -130,7 +130,7 @@ public class ReadBiasedIsolationStressTest {
 
         @Override
         public void doRun() {
-            AtomicBlock block = stm.createTransactionFactoryBuilder()
+            AtomicBlock block = stm.newTransactionFactoryBuilder()
                     .setDirtyCheckEnabled(dirtyCheckEnabled)
                     .buildAtomicBlock();
 

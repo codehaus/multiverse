@@ -171,20 +171,20 @@ public class WriteSkewStressTest {
 
     public class TransferThread extends TestThread {
 
-        private final AtomicBlock snapshotBlock = stm.createTransactionFactoryBuilder()
+        private final AtomicBlock snapshotBlock = stm.newTransactionFactoryBuilder()
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
-        private final AtomicBlock serializedBlock = stm.createTransactionFactoryBuilder()
+        private final AtomicBlock serializedBlock = stm.newTransactionFactoryBuilder()
                 .setIsolationLevel(IsolationLevel.Serializable)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
-        private final AtomicBlock privatizedReadLevelBlock = stm.createTransactionFactoryBuilder()
+        private final AtomicBlock privatizedReadLevelBlock = stm.newTransactionFactoryBuilder()
                 .setLockLevel(LockLevel.CommitLockReads)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();
-        private final AtomicBlock privatizedWriteLevelBlock = stm.createTransactionFactoryBuilder()
+        private final AtomicBlock privatizedWriteLevelBlock = stm.newTransactionFactoryBuilder()
                 .setLockLevel(LockLevel.CommitLockWrites)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setMaxRetries(10000)
@@ -323,7 +323,7 @@ public class WriteSkewStressTest {
     }
 
     public class User {
-        private AtomicBlock getTotalBlock = stm.createTransactionFactoryBuilder()
+        private AtomicBlock getTotalBlock = stm.newTransactionFactoryBuilder()
                 .setReadonly(true)
                 .buildAtomicBlock();
 
@@ -345,7 +345,7 @@ public class WriteSkewStressTest {
         }
 
         public String toString() {
-            return stm.createTransactionFactoryBuilder().buildAtomicBlock().execute(new AtomicClosure<String>() {
+            return stm.newTransactionFactoryBuilder().buildAtomicBlock().execute(new AtomicClosure<String>() {
                 @Override
                 public String execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;

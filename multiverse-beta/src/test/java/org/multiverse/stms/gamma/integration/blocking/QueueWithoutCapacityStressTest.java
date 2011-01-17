@@ -115,10 +115,10 @@ public class QueueWithoutCapacityStressTest implements BetaStmConstants {
     class Queue<E> {
         final Stack<E> pushedStack = new Stack<E>();
         final Stack<E> readyToPopStack = new Stack<E>();
-        final AtomicBlock pushBlock = stm.createTransactionFactoryBuilder()
+        final AtomicBlock pushBlock = stm.newTransactionFactoryBuilder()
                 .setReadLockMode(lockMode)
                 .buildAtomicBlock();
-        final AtomicBlock popBlock = stm.createTransactionFactoryBuilder()
+        final AtomicBlock popBlock = stm.newTransactionFactoryBuilder()
                 .setReadLockMode(lockMode)
                 .buildAtomicBlock();
 

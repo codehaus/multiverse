@@ -55,7 +55,7 @@ public class MonoUpdateWithTransactionDriver implements GammaConstants {
         final GammaLongRef ref = new GammaLongRef(stm, 0);
         long initialVersion = ref.getVersion();
 
-        final GammaAtomicBlock block = stm.createTransactionFactoryBuilder()
+        final GammaAtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(false)
                 .setWriteLockMode(writeLockMode)
                 .buildAtomicBlock();

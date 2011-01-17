@@ -107,10 +107,10 @@ public class DiningPhilosophersStressTest implements GammaConstants {
         private int eatCount = 0;
         private final BooleanRef leftFork;
         private final BooleanRef rightFork;
-        private final AtomicBlock releaseForksBlock = stm.createTransactionFactoryBuilder()
+        private final AtomicBlock releaseForksBlock = stm.newTransactionFactoryBuilder()
                 .setReadLockMode(lockMode)
                 .buildAtomicBlock();
-        private final AtomicBlock takeForksBlock = stm.createTransactionFactoryBuilder()
+        private final AtomicBlock takeForksBlock = stm.newTransactionFactoryBuilder()
                 .setReadLockMode(lockMode)
                 .setMaxRetries(10000)
                 .buildAtomicBlock();

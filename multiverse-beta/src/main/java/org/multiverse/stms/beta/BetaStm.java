@@ -43,7 +43,7 @@ public final class BetaStm implements Stm {
         this.defaultConfig = new BetaTransactionConfiguration(this, configuration)
                 .setSpinCount(spinCount);
         this.defaultConfig.init();
-        this.defaultAtomicBlock = createTransactionFactoryBuilder()
+        this.defaultAtomicBlock = newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .buildAtomicBlock();
     }
@@ -54,7 +54,7 @@ public final class BetaStm implements Stm {
     }
 
     @Override
-    public BetaTransactionFactoryBuilder createTransactionFactoryBuilder() {
+    public BetaTransactionFactoryBuilder newTransactionFactoryBuilder() {
         return new BetaTransactionFactoryBuilderImpl(defaultConfig);
     }
 
@@ -90,7 +90,7 @@ public final class BetaStm implements Stm {
     }
 
     @Override
-    public OrElseBlock createOrElseBlock() {
+    public OrElseBlock newOrElseBlock() {
         return new BetaOrElseBlock();
     }
 

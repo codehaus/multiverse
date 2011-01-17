@@ -74,7 +74,7 @@ public class ContendedCounterDriver extends BenchmarkDriver {
         @Override
         public void doRun() throws Exception {
             final long _incCount = transactionsPerThread;
-            AtomicBlock block = stm.createTransactionFactoryBuilder()
+            AtomicBlock block = stm.newTransactionFactoryBuilder()
                     .setLockLevel(lockLevel)
                     .setDirtyCheckEnabled(dirtyCheck)
                     .buildAtomicBlock();

@@ -48,7 +48,7 @@ public class CountDownCommitBarrier_joinCommitTest {
     public void whenLastOneEntering() throws InterruptedException {
         barrier = new CountDownCommitBarrier(1);
 
-        Transaction tx = stm.createTransactionFactoryBuilder()
+        Transaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .build()
                 .newTransaction();

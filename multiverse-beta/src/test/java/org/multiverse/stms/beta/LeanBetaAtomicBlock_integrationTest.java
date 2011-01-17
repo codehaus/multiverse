@@ -23,7 +23,7 @@ public class LeanBetaAtomicBlock_integrationTest {
 
     @Test
     public void whenExecutedThenThreadLocalTransactionSet() {
-        BetaTransactionFactory transactionFactory = stm.createTransactionFactoryBuilder().build();
+        BetaTransactionFactory transactionFactory = stm.newTransactionFactoryBuilder().build();
         AtomicBlock block = new LeanBetaAtomicBlock(transactionFactory);
         block.execute(new AtomicVoidClosure() {
             @Override

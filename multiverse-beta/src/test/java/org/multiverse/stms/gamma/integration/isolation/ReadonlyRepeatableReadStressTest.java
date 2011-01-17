@@ -60,7 +60,7 @@ public class ReadonlyRepeatableReadStressTest {
 
         @Override
         public void doRun() {
-            AtomicBlock block = stm.createTransactionFactoryBuilder()
+            AtomicBlock block = stm.newTransactionFactoryBuilder()
                     .buildAtomicBlock();
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
@@ -80,12 +80,12 @@ public class ReadonlyRepeatableReadStressTest {
 
     class ReadThread extends TestThread {
 
-        private final AtomicBlock readTrackingReadonlyBlock = stm.createTransactionFactoryBuilder()
+        private final AtomicBlock readTrackingReadonlyBlock = stm.newTransactionFactoryBuilder()
                 .setReadonly(true)
                 .setReadTrackingEnabled(true)
                 .buildAtomicBlock();
 
-        private final AtomicBlock readTrackingUpdateBlock = stm.createTransactionFactoryBuilder()
+        private final AtomicBlock readTrackingUpdateBlock = stm.newTransactionFactoryBuilder()
                 .setReadonly(false)
                 .setReadTrackingEnabled(true)
                 .buildAtomicBlock();

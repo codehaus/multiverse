@@ -43,7 +43,7 @@ public class TimeoutRollbackTest {
     }
 
     public void setAndTimeout() {
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setTimeoutNs(TimeUnit.SECONDS.toNanos(1))
                 .buildAtomicBlock();
 

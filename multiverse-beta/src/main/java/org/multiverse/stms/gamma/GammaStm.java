@@ -1,9 +1,10 @@
 package org.multiverse.stms.gamma;
 
 import org.multiverse.api.*;
-import org.multiverse.api.collections.TransactionalCollectionsFactory;
+import org.multiverse.api.collections.*;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.collections.NaiveTransactionalCollectionFactory;
 import org.multiverse.stms.gamma.transactionalobjects.*;
 import org.multiverse.stms.gamma.transactions.*;
 
@@ -26,6 +27,8 @@ public final class GammaStm implements Stm {
     public final GammaRefFactoryBuilder refFactoryBuilder = new RefFactoryBuilderImpl();
     public final GammaAtomicBlock defaultAtomicBlock;
     public final GammaTransactionConfiguration defaultConfig;
+    public final NaiveTransactionalCollectionFactory defaultTransactionalCollectionFactory
+            = new NaiveTransactionalCollectionFactory(this);
 
     public GammaStm() {
         this(new GammaStmConfiguration());
@@ -39,7 +42,7 @@ public final class GammaStm implements Stm {
         this.defaultBackoffPolicy = configuration.backoffPolicy;
         this.defaultConfig = new GammaTransactionConfiguration(this, configuration)
                 .setSpinCount(spinCount);
-        this.defaultAtomicBlock = createTransactionFactoryBuilder()
+        this.defaultAtomicBlock = newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .buildAtomicBlock();
     }
@@ -55,7 +58,7 @@ public final class GammaStm implements Stm {
     }
 
     @Override
-    public OrElseBlock createOrElseBlock() {
+    public OrElseBlock newOrElseBlock() {
         return null;
     }
 
@@ -293,14 +296,14 @@ public final class GammaStm implements Stm {
     }
 
     @Override
-    public GammaTransactionFactoryBuilder createTransactionFactoryBuilder() {
+    public GammaTransactionFactoryBuilder newTransactionFactoryBuilder() {
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         return new GammaTransactionFactoryBuilderImpl(config);
     }
 
     @Override
     public TransactionalCollectionsFactory getDefaultTransactionalCollectionFactory() {
-        return null;
+        return defaultTransactionalCollectionFactory;
     }
 
     @Override
