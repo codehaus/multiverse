@@ -44,14 +44,18 @@ public interface GammaObject extends GammaConstants {
     /**
      * Tries to acquire a lock on a previous read/written tranlocal and checks for conflict.
      * <p/>
-     * Call can safely
+     * If the lockMode == LOCKMODE_NONE, this call is ignored.
+     * <p/>
+     * The call to this method can safely made if the current lock level is higher the the desired LockMode.
+     * <p/>
+     * If the can't be acquired, no changes are made on the tranlocal.
      *
-     * @param spinCount the maximum number of times to spin
-     * @param tranlocal the tranlocal
-     * @param lockMode
-     * @return
+     * @param spinCount       the maximum number of times to spin
+     * @param tranlocal       the tranlocal
+     * @param desiredLockMode
+     * @return true if the lock was acquired successfully and there was no conflict.
      */
-    boolean tryLockAndCheckConflict(int spinCount, GammaRefTranlocal tranlocal, int lockMode);
+    boolean tryLockAndCheckConflict(int spinCount, GammaRefTranlocal tranlocal, int desiredLockMode);
 
     boolean hasReadConflict(GammaRefTranlocal tranlocal);
 

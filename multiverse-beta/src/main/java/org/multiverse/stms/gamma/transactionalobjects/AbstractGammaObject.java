@@ -5,7 +5,6 @@ import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.PanicError;
-import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.GammaStm;
@@ -174,58 +173,6 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
     }
 
-    @Override
-    public final boolean tryAcquire(final LockMode desiredLockMode) {
-        final GammaTransaction tx = (GammaTransaction) getThreadLocalTransaction();
-
-        if (tx == null) {
-            throw new TransactionRequiredException();
-        }
-
-        return tryAcquire(tx, desiredLockMode);
-    }
-
-    @Override
-    public final boolean tryAcquire(final Transaction tx, final LockMode desiredLockMode) {
-        return tryAcquire((GammaTransaction) tx, desiredLockMode);
-    }
-
-    public final boolean tryAcquire(final GammaTransaction tx, final LockMode desiredLockMode) {
-        if (tx == null) {
-            throw new NullPointerException();
-        }
-
-        if (tx.status != TX_ACTIVE) {
-            throw tx.abortTryAcquireOnBadStatus(this);
-        }
-
-        if (desiredLockMode == null) {
-            throw tx.abortTryAcquireOnNullLockMode(this);
-        }
-
-        final GammaRefTranlocal tranlocal = tx.locate((AbstractGammaRef) this);
-
-        final int currentLockMode = tranlocal == null ? LOCKMODE_NONE : tranlocal.getLockMode();
-
-        if (currentLockMode >= desiredLockMode.asInt()) {
-            return true;
-        }
-
-        switch (currentLockMode) {
-            case LOCKMODE_NONE:
-                break;
-            case LOCKMODE_READ:
-                break;
-            case LOCKMODE_WRITE:
-                break;
-            case LOCKMODE_EXCLUSIVE:
-                return true;
-            default:
-                throw new IllegalStateException();
-        }
-
-        throw new TodoException();
-    }
 
     @Override
     public final void acquire(final LockMode desiredLockMode) {
@@ -390,14 +337,24 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
         //no lock currently is acquired, lets acquire it.
         if (currentLockMode == LOCKMODE_NONE) {
-            long expectedVersion = tranlocal.version;
+            final long expectedVersion = tranlocal.version;
 
-            //if the version already is different, and there is a conflict, we are done since since the lock doesn't need to be acquired.
+            //if the version already is different, there is a conflict, we are done since since the lock doesn't need to be acquired.
             if (expectedVersion != version) {
                 return false;
             }
 
-            if (!tranlocal.hasDepartObligation()) {
+            if (tranlocal.hasDepartObligation()) {
+                if (!tryLockAfterNormalArrive(spinCount, desiredLockMode)) {
+                    return false;
+                }
+
+                if (version != expectedVersion) {
+                    tranlocal.setDepartObligation(false);
+                    departAfterFailureAndUnlock();
+                    return false;
+                }
+            } else {
                 //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
                 final int arriveStatus = tryLockAndArrive(spinCount, desiredLockMode);
 
@@ -405,22 +362,23 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                     return false;
                 }
 
+                if (version != expectedVersion) {
+                    unlockByUnregistered();
+                    return false;
+                }
+
                 if (arriveStatus == ARRIVE_NORMAL) {
                     tranlocal.setDepartObligation(true);
                 }
-            } else if (!tryLockAfterNormalArrive(spinCount, desiredLockMode)) {
-                return false;
             }
 
             tranlocal.setLockMode(desiredLockMode);
-
-            //if the version already is different, we are done since we know that there is a conflict.
-            return version == expectedVersion;
+            return true;
         }
 
-        //if a readlock is acquired, we need to upgrade it.
+        //if a readlock is acquired, we need to upgrade it to a write/exclusive-lock
         if (currentLockMode == LOCKMODE_READ) {
-            if (!tryUpgradeFromReadLock(spinCount, desiredLockMode == LOCKMODE_EXCLUSIVE)) {
+            if (!tryUpgradeReadLockToWriteOrExclusiveLock(spinCount, desiredLockMode == LOCKMODE_EXCLUSIVE)) {
                 return false;
             }
 
@@ -429,7 +387,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
 
         //so we have the write lock, its needs to be upgraded to a commit lock.
-        upgradeToExclusiveLock();
+        upgradeWriteLockToExclusiveLock();
         tranlocal.setLockMode(LOCKMODE_EXCLUSIVE);
         return true;
     }
@@ -510,7 +468,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return ARRIVE_LOCK_NOT_FREE;
     }
 
-    public final boolean tryUpgradeFromReadLock(int spinCount, final boolean exclusiveLock) {
+    public final boolean tryUpgradeReadLockToWriteOrExclusiveLock(int spinCount, final boolean exclusiveLock) {
         do {
             final long current = orec;
 
@@ -542,7 +500,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return false;
     }
 
-    public final void upgradeToExclusiveLock() {
+    public final void upgradeWriteLockToExclusiveLock() {
         while (true) {
             final long current = orec;
 
@@ -905,7 +863,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
     }
 
-    public final void unlockWhenUnregistered() {
+    public final void unlockByUnregistered() {
         while (true) {
             final long current = orec;
 

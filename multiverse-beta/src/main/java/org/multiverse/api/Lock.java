@@ -25,11 +25,10 @@ package org.multiverse.api;
  * Atm it isn't possible to block on a lock. So what happens is that some spinning is done and then some retries
  * in combination with backoffs. In the 0.8 release blocking will be added as well. The exact behavior will be
  * made configurable by some LockAcquisition policy.
- *
+ * <p/>
  * Important:
  * It is up the the Lock implementation to select a higher LockMode than the specified LockMode. Example,
  * the Lock could be implemented using a openForRead in combination with a LockMode. If the readLockMode is
- *
  *
  * @author Peter Veentjer.
  */
@@ -84,7 +83,7 @@ public interface Lock {
      * <p/>
      * If the Lock can't be acquired, a ReadWriteConflict is thrown.
      *
-     * @param tx the Transaction used for this operation.
+     * @param tx              the Transaction used for this operation.
      * @param desiredLockMode the desired lockMode.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
@@ -97,6 +96,8 @@ public interface Lock {
 
     /**
      * Tries to acquire a lock.
+     * <p/>
+     * If the lock can't be acquired or if a conflict is detected, false is returned. True otherwise.
      *
      * @param desiredLockMode the desired LockMode.
      * @return true if the Lock was acquired successfully, false otherwise.
@@ -109,6 +110,8 @@ public interface Lock {
 
     /**
      * Tries to acquire a lock.
+     * <p/>
+     * If the lock can't be acquired or if a conflict is detected, false is returned. True otherwise.
      *
      * @param tx              the Transaction used for this operation.
      * @param desiredLockMode the desired lockmode.

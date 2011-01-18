@@ -24,7 +24,7 @@ public class Orec_upgradeWriteLockToExclusiveLockTest implements GammaConstants 
         GammaLongRef ref = new GammaLongRef(stm);
 
         try {
-            ref.upgradeToExclusiveLock();
+            ref.upgradeWriteLockToExclusiveLock();
             fail();
         } catch (PanicError expected) {
 
@@ -40,7 +40,7 @@ public class Orec_upgradeWriteLockToExclusiveLockTest implements GammaConstants 
         ref.tryLockAndArrive(1, LOCKMODE_READ);
 
         try {
-            ref.upgradeToExclusiveLock();
+            ref.upgradeWriteLockToExclusiveLock();
             fail();
         } catch (PanicError expected) {
 
@@ -55,7 +55,7 @@ public class Orec_upgradeWriteLockToExclusiveLockTest implements GammaConstants 
         GammaLongRef ref = new GammaLongRef(stm);
         ref.tryLockAndArrive(1, LOCKMODE_WRITE);
 
-        ref.upgradeToExclusiveLock();
+        ref.upgradeWriteLockToExclusiveLock();
 
         assertSurplus(ref, 1);
         assertLockMode(ref, LOCKMODE_EXCLUSIVE);
@@ -66,7 +66,7 @@ public class Orec_upgradeWriteLockToExclusiveLockTest implements GammaConstants 
         GammaLongRef ref = new GammaLongRef(stm);
         ref.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
 
-        ref.upgradeToExclusiveLock();
+        ref.upgradeWriteLockToExclusiveLock();
 
         assertSurplus(ref, 1);
         assertLockMode(ref, LOCKMODE_EXCLUSIVE);

@@ -153,7 +153,7 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
 
         if (oldValue == newValue) {
             if (arriveStatus == ARRIVE_UNREGISTERED) {
-                unlockWhenUnregistered();
+                unlockByUnregistered();
             } else {
                 departAfterReadingAndUnlock();
             }
@@ -275,7 +275,7 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
 
         if (amount == 0) {
             if (arriveStatus == ARRIVE_UNREGISTERED) {
-                unlockWhenUnregistered();
+                unlockByUnregistered();
             } else {
                 departAfterReadingAndUnlock();
             }

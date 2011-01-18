@@ -1,8 +1,11 @@
 package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.multiverse.api.IsolationLevel;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LockedException;
+import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.api.functions.*;
 import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.GammaStm;
@@ -10,6 +13,7 @@ import org.multiverse.stms.gamma.GammaStmUtils;
 import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactions.*;
 
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 import static org.multiverse.stms.gamma.GammaStmUtils.asGammaTransaction;
 import static org.multiverse.stms.gamma.GammaStmUtils.getRequiredThreadLocalGammaTransaction;
 import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLocalGammaObjectPool;
@@ -190,7 +194,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             }
             tranlocal.setDepartObligation(false);
         } else if (tranlocal.getLockMode() != LOCKMODE_NONE) {
-            unlockWhenUnregistered();
+            unlockByUnregistered();
             tranlocal.setLockMode(LOCKMODE_NONE);
         }
 
@@ -224,7 +228,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             }
             tranlocal.setDepartObligation(false);
         } else if (tranlocal.getLockMode() != LOCKMODE_NONE) {
-            unlockWhenUnregistered();
+            unlockByUnregistered();
             tranlocal.setLockMode(LOCKMODE_NONE);
         }
 
@@ -1166,6 +1170,95 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tranlocal.addCommutingFunction(tx.pool, function);
     }
 
+    // ============================================================================================
+    // ================================= try acquire =========================================
+    // ============================================================================================
+
+    @Override
+    public final boolean tryAcquire(final LockMode desiredLockMode) {
+        final GammaTransaction tx = (GammaTransaction) getThreadLocalTransaction();
+
+        if (tx == null) {
+            throw new TransactionRequiredException();
+        }
+
+        return tryAcquire(tx, desiredLockMode);
+    }
+
+    public final boolean tryAcquire(final GammaTransaction tx, final LockMode desiredLockMode) {
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        if (tx instanceof MonoGammaTransaction) {
+            return tryAcquire((MonoGammaTransaction) tx, desiredLockMode);
+        } else if (tx instanceof ArrayGammaTransaction) {
+            return tryAcquire((ArrayGammaTransaction) tx, desiredLockMode);
+        } else {
+            return tryAcquire((MapGammaTransaction) tx, desiredLockMode);
+        }
+    }
+
+    @Override
+    public final boolean tryAcquire(final Transaction tx, final LockMode desiredLockMode) {
+        return tryAcquire((GammaTransaction) tx, desiredLockMode);
+    }
+
+    public final boolean tryAcquire(final MonoGammaTransaction tx, final LockMode desiredLockMode) {
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortTryAcquireOnBadStatus(this);
+        }
+
+        if (desiredLockMode == null) {
+            throw tx.abortTryAcquireOnNullLockMode(this);
+        }
+
+        throw new TodoException();
+    }
+
+    public final boolean tryAcquire(final ArrayGammaTransaction tx, final LockMode desiredLockMode) {
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortTryAcquireOnBadStatus(this);
+        }
+
+        if (desiredLockMode == null) {
+            throw tx.abortTryAcquireOnNullLockMode(this);
+        }
+
+        throw new TodoException();
+    }
+
+    public final boolean tryAcquire(final MapGammaTransaction tx, final LockMode desiredLockMode) {
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortTryAcquireOnBadStatus(this);
+        }
+
+        if (desiredLockMode == null) {
+            throw tx.abortTryAcquireOnNullLockMode(this);
+        }
+
+        final GammaTransactionConfiguration config = tx.config;
+
+        final GammaRefTranlocal tranlocal = tx.locate(this);
+        if (tranlocal != null) {
+            return tryLockAndCheckConflict(config.spinCount, tranlocal, desiredLockMode.asInt());
+        }
+
+        throw new TodoException();
+    }
+
     public final void ensure() {
         ensure(getRequiredThreadLocalGammaTransaction());
     }
@@ -1239,7 +1332,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         if (oldValue == newValue) {
             if (arriveStatus == ARRIVE_UNREGISTERED) {
-                unlockWhenUnregistered();
+                unlockByUnregistered();
             } else {
                 departAfterReadingAndUnlock();
             }
@@ -1279,7 +1372,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         if (expectedValue == newValue) {
             if (arriveStatus == ARRIVE_UNREGISTERED) {
-                unlockWhenUnregistered();
+                unlockByUnregistered();
             } else {
                 departAfterReadingAndUnlock();
             }

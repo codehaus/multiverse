@@ -23,7 +23,7 @@ public class Orec_unlockByUnregisteredTest {
         AbstractGammaObject orec = new GammaLongRef(stm);
 
         try {
-            orec.unlockWhenUnregistered();
+            orec.unlockByUnregistered();
             fail();
         } catch (PanicError expected) {
 
@@ -40,7 +40,7 @@ public class Orec_unlockByUnregisteredTest {
         orec.arrive(1);
 
         try {
-            orec.unlockWhenUnregistered();
+            orec.unlockByUnregistered();
             fail();
         } catch (PanicError expected) {
 
@@ -56,7 +56,7 @@ public class Orec_unlockByUnregisteredTest {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
         orec.tryLockAndArrive(1, LOCKMODE_READ);
 
-        orec.unlockWhenUnregistered();
+        orec.unlockByUnregistered();
         assertLockMode(orec, LockMode.None);
         assertSurplus(orec, 1);
     }
@@ -68,7 +68,7 @@ public class Orec_unlockByUnregisteredTest {
         orec.tryLockAndArrive(1, LOCKMODE_READ);
         orec.tryLockAndArrive(1, LOCKMODE_READ);
 
-        orec.unlockWhenUnregistered();
+        orec.unlockByUnregistered();
         assertLockMode(orec, LockMode.Read);
         assertReadLockCount(orec, 2);
         assertSurplus(orec, 1);
@@ -79,7 +79,7 @@ public class Orec_unlockByUnregisteredTest {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
         orec.tryLockAndArrive(1, LOCKMODE_WRITE);
 
-        orec.unlockWhenUnregistered();
+        orec.unlockByUnregistered();
         assertLockMode(orec, LockMode.None);
         assertSurplus(orec, 1);
     }
@@ -89,7 +89,7 @@ public class Orec_unlockByUnregisteredTest {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
         orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
 
-        orec.unlockWhenUnregistered();
+        orec.unlockByUnregistered();
 
         assertLockMode(orec, LOCKMODE_NONE);
         assertReadBiased(orec);
