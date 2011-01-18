@@ -1,42 +1,43 @@
-package org.multiverse.stms.beta.transactionalobjects;
+package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.*;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.stms.beta.BetaStmTestUtils.*;
+import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
-public class BetaRef_awaitNull0Test {
+public class GammaRef_awaitNull0Test {
 
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = new GammaStm();
         clearThreadLocalTransaction();
     }
 
     @Test
     public void whenNull_thenReturnImmediately() {
-        BetaRef ref = newRef(stm);
+        GammaRef<String> ref = new GammaRef<String>(stm);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         ref.awaitNull();
 
-        BetaRefTranlocal tranlocal = (BetaRefTranlocal) tx.get(ref);
-        assertTrue(tranlocal.isReadonly());
-        assertTranlocalHasNoLock(tranlocal);
+        GammaRefTranlocal tranlocal = tx.locate(ref);
+        assertTrue(tranlocal.isRead());
+        assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertRefHasNoLocks(ref);
 
         tx.commit();
@@ -46,15 +47,16 @@ public class BetaRef_awaitNull0Test {
         assertRefHasNoLocks(ref);
     }
 
+
     @Test
     public void whenPrivatizedByOther_thenReadWriteConflict() {
-        BetaRef ref = newRef(stm);
+        GammaRef<String> ref = new GammaRef<String>(stm);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.startDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         try {
             ref.awaitNull();
@@ -65,24 +67,24 @@ public class BetaRef_awaitNull0Test {
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, null);
-        assertRefHasCommitLock(ref, otherTx);
+        assertRefHasExclusiveLock(ref, otherTx);
     }
 
     @Test
     public void whenEnsuredByOther_thenSuccess() {
-        BetaRef ref = newRef(stm);
+        GammaRef<String> ref = new GammaRef<String>(stm);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.startDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
         ref.awaitNull();
 
-        BetaRefTranlocal tranlocal = (BetaRefTranlocal) tx.get(ref);
-        assertTrue(tranlocal.isReadonly());
-        assertTranlocalHasNoLock(tranlocal);
+        GammaRefTranlocal tranlocal = tx.locate(ref);
+        assertTrue(tranlocal.isRead());
+        assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
         assertRefHasWriteLock(ref, otherTx);
 
         tx.commit();
@@ -95,10 +97,10 @@ public class BetaRef_awaitNull0Test {
     @Test
     public void whenNotNull_thenWait() {
         String initialValue = "foo";
-        BetaRef ref = newRef(stm, initialValue);
+        GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction tx = stm.newTransactionFactoryBuilder()
+        GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .build()
                 .newTransaction();
 
@@ -117,7 +119,7 @@ public class BetaRef_awaitNull0Test {
 
     @Test
     public void whenNoTransactionAvailable_thenTransactionRequiredException() {
-        BetaRef ref = newRef(stm);
+        GammaRef<String> ref = new GammaRef<String>(stm);
         long initialVersion = ref.getVersion();
 
         try {
@@ -131,10 +133,10 @@ public class BetaRef_awaitNull0Test {
 
     @Test
     public void whenPreparedTransaction_thenPreparedTransactionException() {
-        BetaRef ref = newRef(stm);
+        GammaRef<String> ref = new GammaRef<String>(stm);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.startDefaultTransaction();
         tx.prepare();
         setThreadLocalTransaction(tx);
 
@@ -150,10 +152,10 @@ public class BetaRef_awaitNull0Test {
 
     @Test
     public void whenAbortedTransaction_thenDeadTransactionException() {
-        BetaRef ref = newRef(stm);
+        GammaRef<String> ref = new GammaRef<String>(stm);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.startDefaultTransaction();
         tx.abort();
         setThreadLocalTransaction(tx);
 
@@ -169,10 +171,10 @@ public class BetaRef_awaitNull0Test {
 
     @Test
     public void whenCommittedTransaction_thenDeadTransactionException() {
-        BetaRef ref = newRef(stm);
+        GammaRef<String> ref = new GammaRef<String>(stm);
         long initialVersion = ref.getVersion();
 
-        BetaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.startDefaultTransaction();
         tx.commit();
         setThreadLocalTransaction(tx);
 
