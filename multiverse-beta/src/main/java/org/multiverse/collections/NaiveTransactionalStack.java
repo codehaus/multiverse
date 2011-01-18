@@ -169,7 +169,7 @@ public final class NaiveTransactionalStack<E> extends AbstractTransactionalColle
 
     @Override
     public boolean remove(Transaction tx, Object o) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
     }
 
     static class It<E> extends AbstractTransactionalIterator<E> {

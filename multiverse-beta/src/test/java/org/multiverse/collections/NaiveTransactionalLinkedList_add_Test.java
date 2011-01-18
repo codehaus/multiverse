@@ -14,7 +14,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 
 public class NaiveTransactionalLinkedList_add_Test {
 
-       private Stm stm;
+    private Stm stm;
 
     @Before
     public void setUp() {
