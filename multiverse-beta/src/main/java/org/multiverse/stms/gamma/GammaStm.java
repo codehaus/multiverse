@@ -85,12 +85,12 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setReadWriteConflictErrorReuse(boolean reused) {
-            if(config.readWriteConflictErrorReuse = reused){
+        public GammaTransactionFactoryBuilder setControlFlowErrorsReused(boolean reused) {
+            if(config.controlFlowErrorsReused = reused){
                 return this;
             }
 
-            return new GammaTransactionFactoryBuilderImpl(config.setReadWriteConflictErrorReused(reused));
+            return new GammaTransactionFactoryBuilderImpl(config.setControlFlowErrorsReused(reused));
         }
 
         @Override

@@ -10,7 +10,7 @@ public interface GammaTransactionFactoryBuilder extends TransactionFactoryBuilde
     GammaTransactionConfiguration getTransactionConfiguration();
 
     @Override
-    GammaTransactionFactoryBuilder setReadWriteConflictErrorReuse(boolean reused);
+    GammaTransactionFactoryBuilder setControlFlowErrorsReused(boolean reused);
 
     @Override
     GammaTransactionFactoryBuilder setReadLockMode(LockMode lockMode);

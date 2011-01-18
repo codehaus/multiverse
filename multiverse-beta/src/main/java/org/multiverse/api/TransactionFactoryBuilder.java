@@ -21,7 +21,7 @@ public interface TransactionFactoryBuilder {
      */
     TransactionConfiguration getTransactionConfiguration();
 
-    TransactionFactoryBuilder setReadWriteConflictErrorReuse(boolean reused);
+    TransactionFactoryBuilder setControlFlowErrorsReused(boolean reused);
 
     /**
      * Sets the transaction familyname.

@@ -1,6 +1,7 @@
 package org.multiverse.stms.gamma.transactions;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.ExplicitAbortException;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
@@ -106,6 +107,11 @@ public final class MapGammaTransaction extends GammaTransaction {
 
         if (status != TX_ACTIVE && status != TX_PREPARED) {
             throw abortCommitOnBadStatus();
+        }
+
+        if (abortOnly) {
+            abort();
+            throw new ExplicitAbortException();
         }
 
         if (size > 0) {
@@ -305,7 +311,11 @@ public final class MapGammaTransaction extends GammaTransaction {
             throw abortRetryOnNoRetryPossible();
         }
 
-        throw Retry.INSTANCE;
+        if (config.controlFlowErrorsReused) {
+            throw Retry.INSTANCE;
+        } else {
+            throw new Retry();
+        }
     }
 
     public final boolean isReadConsistent(GammaRefTranlocal justAdded) {

@@ -2,7 +2,7 @@ package org.multiverse.stms.gamma.benchmarks;
 
 import org.benchy.BenchyUtils;
 import org.multiverse.TestThread;
-import org.multiverse.api.LockLevel;
+import org.multiverse.api.LockMode;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
@@ -99,7 +99,7 @@ public class UncontendedLeanUpdateBenchmark implements GammaConstants {
             //FatArrayGammaTransaction tx = new FatArrayGammaTransaction(stm,1);
             MonoGammaTransaction tx = new MonoGammaTransaction(
                     new GammaTransactionConfiguration(stm)
-                            .setLockLevel(LockLevel.CommitLockReads)
+                            .setReadLockMode(LockMode.Exclusive)
                             .setDirtyCheckEnabled(false));
             long startMs = System.currentTimeMillis();
             for (long k = 0; k < transactionCount; k++) {

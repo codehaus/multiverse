@@ -3,7 +3,7 @@ package org.multiverse.stms.gamma.benchmarks;
 import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
-import org.multiverse.api.LockLevel;
+import org.multiverse.api.LockMode;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
@@ -21,14 +21,14 @@ public class UncontendedMonoUpdateDriver extends BenchmarkDriver {
     private int threadCount = 1;
     private int transactionsPerThread = 100 * 1000 * 1000;
     private boolean dirtyCheck = false;
-    private LockLevel lockLevel = LockLevel.LockNone;
+    private LockMode lockMode = LockMode.None;
 
     @Override
     public void setUp() {
         System.out.printf("Multiverse > Thread count %s \n", threadCount);
         System.out.printf("Multiverse > Transactions per thread %s \n", transactionsPerThread);
         System.out.printf("Multiverse > Dirtycheck %s \n", dirtyCheck);
-        System.out.printf("Multiverse > Locklevel %s \n", lockLevel);
+        System.out.printf("Multiverse > Locklevel %s \n", lockMode);
 
         stm = new GammaStm();
 
@@ -75,7 +75,7 @@ public class UncontendedMonoUpdateDriver extends BenchmarkDriver {
 
             MonoGammaTransaction tx = new MonoGammaTransaction(
                     new GammaTransactionConfiguration(stm)
-                            .setLockLevel(lockLevel)
+                            .setReadLockMode(lockMode)
                             .setDirtyCheckEnabled(dirtyCheck));
             long startMs = System.currentTimeMillis();
             final long _transactionCount = transactionsPerThread;

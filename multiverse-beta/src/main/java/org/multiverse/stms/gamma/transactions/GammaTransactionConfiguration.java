@@ -50,7 +50,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public BackoffPolicy backoffPolicy;
     public long timeoutNs = Long.MAX_VALUE;
     public TraceLevel traceLevel = TraceLevel.None;
-    public boolean readWriteConflictErrorReuse = false;
+    public boolean controlFlowErrorsReused = false;
 
     public ArrayList<TransactionLifecycleListener> permanentListeners;
 
@@ -97,7 +97,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         this.familyName = "anonymoustransaction-" + idGenerator.incrementAndGet();
         this.isAnonymous = true;
         this.globalConflictCounter = stm.getGlobalConflictCounter();
-        this.readWriteConflictErrorReuse = configuration.readWriteConflictErrorReuse;
+        this.controlFlowErrorsReused = configuration.controlFlowErrorsReused;
     }
 
     public GammaTransactionConfiguration(GammaStm stm, int arrayTransactionSize) {
@@ -125,8 +125,8 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     }
 
     @Override
-    public boolean isReadWriteConflictErrorReused() {
-        return readWriteConflictErrorReuse;
+    public boolean isControlFlowErrorsReused() {
+        return controlFlowErrorsReused;
     }
 
     public SpeculativeGammaConfiguration getSpeculativeConfiguration() {
@@ -321,7 +321,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.readWriteConflictErrorReuse = readWriteConflictErrorReuse;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
         return config;
     }
 
@@ -352,7 +352,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.readWriteConflictErrorReuse = readWriteConflictErrorReuse;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
         return config;
     }
 
@@ -384,7 +384,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.readWriteConflictErrorReuse = readWriteConflictErrorReuse;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
         return config;
     }
 
@@ -412,7 +412,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.readWriteConflictErrorReuse = readWriteConflictErrorReuse;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
         return config;
     }
 
@@ -440,7 +440,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.readWriteConflictErrorReuse = readWriteConflictErrorReuse;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
         return config;
     }
 
@@ -468,7 +468,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.readWriteConflictErrorReuse = readWriteConflictErrorReuse;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
         return config;
     }
 
@@ -496,7 +496,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.readWriteConflictErrorReuse = readWriteConflictErrorReuse;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
         return config;
     }
 
@@ -524,7 +524,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.readWriteConflictErrorReuse = readWriteConflictErrorReuse;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
         return config;
     }
 
@@ -552,11 +552,11 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.readWriteConflictErrorReuse = readWriteConflictErrorReuse;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
         return config;
     }
 
-    public GammaTransactionConfiguration setReadWriteConflictErrorReused(boolean readWriteConflictErrorReuse) {
+    public GammaTransactionConfiguration setControlFlowErrorsReused(boolean controlFlowErrorsReused) {
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
         config.readonly = readonly;
         config.spinCount = spinCount;
@@ -580,7 +580,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.readWriteConflictErrorReuse = readWriteConflictErrorReuse;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
         return config;
     }
 
@@ -612,7 +612,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.readWriteConflictErrorReuse = readWriteConflictErrorReuse;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
         return config;
     }
 
@@ -644,7 +644,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.readWriteConflictErrorReuse = readWriteConflictErrorReuse;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
         return config;
     }
 
@@ -676,7 +676,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.readWriteConflictErrorReuse = readWriteConflictErrorReuse;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
         return config;
     }
 
@@ -708,7 +708,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
-        config.readWriteConflictErrorReuse = readWriteConflictErrorReuse;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
         return config;
     }
 
@@ -741,7 +741,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.isolationLevel = isolationLevel;
         config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.readWriteConflictErrorReuse = readWriteConflictErrorReuse;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
         return config;
     }
 
@@ -773,7 +773,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.isolationLevel = isolationLevel;
         config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.readWriteConflictErrorReuse = readWriteConflictErrorReuse;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
         return config;
     }
 
@@ -805,7 +805,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.isolationLevel = isolationLevel;
         config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.readWriteConflictErrorReuse = readWriteConflictErrorReuse;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
         return config;
     }
 
@@ -844,7 +844,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.propagationLevel = propagationLevel;
         config.permanentListeners = newPermanentListeners;
-        config.readWriteConflictErrorReuse = readWriteConflictErrorReuse;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
         return config;
     }
 
@@ -870,7 +870,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
                 ", backoffPolicy=" + backoffPolicy +
                 ", blockingAllowed=" + blockingAllowed +
                 ", timeoutNs=" + timeoutNs +
-                ", readWriteConflictReuse=" + readWriteConflictErrorReuse +
+                ", readWriteConflictReuse=" + controlFlowErrorsReused +
                 ", interruptible=" + interruptible +
                 ", permanentListeners=" + permanentListeners +
                 '}';

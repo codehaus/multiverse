@@ -106,7 +106,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     }
 
     @Override
-    public boolean isReadWriteConflictErrorReused() {
+    public boolean isControlFlowErrorsReused() {
         throw new TodoException();
     }
 

@@ -30,7 +30,7 @@ public final class GammaStmConfiguration {
     public int maxArrayTransactionSize = 20;
     public BackoffPolicy backoffPolicy = ExponentialBackoffPolicy.MAX_100_MS;
     public TraceLevel traceLevel = TraceLevel.None;
-    public boolean readWriteConflictErrorReuse = true;
+    public boolean controlFlowErrorsReused = true;
 
     /**
      * Checks if the configuration is valid.

@@ -15,11 +15,13 @@ import org.multiverse.stms.gamma.MapGammaTransactionFactory;
 import org.multiverse.stms.gamma.MonoGammaTransactionFactory;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
+import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
 
 import java.util.Collection;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 import static org.multiverse.TestUtils.LOCKMODE_EXCLUSIVE;
 import static org.multiverse.TestUtils.LOCKMODE_NONE;
 import static org.multiverse.TestUtils.LOCKMODE_READ;
@@ -60,6 +62,9 @@ public class GammaLongRef_ensure1Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = transactionFactory.newTransaction();
+
+
+
         setThreadLocalTransaction(tx);
         ref.get(tx);
         ref.ensure(tx);
@@ -292,6 +297,8 @@ public class GammaLongRef_ensure1Test {
 
     @Test
     public void whenPossibleWriteSkew_thenCanBeDetectedWithDeferredEnsure() {
+        assumeTrue(!(transactionFactory.newTransaction() instanceof MonoGammaTransaction));
+
         GammaLongRef ref1 = new GammaLongRef(stm);
         GammaLongRef ref2 = new GammaLongRef(stm);
 

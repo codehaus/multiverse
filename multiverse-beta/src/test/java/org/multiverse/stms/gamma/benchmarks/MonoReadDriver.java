@@ -3,7 +3,7 @@ package org.multiverse.stms.gamma.benchmarks;
 import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
-import org.multiverse.api.LockLevel;
+import org.multiverse.api.LockMode;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
@@ -75,7 +75,7 @@ public class MonoReadDriver extends BenchmarkDriver implements GammaConstants {
 
             MonoGammaTransaction tx = new MonoGammaTransaction(
                     new GammaTransactionConfiguration(stm)
-                            .setLockLevel(LockLevel.CommitLockReads)
+                            .setReadLockMode(LockMode.Exclusive)
                             .setDirtyCheckEnabled(false));
             long startMs = System.currentTimeMillis();
             final long _transactionCount = transactionCount;

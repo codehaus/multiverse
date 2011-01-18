@@ -41,9 +41,9 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public final ReadWriteConflict abortOnReadWriteConflict() {
         abort();
-        if(config.readWriteConflictErrorReuse){
+        if (config.controlFlowErrorsReused) {
             return ReadWriteConflict.INSTANCE;
-        }else{
+        } else {
             return new ReadWriteConflict();
         }
     }
@@ -314,7 +314,11 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public final SpeculativeConfigurationError abortOnTooSmallSize(int minimalSize) {
         config.needsMinimalTransactionLength(minimalSize);
         abort();
-        return SpeculativeConfigurationError.INSTANCE;
+        if (config.controlFlowErrorsReused) {
+            return SpeculativeConfigurationError.INSTANCE;
+        } else {
+            return new SpeculativeConfigurationError();
+        }
     }
 
     public final boolean hasWrites() {

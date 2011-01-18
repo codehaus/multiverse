@@ -9,11 +9,11 @@ public class MonoGammaTransactionFactory implements GammaTransactionFactory {
     private final GammaTransactionConfiguration config;
 
     public MonoGammaTransactionFactory(GammaStm stm) {
-        this(new GammaTransactionConfiguration(stm));
+        this(new GammaTransactionConfiguration(stm).setControlFlowErrorsReused(false));
     }
 
     public MonoGammaTransactionFactory(GammaTransactionConfiguration config) {
-        this.config = config;
+        this.config = config.setControlFlowErrorsReused(false);
     }
 
     @Override

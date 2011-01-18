@@ -1,6 +1,7 @@
 package org.multiverse.stms.gamma.transactions;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.ExplicitAbortException;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
@@ -43,20 +44,25 @@ public final class MonoGammaTransaction extends GammaTransaction {
         }
 
         if (abortOnly) {
-            //throw new AbortOn
+            abort();
+            throw new ExplicitAbortException();
         }
 
         final AbstractGammaRef owner = tranlocal.owner;
 
         if (owner != null) {
-            if (status == TX_ACTIVE) {
-                if (!owner.prepare(this, tranlocal)) {
-                    throw abortOnReadWriteConflict();
+            if (hasWrites) {
+                if (status == TX_ACTIVE) {
+                    if (!owner.prepare(this, tranlocal)) {
+                        throw abortOnReadWriteConflict();
+                    }
                 }
-            }
-            Listeners listeners = owner.safe(tranlocal, pool);
-            if (listeners != null) {
-                listeners.openAll(pool);
+                Listeners listeners = owner.safe(tranlocal, pool);
+                if (listeners != null) {
+                    listeners.openAll(pool);
+                }
+            } else {
+                owner.releaseAfterReading(tranlocal, pool);
             }
         }
 
@@ -151,7 +157,11 @@ public final class MonoGammaTransaction extends GammaTransaction {
             throw abortRetryOnNoRetryPossible();
         }
 
-        throw Retry.INSTANCE;
+        if (config.controlFlowErrorsReused) {
+            throw Retry.INSTANCE;
+        } else {
+            throw new Retry();
+        }
     }
 
     @Override
