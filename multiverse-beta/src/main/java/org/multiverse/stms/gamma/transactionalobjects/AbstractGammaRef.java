@@ -10,6 +10,8 @@ import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactions.*;
 
+import static org.multiverse.stms.gamma.GammaStmUtils.asGammaTransaction;
+import static org.multiverse.stms.gamma.GammaStmUtils.getRequiredThreadLocalGammaTransaction;
 import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLocalGammaObjectPool;
 
 public abstract class AbstractGammaRef extends AbstractGammaObject {

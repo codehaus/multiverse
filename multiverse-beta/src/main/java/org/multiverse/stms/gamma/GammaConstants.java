@@ -2,6 +2,11 @@ package org.multiverse.stms.gamma;
 
 import org.multiverse.MultiverseConstants;
 
+/**
+ * Contains the constants for the {@link GammaStm}.
+ *
+ * @author Peter Veentjer.
+ */
 public interface GammaConstants extends MultiverseConstants {
 
     int ARRIVE_NORMAL = 0;

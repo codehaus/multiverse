@@ -9,14 +9,22 @@ import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTransaction;
+import static org.multiverse.stms.gamma.GammaStmUtils.asGammaTransaction;
+import static org.multiverse.stms.gamma.GammaStmUtils.getRequiredThreadLocalGammaTransaction;
 
+/**
+ * A {@link Ref} tailored for the {@link GammaStm}.
+ *
+ * @param <E>
+ * @author Peter Veentjer.
+ */
 public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
 
-    public GammaRef(GammaStm stm) {
+    public GammaRef(final GammaStm stm) {
         this(stm, null);
     }
 
-    public GammaRef(GammaStm stm, E value) {
+    public GammaRef(final GammaStm stm, final E value) {
         super(stm, TYPE_REF);
 
         this.ref_value = value;

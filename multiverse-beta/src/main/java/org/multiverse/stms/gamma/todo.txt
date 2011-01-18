@@ -10,8 +10,6 @@
 
 - speculative size for full conflict scan
 
-- add constructing state for tranlocal
-
 - transaction template.
 
 - open for construction

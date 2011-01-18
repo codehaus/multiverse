@@ -25,6 +25,16 @@ public interface TransactionConfiguration {
     Stm getStm();
 
     /**
+     * Checks if the {@link org.multiverse.api.exceptions.ReadWriteConflict} is cached or a new one is used.
+     *
+     * Exception creation can be very expensive, so by default the ReadWriteConflict Error is reused, but this can
+     * be problematic when debugging.
+     *
+     * @return true if the ReadWriteConflict is reused.
+     */
+    boolean isReadWriteConflictErrorReused();
+
+    /**
      * Gets the IsolationLevel used. With the IsolationLevel you have control on the isolated behavior between
      * transactions.
      *

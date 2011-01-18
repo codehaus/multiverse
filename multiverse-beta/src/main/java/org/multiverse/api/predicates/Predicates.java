@@ -5,7 +5,7 @@ package org.multiverse.api.predicates;
  *
  * @author Peter Veentjer.
  */
-public class Predicates {
+public final class Predicates {
 
     private final static Predicate IsNullPredicate = new Predicate() {
         public boolean evaluate(Object value) {
@@ -37,6 +37,7 @@ public class Predicates {
         return IsNotNullPredicate;
     }
 
+    //we don't want instances.
     private Predicates() {
     }
 }

@@ -1,6 +1,11 @@
 package org.multiverse.stms.gamma;
 
-public class ThreadLocalGammaObjectPool {
+/**
+ * A ThreadLocal that contains the {@link GammaObjectPool}.
+ *
+ * @author Peter Veentjer.
+ */
+public final class ThreadLocalGammaObjectPool {
 
     public final static ThreadLocal<GammaObjectPool> threadlocal = new ThreadLocal<GammaObjectPool>() {
         protected GammaObjectPool initialValue() {

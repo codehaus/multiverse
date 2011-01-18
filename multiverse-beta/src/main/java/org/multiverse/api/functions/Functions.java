@@ -5,7 +5,7 @@ package org.multiverse.api.functions;
  *
  * @author Peter Veentjer.
  */
-public class Functions {
+public final class Functions {
 
     private static final IntFunction incOneIntFunction = new IncIntFunction(1);
 

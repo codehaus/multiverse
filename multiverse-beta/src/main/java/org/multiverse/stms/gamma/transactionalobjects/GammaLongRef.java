@@ -10,15 +10,22 @@ import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
+import static org.multiverse.stms.gamma.GammaStmUtils.asGammaTransaction;
+import static org.multiverse.stms.gamma.GammaStmUtils.getRequiredThreadLocalGammaTransaction;
 import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLocalGammaObjectPool;
 
+/**
+ * A {@link LongRef} for the {@link GammaStm}.
+ *
+ * @author Peter Veentjer.
+ */
 public final class GammaLongRef extends AbstractGammaRef implements LongRef {
 
-    public GammaLongRef(GammaStm stm) {
+    public GammaLongRef(final GammaStm stm) {
         this(stm, 0);
     }
 
-    public GammaLongRef(GammaStm stm, long initialValue) {
+    public GammaLongRef(final GammaStm stm, long initialValue) {
         super(stm, TYPE_LONG);
         this.long_value = initialValue;
         //noinspection PointlessArithmeticExpression

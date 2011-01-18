@@ -106,6 +106,11 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     }
 
     @Override
+    public boolean isReadWriteConflictErrorReused() {
+        throw new TodoException();
+    }
+
+    @Override
     public LockMode getReadLockMode() {
         throw new TodoException();
     }

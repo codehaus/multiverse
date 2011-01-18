@@ -20,7 +20,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public GammaRefTranlocal locate(AbstractGammaRef o) {
+    public final GammaRefTranlocal locate(AbstractGammaRef o) {
         if (status != TX_ACTIVE) {
             throw abortLocateOnBadStatus(o);
         }
@@ -33,7 +33,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public void commit() {
+    public final void commit() {
         if (status == TX_COMMITTED) {
             return;
         }
@@ -65,7 +65,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public void abort() {
+    public final void abort() {
         if (status == TX_ABORTED) {
             return;
         }
@@ -82,7 +82,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public void prepare() {
+    public final void prepare() {
         if (status == TX_PREPARED) {
             return;
         }
@@ -102,13 +102,13 @@ public final class MonoGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public GammaRefTranlocal getRefTranlocal(AbstractGammaRef ref) {
+    public final GammaRefTranlocal getRefTranlocal(AbstractGammaRef ref) {
         //noinspection ObjectEquality
         return tranlocal.owner == ref ? tranlocal : null;
     }
 
     @Override
-    public void retry() {
+    public final void retry() {
         if (status != TX_ACTIVE && status != TX_PREPARED) {
             throw abortRetryOnBadStatus();
         }
@@ -155,7 +155,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public boolean softReset() {
+    public final boolean softReset() {
         if (attempt >= config.getMaxRetries()) {
             return false;
         }
@@ -167,7 +167,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
         return true;
     }
 
-    public void hardReset() {
+    public final void hardReset() {
         status = TX_ACTIVE;
         hasWrites = false;
         remainingTimeoutNs = config.timeoutNs;
@@ -175,7 +175,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
         abortOnly = false;
     }
 
-    public boolean isReadConsistent(GammaRefTranlocal justAdded) {
+    public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
         return true;
     }
 }

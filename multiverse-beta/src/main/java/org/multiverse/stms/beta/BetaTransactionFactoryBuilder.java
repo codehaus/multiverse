@@ -12,6 +12,9 @@ import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 public interface BetaTransactionFactoryBuilder extends TransactionFactoryBuilder {
 
     @Override
+    BetaTransactionFactoryBuilder setReadWriteConflictErrorReuse(boolean reused);
+
+    @Override
     BetaTransactionConfiguration getTransactionConfiguration();
 
     @Override

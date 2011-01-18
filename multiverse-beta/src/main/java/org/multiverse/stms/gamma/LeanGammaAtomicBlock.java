@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 import static java.lang.String.format;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactionContainer;
 
-public class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
+public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
     private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class.getName());
 
     public LeanGammaAtomicBlock(final GammaTransactionFactory transactionFactory) {

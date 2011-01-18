@@ -2,7 +2,12 @@ package org.multiverse.stms.gamma;
 
 import org.multiverse.stms.gamma.transactions.GammaTransactionPool;
 
-public class ThreadLocalGammaTransactionPool {
+/**
+ * A ThreadLocal that stores the {@link GammaTransactionPool}.
+ *
+ * @author Peter Veentjer.
+ */
+public final class ThreadLocalGammaTransactionPool {
 
     private final static ThreadLocal<GammaTransactionPool> threadlocal = new ThreadLocal<GammaTransactionPool>() {
         @Override

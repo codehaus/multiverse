@@ -18,11 +18,13 @@ import org.multiverse.stms.gamma.MapGammaTransactionFactory;
 import org.multiverse.stms.gamma.MonoGammaTransactionFactory;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
+import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
 
 import java.util.Collection;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.LOCKMODE_NONE;
@@ -374,6 +376,8 @@ public class GammaLongRef_commute2Test {
 
     @Test
     public void fullExample() {
+        assumeTrue(!(transactionFactory.newTransaction() instanceof MonoGammaTransaction));
+
         GammaLongRef ref1 = new GammaLongRef(stm, 10);
         GammaLongRef ref2 = new GammaLongRef(stm, 10);
 

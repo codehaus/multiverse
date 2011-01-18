@@ -4,8 +4,15 @@ import org.multiverse.api.*;
 
 import static java.lang.String.format;
 
-@SuppressWarnings({"CanBeFinal"})
-public class GammaStmConfiguration {
+/**
+ * Contains the default configuration for all transactions created by the GammaStm.
+ *
+ * Once the GammaStm has been created, changes on this structure are ignored.
+ *
+ * @author Peter Veentjer.
+ */
+@SuppressWarnings({"ClassWithTooManyFields"})
+public final class GammaStmConfiguration {
     public PropagationLevel propagationLevel = PropagationLevel.Requires;
     public IsolationLevel isolationLevel = IsolationLevel.Snapshot;
     public LockMode readLockMode = LockMode.None;
@@ -14,7 +21,7 @@ public class GammaStmConfiguration {
     public boolean interruptible = false;
     public long timeoutNs = Long.MAX_VALUE;
     public boolean readonly = false;
-    public int spinCount = 16;
+    public int spinCount = 64;
     public boolean dirtyCheck = true;
     public int minimalArrayTreeSize = 4;
     public boolean trackReads = true;
@@ -23,6 +30,7 @@ public class GammaStmConfiguration {
     public int maxArrayTransactionSize = 20;
     public BackoffPolicy backoffPolicy = ExponentialBackoffPolicy.MAX_100_MS;
     public TraceLevel traceLevel = TraceLevel.None;
+    public boolean readWriteConflictErrorReuse = true;
 
     /**
      * Checks if the configuration is valid.

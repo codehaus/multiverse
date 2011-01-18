@@ -1,6 +1,6 @@
 package org.multiverse.stms.gamma.transactions;
 
-public class SpeculativeGammaConfiguration {
+public final class SpeculativeGammaConfiguration {
 
     public final boolean areListenersRequired;
     public final int minimalLength;

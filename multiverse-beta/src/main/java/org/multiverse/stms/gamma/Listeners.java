@@ -15,7 +15,7 @@ import org.multiverse.api.blocking.RetryLatch;
  *
  * @author Peter Veentjer
  */
-public class Listeners {
+public final class Listeners {
     public Listeners next;
     public RetryLatch listener;
     public long listenerEra;

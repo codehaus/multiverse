@@ -22,15 +22,15 @@ public final class MapGammaTransaction extends GammaTransaction {
         this.array = new GammaRefTranlocal[config.minimalArrayTreeSize];
     }
 
-    public float getUsage() {
+    public final float getUsage() {
         return (size * 1.0f) / array.length;
     }
 
-    public int size() {
+    public final int size() {
         return size;
     }
 
-    public int indexOf(final AbstractGammaRef ref, final int hash) {
+    public final int indexOf(final AbstractGammaRef ref, final int hash) {
         int jump = 0;
         boolean goLeft = true;
 
@@ -56,7 +56,7 @@ public final class MapGammaTransaction extends GammaTransaction {
         return -1;
     }
 
-    public void attach(final GammaRefTranlocal tranlocal, final int hash) {
+    public final void attach(final GammaRefTranlocal tranlocal, final int hash) {
         int jump = 0;
         boolean goLeft = true;
 
@@ -99,7 +99,7 @@ public final class MapGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public void commit() {
+    public final void commit() {
         if (status == TX_COMMITTED) {
             return;
         }
@@ -178,7 +178,7 @@ public final class MapGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public void prepare() {
+    public final void prepare() {
         if (status == TX_PREPARED) {
             return;
         }
@@ -214,7 +214,7 @@ public final class MapGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public void abort() {
+    public final void abort() {
         if (status == TX_ABORTED) {
             return;
         }
@@ -231,7 +231,7 @@ public final class MapGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public GammaRefTranlocal locate(AbstractGammaRef o) {
+    public final GammaRefTranlocal locate(AbstractGammaRef o) {
         if (status != TX_ACTIVE) {
             throw abortLocateOnBadStatus(o);
         }
@@ -244,13 +244,13 @@ public final class MapGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public GammaRefTranlocal getRefTranlocal(AbstractGammaRef ref) {
+    public final GammaRefTranlocal getRefTranlocal(AbstractGammaRef ref) {
         int indexOf = indexOf(ref, ref.identityHashCode());
         return indexOf == -1 ? null : array[indexOf];
     }
 
     @Override
-    public void retry() {
+    public final void retry() {
         if (status != TX_ACTIVE && status != TX_PREPARED) {
             throw abortRetryOnBadStatus();
         }
@@ -308,7 +308,7 @@ public final class MapGammaTransaction extends GammaTransaction {
         throw Retry.INSTANCE;
     }
 
-    public boolean isReadConsistent(GammaRefTranlocal justAdded) {
+    public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
         if (!needsConsistency) {
             return true;
         }
@@ -338,7 +338,7 @@ public final class MapGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public boolean softReset() {
+    public final boolean softReset() {
         if (attempt >= config.getMaxRetries()) {
             return false;
         }
@@ -353,7 +353,7 @@ public final class MapGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public void hardReset() {
+    public final void hardReset() {
         status = TX_ACTIVE;
         hasWrites = false;
         remainingTimeoutNs = config.timeoutNs;

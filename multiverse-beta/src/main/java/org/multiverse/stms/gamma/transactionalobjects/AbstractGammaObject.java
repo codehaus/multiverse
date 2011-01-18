@@ -58,30 +58,6 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     //This field has a controlled JMM problem (just like the hashcode of String).
     protected int identityHashCode;
 
-    public static GammaTransaction getRequiredThreadLocalGammaTransaction() {
-        Transaction tx = getThreadLocalTransaction();
-
-        if (tx == null) {
-            throw new TransactionRequiredException();
-        }
-
-        return asGammaTransaction(tx);
-    }
-
-    public static GammaTransaction asGammaTransaction(Transaction tx) {
-        if (tx instanceof GammaTransaction) {
-            return (GammaTransaction) tx;
-        }
-
-        if (tx == null) {
-            throw new NullPointerException("Transaction can't be null");
-        }
-
-        tx.abort();
-        throw new ClassCastException(
-                format("Expected Transaction of class %s, found %s", GammaTransaction.class.getName(), tx.getClass().getName()));
-    }
-
     public AbstractGammaObject(GammaStm stm) {
         this.stm = stm;
     }

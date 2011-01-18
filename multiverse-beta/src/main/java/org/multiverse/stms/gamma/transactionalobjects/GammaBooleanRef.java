@@ -8,13 +8,21 @@ import org.multiverse.api.references.BooleanRef;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
+import static org.multiverse.stms.gamma.GammaStmUtils.asGammaTransaction;
+import static org.multiverse.stms.gamma.GammaStmUtils.getRequiredThreadLocalGammaTransaction;
+
+/**
+ * A {@link BooleanRef} for the {@link GammaStm}.
+ *
+ * @author Peter Veentjer.
+ */
 public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRef {
 
-    public GammaBooleanRef(GammaStm stm) {
+    public GammaBooleanRef(final GammaStm stm) {
         this(stm, false);
     }
 
-    public GammaBooleanRef(GammaStm stm, boolean b) {
+    public GammaBooleanRef(final GammaStm stm, final boolean b) {
         super(stm, TYPE_BOOLEAN);
         this.long_value = asLong(b);
         //noinspection PointlessArithmeticExpression

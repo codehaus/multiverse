@@ -141,6 +141,11 @@ public final class BetaStm implements Stm {
         }
 
         @Override
+        public BetaTransactionFactoryBuilder setReadWriteConflictErrorReuse(boolean reused) {
+            throw new TodoException();
+        }
+
+        @Override
         public BetaTransactionFactoryBuilder setReadLockMode(LockMode lockMode) {
             throw new TodoException();
         }

@@ -10,7 +10,12 @@ import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.multiverse.api.StmUtils.retry;
+import static org.multiverse.stms.gamma.GammaStmUtils.asGammaTransaction;
+import static org.multiverse.stms.gamma.GammaStmUtils.getRequiredThreadLocalGammaTransaction;
 
+/**
+ * @author Peter Veentjer.
+ */
 public final class GammaIntRef extends AbstractGammaRef implements IntRef {
 
     public GammaIntRef(GammaStm stm) {

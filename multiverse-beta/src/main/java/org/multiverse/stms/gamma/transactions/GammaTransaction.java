@@ -33,7 +33,6 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public boolean abortOnly = false;
     public final RetryLatch listener = new DefaultRetryLatch();
 
-
     public GammaTransaction(GammaTransactionConfiguration config, int transactionType) {
         config.init();
         init(config);
@@ -42,7 +41,11 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public final ReadWriteConflict abortOnReadWriteConflict() {
         abort();
-        return ReadWriteConflict.INSTANCE;
+        if(config.readWriteConflictErrorReuse){
+            return ReadWriteConflict.INSTANCE;
+        }else{
+            return new ReadWriteConflict();
+        }
     }
 
     public final ReadonlyException abortOpenForWriteOnReadonly(GammaObject object) {

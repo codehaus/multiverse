@@ -8,6 +8,9 @@ import org.multiverse.api.references.DoubleRef;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
+import static org.multiverse.stms.gamma.GammaStmUtils.asGammaTransaction;
+import static org.multiverse.stms.gamma.GammaStmUtils.getRequiredThreadLocalGammaTransaction;
+
 public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef {
 
     public GammaDoubleRef(GammaStm stm) {
