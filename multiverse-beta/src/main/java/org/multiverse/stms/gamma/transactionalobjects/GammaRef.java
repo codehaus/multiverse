@@ -25,7 +25,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     public GammaRef(final GammaTransaction tx, final E value) {
-        super(tx.getConfiguration().stm, TYPE_BOOLEAN);
+        super(tx.getConfiguration().stm, TYPE_REF);
 
         tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
         GammaRefTranlocal tranlocal = openForConstruction(tx);

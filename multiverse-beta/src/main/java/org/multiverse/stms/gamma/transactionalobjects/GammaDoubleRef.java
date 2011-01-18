@@ -17,7 +17,7 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
     }
 
     public GammaDoubleRef(final GammaTransaction tx, final double value) {
-        super(tx.getConfiguration().stm, TYPE_BOOLEAN);
+        super(tx.getConfiguration().stm, TYPE_DOUBLE);
 
         tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
         GammaRefTranlocal tranlocal = openForConstruction(tx);

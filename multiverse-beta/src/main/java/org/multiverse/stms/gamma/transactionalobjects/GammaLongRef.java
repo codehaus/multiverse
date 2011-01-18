@@ -37,7 +37,7 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
     }
 
     public GammaLongRef(final GammaTransaction tx, final long value) {
-        super(tx.getConfiguration().stm, TYPE_BOOLEAN);
+        super(tx.getConfiguration().stm, TYPE_LONG);
 
         tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
         GammaRefTranlocal tranlocal = openForConstruction(tx);

@@ -23,7 +23,7 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     }
 
     public GammaIntRef(final GammaTransaction tx, final int value) {
-        super(tx.getConfiguration().stm, TYPE_BOOLEAN);
+        super(tx.getConfiguration().stm, TYPE_INT);
 
         tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
         GammaRefTranlocal tranlocal = openForConstruction(tx);
