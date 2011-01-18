@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta.benchmarks;
+package org.multiverse.stms.gamma.benchmarks;
 
 import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
@@ -10,11 +10,11 @@ import org.multiverse.api.closures.AtomicBooleanClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.IntRef;
 import org.multiverse.api.references.Ref;
-import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.gamma.GammaStm;
 
+import static org.benchy.BenchyUtils.format;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
-import static org.multiverse.stms.beta.BetaStmUtils.format;
 
 public class SimpleStackDriver extends BenchmarkDriver {
 
@@ -25,7 +25,7 @@ public class SimpleStackDriver extends BenchmarkDriver {
     private LockLevel lockMode = LockLevel.LockNone;
     private boolean dirtyCheck = false;
 
-    private BetaStm stm;
+    private GammaStm stm;
     private PopThread[] popThreads;
     private PushThread[] pushThreads;
     private Stack<String> stack;
@@ -43,7 +43,7 @@ public class SimpleStackDriver extends BenchmarkDriver {
         System.out.printf("Multiverse > LockLevel %s\n", lockMode);
         System.out.printf("Multiverse > DirtyCheck %s\n", dirtyCheck);
 
-        stm = new BetaStm();
+        stm = new GammaStm();
         stack = new Stack<String>();
 
         pushThreads = new PushThread[pushThreadCount];

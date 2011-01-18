@@ -1,23 +1,23 @@
-package org.multiverse.stms.beta.benchmarks.orec;
+package org.multiverse.stms.gamma.benchmarks.orec;
 
 import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.GlobalConflictCounter;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 
 import static org.benchy.BenchyUtils.*;
-import static org.multiverse.TestUtils.joinAll;
-import static org.multiverse.TestUtils.startAll;
+import static org.multiverse.TestUtils.*;
 
-public class OrecCommitLockUpdateDriver extends BenchmarkDriver implements BetaStmConstants {
-    private BetaLongRef ref;
+
+public class OrecNormalNormalUpdateDriver extends BenchmarkDriver implements GammaConstants {
+    private GammaLongRef ref;
     private GlobalConflictCounter globalConflictCounter;
-    private BetaStm stm;
-    private int threadCount;
+    private GammaStm stm;
 
+    private int threadCount;
     private long operationCount = 1000 * 1000 * 1000;
     private UpdateThread[] threads;
 
@@ -26,8 +26,8 @@ public class OrecCommitLockUpdateDriver extends BenchmarkDriver implements BetaS
         System.out.printf("Multiverse > Operation count is %s\n", operationCount);
         System.out.printf("Multiverse > Thread count is %s\n", threadCount);
 
-        stm = new BetaStm();
-        ref = new BetaLongRef(stm);
+        stm = new GammaStm();
+        ref = new GammaLongRef(stm);
         globalConflictCounter = stm.getGlobalConflictCounter();
 
         threads = new UpdateThread[threadCount];
@@ -40,6 +40,8 @@ public class OrecCommitLockUpdateDriver extends BenchmarkDriver implements BetaS
     public void run(TestCaseResult testCaseResult) {
         startAll(threads);
         joinAll(threads);
+
+        assertEqualsDouble(0, globalConflictCounter.count());
     }
 
     @Override
@@ -53,6 +55,7 @@ public class OrecCommitLockUpdateDriver extends BenchmarkDriver implements BetaS
 
         System.out.printf("Performance : %s update-cycles/second\n", format(transactionsPerSecond));
         System.out.printf("Performance : %s update-cycles/second/thread\n", format(transactionsPerSecondPerThread));
+
     }
 
     class UpdateThread extends TestThread {
@@ -63,15 +66,20 @@ public class OrecCommitLockUpdateDriver extends BenchmarkDriver implements BetaS
         @Override
         public void doRun() throws Exception {
             final long _cycles = operationCount;
-            final BetaLongRef _orec = new BetaLongRef(stm);
+            final GammaLongRef orec = new GammaLongRef(stm);
+            final GammaLongRef _ref = ref;
 
             for (long k = 0; k < _cycles; k++) {
-                int arriveStatus = _orec.___tryLockAndArrive(0, true);
-                if (arriveStatus != ARRIVE_NORMAL) {
-                    _orec.___tryLockAndArrive(0, true);
+                int arriveStatus = orec.arrive(0);
+                if (arriveStatus == ARRIVE_NORMAL) {
+                    orec.tryLockAfterNormalArrive(0, LOCKMODE_EXCLUSIVE);
+                } else {
+                    orec.tryLockAndArrive(0, LOCKMODE_EXCLUSIVE);
                 }
-                _orec.___departAfterUpdateAndUnlock();
+                orec.departAfterUpdateAndUnlock();
             }
+
+            System.out.printf("Orec        : %s\n", orec.___toOrecString());
         }
     }
 }

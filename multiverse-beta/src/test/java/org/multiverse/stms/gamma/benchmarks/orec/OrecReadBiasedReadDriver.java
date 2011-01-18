@@ -1,40 +1,40 @@
-package org.multiverse.stms.beta.benchmarks.orec;
+package org.multiverse.stms.gamma.benchmarks.orec;
 
 import org.benchy.BenchmarkDriver;
 import org.benchy.BenchyUtils;
 import org.benchy.TestCaseResult;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.GlobalConflictCounter;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 
-public class OrecReadBiasedReadDriver extends BenchmarkDriver implements BetaStmConstants {
-    private BetaLongRef ref;
+public class OrecReadBiasedReadDriver extends BenchmarkDriver implements GammaConstants {
+    private GammaLongRef ref;
     private GlobalConflictCounter globalConflictCounter;
-    private BetaStm stm;
+    private GammaStm stm;
 
     private long operationCount = 1000 * 1000 * 1000;
-    private BetaLongRef orec;
+    private GammaLongRef orec;
 
     @Override
     public void setUp() {
         System.out.printf("Multiverse > Operation count is %s\n", operationCount);
 
-        stm = new BetaStm();
-        ref = new BetaLongRef(stm);
+        stm = new GammaStm();
+        ref = new GammaLongRef(stm);
         globalConflictCounter = stm.getGlobalConflictCounter();
-        orec = new BetaLongRef(stm);
+        orec = new GammaLongRef(stm);
     }
 
     @Override
     public void run(TestCaseResult testCaseResult) {
         final long _cycles = operationCount;
-        final BetaLongRef _orec = orec;
+        final GammaLongRef _orec = orec;
 
         for (long k = 0; k < _cycles; k++) {
-            int arriveStatus = _orec.___arrive(0);
+            int arriveStatus = _orec.arrive(0);
             if (arriveStatus == ARRIVE_NORMAL) {
-                _orec.___departAfterReading();
+                _orec.departAfterReading();
             }
         }
     }

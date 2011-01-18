@@ -1,42 +1,35 @@
-package org.multiverse.stms.beta.benchmarks;
+package org.multiverse.stms.gamma.benchmarks;
 
 import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 
+import static org.benchy.BenchyUtils.format;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.BetaStmUtils.format;
-import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecond;
-import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondPerThread;
 
-public class AtomicGetDriver extends BenchmarkDriver implements BetaStmConstants {
+public class AtomicIncrementDriver extends BenchmarkDriver implements GammaConstants {
 
-    private transient BetaStm stm;
-    private transient GetThread[] threads;
+    private transient GammaStm stm;
+    private transient IncThread[] threads;
     private int threadCount;
     private long transactionsPerThread;
     private boolean sharedRef;
-    private boolean weakGet;
 
     @Override
     public void setUp() {
         System.out.printf("Multiverse > Threadcount %s\n", threadCount);
         System.out.printf("Multiverse > Transactions/Thread %s \n", transactionsPerThread);
-        System.out.printf("Multiverse > WeakGet %s \n", weakGet);
         System.out.printf("Multiverse > SharedRef %s \n", sharedRef);
 
-        stm = new BetaStm();
-
-        threads = new GetThread[threadCount];
-
-        BetaLongRef ref = sharedRef ? newLongRef(stm) : null;
+        stm = new GammaStm();
+        threads = new IncThread[threadCount];
+        GammaLongRef ref = sharedRef ? new GammaLongRef(stm) : null;
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new GetThread(k, ref == null ? newLongRef(stm) : ref);
+            threads[k] = new IncThread(k, ref == null ? new GammaLongRef(stm) : ref);
         }
     }
 
@@ -49,13 +42,13 @@ public class AtomicGetDriver extends BenchmarkDriver implements BetaStmConstants
     @Override
     public void processResults(TestCaseResult testCaseResult) {
         long totalDurationMs = 0;
-        for (GetThread t : threads) {
+        for (IncThread t : threads) {
             totalDurationMs += t.durationMs;
         }
 
-        double transactionsPerSecondPerThread = transactionsPerSecondPerThread(
+        double transactionsPerSecondPerThread = BenchmarkUtils.transactionsPerSecondPerThread(
                 transactionsPerThread, totalDurationMs, threadCount);
-        double transactionsPerSecond = transactionsPerSecond(
+        double transactionsPerSecond = BenchmarkUtils.transactionsPerSecond(
                 transactionsPerThread, totalDurationMs, threadCount);
         System.out.printf("Multiverse > Performance %s transactions/second/thread\n",
                 format(transactionsPerSecondPerThread));
@@ -66,12 +59,12 @@ public class AtomicGetDriver extends BenchmarkDriver implements BetaStmConstants
         testCaseResult.put("transactionsPerSecond", transactionsPerSecond);
     }
 
-    class GetThread extends TestThread {
+    class IncThread extends TestThread {
         private long durationMs;
-        private final BetaLongRef ref;
+        private final GammaLongRef ref;
 
-        public GetThread(int id, BetaLongRef ref) {
-            super("AtomicGetThread-" + id);
+        public IncThread(int id, GammaLongRef ref) {
+            super("IncThread-" + id);
             setPriority(Thread.MAX_PRIORITY);
             this.ref = ref;
         }
@@ -79,14 +72,8 @@ public class AtomicGetDriver extends BenchmarkDriver implements BetaStmConstants
         public void doRun() {
             long startMs = System.currentTimeMillis();
             final long _transactionsPerThread = transactionsPerThread;
-            if (weakGet) {
-                for (long k = 0; k < _transactionsPerThread; k++) {
-                    ref.atomicWeakGet();
-                }
-            } else {
-                for (long k = 0; k < _transactionsPerThread; k++) {
-                    ref.atomicGet();
-                }
+            for (long k = 0; k < _transactionsPerThread; k++) {
+                ref.atomicIncrementAndGet(1);
             }
 
             durationMs = System.currentTimeMillis() - startMs;
@@ -94,3 +81,4 @@ public class AtomicGetDriver extends BenchmarkDriver implements BetaStmConstants
         }
     }
 }
+

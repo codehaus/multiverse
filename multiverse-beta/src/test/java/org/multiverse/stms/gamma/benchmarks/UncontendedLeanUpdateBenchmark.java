@@ -1,13 +1,13 @@
-package org.multiverse.stms.beta.benchmarks;
+package org.multiverse.stms.gamma.benchmarks;
 
+import org.benchy.BenchyUtils;
 import org.multiverse.TestThread;
 import org.multiverse.api.LockLevel;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.BetaStmUtils;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
-import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
+import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -15,12 +15,10 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.BetaStmUtils.format;
-import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
+import static org.multiverse.stms.gamma.benchmarks.BenchmarkUtils.*;
 
-public class UncontendedLeanUpdateBenchmark implements BetaStmConstants {
-    private BetaStm stm;
+public class UncontendedLeanUpdateBenchmark implements GammaConstants {
+    private GammaStm stm;
 
     public static void main(String[] args) {
         UncontendedLeanUpdateBenchmark test = new UncontendedLeanUpdateBenchmark();
@@ -31,7 +29,7 @@ public class UncontendedLeanUpdateBenchmark implements BetaStmConstants {
         int[] processors = generateProcessorRange();
 
         System.out.printf("Multiverse> Uncontended update lean-transaction benchmark\n");
-        System.out.printf("Multiverse> 1 BetaRef per transaction\n");
+        System.out.printf("Multiverse> 1 GammaRef per transaction\n");
         System.out.printf("Multiverse> %s Transactions per thread\n", format(transactionCount));
         System.out.printf("Multiverse> Running with the following processor range %s\n", Arrays.toString(processors));
         Result[] result = new Result[processors.length];
@@ -58,7 +56,7 @@ public class UncontendedLeanUpdateBenchmark implements BetaStmConstants {
         System.out.printf("Multiverse> ----------------------------------------------\n");
         System.out.printf("Multiverse> Running with %s thread(s)\n", threadCount);
 
-        stm = new BetaStm();
+        stm = new GammaStm();
 
         UpdateThread[] threads = new UpdateThread[threadCount];
 
@@ -78,7 +76,7 @@ public class UncontendedLeanUpdateBenchmark implements BetaStmConstants {
                 transactionsPerThread, totalDurationMs, threadCount);
         System.out.printf("Multiverse> Threadcount %s\n", threadCount);
         System.out.printf("Multiverse> Performance %s transactions/second/thread\n",
-                BetaStmUtils.format(transactionsPerSecond));
+                BenchyUtils.format(transactionsPerSecond));
         System.out.printf("Multiverse> Performance %s transactions/second\n",
                 transactionsPerSecondAsString(transactionsPerThread, totalDurationMs, threadCount));
         return transactionsPerSecond;
@@ -95,17 +93,17 @@ public class UncontendedLeanUpdateBenchmark implements BetaStmConstants {
         }
 
         public void doRun() {
-            BetaLongRef ref = newLongRef(stm);
+            GammaLongRef ref = new GammaLongRef(stm);
 
-            //FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-            //FatArrayBetaTransaction tx = new FatArrayBetaTransaction(stm,1);
-            LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
-                    new BetaTransactionConfiguration(stm)
+            //FatArrayTreeGammaTransaction tx = new FatArrayTreeGammaTransaction(stm);
+            //FatArrayGammaTransaction tx = new FatArrayGammaTransaction(stm,1);
+            MonoGammaTransaction tx = new MonoGammaTransaction(
+                    new GammaTransactionConfiguration(stm)
                             .setLockLevel(LockLevel.CommitLockReads)
                             .setDirtyCheckEnabled(false));
             long startMs = System.currentTimeMillis();
             for (long k = 0; k < transactionCount; k++) {
-                tx.openForWrite(ref, LOCKMODE_EXCLUSIVE).value++;
+                ref.openForWrite(tx, LOCKMODE_EXCLUSIVE).long_value++;
                 tx.commit();
                 tx.hardReset();
 

@@ -1,20 +1,20 @@
-package org.multiverse.stms.beta.benchmarks;
+package org.multiverse.stms.gamma.benchmarks;
 
 import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 
-import java.util.concurrent.atomic.AtomicLong;
-
+import static org.benchy.BenchyUtils.format;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
-import static org.multiverse.stms.beta.BetaStmUtils.format;
-import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecond;
-import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondPerThread;
 
-public class AtomicLongIncrementDriver extends BenchmarkDriver {
+public class AtomicSetDriver extends BenchmarkDriver implements GammaConstants {
 
-    private transient IncThread[] threads;
+    private transient GammaStm stm;
+    private transient GetThread[] threads;
     private int threadCount;
     private long transactionsPerThread;
     private boolean sharedRef;
@@ -25,10 +25,11 @@ public class AtomicLongIncrementDriver extends BenchmarkDriver {
         System.out.printf("Multiverse > Transactions/Thread %s \n", transactionsPerThread);
         System.out.printf("Multiverse > SharedRef %s \n", sharedRef);
 
-        threads = new IncThread[threadCount];
-        AtomicLong ref = sharedRef ? new AtomicLong() : null;
+        stm = new GammaStm();
+        threads = new GetThread[threadCount];
+        GammaLongRef ref = sharedRef ? new GammaLongRef(stm) : null;
         for (int k = 0; k < threads.length; k++) {
-            threads[k] = new IncThread(k, ref == null ? new AtomicLong() : ref);
+            threads[k] = new GetThread(k, ref == null ? new GammaLongRef(stm) : ref);
         }
     }
 
@@ -41,29 +42,26 @@ public class AtomicLongIncrementDriver extends BenchmarkDriver {
     @Override
     public void processResults(TestCaseResult testCaseResult) {
         long totalDurationMs = 0;
-        for (IncThread t : threads) {
+        for (GetThread t : threads) {
             totalDurationMs += t.durationMs;
         }
 
-        double transactionsPerSecondPerThread = transactionsPerSecondPerThread(
-                transactionsPerThread, totalDurationMs, threadCount);
-        double transactionsPerSecond = transactionsPerSecond(
+        double transactionsPerSecondPerThread = BenchmarkUtils.transactionsPerSecondPerThread(
                 transactionsPerThread, totalDurationMs, threadCount);
         System.out.printf("Multiverse > Performance %s transactions/second/thread\n",
                 format(transactionsPerSecondPerThread));
         System.out.printf("Multiverse > Performance %s transactions/second\n",
-                format(transactionsPerSecond));
+                BenchmarkUtils.transactionsPerSecondAsString(transactionsPerThread, totalDurationMs, threadCount));
 
         testCaseResult.put("transactionsPerSecondPerThread", transactionsPerSecondPerThread);
-        testCaseResult.put("transactionsPerSecond", transactionsPerSecond);
     }
 
-    class IncThread extends TestThread {
+    class GetThread extends TestThread {
         private long durationMs;
-        private final AtomicLong ref;
+        private final GammaLongRef ref;
 
-        public IncThread(int id, AtomicLong ref) {
-            super("IncThread-" + id);
+        public GetThread(int id, GammaLongRef ref) {
+            super("AtomicGetThread-" + id);
             setPriority(Thread.MAX_PRIORITY);
             this.ref = ref;
         }
@@ -72,7 +70,7 @@ public class AtomicLongIncrementDriver extends BenchmarkDriver {
             long startMs = System.currentTimeMillis();
             final long _transactionsPerThread = transactionsPerThread;
             for (long k = 0; k < _transactionsPerThread; k++) {
-                ref.incrementAndGet();
+                ref.atomicGet();
             }
 
             durationMs = System.currentTimeMillis() - startMs;

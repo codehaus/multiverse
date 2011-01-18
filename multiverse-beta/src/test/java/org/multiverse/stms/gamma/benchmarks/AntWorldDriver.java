@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta.benchmarks;
+package org.multiverse.stms.gamma.benchmarks;
 
 import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;

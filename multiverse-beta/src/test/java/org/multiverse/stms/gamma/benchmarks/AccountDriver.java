@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta.benchmarks;
+package org.multiverse.stms.gamma.benchmarks;
 
 import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
@@ -8,7 +8,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicDoubleClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.DoubleRef;
-import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.gamma.GammaStm;
 
 import java.util.Random;
 
@@ -20,7 +20,7 @@ public class AccountDriver extends BenchmarkDriver {
     public static final int TEST_PHASE = 2;
     public static final int SHUTDOWN_PHASE = 3;
 
-    private BetaStm stm;
+    private GammaStm stm;
     private int accountCount;
     private Bank bank;
     private int threadCount;
@@ -30,7 +30,7 @@ public class AccountDriver extends BenchmarkDriver {
 
     @Override
     public void setUp() {
-        stm = new BetaStm();
+        stm = new GammaStm();
         bank = new Bank(accountCount);
 
         threads = new BenchmarkThread[threadCount];

@@ -1,12 +1,12 @@
-package org.multiverse.stms.beta.benchmarks;
+package org.multiverse.stms.gamma.benchmarks;
 
 import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
 
+import static org.benchy.BenchyUtils.format;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
-import static org.multiverse.stms.beta.BetaStmUtils.format;
 
 public class IntrinsicLockStackDriver extends BenchmarkDriver {
 

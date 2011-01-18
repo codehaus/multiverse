@@ -1,27 +1,27 @@
-package org.multiverse.stms.beta.benchmarks;
+package org.multiverse.stms.gamma.benchmarks;
 
 import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
-import org.multiverse.stms.beta.transactions.FatArrayBetaTransaction;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.ArrayGammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
+import static org.benchy.BenchyUtils.format;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newReadBiasedLongRef;
-import static org.multiverse.stms.beta.BetaStmUtils.format;
+import static org.multiverse.stms.gamma.GammaTestUtils.makeReadBiased;
 
 /**
  * @author Peter Veentjer
  */
-public class MultipleUpdateDriver extends BenchmarkDriver implements BetaStmConstants {
+public class MultipleUpdateDriver extends BenchmarkDriver implements GammaConstants {
 
-    private BetaStm stm;
+    private GammaStm stm;
 
-    private long transactionsPerThread ;
+    private long transactionsPerThread;
     private int refCount;
     private int threadCount;
     private WriteThread[] threads;
@@ -32,7 +32,7 @@ public class MultipleUpdateDriver extends BenchmarkDriver implements BetaStmCons
         System.out.printf("Multiverse > Running with %s ref per transaction\n", refCount);
         System.out.printf("Multiverse > %s Transactions per thread\n", format(transactionsPerThread));
 
-        stm = new BetaStm();
+        stm = new GammaStm();
         threads = new WriteThread[threadCount];
 
         for (int k = 0; k < threads.length; k++) {
@@ -79,22 +79,21 @@ public class MultipleUpdateDriver extends BenchmarkDriver implements BetaStmCons
         }
 
         public void doRun() {
-            BetaLongRef[] refs = new BetaLongRef[refCount];
+            GammaLongRef[] refs = new GammaLongRef[refCount];
             for (int k = 0; k < refCount; k++) {
-                refs[k] = newReadBiasedLongRef(stm);
+                refs[k] = makeReadBiased(new GammaLongRef(stm));
             }
 
-            BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm, refs.length);
+            GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, refs.length);
 
-            FatArrayBetaTransaction tx = new FatArrayBetaTransaction(config);
+            ArrayGammaTransaction tx = new ArrayGammaTransaction(config);
 
             long startMs = System.currentTimeMillis();
-
 
             final long t = transactionsPerThread;
             for (int iteration = 0; iteration < t; iteration++) {
                 for (int k = 0; k < refs.length; k++) {
-                    tx.openForWrite(refs[0], LOCKMODE_NONE).value++;
+                    refs[k].openForWrite(tx, LOCKMODE_NONE).long_value++;
                 }
                 tx.commit();
                 tx.hardReset();

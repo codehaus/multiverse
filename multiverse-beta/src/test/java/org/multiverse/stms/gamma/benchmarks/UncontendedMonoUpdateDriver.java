@@ -1,24 +1,21 @@
-package org.multiverse.stms.beta.benchmarks;
+package org.multiverse.stms.gamma.benchmarks;
 
 import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
 import org.multiverse.api.LockLevel;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
-import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
+import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
 
+import static org.benchy.BenchyUtils.format;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.BetaStmUtils.format;
-import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecond;
-import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondPerThread;
 
 public class UncontendedMonoUpdateDriver extends BenchmarkDriver {
 
-    private BetaStm stm;
+    private GammaStm stm;
     private UpdateThread[] threads;
 
     private int threadCount = 1;
@@ -33,7 +30,7 @@ public class UncontendedMonoUpdateDriver extends BenchmarkDriver {
         System.out.printf("Multiverse > Dirtycheck %s \n", dirtyCheck);
         System.out.printf("Multiverse > Locklevel %s \n", lockLevel);
 
-        stm = new BetaStm();
+        stm = new GammaStm();
 
         threads = new UpdateThread[threadCount];
         for (int k = 0; k < threads.length; k++) {
@@ -54,9 +51,9 @@ public class UncontendedMonoUpdateDriver extends BenchmarkDriver {
             totalDurationMs += t.durationMs;
         }
 
-        double transactionsPerSecondPerThread = transactionsPerSecondPerThread(
+        double transactionsPerSecondPerThread = BenchmarkUtils.transactionsPerSecondPerThread(
                 transactionsPerThread, totalDurationMs, threadCount);
-        double transactionsPerSecond = transactionsPerSecond(transactionsPerThread, totalDurationMs, threadCount);
+        double transactionsPerSecond = BenchmarkUtils.transactionsPerSecond(transactionsPerThread, totalDurationMs, threadCount);
         System.out.printf("Multiverse > Performance %s transactions/second/thread\n",
                 format(transactionsPerSecondPerThread));
         System.out.printf("Multiverse > Performance %s transactions/second\n",
@@ -74,16 +71,16 @@ public class UncontendedMonoUpdateDriver extends BenchmarkDriver {
         }
 
         public void doRun() {
-            final BetaLongRef ref = newLongRef(stm);
+            final GammaLongRef ref = new GammaLongRef(stm);
 
-            LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
-                    new BetaTransactionConfiguration(stm)
+            MonoGammaTransaction tx = new MonoGammaTransaction(
+                    new GammaTransactionConfiguration(stm)
                             .setLockLevel(lockLevel)
                             .setDirtyCheckEnabled(dirtyCheck));
             long startMs = System.currentTimeMillis();
             final long _transactionCount = transactionsPerThread;
             for (long k = 0; k < _transactionCount; k++) {
-                tx.openForWrite(ref, LOCKMODE_NONE).value++;
+                ref.openForWrite(tx, LOCKMODE_NONE).long_value++;
                 tx.commit();
                 tx.hardReset();
             }

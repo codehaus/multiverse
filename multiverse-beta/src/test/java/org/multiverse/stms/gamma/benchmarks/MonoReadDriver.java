@@ -1,25 +1,22 @@
-package org.multiverse.stms.beta.benchmarks;
+package org.multiverse.stms.gamma.benchmarks;
 
 import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
 import org.multiverse.api.LockLevel;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
-import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
+import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
 
+import static org.benchy.BenchyUtils.format;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.BetaStmUtils.format;
-import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecond;
-import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.transactionsPerSecondPerThread;
 
-public class MonoReadDriver extends BenchmarkDriver implements BetaStmConstants{
+public class MonoReadDriver extends BenchmarkDriver implements GammaConstants {
 
-    private BetaStm stm;
+    private GammaStm stm;
     private ReadThread[] threads;
     private int threadCount;
     private long transactionsPerThread;
@@ -30,7 +27,7 @@ public class MonoReadDriver extends BenchmarkDriver implements BetaStmConstants{
         System.out.printf("Multiverse > Thread count is %s\n", threadCount);
         System.out.printf("Multiverse > Transactions/thread is %s\n", transactionsPerThread);
 
-        stm = new BetaStm();
+        stm = new GammaStm();
 
         threads = new ReadThread[threadCount];
 
@@ -52,9 +49,9 @@ public class MonoReadDriver extends BenchmarkDriver implements BetaStmConstants{
             totalDurationMs += t.durationMs;
         }
 
-        double transactionsPerSecondPerThread = transactionsPerSecondPerThread(
+        double transactionsPerSecondPerThread = BenchmarkUtils.transactionsPerSecondPerThread(
                 transactionsPerThread, totalDurationMs, threadCount);
-        double transactionsPerSecond = transactionsPerSecond(transactionsPerThread,totalDurationMs,threadCount);
+        double transactionsPerSecond = BenchmarkUtils.transactionsPerSecond(transactionsPerThread, totalDurationMs, threadCount);
         System.out.printf("Multiverse > Performance %s transactions/second/thread\n",
                 format(transactionsPerSecondPerThread));
         System.out.printf("Multiverse > Performance %s transactions/second\n",
@@ -74,16 +71,16 @@ public class MonoReadDriver extends BenchmarkDriver implements BetaStmConstants{
         }
 
         public void doRun() {
-            BetaLongRef ref = newLongRef(stm);
+            GammaLongRef ref = new GammaLongRef(stm);
 
-            LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
-                    new BetaTransactionConfiguration(stm)
+            MonoGammaTransaction tx = new MonoGammaTransaction(
+                    new GammaTransactionConfiguration(stm)
                             .setLockLevel(LockLevel.CommitLockReads)
                             .setDirtyCheckEnabled(false));
             long startMs = System.currentTimeMillis();
             final long _transactionCount = transactionCount;
             for (long k = 0; k < _transactionCount; k++) {
-                tx.openForRead(ref, lockMode);
+                ref.openForRead(tx, lockMode);
                 tx.commit();
                 tx.hardReset();
             }

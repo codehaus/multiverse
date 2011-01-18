@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta.benchmarks;
+package org.multiverse.stms.gamma.benchmarks;
 
 import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
@@ -7,12 +7,12 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.LockLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 
+import static org.benchy.BenchyUtils.format;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
-import static org.multiverse.stms.beta.BetaStmUtils.format;
 
 public class ContendedCounterDriver extends BenchmarkDriver {
 
@@ -20,8 +20,8 @@ public class ContendedCounterDriver extends BenchmarkDriver {
     private LockLevel lockLevel = LockLevel.LockNone;
     private long transactionsPerThread;
     private boolean dirtyCheck;
-    private BetaStm stm;
-    private BetaLongRef ref;
+    private GammaStm stm;
+    private GammaLongRef ref;
     private IncThread[] threads;
 
     @Override
@@ -31,7 +31,7 @@ public class ContendedCounterDriver extends BenchmarkDriver {
         System.out.printf("Multiverse > Dirty check %s \n", dirtyCheck);
         System.out.printf("Multiverse > Pessimistic lock level %s \n", lockLevel);
 
-        stm = new BetaStm();
+        stm = new GammaStm();
         ref = stm.getRefFactoryBuilder().build().newLongRef(0);
         threads = new IncThread[threadCount];
         for (int k = 0; k < threads.length; k++) {

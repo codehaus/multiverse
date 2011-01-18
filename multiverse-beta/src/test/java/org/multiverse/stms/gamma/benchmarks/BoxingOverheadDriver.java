@@ -1,26 +1,23 @@
-package org.multiverse.stms.beta.benchmarks;
+package org.multiverse.stms.gamma.benchmarks;
 
 import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
 import org.multiverse.api.LockLevel;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactionalobjects.BetaRef;
-import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
-import org.multiverse.stms.beta.transactions.LeanMonoBetaTransaction;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
+import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
+import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newRef;
-import static org.multiverse.stms.beta.benchmarks.BenchmarkUtils.*;
 
-public class BoxingOverheadDriver extends BenchmarkDriver implements BetaStmConstants {
+public class BoxingOverheadDriver extends BenchmarkDriver implements GammaConstants {
 
-    private BetaStm stm;
+    private GammaStm stm;
     private boolean withBoxing;
     private long transactionsPerThread;
     private int threadCount;
@@ -28,11 +25,11 @@ public class BoxingOverheadDriver extends BenchmarkDriver implements BetaStmCons
 
     @Override
     public void setUp() {
-        System.out.printf("Multiverse > Transactions/thread %s \n", format(transactionsPerThread));
+        System.out.printf("Multiverse > Transactions/thread %s \n", BenchmarkUtils.format(transactionsPerThread));
         System.out.printf("Multiverse > ThreadCount %s \n", threadCount);
         System.out.printf("Multiverse > With Boxing %s \n", withBoxing);
 
-        stm = new BetaStm();
+        stm = new GammaStm();
         threads = new UpdateThread[threadCount];
         for (int k = 0; k < threads.length; k++) {
             threads[k] = new UpdateThread(k);
@@ -52,11 +49,11 @@ public class BoxingOverheadDriver extends BenchmarkDriver implements BetaStmCons
             totalDurationMs += t.durationMs;
         }
 
-        double transactionsPerSecondPerThread = transactionsPerSecondPerThread(
+        double transactionsPerSecondPerThread = BenchmarkUtils.transactionsPerSecondPerThread(
                 transactionsPerThread, totalDurationMs, threadCount);
 
-        double transactionsPerSecond = transactionsPerSecond(
-                transactionsPerThread, totalDurationMs,threadCount);
+        double transactionsPerSecond = BenchmarkUtils.transactionsPerSecond(
+                transactionsPerThread, totalDurationMs, threadCount);
 
         System.out.printf("Multiverse > Performance %s transactions/second/thread\n",
                 BenchmarkUtils.format(transactionsPerSecondPerThread));
@@ -75,8 +72,8 @@ public class BoxingOverheadDriver extends BenchmarkDriver implements BetaStmCons
         }
 
         public void doRun() {
-            LeanMonoBetaTransaction tx = new LeanMonoBetaTransaction(
-                    new BetaTransactionConfiguration(stm)
+            MonoGammaTransaction tx = new MonoGammaTransaction(
+                    new GammaTransactionConfiguration(stm)
                             .setLockLevel(LockLevel.CommitLockReads)
                             .setDirtyCheckEnabled(false));
 
@@ -84,17 +81,17 @@ public class BoxingOverheadDriver extends BenchmarkDriver implements BetaStmCons
 
             final long _transactionCount = transactionsPerThread;
             if (withBoxing) {
-                BetaRef<Long> ref = newRef(stm, new Long(0));
+                GammaRef<Long> ref = new GammaRef<Long>(stm, new Long(0));
                 for (long k = 0; k < _transactionCount; k++) {
-                    tx.openForWrite(ref, LOCKMODE_NONE).value++;
+                    ref.openForWrite(tx, LOCKMODE_NONE).long_value++;
                     tx.commit();
                     tx.hardReset();
                 }
                 assertEquals(_transactionCount, (long) ref.atomicGet());
             } else {
-                BetaLongRef ref = newLongRef(stm);
+                GammaLongRef ref = new GammaLongRef(stm);
                 for (long k = 0; k < _transactionCount; k++) {
-                    tx.openForWrite(ref, LOCKMODE_NONE).value++;
+                    ref.openForWrite(tx, LOCKMODE_NONE).long_value++;
                     tx.commit();
                     tx.hardReset();
                 }

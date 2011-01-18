@@ -1,27 +1,23 @@
-package org.multiverse.stms.beta.benchmarks.orec;
+package org.multiverse.stms.gamma.benchmarks.orec;
 
 import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.GlobalConflictCounter;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 
-import static org.benchy.BenchyUtils.format;
-import static org.benchy.BenchyUtils.operationsPerSecond;
-import static org.benchy.BenchyUtils.operationsPerSecondPerThread;
-import static org.multiverse.TestUtils.assertEqualsDouble;
+import static org.benchy.BenchyUtils.*;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
 
-
-public class OrecNormalNormalUpdateDriver extends BenchmarkDriver implements BetaStmConstants {
-    private BetaLongRef ref;
+public class OrecCommitLockUpdateDriver extends BenchmarkDriver implements GammaConstants {
+    private GammaLongRef ref;
     private GlobalConflictCounter globalConflictCounter;
-    private BetaStm stm;
-
+    private GammaStm stm;
     private int threadCount;
+
     private long operationCount = 1000 * 1000 * 1000;
     private UpdateThread[] threads;
 
@@ -30,8 +26,8 @@ public class OrecNormalNormalUpdateDriver extends BenchmarkDriver implements Bet
         System.out.printf("Multiverse > Operation count is %s\n", operationCount);
         System.out.printf("Multiverse > Thread count is %s\n", threadCount);
 
-        stm = new BetaStm();
-        ref = new BetaLongRef(stm);
+        stm = new GammaStm();
+        ref = new GammaLongRef(stm);
         globalConflictCounter = stm.getGlobalConflictCounter();
 
         threads = new UpdateThread[threadCount];
@@ -44,8 +40,6 @@ public class OrecNormalNormalUpdateDriver extends BenchmarkDriver implements Bet
     public void run(TestCaseResult testCaseResult) {
         startAll(threads);
         joinAll(threads);
-
-        assertEqualsDouble(0, globalConflictCounter.count());
     }
 
     @Override
@@ -59,7 +53,6 @@ public class OrecNormalNormalUpdateDriver extends BenchmarkDriver implements Bet
 
         System.out.printf("Performance : %s update-cycles/second\n", format(transactionsPerSecond));
         System.out.printf("Performance : %s update-cycles/second/thread\n", format(transactionsPerSecondPerThread));
-
     }
 
     class UpdateThread extends TestThread {
@@ -70,20 +63,15 @@ public class OrecNormalNormalUpdateDriver extends BenchmarkDriver implements Bet
         @Override
         public void doRun() throws Exception {
             final long _cycles = operationCount;
-            final BetaLongRef orec = new BetaLongRef(stm);
-            final BetaLongRef _ref = ref;
+            final GammaLongRef _orec = new GammaLongRef(stm);
 
             for (long k = 0; k < _cycles; k++) {
-                int arriveStatus = orec.___arrive(0);
-                if (arriveStatus == ARRIVE_NORMAL) {
-                    orec.___tryLockAfterNormalArrive(0, true);
-                } else {
-                    orec.___tryLockAndArrive(0, true);
+                int arriveStatus = _orec.tryLockAndArrive(0, LOCKMODE_EXCLUSIVE);
+                if (arriveStatus != ARRIVE_NORMAL) {
+                    _orec.tryLockAndArrive(0, LOCKMODE_EXCLUSIVE);
                 }
-                orec.___departAfterUpdateAndUnlock();
+                _orec.departAfterUpdateAndUnlock();
             }
-
-            System.out.printf("Orec        : %s\n", orec.___toOrecString());
         }
     }
 }

@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta.benchmarks;
+package org.multiverse.stms.gamma.benchmarks;
 
 /**
  * A once reusable blocking structure. Other threads can wait for it while it is still closed, and once it
