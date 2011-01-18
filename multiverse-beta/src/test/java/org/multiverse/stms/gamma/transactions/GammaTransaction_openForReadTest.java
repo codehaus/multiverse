@@ -32,6 +32,7 @@ public abstract class GammaTransaction_openForReadTest<T extends GammaTransactio
 
     protected abstract T newTransaction(GammaTransactionConfiguration config);
 
+
     @Test
     public void whenStmMismatch() {
         GammaStm otherStm = new GammaStm();

@@ -8,8 +8,7 @@ import org.multiverse.api.references.BooleanRef;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
-import static org.multiverse.stms.gamma.GammaStmUtils.asGammaTransaction;
-import static org.multiverse.stms.gamma.GammaStmUtils.getRequiredThreadLocalGammaTransaction;
+import static org.multiverse.stms.gamma.GammaStmUtils.*;
 
 /**
  * A {@link BooleanRef} for the {@link GammaStm}.
@@ -18,13 +17,25 @@ import static org.multiverse.stms.gamma.GammaStmUtils.getRequiredThreadLocalGamm
  */
 public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRef {
 
+    public GammaBooleanRef(final GammaTransaction tx) {
+        this(tx, false);
+    }
+
+    public GammaBooleanRef(final GammaTransaction tx, final boolean value) {
+        super(tx.getConfiguration().stm, TYPE_BOOLEAN);
+
+        tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        GammaRefTranlocal tranlocal = openForConstruction(tx);
+        tranlocal.long_value = booleanAsLong(value);
+    }
+
     public GammaBooleanRef(final GammaStm stm) {
         this(stm, false);
     }
 
     public GammaBooleanRef(final GammaStm stm, final boolean b) {
         super(stm, TYPE_BOOLEAN);
-        this.long_value = asLong(b);
+        this.long_value = booleanAsLong(b);
         //noinspection PointlessArithmeticExpression
         this.version = VERSION_UNCOMMITTED + 1;
     }
@@ -40,7 +51,7 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     }
 
     public final boolean set(final GammaTransaction tx, final boolean value) {
-        openForWrite(tx, LOCKMODE_NONE).long_value = asLong(value);
+        openForWrite(tx, LOCKMODE_NONE).long_value = booleanAsLong(value);
         return value;
     }
 
@@ -55,27 +66,27 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     }
 
     public final boolean get(final GammaTransaction tx) {
-        return asBoolean(openForRead(tx, LOCKMODE_NONE).long_value);
+        return longAsBoolean(openForRead(tx, LOCKMODE_NONE).long_value);
     }
 
     @Override
     public final boolean atomicGet() {
-        return asBoolean(atomicGetLong());
+        return longAsBoolean(atomicGetLong());
     }
 
     @Override
     public final boolean atomicWeakGet() {
-        return asBoolean(long_value);
+        return longAsBoolean(long_value);
     }
 
     @Override
     public final boolean atomicSet(final boolean newValue) {
-        return asBoolean(atomicSetLong(asLong(newValue), false));
+        return longAsBoolean(atomicSetLong(booleanAsLong(newValue), false));
     }
 
     @Override
     public final boolean atomicGetAndSet(final boolean newValue) {
-        return asBoolean(atomicSetLong(asLong(newValue), true));
+        return longAsBoolean(atomicSetLong(booleanAsLong(newValue), true));
     }
 
     @Override
@@ -90,8 +101,8 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
 
     public final boolean getAndSet(final GammaTransaction tx, final boolean value) {
         GammaRefTranlocal tranlocal = openForWrite(tx, LOCKMODE_NONE);
-        boolean oldValue = asBoolean(tranlocal.long_value);
-        tranlocal.long_value = asLong(value);
+        boolean oldValue = longAsBoolean(tranlocal.long_value);
+        tranlocal.long_value = booleanAsLong(value);
         return oldValue;
     }
 
@@ -152,10 +163,10 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
         boolean abort = true;
 
         try {
-            boolean oldValue = asBoolean(write.long_value);
-            write.long_value = asLong(function.call(oldValue));
+            boolean oldValue = longAsBoolean(write.long_value);
+            write.long_value = booleanAsLong(function.call(oldValue));
             abort = false;
-            return returnOld ? oldValue : asBoolean(write.long_value);
+            return returnOld ? oldValue : longAsBoolean(write.long_value);
         } finally {
             if (abort) {
                 tx.abort();
@@ -180,7 +191,7 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
 
     @Override
     public final boolean atomicCompareAndSet(final boolean expectedValue, final boolean newValue) {
-        return atomicCompareAndSetLong(asLong(expectedValue), asLong(newValue));
+        return atomicCompareAndSetLong(booleanAsLong(expectedValue), booleanAsLong(newValue));
     }
 
     @Override
@@ -194,7 +205,7 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     }
 
     public final void await(final GammaTransaction tx, final boolean value) {
-        if (asBoolean(openForRead(tx, LOCKMODE_NONE).long_value) != value) {
+        if (longAsBoolean(openForRead(tx, LOCKMODE_NONE).long_value) != value) {
             tx.retry();
         }
     }
@@ -213,7 +224,7 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
         final GammaRefTranlocal tranlocal = openForRead(tx, LOCKMODE_NONE);
         boolean abort = true;
         try {
-            if (!predicate.evaluate(asBoolean(tranlocal.long_value))) {
+            if (!predicate.evaluate(longAsBoolean(tranlocal.long_value))) {
                 tx.retry();
             }
             abort = false;
@@ -227,14 +238,7 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     @Override
     public String toDebugString() {
         return String.format("GammaBooleanRef{orec=%s, version=%s, value=%s, hasListeners=%s)",
-                ___toOrecString(), version, asBoolean(long_value), listeners != null);
+                ___toOrecString(), version, longAsBoolean(long_value), listeners != null);
     }
 
-    public static boolean asBoolean(long value) {
-        return value == 1;
-    }
-
-    public static long asLong(boolean b) {
-        return b ? 1 : 0;
-    }
 }

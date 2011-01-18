@@ -32,9 +32,16 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
         this.version = VERSION_UNCOMMITTED + 1;
     }
 
-    public GammaLongRef(GammaTransaction tx) {
-        super(tx.config.stm, TYPE_LONG);
-        openForConstruction(tx);
+    public GammaLongRef(final GammaTransaction tx) {
+        this(tx, 0);
+    }
+
+    public GammaLongRef(final GammaTransaction tx, final long value) {
+        super(tx.getConfiguration().stm, TYPE_BOOLEAN);
+
+        tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        GammaRefTranlocal tranlocal = openForConstruction(tx);
+        tranlocal.long_value = value;
     }
 
     @Override

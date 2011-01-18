@@ -37,6 +37,22 @@ public abstract class GammaTransaction_commuteTest<T extends GammaTransaction> {
     protected abstract int getMaxCapacity();
 
     @Test
+    public void whenTransactionAbortOnly_thenWriteStillPossible() {
+        GammaLongRef ref = new GammaLongRef(stm, 0);
+
+        GammaTransaction tx = stm.startDefaultTransaction();
+        tx.setAbortOnly();
+        ref.commute(tx, Functions.newIncLongFunction());
+
+        GammaRefTranlocal tranlocal = tx.locate(ref);
+        assertNotNull(tranlocal);
+        assertEquals(TRANLOCAL_COMMUTING, tranlocal.getMode());
+        assertTrue(tx.isAbortOnly());
+        assertIsActive(tx);
+    }
+
+
+    @Test
     public void whenMultipleCommutesOnSingleRef() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);

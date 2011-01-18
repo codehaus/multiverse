@@ -3,10 +3,10 @@ package org.multiverse.stms.gamma.transactionalobjects;
 import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LockedException;
-import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.*;
 import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.GammaStmUtils;
 import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactions.*;
 
@@ -14,6 +14,7 @@ import static org.multiverse.stms.gamma.GammaStmUtils.asGammaTransaction;
 import static org.multiverse.stms.gamma.GammaStmUtils.getRequiredThreadLocalGammaTransaction;
 import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLocalGammaObjectPool;
 
+@SuppressWarnings({"OverlyComplexClass", "OverlyCoupledClass"})
 public abstract class AbstractGammaRef extends AbstractGammaObject {
 
     private final int type;
@@ -83,13 +84,13 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 break;
             case TYPE_DOUBLE:
                 DoubleFunction doubleFunction = (DoubleFunction) function;
-                double doubleResult = doubleFunction.call(GammaDoubleRef.asDouble(tranlocal.long_value));
-                tranlocal.long_value = GammaDoubleRef.asLong(doubleResult);
+                double doubleResult = doubleFunction.call(GammaStmUtils.longAsDouble(tranlocal.long_value));
+                tranlocal.long_value = GammaStmUtils.doubleAsLong(doubleResult);
                 break;
             case TYPE_BOOLEAN:
                 BooleanFunction booleanFunction = (BooleanFunction) function;
-                boolean booleanResult = booleanFunction.call(GammaBooleanRef.asBoolean(tranlocal.long_value));
-                tranlocal.long_value = GammaBooleanRef.asLong(booleanResult);
+                boolean booleanResult = booleanFunction.call(GammaStmUtils.longAsBoolean(tranlocal.long_value));
+                tranlocal.long_value = GammaStmUtils.booleanAsLong(booleanResult);
                 break;
             default:
                 throw new IllegalStateException();
@@ -201,7 +202,6 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             tranlocal.ref_value = null;
             tranlocal.ref_oldValue = null;
         }
-
 
         departAfterUpdateAndUnlock();
         tranlocal.setLockMode(LOCKMODE_NONE);
@@ -333,6 +333,20 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
     }
 
+    private void initTranlocalForConstruction(final GammaRefTranlocal tranlocal) {
+        tranlocal.isDirty = true;
+        tranlocal.mode = TRANLOCAL_CONSTRUCTING;
+        tranlocal.setLockMode(LOCKMODE_EXCLUSIVE);
+        tranlocal.setDepartObligation(true);
+        if (type == TYPE_REF) {
+            tranlocal.ref_value = null;
+            tranlocal.ref_oldValue = null;
+        } else {
+            tranlocal.long_value = 0;
+            tranlocal.long_oldValue = 0;
+        }
+    }
+
     @Override
     public final GammaRefTranlocal openForConstruction(MonoGammaTransaction tx) {
         if (tx.status != TX_ACTIVE) {
@@ -350,7 +364,25 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOpenForConstructionOnReadonly(this);
         }
 
-        throw new TodoException();
+        final GammaRefTranlocal tranlocal = tx.tranlocal;
+
+        //noinspection ObjectEquality
+        if (tranlocal.owner == this) {
+            if (!tranlocal.isConstructing()) {
+                throw tx.abortOpenForConstructionOnBadReference(this);
+            }
+
+            return tranlocal;
+        }
+
+        if (tranlocal.owner != null) {
+            throw tx.abortOnTooSmallSize(2);
+        }
+
+        tx.hasWrites = true;
+        tranlocal.owner = this;
+        initTranlocalForConstruction(tranlocal);
+        return tranlocal;
     }
 
     @Override
@@ -370,7 +402,27 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOpenForConstructionOnReadonly(this);
         }
 
-        throw new TodoException();
+        final int identityHash = identityHashCode();
+        final int indexOf = tx.indexOf(this, identityHash);
+
+        if (indexOf > -1) {
+            final GammaRefTranlocal tranlocal = tx.array[indexOf];
+
+            if (!tranlocal.isConstructing()) {
+                throw tx.abortOpenForConstructionOnBadReference(this);
+            }
+
+            return tranlocal;
+        }
+
+        final GammaRefTranlocal tranlocal = tx.pool.take(this);
+        tranlocal.owner = this;
+        initTranlocalForConstruction(tranlocal);
+        tx.hasWrites = true;
+        tx.attach(tranlocal, identityHash);
+        tx.size++;
+
+        return tranlocal;
     }
 
     @Override
@@ -390,7 +442,42 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOpenForConstructionOnReadonly(this);
         }
 
-        throw new TodoException();
+        GammaRefTranlocal found = null;
+        GammaRefTranlocal newNode = null;
+        GammaRefTranlocal node = tx.head;
+        while (true) {
+            if (node == null) {
+                break;
+            } else if (node.owner == this) {
+                found = node;
+                break;
+            } else if (node.owner == null) {
+                newNode = node;
+                break;
+            } else {
+                node = node.next;
+            }
+        }
+
+        if (found != null) {
+            if (!found.isConstructing()) {
+                throw tx.abortOpenForConstructionOnBadReference(this);
+            }
+
+            tx.shiftInFront(found);
+            return found;
+        }
+
+        if (newNode == null) {
+            throw tx.abortOnTooSmallSize(config.arrayTransactionSize + 1);
+        }
+
+        newNode.owner = this;
+        initTranlocalForConstruction(newNode);
+        tx.size++;
+        tx.shiftInFront(newNode);
+        tx.hasWrites = true;
+        return newNode;
     }
     // ============================================================================================
     // =============================== open for read ==============================================
@@ -540,12 +627,12 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tx.size++;
         tx.shiftInFront(newNode);
 
-        if (tx.needsConsistency) {
+        if (tx.hasReads) {
             if (!tx.isReadConsistent(newNode)) {
                 throw tx.abortOnReadWriteConflict();
             }
         } else {
-            tx.needsConsistency = true;
+            tx.hasReads = true;
         }
 
         return newNode;
@@ -603,12 +690,12 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOnReadWriteConflict();
         }
 
-        if (tx.needsConsistency) {
+        if (tx.hasReads) {
             if (!tx.isReadConsistent(tranlocal)) {
                 throw tx.abortOnReadWriteConflict();
             }
         } else {
-            tx.needsConsistency = true;
+            tx.hasReads = true;
         }
 
         return tranlocal;
@@ -698,12 +785,12 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOnReadWriteConflict();
         }
 
-        if (tx.needsConsistency) {
+        if (tx.hasReads) {
             if (!tx.isReadConsistent(tranlocal)) {
                 throw tx.abortOnReadWriteConflict();
             }
         } else {
-            tx.needsConsistency = true;
+            tx.hasReads = true;
         }
 
         return tranlocal;
@@ -843,15 +930,15 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOnReadWriteConflict();
         }
 
-        if (tx.needsConsistency) {
+        if (tx.hasReads) {
             if (!tx.isReadConsistent(newNode)) {
                 throw tx.abortOnReadWriteConflict();
             }
         } else {
-            tx.needsConsistency = true;
+            tx.hasReads = true;
         }
 
-        tx.needsConsistency = true;
+        tx.hasReads = true;
         tx.hasWrites = true;
         tx.size++;
         tx.shiftInFront(newNode);

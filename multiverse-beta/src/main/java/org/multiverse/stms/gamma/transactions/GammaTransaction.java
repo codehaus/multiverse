@@ -48,6 +48,16 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
+    public final IllegalArgumentException abortOpenForConstructionOnBadReference(
+            final GammaObject ref) {
+
+        abort();
+        return new IllegalArgumentException(
+                format("[%s] Failed to execute Transaction.openForConstruction '%s', reason: the object is not new and has previous commits",
+                        config.familyName, toDebugString(ref)));
+    }
+
+
     public final ReadonlyException abortOpenForWriteOnReadonly(GammaObject object) {
         abort();
         return new ReadonlyException(

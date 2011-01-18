@@ -8,10 +8,21 @@ import org.multiverse.api.references.DoubleRef;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
-import static org.multiverse.stms.gamma.GammaStmUtils.asGammaTransaction;
-import static org.multiverse.stms.gamma.GammaStmUtils.getRequiredThreadLocalGammaTransaction;
+import static org.multiverse.stms.gamma.GammaStmUtils.*;
 
 public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef {
+
+    public GammaDoubleRef(final GammaTransaction tx) {
+        this(tx, 0);
+    }
+
+    public GammaDoubleRef(final GammaTransaction tx, final double value) {
+        super(tx.getConfiguration().stm, TYPE_BOOLEAN);
+
+        tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        GammaRefTranlocal tranlocal = openForConstruction(tx);
+        tranlocal.long_value = doubleAsLong(value);
+    }
 
     public GammaDoubleRef(GammaStm stm) {
         this(stm, 0);
@@ -19,7 +30,7 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
 
     public GammaDoubleRef(GammaStm stm, double value) {
         super(stm, TYPE_DOUBLE);
-        this.long_value = asLong(value);
+        this.long_value = doubleAsLong(value);
         //noinspection PointlessArithmeticExpression
         this.version = VERSION_UNCOMMITTED + 1;
     }
@@ -35,7 +46,7 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
     }
 
     public final double set(final GammaTransaction tx, final double value) {
-        openForWrite(tx, LOCKMODE_NONE).long_value = asLong(value);
+        openForWrite(tx, LOCKMODE_NONE).long_value = doubleAsLong(value);
         return value;
     }
 
@@ -50,27 +61,27 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
     }
 
     public final double get(final GammaTransaction tx) {
-        return asDouble(openForRead(tx, LOCKMODE_NONE).long_value);
+        return longAsDouble(openForRead(tx, LOCKMODE_NONE).long_value);
     }
 
     @Override
     public final double atomicGet() {
-        return asDouble(atomicGetLong());
+        return longAsDouble(atomicGetLong());
     }
 
     @Override
     public final double atomicWeakGet() {
-        return asDouble(long_value);
+        return longAsDouble(long_value);
     }
 
     @Override
     public final double atomicSet(final double newValue) {
-        return asDouble(atomicSetLong(asLong(newValue), false));
+        return longAsDouble(atomicSetLong(doubleAsLong(newValue), false));
     }
 
     @Override
     public final double atomicGetAndSet(final double newValue) {
-        return asDouble(atomicSetLong(asLong(newValue), true));
+        return longAsDouble(atomicSetLong(doubleAsLong(newValue), true));
     }
 
     @Override
@@ -85,8 +96,8 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
 
     public final double getAndSet(final GammaTransaction tx, final double value) {
         GammaRefTranlocal tranlocal = openForWrite(tx, LOCKMODE_NONE);
-        double oldValue = asDouble(tranlocal.long_value);
-        tranlocal.long_value = asLong(value);
+        double oldValue = longAsDouble(tranlocal.long_value);
+        tranlocal.long_value = doubleAsLong(value);
         return oldValue;
     }
 
@@ -162,10 +173,10 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
         boolean abort = true;
 
         try {
-            double oldValue = asDouble(write.long_value);
-            write.long_value = asLong(function.call(oldValue));
+            double oldValue = longAsDouble(write.long_value);
+            write.long_value = doubleAsLong(function.call(oldValue));
             abort = false;
-            return returnOld ? oldValue : asDouble(write.long_value);
+            return returnOld ? oldValue : longAsDouble(write.long_value);
         } finally {
             if (abort) {
                 tx.abort();
@@ -176,7 +187,7 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
 
     @Override
     public final boolean atomicCompareAndSet(final double expectedValue, final double newValue) {
-        return atomicCompareAndSetLong(asLong(expectedValue), asLong(newValue));
+        return atomicCompareAndSetLong(doubleAsLong(expectedValue), doubleAsLong(newValue));
     }
 
     @Override
@@ -197,8 +208,8 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
 
     public final double getAndIncrement(final GammaTransaction tx, final double amount) {
         GammaRefTranlocal tranlocal = openForWrite(tx, LOCKMODE_NONE);
-        double oldValue = asDouble(tranlocal.long_value);
-        tranlocal.long_value = asLong(oldValue + amount);
+        double oldValue = longAsDouble(tranlocal.long_value);
+        tranlocal.long_value = doubleAsLong(oldValue + amount);
         return oldValue;
     }
 
@@ -220,8 +231,8 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
 
     public final double incrementAndGet(final GammaTransaction tx, final double amount) {
         GammaRefTranlocal tranlocal = openForWrite(tx, LOCKMODE_NONE);
-        double result = asDouble(tranlocal.long_value) + amount;
-        tranlocal.long_value = asLong(result);
+        double result = longAsDouble(tranlocal.long_value) + amount;
+        tranlocal.long_value = doubleAsLong(result);
         return result;
     }
 
@@ -236,7 +247,7 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
     }
 
     public final void await(final GammaTransaction tx, final double value) {
-        if (asDouble(openForRead(tx, LOCKMODE_NONE).long_value) != value) {
+        if (longAsDouble(openForRead(tx, LOCKMODE_NONE).long_value) != value) {
             tx.retry();
         }
     }
@@ -255,7 +266,7 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
         final GammaRefTranlocal tranlocal = openForRead(tx, LOCKMODE_NONE);
         boolean abort = true;
         try {
-            if (!predicate.evaluate(asDouble(tranlocal.long_value))) {
+            if (!predicate.evaluate(longAsDouble(tranlocal.long_value))) {
                 tx.retry();
             }
             abort = false;
@@ -269,14 +280,7 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
     @Override
     public String toDebugString() {
         return String.format("GammaDoubleRef{orec=%s, version=%s, value=%s, hasListeners=%s)",
-                ___toOrecString(), version, asDouble(long_value), listeners != null);
+                ___toOrecString(), version, longAsDouble(long_value), listeners != null);
     }
 
-    public static double asDouble(long value) {
-        return Double.longBitsToDouble(value);
-    }
-
-    public static long asLong(double value) {
-        return Double.doubleToLongBits(value);
-    }
 }

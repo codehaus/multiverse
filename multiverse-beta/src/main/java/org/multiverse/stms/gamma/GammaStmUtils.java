@@ -42,6 +42,22 @@ public final class GammaStmUtils {
                 format("Expected Transaction of class %s, found %s", GammaTransaction.class.getName(), tx.getClass().getName()));
     }
 
+    public static boolean longAsBoolean(long value) {
+        return value == 1;
+    }
+
+    public static long booleanAsLong(boolean b) {
+        return b ? 1 : 0;
+    }
+
+    public static double longAsDouble(long value) {
+        return Double.longBitsToDouble(value);
+    }
+
+    public static long doubleAsLong(double value) {
+        return Double.doubleToLongBits(value);
+    }
+
     //we don't want instances.
     private GammaStmUtils() {
     }

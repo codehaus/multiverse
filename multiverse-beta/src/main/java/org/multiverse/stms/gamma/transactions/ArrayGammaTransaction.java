@@ -12,7 +12,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
 
     public GammaRefTranlocal head;
     public int size = 0;
-    public boolean needsConsistency = false;
+    public boolean hasReads = false;
     public final Listeners[] listenersArray;
 
     public ArrayGammaTransaction(final GammaStm stm) {
@@ -38,7 +38,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
     }
 
     public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
-        if (!needsConsistency) {
+        if (!hasReads) {
             return true;
         }
 
@@ -84,7 +84,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
             throw abortCommitOnBadStatus();
         }
 
-        if(abortOnly){
+        if (abortOnly) {
             abort();
             throw new ExplicitAbortException();
         }
@@ -269,6 +269,11 @@ public final class ArrayGammaTransaction extends GammaTransaction {
             throw abortPrepareOnBadStatus();
         }
 
+        if (abortOnly) {
+            abort();
+            throw new ExplicitAbortException();
+        }
+
         if (!prepareChainForCommit()) {
             throw abortOnReadWriteConflict();
         }
@@ -295,7 +300,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         size = 0;
         remainingTimeoutNs = config.timeoutNs;
         attempt = 1;
-        needsConsistency = false;
+        hasReads = false;
         abortOnly = false;
     }
 
@@ -308,7 +313,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         status = TX_ACTIVE;
         hasWrites = false;
         size = 0;
-        needsConsistency = false;
+        hasReads = false;
         abortOnly = false;
         attempt++;
         return true;

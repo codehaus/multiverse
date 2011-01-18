@@ -2,15 +2,12 @@ package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.stms.gamma.GammaConstants;
-import org.multiverse.stms.gamma.GammaObjectPool;
-import org.multiverse.stms.gamma.GammaStm;
-import org.multiverse.stms.gamma.Listeners;
+import org.multiverse.stms.gamma.*;
 
 import static org.junit.Assert.*;
+import static org.multiverse.stms.gamma.GammaStmUtils.doubleAsLong;
 import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasNoLocks;
 import static org.multiverse.stms.gamma.GammaTestUtils.assertVersionAndValue;
-import static org.multiverse.stms.gamma.transactionalobjects.GammaDoubleRef.asLong;
 
 public class AbstractGammaRef_saveTest implements GammaConstants {
 
@@ -122,7 +119,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
 
         boolean newValue = false;
 
-        tranlocal.long_value = GammaBooleanRef.asLong(newValue);
+        tranlocal.long_value = GammaStmUtils.booleanAsLong(newValue);
         tranlocal.setDirty(true);
         Listeners listeners = ref.safe(tranlocal, pool);
 
@@ -167,7 +164,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
 
         boolean newValue = false;
 
-        tranlocal.long_value = GammaBooleanRef.asLong(newValue);
+        tranlocal.long_value = GammaStmUtils.booleanAsLong(newValue);
         tranlocal.setDirty(true);
         Listeners result = ref.safe(tranlocal, pool);
 
@@ -212,7 +209,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
 
         double newValue = 20;
 
-        tranlocal.long_value = asLong(newValue);
+        tranlocal.long_value = doubleAsLong(newValue);
         tranlocal.setDirty(true);
         Listeners listeners = ref.safe(tranlocal, pool);
 
@@ -255,7 +252,7 @@ public class AbstractGammaRef_saveTest implements GammaConstants {
 
         double newValue = 20;
 
-        tranlocal.long_value = asLong(newValue);
+        tranlocal.long_value = doubleAsLong(newValue);
         tranlocal.setDirty(true);
         Listeners result = ref.safe(tranlocal, pool);
 

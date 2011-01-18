@@ -3,6 +3,7 @@ package org.multiverse.stms.gamma.transactions;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.stms.gamma.GammaStm;
 
 import static org.junit.Assert.*;
@@ -52,17 +53,18 @@ public abstract class GammaTransaction_isAbortOnlyTest<T extends GammaTransactio
         assertIsPrepared(tx);
     }
 
-
     @Test
-    public void whenPreparedAndSetAbortOnly() {
+    public void whenPreparedAndSetAbortOnly_thenPreparedTransactionException() {
         T tx = newTransaction();
-        tx.setAbortOnly();
         tx.prepare();
 
-        boolean result = tx.isAbortOnly();
+        try {
+            tx.setAbortOnly();
+            fail();
+        } catch (PreparedTransactionException expected) {
+        }
 
-        assertTrue(result);
-        assertIsPrepared(tx);
+        assertIsAborted(tx);
     }
 
     @Test

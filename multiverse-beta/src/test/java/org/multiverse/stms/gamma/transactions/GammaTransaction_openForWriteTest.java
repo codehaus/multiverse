@@ -71,7 +71,7 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
     }
 
     @Test
-    public void whenTransactionAbortOnly_thenReadStillPossible() {
+    public void whenTransactionAbortOnly_thenWriteStillPossible() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
         GammaTransaction tx = stm.startDefaultTransaction();

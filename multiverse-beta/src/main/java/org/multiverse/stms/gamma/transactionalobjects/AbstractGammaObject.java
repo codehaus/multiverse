@@ -17,6 +17,7 @@ import sun.misc.Unsafe;
 import static java.lang.String.format;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
+@SuppressWarnings({"OverlyComplexClass"})
 public abstract class AbstractGammaObject implements GammaObject, Lock {
 
     //it is important that the maximum threshold is not larger than 1023 (there are 10 bits for the readonly count)
@@ -550,7 +551,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             }
 
             if (!hasWriteLock(current)) {
-                throw new PanicError("Can't upgradeToExclusiveLock is the updateLock is not acquired");
+                throw new PanicError("Can't upgradeToExclusiveLock if the updateLock is not acquired");
             }
 
             long next = setExclusiveLock(current, true);
@@ -648,7 +649,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             final long current = orec;
 
             if (isReadBiased(current)) {
-                throw new PanicError("Can't tryLockAfterNormalArrive of the orec is readbiased " + toOrecString(current));
+                throw new PanicError("Can't tryLockAfterNormalArrive if the orec is readbiased " + toOrecString(current));
             }
 
             boolean locked = lockMode == LOCKMODE_READ ? hasWriteOrExclusiveLock(current) : hasAnyLock(current);
@@ -661,7 +662,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
             if (getSurplus(current) == 0) {
                 throw new PanicError(
-                        "Can't acquire any Lock is there is no surplus (so if it didn't do a read before)" +
+                        "Can't acquire any Lock if there is no surplus (so if it didn't do a read before)" +
                                 toOrecString(current));
             }
 

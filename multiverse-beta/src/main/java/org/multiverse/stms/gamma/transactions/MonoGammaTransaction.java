@@ -97,6 +97,11 @@ public final class MonoGammaTransaction extends GammaTransaction {
             throw abortPrepareOnBadStatus();
         }
 
+        if (abortOnly) {
+            abort();
+            throw new ExplicitAbortException();
+        }
+
         final AbstractGammaRef owner = tranlocal.owner;
         if (owner != null) {
             if (!owner.prepare(this, tranlocal)) {

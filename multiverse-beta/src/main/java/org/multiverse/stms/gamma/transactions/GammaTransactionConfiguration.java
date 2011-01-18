@@ -75,6 +75,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
 
         this.stm = stm;
+        this.globalConflictCounter = stm.getGlobalConflictCounter();
         this.interruptible = configuration.interruptible;
         this.readonly = configuration.readonly;
         this.spinCount = configuration.spinCount;
@@ -94,10 +95,9 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         this.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
         this.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         this.propagationLevel = configuration.propagationLevel;
+        this.controlFlowErrorsReused = configuration.controlFlowErrorsReused;
         this.familyName = "anonymoustransaction-" + idGenerator.incrementAndGet();
         this.isAnonymous = true;
-        this.globalConflictCounter = stm.getGlobalConflictCounter();
-        this.controlFlowErrorsReused = configuration.controlFlowErrorsReused;
     }
 
     public GammaTransactionConfiguration(GammaStm stm, int arrayTransactionSize) {
@@ -616,7 +616,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         return config;
     }
 
-     public GammaTransactionConfiguration setBackoffPolicy(BackoffPolicy backoffPolicy) {
+    public GammaTransactionConfiguration setBackoffPolicy(BackoffPolicy backoffPolicy) {
         if (backoffPolicy == null) {
             throw new NullPointerException("backoffPolicy can't be null");
         }

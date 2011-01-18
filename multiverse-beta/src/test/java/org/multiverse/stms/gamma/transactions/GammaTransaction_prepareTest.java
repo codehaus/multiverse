@@ -5,6 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.ExplicitAbortException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
@@ -29,9 +30,17 @@ public abstract class GammaTransaction_prepareTest<T extends GammaTransaction> i
     protected abstract T newTransaction(GammaTransactionConfiguration config);
 
     @Test
-    @Ignore
     public void whenAbortOnly() {
+        T tx = newTransaction();
+        tx.setAbortOnly();
 
+        try {
+            tx.prepare();
+            fail();
+        } catch (ExplicitAbortException expected) {
+        }
+
+        assertIsAborted(tx);
     }
 
     @Test

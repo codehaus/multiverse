@@ -18,6 +18,18 @@ import static org.multiverse.stms.gamma.GammaStmUtils.getRequiredThreadLocalGamm
  */
 public final class GammaIntRef extends AbstractGammaRef implements IntRef {
 
+    public GammaIntRef(final GammaTransaction tx) {
+        this(tx, 0);
+    }
+
+    public GammaIntRef(final GammaTransaction tx, final int value) {
+        super(tx.getConfiguration().stm, TYPE_BOOLEAN);
+
+        tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        GammaRefTranlocal tranlocal = openForConstruction(tx);
+        tranlocal.long_value = value;
+    }
+
     public GammaIntRef(GammaStm stm) {
         this(stm, 0);
     }

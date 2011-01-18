@@ -2,7 +2,7 @@ package org.multiverse.api;
 
 /**
  * The interface each transactional object needs to implement.
- *
+ * <p/>
  * All methods are threadsafe.
  *
  * @author Peter Veentjer.
@@ -27,6 +27,13 @@ public interface TransactionalObject {
     Lock getLock();
 
     /**
+     * Returns the current version of the transactional object. Each time an update happens, the value is increased.
+     *
+     * @return the current version.
+     */
+    long getVersion();
+
+    /**
      * Does a ensure. What is means is that at the end of the transaction (so deferred)
      * checks if no other transaction has made an update and also guarantees that till the transaction
      * completes no other transaction is able to do an update. Using the ensure you can
@@ -34,7 +41,7 @@ public interface TransactionalObject {
      * ensured/privatized tranlocals (although it doesn't provide any value anymore since the ensure
      * privatize already prevent conflicts).
      * <p/>
-     * Unlike the {@link Lock#acquireWriteLock()} which is pessimistic, this is optimistic.
+     * Unlike the {@link Lock#acquire(LockMode)} which is pessimistic, this is optimistic.
      * <p/>
      * This method doesn't provide any value if the transaction is readonly.
      * <p/>
@@ -55,7 +62,7 @@ public interface TransactionalObject {
      * ensured/privatized tranlocals (although it doesn't provide any value anymore since the ensure
      * privatize already prevent conflicts).
      * <p/>
-     * Unlike the {@link Lock#acquireWriteLock(Transaction)} which is pessimistic, this is optimistic.
+     * Unlike the {@link Lock#acquire(LockMode)} which is pessimistic, this is optimistic.
      * <p/>
      * This method doesn't provide any value if the transaction is readonly.
      * <p/>
