@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta;
+package org.multiverse.stms.gamma;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,12 +12,12 @@ import static org.multiverse.api.StmUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class StmUtilsTest {
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = new BetaStm();
+        stm = new GammaStm();
     }
 
     @Test

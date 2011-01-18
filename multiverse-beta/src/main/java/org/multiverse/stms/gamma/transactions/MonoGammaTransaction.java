@@ -171,7 +171,7 @@ public final class MonoGammaTransaction extends GammaTransaction {
         status = TX_ACTIVE;
         hasWrites = false;
         remainingTimeoutNs = config.timeoutNs;
-        attempt = 0;
+        attempt = 1;
         abortOnly = false;
     }
 

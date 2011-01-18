@@ -284,7 +284,7 @@ public final class ArrayGammaTransaction extends GammaTransaction {
         hasWrites = false;
         size = 0;
         remainingTimeoutNs = config.timeoutNs;
-        attempt = 0;
+        attempt = 1;
         needsConsistency = false;
         abortOnly = false;
     }

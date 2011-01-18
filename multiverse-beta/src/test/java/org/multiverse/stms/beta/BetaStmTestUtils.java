@@ -130,10 +130,6 @@ public class BetaStmTestUtils implements BetaStmConstants {
         assertEquals(LOCKMODE_EXCLUSIVE, tranlocal.getLockMode());
     }
 
-    public static void assertTranlocalHasUpdateLock(BetaTranlocal tranlocal) {
-        assertEquals(LOCKMODE_WRITE, tranlocal.getLockMode());
-    }
-
     public static BetaRef newRef(BetaStm stm) {
         return newRef(stm, null);
     }

@@ -357,7 +357,7 @@ public final class MapGammaTransaction extends GammaTransaction {
         status = TX_ACTIVE;
         hasWrites = false;
         remainingTimeoutNs = config.timeoutNs;
-        attempt = 0;
+        attempt = 1;
         size = 0;
         needsConsistency = false;
         abortOnly = false;
