@@ -119,10 +119,10 @@ public class QueueWithCapacityStressTest implements GammaConstants {
         final Stack<E> readyToPopStack = new Stack<E>();
         final AtomicBlock pushBlock = stm.newTransactionFactoryBuilder()
                 .setReadLockMode(lockMode)
-                .buildAtomicBlock();
+                .newAtomicBlock();
         final AtomicBlock popBlock = stm.newTransactionFactoryBuilder()
                 .setReadLockMode(lockMode)
-                .buildAtomicBlock();
+                .newAtomicBlock();
         final GammaIntRef size = new GammaIntRef(stm);
 
         public void push(final E item) {

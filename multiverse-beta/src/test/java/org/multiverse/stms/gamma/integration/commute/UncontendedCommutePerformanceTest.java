@@ -67,7 +67,7 @@ public class UncontendedCommutePerformanceTest {
         public void doRun() throws Exception {
             AtomicBlock block = stm.newTransactionFactoryBuilder()
                     .setDirtyCheckEnabled(false)
-                    .buildAtomicBlock();
+                    .newAtomicBlock();
 
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
@@ -91,7 +91,7 @@ public class UncontendedCommutePerformanceTest {
         @Override
         public void doRun() throws Exception {
             AtomicBlock block = stm.newTransactionFactoryBuilder()
-                    .buildAtomicBlock();
+                    .newAtomicBlock();
 
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override

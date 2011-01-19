@@ -16,7 +16,7 @@ public final class MapGammaTransactionFactory implements GammaTransactionFactory
     }
 
     @Override
-    public GammaTransactionConfiguration getTransactionConfiguration() {
+    public GammaTransactionConfiguration getConfiguration() {
         return config;
     }
 

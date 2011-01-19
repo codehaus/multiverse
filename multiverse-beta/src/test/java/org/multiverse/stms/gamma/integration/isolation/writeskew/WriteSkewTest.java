@@ -37,7 +37,7 @@ public class WriteSkewTest {
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
@@ -65,7 +65,7 @@ public class WriteSkewTest {
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setWriteLockMode(writeLockMode)
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
@@ -92,7 +92,7 @@ public class WriteSkewTest {
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setReadLockMode(readLockMode)
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
@@ -124,7 +124,7 @@ public class WriteSkewTest {
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
@@ -152,7 +152,7 @@ public class WriteSkewTest {
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
 
         ref1.incrementAndGet(tx, 1);
@@ -175,7 +175,7 @@ public class WriteSkewTest {
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Serializable)
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
         ref1.incrementAndGet(tx, 1);
         ref2.get(tx);

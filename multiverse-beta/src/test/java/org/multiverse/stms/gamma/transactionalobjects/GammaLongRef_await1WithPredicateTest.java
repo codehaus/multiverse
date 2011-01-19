@@ -36,7 +36,7 @@ public class GammaLongRef_await1WithPredicateTest {
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
         setThreadLocalTransaction(tx);
 

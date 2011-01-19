@@ -137,7 +137,7 @@ public class ReadConsistencyStressTest {
         public void doRun() throws Exception {
             AtomicBlock block = stm.newTransactionFactoryBuilder()
                     .setSpeculativeConfigurationEnabled(false)
-                    .buildAtomicBlock();
+                    .newAtomicBlock();
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
@@ -179,7 +179,7 @@ public class ReadConsistencyStressTest {
                     .setSpeculativeConfigurationEnabled(false)
                     .setBlockingAllowed(false)
                     .setReadonly(true)
-                    .buildAtomicBlock();
+                    .newAtomicBlock();
 
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override

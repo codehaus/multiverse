@@ -26,7 +26,7 @@ public interface TransactionConfiguration {
 
     /**
      * Checks if the {@link org.multiverse.api.exceptions.ControlFlowError} is cached or a new one is used.
-     *
+     * <p/>
      * Exception creation can be very expensive, so by default the ControlFlowError is reused, but this can
      * be problematic when debugging.
      *
@@ -126,8 +126,18 @@ public interface TransactionConfiguration {
     @Deprecated
     LockLevel getLockLevel();
 
+    /**
+     * Gets the current LockMode for all reads.
+     *
+     * @return the current LockMode for all reads.
+     */
     LockMode getReadLockMode();
 
+    /**
+     * Gets the current LockMode for all writes.
+     *
+     * @return the current LockMode for all writes.
+     */
     LockMode getWriteLockMode();
 
     /**

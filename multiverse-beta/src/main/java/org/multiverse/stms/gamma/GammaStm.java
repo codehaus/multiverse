@@ -44,7 +44,7 @@ public final class GammaStm implements Stm {
                 .setSpinCount(spinCount);
         this.defaultAtomicBlock = newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
-                .buildAtomicBlock();
+                .newAtomicBlock();
     }
 
     @Override
@@ -86,7 +86,7 @@ public final class GammaStm implements Stm {
 
         @Override
         public GammaTransactionFactoryBuilder setControlFlowErrorsReused(boolean reused) {
-            if(config.controlFlowErrorsReused = reused){
+            if (config.controlFlowErrorsReused = reused) {
                 return this;
             }
 
@@ -245,11 +245,11 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaAtomicBlock buildAtomicBlock() {
+        public GammaAtomicBlock newAtomicBlock() {
             config.init();
 
             if (leanAtomicBlock()) {
-                return new LeanGammaAtomicBlock(build());
+                return new LeanGammaAtomicBlock(newTransactionFactory());
             } else {
                 throw new TodoException();
                 //return new FatGammaAtomicBlock(build());
@@ -261,7 +261,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactory build() {
+        public GammaTransactionFactory newTransactionFactory() {
             config.init();
 
             if (config.isSpeculativeConfigEnabled()) {
@@ -336,7 +336,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionConfiguration getTransactionConfiguration() {
+        public GammaTransactionConfiguration getConfiguration() {
             return config;
         }
 
@@ -373,7 +373,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionConfiguration getTransactionConfiguration() {
+        public GammaTransactionConfiguration getConfiguration() {
             return config;
         }
 

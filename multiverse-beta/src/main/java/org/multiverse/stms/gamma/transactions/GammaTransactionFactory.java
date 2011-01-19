@@ -5,7 +5,7 @@ import org.multiverse.api.TransactionFactory;
 public interface GammaTransactionFactory extends TransactionFactory {
 
     @Override
-    GammaTransactionConfiguration getTransactionConfiguration();
+    GammaTransactionConfiguration getConfiguration();
 
     @Override
     GammaTransaction newTransaction();

@@ -174,21 +174,21 @@ public class WriteSkewStressTest {
         private final AtomicBlock snapshotBlock = stm.newTransactionFactoryBuilder()
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setMaxRetries(10000)
-                .buildAtomicBlock();
+                .newAtomicBlock();
         private final AtomicBlock serializedBlock = stm.newTransactionFactoryBuilder()
                 .setIsolationLevel(IsolationLevel.Serializable)
                 .setMaxRetries(10000)
-                .buildAtomicBlock();
+                .newAtomicBlock();
         private final AtomicBlock privatizedReadLevelBlock = stm.newTransactionFactoryBuilder()
                 .setLockLevel(LockLevel.CommitLockReads)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setMaxRetries(10000)
-                .buildAtomicBlock();
+                .newAtomicBlock();
         private final AtomicBlock privatizedWriteLevelBlock = stm.newTransactionFactoryBuilder()
                 .setLockLevel(LockLevel.CommitLockWrites)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setMaxRetries(10000)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
 
         public TransferThread(int id) {
@@ -325,7 +325,7 @@ public class WriteSkewStressTest {
     public class User {
         private AtomicBlock getTotalBlock = stm.newTransactionFactoryBuilder()
                 .setReadonly(true)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         private GammaLongRef account1 = new GammaLongRef(stm);
         private GammaLongRef account2 = new GammaLongRef(stm);
@@ -345,7 +345,7 @@ public class WriteSkewStressTest {
         }
 
         public String toString() {
-            return stm.newTransactionFactoryBuilder().buildAtomicBlock().execute(new AtomicClosure<String>() {
+            return stm.newTransactionFactoryBuilder().newAtomicBlock().execute(new AtomicClosure<String>() {
                 @Override
                 public String execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;

@@ -63,7 +63,7 @@ public class AbstractGammaObject_prepareTest implements GammaConstants {
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(true)
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
 
         GammaRefTranlocal tranlocal = ref.openForWrite(tx, lockMode.asInt());
@@ -100,7 +100,7 @@ public class AbstractGammaObject_prepareTest implements GammaConstants {
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(dirtyCheck)
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
 
         GammaRefTranlocal tranlocal = ref.openForWrite(tx, lockMode.asInt());
@@ -130,7 +130,7 @@ public class AbstractGammaObject_prepareTest implements GammaConstants {
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(false)
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
 
         GammaRefTranlocal tranlocal = ref.openForWrite(tx, lockMode.asInt());

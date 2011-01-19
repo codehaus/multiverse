@@ -112,11 +112,11 @@ public class DiningPhilosophersStressTest implements GammaConstants {
         private final BooleanRef rightFork;
         private final AtomicBlock releaseForksBlock = stm.newTransactionFactoryBuilder()
                 .setReadLockMode(lockMode)
-                .buildAtomicBlock();
+                .newAtomicBlock();
         private final AtomicBlock takeForksBlock = stm.newTransactionFactoryBuilder()
                 .setReadLockMode(lockMode)
                 .setMaxRetries(10000)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         PhilosopherThread(int id, BooleanRef leftFork, BooleanRef rightFork) {
             super("PhilosopherThread-" + id);

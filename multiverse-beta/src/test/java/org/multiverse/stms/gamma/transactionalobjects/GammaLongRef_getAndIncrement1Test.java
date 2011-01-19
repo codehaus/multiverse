@@ -31,7 +31,7 @@ public class GammaLongRef_getAndIncrement1Test implements GammaConstants {
 
     public GammaLongRef_getAndIncrement1Test(GammaTransactionFactory transactionFactory) {
         this.transactionFactory = transactionFactory;
-        this.stm = transactionFactory.getTransactionConfiguration().getStm();
+        this.stm = transactionFactory.getConfiguration().getStm();
     }
 
     @Before

@@ -41,7 +41,7 @@ public class ReadonlyTest {
     public void updateInReadonlyMethod(final GammaLongRef ref, final int newValue) {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setReadonly(true)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         block.execute(new AtomicVoidClosure() {
             @Override
@@ -64,7 +64,7 @@ public class ReadonlyTest {
     public void readonly_createNewTransactionObject(final long value) {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setReadonly(true)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         block.execute(new AtomicVoidClosure() {
             @Override
@@ -86,7 +86,7 @@ public class ReadonlyTest {
     public Integer readonly_createNormalObject(final int value) {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setReadonly(true)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         return block.execute(new AtomicClosure<Integer>() {
             @Override
@@ -107,7 +107,7 @@ public class ReadonlyTest {
     public long readInReadonlyMethod(final GammaLongRef ref) {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setReadonly(true)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         return block.execute(new AtomicLongClosure() {
             @Override
@@ -128,7 +128,7 @@ public class ReadonlyTest {
     public GammaLongRef update_createNewTransactionObject(final int value) {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setReadonly(false)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         return block.execute(new AtomicClosure<GammaLongRef>() {
             @Override
@@ -151,7 +151,7 @@ public class ReadonlyTest {
     public Integer update_createNormalObject(final int value) {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setReadonly(false)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         return block.execute(new AtomicClosure<Integer>() {
             @Override
@@ -173,7 +173,7 @@ public class ReadonlyTest {
     public long readInUpdateMethod(final GammaLongRef ref) {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setReadonly(false)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         return block.execute(new AtomicLongClosure() {
             @Override
@@ -194,7 +194,7 @@ public class ReadonlyTest {
     public void updateInUpdateMethod(final GammaLongRef ref, final int newValue) {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setReadonly(false)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         block.execute(new AtomicVoidClosure() {
             @Override
@@ -216,7 +216,7 @@ public class ReadonlyTest {
 
 
     public void defaultTransactionalMethod(final GammaLongRef ref) {
-        stm.newTransactionFactoryBuilder().buildAtomicBlock().execute(new AtomicVoidClosure() {
+        stm.newTransactionFactoryBuilder().newAtomicBlock().execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
                 assertFalse(tx.getConfiguration().isReadonly());

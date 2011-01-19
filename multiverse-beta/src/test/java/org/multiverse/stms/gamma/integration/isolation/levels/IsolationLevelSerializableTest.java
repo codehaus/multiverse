@@ -30,7 +30,7 @@ public class IsolationLevelSerializableTest {
         transactionFactory = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Serializable)
-                .build();
+                .newTransactionFactory();
     }
 
     @Test
@@ -41,7 +41,7 @@ public class IsolationLevelSerializableTest {
                 .setSpeculativeConfigurationEnabled(false)
                 .setReadTrackingEnabled(true)
                 .setIsolationLevel(IsolationLevel.Serializable)
-                .build();
+                .newTransactionFactory();
 
         GammaTransaction tx = transactionFactory.newTransaction();
         ref.get(tx);
@@ -62,7 +62,7 @@ public class IsolationLevelSerializableTest {
                 .setReadTrackingEnabled(false)
                 .setBlockingAllowed(false)
                 .setIsolationLevel(IsolationLevel.Serializable)
-                .build();
+                .newTransactionFactory();
 
         GammaTransaction tx = transactionFactory.newTransaction();
         ref.get(tx);

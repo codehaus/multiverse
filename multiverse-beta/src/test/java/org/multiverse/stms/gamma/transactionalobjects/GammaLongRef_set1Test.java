@@ -33,7 +33,7 @@ public class GammaLongRef_set1Test {
 
     public GammaLongRef_set1Test(GammaTransactionFactory transactionFactory) {
         this.transactionFactory = transactionFactory;
-        this.stm = transactionFactory.getTransactionConfiguration().getStm();
+        this.stm = transactionFactory.getConfiguration().getStm();
     }
 
     @Before

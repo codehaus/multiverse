@@ -38,7 +38,7 @@ public class GammaLongRef_ensure1Test {
 
     public GammaLongRef_ensure1Test(GammaTransactionFactory transactionFactory) {
         this.transactionFactory = transactionFactory;
-        this.stm = transactionFactory.getTransactionConfiguration().getStm();
+        this.stm = transactionFactory.getConfiguration().getStm();
     }
 
     @Before
@@ -62,7 +62,6 @@ public class GammaLongRef_ensure1Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = transactionFactory.newTransaction();
-
 
 
         setThreadLocalTransaction(tx);

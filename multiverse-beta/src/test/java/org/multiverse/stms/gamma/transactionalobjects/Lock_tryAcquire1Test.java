@@ -37,7 +37,7 @@ public class Lock_tryAcquire1Test {
 
     public Lock_tryAcquire1Test(GammaTransactionFactory transactionFactory) {
         this.transactionFactory = transactionFactory;
-        this.stm = transactionFactory.getTransactionConfiguration().getStm();
+        this.stm = transactionFactory.getConfiguration().getStm();
     }
 
     @Before

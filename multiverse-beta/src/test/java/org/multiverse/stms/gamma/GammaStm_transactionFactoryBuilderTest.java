@@ -111,18 +111,18 @@ public class GammaStm_transactionFactoryBuilderTest {
         GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
                 .setReadTrackingEnabled(false)
                 .setBlockingAllowed(false)
-                .build();
+                .newTransactionFactory();
 
-        assertFalse(txFactory.getTransactionConfiguration().isReadTrackingEnabled());
+        assertFalse(txFactory.getConfiguration().isReadTrackingEnabled());
     }
 
     @Test
     public void whenSpeculativeConfigEnabled() {
         GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(true)
-                .build();
+                .newTransactionFactory();
 
-        GammaTransactionConfiguration configuration = txFactory.getTransactionConfiguration();
+        GammaTransactionConfiguration configuration = txFactory.getConfiguration();
         assertFalse(configuration.getSpeculativeConfiguration().isFat);
         assertTrue(configuration.isSpeculativeConfigEnabled());
     }
@@ -132,10 +132,10 @@ public class GammaStm_transactionFactoryBuilderTest {
         GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(true)
                 .setIsolationLevel(IsolationLevel.Serializable)
-                .build();
+                .newTransactionFactory();
 
 
-        GammaTransactionConfiguration configuration = txFactory.getTransactionConfiguration();
+        GammaTransactionConfiguration configuration = txFactory.getConfiguration();
         assertTrue(configuration.getSpeculativeConfiguration().isFat);
         assertTrue(configuration.isSpeculativeConfigEnabled());
     }
@@ -146,7 +146,7 @@ public class GammaStm_transactionFactoryBuilderTest {
         GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(true)
                 .setIsolationLevel(IsolationLevel.Serializable)
-                .build();
+                .newTransactionFactory();
 
         GammaTransaction tx = txFactory.newTransaction();
         assertTrue(tx instanceof MapGammaTransaction);

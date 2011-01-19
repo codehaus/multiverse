@@ -60,7 +60,7 @@ public class EnsureDeadLockStressTest {
             AtomicBlock block = stm.newTransactionFactoryBuilder()
                     .setSpinCount(1000)
                     .setMaxRetries(10000)
-                    .buildAtomicBlock();
+                    .newAtomicBlock();
 
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override

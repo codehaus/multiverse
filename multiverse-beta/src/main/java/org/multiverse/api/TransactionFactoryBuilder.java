@@ -21,6 +21,14 @@ public interface TransactionFactoryBuilder {
      */
     TransactionConfiguration getTransactionConfiguration();
 
+    /**
+     * Sets if ControlFlowErrors are reused. Normally you don't want to reuse them because they can be expensive
+     * to create (especially the stacktrace) and they could be created very often. But for debugging purposes it
+     * can be quite annoying.
+     *
+     * @param reused true if ControlFlowErrors should be reused.
+     * @return the updated TransactionFactoryBuilder.
+     */
     TransactionFactoryBuilder setControlFlowErrorsReused(boolean reused);
 
     /**
@@ -48,7 +56,7 @@ public interface TransactionFactoryBuilder {
     /**
      * Sets the LockMode for all reads.
      *
-     * @param lockMode  the LockMode to set.
+     * @param lockMode the LockMode to set.
      * @return the updated TransactionFactoryBuilder.
      * @throws NullPointerException if lockMode is null.
      */
@@ -56,7 +64,7 @@ public interface TransactionFactoryBuilder {
 
     /**
      * Sets the LockMode for all writes. For a write, always a read needs to be done, so if the ReadLockMode is
-     *
+     * <p/>
      * Freshly constructed objects that are not committed, automatically are locked with an Exclusive lock.
      *
      * @param lockMode the LockMode to set.
@@ -217,7 +225,7 @@ public interface TransactionFactoryBuilder {
      *          if the TransactionFactory could not be build
      *          because the configuration was not correct.
      */
-    TransactionFactory build();
+    TransactionFactory newTransactionFactory();
 
     /**
      * Builds an AtomicBlock optimized for a transactions created by this TransactionFactoryBuilder.
@@ -227,5 +235,5 @@ public interface TransactionFactoryBuilder {
      *          if the TransactionFactory could not be build
      *          because the configuration was not correct.
      */
-    AtomicBlock buildAtomicBlock();
+    AtomicBlock newAtomicBlock();
 }

@@ -17,7 +17,7 @@ public class MonoGammaTransactionFactory implements GammaTransactionFactory {
     }
 
     @Override
-    public GammaTransactionConfiguration getTransactionConfiguration() {
+    public GammaTransactionConfiguration getConfiguration() {
         return config;
     }
 

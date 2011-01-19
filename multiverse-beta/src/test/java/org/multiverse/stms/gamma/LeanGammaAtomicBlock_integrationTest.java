@@ -24,7 +24,7 @@ public class LeanGammaAtomicBlock_integrationTest {
 
     @Test
     public void whenExecutedThenThreadLocalTransactionSet() {
-        GammaTransactionFactory transactionFactory = stm.newTransactionFactoryBuilder().build();
+        GammaTransactionFactory transactionFactory = stm.newTransactionFactoryBuilder().newTransactionFactory();
         AtomicBlock block = new LeanGammaAtomicBlock(transactionFactory);
         block.execute(new AtomicVoidClosure() {
             @Override

@@ -36,7 +36,7 @@ public class GammaAtomicBlock_timeoutTest {
     public void whenTimeout() throws InterruptedException {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setTimeoutNs(timeoutNs)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         AwaitThread t = new AwaitThread(block);
         t.setPrintStackTrace(false);
@@ -51,7 +51,7 @@ public class GammaAtomicBlock_timeoutTest {
     public void whenSuccess() {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setTimeoutNs(timeoutNs)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         AwaitThread t = new AwaitThread(block);
         t.setPrintStackTrace(false);
@@ -85,7 +85,7 @@ public class GammaAtomicBlock_timeoutTest {
 
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setTimeoutNs(0)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         AwaitThread t = new AwaitThread(block);
         t.setPrintStackTrace(false);

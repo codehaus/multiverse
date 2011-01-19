@@ -11,15 +11,13 @@ import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
-public class GammaRef_awaitNull1Test implements GammaConstants{
+public class GammaRef_awaitNull1Test implements GammaConstants {
 
     private GammaStm stm;
 
@@ -100,7 +98,7 @@ public class GammaRef_awaitNull1Test implements GammaConstants{
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
-                 .build()
+                .newTransactionFactory()
                 .newTransaction();
 
         try {

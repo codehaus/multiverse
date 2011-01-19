@@ -106,10 +106,10 @@ public class NonReentrantSemaphoreStressTest {
             ref = new GammaLongRef(stm, initial);
             upBlock = stm.newTransactionFactoryBuilder()
                     .setReadLockMode(lockMode)
-                    .buildAtomicBlock();
+                    .newAtomicBlock();
             downBlock = stm.newTransactionFactoryBuilder()
                     .setReadLockMode(lockMode)
-                    .buildAtomicBlock();
+                    .newAtomicBlock();
         }
 
         public void up() {

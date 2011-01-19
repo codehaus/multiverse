@@ -59,7 +59,7 @@ public class RetryInterruptibleTest {
         public void await() throws Exception {
             AtomicBlock block = stm.newTransactionFactoryBuilder()
                     .setInterruptible(true)
-                    .buildAtomicBlock();
+                    .newAtomicBlock();
 
             block.executeChecked(new AtomicVoidClosure() {
                 @Override

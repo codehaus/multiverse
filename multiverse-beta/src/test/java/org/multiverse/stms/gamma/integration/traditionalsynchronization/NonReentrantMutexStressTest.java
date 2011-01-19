@@ -139,10 +139,10 @@ public class NonReentrantMutexStressTest {
         final GammaLongRef locked = new GammaLongRef(stm, 0);
         final AtomicBlock lockBlock = stm.newTransactionFactoryBuilder()
                 .setReadLockMode(lockMode)
-                .buildAtomicBlock();
+                .newAtomicBlock();
         final AtomicBlock unlockBlock = stm.newTransactionFactoryBuilder()
                 .setReadLockMode(lockMode)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         final AtomicVoidClosure lockClosure = new AtomicVoidClosure() {
             @Override

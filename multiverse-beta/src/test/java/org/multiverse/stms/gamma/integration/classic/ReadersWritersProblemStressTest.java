@@ -178,12 +178,12 @@ public class ReadersWritersProblemStressTest {
             acquireReadLockBlock = stm.newTransactionFactoryBuilder()
                     .setReadLockMode(lockMode)
                     .setMaxRetries(10000)
-                    .buildAtomicBlock();
+                    .newAtomicBlock();
 
             acquireWriteLockBlock = stm.newTransactionFactoryBuilder()
                     .setReadLockMode(lockMode)
                     .setMaxRetries(10000)
-                    .buildAtomicBlock();
+                    .newAtomicBlock();
         }
 
         public void acquireReadLock() {

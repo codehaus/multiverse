@@ -17,7 +17,7 @@ public class ArrayGammaTransactionFactory implements GammaTransactionFactory {
     }
 
     @Override
-    public GammaTransactionConfiguration getTransactionConfiguration() {
+    public GammaTransactionConfiguration getConfiguration() {
         return config;
     }
 

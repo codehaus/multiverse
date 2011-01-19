@@ -77,7 +77,7 @@ public class ContendedCounterDriver extends BenchmarkDriver {
             AtomicBlock block = stm.newTransactionFactoryBuilder()
                     .setLockLevel(lockLevel)
                     .setDirtyCheckEnabled(dirtyCheck)
-                    .buildAtomicBlock();
+                    .newAtomicBlock();
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {

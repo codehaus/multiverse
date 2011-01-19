@@ -120,7 +120,7 @@ public class MoneyTransferStressTest {
         }
 
         public void doRun() {
-            AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
+            AtomicBlock block = stm.newTransactionFactoryBuilder().newAtomicBlock();
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {

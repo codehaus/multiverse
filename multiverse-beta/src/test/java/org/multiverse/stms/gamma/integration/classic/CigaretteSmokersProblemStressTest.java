@@ -51,7 +51,7 @@ public class CigaretteSmokersProblemStressTest {
                 .newTransactionFactoryBuilder()
                         //.setLockLevel(PessimisticLockLevel.CommitLockReads)
                         //.setIsolationLevel(IsolationLevel.Serializable)
-                .buildAtomicBlock();
+                .newAtomicBlock();
     }
 
     @Test

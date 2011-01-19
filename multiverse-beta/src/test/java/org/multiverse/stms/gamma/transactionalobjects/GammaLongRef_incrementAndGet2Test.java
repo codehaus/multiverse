@@ -32,7 +32,7 @@ public class GammaLongRef_incrementAndGet2Test {
 
     public GammaLongRef_incrementAndGet2Test(GammaTransactionFactory transactionFactory) {
         this.transactionFactory = transactionFactory;
-        this.stm = transactionFactory.getTransactionConfiguration().getStm();
+        this.stm = transactionFactory.getConfiguration().getStm();
     }
 
     @Before

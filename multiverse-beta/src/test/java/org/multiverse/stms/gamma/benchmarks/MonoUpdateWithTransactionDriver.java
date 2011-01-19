@@ -58,7 +58,7 @@ public class MonoUpdateWithTransactionDriver implements GammaConstants {
         final GammaAtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(false)
                 .setWriteLockMode(writeLockMode)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         final AtomicVoidClosure closure = new AtomicVoidClosure() {
             @Override

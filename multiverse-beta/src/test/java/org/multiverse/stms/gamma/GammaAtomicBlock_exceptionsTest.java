@@ -23,7 +23,7 @@ public class GammaAtomicBlock_exceptionsTest implements GammaConstants {
 
     @Test
     public void executeChecked_whenCheckedExceptionThrown() {
-        AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
+        AtomicBlock block = stm.newTransactionFactoryBuilder().newAtomicBlock();
         final GammaLongRef ref = new GammaLongRef(stm, 10);
 
         final Exception ex = new Exception();
@@ -47,7 +47,7 @@ public class GammaAtomicBlock_exceptionsTest implements GammaConstants {
 
     @Test
     public void executeChecked_whenRuntimeExceptionThrown() throws Exception {
-        AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
+        AtomicBlock block = stm.newTransactionFactoryBuilder().newAtomicBlock();
         final GammaLongRef ref = new GammaLongRef(stm, 10);
 
         final RuntimeException ex = new RuntimeException();
@@ -72,7 +72,7 @@ public class GammaAtomicBlock_exceptionsTest implements GammaConstants {
 
     @Test
     public void executeChecked_whenErrorThrown() throws Exception {
-        AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
+        AtomicBlock block = stm.newTransactionFactoryBuilder().newAtomicBlock();
         final GammaLongRef ref = new GammaLongRef(stm, 10);
 
         final Error ex = new Error();
@@ -96,7 +96,7 @@ public class GammaAtomicBlock_exceptionsTest implements GammaConstants {
 
     @Test
     public void execute_whenCheckedExceptionThrown() {
-        AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
+        AtomicBlock block = stm.newTransactionFactoryBuilder().newAtomicBlock();
         final GammaLongRef ref = new GammaLongRef(stm, 10);
 
         final Exception ex = new Exception();
@@ -120,7 +120,7 @@ public class GammaAtomicBlock_exceptionsTest implements GammaConstants {
 
     @Test
     public void execute_whenRuntimeExceptionThrown() {
-        AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
+        AtomicBlock block = stm.newTransactionFactoryBuilder().newAtomicBlock();
         final GammaLongRef ref = new GammaLongRef(stm, 10);
 
         final RuntimeException ex = new RuntimeException();
@@ -145,7 +145,7 @@ public class GammaAtomicBlock_exceptionsTest implements GammaConstants {
 
     @Test
     public void execute_whenErrorThrown() {
-        AtomicBlock block = stm.newTransactionFactoryBuilder().buildAtomicBlock();
+        AtomicBlock block = stm.newTransactionFactoryBuilder().newAtomicBlock();
         final GammaLongRef ref = new GammaLongRef(stm, 10);
 
         final Error ex = new Error();

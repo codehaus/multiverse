@@ -50,7 +50,7 @@ public class CountDownCommitBarrier_joinCommitTest {
 
         Transaction tx = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
 
         barrier.joinCommit(tx);

@@ -111,12 +111,12 @@ public class ReadCommittedStressTest {
             AtomicBlock readonlyReadtrackingBlock = stm.newTransactionFactoryBuilder()
                     .setReadonly(true)
                     .setReadTrackingEnabled(true)
-                    .buildAtomicBlock();
+                    .newAtomicBlock();
 
             AtomicBlock updateReadtrackingBlock = stm.newTransactionFactoryBuilder()
                     .setReadonly(false)
                     .setReadTrackingEnabled(true)
-                    .buildAtomicBlock();
+                    .newAtomicBlock();
 
             int k = 0;
             while (!stop) {

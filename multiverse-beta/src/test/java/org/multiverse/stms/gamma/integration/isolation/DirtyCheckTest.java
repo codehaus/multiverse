@@ -27,7 +27,7 @@ public class DirtyCheckTest {
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(false)
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
 
         ref.set(tx, 0);
@@ -44,7 +44,7 @@ public class DirtyCheckTest {
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(false)
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
 
         ref.set(tx, 1);
@@ -61,7 +61,7 @@ public class DirtyCheckTest {
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(true)
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
 
         ref.set(tx, 0);
@@ -78,7 +78,7 @@ public class DirtyCheckTest {
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(true)
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
 
         ref.set(tx, 1);

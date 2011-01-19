@@ -22,7 +22,7 @@ public class GammaAtomicBlockTest {
         clearThreadLocalTransaction();
         stm = new GammaStm();
         block = stm.newTransactionFactoryBuilder()
-                .buildAtomicBlock();
+                .newAtomicBlock();
     }
 
     @Test

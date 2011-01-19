@@ -79,7 +79,7 @@ public class NoBlockingTest {
         AtomicBlock block = getGlobalStmInstance()
                 .newTransactionFactoryBuilder()
                 .setBlockingAllowed(false)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         try {
             block.execute(new AtomicVoidClosure() {

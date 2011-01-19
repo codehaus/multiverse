@@ -23,7 +23,7 @@ public class GammaStm_transactionFactoryValidationTest {
                 .setBlockingAllowed(true);
 
         try {
-            builder.build();
+            builder.newTransactionFactory();
             fail();
         } catch (IllegalStateException expected) {
         }
@@ -37,7 +37,7 @@ public class GammaStm_transactionFactoryValidationTest {
                 .setIsolationLevel(IsolationLevel.Serializable);
 
         try {
-            builder.build();
+            builder.newTransactionFactory();
             fail();
         } catch (IllegalStateException expected) {
         }
@@ -56,7 +56,7 @@ public class GammaStm_transactionFactoryValidationTest {
                 .setReadTrackingEnabled(readTrackingEnabled)
                 .setIsolationLevel(IsolationLevel.Serializable);
 
-        builder.build();
+        builder.newTransactionFactory();
     }
 
 
@@ -67,7 +67,7 @@ public class GammaStm_transactionFactoryValidationTest {
                 .setReadLockMode(LockMode.Read);
 
         try {
-            builder.build();
+            builder.newTransactionFactory();
             fail();
         } catch (IllegalStateException expected) {
         }

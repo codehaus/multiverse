@@ -35,7 +35,7 @@ public class GammaAtomicBlock_interruptibleTest implements GammaConstants {
 
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setInterruptible(true)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         WaitWithoutTimeoutThread t = new WaitWithoutTimeoutThread(ref, block);
         t.setPrintStackTrace(false);
@@ -59,7 +59,7 @@ public class GammaAtomicBlock_interruptibleTest implements GammaConstants {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setTimeoutNs(TimeUnit.SECONDS.toNanos(10))
                 .setInterruptible(true)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         WaitWithoutTimeoutThread t = new WaitWithoutTimeoutThread(ref, block);
         t.setPrintStackTrace(false);

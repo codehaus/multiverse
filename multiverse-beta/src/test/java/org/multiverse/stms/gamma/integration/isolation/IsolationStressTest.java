@@ -163,7 +163,7 @@ public class IsolationStressTest implements GammaConstants {
                     .setSpeculativeConfigurationEnabled(false)
                     .setWriteLockMode(lockMode)
                     .setMaxRetries(10000)
-                    .buildAtomicBlock();
+                    .newAtomicBlock();
 
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override

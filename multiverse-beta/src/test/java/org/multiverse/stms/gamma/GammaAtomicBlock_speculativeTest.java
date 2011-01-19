@@ -42,7 +42,7 @@ public class GammaAtomicBlock_speculativeTest implements GammaConstants {
 
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(true)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         block.execute(new AtomicVoidClosure() {
             @Override
@@ -171,7 +171,7 @@ public class GammaAtomicBlock_speculativeTest implements GammaConstants {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setTimeoutNs(1000)
                 .setSpeculativeConfigurationEnabled(true)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         block.execute(new AtomicVoidClosure() {
             @Override

@@ -67,8 +67,8 @@ public interface GammaTransactionFactoryBuilder extends TransactionFactoryBuilde
     GammaTransactionFactoryBuilder setBlockingAllowed(boolean blockingAllowed);
 
     @Override
-    GammaTransactionFactory build();
+    GammaTransactionFactory newTransactionFactory();
 
     @Override
-    GammaAtomicBlock buildAtomicBlock();
+    GammaAtomicBlock newAtomicBlock();
 }

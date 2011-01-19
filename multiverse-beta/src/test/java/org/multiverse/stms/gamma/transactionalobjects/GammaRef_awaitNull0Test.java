@@ -7,9 +7,7 @@ import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -101,7 +99,7 @@ public class GammaRef_awaitNull0Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
 
         setThreadLocalTransaction(tx);

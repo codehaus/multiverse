@@ -101,10 +101,10 @@ public class ConditionVariableStressTest {
         final int capacity;
         final AtomicBlock pushBlock = stm.newTransactionFactoryBuilder()
                 .setReadLockMode(lockMode)
-                .buildAtomicBlock();
+                .newAtomicBlock();
         final AtomicBlock popBlock = stm.newTransactionFactoryBuilder()
                 .setReadLockMode(lockMode)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         Stack(int capacity) {
             this.capacity = capacity;

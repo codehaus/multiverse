@@ -52,7 +52,7 @@ public class GammaLongRef_decrement2Test {
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setReadonly(true)
                 .setSpeculativeConfigurationEnabled(false)
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
 
         try {

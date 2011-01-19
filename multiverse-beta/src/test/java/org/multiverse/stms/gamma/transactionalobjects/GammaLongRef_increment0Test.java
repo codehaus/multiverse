@@ -30,7 +30,7 @@ public class GammaLongRef_increment0Test {
 
     public GammaLongRef_increment0Test(GammaTransactionFactory transactionFactory) {
         this.transactionFactory = transactionFactory;
-        this.stm = transactionFactory.getTransactionConfiguration().getStm();
+        this.stm = transactionFactory.getConfiguration().getStm();
     }
 
     @Before
@@ -73,7 +73,7 @@ public class GammaLongRef_increment0Test {
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setReadonly(true)
                 .setSpeculativeConfigurationEnabled(false)
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
         setThreadLocalTransaction(tx);
 

@@ -102,10 +102,10 @@ public class ReentrantMutexStressTest {
         ReentrantMutex(LockMode readLockMode) {
             lockBlock = stm.newTransactionFactoryBuilder()
                     .setReadLockMode(readLockMode)
-                    .buildAtomicBlock();
+                    .newAtomicBlock();
             unlockBlock = stm.newTransactionFactoryBuilder()
                     .setReadLockMode(readLockMode)
-                    .buildAtomicBlock();
+                    .newAtomicBlock();
         }
 
         public void lock(final Thread thread) {

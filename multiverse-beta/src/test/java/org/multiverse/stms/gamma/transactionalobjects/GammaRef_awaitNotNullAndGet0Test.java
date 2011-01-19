@@ -15,7 +15,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
-public class GammaRef_awaitNotNullAndGet0Test implements GammaConstants{
+public class GammaRef_awaitNotNullAndGet0Test implements GammaConstants {
 
     private GammaStm stm;
 
@@ -28,7 +28,7 @@ public class GammaRef_awaitNotNullAndGet0Test implements GammaConstants{
     @Test
     public void whenNull_thenReturnImmediately() {
         String initialValue = "foo";
-        GammaRef<String> ref = new GammaRef<String>(stm,initialValue);
+        GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.startDefaultTransaction();
@@ -103,7 +103,7 @@ public class GammaRef_awaitNotNullAndGet0Test implements GammaConstants{
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
 
         setThreadLocalTransaction(tx);

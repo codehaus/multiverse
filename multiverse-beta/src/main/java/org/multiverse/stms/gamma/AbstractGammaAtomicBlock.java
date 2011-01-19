@@ -14,7 +14,7 @@ public abstract class AbstractGammaAtomicBlock implements GammaAtomicBlock {
             throw new NullPointerException();
         }
         this.transactionFactory = transactionFactory;
-        this.transactionConfiguration = transactionFactory.getTransactionConfiguration();
+        this.transactionConfiguration = transactionFactory.getConfiguration();
         this.backoffPolicy = transactionConfiguration.backoffPolicy;
     }
 }

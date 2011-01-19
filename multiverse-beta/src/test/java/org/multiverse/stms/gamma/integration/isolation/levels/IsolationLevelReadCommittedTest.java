@@ -26,7 +26,7 @@ public class IsolationLevelReadCommittedTest {
         transactionFactory = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.ReadCommitted)
-                .build();
+                .newTransactionFactory();
     }
 
     @Test
@@ -37,7 +37,7 @@ public class IsolationLevelReadCommittedTest {
                 .setSpeculativeConfigurationEnabled(false)
                 .setReadTrackingEnabled(true)
                 .setIsolationLevel(IsolationLevel.ReadCommitted)
-                .build();
+                .newTransactionFactory();
 
         GammaTransaction tx = transactionFactory.newTransaction();
         ref.get(tx);
@@ -57,7 +57,7 @@ public class IsolationLevelReadCommittedTest {
                 .setReadTrackingEnabled(false)
                 .setBlockingAllowed(false)
                 .setIsolationLevel(IsolationLevel.ReadCommitted)
-                .build();
+                .newTransactionFactory();
 
         GammaTransaction tx = transactionFactory.newTransaction();
         ref.get(tx);

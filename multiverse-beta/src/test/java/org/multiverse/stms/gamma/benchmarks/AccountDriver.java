@@ -64,7 +64,7 @@ public class AccountDriver extends BenchmarkDriver {
         volatile private int phase;
         private int steps;
 
-        BenchmarkThread(int id, int nb, int max,int readThreads, int writeThreads) {
+        BenchmarkThread(int id, int nb, int max, int readThreads, int writeThreads) {
             phase = WARMUP_PHASE;
             steps = 0;
             this.id = id;
@@ -152,9 +152,9 @@ public class AccountDriver extends BenchmarkDriver {
 
     class Bank {
         private final Account[] accounts;
-        private final AtomicBlock addInterrestBlock = stm.newTransactionFactoryBuilder().buildAtomicBlock();
-        private final AtomicBlock computeTotalBlock = stm.newTransactionFactoryBuilder().buildAtomicBlock();
-        private final AtomicBlock transferBlock = stm.newTransactionFactoryBuilder().buildAtomicBlock();
+        private final AtomicBlock addInterrestBlock = stm.newTransactionFactoryBuilder().newAtomicBlock();
+        private final AtomicBlock computeTotalBlock = stm.newTransactionFactoryBuilder().newAtomicBlock();
+        private final AtomicBlock transferBlock = stm.newTransactionFactoryBuilder().newAtomicBlock();
 
         public Bank(int accountCount) {
             accounts = new Account[accountCount];

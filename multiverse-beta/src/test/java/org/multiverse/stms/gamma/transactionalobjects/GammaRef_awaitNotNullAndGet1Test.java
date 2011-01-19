@@ -17,7 +17,7 @@ import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
-public class GammaRef_awaitNotNullAndGet1Test implements GammaConstants{
+public class GammaRef_awaitNotNullAndGet1Test implements GammaConstants {
 
     private GammaStm stm;
 
@@ -101,7 +101,7 @@ public class GammaRef_awaitNotNullAndGet1Test implements GammaConstants{
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
-                .build()
+                .newTransactionFactory()
                 .newTransaction();
 
         try {

@@ -104,16 +104,16 @@ public class NonReentrantReadWriteLockStressTest {
         final AtomicLong writers = new AtomicLong();
         final AtomicBlock acquireReadLockBlock = stm.newTransactionFactoryBuilder()
                 .setReadLockMode(lockMode)
-                .buildAtomicBlock();
+                .newAtomicBlock();
         final AtomicBlock releaseReadLockBlock = stm.newTransactionFactoryBuilder()
                 .setReadLockMode(lockMode)
-                .buildAtomicBlock();
+                .newAtomicBlock();
         final AtomicBlock acquireWriteLockBlock = stm.newTransactionFactoryBuilder()
                 .setReadLockMode(lockMode)
-                .buildAtomicBlock();
+                .newAtomicBlock();
         final AtomicBlock releaseWriteLockBlock = stm.newTransactionFactoryBuilder()
                 .setReadLockMode(lockMode)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
 
         public void acquireReadLock() {

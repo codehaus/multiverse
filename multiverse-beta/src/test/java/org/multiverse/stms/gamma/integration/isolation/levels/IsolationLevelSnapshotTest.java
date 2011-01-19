@@ -28,7 +28,7 @@ public class IsolationLevelSnapshotTest {
         transactionFactory = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
-                .build();
+                .newTransactionFactory();
     }
 
     @Test
