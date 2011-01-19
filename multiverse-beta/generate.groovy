@@ -19,7 +19,6 @@ class TransactionalObject {
     String type//the type of data it contains
     String objectType//the type of data it contains
     String initialValue//the initial value
-    int classIndex
     String typeParameter
 //  String parametrizedTranlocal
     String functionClass//the class of the callable used for commuting operations
@@ -103,7 +102,6 @@ List<TransactionalObject> createTransactionalObjects() {
             typeParameter: '<E>',
             initialValue: 'null',
             referenceInterface: 'Ref',
-            classIndex: 0,
             functionClass: 'Function',
             isReference: true,
             isNumber: false,
@@ -115,7 +113,6 @@ List<TransactionalObject> createTransactionalObjects() {
             referenceInterface: 'IntRef',
             typeParameter: '',
             initialValue: '0',
-            classIndex: 1,
             functionClass: 'IntFunction',
             isReference: true,
             isNumber: true,
@@ -127,7 +124,6 @@ List<TransactionalObject> createTransactionalObjects() {
             referenceInterface: 'BooleanRef',
             typeParameter: '',
             initialValue: 'false',
-            classIndex: 2,
             functionClass: 'BooleanFunction',
             isReference: true,
             isNumber: false,
@@ -139,7 +135,6 @@ List<TransactionalObject> createTransactionalObjects() {
             referenceInterface: 'DoubleRef',
             typeParameter: '',
             initialValue: '0',
-            classIndex: 3,
             functionClass: 'DoubleFunction',
             isReference: true,
             isNumber: true,
@@ -151,7 +146,6 @@ List<TransactionalObject> createTransactionalObjects() {
             objectType: 'Long',
             typeParameter: '',
             initialValue: '0',
-            classIndex: 4,
             functionClass: 'LongFunction',
             isReference: true,
             isNumber: true,
@@ -162,7 +156,6 @@ List<TransactionalObject> createTransactionalObjects() {
             objectType: '',
             typeParameter: '',
             initialValue: '',
-            classIndex: -1,
             functionClass: 'Function',
             referenceInterface: '',
             isReference: false,
