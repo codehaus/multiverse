@@ -189,7 +189,7 @@ public class GammaTestUtils implements GammaConstants {
         assertFalse(orec.isReadBiased());
     }
 
-    public static void assertReadonlyCount(int expectedReadonlyCount, AbstractGammaObject orec) {
+    public static void assertReadonlyCount(AbstractGammaObject orec, int expectedReadonlyCount) {
         assertEquals(expectedReadonlyCount, orec.getReadonlyCount());
     }
 

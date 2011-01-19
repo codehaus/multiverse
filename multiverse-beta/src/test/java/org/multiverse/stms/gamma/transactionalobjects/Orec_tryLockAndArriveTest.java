@@ -26,7 +26,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_NORMAL, result);
         assertSurplus(orec, 1);
         assertUpdateBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_EXCLUSIVE);
     }
 
@@ -40,7 +40,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
         assertUpdateBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_WRITE);
     }
 
@@ -54,7 +54,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
         assertUpdateBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_EXCLUSIVE);
     }
 
@@ -68,7 +68,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
         assertUpdateBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertReadLockCount(orec, 1);
     }
 
@@ -83,7 +83,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_NORMAL, result);
         assertSurplus(orec, 1);
         assertUpdateBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_WRITE);
     }
 
@@ -97,7 +97,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
         assertUpdateBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_WRITE);
     }
 
@@ -111,7 +111,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
         assertUpdateBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_EXCLUSIVE);
     }
 
@@ -125,7 +125,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
         assertUpdateBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertReadLockCount(orec, 1);
     }
 
@@ -140,7 +140,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_NORMAL, result);
         assertSurplus(orec, 1);
         assertUpdateBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertReadLockCount(orec, 1);
     }
 
@@ -154,7 +154,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
         assertUpdateBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_WRITE);
     }
 
@@ -168,7 +168,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
         assertUpdateBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_EXCLUSIVE);
     }
 
@@ -182,7 +182,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_NORMAL, result);
         assertSurplus(orec, 2);
         assertUpdateBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertReadLockCount(orec, 2);
     }
 
@@ -197,7 +197,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_UNREGISTERED, result);
         assertSurplus(orec, 1);
         assertReadBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_EXCLUSIVE);
     }
 
@@ -211,7 +211,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
         assertReadBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_WRITE);
     }
 
@@ -225,7 +225,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
         assertReadBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_EXCLUSIVE);
     }
 
@@ -239,7 +239,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
         assertReadBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertReadLockCount(orec, 1);
     }
 
@@ -254,7 +254,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_UNREGISTERED, result);
         assertSurplus(orec, 1);
         assertReadBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_WRITE);
     }
 
@@ -268,7 +268,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
         assertReadBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_WRITE);
     }
 
@@ -282,7 +282,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
         assertReadBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_EXCLUSIVE);
     }
 
@@ -296,7 +296,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
         assertReadBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertReadLockCount(orec, 1);
     }
 
@@ -311,7 +311,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_UNREGISTERED, result);
         assertSurplus(orec, 1);
         assertReadBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertReadLockCount(orec, 1);
     }
 
@@ -325,7 +325,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
         assertReadBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_WRITE);
     }
 
@@ -339,7 +339,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
         assertReadBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_EXCLUSIVE);
     }
 
@@ -353,7 +353,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
         assertEquals(ARRIVE_UNREGISTERED, result);
         assertSurplus(orec, 1);
         assertReadBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertReadLockCount(orec, 2);
     }
 }

@@ -6,6 +6,7 @@ import org.multiverse.api.StmUtils;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.IntRef;
+import org.multiverse.stms.gamma.SomeUncheckedException;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.StmUtils.newIntRef;
@@ -102,11 +103,11 @@ public class ComposabilityTest {
                         }
                     });
 
-                    throw new MyException();
+                    throw new SomeUncheckedException();
                 }
             });
             fail();
-        } catch (MyException expected) {
+        } catch (SomeUncheckedException expected) {
         }
 
         assertEquals(initialValue, ref.atomicGet());
@@ -126,13 +127,13 @@ public class ComposabilityTest {
                     StmUtils.execute(new AtomicVoidClosure() {
                         @Override
                         public void execute(Transaction tx) throws Exception {
-                            throw new MyException();
+                            throw new SomeUncheckedException();
                         }
                     });
                 }
             });
             fail();
-        } catch (MyException expected) {
+        } catch (SomeUncheckedException expected) {
         }
 
         assertEquals(initialValue, ref.atomicGet());
@@ -159,13 +160,13 @@ public class ComposabilityTest {
                     StmUtils.execute(new AtomicVoidClosure() {
                         @Override
                         public void execute(Transaction tx) throws Exception {
-                            throw new MyException();
+                            throw new SomeUncheckedException();
                         }
                     });
                 }
             });
             fail();
-        } catch (MyException expected) {
+        } catch (SomeUncheckedException expected) {
         }
 
         assertEquals(initialValue, ref.atomicGet());
@@ -241,6 +242,4 @@ public class ComposabilityTest {
         assertEquals(initialValue + 3, ref.atomicGet());
     }
 
-    class MyException extends RuntimeException {
-    }
 }

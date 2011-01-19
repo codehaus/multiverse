@@ -2,6 +2,10 @@
                         to do
 --------------------------------------------------------------------
 
+- beta stm needs to be removed
+
+- fat atomic block for propagation needs to be migrated from beta to gamma engine
+
 - commute: while commuting, no transaction accessed allowed.
 
 - readonly/readbiased

@@ -24,7 +24,7 @@ public class Orec_arriveTest implements GammaConstants {
 
         assertEquals(ARRIVE_NORMAL, result);
         assertSurplus(orec, 1);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertUpdateBiased(orec);
         assertLockMode(orec, LOCKMODE_NONE);
     }
@@ -40,7 +40,7 @@ public class Orec_arriveTest implements GammaConstants {
         assertEquals(ARRIVE_NORMAL, result);
         assertUpdateBiased(orec);
         assertSurplus(orec, 3);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_NONE);
     }
 
@@ -53,7 +53,7 @@ public class Orec_arriveTest implements GammaConstants {
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertUpdateBiased(orec);
         assertLockMode(orec, LOCKMODE_EXCLUSIVE);
     }
@@ -67,7 +67,7 @@ public class Orec_arriveTest implements GammaConstants {
 
         assertEquals(ARRIVE_NORMAL, result);
         assertSurplus(orec, 2);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertUpdateBiased(orec);
         assertLockMode(orec, LOCKMODE_WRITE);
     }
@@ -82,7 +82,7 @@ public class Orec_arriveTest implements GammaConstants {
         assertLockMode(orec, LOCKMODE_NONE);
         assertSurplus(orec, 1);
         assertReadBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
     }
 
     @Test
@@ -96,6 +96,6 @@ public class Orec_arriveTest implements GammaConstants {
         assertLockMode(orec, LOCKMODE_NONE);
         assertSurplus(orec, 1);
         assertReadBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
     }
 }

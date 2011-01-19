@@ -8,11 +8,17 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.ExplicitAbortException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.functions.Functions;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.SomeError;
+import org.multiverse.stms.gamma.SomeUncheckedException;
 import org.multiverse.stms.gamma.transactionalobjects.*;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
@@ -30,6 +36,141 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
     protected abstract T newTransaction(GammaTransactionConfiguration config);
 
     protected abstract void assertCleaned(T transaction);
+
+    @Test
+    public void whenContainsConstructedIntRef() {
+        T tx = newTransaction();
+        int initialValue = 10;
+        GammaIntRef ref = new GammaIntRef(tx, initialValue);
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, GammaObject.VERSION_UNCOMMITTED + 1, initialValue);
+        assertSurplus(ref, 0);
+        assertReadonlyCount(ref, 0);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void whenContainsConstructedBooleanRef() {
+        T tx = newTransaction();
+        boolean initialValue = true;
+        GammaBooleanRef ref = new GammaBooleanRef(tx, initialValue);
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, GammaObject.VERSION_UNCOMMITTED + 1, initialValue);
+        assertSurplus(ref, 0);
+        assertReadonlyCount(ref, 0);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void whenContainsConstructedDoubleRef() {
+        T tx = newTransaction();
+        double initialValue = 10;
+        GammaDoubleRef ref = new GammaDoubleRef(tx, initialValue);
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, GammaObject.VERSION_UNCOMMITTED + 1, initialValue);
+        assertSurplus(ref, 0);
+        assertReadonlyCount(ref, 0);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void whenContainsConstructedRef() {
+        T tx = newTransaction();
+        String initialValue = "foo";
+        GammaRef<String> ref = new GammaRef<String>(tx, initialValue);
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, GammaObject.VERSION_UNCOMMITTED + 1, initialValue);
+        assertSurplus(ref, 0);
+        assertReadonlyCount(ref, 0);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void whenContainsConstructedLongRef() {
+        T tx = newTransaction();
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(tx, initialValue);
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, GammaObject.VERSION_UNCOMMITTED + 1, initialValue);
+        assertSurplus(ref, 0);
+        assertReadonlyCount(ref, 0);
+        assertUpdateBiased(ref);
+    }
+
+    @Test
+    public void whenCommuteThrowsRuntimeException() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        T tx = newTransaction();
+        LongFunction function = mock(LongFunction.class);
+        when(function.call(initialValue)).thenThrow(new SomeUncheckedException());
+        ref.commute(tx, function);
+
+        try {
+            tx.commit();
+            fail();
+        } catch (SomeUncheckedException expected) {
+        }
+
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertRefHasNoLocks(ref);
+    }
+
+    @Test
+    public void whenCommuteThrowsError() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        T tx = newTransaction();
+        LongFunction function = mock(LongFunction.class);
+        when(function.call(initialValue)).thenThrow(new SomeError());
+        ref.commute(tx, function);
+
+        try {
+            tx.commit();
+            fail();
+        } catch (SomeError expected) {
+        }
+
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertRefHasNoLocks(ref);
+    }
+
+    @Test
+    public void whenContainsCommute() {
+        long initialValue = 10;
+
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        T tx = newTransaction();
+        ref.commute(tx, Functions.newIncLongFunction());
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
+        assertRefHasNoLocks(ref);
+    }
 
     @Test
     public void whenAbortOnly() {

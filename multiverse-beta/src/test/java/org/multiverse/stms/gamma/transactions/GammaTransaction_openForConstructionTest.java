@@ -8,10 +8,12 @@ import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.StmMismatchException;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
+import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public abstract class GammaTransaction_openForConstructionTest<T extends GammaTransaction> {
     protected GammaStm stm;
@@ -43,15 +45,37 @@ public abstract class GammaTransaction_openForConstructionTest<T extends GammaTr
     }
 
     @Test
-    @Ignore
     public void whenSuccess() {
+        T tx = newTransaction();
+        long initialVersion = 10;
+        GammaLongRef ref = new GammaLongRef(tx, initialVersion);
+        GammaRefTranlocal tranlocal = tx.locate(ref);
 
+        assertNotNull(tranlocal);
+        assertRefHasExclusiveLock(ref, tx);
+        assertTrue(tx.hasWrites);
+        assertSame(ref, tranlocal.owner);
+        assertEquals(LOCKMODE_EXCLUSIVE, tranlocal.getLockMode());
+        assertEquals(TRANLOCAL_CONSTRUCTING, tranlocal.getMode());
+        assertTrue(tranlocal.isDirty);
+        assertRefHasExclusiveLock(ref, tx);
     }
 
     @Test
-    @Ignore
     public void whenAlreadyOpenedForConstruction() {
+        T tx = newTransaction();
+        long initialVersion = 10;
+        GammaLongRef ref = new GammaLongRef(tx, initialVersion);
+        GammaRefTranlocal tranlocal = ref.openForConstruction(tx);
 
+        assertNotNull(tranlocal);
+        assertRefHasExclusiveLock(ref, tx);
+        assertTrue(tx.hasWrites);
+        assertSame(ref, tranlocal.owner);
+        assertEquals(LOCKMODE_EXCLUSIVE, tranlocal.getLockMode());
+        assertEquals(TRANLOCAL_CONSTRUCTING, tranlocal.getMode());
+        assertTrue(tranlocal.isDirty);
+        assertRefHasExclusiveLock(ref, tx);
     }
 
     @Test

@@ -128,7 +128,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
         assertRefHasWriteLock(ref, otherTx);
         assertSurplus(ref, 1);
         assertUpdateBiased(ref);
-        assertReadonlyCount(0, ref);
+        assertReadonlyCount(ref, 0);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 

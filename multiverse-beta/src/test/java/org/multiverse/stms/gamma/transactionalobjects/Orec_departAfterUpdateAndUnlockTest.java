@@ -36,7 +36,7 @@ public class Orec_departAfterUpdateAndUnlockTest {
         assertEquals(oldConflictCount, globalConflictCounter.count());
         assertLockMode(orec, LOCKMODE_NONE);
         assertSurplus(orec, 0);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
         assertUpdateBiased(orec);
     }
 
@@ -57,7 +57,7 @@ public class Orec_departAfterUpdateAndUnlockTest {
         assertLockMode(orec, LOCKMODE_NONE);
         assertSurplus(orec, 2);
         assertUpdateBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class Orec_departAfterUpdateAndUnlockTest {
         assertLockMode(orec, LOCKMODE_NONE);
         assertSurplus(orec, 0);
         assertUpdateBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
     }
 
     @Test
@@ -95,7 +95,7 @@ public class Orec_departAfterUpdateAndUnlockTest {
         assertLockMode(orec, LOCKMODE_NONE);
         assertSurplus(orec, 2);
         assertUpdateBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
     }
 
     @Test
@@ -116,7 +116,7 @@ public class Orec_departAfterUpdateAndUnlockTest {
         assertLockMode(orec, LOCKMODE_WRITE);
         assertSurplus(orec, 1);
         assertUpdateBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
     }
 
     @Test
@@ -138,6 +138,6 @@ public class Orec_departAfterUpdateAndUnlockTest {
         assertReadLockCount(orec, 1);
         assertSurplus(orec, 1);
         assertUpdateBiased(orec);
-        assertReadonlyCount(0, orec);
+        assertReadonlyCount(orec, 0);
     }
 }

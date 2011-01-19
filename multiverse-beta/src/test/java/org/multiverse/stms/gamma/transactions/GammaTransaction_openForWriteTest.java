@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.*;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
@@ -52,16 +53,41 @@ public abstract class GammaTransaction_openForWriteTest<T extends GammaTransacti
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
-    @Test
-    @Ignore
-    public void whenAlreadyOpenedForConstruction() {
 
+    @Test
+    public void whenAlreadyOpenedForConstruction() {
+        T tx = newTransaction();
+        GammaLongRef ref = new GammaLongRef(tx, 0);
+
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+
+        assertNotNull(tranlocal);
+        assertSame(ref, tranlocal.owner);
+        assertEquals(LOCKMODE_EXCLUSIVE, tranlocal.getLockMode());
+        assertEquals(TRANLOCAL_CONSTRUCTING, tranlocal.getMode());
+        assertRefHasExclusiveLock(ref, tx);
+        assertIsActive(tx);
     }
 
     @Test
-    @Ignore
     public void whenAlreadyOpenedForCommute() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
+        T tx = newTransaction();
+        ref.commute(tx, Functions.newIncLongFunction());
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+
+        assertNotNull(tranlocal);
+        assertSame(ref, tranlocal.owner);
+        assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
+        assertEquals(TRANLOCAL_WRITE, tranlocal.getMode());
+        assertIsActive(tx);
+        assertEquals(11, tranlocal.long_value);
+        assertEquals(10, tranlocal.long_oldValue);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
