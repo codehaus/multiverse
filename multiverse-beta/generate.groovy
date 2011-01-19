@@ -35,8 +35,8 @@ engine.init();
 
 def refs = createTransactionalObjects();
 def atomicClosures = createClosures();
-def atomicBlocks = [new AtomicBlock(name: 'FatBetaAtomicBlock', lean: false),
-        new AtomicBlock(name: 'LeanBetaAtomicBlock', lean: true)]
+def atomicBlocks = [new AtomicBlock(name: 'FatGammaAtomicBlock', lean: false),
+        new AtomicBlock(name: 'LeanGammaAtomicBlock', lean: true)]
 
 generateRefFactory(engine, refs);
 
@@ -50,14 +50,14 @@ for (def closure in atomicClosures) {
     generateAtomicClosure(engine, closure)
 }
 
-//generateAtomicBlock(engine, atomicClosures)
+generateAtomicBlock(engine, atomicClosures)
 //generateOrElseBlock(engine, atomicClosures)
 //generateBetaOrElseBlock(engine, atomicClosures)
 //generateStmUtils(engine, atomicClosures)
 
-//for (def atomicBlock in atomicBlocks) {
-//  generateBetaAtomicBlock(engine, atomicBlock, atomicClosures)
-//}
+for (def atomicBlock in atomicBlocks) {
+    generateBetaAtomicBlock(engine, atomicBlock, atomicClosures)
+}
 
 
 List<AtomicClosure> createClosures() {
@@ -187,7 +187,7 @@ void generateAtomicClosure(VelocityEngine engine, AtomicClosure closure) {
 }
 
 void generateBetaAtomicBlock(VelocityEngine engine, AtomicBlock atomicBlock, List<AtomicClosure> closures) {
-    Template t = engine.getTemplate('src/main/java/org/multiverse/stms/gamma/BetaAtomicBlock.vm')
+    Template t = engine.getTemplate('src/main/java/org/multiverse/stms/gamma/GammaAtomicBlock.vm')
 
     VelocityContext context = new VelocityContext()
     context.put('atomicBlock', atomicBlock)

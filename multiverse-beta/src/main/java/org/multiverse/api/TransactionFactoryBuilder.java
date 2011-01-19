@@ -74,17 +74,6 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setWriteLockMode(LockMode lockMode);
 
     /**
-     * Sets the {@link LockLevel}. With the LockLevel you have control
-     * on transaction level on how pessimistic or optimistic a transaction is.
-     *
-     * @param lockLevel the new LockLevel
-     * @return the updated TransactionFactoryBuilder
-     * @throws NullPointerException if lockLevel is null.
-     */
-    @Deprecated
-    TransactionFactoryBuilder setLockLevel(LockLevel lockLevel);
-
-    /**
      * Adds a permanent Listener to this TransactionFactoryBuilder. All permanent listeners are always executed
      * after all normal listeners are executed. If the same listener is added multiple times, it will be executed
      * multiple times.

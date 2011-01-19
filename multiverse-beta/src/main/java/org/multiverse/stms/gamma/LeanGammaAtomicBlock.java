@@ -13,8 +13,16 @@ import java.util.logging.Logger;
 import static java.lang.String.format;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactionContainer;
 
+/**
+ * An GammaAtomicBlock made for the GammaStm.
+ * <p/>
+ * This code is generated.
+ *
+ * @author Peter Veentjer
+ */
 public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
     private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class.getName());
+
 
     public LeanGammaAtomicBlock(final GammaTransactionFactory transactionFactory) {
         super(transactionFactory);
@@ -38,16 +46,18 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
     @Override
     public <E> E execute(final AtomicClosure<E> closure) {
+
         if (closure == null) {
             throw new NullPointerException();
         }
 
-        final ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.transactionPool;
         if (pool == null) {
             pool = new GammaTransactionPool();
             transactionContainer.transactionPool = pool;
         }
+
         GammaTransaction tx = (GammaTransaction) transactionContainer.transaction;
         if (tx == null || !tx.isAlive()) {
             tx = null;
@@ -146,12 +156,13 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             throw new NullPointerException();
         }
 
-        final ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.transactionPool;
         if (pool == null) {
             pool = new GammaTransactionPool();
             transactionContainer.transactionPool = pool;
         }
+
         GammaTransaction tx = (GammaTransaction) transactionContainer.transaction;
         if (tx == null || !tx.isAlive()) {
             tx = null;
@@ -250,12 +261,13 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             throw new NullPointerException();
         }
 
-        final ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.transactionPool;
         if (pool == null) {
             pool = new GammaTransactionPool();
             transactionContainer.transactionPool = pool;
         }
+
         GammaTransaction tx = (GammaTransaction) transactionContainer.transaction;
         if (tx == null || !tx.isAlive()) {
             tx = null;
@@ -354,12 +366,13 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             throw new NullPointerException();
         }
 
-        final ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.transactionPool;
         if (pool == null) {
             pool = new GammaTransactionPool();
             transactionContainer.transactionPool = pool;
         }
+
         GammaTransaction tx = (GammaTransaction) transactionContainer.transaction;
         if (tx == null || !tx.isAlive()) {
             tx = null;
@@ -458,12 +471,13 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             throw new NullPointerException();
         }
 
-        final ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.transactionPool;
         if (pool == null) {
             pool = new GammaTransactionPool();
             transactionContainer.transactionPool = pool;
         }
+
         GammaTransaction tx = (GammaTransaction) transactionContainer.transaction;
         if (tx == null || !tx.isAlive()) {
             tx = null;
@@ -562,12 +576,13 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             throw new NullPointerException();
         }
 
-        final ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
         GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.transactionPool;
         if (pool == null) {
             pool = new GammaTransactionPool();
             transactionContainer.transactionPool = pool;
         }
+
         GammaTransaction tx = (GammaTransaction) transactionContainer.transaction;
         if (tx == null || !tx.isAlive()) {
             tx = null;

@@ -2,8 +2,6 @@
                         to do
 --------------------------------------------------------------------
 
-- fat atomic block for propagation needs to be migrated from beta to gamma engine
-
 - commute: while commuting, no transaction accessed allowed.
 
 - readonly/readbiased
@@ -42,9 +40,15 @@
 
 - check read+locklevel & write+locklevel
 
+- once a commuting tranlocal is made read/write, should a conflict check be done?
+
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- fat atomic block for propagation needs to be migrated from beta to gamma engine
+
+- LockLevel is removed
 
 - atomicToString for refs
 

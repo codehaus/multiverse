@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.IsolationLevel;
-import org.multiverse.api.LockLevel;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicLongClosure;
@@ -180,12 +180,12 @@ public class WriteSkewStressTest {
                 .setMaxRetries(10000)
                 .newAtomicBlock();
         private final AtomicBlock privatizedReadLevelBlock = stm.newTransactionFactoryBuilder()
-                .setLockLevel(LockLevel.CommitLockReads)
+                .setReadLockMode(LockMode.Exclusive)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setMaxRetries(10000)
                 .newAtomicBlock();
         private final AtomicBlock privatizedWriteLevelBlock = stm.newTransactionFactoryBuilder()
-                .setLockLevel(LockLevel.CommitLockWrites)
+                .setWriteLockMode(LockMode.Exclusive)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .setMaxRetries(10000)
                 .newAtomicBlock();

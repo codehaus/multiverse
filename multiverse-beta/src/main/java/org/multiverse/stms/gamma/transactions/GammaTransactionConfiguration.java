@@ -2,7 +2,6 @@ package org.multiverse.stms.gamma.transactions;
 
 import org.multiverse.api.*;
 import org.multiverse.api.exceptions.IllegalTransactionFactoryException;
-import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
@@ -175,11 +174,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     @Override
     public int getSpinCount() {
         return spinCount;
-    }
-
-    @Override
-    public LockLevel getLockLevel() {
-        throw new TodoException();
     }
 
     @Override

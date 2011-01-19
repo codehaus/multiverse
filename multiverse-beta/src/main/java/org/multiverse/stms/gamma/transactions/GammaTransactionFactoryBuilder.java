@@ -25,9 +25,6 @@ public interface GammaTransactionFactoryBuilder extends TransactionFactoryBuilde
     GammaTransactionFactoryBuilder setPropagationLevel(PropagationLevel propagationLevel);
 
     @Override
-    GammaTransactionFactoryBuilder setLockLevel(LockLevel lockLevel);
-
-    @Override
     GammaTransactionFactoryBuilder addPermanentListener(TransactionLifecycleListener listener);
 
     @Override

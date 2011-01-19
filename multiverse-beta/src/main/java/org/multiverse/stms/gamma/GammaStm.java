@@ -2,7 +2,6 @@ package org.multiverse.stms.gamma;
 
 import org.multiverse.api.*;
 import org.multiverse.api.collections.TransactionalCollectionsFactory;
-import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.collections.NaiveTransactionalCollectionFactory;
 import org.multiverse.stms.gamma.transactionalobjects.*;
@@ -185,11 +184,6 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setLockLevel(final LockLevel lockLevel) {
-            throw new TodoException();
-        }
-
-        @Override
         public GammaTransactionFactoryBuilder setDirtyCheckEnabled(final boolean dirtyCheckEnabled) {
             if (dirtyCheckEnabled == config.dirtyCheck) {
                 return this;
@@ -251,8 +245,7 @@ public final class GammaStm implements Stm {
             if (leanAtomicBlock()) {
                 return new LeanGammaAtomicBlock(newTransactionFactory());
             } else {
-                throw new TodoException();
-                //return new FatGammaAtomicBlock(build());
+                return new FatGammaAtomicBlock(newTransactionFactory());
             }
         }
 

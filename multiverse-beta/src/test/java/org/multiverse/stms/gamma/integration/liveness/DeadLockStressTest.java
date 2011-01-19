@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.LockLevel;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.gamma.GammaStm;
@@ -81,11 +81,11 @@ public class DeadLockStressTest {
                 .newAtomicBlock();
 
         private final AtomicBlock pessimisticReadLevelBlock = stm.newTransactionFactoryBuilder()
-                .setLockLevel(LockLevel.CommitLockReads)
+                .setReadLockMode(LockMode.Exclusive)
                 .newAtomicBlock();
 
         private final AtomicBlock pessimisticWriteLevelBlock = stm.newTransactionFactoryBuilder()
-                .setLockLevel(LockLevel.CommitLockWrites)
+                .setWriteLockMode(LockMode.Exclusive)
                 .newAtomicBlock();
 
         public ChangeThread(int id) {

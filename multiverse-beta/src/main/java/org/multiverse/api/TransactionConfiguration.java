@@ -116,17 +116,6 @@ public interface TransactionConfiguration {
     int getSpinCount();
 
     /**
-     * Returns the LockLevel used on all reads/writes. The highest level always overrides the
-     * lowest level (so a LockLevel.ensureAllReads overrides a non locking individual read and
-     * an ensure overrides LockLevel.none).
-     *
-     * @return the LockLevel.
-     * @see org.multiverse.api.TransactionFactoryBuilder#setLockLevel(LockLevel)
-     */
-    @Deprecated
-    LockLevel getLockLevel();
-
-    /**
      * Gets the current LockMode for all reads.
      *
      * @return the current LockMode for all reads.

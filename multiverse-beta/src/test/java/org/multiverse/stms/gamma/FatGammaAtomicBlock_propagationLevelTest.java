@@ -1,4 +1,4 @@
-package org.multiverse.stms.beta;
+package org.multiverse.stms.gamma;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -9,8 +9,9 @@ import org.multiverse.api.closures.AtomicIntClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.TransactionNotAllowedException;
 import org.multiverse.api.exceptions.TransactionRequiredException;
-import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.*;
@@ -18,14 +19,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
 
-public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants {
-    private BetaStm stm;
+public class FatGammaAtomicBlock_propagationLevelTest implements GammaConstants {
+    private GammaStm stm;
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = new GammaStm();
         clearThreadLocalTransaction();
     }
 
@@ -33,9 +33,9 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
     public void whenNeverAndTransactionAvailable_thenNoTransactionAllowedException() {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Never)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
-        BetaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.startDefaultTransaction();
         setThreadLocalTransaction(otherTx);
 
         AtomicVoidClosure closure = mock(AtomicVoidClosure.class);
@@ -55,7 +55,7 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
     public void whenNeverAndNoTransactionAvailable() {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Never)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         AtomicIntClosure closure = new AtomicIntClosure() {
             @Override
@@ -75,7 +75,7 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
     public void whenMandatoryAndNoTransactionAvailable_thenNoTransactionFoundException() {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Mandatory)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         AtomicVoidClosure closure = mock(AtomicVoidClosure.class);
 
@@ -93,9 +93,9 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
     public void whenMandatoryAndTransactionAvailable_thenExistingTransactionUsed() {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Mandatory)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
-        final BetaTransaction otherTx = stm.startDefaultTransaction();
+        final GammaTransaction otherTx = stm.startDefaultTransaction();
         setThreadLocalTransaction(otherTx);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
@@ -115,23 +115,23 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
 
     @Test
     public void whenRequiresAndNoTransactionAvailable_thenNewTransactionUsed() {
-        BetaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
+        GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Requires)
-                .build();
+                .newTransactionFactory();
 
-        final BetaLongRef ref = newLongRef(stm);
+        final GammaLongRef ref = new GammaLongRef(stm);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
             @Override
             public int execute(Transaction tx) throws Exception {
                 assertNotNull(tx);
-                BetaTransaction btx = (BetaTransaction) tx;
-                btx.openForWrite(ref, LOCKMODE_NONE).value++;
+                GammaTransaction btx = (GammaTransaction) tx;
+                ref.incrementAndGet(1);
                 return 10;
             }
         };
 
-        int result = new FatBetaAtomicBlock(txFactory).execute(closure);
+        int result = new FatGammaAtomicBlock(txFactory).execute(closure);
 
         assertEquals(10, result);
         assertNull(getThreadLocalTransaction());
@@ -140,26 +140,26 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
 
     @Test
     public void whenRequiresAndTransactionAvailable_thenExistingTransactionUsed() {
-        BetaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
+        GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Requires)
-                .build();
+                .newTransactionFactory();
 
-        final BetaTransaction existingTx = stm.startDefaultTransaction();
+        final GammaTransaction existingTx = stm.startDefaultTransaction();
         setThreadLocalTransaction(existingTx);
 
-        final BetaLongRef ref = newLongRef(stm);
+        final GammaLongRef ref = new GammaLongRef(stm);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
             @Override
             public int execute(Transaction tx) throws Exception {
                 assertSame(existingTx, tx);
-                BetaTransaction btx = (BetaTransaction) tx;
-                btx.openForWrite(ref, LOCKMODE_NONE).value++;
+                GammaTransaction btx = (GammaTransaction) tx;
+                ref.incrementAndGet(btx, 1);
                 return 10;
             }
         };
 
-        int result = new FatBetaAtomicBlock(txFactory).execute(closure);
+        int result = new FatGammaAtomicBlock(txFactory).execute(closure);
 
         assertEquals(10, result);
         assertSame(existingTx, getThreadLocalTransaction());
@@ -172,16 +172,16 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
     public void whenRequiresNewAndNoTransactionAvailable_thenNewTransactionCreated() {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.RequiresNew)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
-        final BetaLongRef ref = newLongRef(stm, 0);
+        final GammaLongRef ref = new GammaLongRef(stm, 0);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
             @Override
             public int execute(Transaction tx) throws Exception {
                 assertNotNull(tx);
-                BetaTransaction btx = (BetaTransaction) tx;
-                btx.openForWrite(ref, LOCKMODE_NONE).value++;
+                GammaTransaction btx = (GammaTransaction) tx;
+                ref.incrementAndGet(btx, 1);
                 return 10;
             }
         };
@@ -197,20 +197,20 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
     public void whenRequiresNewAndTransactionAvailable_thenExistingTransactionSuspended() {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.RequiresNew)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
-        final BetaTransaction otherTx = stm.startDefaultTransaction();
+        final GammaTransaction otherTx = stm.startDefaultTransaction();
         setThreadLocalTransaction(otherTx);
 
-        final BetaLongRef ref = newLongRef(stm, 10);
+        final GammaLongRef ref = new GammaLongRef(stm, 10);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
             @Override
             public int execute(Transaction tx) throws Exception {
                 assertNotNull(tx);
                 assertNotSame(otherTx, tx);
-                BetaTransaction btx = (BetaTransaction) tx;
-                btx.openForWrite(ref, LOCKMODE_NONE).value++;
+                GammaTransaction btx = (GammaTransaction) tx;
+                ref.incrementAndGet(btx, 1);
                 return 1;
             }
         };
@@ -227,9 +227,9 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
     public void whenSupportsAndTransactionAvailable() {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Supports)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
-        final BetaTransaction otherTx = stm.startDefaultTransaction();
+        final GammaTransaction otherTx = stm.startDefaultTransaction();
         setThreadLocalTransaction(otherTx);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
@@ -251,7 +251,7 @@ public class FatBetaAtomicBlock_propagationLevelTest implements BetaStmConstants
     public void whenSupportsAndNoTransactionAvailable() {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setPropagationLevel(PropagationLevel.Supports)
-                .buildAtomicBlock();
+                .newAtomicBlock();
 
         AtomicIntClosure closure = new AtomicIntClosure() {
             @Override

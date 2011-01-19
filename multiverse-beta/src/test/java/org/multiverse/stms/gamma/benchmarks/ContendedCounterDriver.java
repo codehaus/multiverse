@@ -4,7 +4,7 @@ import org.benchy.BenchmarkDriver;
 import org.benchy.TestCaseResult;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.LockLevel;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.gamma.GammaStm;
@@ -17,7 +17,7 @@ import static org.multiverse.TestUtils.startAll;
 public class ContendedCounterDriver extends BenchmarkDriver {
 
     private int threadCount;
-    private LockLevel lockLevel = LockLevel.LockNone;
+    private LockMode lockLevel = LockMode.None;
     private long transactionsPerThread;
     private boolean dirtyCheck;
     private GammaStm stm;
@@ -75,7 +75,7 @@ public class ContendedCounterDriver extends BenchmarkDriver {
         public void doRun() throws Exception {
             final long _incCount = transactionsPerThread;
             AtomicBlock block = stm.newTransactionFactoryBuilder()
-                    .setLockLevel(lockLevel)
+                    .setReadLockMode(lockLevel)
                     .setDirtyCheckEnabled(dirtyCheck)
                     .newAtomicBlock();
             AtomicVoidClosure closure = new AtomicVoidClosure() {

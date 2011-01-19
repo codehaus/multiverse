@@ -126,17 +126,25 @@ public interface Transaction {
 
     /**
      * Signals that the only possible outcome of the Transaction is one that aborts. When the transaction prepares or
-     * commits it checks if the transaction is marked for abort. If so, it will automatically aborted. If the
-     * transaction is executed inside an AtomicBlock, it is automatically retried.
+     * commits it checks if the transaction is marked for abort. If so, it will automatically aborted and an
+     * {@link org.multiverse.api.exceptions.ExplicitAbortException} is thrown.
      * <p/>
      * This method is not threadsafe, so can only be called by the thread that used the transaction.
      *
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if the transaction is not in the correct
-     *          state for this operation.
+     *          if the transaction is not active.
      */
     void setAbortOnly();
 
+    /**
+     * Checks if this Transaction is abortonly.
+     * <p/>
+     * This method is not threadsafe, so can only be called by the thread that used the transaction.
+     *
+     * @return true if abortonly, false otherwise.
+     * @throws org.multiverse.api.exceptions.DeadTransactionException
+     *          if the transaction is committed/aborted.
+     */
     boolean isAbortOnly();
 
     /**
