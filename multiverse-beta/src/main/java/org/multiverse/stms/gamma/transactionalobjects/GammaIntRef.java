@@ -337,4 +337,22 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
                 ___toOrecString(), version, long_value, listeners != null);
     }
 
+    @Override
+    public String toString() {
+        return toString(getRequiredThreadLocalGammaTransaction());
+    }
+
+    @Override
+    public String toString(Transaction tx) {
+        return toString(asGammaTransaction(tx));
+    }
+
+    public String toString(GammaTransaction tx) {
+        return Integer.toString(get(tx));
+    }
+
+    @Override
+    public String atomicToString() {
+        return Integer.toString(atomicGet());
+    }
 }

@@ -83,4 +83,11 @@ public interface TransactionalObject {
      * @return the debug representation of the TransactionalObject.
      */
     String toDebugString();
+
+    @Override
+    String toString();
+
+    String toString(Transaction tx);
+
+    String atomicToString();
 }

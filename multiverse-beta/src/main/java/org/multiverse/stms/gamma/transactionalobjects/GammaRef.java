@@ -302,4 +302,25 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
         return String.format("GammaRef{orec=%s, version=%s, value=%s, hasListeners=%s)",
                 ___toOrecString(), version, ref_value, listeners != null);
     }
+
+    @Override
+    public String toString() {
+        return toString(getRequiredThreadLocalGammaTransaction());
+    }
+
+    @Override
+    public String toString(Transaction tx) {
+        return toString(asGammaTransaction(tx));
+    }
+
+    public String toString(GammaTransaction tx) {
+        E value = get(tx);
+        return value == null ? "null" : value.toString();
+    }
+
+    @Override
+    public String atomicToString() {
+        E value = atomicGet();
+        return value == null ? "null" : value.toString();
+    }
 }

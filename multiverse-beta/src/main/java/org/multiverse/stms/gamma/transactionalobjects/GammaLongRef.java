@@ -405,4 +405,23 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
         return String.format("GammaLongRef{orec=%s, version=%s, value=%s, hasListeners=%s)",
                 ___toOrecString(), version, long_value, listeners != null);
     }
+
+    @Override
+    public String toString() {
+        return toString(getRequiredThreadLocalGammaTransaction());
+    }
+
+    @Override
+    public String toString(Transaction tx) {
+        return toString(asGammaTransaction(tx));
+    }
+
+    public String toString(GammaTransaction tx) {
+        return Long.toString(get(tx));
+    }
+
+    @Override
+    public String atomicToString() {
+        return Long.toString(atomicGet());
+    }
 }

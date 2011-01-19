@@ -285,4 +285,22 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
                 ___toOrecString(), version, longAsDouble(long_value), listeners != null);
     }
 
+    @Override
+    public String toString() {
+        return toString(getRequiredThreadLocalGammaTransaction());
+    }
+
+    @Override
+    public String toString(Transaction tx) {
+        return toString(asGammaTransaction(tx));
+    }
+
+    public String toString(GammaTransaction tx) {
+        return Double.toString(get(tx));
+    }
+
+    @Override
+    public String atomicToString() {
+        return Double.toString(atomicGet());
+    }
 }

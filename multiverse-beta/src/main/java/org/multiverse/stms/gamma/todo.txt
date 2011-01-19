@@ -2,8 +2,6 @@
                         to do
 --------------------------------------------------------------------
 
-- beta stm needs to be removed
-
 - fat atomic block for propagation needs to be migrated from beta to gamma engine
 
 - commute: while commuting, no transaction accessed allowed.
@@ -32,6 +30,24 @@
 
 - GammaRef.atomicCompareAndSet
 
+- GammaMapTransaction.prepare and readlock level
+
+- GammaArrayTransaction.prepare and readlock level
+
+- GammaMonoTransaction.prepare and readlock level
+
+- listeners
+
+- permanent listeners
+
+- check read+locklevel & write+locklevel
+
+--------------------------------------------------------------------
+                        done
+--------------------------------------------------------------------
+
+- atomicToString for refs
+
 - GammaIntRef.toString
 
 - GammaLongRef.toString
@@ -42,15 +58,7 @@
 
 - GammaRef.toString
 
-- GammaMapTransaction.prepare and readlock level
-
-- GammaArrayTransaction.prepare and readlock level
-
-- GammaMonoTransaction.prepare and readlock level
-
---------------------------------------------------------------------
-                        done
---------------------------------------------------------------------
+- beta stm needs to be removed
 
 - fat transaction template.
 
