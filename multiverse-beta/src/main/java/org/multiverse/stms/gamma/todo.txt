@@ -14,15 +14,47 @@
 
 - speculative size for full conflict scan
 
-- transaction template.
-
-- open for construction
-
 - last readwrite conflict should show which transactional object caused it.
+
+- GammaBooleanRef.atomicAlter
+
+- GammaDoubleRef.atomicAlterSupport
+
+- GammaDoubleRef.atomicGetAndIncrement
+
+- GammaIntRef.atomicAlter
+
+- GammaIntRef.atomicIncrement
+
+- GammaRef.atomicGetAndSet
+
+- GammaRef.atomicAlter
+
+- GammaRef.atomicCompareAndSet
+
+- GammaIntRef.toString
+
+- GammaLongRef.toString
+
+- GammaDoubleRef.toString
+
+- GammaBooleanRef.toString
+
+- GammaRef.toString
+
+- GammaMapTransaction.prepare and readlock level
+
+- GammaArrayTransaction.prepare and readlock level
+
+- GammaMonoTransaction.prepare and readlock level
 
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- fat transaction template.
+
+- open for construction
 
 - transaction: copy for speculative failure
 

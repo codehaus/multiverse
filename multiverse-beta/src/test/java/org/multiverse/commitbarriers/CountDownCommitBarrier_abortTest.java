@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.gamma.GammaStm;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -15,11 +15,11 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 
 public class CountDownCommitBarrier_abortTest {
     private CountDownCommitBarrier barrier;
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = new GammaStm();
         clearThreadLocalTransaction();
         clearCurrentThreadInterruptedStatus();
     }

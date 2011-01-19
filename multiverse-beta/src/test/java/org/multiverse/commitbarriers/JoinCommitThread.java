@@ -3,7 +3,7 @@ package org.multiverse.commitbarriers;
 import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.gamma.GammaStm;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -12,9 +12,9 @@ import static org.junit.Assert.assertNotNull;
  */
 public class JoinCommitThread extends TestThread {
     private final CountDownCommitBarrier barrier;
-    private final BetaStm stm;
+    private final GammaStm stm;
 
-    public JoinCommitThread(BetaStm stm, CountDownCommitBarrier barrier) {
+    public JoinCommitThread(GammaStm stm, CountDownCommitBarrier barrier) {
         this.barrier = barrier;
         this.stm = stm;
     }

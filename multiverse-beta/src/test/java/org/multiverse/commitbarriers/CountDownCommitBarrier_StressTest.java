@@ -4,8 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaIntRef;
 
 import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -31,20 +31,20 @@ public class CountDownCommitBarrier_StressTest {
     private int spawnCountPerThread = 2 * 1000;
     private int spawnCount = 5;
 
-    private BetaIntRef[] refs;
+    private GammaIntRef[] refs;
     private ThreadPoolExecutor executor =
             new ThreadPoolExecutor(50, 50, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
     private ThreadPoolExecutor spawnExecutor =
             new ThreadPoolExecutor(spawnCount, spawnCount, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = new BetaStm();
+        stm = new GammaStm();
         commitInc = new AtomicLong();
         totalInc = new AtomicLong();
-        refs = new BetaIntRef[refCount];
+        refs = new GammaIntRef[refCount];
         for (int k = 0; k < refCount; k++) {
             refs[k] = stm.getDefaultRefFactory().newIntRef(0);
         }

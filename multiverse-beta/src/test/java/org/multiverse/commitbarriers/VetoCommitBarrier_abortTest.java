@@ -6,8 +6,8 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaIntRef;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
@@ -15,13 +15,13 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 
 public class VetoCommitBarrier_abortTest {
     private VetoCommitBarrier barrier;
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
         clearCurrentThreadInterruptedStatus();
-        stm = new BetaStm();
+        stm = new GammaStm();
     }
 
     @After
@@ -40,7 +40,7 @@ public class VetoCommitBarrier_abortTest {
     @Test
     public void whenPendingTransactions_theyAreAborted() throws InterruptedException {
         barrier = new VetoCommitBarrier();
-        BetaIntRef ref = new BetaIntRef(stm, 0);
+        GammaIntRef ref = new GammaIntRef(stm, 0);
         IncThread thread1 = new IncThread(ref);
         IncThread thread2 = new IncThread(ref);
 
@@ -82,10 +82,10 @@ public class VetoCommitBarrier_abortTest {
     }
 
     public class IncThread extends TestThread {
-        private final BetaIntRef ref;
+        private final GammaIntRef ref;
         private Transaction tx;
 
-        public IncThread(BetaIntRef ref) {
+        public IncThread(GammaIntRef ref) {
             super("IncThread");
             setPrintStackTrace(false);
             this.ref = ref;

@@ -191,12 +191,6 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
     }
 
     @Override
-    public final double atomicGetAndIncrement(final double amount) {
-        //todo
-        throw new TodoException();
-    }
-
-    @Override
     public final double getAndIncrement(final double amount) {
         return getAndIncrement(getRequiredThreadLocalGammaTransaction(), amount);
     }
@@ -214,8 +208,16 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
     }
 
     @Override
+    public final double atomicGetAndIncrement(final double amount) {
+        return atomicIncrement(amount, true);
+    }
+
+    @Override
     public final double atomicIncrementAndGet(final double amount) {
-        //todo
+        return atomicIncrement(amount, true);
+    }
+
+    private double atomicIncrement(final double amount, boolean returnOld) {
         throw new TodoException();
     }
 

@@ -173,7 +173,7 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
     }
 
     @Test
-    public void whenAbortOnly() {
+    public void abortOnly_whenUnused() {
         T tx = newTransaction();
         tx.setAbortOnly();
 
@@ -184,6 +184,26 @@ public abstract class GammaTransaction_commitTest<T extends GammaTransaction> im
         }
 
         assertIsAborted(tx);
+    }
+
+    @Test
+    public void abortOnly_whenDirty() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        T tx = newTransaction();
+        tx.setAbortOnly();
+
+        try {
+            ref.set(tx, initialValue + 1);
+            tx.commit();
+            fail();
+        } catch (ExplicitAbortException expected) {
+        }
+
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test

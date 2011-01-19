@@ -6,19 +6,19 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaIntRef;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class VetoCommitBarrier_vetoCommitTest {
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = new GammaStm();
         clearThreadLocalTransaction();
         clearCurrentThreadInterruptedStatus();
     }
@@ -40,9 +40,9 @@ public class VetoCommitBarrier_vetoCommitTest {
     public void whenPendingTransactions() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
 
-        BetaIntRef ref1 = new BetaIntRef(stm);
-        BetaIntRef ref2 = new BetaIntRef(stm);
-        BetaIntRef ref3 = new BetaIntRef(stm);
+        GammaIntRef ref1 = new GammaIntRef(stm);
+        GammaIntRef ref2 = new GammaIntRef(stm);
+        GammaIntRef ref3 = new GammaIntRef(stm);
 
         IncThread thread1 = new IncThread(ref1, barrier);
         IncThread thread2 = new IncThread(ref2, barrier);
@@ -86,11 +86,11 @@ public class VetoCommitBarrier_vetoCommitTest {
     }
 
     public class IncThread extends TestThread {
-        private final BetaIntRef ref;
+        private final GammaIntRef ref;
         private final VetoCommitBarrier barrier;
         private Transaction tx;
 
-        public IncThread(BetaIntRef ref, VetoCommitBarrier barrier) {
+        public IncThread(GammaIntRef ref, VetoCommitBarrier barrier) {
             super("IncThread");
             this.barrier = barrier;
             this.ref = ref;

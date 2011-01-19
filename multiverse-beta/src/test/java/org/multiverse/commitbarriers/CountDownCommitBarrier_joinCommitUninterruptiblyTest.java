@@ -7,7 +7,7 @@ import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.stms.beta.BetaStm;
+import org.multiverse.stms.gamma.GammaStm;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
@@ -15,11 +15,11 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 
 public class CountDownCommitBarrier_joinCommitUninterruptiblyTest {
     private CountDownCommitBarrier barrier;
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = new GammaStm();
         clearThreadLocalTransaction();
         clearCurrentThreadInterruptedStatus();
     }

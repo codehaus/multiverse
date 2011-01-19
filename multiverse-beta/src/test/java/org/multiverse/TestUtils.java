@@ -3,25 +3,18 @@ package org.multiverse;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.blocking.RetryLatch;
-import org.multiverse.api.functions.Function;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.Listeners;
-import org.multiverse.stms.beta.transactionalobjects.*;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
-import org.multiverse.stms.beta.transactions.FatMonoBetaTransaction;
 import org.multiverse.utils.Bugshaker;
 import org.multiverse.utils.ThreadLocalRandom;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.multiverse.stms.beta.BetaStmTestUtils.newLongRef;
-import static org.multiverse.stms.beta.transactionalobjects.OrecTestUtils.assertHasNoCommitLock;
 
 /**
  * @author Peter Veentjer
@@ -44,52 +37,6 @@ public class TestUtils implements MultiverseConstants {
         return Runtime.getRuntime().availableProcessors();
     }
 
-    public static void assertAttached(BetaTransaction tx, BetaTranlocal tranlocal) {
-        BetaTranlocal result = tx.get(tranlocal.owner);
-        assertSame(tranlocal, result);
-    }
-
-    public static void assertNotAttached(BetaTransaction tx, BetaTransactionalObject object) {
-        BetaTranlocal result = tx.get(object);
-        assertNull(result);
-    }
-
-    public static void assertHasNoCommutingFunctions(BetaLongRefTranlocal tranlocal) {
-        assertHasCommutingFunctions(tranlocal);
-    }
-
-    public static void assertHasUpdates(BetaTransaction tx) {
-        assertTrue((Boolean) getField(tx, "hasUpdates"));
-    }
-
-    public static void assertHasNoUpdates(BetaTransaction tx) {
-        assertFalse((Boolean) getField(tx, "hasUpdates"));
-    }
-
-    public static void assertHasCommutingFunctions(BetaLongRefTranlocal tranlocal, Function... expected) {
-        CallableNode current = tranlocal.headCallable;
-        List<Function> functions = new LinkedList<Function>();
-        while (current != null) {
-            functions.add(current.function);
-            current = current.next;
-        }
-
-        assertEquals(asList(expected), functions);
-    }
-
-    public static void assertHasNoNormalListeners(BetaTransaction tx) {
-        assertHasNormalListeners(tx);
-    }
-
-    public static void assertHasNormalListeners(BetaTransaction tx, TransactionLifecycleListener... listeners) {
-        List<TransactionLifecycleListener> l =
-                (List<TransactionLifecycleListener>) getField(tx, "normalListeners");
-        if (l == null) {
-            l = new LinkedList<TransactionLifecycleListener>();
-        }
-        assertEquals(Arrays.asList(listeners), l);
-    }
-
     public static void assertEra(RetryLatch latch, long era) {
         assertEquals(era, latch.getEra());
     }
@@ -100,14 +47,6 @@ public class TestUtils implements MultiverseConstants {
 
     public static void assertClosed(RetryLatch latch) {
         assertFalse(latch.isOpen());
-    }
-
-    public static void assertAllNull(BetaTranlocal[] array) {
-        assertNotNull(array);
-
-        for (BetaTranlocal tranlocal : array) {
-            assertNull(tranlocal);
-        }
     }
 
     public static void assertEqualByteArray(byte[] array1, byte[] array2) {
@@ -124,22 +63,6 @@ public class TestUtils implements MultiverseConstants {
         for (int k = 0; k < array1.length; k++) {
             assertEquals(array1[k], array2[k]);
         }
-    }
-
-    public static void assertHasListeners(BetaTransactionalObject ref, RetryLatch... listeners) {
-        Set<RetryLatch> expected = new HashSet<RetryLatch>(Arrays.asList(listeners));
-
-        Set<RetryLatch> found = new HashSet<RetryLatch>();
-        Listeners l = (Listeners) getField(ref, "listeners");
-        while (l != null) {
-            found.add(l.listener);
-            l = l.next;
-        }
-        assertEquals(expected, found);
-    }
-
-    public static void assertHasNoListeners(BetaTransactionalObject ref) {
-        assertHasListeners(ref);
     }
 
     public static Object getField(Object o, String fieldname) {
@@ -205,10 +128,6 @@ public class TestUtils implements MultiverseConstants {
         }
     }
 
-    public static BetaLongRef createReadBiasedLongRef(BetaStm stm) {
-        return createReadBiasedLongRef(stm, 0);
-    }
-
     public static int randomInt(int max) {
         if (max <= 0) {
             return 0;
@@ -224,23 +143,6 @@ public class TestUtils implements MultiverseConstants {
     public static void sleepMs(long ms) {
         long us = TimeUnit.MILLISECONDS.toMicros(ms);
         Bugshaker.sleepUs(us);
-    }
-
-    //todo: should be moved to betastmtestutils.
-
-    public static BetaLongRef createReadBiasedLongRef(BetaStm stm, long value) {
-        BetaLongRef ref = newLongRef(stm, value);
-
-        for (int k = 0; k < ref.___getReadBiasedThreshold(); k++) {
-            BetaTransaction tx = new FatMonoBetaTransaction(stm);
-            tx.openForRead(ref, LOCKMODE_NONE);
-            tx.commit();
-            assertHasNoCommitLock(ref);
-        }
-
-        assertTrue(ref.___isReadBiased());
-
-        return ref;
     }
 
     public static boolean randomBoolean() {

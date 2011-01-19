@@ -6,8 +6,8 @@ import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaIntRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
@@ -17,13 +17,13 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
 public class VetoCommitBarrier_integrationTest {
 
     private VetoCommitBarrier barrier;
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
         clearCurrentThreadInterruptedStatus();
-        stm = new BetaStm();
+        stm = new GammaStm();
     }
 
     @After
@@ -35,8 +35,8 @@ public class VetoCommitBarrier_integrationTest {
     public void test() throws InterruptedException {
         barrier = new VetoCommitBarrier();
 
-        BetaIntRef ref1 = new BetaIntRef(stm);
-        BetaIntRef ref2 = new BetaIntRef(stm);
+        GammaIntRef ref1 = new GammaIntRef(stm);
+        GammaIntRef ref2 = new GammaIntRef(stm);
 
         CommitThread t1 = new CommitThread(1, ref1);
         CommitThread t2 = new CommitThread(2, ref2);
@@ -56,8 +56,8 @@ public class VetoCommitBarrier_integrationTest {
     public void testAbort() throws InterruptedException {
         barrier = new VetoCommitBarrier();
 
-        BetaIntRef ref1 = new BetaIntRef(stm);
-        BetaIntRef ref2 = new BetaIntRef(stm);
+        GammaIntRef ref1 = new GammaIntRef(stm);
+        GammaIntRef ref2 = new GammaIntRef(stm);
 
         CommitThread t1 = new CommitThread(1, ref1);
         t1.setPrintStackTrace(false);
@@ -77,9 +77,9 @@ public class VetoCommitBarrier_integrationTest {
     }
 
     public class CommitThread extends TestThread {
-        private BetaIntRef ref;
+        private GammaIntRef ref;
 
-        public CommitThread(int id, BetaIntRef ref) {
+        public CommitThread(int id, GammaIntRef ref) {
             super("CommitThread-" + id);
             this.ref = ref;
         }

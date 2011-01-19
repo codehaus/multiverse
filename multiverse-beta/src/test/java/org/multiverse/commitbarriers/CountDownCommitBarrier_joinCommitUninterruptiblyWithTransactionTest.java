@@ -10,8 +10,8 @@ import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.references.IntRef;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaIntRef;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -20,11 +20,11 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 
 public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest {
     private CountDownCommitBarrier barrier;
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = new GammaStm();
         clearThreadLocalTransaction();
         clearCurrentThreadInterruptedStatus();
     }
@@ -140,7 +140,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
     public void whenCommittedWhileWaiting() throws InterruptedException {
         barrier = new CountDownCommitBarrier(2);
 
-        final BetaIntRef ref = stm.getDefaultRefFactory().newIntRef(0);
+        final GammaIntRef ref = stm.getDefaultRefFactory().newIntRef(0);
 
         TestThread t = new TestThread() {
             @Override
@@ -173,7 +173,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
     public void whenAbortedWhileWaiting_() throws InterruptedException {
         barrier = new CountDownCommitBarrier(2);
 
-        final BetaIntRef ref = stm.getDefaultRefFactory().newIntRef(0);
+        final GammaIntRef ref = stm.getDefaultRefFactory().newIntRef(0);
 
         TestThread t = new TestThread() {
             @Override

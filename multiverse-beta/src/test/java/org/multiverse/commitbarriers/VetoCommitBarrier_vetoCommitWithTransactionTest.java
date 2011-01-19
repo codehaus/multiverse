@@ -9,21 +9,21 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.BetaStmConstants;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
-import org.multiverse.stms.beta.transactions.BetaTransaction;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaIntRef;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class VetoCommitBarrier_vetoCommitWithTransactionTest implements BetaStmConstants {
-    private BetaStm stm;
+public class VetoCommitBarrier_vetoCommitWithTransactionTest implements GammaConstants {
+    private GammaStm stm;
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = new GammaStm();
         clearThreadLocalTransaction();
         clearCurrentThreadInterruptedStatus();
     }
@@ -62,7 +62,7 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest implements BetaStmC
     public void whenPendingTransaction() throws InterruptedException {
         final VetoCommitBarrier barrier = new VetoCommitBarrier();
 
-        final BetaIntRef ref = new BetaIntRef(stm);
+        final GammaIntRef ref = new GammaIntRef(stm);
 
         TestThread t = new TestThread() {
             @Override
@@ -95,10 +95,10 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest implements BetaStmC
 
     @Test
     public void whenTransactionFailedToPrepare_thenBarrierNotAbortedOrCommitted() {
-        final BetaIntRef ref = new BetaIntRef(stm);
+        final GammaIntRef ref = new GammaIntRef(stm);
 
-        BetaTransaction tx = stm.startDefaultTransaction();
-        tx.openForRead(ref, LOCKMODE_NONE);
+        GammaTransaction tx = stm.startDefaultTransaction();
+        ref.get(tx);
 
         stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
             @Override
@@ -107,7 +107,7 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest implements BetaStmC
             }
         });
 
-        tx.openForWrite(ref, LOCKMODE_NONE).value++;
+        ref.incrementAndGet(1);
 
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         try {

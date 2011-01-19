@@ -10,20 +10,20 @@ import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.TooManyRetriesException;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaIntRef;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 public class VetoCommitBarrier_joinCommitTest {
-    private BetaStm stm;
+    private GammaStm stm;
     private TransactionFactory txFactory;
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = new GammaStm();
         txFactory = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(false)
                 .build();
@@ -54,7 +54,7 @@ public class VetoCommitBarrier_joinCommitTest {
     @Ignore
     public void whenTransactionPreparable_thenAdded() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
-        BetaIntRef ref = new BetaIntRef(stm);
+        GammaIntRef ref = new GammaIntRef(stm);
         IncThread thread = new IncThread(ref, barrier);
         thread.start();
 
@@ -69,7 +69,7 @@ public class VetoCommitBarrier_joinCommitTest {
     public void whenTransactionPrepared_thenAdded() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
 
-        BetaIntRef ref = new BetaIntRef(stm);
+        GammaIntRef ref = new GammaIntRef(stm);
         IncThread thread = new IncThread(ref, barrier, true);
         thread.start();
 
@@ -83,7 +83,7 @@ public class VetoCommitBarrier_joinCommitTest {
     @Ignore
     public void whenPrepareFails() throws InterruptedException {
         final VetoCommitBarrier group = new VetoCommitBarrier();
-        final BetaIntRef ref = new BetaIntRef(stm);
+        final GammaIntRef ref = new GammaIntRef(stm);
 
         FailToPrepareThread thread = new FailToPrepareThread(group, ref);
         thread.start();
@@ -103,9 +103,9 @@ public class VetoCommitBarrier_joinCommitTest {
 
     class FailToPrepareThread extends TestThread {
         final VetoCommitBarrier group;
-        final BetaIntRef ref;
+        final GammaIntRef ref;
 
-        FailToPrepareThread(VetoCommitBarrier group, BetaIntRef ref) {
+        FailToPrepareThread(VetoCommitBarrier group, GammaIntRef ref) {
             super("FailedToPrepareThread");
             this.group = group;
             this.ref = ref;
@@ -187,7 +187,7 @@ public class VetoCommitBarrier_joinCommitTest {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         barrier.atomicVetoCommit();
 
-        System.out.println("barrier.state: "+barrier);
+        System.out.println("barrier.state: " + barrier);
 
         Transaction tx = txFactory.newTransaction();
         try {
@@ -202,15 +202,15 @@ public class VetoCommitBarrier_joinCommitTest {
     }
 
     public class IncThread extends TestThread {
-        private final BetaIntRef ref;
+        private final GammaIntRef ref;
         private final VetoCommitBarrier barrier;
         private boolean prepare;
 
-        public IncThread(BetaIntRef ref, VetoCommitBarrier barrier) {
+        public IncThread(GammaIntRef ref, VetoCommitBarrier barrier) {
             this(ref, barrier, false);
         }
 
-        public IncThread(BetaIntRef ref, VetoCommitBarrier barrier, boolean prepare) {
+        public IncThread(GammaIntRef ref, VetoCommitBarrier barrier, boolean prepare) {
             super("IncThread");
             this.barrier = barrier;
             this.ref = ref;

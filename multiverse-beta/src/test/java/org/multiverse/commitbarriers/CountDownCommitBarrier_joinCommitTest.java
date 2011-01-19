@@ -7,8 +7,8 @@ import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.stms.beta.BetaStm;
-import org.multiverse.stms.beta.transactionalobjects.BetaIntRef;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaIntRef;
 
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
@@ -16,11 +16,11 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 
 public class CountDownCommitBarrier_joinCommitTest {
     private CountDownCommitBarrier barrier;
-    private BetaStm stm;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
-        stm = new BetaStm();
+        stm = new GammaStm();
         clearThreadLocalTransaction();
         clearCurrentThreadInterruptedStatus();
     }
@@ -64,7 +64,7 @@ public class CountDownCommitBarrier_joinCommitTest {
     public void whenAbortedWhileWaiting() throws InterruptedException {
         barrier = new CountDownCommitBarrier(2);
 
-        final BetaIntRef ref = stm.getDefaultRefFactory().newIntRef(0);
+        final GammaIntRef ref = stm.getDefaultRefFactory().newIntRef(0);
 
         TestThread t = new TestThread() {
             @Override
@@ -113,7 +113,7 @@ public class CountDownCommitBarrier_joinCommitTest {
     public void whenInterruptedWhileWaiting() throws InterruptedException {
         barrier = new CountDownCommitBarrier(2);
 
-        final BetaIntRef ref = stm.getDefaultRefFactory().newIntRef(0);
+        final GammaIntRef ref = stm.getDefaultRefFactory().newIntRef(0);
 
         TestThread t = new TestThread() {
             @Override
