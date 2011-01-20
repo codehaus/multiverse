@@ -185,36 +185,6 @@ performance.
 - mono transaction can do a cheap read of the current tranlocal already is permanent:
   this is because no consistency guaranteed need to be provided.
 
-- testing:
-
-    - testing tranlocal.prepareAll needs to be tested with conflict check
-
-    - testing tranlocal.prepareDirty needs to be tested with conflict check
-
-    - testing of transaction access while commute
-
-    - when pessimistic locking level used, dirty flag not set correctly.
-
-    - tranlocal.prepareWithWriteSkewPrevention needs to be tested.
-
-    - functionality with dirty and non dirty needs to be tested better
-
-    - testing: dirty/non dirty stuff in combination with commit and isolation level
-
-    - testing: dirty/non dirty stuff in combination with prepare and isolation level
-
-    - integration tests should touch all transaction implementations.
-
-    - testing on checkConflict on openForRead
-
-    - testing on checkConflict on openForWrite.
-
-    - unshared atomicget, with periodic atomicset.
-
-    - testing: atomic block & propagation and committed/aborted/prepared/new transaction on threadlocal
-
-    - improved testing in the transaction for the ensure functionality
-
 ----------------------------------------------------------------------
                             todo
 ----------------------------------------------------------------------

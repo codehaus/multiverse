@@ -21,7 +21,7 @@ import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLoca
 @SuppressWarnings({"OverlyComplexClass", "OverlyCoupledClass"})
 public abstract class AbstractGammaRef extends AbstractGammaObject {
 
-    private final int type;
+    public final int type;
     @SuppressWarnings({"VolatileLongOrDoubleField"})
     public volatile long long_value;
     public volatile Object ref_value;
@@ -127,6 +127,41 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         //todo: content of this method can be inlined here.
         releaseAfterUpdate(tranlocal, pool);
+        return listenerAfterWrite;
+    }
+
+    public final Listeners leanSafe(final GammaRefTranlocal tranlocal) {
+        if (!tranlocal.isDirty) {
+            if (type == TYPE_REF) {
+                tranlocal.ref_value = null;
+                tranlocal.ref_oldValue = null;
+            }
+
+            tranlocal.owner = null;
+            return null;
+        }
+
+        if (type == TYPE_REF) {
+            ref_value = tranlocal.ref_value;
+            //we need to set them to null to prevent memory leaks.
+            tranlocal.ref_value = null;
+            tranlocal.ref_oldValue = null;
+        } else {
+            long_value = tranlocal.long_value;
+        }
+
+        version = tranlocal.version + 1;
+
+        Listeners listenerAfterWrite = listeners;
+
+        if (listenerAfterWrite != null) {
+            listenerAfterWrite = ___removeListenersAfterWrite();
+        }
+
+        departAfterUpdateAndUnlock();
+        tranlocal.setLockMode(LOCKMODE_NONE);
+        tranlocal.owner = null;
+        tranlocal.setDepartObligation(false);
         return listenerAfterWrite;
     }
 
@@ -319,6 +354,37 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             tranlocal.setLockMode(lockMode);
             tranlocal.setDepartObligation(arriveStatus == ARRIVE_NORMAL);
             return true;
+        }
+    }
+
+    public final boolean leanLoad(final GammaRefTranlocal tranlocal) {
+        while (true) {
+            //JMM: nothing can jump behind the following statement
+            Object readRef = ref_value;
+            final long readVersion = version;
+
+            int spinCount = 64;
+            for (; ;) {
+                if (!hasExclusiveLock()) {
+                    break;
+                }
+                spinCount--;
+
+                if (spinCount < 0) {
+                    return false;
+                }
+            }
+
+            if (readVersion == version && readRef == ref_value) {
+                //at this point we are sure that the read was unlocked.
+                tranlocal.version = readVersion;
+                tranlocal.ref_value = readRef;
+                tranlocal.ref_oldValue = readRef;
+                tranlocal.owner = this;
+                tranlocal.setLockMode(LOCKMODE_NONE);
+                tranlocal.setDepartObligation(false);
+                return true;
+            }
         }
     }
 
@@ -562,6 +628,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         return tranlocal;
     }
 
+
     @Override
     public final GammaRefTranlocal openForRead(final ArrayGammaTransaction tx, int desiredLockMode) {
         if (tx.status != TX_ACTIVE) {
@@ -639,6 +706,110 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             tx.hasReads = true;
         }
 
+        return newNode;
+    }
+
+    public final GammaRefTranlocal openForRead(final LeanArrayGammaTransaction tx) {
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortOpenForReadOnBadStatus(this);
+        }
+
+        if (tx.head.owner == this) {
+            return tx.head;
+        }
+
+        //look inside the transaction if it already is opened for read or otherwise look for an empty spot to
+        //place the read.
+        GammaRefTranlocal found = null;
+        GammaRefTranlocal newNode = null;
+        GammaRefTranlocal node = tx.head;
+        while (true) {
+            if (node == null) {
+                break;
+            } else if (node.owner == this) {
+                found = node;
+                break;
+            } else if (node.owner == null) {
+                newNode = node;
+                break;
+            } else {
+                node = node.next;
+            }
+        }
+
+        //we have found it.
+        if (found != null) {
+            tx.shiftInFront(found);
+            return found;
+        }
+
+        //we have not found it, but there also is no spot available.
+        if (newNode == null) {
+            throw tx.abortOnTooSmallSize(tx.config.arrayTransactionSize + 1);
+        }
+
+        //load it
+        newNode.mode = TRANLOCAL_READ;
+        newNode.isDirty = false;
+        newNode.owner = this;
+        newNode.setLockMode(LOCKMODE_NONE);
+        newNode.setDepartObligation(false);
+        while (true) {
+            //JMM: nothing can jump behind the following statement
+            Object readRef = ref_value;
+            final long readVersion = version;
+
+            //wait for the exclusive lock to come available.
+            int spinCount = 64;
+            for (; ;) {
+                if (!hasExclusiveLock()) {
+                    break;
+                }
+                spinCount--;
+                if (spinCount < 0) {
+                    throw tx.abortOnReadWriteConflict();
+                }
+            }
+
+            //check if the version and value we read are still the same, if they are not, we have read illegal memory,
+            //so we are going to try again.
+            if (readVersion == version && readRef == ref_value) {
+                //at this point we are sure that the read was unlocked.
+                newNode.version = readVersion;
+                newNode.ref_value = readRef;
+                newNode.ref_oldValue = readRef;
+                break;
+            }
+        }
+
+        tx.size++;
+        //lets put it in the front it isn't the first one that is opened.
+        if (tx.size > 1) {
+            tx.shiftInFront(newNode);
+        }
+
+        //check if the transaction still is read consistent.
+        if (tx.hasReads) {
+            node = tx.head;
+            do {
+                //if we are at the end, we are done.
+                final AbstractGammaRef owner = node.owner;
+
+                if (owner == null) {
+                    break;
+                }
+
+                if (node != newNode && (owner.hasExclusiveLock() || owner.version != node.version)) {
+                    throw tx.abortOnReadWriteConflict();
+                }
+
+                node = node.next;
+            } while (node != null);
+        } else {
+            tx.hasReads = true;
+        }
+
+        //we are done, the load was correct and the transaction still is read consistent.
         return newNode;
     }
 
