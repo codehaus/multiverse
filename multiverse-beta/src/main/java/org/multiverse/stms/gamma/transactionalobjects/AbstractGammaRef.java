@@ -16,7 +16,6 @@ import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 import org.multiverse.stms.gamma.transactions.fat.FatLinkedGammaTransaction;
 import org.multiverse.stms.gamma.transactions.fat.FatMapGammaTransaction;
 import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
-import org.multiverse.stms.gamma.transactions.lean.LeanArrayGammaTransaction;
 import org.multiverse.stms.gamma.transactions.lean.LeanLinkedGammaTransaction;
 import org.multiverse.stms.gamma.transactions.lean.LeanMonoGammaTransaction;
 
@@ -138,24 +137,13 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     }
 
     public final Listeners leanSafe(final GammaRefTranlocal tranlocal) {
-        if (!tranlocal.isDirty) {
-            if (type == TYPE_REF) {
-                tranlocal.ref_value = null;
-                tranlocal.ref_oldValue = null;
-            }
-
+        if (tranlocal.mode == TRANLOCAL_READ) {
+            tranlocal.ref_value = null;
             tranlocal.owner = null;
             return null;
         }
 
-        if (type == TYPE_REF) {
-            ref_value = tranlocal.ref_value;
-            //we need to set them to null to prevent memory leaks.
-            tranlocal.ref_value = null;
-            tranlocal.ref_oldValue = null;
-        } else {
-            long_value = tranlocal.long_value;
-        }
+        ref_value = tranlocal.ref_value;
 
         version = tranlocal.version + 1;
 
@@ -165,10 +153,15 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             listenerAfterWrite = ___removeListenersAfterWrite();
         }
 
-        departAfterUpdateAndUnlock();
-        tranlocal.setLockMode(LOCKMODE_NONE);
+        if (tranlocal.hasDepartObligation) {
+            departAfterUpdateAndUnlock();
+        } else {
+            unlockByUnregistered();
+        }
+        tranlocal.ref_value = null;
+        tranlocal.lockMode = LOCKMODE_NONE;
         tranlocal.owner = null;
-        tranlocal.setDepartObligation(false);
+        tranlocal.hasDepartObligation = false;
         return listenerAfterWrite;
     }
 
@@ -386,7 +379,6 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 //at this point we are sure that the read was unlocked.
                 tranlocal.version = readVersion;
                 tranlocal.ref_value = readRef;
-                tranlocal.ref_oldValue = readRef;
                 tranlocal.owner = this;
                 tranlocal.setLockMode(LOCKMODE_NONE);
                 tranlocal.setDepartObligation(false);
@@ -635,14 +627,6 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         return tranlocal;
     }
 
-    public final GammaRefTranlocal openForRead(final GammaTransaction tx) {
-        if (tx instanceof LeanLinkedGammaTransaction) {
-            return openForRead((LeanLinkedGammaTransaction) tx);
-        } else {
-            return openForRead((LeanMonoGammaTransaction) tx);
-        }
-    }
-
     @Override
     public final GammaRefTranlocal openForRead(final FatLinkedGammaTransaction tx, int desiredLockMode) {
         if (tx.status != TX_ACTIVE) {
@@ -723,326 +707,6 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         return newNode;
     }
 
-    public final GammaRefTranlocal openForRead(final LeanLinkedGammaTransaction tx) {
-        if (tx.status != TX_ACTIVE) {
-            throw tx.abortOpenForReadOnBadStatus(this);
-        }
-
-        if (tx.head.owner == this) {
-            return tx.head;
-        }
-
-        //look inside the transaction if it already is opened for read or otherwise look for an empty spot to
-        //place the read.
-        GammaRefTranlocal found = null;
-        GammaRefTranlocal newNode = null;
-        GammaRefTranlocal node = tx.head;
-        while (true) {
-            if (node == null) {
-                break;
-            } else if (node.owner == this) {
-                found = node;
-                break;
-            } else if (node.owner == null) {
-                newNode = node;
-                break;
-            } else {
-                node = node.next;
-            }
-        }
-
-        //we have found it.
-        if (found != null) {
-            tx.shiftInFront(found);
-            return found;
-        }
-
-        //we have not found it, but there also is no spot available.
-        if (newNode == null) {
-            throw tx.abortOnTooSmallSize(tx.config.arrayTransactionSize + 1);
-        }
-
-        //load it
-        newNode.mode = TRANLOCAL_READ;
-        newNode.isDirty = false;
-        newNode.owner = this;
-        newNode.setLockMode(LOCKMODE_NONE);
-        newNode.setDepartObligation(false);
-        while (true) {
-            //JMM: nothing can jump behind the following statement
-            Object readRef = ref_value;
-            final long readVersion = version;
-
-            //wait for the exclusive lock to come available.
-            int spinCount = 64;
-            for (; ;) {
-                if (!hasExclusiveLock()) {
-                    break;
-                }
-                spinCount--;
-                if (spinCount < 0) {
-                    throw tx.abortOnReadWriteConflict();
-                }
-            }
-
-            //check if the version and value we read are still the same, if they are not, we have read illegal memory,
-            //so we are going to try again.
-            if (readVersion == version && readRef == ref_value) {
-                //at this point we are sure that the read was unlocked.
-                newNode.version = readVersion;
-                newNode.ref_value = readRef;
-                newNode.ref_oldValue = readRef;
-                break;
-            }
-        }
-
-        tx.size++;
-        //lets put it in the front it isn't the first one that is opened.
-        if (tx.size > 1) {
-            tx.shiftInFront(newNode);
-        }
-
-        //check if the transaction still is read consistent.
-        if (tx.hasReads) {
-            node = tx.head;
-            do {
-                //if we are at the end, we are done.
-                final AbstractGammaRef owner = node.owner;
-
-                if (owner == null) {
-                    break;
-                }
-
-                if (node != newNode && (owner.hasExclusiveLock() || owner.version != node.version)) {
-                    throw tx.abortOnReadWriteConflict();
-                }
-
-                node = node.next;
-            } while (node != null);
-        } else {
-            tx.hasReads = true;
-        }
-
-        //we are done, the load was correct and the transaction still is read consistent.
-        return newNode;
-    }
-
-    public final GammaRefTranlocal openForWrite(final GammaTransaction tx) {
-        if (tx instanceof LeanMonoGammaTransaction) {
-            return openForWrite((LeanMonoGammaTransaction) tx);
-        } else {
-            return openForWrite((LeanArrayGammaTransaction) tx);
-        }
-    }
-
-    public final GammaRefTranlocal openForWrite(final LeanMonoGammaTransaction tx) {
-        if (tx.status != TX_ACTIVE) {
-            throw tx.abortOpenForReadOnBadStatus(this);
-        }
-
-        final GammaRefTranlocal tranlocal = tx.tranlocal;
-
-        //noinspection ObjectEquality
-        if (tranlocal.owner == this) {
-            if (tranlocal.mode == TRANLOCAL_READ) {
-                tranlocal.ref_oldValue = tranlocal.ref_value;
-                tranlocal.mode = TRANLOCAL_WRITE;
-            }
-            return tranlocal;
-        }
-
-        if (type != TYPE_REF) {
-            throw tx.abortOpenForWriteOnNonRefType(this);
-        }
-
-        if (tranlocal.owner != null) {
-            throw tx.abortOnTooSmallSize(2);
-        }
-
-        tx.hasWrites = true;
-        tranlocal.mode = TRANLOCAL_WRITE;
-        tranlocal.owner = this;
-        for (; ;) {
-            //JMM: nothing can jump behind the following statement
-            final Object readRef = ref_value;
-            final long readVersion = version;
-
-            //wait for the exclusive lock to come available.
-            int spinCount = 64;
-            for (; ;) {
-                if (!hasExclusiveLock()) {
-                    break;
-                }
-                spinCount--;
-                if (spinCount < 0) {
-                    throw tx.abortOnReadWriteConflict();
-                }
-            }
-
-            //check if the version and value we read are still the same, if they are not, we have read illegal memory,
-            //so we are going to try again.
-            if (readVersion == version) {
-                //at this point we are sure that the read was unlocked.
-                tranlocal.version = readVersion;
-                tranlocal.ref_value = readRef;
-                tranlocal.ref_oldValue = readRef;
-                break;
-            }
-        }
-
-        return tranlocal;
-    }
-
-
-    public final GammaRefTranlocal openForRead(final LeanMonoGammaTransaction tx) {
-        if (tx.status != TX_ACTIVE) {
-            throw tx.abortOpenForReadOnBadStatus(this);
-        }
-
-        final GammaRefTranlocal tranlocal = tx.tranlocal;
-
-        //noinspection ObjectEquality
-        if (tranlocal.owner == this) {
-            return tranlocal;
-        }
-
-        if (tranlocal.owner != null) {
-            throw tx.abortOnTooSmallSize(2);
-        }
-
-        if (type != TYPE_REF) {
-            throw tx.abortOpenForWriteOnNonRefType(this);
-        }
-
-        tranlocal.mode = TRANLOCAL_READ;
-        tranlocal.owner = this;
-        for (; ;) {
-            //JMM: nothing can jump behind the following statement
-            final Object readRef = ref_value;
-            final long readVersion = version;
-
-            //wait for the exclusive lock to come available.
-            int spinCount = 64;
-            for (; ;) {
-                if (!hasExclusiveLock()) {
-                    break;
-                }
-                spinCount--;
-                if (spinCount < 0) {
-                    throw tx.abortOnReadWriteConflict();
-                }
-            }
-
-            //check if the version and value we read are still the same, if they are not, we have read illegal memory,
-            //so we are going to try again.
-            if (readVersion == version) {
-                //at this point we are sure that the read was unlocked.
-                tranlocal.version = readVersion;
-                tranlocal.ref_value = readRef;
-                break;
-            }
-        }
-
-        return tranlocal;
-    }
-
-    public GammaRefTranlocal openForRead(final LeanArrayGammaTransaction tx) {
-        if (tx.status != TX_ACTIVE) {
-            throw tx.abortOpenForReadOnBadStatus(this);
-        }
-
-        final GammaRefTranlocal[] array = tx.tranlocals;
-        int index;
-        GammaRefTranlocal tranlocal = null;
-        for (index = 0; index < array.length; index++) {
-            tranlocal = array[index];
-            final AbstractGammaRef owner = tranlocal.owner;
-
-            if (owner == null) {
-                break;
-            }
-
-            if (owner == this) {
-                //if (index > 3) {
-                //    GammaRefTranlocal tmp = array[0];
-                //    array[index] = tmp;
-                //    array[0] = tranlocal;
-                //}
-                return tranlocal;
-            }
-        }
-
-
-        //we have not found it, but there also is no spot available.
-        if (index == array.length - 1) {
-            throw tx.abortOnTooSmallSize(array.length + 1);
-        }
-
-        //load it
-        tx.size++;
-        //tranlocal.mode = TRANLOCAL_READ;
-        //tranlocal.isDirty = false;
-        tranlocal.owner = this;
-        //tranlocal.setLockMode(LOCKMODE_NONE);
-        //tranlocal.hasDepartObligation = false;
-        while (true) {
-            //JMM: nothing can jump behind the following statement
-            Object readRef = ref_value;
-            final long readVersion = version;
-
-            //wait for the exclusive lock to come available.
-            int spinCount = 64;
-            for (; ;) {
-                if ((orec & BITMASK_EXCLUSIVELOCK) == 0) {
-                    break;
-                }
-                spinCount--;
-                if (spinCount < 0) {
-                    throw tx.abortOnReadWriteConflict();
-                }
-            }
-
-            //check if the version and value we read are still the same, if they are not, we have read illegal memory,
-            //so we are going to try again.
-            if (readVersion == version) {
-                //at this point we are sure that the read was unlocked.
-                tranlocal.version = readVersion;
-                tranlocal.ref_value = readRef;
-                //tranlocal.ref_oldValue = readRef;
-                break;
-            }
-        }
-
-        //lets put it in the front it isn't the first one that is opened.
-        //if (index > 3) {
-        //    GammaRefTranlocal tmp = array[0];
-        //    array[index] = tmp;
-        //    array[0] = tranlocal;
-        //}
-
-        //check if the transaction still is read consistent.
-        if (tx.hasReads) {
-            for (int k = 0; k < array.length; k++) {
-                final GammaRefTranlocal t = array[k];
-                //if we are at the end, we are done.
-                final AbstractGammaRef owner = t.owner;
-
-                if (owner == null) {
-                    break;
-                }
-
-                if (t != tranlocal && ((orec & BITMASK_EXCLUSIVELOCK) != 0 || owner.version != t.version)) {
-                    throw tx.abortOnReadWriteConflict();
-                }
-            }
-        } else {
-            tx.hasReads = true;
-        }
-
-        //we are done, the load was correct and the transaction still is read consistent.
-        return tranlocal;
-    }
-
     @Override
     public final GammaRefTranlocal openForRead(final FatMapGammaTransaction tx, int desiredLockMode) {
         if (tx.status != TX_ACTIVE) {
@@ -1106,9 +770,210 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         return tranlocal;
     }
 
+    public final GammaRefTranlocal openForRead(final GammaTransaction tx) {
+        if (tx instanceof LeanLinkedGammaTransaction) {
+            return openForRead((LeanLinkedGammaTransaction) tx);
+        } else {
+            return openForRead((LeanMonoGammaTransaction) tx);
+        }
+    }
+
+    public final GammaRefTranlocal openForRead(final LeanLinkedGammaTransaction tx) {
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortOpenForReadOnBadStatus(this);
+        }
+
+        if (tx.head.owner == this) {
+            return tx.head;
+        }
+
+        //look inside the transaction if it already is opened for read or otherwise look for an empty spot to
+        //place the read.
+        GammaRefTranlocal found = null;
+        GammaRefTranlocal newNode = null;
+        GammaRefTranlocal node = tx.head;
+        while (true) {
+            if (node == null) {
+                break;
+            } else if (node.owner == this) {
+                found = node;
+                break;
+            } else if (node.owner == null) {
+                newNode = node;
+                break;
+            } else {
+                node = node.next;
+            }
+        }
+
+        //we have found it.
+        if (found != null) {
+            tx.shiftInFront(found);
+            return found;
+        }
+
+        //we have not found it, but there also is no spot available.
+        if (newNode == null) {
+            throw tx.abortOnTooSmallSize(tx.config.arrayTransactionSize + 1);
+        }
+
+        if (type != TYPE_REF) {
+            throw tx.abortOpenForWriteOnNonRefType(this);
+        }
+
+        //load it
+        newNode.mode = TRANLOCAL_READ;
+        newNode.isDirty = false;
+        newNode.owner = this;
+        while (true) {
+            //JMM: nothing can jump behind the following statement
+            Object readRef = ref_value;
+            final long readVersion = version;
+
+            //wait for the exclusive lock to come available.
+            int spinCount = 64;
+            for (; ;) {
+                if (!hasExclusiveLock()) {
+                    break;
+                }
+                spinCount--;
+                if (spinCount < 0) {
+                    throw tx.abortOnReadWriteConflict();
+                }
+            }
+
+            //check if the version and value we read are still the same, if they are not, we have read illegal memory,
+            //so we are going to try again.
+            if (readVersion == version && readRef == ref_value) {
+                //at this point we are sure that the read was unlocked.
+                newNode.version = readVersion;
+                newNode.ref_value = readRef;
+                break;
+            }
+        }
+
+        tx.size++;
+        //lets put it in the front it isn't the first one that is opened.
+        if (tx.size > 1) {
+            tx.shiftInFront(newNode);
+        }
+
+        //check if the transaction still is read consistent.
+        if (tx.hasReads) {
+            node = tx.head;
+            do {
+                //if we are at the end, we are done.
+                final AbstractGammaRef owner = node.owner;
+
+                if (owner == null) {
+                    break;
+                }
+
+                if (node != newNode && (owner.hasExclusiveLock() || owner.version != node.version)) {
+                    throw tx.abortOnReadWriteConflict();
+                }
+
+                node = node.next;
+            } while (node != null);
+        } else {
+            tx.hasReads = true;
+        }
+
+        //we are done, the load was correct and the transaction still is read consistent.
+        return newNode;
+    }
+
+    public final GammaRefTranlocal openForRead(final LeanMonoGammaTransaction tx) {
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortOpenForReadOnBadStatus(this);
+        }
+
+        final GammaRefTranlocal tranlocal = tx.tranlocal;
+
+        //noinspection ObjectEquality
+        if (tranlocal.owner == this) {
+            return tranlocal;
+        }
+
+        if (tranlocal.owner != null) {
+            throw tx.abortOnTooSmallSize(2);
+        }
+
+        if (type != TYPE_REF) {
+            throw tx.abortOpenForWriteOnNonRefType(this);
+        }
+
+        tranlocal.mode = TRANLOCAL_READ;
+        tranlocal.owner = this;
+        for (; ;) {
+            //JMM: nothing can jump behind the following statement
+            final Object readRef = ref_value;
+            final long readVersion = version;
+
+            //wait for the exclusive lock to come available.
+            int spinCount = 64;
+            for (; ;) {
+                if (!hasExclusiveLock()) {
+                    break;
+                }
+                spinCount--;
+                if (spinCount < 0) {
+                    throw tx.abortOnReadWriteConflict();
+                }
+            }
+
+            //check if the version and value we read are still the same, if they are not, we have read illegal memory,
+            //so we are going to try again.
+            if (readVersion == version) {
+                //at this point we are sure that the read was unlocked.
+                tranlocal.version = readVersion;
+                tranlocal.ref_value = readRef;
+                break;
+            }
+        }
+
+        return tranlocal;
+    }
+
+
     // ============================================================================================
     // =============================== open for write =============================================
     // ============================================================================================
+
+    public final GammaRefTranlocal openForWrite(final GammaTransaction tx) {
+        if (tx instanceof LeanMonoGammaTransaction) {
+            return openForWrite((LeanMonoGammaTransaction) tx);
+        } else {
+            return openForWrite((LeanLinkedGammaTransaction) tx);
+        }
+    }
+
+    public final GammaRefTranlocal openForWrite(final LeanMonoGammaTransaction tx) {
+        final GammaRefTranlocal tranlocal = openForRead(tx);
+
+        if (!tx.hasWrites) {
+            tx.hasWrites = true;
+        }
+
+        if (tranlocal.mode == TRANLOCAL_READ) {
+            tranlocal.mode = TRANLOCAL_WRITE;
+        }
+
+        return tranlocal;
+    }
+
+    public final GammaRefTranlocal openForWrite(final LeanLinkedGammaTransaction tx) {
+        final GammaRefTranlocal tranlocal = openForRead(tx);
+        if (!tx.hasWrites) {
+            tx.hasWrites = true;
+        }
+
+        if (tranlocal.mode == TRANLOCAL_READ) {
+            tranlocal.mode = TRANLOCAL_WRITE;
+        }
+
+        return tranlocal;
+    }
 
     @Override
     public final GammaRefTranlocal openForWrite(final GammaTransaction tx, final int lockMode) {

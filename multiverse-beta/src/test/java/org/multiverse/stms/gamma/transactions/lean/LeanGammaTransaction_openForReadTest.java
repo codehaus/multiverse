@@ -2,8 +2,10 @@ package org.multiverse.stms.gamma.transactions.lean;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
@@ -11,8 +13,7 @@ import org.multiverse.stms.gamma.transactionalobjects.*;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.assertIsAborted;
-import static org.multiverse.TestUtils.assertIsCommitted;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransaction> implements GammaConstants {
@@ -105,11 +106,61 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
 
     @Test
     public void whenExclusiveLockObtainedByOthers() {
+        String initialValue = "foo";
+        GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction otherTx = stm.startDefaultTransaction();
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
+
+        T tx = newTransaction();
+        try {
+            ref.openForRead(tx);
+            fail();
+        } catch (ReadWriteConflict expected) {
+
+        }
+
+        assertIsAborted(tx);
+        assertRefHasExclusiveLock(ref, otherTx);
+        assertSurplus(ref, 1);
+        assertUpdateBiased(ref);
+        assertReadonlyCount(ref, 0);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
     public void whenNonExclusiveLockAcquiredByOthers() {
+        whenNonExclusiveLockAcquiredByOthers(LockMode.Read);
+        whenNonExclusiveLockAcquiredByOthers(LockMode.Write);
+    }
 
+    public void whenNonExclusiveLockAcquiredByOthers(LockMode lockMode) {
+        String initialValue = "foo";
+        GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction otherTx = stm.startDefaultTransaction();
+        ref.getLock().acquire(otherTx, lockMode);
+
+        T tx = newTransaction();
+        GammaRefTranlocal tranlocal = ref.openForRead(tx);
+
+        assertIsActive(tx);
+        assertNotNull(tranlocal);
+        assertSame(ref, tranlocal.owner);
+        assertSame(initialValue, tranlocal.ref_value);
+        assertNull(tranlocal.ref_oldValue);
+        assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
+        assertEquals(TRANLOCAL_READ, tranlocal.mode);
+        assertFalse(tranlocal.hasDepartObligation);
+        assertEquals(initialVersion, tranlocal.version);
+
+        assertRefHasLockMode(ref, otherTx, lockMode.asInt());
+        assertSurplus(ref, 1);
+        assertUpdateBiased(ref);
+        assertReadonlyCount(ref, 0);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
@@ -126,6 +177,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
         assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
         assertEquals(TRANLOCAL_READ, tranlocal.mode);
         assertSame(initialValue, tranlocal.ref_value);
+        assertNull(tranlocal.ref_oldValue);
         assertEquals(initialVersion, tranlocal.version);
 
         assertRefHasNoLocks(ref);
@@ -148,6 +200,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
         assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
         assertEquals(TRANLOCAL_READ, tranlocal.mode);
         assertSame(initialValue, tranlocal.ref_value);
+        assertNull(tranlocal.ref_oldValue);
         assertEquals(initialVersion, tranlocal.version);
 
         assertRefHasNoLocks(ref);
@@ -170,6 +223,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
         assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
         assertEquals(TRANLOCAL_WRITE, tranlocal.mode);
         assertSame(initialValue, tranlocal.ref_value);
+        assertNull(tranlocal.ref_oldValue);
         assertEquals(initialVersion, tranlocal.version);
 
         assertRefHasNoLocks(ref);
