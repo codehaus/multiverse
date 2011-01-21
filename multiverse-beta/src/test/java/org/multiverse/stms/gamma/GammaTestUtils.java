@@ -28,6 +28,9 @@ public class GammaTestUtils implements GammaConstants {
         Assert.assertEquals(asList(expected), functions);
     }
 
+    public static void assertSpeculativeConfigurationNonRefTypeRequired(GammaTransaction tx) {
+        assertTrue(tx.config.speculativeConfiguration.get().isNonRefTypeRequired);
+    }
 
     public static void assertHasListeners(AbstractGammaObject ref, RetryLatch... listeners) {
         Set<RetryLatch> expected = new HashSet<RetryLatch>(Arrays.asList(listeners));

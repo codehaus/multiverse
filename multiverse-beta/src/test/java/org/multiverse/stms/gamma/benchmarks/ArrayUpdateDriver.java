@@ -6,8 +6,8 @@ import org.junit.Test;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactions.ArrayGammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
+import org.multiverse.stms.gamma.transactions.fat.FatLinkedGammaTransaction;
 
 public class ArrayUpdateDriver implements GammaConstants {
 
@@ -23,7 +23,7 @@ public class ArrayUpdateDriver implements GammaConstants {
     public void test() {
         final long txCount = 1000 * 1000 * 1000;
 
-        ArrayGammaTransaction tx = new ArrayGammaTransaction(new GammaTransactionConfiguration(stm));
+        FatLinkedGammaTransaction tx = new FatLinkedGammaTransaction(new GammaTransactionConfiguration(stm));
         GammaLongRef[] refs = new GammaLongRef[refCount];
         for (int k = 0; k < refs.length; k++) {
             refs[k] = new GammaLongRef(stm, 0);

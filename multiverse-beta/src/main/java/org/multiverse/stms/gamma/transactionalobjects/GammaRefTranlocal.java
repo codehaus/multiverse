@@ -4,23 +4,25 @@ import org.multiverse.api.functions.Function;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaObjectPool;
 
+@SuppressWarnings({"ClassWithTooManyFields"})
 public final class GammaRefTranlocal<E> implements GammaConstants {
 
-    public long long_value;
-    public long long_oldValue;
     public E ref_value;
-    public E ref_oldValue;
-
     public long version;
-    private int lockMode;
+    public int lockMode;
     public AbstractGammaRef owner;
     public int mode;
-    private boolean hasDepartObligation;
+    public boolean hasDepartObligation;
+    public boolean isDirty;
     public GammaRefTranlocal next;
     public GammaRefTranlocal previous;
-    public boolean isDirty = false;
     public CallableNode headCallable;
-    public boolean writeSkewCheck = false;
+    public boolean writeSkewCheck;
+
+    public long long_oldValue;
+    public E ref_oldValue;
+    public long long_value;
+
 
     public boolean isDirty() {
         return isDirty;

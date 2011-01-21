@@ -7,7 +7,7 @@ import org.multiverse.api.LockMode;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
-import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
 
 import static org.benchy.BenchyUtils.format;
 import static org.junit.Assert.assertEquals;
@@ -73,7 +73,7 @@ public class UncontendedMonoUpdateDriver extends BenchmarkDriver {
         public void doRun() {
             final GammaLongRef ref = new GammaLongRef(stm);
 
-            MonoGammaTransaction tx = new MonoGammaTransaction(
+            FatMonoGammaTransaction tx = new FatMonoGammaTransaction(
                     new GammaTransactionConfiguration(stm)
                             .setReadLockMode(lockMode)
                             .setDirtyCheckEnabled(dirtyCheck));

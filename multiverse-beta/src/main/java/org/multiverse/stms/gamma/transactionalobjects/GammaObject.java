@@ -6,10 +6,10 @@ import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
-import org.multiverse.stms.gamma.transactions.ArrayGammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
-import org.multiverse.stms.gamma.transactions.MapGammaTransaction;
-import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatLinkedGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatMapGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
 
 public interface GammaObject extends GammaConstants {
 
@@ -19,27 +19,27 @@ public interface GammaObject extends GammaConstants {
 
     GammaRefTranlocal openForWrite(GammaTransaction tx, int lockMode);
 
-    GammaRefTranlocal openForWrite(MonoGammaTransaction tx, int lockMode);
+    GammaRefTranlocal openForWrite(FatMonoGammaTransaction tx, int lockMode);
 
-    GammaRefTranlocal openForWrite(ArrayGammaTransaction tx, int lockMode);
+    GammaRefTranlocal openForWrite(FatLinkedGammaTransaction tx, int lockMode);
 
-    GammaRefTranlocal openForWrite(MapGammaTransaction tx, int lockMode);
+    GammaRefTranlocal openForWrite(FatMapGammaTransaction tx, int lockMode);
 
     GammaRefTranlocal openForRead(GammaTransaction tx, int lockMode);
 
-    GammaRefTranlocal openForRead(MonoGammaTransaction tx, int lockMode);
+    GammaRefTranlocal openForRead(FatMonoGammaTransaction tx, int lockMode);
 
-    GammaRefTranlocal openForRead(ArrayGammaTransaction tx, int lockMode);
+    GammaRefTranlocal openForRead(FatLinkedGammaTransaction tx, int lockMode);
 
-    GammaRefTranlocal openForRead(MapGammaTransaction tx, int lockMode);
+    GammaRefTranlocal openForRead(FatMapGammaTransaction tx, int lockMode);
 
     GammaRefTranlocal openForConstruction(GammaTransaction tx);
 
-    GammaRefTranlocal openForConstruction(MonoGammaTransaction tx);
+    GammaRefTranlocal openForConstruction(FatMonoGammaTransaction tx);
 
-    GammaRefTranlocal openForConstruction(MapGammaTransaction tx);
+    GammaRefTranlocal openForConstruction(FatMapGammaTransaction tx);
 
-    GammaRefTranlocal openForConstruction(ArrayGammaTransaction tx);
+    GammaRefTranlocal openForConstruction(FatLinkedGammaTransaction tx);
 
     /**
      * Tries to acquire a lock on a previous read/written tranlocal and checks for conflict.

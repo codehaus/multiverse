@@ -10,7 +10,7 @@ import org.multiverse.stms.gamma.GammaAtomicBlock;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
 
 import static org.junit.Assert.assertEquals;
 
@@ -63,7 +63,7 @@ public class MonoUpdateWithTransactionDriver implements GammaConstants {
         final AtomicVoidClosure closure = new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                ref.openForWrite((MonoGammaTransaction) tx, LOCKMODE_NONE).long_value++;
+                ref.openForWrite((FatMonoGammaTransaction) tx, LOCKMODE_NONE).long_value++;
             }
         };
 

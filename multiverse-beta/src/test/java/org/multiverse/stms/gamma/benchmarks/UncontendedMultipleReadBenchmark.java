@@ -4,8 +4,8 @@ import org.multiverse.TestThread;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactions.ArrayGammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
+import org.multiverse.stms.gamma.transactions.fat.FatLinkedGammaTransaction;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -126,7 +126,7 @@ public class UncontendedMultipleReadBenchmark implements GammaConstants {
 
             GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, 1)
                     .setReadonly(true);
-            ArrayGammaTransaction tx = new ArrayGammaTransaction(config);
+            FatLinkedGammaTransaction tx = new FatLinkedGammaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 
@@ -146,7 +146,7 @@ public class UncontendedMultipleReadBenchmark implements GammaConstants {
 
             GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, 2)
                     .setReadonly(true);
-            ArrayGammaTransaction tx = new ArrayGammaTransaction(config);
+            FatLinkedGammaTransaction tx = new FatLinkedGammaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 
@@ -170,7 +170,7 @@ public class UncontendedMultipleReadBenchmark implements GammaConstants {
 
             GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, 4)
                     .setReadonly(true);
-            ArrayGammaTransaction tx = new ArrayGammaTransaction(config);
+            FatLinkedGammaTransaction tx = new FatLinkedGammaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 
@@ -199,7 +199,7 @@ public class UncontendedMultipleReadBenchmark implements GammaConstants {
 
             GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, 8)
                     .setReadonly(true);
-            ArrayGammaTransaction tx = new ArrayGammaTransaction(config);
+            FatLinkedGammaTransaction tx = new FatLinkedGammaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 
@@ -242,7 +242,7 @@ public class UncontendedMultipleReadBenchmark implements GammaConstants {
 
             GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, 16)
                     .setReadonly(true);
-            ArrayGammaTransaction tx = new ArrayGammaTransaction(config);
+            FatLinkedGammaTransaction tx = new FatLinkedGammaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 
@@ -311,7 +311,7 @@ public class UncontendedMultipleReadBenchmark implements GammaConstants {
 
             GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, 32)
                     .setReadonly(true);
-            ArrayGammaTransaction tx = new ArrayGammaTransaction(config);
+            FatLinkedGammaTransaction tx = new FatLinkedGammaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 

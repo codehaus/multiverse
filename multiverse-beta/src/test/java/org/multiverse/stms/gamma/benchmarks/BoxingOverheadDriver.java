@@ -9,7 +9,7 @@ import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
-import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
@@ -61,7 +61,7 @@ public class BoxingOverheadDriver extends BenchmarkDriver implements GammaConsta
                 BenchmarkUtils.format(transactionsPerSecond));
 
         testCaseResult.put("transactionsPerThreadPerSecond", transactionsPerSecondPerThread);
-        testCaseResult.put("transactionsPerSecond",transactionsPerSecond);
+        testCaseResult.put("transactionsPerSecond", transactionsPerSecond);
     }
 
     class UpdateThread extends TestThread {
@@ -72,7 +72,7 @@ public class BoxingOverheadDriver extends BenchmarkDriver implements GammaConsta
         }
 
         public void doRun() {
-            MonoGammaTransaction tx = new MonoGammaTransaction(
+            FatMonoGammaTransaction tx = new FatMonoGammaTransaction(
                     new GammaTransactionConfiguration(stm)
                             .setReadLockMode(LockMode.Exclusive)
                             .setDirtyCheckEnabled(false));

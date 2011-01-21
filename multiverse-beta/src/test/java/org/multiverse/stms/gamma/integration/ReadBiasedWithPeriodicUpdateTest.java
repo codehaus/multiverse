@@ -6,7 +6,7 @@ import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
-import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -27,13 +27,13 @@ public class ReadBiasedWithPeriodicUpdateTest implements GammaConstants {
         GammaLongRef ref = new GammaLongRef(stm);
 
         for (int l = 0; l < 100; l++) {
-            GammaTransaction tx = new MonoGammaTransaction(stm);
+            GammaTransaction tx = new FatMonoGammaTransaction(stm);
             tx.arriveEnabled = true;
             ref.openForWrite(tx, LOCKMODE_NONE).long_value++;
             tx.commit();
 
             for (int k = 0; k < 1000; k++) {
-                GammaTransaction readonlyTx = new MonoGammaTransaction(stm);
+                GammaTransaction readonlyTx = new FatMonoGammaTransaction(stm);
                 readonlyTx.arriveEnabled = true;
                 ref.openForRead(readonlyTx, LOCKMODE_NONE);
                 readonlyTx.commit();

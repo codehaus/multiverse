@@ -12,7 +12,7 @@ import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.gamma.*;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
-import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
 
 import java.util.Collection;
 
@@ -295,7 +295,7 @@ public class GammaLongRef_ensure0Test implements GammaConstants {
 
     @Test
     public void whenPossibleWriteSkew_thenCanBeDetectedWithEnsure() {
-        assumeTrue(!(transactionFactory.newTransaction() instanceof MonoGammaTransaction));
+        assumeTrue(!(transactionFactory.newTransaction() instanceof FatMonoGammaTransaction));
 
         GammaLongRef ref1 = new GammaLongRef(stm);
         GammaLongRef ref2 = new GammaLongRef(stm);

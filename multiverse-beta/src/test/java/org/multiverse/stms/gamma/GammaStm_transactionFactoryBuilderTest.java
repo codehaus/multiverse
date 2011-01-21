@@ -5,7 +5,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.*;
 import org.multiverse.api.lifecycle.TransactionLifecycleListener;
-import org.multiverse.stms.gamma.transactions.*;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
+import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
+import org.multiverse.stms.gamma.transactions.GammaTransactionFactoryBuilder;
+import org.multiverse.stms.gamma.transactions.fat.FatMapGammaTransaction;
 
 import java.util.List;
 
@@ -149,7 +153,7 @@ public class GammaStm_transactionFactoryBuilderTest {
                 .newTransactionFactory();
 
         GammaTransaction tx = txFactory.newTransaction();
-        assertTrue(tx instanceof MapGammaTransaction);
+        assertTrue(tx instanceof FatMapGammaTransaction);
     }
 
     @Test

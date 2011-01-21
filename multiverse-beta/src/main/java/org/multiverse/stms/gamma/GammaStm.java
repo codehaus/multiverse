@@ -6,6 +6,9 @@ import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.collections.NaiveTransactionalCollectionFactory;
 import org.multiverse.stms.gamma.transactionalobjects.*;
 import org.multiverse.stms.gamma.transactions.*;
+import org.multiverse.stms.gamma.transactions.fat.FatLinkedGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatMapGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
 
 import static org.multiverse.stms.gamma.ThreadLocalGammaTransactionPool.getThreadLocalGammaTransactionPool;
 
@@ -48,7 +51,7 @@ public final class GammaStm implements Stm {
 
     @Override
     public GammaTransaction startDefaultTransaction() {
-        return new MapGammaTransaction(this);
+        return new FatMapGammaTransaction(this);
     }
 
     @Override
@@ -340,10 +343,10 @@ public final class GammaStm implements Stm {
 
         @Override
         public GammaTransaction newTransaction(final GammaTransactionPool pool) {
-            MapGammaTransaction tx = pool.takeMapGammaTransaction();
+            FatMapGammaTransaction tx = pool.takeMapGammaTransaction();
 
             if (tx == null) {
-                tx = new MapGammaTransaction(config);
+                tx = new FatMapGammaTransaction(config);
             } else {
                 tx.init(config);
             }
@@ -388,9 +391,9 @@ public final class GammaStm implements Stm {
             final int length = speculativeConfiguration.minimalLength;
 
             if (length <= 1) {
-                MonoGammaTransaction tx = pool.takeMonoGammaTransaction();
+                FatMonoGammaTransaction tx = pool.takeMonoGammaTransaction();
                 if (tx == null) {
-                    return new MonoGammaTransaction(config);
+                    return new FatMonoGammaTransaction(config);
                 }
 
                 tx.init(config);
@@ -398,18 +401,18 @@ public final class GammaStm implements Stm {
 
             } else if (length <= config.arrayTransactionSize) {
 
-                final ArrayGammaTransaction tx = pool.takeArrayGammaTransaction();
+                final FatLinkedGammaTransaction tx = pool.takeArrayGammaTransaction();
                 if (tx == null) {
-                    return new ArrayGammaTransaction(config);
+                    return new FatLinkedGammaTransaction(config);
                 }
 
                 tx.init(config);
                 return tx;
 
             } else {
-                final MapGammaTransaction tx = pool.takeMapGammaTransaction();
+                final FatMapGammaTransaction tx = pool.takeMapGammaTransaction();
                 if (tx == null) {
-                    return new MapGammaTransaction(config);
+                    return new FatMapGammaTransaction(config);
                 }
 
                 tx.init(config);

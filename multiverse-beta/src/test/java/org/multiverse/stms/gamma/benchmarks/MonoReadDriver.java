@@ -8,7 +8,7 @@ import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
-import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
 
 import static org.benchy.BenchyUtils.format;
 import static org.multiverse.TestUtils.joinAll;
@@ -57,7 +57,7 @@ public class MonoReadDriver extends BenchmarkDriver implements GammaConstants {
         System.out.printf("Multiverse > Performance %s transactions/second\n",
                 format(transactionsPerSecond));
 
-        testCaseResult.put("transactionsPerSecond",transactionsPerSecond);
+        testCaseResult.put("transactionsPerSecond", transactionsPerSecond);
         testCaseResult.put("transactionsPerSecondPerThread", transactionsPerSecondPerThread);
     }
 
@@ -73,7 +73,7 @@ public class MonoReadDriver extends BenchmarkDriver implements GammaConstants {
         public void doRun() {
             GammaLongRef ref = new GammaLongRef(stm);
 
-            MonoGammaTransaction tx = new MonoGammaTransaction(
+            FatMonoGammaTransaction tx = new FatMonoGammaTransaction(
                     new GammaTransactionConfiguration(stm)
                             .setReadLockMode(LockMode.Exclusive)
                             .setDirtyCheckEnabled(false));

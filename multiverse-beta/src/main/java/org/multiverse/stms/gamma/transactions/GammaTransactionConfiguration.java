@@ -218,7 +218,17 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         return Collections.unmodifiableList(permanentListeners);
     }
 
-    public void needsOrelse() {
+    public void setSpeculativeConfigurationToUseNonRefType() {
+        while (true) {
+            SpeculativeGammaConfiguration current = speculativeConfiguration.get();
+            SpeculativeGammaConfiguration update = current.createWithNonRefType();
+            if (speculativeConfiguration.compareAndSet(current, update)) {
+                return;
+            }
+        }
+    }
+
+    public void setSpeculativeConfigurationTouseOrElse() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
             SpeculativeGammaConfiguration update = current.createWithOrElseRequired();
@@ -228,7 +238,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
     }
 
-    public void needsListeners() {
+    public void setSpeculativeConfigurationToUseListeners() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
             SpeculativeGammaConfiguration update = current.createWithListenersRequired();
@@ -238,7 +248,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
     }
 
-    public void needsCommute() {
+    public void setSpeculativeConfigurationTouseCommute() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
             SpeculativeGammaConfiguration update = current.createWithCommuteRequired();

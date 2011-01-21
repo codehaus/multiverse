@@ -1,5 +1,9 @@
 package org.multiverse.stms.gamma.transactions;
 
+import org.multiverse.stms.gamma.transactions.fat.FatLinkedGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatMapGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
+
 public class GammaTransactionPool {
 
     private final static boolean ENABLED = Boolean.parseBoolean(
@@ -7,11 +11,11 @@ public class GammaTransactionPool {
 
     private final boolean enabled;
 
-    private final MonoGammaTransaction[] poolMonoGammaTransaction = new MonoGammaTransaction[10];
+    private final FatMonoGammaTransaction[] poolMonoGammaTransaction = new FatMonoGammaTransaction[10];
     private int poolMonoGammaTransactionIndex = -1;
-    private final ArrayGammaTransaction[] poolFatArrayGammaTransaction = new ArrayGammaTransaction[10];
+    private final FatLinkedGammaTransaction[] poolFatArrayGammaTransaction = new FatLinkedGammaTransaction[10];
     private int poolFatArrayGammaTransactionIndex = -1;
-    private final MapGammaTransaction[] poolMapGammaTransaction = new MapGammaTransaction[10];
+    private final FatMapGammaTransaction[] poolMapGammaTransaction = new FatMapGammaTransaction[10];
     private int poolMapGammaTransactionIndex = -1;
 
     public GammaTransactionPool() {
@@ -23,12 +27,12 @@ public class GammaTransactionPool {
      *
      * @return the taken FatMonoGammaTransaction or null of none available.
      */
-    public MonoGammaTransaction takeMonoGammaTransaction() {
+    public FatMonoGammaTransaction takeMonoGammaTransaction() {
         if (!enabled || poolMonoGammaTransactionIndex == -1) {
             return null;
         }
 
-        MonoGammaTransaction tx = poolMonoGammaTransaction[poolMonoGammaTransactionIndex];
+        FatMonoGammaTransaction tx = poolMonoGammaTransaction[poolMonoGammaTransactionIndex];
         poolMonoGammaTransaction[poolMonoGammaTransactionIndex] = null;
         poolMonoGammaTransactionIndex--;
         return tx;
@@ -40,12 +44,12 @@ public class GammaTransactionPool {
      *
      * @return the taken FatArrayGammaTransaction or null of none available.
      */
-    public ArrayGammaTransaction takeArrayGammaTransaction() {
+    public FatLinkedGammaTransaction takeArrayGammaTransaction() {
         if (!enabled || poolFatArrayGammaTransactionIndex == -1) {
             return null;
         }
 
-        ArrayGammaTransaction tx = poolFatArrayGammaTransaction[poolFatArrayGammaTransactionIndex];
+        FatLinkedGammaTransaction tx = poolFatArrayGammaTransaction[poolFatArrayGammaTransactionIndex];
         poolFatArrayGammaTransaction[poolFatArrayGammaTransactionIndex] = null;
         poolFatArrayGammaTransactionIndex--;
         return tx;
@@ -57,12 +61,12 @@ public class GammaTransactionPool {
      *
      * @return the taken FatArrayTreeGammaTransaction or null of none available.
      */
-    public MapGammaTransaction takeMapGammaTransaction() {
+    public FatMapGammaTransaction takeMapGammaTransaction() {
         if (!enabled || poolMapGammaTransactionIndex == -1) {
             return null;
         }
 
-        MapGammaTransaction tx = poolMapGammaTransaction[poolMapGammaTransactionIndex];
+        FatMapGammaTransaction tx = poolMapGammaTransaction[poolMapGammaTransactionIndex];
         poolMapGammaTransaction[poolMapGammaTransactionIndex] = null;
         poolMapGammaTransactionIndex--;
         return tx;
@@ -92,7 +96,7 @@ public class GammaTransactionPool {
                 }
 
                 poolMonoGammaTransactionIndex++;
-                poolMonoGammaTransaction[poolMonoGammaTransactionIndex] = (MonoGammaTransaction) tx;
+                poolMonoGammaTransaction[poolMonoGammaTransactionIndex] = (FatMonoGammaTransaction) tx;
                 break;
             case GammaTransaction.POOL_TRANSACTIONTYPE_ARRAY:
                 if (poolFatArrayGammaTransactionIndex == poolFatArrayGammaTransaction.length - 1) {
@@ -100,7 +104,7 @@ public class GammaTransactionPool {
                 }
 
                 poolFatArrayGammaTransactionIndex++;
-                poolFatArrayGammaTransaction[poolFatArrayGammaTransactionIndex] = (ArrayGammaTransaction) tx;
+                poolFatArrayGammaTransaction[poolFatArrayGammaTransactionIndex] = (FatLinkedGammaTransaction) tx;
                 break;
             case GammaTransaction.POOL_TRANSACTIONTYPE_MAP:
                 if (poolMapGammaTransactionIndex == poolMapGammaTransaction.length - 1) {
@@ -108,7 +112,7 @@ public class GammaTransactionPool {
                 }
 
                 poolMapGammaTransactionIndex++;
-                poolMapGammaTransaction[poolMapGammaTransactionIndex] = (MapGammaTransaction) tx;
+                poolMapGammaTransaction[poolMapGammaTransactionIndex] = (FatMapGammaTransaction) tx;
                 break;
             default:
                 throw new IllegalArgumentException();

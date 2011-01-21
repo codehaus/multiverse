@@ -1,6 +1,10 @@
 package org.multiverse.stms.gamma;
 
-import org.multiverse.stms.gamma.transactions.*;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
+import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
+import org.multiverse.stms.gamma.transactions.GammaTransactionPool;
+import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
 
 import static org.multiverse.stms.gamma.ThreadLocalGammaTransactionPool.getThreadLocalGammaTransactionPool;
 
@@ -32,10 +36,10 @@ public class MonoGammaTransactionFactory implements GammaTransactionFactory {
     }
 
     @Override
-    public MonoGammaTransaction newTransaction(GammaTransactionPool pool) {
-        MonoGammaTransaction tx = pool.takeMonoGammaTransaction();
+    public FatMonoGammaTransaction newTransaction(GammaTransactionPool pool) {
+        FatMonoGammaTransaction tx = pool.takeMonoGammaTransaction();
         if (tx == null) {
-            tx = new MonoGammaTransaction(config);
+            tx = new FatMonoGammaTransaction(config);
         } else {
             tx.init(config);
         }

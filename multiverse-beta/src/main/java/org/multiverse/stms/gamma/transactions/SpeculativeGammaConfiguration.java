@@ -6,22 +6,25 @@ public final class SpeculativeGammaConfiguration {
     public final int minimalLength;
     public final boolean isCommuteRequired;
     public final boolean isOrelseRequired;
+    public final boolean isNonRefTypeRequired;
     public final boolean isFat;
 
     public SpeculativeGammaConfiguration(boolean fat) {
-        this(fat, false, false, 1, false);
+        this(fat, false, false, false, false, 1);
     }
 
     public SpeculativeGammaConfiguration(
             final boolean fat,
             final boolean areListenersRequired,
             final boolean commuteRequired,
-            final int minimalLength,
-            final boolean orelseRequired) {
+            final boolean nonRefTypeRequired,
+            final boolean orelseRequired,
+            final int minimalLength) {
 
         if (minimalLength < 0) {
             throw new IllegalArgumentException();
         }
+        this.isNonRefTypeRequired = nonRefTypeRequired;
         this.areListenersRequired = areListenersRequired;
         this.minimalLength = minimalLength;
         this.isCommuteRequired = commuteRequired;
@@ -42,8 +45,10 @@ public final class SpeculativeGammaConfiguration {
                 isFat,
                 areListenersRequired,
                 isCommuteRequired,
-                newMinimalLength,
-                isOrelseRequired);
+                isNonRefTypeRequired,
+                isOrelseRequired,
+                newMinimalLength
+        );
     }
 
     public SpeculativeGammaConfiguration createWithListenersRequired() {
@@ -55,8 +60,10 @@ public final class SpeculativeGammaConfiguration {
                 true,
                 true,
                 isCommuteRequired,
-                minimalLength,
-                isOrelseRequired);
+                isNonRefTypeRequired,
+                isOrelseRequired,
+                minimalLength
+        );
     }
 
     public SpeculativeGammaConfiguration createWithOrElseRequired() {
@@ -67,9 +74,25 @@ public final class SpeculativeGammaConfiguration {
         return new SpeculativeGammaConfiguration(
                 true,
                 areListenersRequired,
+                isCommuteRequired,
+                isNonRefTypeRequired,
+                true,
+                minimalLength);
+    }
+
+    public SpeculativeGammaConfiguration createWithNonRefType() {
+        if (isNonRefTypeRequired) {
+            return this;
+        }
+
+        return new SpeculativeGammaConfiguration(
+                true,
                 areListenersRequired,
-                minimalLength,
-                true);
+                isCommuteRequired,
+                true,
+                isOrelseRequired,
+                minimalLength
+        );
     }
 
     public SpeculativeGammaConfiguration createWithCommuteRequired() {
@@ -81,8 +104,10 @@ public final class SpeculativeGammaConfiguration {
                 true,
                 areListenersRequired,
                 true,
-                minimalLength,
-                isOrelseRequired);
+                isNonRefTypeRequired,
+                isOrelseRequired,
+                minimalLength
+        );
     }
 
     @Override
@@ -90,6 +115,7 @@ public final class SpeculativeGammaConfiguration {
         return "SpeculativeGammaConfiguration{" +
                 "areListenersRequired=" + areListenersRequired +
                 ", isCommuteRequired=" + isCommuteRequired +
+                ", isNonRefTypeRequired=" + isNonRefTypeRequired +
                 ", isOrelseRequired=" + isOrelseRequired +
                 ", minimalLength=" + minimalLength +
                 ", isFat=" + isFat +

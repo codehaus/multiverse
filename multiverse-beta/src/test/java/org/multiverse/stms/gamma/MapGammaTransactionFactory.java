@@ -1,6 +1,10 @@
 package org.multiverse.stms.gamma;
 
-import org.multiverse.stms.gamma.transactions.*;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
+import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
+import org.multiverse.stms.gamma.transactions.GammaTransactionPool;
+import org.multiverse.stms.gamma.transactions.fat.FatMapGammaTransaction;
 
 import static org.multiverse.stms.gamma.ThreadLocalGammaTransactionPool.getThreadLocalGammaTransactionPool;
 
@@ -34,7 +38,7 @@ public final class MapGammaTransactionFactory implements GammaTransactionFactory
     public GammaTransaction newTransaction(GammaTransactionPool pool) {
         GammaTransaction tx = pool.takeMapGammaTransaction();
         if (tx == null) {
-            tx = new MapGammaTransaction(config);
+            tx = new FatMapGammaTransaction(config);
         } else {
             tx.init(config);
         }

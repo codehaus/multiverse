@@ -22,12 +22,12 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     //it is important that the maximum threshold is not larger than 1023 (there are 10 bits for the readonly count)
     private static final int READBIASED_THRESHOLD = 16;
 
-    private static final long BITMASK_EXCLUSIVELOCK = 0x8000000000000000L;
-    private static final long BITMASK_UPDATELOCK = 0x4000000000000000L;
-    private static final long BITMASK_READBIASED = 0x2000000000000000L;
-    private static final long BITMASK_READLOCKS = 0x1FFFFF0000000000L;
-    private static final long BITMASK_SURPLUS = 0x000000FFFFFFFE00L;
-    private static final long BITMASK_READONLY_COUNT = 0x00000000000003FFL;
+    public static final long BITMASK_EXCLUSIVELOCK = 0x8000000000000000L;
+    public static final long BITMASK_UPDATELOCK = 0x4000000000000000L;
+    public static final long BITMASK_READBIASED = 0x2000000000000000L;
+    public static final long BITMASK_READLOCKS = 0x1FFFFF0000000000L;
+    public static final long BITMASK_SURPLUS = 0x000000FFFFFFFE00L;
+    public static final long BITMASK_READONLY_COUNT = 0x00000000000003FFL;
 
     protected static final Unsafe ___unsafe = ToolUnsafe.getUnsafe();
     protected static final long listenersOffset;
@@ -47,7 +47,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     public final GammaStm stm;
 
     @SuppressWarnings({"UnusedDeclaration"})
-    protected volatile Listeners listeners;
+    public volatile Listeners listeners;
 
     @SuppressWarnings({"VolatileLongOrDoubleField"})
     public volatile long version;
@@ -77,7 +77,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return this;
     }
 
-    protected final Listeners ___removeListenersAfterWrite() {
+    public final Listeners ___removeListenersAfterWrite() {
         if (listeners == null) {
             return null;
         }
@@ -566,6 +566,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
         return ARRIVE_LOCK_NOT_FREE;
     }
+
 
     public final int tryExclusiveLockAndArrive(int spinCount) {
         do {

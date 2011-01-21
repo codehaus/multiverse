@@ -8,7 +8,7 @@ import org.multiverse.api.closures.AtomicLongClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.TooManyRetriesException;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -61,7 +61,7 @@ public class GammaAtomicBlock_integrationTest implements GammaConstants {
     public void whenTooManyRetries() {
         final GammaLongRef ref = new GammaLongRef(stm);
 
-        MonoGammaTransaction otherTx = new MonoGammaTransaction(stm);
+        FatMonoGammaTransaction otherTx = new FatMonoGammaTransaction(stm);
         ref.openForWrite(otherTx, LOCKMODE_EXCLUSIVE);
 
         try {

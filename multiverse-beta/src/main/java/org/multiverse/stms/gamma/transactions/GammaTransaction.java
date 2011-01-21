@@ -48,6 +48,33 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
+    public SpeculativeConfigurationError abortOpenForReadOnNonRefType(AbstractGammaRef ref) {
+        config.setSpeculativeConfigurationToUseNonRefType();
+        abort();
+        if (config.controlFlowErrorsReused) {
+            return SpeculativeConfigurationError.INSTANCE;
+        } else {
+            return new SpeculativeConfigurationError(
+                    format("[%s] Failed to execute Transaction.openForRead '%s', reason: the transaction is lean, but the type is not an object ref",
+                            config.familyName, toDebugString(ref)));
+
+        }
+    }
+
+
+    public SpeculativeConfigurationError abortOpenForWriteOnNonRefType(AbstractGammaRef ref) {
+        config.setSpeculativeConfigurationToUseNonRefType();
+        abort();
+        if (config.controlFlowErrorsReused) {
+            return SpeculativeConfigurationError.INSTANCE;
+        } else {
+            return new SpeculativeConfigurationError(
+                    format("[%s] Failed to execute Transaction.openForWrite '%s', reason: the transaction is lean, but the type is not an object ref",
+                            config.familyName, toDebugString(ref)));
+
+        }
+    }
+
     public final IllegalArgumentException abortOpenForConstructionOnBadReference(
             final GammaObject ref) {
 

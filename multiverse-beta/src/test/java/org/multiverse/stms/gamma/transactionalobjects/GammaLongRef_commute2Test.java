@@ -18,7 +18,7 @@ import org.multiverse.stms.gamma.MapGammaTransactionFactory;
 import org.multiverse.stms.gamma.MonoGammaTransactionFactory;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
-import org.multiverse.stms.gamma.transactions.MonoGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
 
 import java.util.Collection;
 
@@ -375,7 +375,7 @@ public class GammaLongRef_commute2Test {
 
     @Test
     public void fullExample() {
-        assumeTrue(!(transactionFactory.newTransaction() instanceof MonoGammaTransaction));
+        assumeTrue(!(transactionFactory.newTransaction() instanceof FatMonoGammaTransaction));
 
         GammaLongRef ref1 = new GammaLongRef(stm, 10);
         GammaLongRef ref2 = new GammaLongRef(stm, 10);
