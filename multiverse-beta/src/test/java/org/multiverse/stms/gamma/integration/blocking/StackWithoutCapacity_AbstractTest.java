@@ -1,5 +1,6 @@
 package org.multiverse.stms.gamma.integration.blocking;
 
+import org.junit.After;
 import org.junit.Before;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
@@ -36,6 +37,13 @@ public abstract class StackWithoutCapacity_AbstractTest implements GammaConstant
         stm = new GammaStm();
     }
 
+    @After
+    public void tearDown() {
+        if (stack != null) {
+            System.out.println(stack.head.toDebugString());
+        }
+    }
+
     public void run() {
         stack = new Stack<Integer>();
 
@@ -43,11 +51,7 @@ public abstract class StackWithoutCapacity_AbstractTest implements GammaConstant
         ConsumeThread consumeThread = new ConsumeThread();
 
         startAll(produceThread, consumeThread);
-        try {
-            joinAll(produceThread, consumeThread);
-        } finally {
-            System.out.println(stack.head.toDebugString());
-        }
+        joinAll(produceThread, consumeThread);
 
         System.out.println("finished executing, checking if content is correct (can take some time)");
 

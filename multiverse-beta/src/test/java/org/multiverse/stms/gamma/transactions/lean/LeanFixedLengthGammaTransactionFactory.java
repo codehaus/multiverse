@@ -16,6 +16,10 @@ public class LeanFixedLengthGammaTransactionFactory implements GammaTransactionF
         this(new GammaTransactionConfiguration(stm));
     }
 
+    public LeanFixedLengthGammaTransactionFactory(GammaStm stm, int fixedLengthSize) {
+        this(new GammaTransactionConfiguration(stm, fixedLengthSize));
+    }
+
     public LeanFixedLengthGammaTransactionFactory(GammaTransactionConfiguration config) {
         this.config = config;
     }

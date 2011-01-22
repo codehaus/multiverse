@@ -153,11 +153,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             listenerAfterWrite = ___removeListenersAfterWrite();
         }
 
-        if (tranlocal.hasDepartObligation) {
-            departAfterUpdateAndUnlock();
-        } else {
-            unlockByUnregistered();
-        }
+        departAfterUpdateAndUnlock();
         tranlocal.ref_value = null;
         tranlocal.lockMode = LOCKMODE_NONE;
         tranlocal.owner = null;

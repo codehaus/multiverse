@@ -117,6 +117,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
             }
 
             node.hasDepartObligation = arriveStatus == ARRIVE_NORMAL;
+            node.lockMode = LOCKMODE_EXCLUSIVE;
 
             if (owner.version != version) {
                 return false;
@@ -159,6 +160,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
                     } else {
                         owner.unlockByUnregistered();
                     }
+                    node.setLockMode(LOCKMODE_NONE);
                 }
             }
 

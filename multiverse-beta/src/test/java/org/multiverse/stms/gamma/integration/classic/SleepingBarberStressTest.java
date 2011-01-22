@@ -38,6 +38,7 @@ public class SleepingBarberStressTest {
         joinAll(thread, spawnThread);
     }
 
+    @SuppressWarnings({"ObjectAllocationInLoop"})
     class CustomerSpawnThread extends TestThread {
         public CustomerSpawnThread() {
             super("CustomerSpawnThread");
@@ -101,7 +102,7 @@ public class SleepingBarberStressTest {
         }
     }
 
-    class BarberShop {
+    static class BarberShop {
         private BooleanRef closed = newBooleanRef(false);
         private IntRef freeSeats = newIntRef(5);
 
