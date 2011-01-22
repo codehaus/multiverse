@@ -1,11 +1,8 @@
 package org.multiverse.stms.gamma.integration.classic;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.LockMode;
-import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.BooleanRef;
@@ -23,14 +20,13 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 /**
  * http://en.wikipedia.org/wiki/Dining_philosophers_problem
  */
-public class DiningPhilosophersStressTest implements GammaConstants {
+public abstract class DiningPhilosophers_AbstractTest implements GammaConstants {
 
     private int philosopherCount = 10;
     private volatile boolean stop;
 
     private BooleanRef[] forks;
-    private LockMode lockMode;
-    private Stm stm;
+    protected GammaStm stm;
     private RefFactory refFactory;
 
     @Before
@@ -43,28 +39,11 @@ public class DiningPhilosophersStressTest implements GammaConstants {
         stop = false;
     }
 
-    @Test
-    public void testNoLocking() {
-        test(LockMode.None);
-    }
+    protected abstract AtomicBlock newTakeForksBlock();
 
-    @Test
-    public void testReadLock() {
-        test(LockMode.Read);
-    }
+    protected abstract AtomicBlock newReleaseForksBlock();
 
-    @Test
-    public void testWriteLock() {
-        test(LockMode.Write);
-    }
-
-    @Test
-    public void testExclusiveLock() {
-        test(LockMode.Exclusive);
-    }
-
-    public void test(LockMode lockLevel) {
-        this.lockMode = lockLevel;
+    public void run() {
         createForks();
 
         PhilosopherThread[] philosopherThreads = createPhilosopherThreads();
@@ -110,13 +89,8 @@ public class DiningPhilosophersStressTest implements GammaConstants {
         private int eatCount = 0;
         private final BooleanRef leftFork;
         private final BooleanRef rightFork;
-        private final AtomicBlock releaseForksBlock = stm.newTransactionFactoryBuilder()
-                .setReadLockMode(lockMode)
-                .newAtomicBlock();
-        private final AtomicBlock takeForksBlock = stm.newTransactionFactoryBuilder()
-                .setReadLockMode(lockMode)
-                .setMaxRetries(10000)
-                .newAtomicBlock();
+        private final AtomicBlock releaseForksBlock = newReleaseForksBlock();
+        private final AtomicBlock takeForksBlock = newTakeForksBlock();
 
         PhilosopherThread(int id, BooleanRef leftFork, BooleanRef rightFork) {
             super("PhilosopherThread-" + id);
@@ -172,4 +146,6 @@ public class DiningPhilosophersStressTest implements GammaConstants {
             });
         }
     }
+
+
 }

@@ -1,7 +1,6 @@
 package org.multiverse.stms.gamma.integration.classic;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
 import org.multiverse.api.AtomicBlock;
@@ -10,6 +9,7 @@ import org.multiverse.api.closures.AtomicBooleanClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.BooleanRef;
 import org.multiverse.api.references.Ref;
+import org.multiverse.stms.gamma.GammaStm;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
@@ -20,7 +20,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 /**
  * http://en.wikipedia.org/wiki/Cigarette_smokers_problem
  */
-public class CigaretteSmokersProblemStressTest {
+public abstract class CigaretteSmokersProblem_AbstractTest {
     private static final int SMOKE_TIME_SECONDS = 10;
 
     private BooleanRef tobaccoAvailable;
@@ -33,10 +33,14 @@ public class CigaretteSmokersProblemStressTest {
     private SmokerThread tobaccoProvider;
     private volatile boolean stop;
     private AtomicBlock block;
+    protected GammaStm stm;
+
+    protected abstract AtomicBlock newBlock();
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
+        stm = (GammaStm) getGlobalStmInstance();
         tobaccoAvailable = newBooleanRef();
         paperAvailable = newBooleanRef();
         matchesAvailable = newBooleanRef();
@@ -46,16 +50,11 @@ public class CigaretteSmokersProblemStressTest {
         matchProvider = new SmokerThread("MatchProvidedThread", tobaccoAvailable, paperAvailable);
         tobaccoProvider = new SmokerThread("TobaccoProviderThread", paperAvailable, matchesAvailable);
         stop = false;
-
-        block = getGlobalStmInstance()
-                .newTransactionFactoryBuilder()
-                        //.setLockLevel(PessimisticLockLevel.CommitLockReads)
-                        //.setIsolationLevel(IsolationLevel.Serializable)
-                .newAtomicBlock();
     }
 
-    @Test
-    public void test() {
+    public void run() {
+        block = newBlock();
+
         startAll(arbiterThread, paperProvider, matchProvider, tobaccoProvider);
         sleepMs(60000);
         System.out.println("Stopping threads");
