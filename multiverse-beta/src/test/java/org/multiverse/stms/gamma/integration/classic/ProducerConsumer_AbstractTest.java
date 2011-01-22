@@ -3,34 +3,62 @@ package org.multiverse.stms.gamma.integration.classic;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
+import org.multiverse.api.AtomicBlock;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.IntRef;
+import org.multiverse.stms.gamma.GammaStm;
 
 import static junit.framework.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.StmUtils.*;
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
+import static org.multiverse.api.StmUtils.newIntRef;
+import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * http://en.wikipedia.org/wiki/Producer-consumer_problem
  */
-public class ProducerConsumerStressTest {
+public class ProducerConsumer_AbstractTest {
 
     private Buffer buffer;
     private volatile boolean stop;
     private static final int MAX_CAPACITY = 100;
+    private LockMode lockMode;
+    private GammaStm stm;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        buffer = new Buffer();
+        stm = (GammaStm) getGlobalStmInstance();
         stop = false;
     }
 
     @Test
-    public void test() {
+    public void testNoLock() {
+        test(LockMode.None);
+    }
+
+    @Test
+    public void testReadLock() {
+        test(LockMode.Read);
+    }
+
+    @Test
+    public void testWriteLock() {
+        test(LockMode.Write);
+    }
+
+    @Test
+    public void testExclusiveLock() {
+        test(LockMode.Exclusive);
+    }
+
+    public void test(LockMode lockMode) {
+        this.lockMode = lockMode;
+        buffer = new Buffer();
         ProducerThread producerThread = new ProducerThread();
         ConsumerThread consumerThread = new ConsumerThread();
 
@@ -89,6 +117,14 @@ public class ProducerConsumerStressTest {
     class Buffer {
         private final IntRef size = newIntRef();
         private final IntRef[] items;
+        private final AtomicBlock takeBlock = stm.newTransactionFactoryBuilder()
+                .setReadLockMode(lockMode)
+                .newAtomicBlock();
+
+        private final AtomicBlock putBlock = stm.newTransactionFactoryBuilder()
+                .setReadLockMode(lockMode)
+                .newAtomicBlock();
+
 
         Buffer() {
             this.items = new IntRef[MAX_CAPACITY];
@@ -98,7 +134,7 @@ public class ProducerConsumerStressTest {
         }
 
         int take() {
-            return execute(new AtomicClosure<Integer>() {
+            return takeBlock.execute(new AtomicClosure<Integer>() {
                 @Override
                 public Integer execute(Transaction tx) throws Exception {
                     if (size.get() == 0) {
@@ -112,7 +148,7 @@ public class ProducerConsumerStressTest {
         }
 
         void put(final int item) {
-            execute(new AtomicVoidClosure() {
+            putBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     if (size.get() >= MAX_CAPACITY) {
