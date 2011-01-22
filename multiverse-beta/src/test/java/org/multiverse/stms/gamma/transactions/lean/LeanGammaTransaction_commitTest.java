@@ -10,8 +10,8 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
@@ -27,6 +27,8 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
 
     public abstract T newTransaction();
 
+    public abstract int getMaximumLength();
+
     public abstract void assertClearedAfterCommit();
 
     public abstract void assertClearedAfterAbort();
@@ -39,6 +41,81 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         assertIsCommitted();
         assertClearedAfterCommit();
     }
+
+    @Test
+    public void whenMultipleDirtyWrites() {
+        assumeTrue(getMaximumLength() > 1);
+
+        String initialValue1 = "foo1";
+        String updateValue1 = "bar1";
+        GammaRef<String> ref1 = new GammaRef<String>(stm, initialValue1);
+        long initialVersion1 = ref1.getVersion();
+
+        String initialValue2 = "foo2";
+        String updateValue2 = "bar1";
+        GammaRef<String> ref2 = new GammaRef<String>(stm, initialValue2);
+        long initialVersion2 = ref2.getVersion();
+
+        T tx = newTransaction();
+        GammaRefTranlocal tranlocal1 = ref1.openForWrite(tx, LOCKMODE_NONE);
+        tranlocal1.ref_value = updateValue1;
+        GammaRefTranlocal tranlocal2 = ref2.openForWrite(tx, LOCKMODE_NONE);
+        tranlocal2.ref_value = updateValue2;
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertRefHasNoLocks(ref1);
+        assertSurplus(ref1, 0);
+        assertVersionAndValue(ref1, initialVersion1 + 1, updateValue1);
+        assertUpdateBiased(ref1);
+        assertNull(tranlocal1.owner);
+        assertNull(tranlocal1.ref_value);
+        assertFalse(tranlocal1.hasDepartObligation);
+
+        assertRefHasNoLocks(ref2);
+        assertSurplus(ref2, 0);
+        assertVersionAndValue(ref2, initialVersion2 + 1, updateValue2);
+        assertUpdateBiased(ref2);
+        assertNull(tranlocal2.owner);
+        assertNull(tranlocal2.ref_value);
+        assertFalse(tranlocal2.hasDepartObligation);
+    }
+
+    @Test
+    public void whenMultipleNonDirtyWrites() {
+        assumeTrue(getMaximumLength() > 1);
+
+        String initialValue1 = "foo1";
+        GammaRef<String> ref1 = new GammaRef<String>(stm, initialValue1);
+        long initialVersion1 = ref1.getVersion();
+
+        String initialValue2 = "foo2";
+        GammaRef<String> ref2 = new GammaRef<String>(stm, initialValue2);
+        long initialVersion2 = ref2.getVersion();
+
+        T tx = newTransaction();
+        GammaRefTranlocal tranlocal1 = ref1.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal2 = ref2.openForWrite(tx, LOCKMODE_NONE);
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertRefHasNoLocks(ref1);
+        assertSurplus(ref1, 0);
+        assertVersionAndValue(ref1, initialVersion1 + 1, initialValue1);
+        assertUpdateBiased(ref1);
+        assertNull(tranlocal1.owner);
+        assertNull(tranlocal1.ref_value);
+        assertFalse(tranlocal1.hasDepartObligation);
+
+        assertRefHasNoLocks(ref2);
+        assertSurplus(ref2, 0);
+        assertVersionAndValue(ref2, initialVersion2 + 1, initialValue2);
+        assertUpdateBiased(ref2);
+        assertNull(tranlocal2.owner);
+        assertNull(tranlocal2.ref_value);
+        assertFalse(tranlocal2.hasDepartObligation);
+    }
+
 
     @Test
     public void whenNonDirtyUpdate() {

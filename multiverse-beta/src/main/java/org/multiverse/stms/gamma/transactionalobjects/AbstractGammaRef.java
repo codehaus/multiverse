@@ -1594,6 +1594,41 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         return returnOld ? oldValue : newValue;
     }
 
+    public final Object atomicSetObject(final Object newValue, boolean returnOld) {
+        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
+
+        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+            throw new LockedException();
+        }
+
+        final Object oldValue = ref_value;
+
+        if (oldValue == newValue) {
+            if (arriveStatus == ARRIVE_UNREGISTERED) {
+                unlockByUnregistered();
+            } else {
+                departAfterReadingAndUnlock();
+            }
+
+            return newValue;
+        }
+
+        ref_value = newValue;
+        //noinspection NonAtomicOperationOnVolatileField
+        version++;
+
+        final Listeners listeners = ___removeListenersAfterWrite();
+
+        departAfterUpdateAndUnlock();
+
+        if (listeners != null) {
+            final GammaObjectPool pool = getThreadLocalGammaObjectPool();
+            listeners.openAll(pool);
+        }
+
+        return returnOld ? oldValue : newValue;
+    }
+
     public final boolean atomicCompareAndSetLong(final long expectedValue, final long newValue) {
         final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
 

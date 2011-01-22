@@ -13,6 +13,7 @@ import org.multiverse.stms.gamma.transactionalobjects.*;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
@@ -27,6 +28,34 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
     @Before
     public void setUp() {
         stm = new GammaStm();
+    }
+
+    @Test
+    public void whenMultipleWrites() {
+        assumeTrue(getMaximumLength() > 1);
+
+        String initialValue1 = "foo1";
+        GammaRef<String> ref1 = new GammaRef<String>(stm, initialValue1);
+        String initialValue2 = "foo2";
+        GammaRef<String> ref2 = new GammaRef<String>(stm, initialValue2);
+
+        GammaTransaction tx = newTransaction();
+        GammaRefTranlocal tranlocal1 = ref1.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal2 = ref2.openForRead(tx, LOCKMODE_NONE);
+
+        assertIsActive(tx);
+
+        assertRefHasNoLocks(ref1);
+        assertSurplus(ref1, 0);
+        assertSame(ref1, tranlocal1.owner);
+        assertEquals(TRANLOCAL_READ, tranlocal1.mode);
+        assertSame(initialValue1, tranlocal1.ref_value);
+
+        assertRefHasNoLocks(ref2);
+        assertSurplus(ref2, 0);
+        assertSame(ref2, tranlocal2.owner);
+        assertEquals(TRANLOCAL_READ, tranlocal2.mode);
+        assertSame(initialValue2, tranlocal2.ref_value);
     }
 
     @Test
@@ -235,6 +264,76 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
 
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
+    }
+
+    @Test
+    public void whenMultipleReadsAndConsistent() {
+        assumeTrue(getMaximumLength() > 1);
+
+        GammaRef<String> ref1 = new GammaRef<String>(stm);
+        GammaRef<String> ref2 = new GammaRef<String>(stm);
+
+        GammaTransaction tx = newTransaction();
+        ref1.openForRead(tx, LOCKMODE_NONE);
+        ref2.openForRead(tx, LOCKMODE_NONE);
+        tx.commit();
+
+        assertIsCommitted(tx);
+        assertRefHasNoLocks(ref1);
+        assertSurplus(ref1, 0);
+        assertRefHasNoLocks(ref2);
+        assertSurplus(ref2, 0);
+    }
+
+    @Test
+    public void whenMultipleReadsAndInconsistent() {
+        assumeTrue(getMaximumLength() > 1);
+
+        GammaRef<String> ref1 = new GammaRef<String>(stm);
+        GammaRef<String> ref2 = new GammaRef<String>(stm);
+
+        GammaTransaction tx = newTransaction();
+        ref1.openForRead(tx, LOCKMODE_NONE);
+
+        ref1.atomicSet("foo");
+
+        try {
+            ref2.openForRead(tx, LOCKMODE_NONE);
+            fail();
+        } catch (ReadWriteConflict expected) {
+        }
+
+        assertIsAborted(tx);
+        assertRefHasNoLocks(ref1);
+        assertSurplus(ref1, 0);
+        assertRefHasNoLocks(ref2);
+        assertSurplus(ref2, 0);
+    }
+
+    @Test
+    public void whenMultipleReadsAndPreviousReadLockedExclusively() {
+        assumeTrue(getMaximumLength() > 1);
+
+        GammaRef<String> ref1 = new GammaRef<String>(stm);
+        GammaRef<String> ref2 = new GammaRef<String>(stm);
+
+        GammaTransaction tx = newTransaction();
+        ref1.openForRead(tx, LOCKMODE_NONE);
+
+        GammaTransaction otherTx = stm.startDefaultTransaction();
+        ref1.getLock().acquire(otherTx, LockMode.Exclusive);
+
+        try {
+            ref2.openForRead(tx, LOCKMODE_NONE);
+            fail();
+        } catch (ReadWriteConflict expected) {
+        }
+
+        assertIsAborted(tx);
+        assertRefHasExclusiveLock(ref1, otherTx);
+        assertSurplus(ref1, 1);
+        assertRefHasNoLocks(ref2);
+        assertSurplus(ref2, 0);
     }
 
     @Test

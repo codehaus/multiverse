@@ -1,7 +1,6 @@
 package org.multiverse.stms.gamma.transactions.lean;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.stms.gamma.GammaStm;
@@ -27,9 +26,11 @@ public abstract class LeanGammaTransaction_abortTest<T extends GammaTransaction>
     public abstract T newTransaction();
 
     @Test
-    @Ignore
     public void whenUnused() {
+        T tx = newTransaction();
+        tx.abort();
 
+        assertIsAborted(tx);
     }
 
     @Test

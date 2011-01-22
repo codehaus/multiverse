@@ -105,7 +105,20 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
                 continue;
             }
 
-            if (!owner.prepare(this, node)) {
+            final long version = node.version;
+            if (owner.version != version) {
+                return false;
+            }
+
+            int arriveStatus = owner.tryLockAndArrive(64, LOCKMODE_EXCLUSIVE);
+
+            if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+                return false;
+            }
+
+            node.hasDepartObligation = arriveStatus == ARRIVE_NORMAL;
+
+            if (owner.version != version) {
                 return false;
             }
 

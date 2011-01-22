@@ -86,14 +86,12 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
 
     @Override
     public final E atomicSet(final E newValue) {
-        atomicGetAndSet(newValue);
-        return newValue;
+        return (E) atomicSetObject(newValue, false);
     }
 
     @Override
     public final E atomicGetAndSet(final E newValue) {
-        //todo:
-        throw new TodoException();
+        return (E) atomicSetObject(newValue, true);
     }
 
     @Override

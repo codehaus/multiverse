@@ -16,4 +16,9 @@ public class LeanMonoGammaTransaction_commitTest extends LeanGammaTransaction_co
     public void assertClearedAfterAbort() {
         //To change body of implemented methods use File | Settings | File Templates.
     }
+
+    @Override
+    public int getMaximumLength() {
+        return 1;
+    }
 }
