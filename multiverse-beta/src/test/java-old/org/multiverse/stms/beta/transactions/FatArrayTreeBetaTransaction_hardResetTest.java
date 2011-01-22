@@ -3,7 +3,7 @@ package org.multiverse.stms.beta.transactions;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
@@ -113,7 +113,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
 
     @Test
     public void whenHasPermanentListener() {
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        TransactionListener listener = mock(TransactionListener.class);
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .addPermanentListener(listener);
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(config);
@@ -130,7 +130,7 @@ public class FatArrayTreeBetaTransaction_hardResetTest {
     @Test
     public void whenHasNormalListener() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        TransactionListener listener = mock(TransactionListener.class);
         tx.register(listener);
 
         tx.hardReset();

@@ -3,7 +3,7 @@ package org.multiverse.stms.beta.transactions;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.beta.BetaStm;
 
 import static org.junit.Assert.assertTrue;
@@ -22,7 +22,7 @@ public class LeanArrayBetaTransaction_registerTest {
 
     @Test
     public void whenRegistered_thenSpeculativeFailure() {
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        TransactionListener listener = mock(TransactionListener.class);
 
         LeanArrayBetaTransaction tx = new LeanArrayBetaTransaction(stm);
 

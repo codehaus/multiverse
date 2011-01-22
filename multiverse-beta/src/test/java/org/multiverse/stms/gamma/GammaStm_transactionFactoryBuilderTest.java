@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.*;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
@@ -59,7 +59,7 @@ public class GammaStm_transactionFactoryBuilderTest {
     @Test
     public void whenPermanentListenerAdded() {
         GammaTransactionFactoryBuilder oldBuilder = stm.newTransactionFactoryBuilder();
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        TransactionListener listener = mock(TransactionListener.class);
         GammaTransactionFactoryBuilder newBuilder = oldBuilder.addPermanentListener(listener);
 
         assertEquals(asList(listener), newBuilder.getTransactionConfiguration().getPermanentListeners());
@@ -69,7 +69,7 @@ public class GammaStm_transactionFactoryBuilderTest {
     @Test
     public void whenPermanentListenerAdded_thenNoCheckForDuplicates() {
         GammaTransactionFactoryBuilder oldBuilder = stm.newTransactionFactoryBuilder();
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        TransactionListener listener = mock(TransactionListener.class);
         GammaTransactionFactoryBuilder newBuilder = oldBuilder.addPermanentListener(listener)
                 .addPermanentListener(listener);
 
@@ -84,23 +84,23 @@ public class GammaStm_transactionFactoryBuilderTest {
 
     @Test
     public void whenMultipleListenersAdded_thenTheyAreAddedInOrder() {
-        TransactionLifecycleListener listener1 = mock(TransactionLifecycleListener.class);
-        TransactionLifecycleListener listener2 = mock(TransactionLifecycleListener.class);
+        TransactionListener listener1 = mock(TransactionListener.class);
+        TransactionListener listener2 = mock(TransactionListener.class);
         GammaTransactionFactoryBuilder builder = stm.newTransactionFactoryBuilder()
                 .addPermanentListener(listener1)
                 .addPermanentListener(listener2);
 
-        List<TransactionLifecycleListener> listeners = builder.getTransactionConfiguration().getPermanentListeners();
+        List<TransactionListener> listeners = builder.getTransactionConfiguration().getPermanentListeners();
         assertEquals(asList(listener1, listener2), listeners);
     }
 
     @Test
     public void whenGetPermanentListenersCalled_immutableListReturned() {
         GammaTransactionFactoryBuilder builder = stm.newTransactionFactoryBuilder()
-                .addPermanentListener(mock(TransactionLifecycleListener.class))
-                .addPermanentListener(mock(TransactionLifecycleListener.class));
+                .addPermanentListener(mock(TransactionListener.class))
+                .addPermanentListener(mock(TransactionListener.class));
 
-        List<TransactionLifecycleListener> listeners = builder.getTransactionConfiguration().getPermanentListeners();
+        List<TransactionListener> listeners = builder.getTransactionConfiguration().getPermanentListeners();
 
         try {
             listeners.clear();

@@ -1,6 +1,6 @@
 package org.multiverse.api;
 
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 
 /**
  * All changes on transaction objects must be done through a Transaction. The transaction make sure that changes
@@ -26,9 +26,9 @@ import org.multiverse.api.lifecycle.TransactionLifecycleListener;
  * <dt>TransactionLifecycle</dt>
  * <dd>
  * It is possible to listen to a Transaction when it aborts, or commits. This can be done with the
- * {@link #register(TransactionLifecycleListener)}.* You can also register permanent lifecycle listeners (useful for a
+ * {@link #register(org.multiverse.api.lifecycle.TransactionListener)}.* You can also register permanent lifecycle listeners (useful for a
  * product that uses Multiverse as lower level stm, look for the
- * {@link TransactionFactoryBuilder#addPermanentListener(TransactionLifecycleListener)}.
+ * {@link TransactionFactoryBuilder#addPermanentListener(org.multiverse.api.lifecycle.TransactionListener)}.
  * <p/>
  * When the Transaction is reset, the normal lifecycle tasks are dropped and the permanent are not. So the lifecycle
  * task need to be registered again (this is easy because the transaction is executed again).
@@ -164,7 +164,7 @@ public interface Transaction {
     /**
      * Registers a TransactionLifecycleListener. Every time a transaction is retried, the listener needs to
      * be registered again if you want the task to be executed again. If you want a permanent listener, have
-     * a look at the {@link TransactionFactoryBuilder#addPermanentListener(TransactionLifecycleListener)}.
+     * a look at the {@link TransactionFactoryBuilder#addPermanentListener(org.multiverse.api.lifecycle.TransactionListener)}.
      * <p/>
      * If a TransactionLifecycleListener is added more than once, it is executed more than once. No checks
      * are made. The permanent listeners are executed in the order they are added.
@@ -175,5 +175,5 @@ public interface Transaction {
      *                              if the transaction is not in the correct
      *                              state (e.g. aborted or committed).
      */
-    void register(TransactionLifecycleListener listener);
+    void register(TransactionListener listener);
 }

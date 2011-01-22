@@ -13,7 +13,7 @@ import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -383,9 +383,9 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     public void listeners_whenPostCommitListenerFails() {
         assumeTrue(isSupportingListeners());
 
-        TransactionLifecycleListener listener1 = mock(TransactionLifecycleListener.class);
-        TransactionLifecycleListener listener2 = mock(TransactionLifecycleListener.class);
-        TransactionLifecycleListener listener3 = mock(TransactionLifecycleListener.class);
+        TransactionListener listener1 = mock(TransactionListener.class);
+        TransactionListener listener2 = mock(TransactionListener.class);
+        TransactionListener listener3 = mock(TransactionListener.class);
 
 
         BetaTransaction tx = newTransaction();
@@ -412,9 +412,9 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     public void listeners_whenPermanentListenerFailsWithPostCommit() {
         assumeTrue(isSupportingListeners());
 
-        TransactionLifecycleListener listener1 = mock(TransactionLifecycleListener.class);
-        TransactionLifecycleListener listener2 = mock(TransactionLifecycleListener.class);
-        TransactionLifecycleListener listener3 = mock(TransactionLifecycleListener.class);
+        TransactionListener listener1 = mock(TransactionListener.class);
+        TransactionListener listener2 = mock(TransactionListener.class);
+        TransactionListener listener3 = mock(TransactionListener.class);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .addPermanentListener(listener1)
@@ -446,7 +446,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     public void listeners_whenPermanentLifecycleListenerAvailable_thenNotified() {
         assumeTrue(isSupportingListeners());
 
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        TransactionListener listener = mock(TransactionListener.class);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .addPermanentListener(listener);
@@ -463,7 +463,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
 
         assumeTrue(isSupportingListeners());
 
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        TransactionListener listener = mock(TransactionListener.class);
         BetaTransaction tx = newTransaction();
         tx.register(listener);
         tx.commit();
@@ -476,8 +476,8 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
     public void listeners_whenNormalAndPermanentLifecycleListenersAvailable_permanentGetsCalledFirst() {
         assumeTrue(isSupportingListeners());
 
-        TransactionLifecycleListener normalListener = mock(TransactionLifecycleListener.class);
-        TransactionLifecycleListener permanentListener = mock(TransactionLifecycleListener.class);
+        TransactionListener normalListener = mock(TransactionListener.class);
+        TransactionListener permanentListener = mock(TransactionListener.class);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm)
                 .addPermanentListener(permanentListener);
@@ -605,7 +605,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         assertEquals(TransactionLifecycleEvent.PostCommit, listenerMock.events.get(1));
     }
 
-    class TransactionLifecycleListenerMock implements TransactionLifecycleListener {
+    class TransactionLifecycleListenerMock implements TransactionListener {
         List<Transaction> transactions = new LinkedList<Transaction>();
         List<TransactionLifecycleEvent> events = new LinkedList<TransactionLifecycleEvent>();
 

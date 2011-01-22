@@ -1,6 +1,6 @@
 package org.multiverse.api;
 
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 
 import java.util.List;
 
@@ -170,7 +170,7 @@ public interface TransactionConfiguration {
      *
      * @return unmodifiable List containing all permanent TransactionLifecycleListeners.
      */
-    List<TransactionLifecycleListener> getPermanentListeners();
+    List<TransactionListener> getPermanentListeners();
 
     /**
      * Returns the maximum number of times this Transaction be retried before failing. The returned value will

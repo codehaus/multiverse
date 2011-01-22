@@ -2,7 +2,7 @@ package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.exceptions.IllegalTransactionFactoryException;
 import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConfiguration;
 import org.multiverse.stms.beta.BetaStmConstants;
@@ -51,7 +51,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     public long timeoutNs = Long.MAX_VALUE;
     public TraceLevel traceLevel = TraceLevel.None;
 
-    public ArrayList<TransactionLifecycleListener> permanentListeners;
+    public ArrayList<TransactionListener> permanentListeners;
 
     public BetaTransactionConfiguration(BetaStm stm) {
         this(stm, new BetaStmConfiguration());
@@ -214,7 +214,7 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
     }
 
     @Override
-    public List<TransactionLifecycleListener> getPermanentListeners() {
+    public List<TransactionListener> getPermanentListeners() {
         if (permanentListeners == null) {
             return Collections.EMPTY_LIST;
         }
@@ -716,13 +716,13 @@ public final class BetaTransactionConfiguration implements TransactionConfigurat
         return config;
     }
 
-    public BetaTransactionConfiguration addPermanentListener(TransactionLifecycleListener listener) {
+    public BetaTransactionConfiguration addPermanentListener(TransactionListener listener) {
         if (listener == null) {
             throw new NullPointerException();
         }
 
-        ArrayList<TransactionLifecycleListener> newPermanentListeners
-                = new ArrayList<TransactionLifecycleListener>();
+        ArrayList<TransactionListener> newPermanentListeners
+                = new ArrayList<TransactionListener>();
         if (permanentListeners != null) {
             newPermanentListeners.addAll(permanentListeners);
         }

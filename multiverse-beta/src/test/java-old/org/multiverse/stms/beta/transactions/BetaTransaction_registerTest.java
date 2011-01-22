@@ -3,7 +3,7 @@ package org.multiverse.stms.beta.transactions;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 
@@ -42,7 +42,7 @@ public abstract class BetaTransaction_registerTest implements BetaStmConstants {
     public void whenFirst() {
         BetaTransaction tx = newTransaction();
 
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        TransactionListener listener = mock(TransactionListener.class);
         tx.register(listener);
 
         assertIsActive(tx);
@@ -54,8 +54,8 @@ public abstract class BetaTransaction_registerTest implements BetaStmConstants {
     public void whenMultipleRegisters() {
         BetaTransaction tx = newTransaction();
 
-        TransactionLifecycleListener listener1 = mock(TransactionLifecycleListener.class);
-        TransactionLifecycleListener listener2 = mock(TransactionLifecycleListener.class);
+        TransactionListener listener1 = mock(TransactionListener.class);
+        TransactionListener listener2 = mock(TransactionListener.class);
         tx.register(listener1);
         tx.register(listener2);
 
@@ -69,7 +69,7 @@ public abstract class BetaTransaction_registerTest implements BetaStmConstants {
         BetaTransaction tx = newTransaction();
         tx.prepare();
 
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        TransactionListener listener = mock(TransactionListener.class);
 
         tx.register(listener);
 
@@ -83,7 +83,7 @@ public abstract class BetaTransaction_registerTest implements BetaStmConstants {
         BetaTransaction tx = newTransaction();
         tx.abort();
 
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        TransactionListener listener = mock(TransactionListener.class);
         try {
             tx.register(listener);
             fail();
@@ -101,7 +101,7 @@ public abstract class BetaTransaction_registerTest implements BetaStmConstants {
         BetaTransaction tx = newTransaction();
         tx.commit();
 
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        TransactionListener listener = mock(TransactionListener.class);
         try {
             tx.register(listener);
             fail();

@@ -2,7 +2,7 @@ package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 
 import java.util.ArrayList;
 
@@ -13,7 +13,7 @@ public abstract class AbstractLeanBetaTransaction extends BetaTransaction {
     }
 
     @Override
-    public final ArrayList<TransactionLifecycleListener> getNormalListeners() {
+    public final ArrayList<TransactionListener> getNormalListeners() {
         return null;
     }
 
@@ -24,7 +24,7 @@ public abstract class AbstractLeanBetaTransaction extends BetaTransaction {
     }
 
     @Override
-    public final void register(final TransactionLifecycleListener listener) {
+    public final void register(final TransactionListener listener) {
         if (listener == null) {
             abort();
             throw new NullPointerException();

@@ -2,7 +2,7 @@ package org.multiverse.stms.gamma;
 
 import org.multiverse.api.*;
 import org.multiverse.api.collections.TransactionalCollectionsFactory;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.collections.NaiveTransactionalCollectionFactory;
 import org.multiverse.stms.gamma.transactionalobjects.*;
 import org.multiverse.stms.gamma.transactions.*;
@@ -82,7 +82,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder addPermanentListener(TransactionLifecycleListener listener) {
+        public GammaTransactionFactoryBuilder addPermanentListener(TransactionListener listener) {
             return new GammaTransactionFactoryBuilderImpl(config.addPermanentListener(listener));
         }
 

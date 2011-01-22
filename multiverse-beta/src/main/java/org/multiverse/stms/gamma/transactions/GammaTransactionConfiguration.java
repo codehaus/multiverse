@@ -2,7 +2,7 @@ package org.multiverse.stms.gamma.transactions;
 
 import org.multiverse.api.*;
 import org.multiverse.api.exceptions.IllegalTransactionFactoryException;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.GammaStmConfiguration;
@@ -51,7 +51,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public TraceLevel traceLevel = TraceLevel.None;
     public boolean controlFlowErrorsReused = false;
 
-    public ArrayList<TransactionLifecycleListener> permanentListeners;
+    public ArrayList<TransactionListener> permanentListeners;
 
     public GammaTransactionConfiguration(GammaStm stm) {
         this(stm, new GammaStmConfiguration());
@@ -211,7 +211,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     }
 
     @Override
-    public List<TransactionLifecycleListener> getPermanentListeners() {
+    public List<TransactionListener> getPermanentListeners() {
         if (permanentListeners == null) {
             return Collections.EMPTY_LIST;
         }
@@ -834,13 +834,13 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         return config;
     }
 
-    public GammaTransactionConfiguration addPermanentListener(TransactionLifecycleListener listener) {
+    public GammaTransactionConfiguration addPermanentListener(TransactionListener listener) {
         if (listener == null) {
             throw new NullPointerException();
         }
 
-        ArrayList<TransactionLifecycleListener> newPermanentListeners
-                = new ArrayList<TransactionLifecycleListener>();
+        ArrayList<TransactionListener> newPermanentListeners
+                = new ArrayList<TransactionListener>();
         if (permanentListeners != null) {
             newPermanentListeners.addAll(permanentListeners);
         }

@@ -1,7 +1,7 @@
 package org.multiverse.stms.gamma.transactions;
 
 import org.multiverse.api.*;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.gamma.GammaAtomicBlock;
 
 public interface GammaTransactionFactoryBuilder extends TransactionFactoryBuilder {
@@ -25,7 +25,7 @@ public interface GammaTransactionFactoryBuilder extends TransactionFactoryBuilde
     GammaTransactionFactoryBuilder setPropagationLevel(PropagationLevel propagationLevel);
 
     @Override
-    GammaTransactionFactoryBuilder addPermanentListener(TransactionLifecycleListener listener);
+    GammaTransactionFactoryBuilder addPermanentListener(TransactionListener listener);
 
     @Override
     GammaTransactionFactoryBuilder setTraceLevel(TraceLevel traceLevel);

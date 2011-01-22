@@ -6,7 +6,7 @@ import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.Function;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
@@ -196,7 +196,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
-    public final StmMismatchException abortOpenForWriteOnBadStm(GammaObject gammaLongRef) {
+    public final StmMismatchException abortOpenForWriteOnBadStm(GammaObject ref) {
         abortIfAlive();
         //todo: message
         return new StmMismatchException("");
@@ -302,6 +302,46 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         return new NullPointerException(
                 format("[%s] Failed to execute Transaction.commute '%s', reason: the function is null",
                         config.familyName, toDebugString(object)));
+    }
+
+
+    private NullPointerException abortRegisterOnNullListener() {
+        abortIfAlive();
+        return new NullPointerException(
+                format("[%s] Failed to execute Transaction.register , reason: the listener is null",
+                        config.familyName));
+    }
+
+
+    private IllegalTransactionStateException abortRegisterOnBadStatus() {
+        switch (status) {
+            case TX_PREPARED:
+                abort();
+                return new PreparedTransactionException(
+                        format("[%s] Failed to execute Transaction.register, reason: the transaction is prepared",
+                                config.familyName));
+            case TX_ABORTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.register, reason: the transaction is aborted",
+                                config.familyName));
+            case TX_COMMITTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.register, reason: the transaction is prepared",
+                                config.familyName));
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+    public SpeculativeConfigurationError abortRegisterOnListenerRequired() {
+        config.setSpeculativeConfigurationToUseListeners();
+        abortIfAlive();
+        if (config.controlFlowErrorsReused) {
+            return SpeculativeConfigurationError.INSTANCE;
+        }
+        return new SpeculativeConfigurationError(
+                format("[%s] Failed to execute Transaction.register, reason: the transaction is lean, but listeners are required",
+                        config.familyName));
     }
 
 
@@ -454,7 +494,19 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     @Override
-    public void register(TransactionLifecycleListener listener) {
+    public void register(TransactionListener listener) {
+        if (listener == null) {
+            throw abortRegisterOnNullListener();
+        }
+
+        if (status != TX_ACTIVE) {
+            throw abortRegisterOnBadStatus();
+        }
+
+        if (transactionType == TRANSACTIONTYPE_LEAN_MONO || transactionType == TRANSACTIONTYPE_LEAN_FIXED_LENGTH) {
+            throw abortRegisterOnListenerRequired();
+        }
+
         throw new TodoException();
     }
 

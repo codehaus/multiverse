@@ -6,7 +6,7 @@ import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRefTranlocal;
@@ -152,7 +152,7 @@ public abstract class BetaTransaction_abortTest {
         assertEquals(TransactionLifecycleEvent.PostAbort, listenerMock.events.get(0));
     }
 
-    class TransactionLifecycleListenerMock implements TransactionLifecycleListener {
+    class TransactionLifecycleListenerMock implements TransactionListener {
         List<Transaction> transactions = new LinkedList<Transaction>();
         List<TransactionLifecycleEvent> events = new LinkedList<TransactionLifecycleEvent>();
 

@@ -8,7 +8,7 @@ import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -364,7 +364,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         assertIsAborted(tx);
     }
 
-    class TransactionLifecycleListenerMock implements TransactionLifecycleListener {
+    class TransactionLifecycleListenerMock implements TransactionListener {
         List<Transaction> transactions = new LinkedList<Transaction>();
         List<TransactionLifecycleEvent> events = new LinkedList<TransactionLifecycleEvent>();
 

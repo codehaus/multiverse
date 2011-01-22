@@ -1,11 +1,10 @@
 package org.multiverse.stms.gamma.transactions.lean;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alarmnummer
- * Date: 1/22/11
- * Time: 5:05 AM
- * To change this template use File | Settings | File Templates.
- */
-public class LeanFixedLengthGammaTransaction_registerTest {
+public class LeanFixedLengthGammaTransaction_registerTest
+        extends LeanGammaTransaction_registerTest<LeanFixedLengthGammaTransaction> {
+
+    @Override
+    public LeanFixedLengthGammaTransaction newTransaction() {
+        return new LeanFixedLengthGammaTransaction(stm);
+    }
 }

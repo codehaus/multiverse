@@ -3,7 +3,7 @@ package org.multiverse.commitbarriers;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 
 import java.util.List;
 
@@ -228,7 +228,7 @@ public final class CountDownCommitBarrier extends CommitBarrier {
      * A TransactionLifecycleListener that is responsible for restoring the the number of
      * parties after the transaction that increased them, was aborted.
      */
-    private class RestorePartiesCompensatingTask implements TransactionLifecycleListener {
+    private class RestorePartiesCompensatingTask implements TransactionListener {
         private final int extra;
 
         RestorePartiesCompensatingTask(int extra) {

@@ -2,7 +2,7 @@ package org.multiverse.stms.beta;
 
 import org.multiverse.api.collections.TransactionalCollectionsFactory;
 import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.collections.NaiveTransactionalCollectionFactory;
 import org.multiverse.stms.beta.conflictcounters.GlobalConflictCounter;
 import org.multiverse.stms.beta.transactionalobjects.*;
@@ -135,7 +135,7 @@ public final class BetaStm implements Stm {
         }
 
         @Override
-        public BetaTransactionFactoryBuilder addPermanentListener(TransactionLifecycleListener listener) {
+        public BetaTransactionFactoryBuilder addPermanentListener(TransactionListener listener) {
             return new BetaTransactionFactoryBuilderImpl(config.addPermanentListener(listener));
         }
 

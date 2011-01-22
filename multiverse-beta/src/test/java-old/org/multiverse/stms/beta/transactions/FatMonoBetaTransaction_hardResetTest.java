@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 
@@ -115,7 +115,7 @@ public class FatMonoBetaTransaction_hardResetTest {
     @Test
     public void whenHasNormalListener() {
         FatMonoBetaTransaction tx = new FatMonoBetaTransaction(stm);
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        TransactionListener listener = mock(TransactionListener.class);
         tx.register(listener);
 
         tx.hardReset();

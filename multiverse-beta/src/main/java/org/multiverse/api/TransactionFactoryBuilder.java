@@ -1,6 +1,6 @@
 package org.multiverse.api;
 
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 
 /**
  * A Builder for creating a {@link TransactionFactory}. This builder provides full control on transaction
@@ -85,7 +85,7 @@ public interface TransactionFactoryBuilder {
      * @return the updated TransactionFactoryBuilder.
      * @throws NullPointerException if listener is null.
      */
-    TransactionFactoryBuilder addPermanentListener(TransactionLifecycleListener listener);
+    TransactionFactoryBuilder addPermanentListener(TransactionListener listener);
 
     /**
      * Sets the TraceLevel. With tracing it is possible to see what is happening inside a transaction.

@@ -2,7 +2,7 @@ package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
 import org.multiverse.stms.beta.transactionalobjects.BetaTranlocal;
@@ -51,7 +51,7 @@ public class FatArrayTreeBetaTransaction_initTest {
     @Test
     public void whenNormalListenersAvailable_thenTheyAreRemoved() {
         FatArrayTreeBetaTransaction tx = new FatArrayTreeBetaTransaction(stm);
-        TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        TransactionListener listener = mock(TransactionListener.class);
         tx.register(listener);
 
         BetaTransactionConfiguration config = new BetaTransactionConfiguration(stm);

@@ -1,6 +1,6 @@
 package org.multiverse.stms.beta;
 
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.beta.transactions.BetaTransactionConfiguration;
 
 /**
@@ -17,7 +17,7 @@ public interface BetaTransactionFactoryBuilder extends TransactionFactoryBuilder
     BetaTransactionConfiguration getTransactionConfiguration();
 
     @Override
-    BetaTransactionFactoryBuilder addPermanentListener(TransactionLifecycleListener listener);
+    BetaTransactionFactoryBuilder addPermanentListener(TransactionListener listener);
 
     @Override
     BetaTransactionFactoryBuilder setFamilyName(String familyName);

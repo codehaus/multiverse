@@ -2,7 +2,7 @@ package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
-import org.multiverse.api.lifecycle.TransactionLifecycleListener;
+import org.multiverse.api.lifecycle.TransactionListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +12,13 @@ import java.util.List;
  */
 public abstract class AbstractFatBetaTransaction extends BetaTransaction {
 
-    protected ArrayList<TransactionLifecycleListener> normalListeners;
+    protected ArrayList<TransactionListener> normalListeners;
 
     public AbstractFatBetaTransaction(int poolTransactionType, BetaTransactionConfiguration config) {
         super(poolTransactionType, config);
     }
 
-    protected final void notifyListeners(List<TransactionLifecycleListener> listeners, TransactionLifecycleEvent event) {
+    protected final void notifyListeners(List<TransactionListener> listeners, TransactionLifecycleEvent event) {
         if (listeners == null) {
             return;
         }
@@ -30,7 +30,7 @@ public abstract class AbstractFatBetaTransaction extends BetaTransaction {
     }
 
     @Override
-    public final ArrayList<TransactionLifecycleListener> getNormalListeners() {
+    public final ArrayList<TransactionListener> getNormalListeners() {
         return normalListeners;
     }
 
@@ -41,7 +41,7 @@ public abstract class AbstractFatBetaTransaction extends BetaTransaction {
     }
 
     @Override
-    public final void register(final TransactionLifecycleListener listener) {
+    public final void register(final TransactionListener listener) {
         if (listener == null) {
             abort();
             throw new NullPointerException();
