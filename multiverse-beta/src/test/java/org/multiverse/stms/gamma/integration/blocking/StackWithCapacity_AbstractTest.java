@@ -1,33 +1,38 @@
 package org.multiverse.stms.gamma.integration.blocking;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaIntRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
-import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.TestUtils.*;
+import static org.multiverse.TestUtils.joinAll;
+import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class QueueWithoutCapacityStressTest implements GammaConstants {
+/**
+ * The test is not very efficient since a lot of temporary objects like the transaction template are created.
+ * But that is alright for this test since it isn't a benchmark.
+ *
+ * @author Peter Veentjer.
+ */
+public abstract class StackWithCapacity_AbstractTest implements GammaConstants {
 
-    private LockMode lockMode;
-
-    private GammaStm stm;
-    private Queue<Integer> queue;
-    private int itemCount = 10 * 1000 * 1000;
+    protected GammaStm stm;
+    private int itemCount = 2 * 1000 * 1000;
+    private Stack<Integer> stack;
+    private int maxCapacity = 1000;
 
     @Before
     public void setUp() {
@@ -35,29 +40,12 @@ public class QueueWithoutCapacityStressTest implements GammaConstants {
         stm = (GammaStm) getGlobalStmInstance();
     }
 
-    @Test
-    public void testLockModeNone() {
-        test(LockMode.None);
-    }
+    protected abstract AtomicBlock newPopBlock();
 
-    @Test
-    public void testLockModeRead() {
-        test(LockMode.Read);
-    }
+    protected abstract AtomicBlock newPushBlock();
 
-    @Test
-    public void testLockModeWrite() {
-        test(LockMode.Write);
-    }
-
-    @Test
-    public void testLockModeCommit() {
-        test(LockMode.Exclusive);
-    }
-
-    public void test(LockMode lockMode) {
-        this.lockMode = lockMode;
-        queue = new Queue<Integer>();
+    public void run() {
+        stack = new Stack<Integer>();
 
         ProduceThread produceThread = new ProduceThread();
         ConsumeThread consumeThread = new ConsumeThread();
@@ -65,8 +53,12 @@ public class QueueWithoutCapacityStressTest implements GammaConstants {
         startAll(produceThread, consumeThread);
         joinAll(produceThread, consumeThread);
 
+        System.out.println("finished executing");
+
         assertEquals(itemCount, produceThread.producedItems.size());
-        assertEquals(produceThread.producedItems, consumeThread.consumedItems);
+        assertEquals(
+                new HashSet<Integer>(produceThread.producedItems),
+                new HashSet<Integer>(consumeThread.consumedItems));
     }
 
     class ConsumeThread extends TestThread {
@@ -80,7 +72,7 @@ public class QueueWithoutCapacityStressTest implements GammaConstants {
         @Override
         public void doRun() throws Exception {
             for (int k = 0; k < itemCount; k++) {
-                int item = queue.pop();
+                int item = stack.pop();
                 consumedItems.add(item);
 
                 if (k % 100000 == 0) {
@@ -101,33 +93,32 @@ public class QueueWithoutCapacityStressTest implements GammaConstants {
         @Override
         public void doRun() throws Exception {
             for (int k = 0; k < itemCount; k++) {
-                queue.push(k);
+                stack.push(k);
                 producedItems.add(k);
 
                 if (k % 100000 == 0) {
-                    sleepMs(100);
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
             }
         }
     }
 
-    class Queue<E> {
-        final Stack<E> pushedStack = new Stack<E>();
-        final Stack<E> readyToPopStack = new Stack<E>();
-        final AtomicBlock pushBlock = stm.newTransactionFactoryBuilder()
-                .setReadLockMode(lockMode)
-                .newAtomicBlock();
-        final AtomicBlock popBlock = stm.newTransactionFactoryBuilder()
-                .setReadLockMode(lockMode)
-                .newAtomicBlock();
+    class Stack<E> {
+        private final GammaRef<Node<E>> head = new GammaRef<Node<E>>(stm);
+        private final GammaIntRef size = new GammaIntRef(stm);
+        private final AtomicBlock pushBlock = newPushBlock();
+        private final AtomicBlock popBlock = newPopBlock();
 
         public void push(final E item) {
             pushBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    GammaTransaction btx = (GammaTransaction) tx;
-                    pushedStack.push(btx, item);
+                    if (size.get() >= maxCapacity) {
+                        retry();
+                    }
+
+                    size.increment();
+                    head.set(new Node<E>(item, head.get()));
                 }
             });
         }
@@ -136,44 +127,16 @@ public class QueueWithoutCapacityStressTest implements GammaConstants {
             return popBlock.execute(new AtomicClosure<E>() {
                 @Override
                 public E execute(Transaction tx) throws Exception {
-                    GammaTransaction btx = (GammaTransaction) tx;
-
-                    if (!readyToPopStack.isEmpty(btx)) {
-                        return readyToPopStack.pop(btx);
+                    if (head.isNull()) {
+                        retry();
                     }
 
-                    while (!pushedStack.isEmpty(btx)) {
-                        E item = pushedStack.pop(btx);
-                        readyToPopStack.push(btx, item);
-                    }
-
-                    return readyToPopStack.pop(btx);
+                    size.decrement();
+                    Node<E> node = head.get();
+                    head.set(node.next);
+                    return node.item;
                 }
             });
-        }
-    }
-
-    class Stack<E> {
-        final GammaRef<Node<E>> head = new GammaRef<Node<E>>(stm);
-
-        void push(GammaTransaction tx, E item) {
-            Node<E> newHead = new Node<E>(item, head.get());
-            head.set(newHead);
-        }
-
-        boolean isEmpty(GammaTransaction tx) {
-            return head.isNull();
-        }
-
-        E pop(GammaTransaction tx) {
-            Node<E> node = head.get();
-
-            if (node == null) {
-                retry();
-            }
-
-            head.set(node.next);
-            return node.item;
         }
     }
 
@@ -186,4 +149,5 @@ public class QueueWithoutCapacityStressTest implements GammaConstants {
             this.next = next;
         }
     }
+
 }

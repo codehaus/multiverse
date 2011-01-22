@@ -1,16 +1,13 @@
 package org.multiverse.stms.gamma.integration.blocking;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
-import org.multiverse.stms.gamma.transactionalobjects.GammaIntRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 
 import java.util.HashSet;
@@ -19,8 +16,6 @@ import java.util.LinkedList;
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.startAll;
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
@@ -29,44 +24,19 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  *
  * @author Peter Veentjer.
  */
-public class StackWithCapacityStressTest implements GammaConstants {
+public abstract class StackWithoutCapacity_AbstractTest implements GammaConstants {
 
-    private GammaStm stm;
-    private int itemCount = 2 * 1000 * 1000;
+    public GammaStm stm;
+    private int itemCount = 5 * 1000 * 1000;
     private Stack<Integer> stack;
-    private int maxCapacity = 1000;
-    private LockMode lockMode;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = (GammaStm) getGlobalStmInstance();
+        stm = new GammaStm();
     }
 
-    @Test
-    public void testWithNoLocks() {
-        test(LockMode.None);
-    }
-
-    @Test
-    public void testWithReadLock() {
-        test(LockMode.Read);
-    }
-
-    @Test
-    public void testWithWriteLock() {
-        test(LockMode.Write);
-    }
-
-    @Test
-    public void testWithExclusiveLock() {
-        test(LockMode.Exclusive);
-    }
-
-
-    public void test(LockMode lockMode) {
-        this.lockMode = lockMode;
-
+    public void run() {
         stack = new Stack<Integer>();
 
         ProduceThread produceThread = new ProduceThread();
@@ -75,9 +45,10 @@ public class StackWithCapacityStressTest implements GammaConstants {
         startAll(produceThread, consumeThread);
         joinAll(produceThread, consumeThread);
 
-        System.out.println("finished executing");
+        System.out.println("finished executing, checking if content is correct (can take some time)");
 
         assertEquals(itemCount, produceThread.producedItems.size());
+
         assertEquals(
                 new HashSet<Integer>(produceThread.producedItems),
                 new HashSet<Integer>(consumeThread.consumedItems));
@@ -127,23 +98,14 @@ public class StackWithCapacityStressTest implements GammaConstants {
 
     class Stack<E> {
         private final GammaRef<Node<E>> head = new GammaRef<Node<E>>(stm);
-        private final GammaIntRef size = new GammaIntRef(stm);
-        private final AtomicBlock pushBlock = stm.newTransactionFactoryBuilder()
-                .setReadLockMode(lockMode)
-                .newAtomicBlock();
-        private final AtomicBlock popBlock = stm.newTransactionFactoryBuilder()
-                .setReadLockMode(lockMode)
-                .newAtomicBlock();
+        private final AtomicBlock pushBlock = newPushAtomicBLock();
+
+        private final AtomicBlock popBlock = newPopAtomicBLock();
 
         public void push(final E item) {
             pushBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    if (size.get() >= maxCapacity) {
-                        retry();
-                    }
-
-                    size.increment();
                     head.set(new Node<E>(item, head.get()));
                 }
             });
@@ -153,18 +115,17 @@ public class StackWithCapacityStressTest implements GammaConstants {
             return popBlock.execute(new AtomicClosure<E>() {
                 @Override
                 public E execute(Transaction tx) throws Exception {
-                    if (head.isNull()) {
-                        retry();
-                    }
-
-                    size.decrement();
-                    Node<E> node = head.get();
+                    Node<E> node = head.awaitNotNullAndGet();
                     head.set(node.next);
                     return node.item;
                 }
             });
         }
     }
+
+    protected abstract AtomicBlock newPopAtomicBLock();
+
+    protected abstract AtomicBlock newPushAtomicBLock();
 
     class Node<E> {
         final E item;
@@ -175,5 +136,4 @@ public class StackWithCapacityStressTest implements GammaConstants {
             this.next = next;
         }
     }
-
 }

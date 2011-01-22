@@ -334,13 +334,14 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                     return false;
                 }
 
-                if (version != expectedVersion) {
-                    unlockByUnregistered();
-                    return false;
-                }
+                tranlocal.setLockMode(desiredLockMode);
 
                 if (arriveStatus == ARRIVE_NORMAL) {
                     tranlocal.setDepartObligation(true);
+                }
+
+                if (version != expectedVersion) {
+                    return false;
                 }
             }
 
