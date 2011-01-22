@@ -39,8 +39,14 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         this.transactionType = transactionType;
     }
 
+    public final void abortIfAlive() {
+        if (isAlive()) {
+            abort();
+        }
+    }
+
     public final ReadWriteConflict abortOnReadWriteConflict() {
-        abort();
+        abortIfAlive();
         if (config.controlFlowErrorsReused) {
             return ReadWriteConflict.INSTANCE;
         } else {
@@ -50,7 +56,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public SpeculativeConfigurationError abortOpenForReadOnNonRefType(AbstractGammaRef ref) {
         config.setSpeculativeConfigurationToUseNonRefType();
-        abort();
+        abortIfAlive();
         if (config.controlFlowErrorsReused) {
             return SpeculativeConfigurationError.INSTANCE;
         } else {
@@ -64,7 +70,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public SpeculativeConfigurationError abortOpenForWriteOnNonRefType(AbstractGammaRef ref) {
         config.setSpeculativeConfigurationToUseNonRefType();
-        abort();
+        abortIfAlive();
         if (config.controlFlowErrorsReused) {
             return SpeculativeConfigurationError.INSTANCE;
         } else {
@@ -78,7 +84,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public final IllegalArgumentException abortOpenForConstructionOnBadReference(
             final GammaObject ref) {
 
-        abort();
+        abortIfAlive();
         return new IllegalArgumentException(
                 format("[%s] Failed to execute Transaction.openForConstruction '%s', reason: the object is not new and has previous commits",
                         config.familyName, toDebugString(ref)));
@@ -86,21 +92,21 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
 
     public final ReadonlyException abortOpenForWriteOnReadonly(GammaObject object) {
-        abort();
+        abortIfAlive();
         return new ReadonlyException(
                 format("[%s] Failed to Transaction.openForWrite '%s', reason: the transaction is readonly",
                         config.familyName, toDebugString(object)));
     }
 
     public final IllegalTransactionStateException abortRetryOnNoRetryPossible() {
-        abort();
+        abortIfAlive();
         throw new RetryNotPossibleException(
                 format("[%s] Failed to execute Transaction.retry, reason: there are no tracked reads",
                         config.familyName));
     }
 
     public final RetryNotAllowedException abortRetryOnNoBlockingAllowed() {
-        abort();
+        abortIfAlive();
         return new RetryNotAllowedException(
                 format("[%s] Failed to execute Transaction.retry, reason: the transaction doesn't allow blocking",
                         config.familyName));
@@ -148,7 +154,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public final NullPointerException abortLocateOnNullArgument() {
-        abort();
+        abortIfAlive();
         return new NullPointerException(
                 format("[%s] Failed to execute Transaction.locate, reason: the reference is null",
                         config.familyName));
@@ -176,7 +182,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public final StmMismatchException abortOpenForWriteOnBadStm(GammaObject gammaLongRef) {
-        abort();
+        abortIfAlive();
         //todo: message
         return new StmMismatchException("");
     }
@@ -203,7 +209,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public final StmMismatchException abortOpenForReadOnBadStm(GammaObject o) {
-        abort();
+        abortIfAlive();
         //todo: message
         return new StmMismatchException("");
     }
@@ -230,13 +236,13 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public final StmMismatchException abortOpenForConstructionOnBadStm(GammaObject o) {
-        abort();
+        abortIfAlive();
         //todo: message
         return new StmMismatchException("");
     }
 
     public ReadonlyException abortOpenForConstructionOnReadonly(GammaObject o) {
-        abort();
+        abortIfAlive();
         return new ReadonlyException(
                 format("[%s] Failed to execute Transaction.openForConstruction '%s', reason: the transaction is readonly",
                         config.familyName, toDebugString(o)));
@@ -264,20 +270,20 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public StmMismatchException abortCommuteOnBadStm(GammaObject gammaLongRef) {
-        abort();
+        abortIfAlive();
         //todo: message
         return new StmMismatchException("");
     }
 
     public ReadonlyException abortCommuteOnReadonly(final GammaObject object) {
-        abort();
+        abortIfAlive();
         return new ReadonlyException(
                 format("[%s] Failed to execute Transaction.commute '%s', reason: the transaction is readonly",
                         config.familyName, toDebugString(object)));
     }
 
     public NullPointerException abortCommuteOnNullFunction(final GammaObject object) {
-        abort();
+        abortIfAlive();
         return new NullPointerException(
                 format("[%s] Failed to execute Transaction.commute '%s', reason: the function is null",
                         config.familyName, toDebugString(object)));
@@ -326,7 +332,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public NullPointerException abortTryAcquireOnNullLockMode(GammaObject object) {
-        abort();
+        abortIfAlive();
         return new NullPointerException(
                 format("[%s] Failed to execute Lock.tryAcquire '%s', reason: the lockMode is null",
                         config.familyName, toDebugString(object)));
@@ -350,7 +356,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public final SpeculativeConfigurationError abortOnTooSmallSize(int minimalSize) {
         config.needsMinimalTransactionLength(minimalSize);
-        abort();
+        abortIfAlive();
         if (config.controlFlowErrorsReused) {
             return SpeculativeConfigurationError.INSTANCE;
         } else {
