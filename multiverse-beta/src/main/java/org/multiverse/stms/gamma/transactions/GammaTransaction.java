@@ -51,17 +51,26 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
-    public SpeculativeConfigurationError abortOpenForReadOnNonRefType(AbstractGammaRef ref) {
-        config.setSpeculativeConfigurationToUseNonRefType();
+    public SpeculativeConfigurationError abortCommuteOnCommuteRequired(AbstractGammaRef ref) {
+        config.setSpeculativeConfigurationToUseCommute();
         abortIfAlive();
         if (config.controlFlowErrorsReused) {
             return SpeculativeConfigurationError.INSTANCE;
-        } else {
-            return new SpeculativeConfigurationError(
-                    format("[%s] Failed to execute Transaction.openForRead '%s', reason: the transaction is lean, but the type is not an object ref",
-                            config.familyName, toDebugString(ref)));
-
         }
+        return new SpeculativeConfigurationError(
+                format("[%s] Failed to execute Ref.commute '%s', reason: the transaction is lean, but commute is required",
+                        config.familyName, toDebugString(ref)));
+    }
+
+    public SpeculativeConfigurationError abortOpenForConstructionRequired(AbstractGammaRef ref) {
+        config.setSpeculativeConfigurationToUseConstructedObjects();
+        abortIfAlive();
+        if (config.controlFlowErrorsReused) {
+            return SpeculativeConfigurationError.INSTANCE;
+        }
+        return new SpeculativeConfigurationError(
+                format("[%s] Failed to execute Ref.openForConstruction '%s', reason: the transaction is lean, but explicit attachments of constructed objects is required",
+                        config.familyName, toDebugString(ref)));
     }
 
     public SpeculativeConfigurationError abortOpenForReadOrWriteOnExplicitLocking(AbstractGammaRef ref) {
@@ -75,14 +84,14 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                         config.familyName, toDebugString(ref)));
     }
 
-    public SpeculativeConfigurationError abortOpenForWriteOnNonRefType(AbstractGammaRef ref) {
+    public SpeculativeConfigurationError abortOpenForReadOrWriteOnNonRefType(AbstractGammaRef ref) {
         config.setSpeculativeConfigurationToUseNonRefType();
         abortIfAlive();
         if (config.controlFlowErrorsReused) {
             return SpeculativeConfigurationError.INSTANCE;
         }
         return new SpeculativeConfigurationError(
-                format("[%s] Failed to execute Ref.openForWrite '%s', reason: the transaction is lean, but the type is not an object ref",
+                format("[%s] Failed to execute Ref.openForRead/openForWrite '%s', reason: the transaction is lean, but explicit locking is required",
                         config.familyName, toDebugString(ref)));
 
     }
@@ -530,4 +539,5 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                 throw new IllegalStateException();
         }
     }
+
 }

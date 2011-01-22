@@ -161,7 +161,7 @@ public class GammaTransactionPool implements GammaConstants {
                 poolLeanFixedLengthIndex++;
                 poolLeanFixedLength[poolLeanFixedLengthIndex] = (LeanFixedLengthGammaTransaction) tx;
                 break;
-            case TRANSACTIONTYPE_MAP:
+            case TRANSACTIONTYPE_FAT_VARIABLE_LENGTH:
                 if (poolMapIndex == poolMap.length - 1) {
                     return;
                 }

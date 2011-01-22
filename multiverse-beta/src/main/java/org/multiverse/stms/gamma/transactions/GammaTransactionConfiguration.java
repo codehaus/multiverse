@@ -248,7 +248,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
     }
 
-    public void setSpeculativeConfigurationTouseCommute() {
+    public void setSpeculativeConfigurationToUseCommute() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
             SpeculativeGammaConfiguration update = current.createWithCommuteRequired();
@@ -263,6 +263,17 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
             SpeculativeGammaConfiguration update = current.createWithLocksRequired();
             if (speculativeConfiguration.compareAndSet(current, update)) {
+                return;
+            }
+        }
+    }
+
+    public void setSpeculativeConfigurationToUseConstructedObjects() {
+        while (true) {
+            SpeculativeGammaConfiguration current = speculativeConfiguration.get();
+            SpeculativeGammaConfiguration next = current.createWithConstructedObjectsRequired();
+
+            if (speculativeConfiguration.compareAndSet(current, next)) {
                 return;
             }
         }

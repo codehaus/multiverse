@@ -357,47 +357,22 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
     }
 
-    public final boolean leanLoad(final GammaRefTranlocal tranlocal) {
-        while (true) {
-            //JMM: nothing can jump behind the following statement
-            Object readRef = ref_value;
-            final long readVersion = version;
-
-            int spinCount = 64;
-            for (; ;) {
-                if (!hasExclusiveLock()) {
-                    break;
-                }
-                spinCount--;
-
-                if (spinCount < 0) {
-                    return false;
-                }
-            }
-
-            if (readVersion == version && readRef == ref_value) {
-                //at this point we are sure that the read was unlocked.
-                tranlocal.version = readVersion;
-                tranlocal.ref_value = readRef;
-                tranlocal.owner = this;
-                tranlocal.setLockMode(LOCKMODE_NONE);
-                tranlocal.setDepartObligation(false);
-                return true;
-            }
-        }
-    }
-
     public final GammaRefTranlocal openForConstruction(GammaTransaction tx) {
         if (tx == null) {
             throw new NullPointerException();
         }
 
-        if (tx instanceof FatMonoGammaTransaction) {
+
+        final int type = tx.transactionType;
+
+        if (type == TRANSACTIONTYPE_FAT_MONO) {
             return openForConstruction((FatMonoGammaTransaction) tx);
-        } else if (tx instanceof FatFixedLengthGammaTransaction) {
+        } else if (type == TRANSACTIONTYPE_FAT_FIXED_LENGTH) {
             return openForConstruction((FatFixedLengthGammaTransaction) tx);
-        } else {
+        } else if (type == TRANSACTIONTYPE_FAT_VARIABLE_LENGTH) {
             return openForConstruction((FatVariableLengthGammaTransaction) tx);
+        } else {
+            throw tx.abortOpenForConstructionRequired(this);
         }
     }
 
@@ -812,7 +787,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (type != TYPE_REF) {
-            throw tx.abortOpenForWriteOnNonRefType(this);
+            throw tx.abortOpenForReadOrWriteOnNonRefType(this);
         }
 
         //load it
@@ -898,7 +873,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (type != TYPE_REF) {
-            throw tx.abortOpenForWriteOnNonRefType(this);
+            throw tx.abortOpenForReadOrWriteOnNonRefType(this);
         }
 
         tranlocal.mode = TRANLOCAL_READ;
@@ -1217,12 +1192,16 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw new NullPointerException("tx can't be null");
         }
 
-        if (tx instanceof FatMonoGammaTransaction) {
+        final int type = tx.transactionType;
+
+        if (type == TRANSACTIONTYPE_FAT_MONO) {
             openForCommute((FatMonoGammaTransaction) tx, function);
-        } else if (tx instanceof FatFixedLengthGammaTransaction) {
+        } else if (type == TRANSACTIONTYPE_FAT_FIXED_LENGTH) {
             openForCommute((FatFixedLengthGammaTransaction) tx, function);
-        } else {
+        } else if (type == TRANSACTIONTYPE_FAT_VARIABLE_LENGTH) {
             openForCommute((FatVariableLengthGammaTransaction) tx, function);
+        } else {
+            throw tx.abortCommuteOnCommuteRequired(this);
         }
     }
 

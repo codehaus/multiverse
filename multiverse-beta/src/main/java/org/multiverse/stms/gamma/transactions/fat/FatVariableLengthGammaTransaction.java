@@ -21,7 +21,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
     }
 
     public FatVariableLengthGammaTransaction(GammaTransactionConfiguration config) {
-        super(config, TRANSACTIONTYPE_MAP);
+        super(config, TRANSACTIONTYPE_FAT_VARIABLE_LENGTH);
         this.array = new GammaRefTranlocal[config.minimalArrayTreeSize];
     }
 
