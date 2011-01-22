@@ -43,7 +43,11 @@ public abstract class StackWithoutCapacity_AbstractTest implements GammaConstant
         ConsumeThread consumeThread = new ConsumeThread();
 
         startAll(produceThread, consumeThread);
-        joinAll(produceThread, consumeThread);
+        try {
+            joinAll(produceThread, consumeThread);
+        } finally {
+            System.out.println(stack.head.toDebugString());
+        }
 
         System.out.println("finished executing, checking if content is correct (can take some time)");
 

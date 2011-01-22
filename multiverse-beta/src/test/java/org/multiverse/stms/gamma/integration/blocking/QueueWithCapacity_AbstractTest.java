@@ -1,10 +1,8 @@
 package org.multiverse.stms.gamma.integration.blocking;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
@@ -23,13 +21,12 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class QueueWithCapacityStressTest implements GammaConstants {
+public abstract class QueueWithCapacity_AbstractTest implements GammaConstants {
 
-    private GammaStm stm;
+    protected GammaStm stm;
     private Queue<Integer> queue;
     private int itemCount = 2 * 1000 * 1000;
     private int maxCapacity = 1000;
-    private LockMode lockMode;
 
     @Before
     public void setUp() {
@@ -37,30 +34,12 @@ public class QueueWithCapacityStressTest implements GammaConstants {
         stm = (GammaStm) getGlobalStmInstance();
     }
 
-    @Test
-    public void testLockModeNone() {
-        test(LockMode.None);
-    }
+    protected abstract AtomicBlock newPopBlock();
 
-    @Test
-    public void testLockModeRead() {
-        test(LockMode.Read);
-    }
-
-    @Test
-    public void testLockModeWrite() {
-        test(LockMode.Write);
-    }
-
-    @Test
-    public void testLockModeCommit() {
-        test(LockMode.Exclusive);
-    }
+    protected abstract AtomicBlock newPushBlock();
 
 
-    public void test(LockMode lockMode) {
-        this.lockMode = lockMode;
-
+    public void run() {
         queue = new Queue<Integer>();
         ProduceThread produceThread = new ProduceThread();
         ConsumeThread consumeThread = new ConsumeThread();
@@ -117,12 +96,9 @@ public class QueueWithCapacityStressTest implements GammaConstants {
     class Queue<E> {
         final Stack<E> pushedStack = new Stack<E>();
         final Stack<E> readyToPopStack = new Stack<E>();
-        final AtomicBlock pushBlock = stm.newTransactionFactoryBuilder()
-                .setReadLockMode(lockMode)
-                .newAtomicBlock();
-        final AtomicBlock popBlock = stm.newTransactionFactoryBuilder()
-                .setReadLockMode(lockMode)
-                .newAtomicBlock();
+        final AtomicBlock pushBlock = newPushBlock();
+        final AtomicBlock popBlock = newPopBlock();
+
         final GammaIntRef size = new GammaIntRef(stm);
 
         public void push(final E item) {

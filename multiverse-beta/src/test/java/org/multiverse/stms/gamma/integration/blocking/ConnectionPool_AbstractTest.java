@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicIntClosure;
@@ -27,14 +26,13 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  *
  * @author Peter Veentjer.
  */
-public class ConnectionPoolStressTest implements GammaConstants {
+public abstract class ConnectionPool_AbstractTest implements GammaConstants {
     private int poolsize = processorCount();
     private int threadCount = processorCount() * 2;
     private volatile boolean stop;
 
     private ConnectionPool pool;
-    private GammaStm stm;
-    private LockMode lockMode;
+    protected GammaStm stm;
 
     @Before
     public void setUp() {
@@ -43,29 +41,12 @@ public class ConnectionPoolStressTest implements GammaConstants {
         stop = false;
     }
 
-    @Test
-    public void testNoLocking() {
-        test(LockMode.None);
-    }
+    protected abstract AtomicBlock newReturnBlock();
 
-    @Test
-    public void testReadLockMode() {
-        test(LockMode.Read);
-    }
-
-    @Test
-    public void testWriteLockMode() {
-        test(LockMode.Write);
-    }
-
-    @Test
-    public void testExclusiveLockMode() {
-        test(LockMode.Exclusive);
-    }
+    protected abstract AtomicBlock newTakeBlock();
 
     @Test
     public void sanityTest() {
-        lockMode = LockMode.None;
         ConnectionPool pool = new ConnectionPool(2);
 
         Connection c1 = pool.takeConnection();
@@ -81,9 +62,7 @@ public class ConnectionPoolStressTest implements GammaConstants {
         assertEquals(2, pool.size());
     }
 
-    public void test(LockMode lockMode) {
-        this.lockMode = lockMode;
-
+    public void run() {
         pool = new ConnectionPool(poolsize);
         WorkerThread[] threads = createThreads();
 
@@ -95,14 +74,9 @@ public class ConnectionPoolStressTest implements GammaConstants {
     }
 
     class ConnectionPool {
-        final AtomicBlock takeConnectionBlock = stm.newTransactionFactoryBuilder()
-                .setWriteLockMode(lockMode)
-                .setMaxRetries(10000)
-                .newAtomicBlock();
+        final AtomicBlock takeConnectionBlock = newTakeBlock();
 
-        final AtomicBlock returnConnectionBlock = stm.newTransactionFactoryBuilder()
-                .setWriteLockMode(lockMode)
-                .newAtomicBlock();
+        final AtomicBlock returnConnectionBlock = newReturnBlock();
 
         final AtomicBlock sizeBlock = stm.newTransactionFactoryBuilder().newAtomicBlock();
 
