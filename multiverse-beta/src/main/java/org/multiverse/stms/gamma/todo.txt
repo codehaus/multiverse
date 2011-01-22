@@ -42,6 +42,8 @@
 
 - once a commuting tranlocal is made read/write, should a conflict check be done?
 
+- look at the unlock after a write.
+
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------

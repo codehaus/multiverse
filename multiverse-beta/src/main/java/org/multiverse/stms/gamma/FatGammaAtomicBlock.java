@@ -232,7 +232,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         abort = false;
                         GammaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
-                        pool.putGammaTransaction(old);
+                        pool.put(old);
                         transactionContainer.transaction = tx;
                     } catch (ReadWriteConflict e) {
                         if (___TracingEnabled) {
@@ -250,7 +250,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     tx.abort();
                 }
 
-                pool.putGammaTransaction(tx);
+                pool.put(tx);
                 transactionContainer.transaction = null;
             }
         } catch (RuntimeException e) {
@@ -467,7 +467,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         abort = false;
                         GammaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
-                        pool.putGammaTransaction(old);
+                        pool.put(old);
                         transactionContainer.transaction = tx;
                     } catch (ReadWriteConflict e) {
                         if (___TracingEnabled) {
@@ -485,7 +485,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     tx.abort();
                 }
 
-                pool.putGammaTransaction(tx);
+                pool.put(tx);
                 transactionContainer.transaction = null;
             }
         } catch (RuntimeException e) {
@@ -702,7 +702,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         abort = false;
                         GammaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
-                        pool.putGammaTransaction(old);
+                        pool.put(old);
                         transactionContainer.transaction = tx;
                     } catch (ReadWriteConflict e) {
                         if (___TracingEnabled) {
@@ -720,7 +720,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     tx.abort();
                 }
 
-                pool.putGammaTransaction(tx);
+                pool.put(tx);
                 transactionContainer.transaction = null;
             }
         } catch (RuntimeException e) {
@@ -937,7 +937,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         abort = false;
                         GammaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
-                        pool.putGammaTransaction(old);
+                        pool.put(old);
                         transactionContainer.transaction = tx;
                     } catch (ReadWriteConflict e) {
                         if (___TracingEnabled) {
@@ -955,7 +955,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     tx.abort();
                 }
 
-                pool.putGammaTransaction(tx);
+                pool.put(tx);
                 transactionContainer.transaction = null;
             }
         } catch (RuntimeException e) {
@@ -1172,7 +1172,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         abort = false;
                         GammaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
-                        pool.putGammaTransaction(old);
+                        pool.put(old);
                         transactionContainer.transaction = tx;
                     } catch (ReadWriteConflict e) {
                         if (___TracingEnabled) {
@@ -1190,7 +1190,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     tx.abort();
                 }
 
-                pool.putGammaTransaction(tx);
+                pool.put(tx);
                 transactionContainer.transaction = null;
             }
         } catch (RuntimeException e) {
@@ -1414,7 +1414,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         abort = false;
                         GammaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
-                        pool.putGammaTransaction(old);
+                        pool.put(old);
                         transactionContainer.transaction = tx;
                     } catch (ReadWriteConflict e) {
                         if (___TracingEnabled) {
@@ -1432,7 +1432,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     tx.abort();
                 }
 
-                pool.putGammaTransaction(tx);
+                pool.put(tx);
                 transactionContainer.transaction = null;
             }
         } catch (RuntimeException e) {

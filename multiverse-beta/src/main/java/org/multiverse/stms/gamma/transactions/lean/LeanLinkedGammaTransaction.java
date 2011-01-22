@@ -23,7 +23,7 @@ public final class LeanLinkedGammaTransaction extends GammaTransaction {
 
     @SuppressWarnings({"ObjectAllocationInLoop"})
     public LeanLinkedGammaTransaction(final GammaTransactionConfiguration config) {
-        super(config, POOL_TRANSACTIONTYPE_ARRAY);
+        super(config, POOL_TRANSACTIONTYPE_LEAN_ARRAY);
 
         listenersArray = new Listeners[config.arrayTransactionSize];
 

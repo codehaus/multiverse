@@ -37,7 +37,7 @@ public class MonoGammaTransactionFactory implements GammaTransactionFactory {
 
     @Override
     public FatMonoGammaTransaction newTransaction(GammaTransactionPool pool) {
-        FatMonoGammaTransaction tx = pool.takeMonoGammaTransaction();
+        FatMonoGammaTransaction tx = pool.takeFatMono();
         if (tx == null) {
             tx = new FatMonoGammaTransaction(config);
         } else {

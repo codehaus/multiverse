@@ -22,7 +22,7 @@ public final class FatLinkedGammaTransaction extends GammaTransaction {
     }
 
     public FatLinkedGammaTransaction(final GammaTransactionConfiguration config) {
-        super(config, POOL_TRANSACTIONTYPE_ARRAY);
+        super(config, POOL_TRANSACTIONTYPE_FAT_ARRAY);
 
         listenersArray = new Listeners[config.arrayTransactionSize];
 

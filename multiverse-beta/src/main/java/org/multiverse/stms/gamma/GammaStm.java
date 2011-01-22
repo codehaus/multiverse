@@ -343,7 +343,7 @@ public final class GammaStm implements Stm {
 
         @Override
         public GammaTransaction newTransaction(final GammaTransactionPool pool) {
-            FatMapGammaTransaction tx = pool.takeMapGammaTransaction();
+            FatMapGammaTransaction tx = pool.takeMap();
 
             if (tx == null) {
                 tx = new FatMapGammaTransaction(config);
@@ -391,7 +391,7 @@ public final class GammaStm implements Stm {
             final int length = speculativeConfiguration.minimalLength;
 
             if (length <= 1) {
-                FatMonoGammaTransaction tx = pool.takeMonoGammaTransaction();
+                FatMonoGammaTransaction tx = pool.takeFatMono();
                 if (tx == null) {
                     return new FatMonoGammaTransaction(config);
                 }
@@ -401,7 +401,7 @@ public final class GammaStm implements Stm {
 
             } else if (length <= config.arrayTransactionSize) {
 
-                final FatLinkedGammaTransaction tx = pool.takeArrayGammaTransaction();
+                final FatLinkedGammaTransaction tx = pool.takeFatArray();
                 if (tx == null) {
                     return new FatLinkedGammaTransaction(config);
                 }
@@ -410,7 +410,7 @@ public final class GammaStm implements Stm {
                 return tx;
 
             } else {
-                final FatMapGammaTransaction tx = pool.takeMapGammaTransaction();
+                final FatMapGammaTransaction tx = pool.takeMap();
                 if (tx == null) {
                     return new FatMapGammaTransaction(config);
                 }

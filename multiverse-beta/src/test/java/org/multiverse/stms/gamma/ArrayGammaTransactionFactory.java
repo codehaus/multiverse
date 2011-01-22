@@ -37,7 +37,7 @@ public class ArrayGammaTransactionFactory implements GammaTransactionFactory {
 
     @Override
     public FatLinkedGammaTransaction newTransaction(GammaTransactionPool pool) {
-        FatLinkedGammaTransaction tx = pool.takeArrayGammaTransaction();
+        FatLinkedGammaTransaction tx = pool.takeFatArray();
         if (tx == null) {
             tx = new FatLinkedGammaTransaction(config);
         } else {

@@ -36,7 +36,7 @@ public final class MapGammaTransactionFactory implements GammaTransactionFactory
 
     @Override
     public GammaTransaction newTransaction(GammaTransactionPool pool) {
-        GammaTransaction tx = pool.takeMapGammaTransaction();
+        GammaTransaction tx = pool.takeMap();
         if (tx == null) {
             tx = new FatMapGammaTransaction(config);
         } else {

@@ -19,7 +19,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
     }
 
     public FatMonoGammaTransaction(GammaTransactionConfiguration config) {
-        super(config, POOL_TRANSACTIONTYPE_MONO);
+        super(config, POOL_TRANSACTIONTYPE_FAT_MONO);
     }
 
     @Override
