@@ -19,7 +19,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
     }
 
     public LeanMonoGammaTransaction(GammaTransactionConfiguration config) {
-        super(config, POOL_TRANSACTIONTYPE_LEAN_MONO);
+        super(config, TRANSACTIONTYPE_LEAN_MONO);
     }
 
     @Override

@@ -39,7 +39,7 @@ public abstract class LeanGammaTransaction_abortTest<T extends GammaTransaction>
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaRefTranlocal tranlocal = ref.openForRead(tx);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
         tx.abort();
 
         assertIsAborted(tx);
@@ -61,7 +61,7 @@ public abstract class LeanGammaTransaction_abortTest<T extends GammaTransaction>
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaRefTranlocal tranlocal = ref.openForWrite(tx);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
         tx.abort();
 
         assertIsAborted(tx);

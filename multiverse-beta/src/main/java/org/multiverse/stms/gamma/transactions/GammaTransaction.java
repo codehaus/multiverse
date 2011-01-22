@@ -18,20 +18,15 @@ import static org.multiverse.stms.gamma.GammaStmUtils.toDebugString;
 
 public abstract class GammaTransaction implements GammaConstants, Transaction {
 
-    public final static int POOL_TRANSACTIONTYPE_LEAN_MONO = 1;
-    public final static int POOL_TRANSACTIONTYPE_LEAN_FIXED_LENGTH = 2;
-    public final static int POOL_TRANSACTIONTYPE_FAT_MONO = 3;
-    public final static int POOL_TRANSACTIONTYPE_FAT_FIXED_LENGTH = 4;
-    public final static int POOL_TRANSACTIONTYPE_MAP = 5;
-
     public final GammaObjectPool pool = new GammaObjectPool();
     public int status = TX_ACTIVE;
     public GammaTransactionConfiguration config;
     public int attempt;
     public long remainingTimeoutNs;
     public boolean hasWrites;
-    public boolean arriveEnabled;
     public final int transactionType;
+
+    public boolean arriveEnabled;
     public boolean abortOnly = false;
     public final RetryLatch listener = new DefaultRetryLatch();
 
@@ -69,18 +64,27 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
+    public SpeculativeConfigurationError abortOpenForReadOrWriteOnExplicitLocking(AbstractGammaRef ref) {
+        config.setSpeculativeConfigurationToUseNonRefType();
+        abortIfAlive();
+        if (config.controlFlowErrorsReused) {
+            return SpeculativeConfigurationError.INSTANCE;
+        }
+        return new SpeculativeConfigurationError(
+                format("[%s] Failed to execute Ref.openForRead/openForWrite '%s', reason: the transaction is lean, but explicit locking is required",
+                        config.familyName, toDebugString(ref)));
+    }
 
     public SpeculativeConfigurationError abortOpenForWriteOnNonRefType(AbstractGammaRef ref) {
         config.setSpeculativeConfigurationToUseNonRefType();
         abortIfAlive();
         if (config.controlFlowErrorsReused) {
             return SpeculativeConfigurationError.INSTANCE;
-        } else {
-            return new SpeculativeConfigurationError(
-                    format("[%s] Failed to execute Transaction.openForWrite '%s', reason: the transaction is lean, but the type is not an object ref",
-                            config.familyName, toDebugString(ref)));
-
         }
+        return new SpeculativeConfigurationError(
+                format("[%s] Failed to execute Ref.openForWrite '%s', reason: the transaction is lean, but the type is not an object ref",
+                        config.familyName, toDebugString(ref)));
+
     }
 
     public final IllegalArgumentException abortOpenForConstructionOnBadReference(

@@ -9,7 +9,7 @@ import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
 import org.multiverse.stms.gamma.transactions.GammaTransactionFactoryBuilder;
-import org.multiverse.stms.gamma.transactions.fat.FatMapGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransaction;
 
 import java.util.List;
 
@@ -153,7 +153,7 @@ public class GammaStm_transactionFactoryBuilderTest {
                 .newTransactionFactory();
 
         GammaTransaction tx = txFactory.newTransaction();
-        assertTrue(tx instanceof FatMapGammaTransaction);
+        assertTrue(tx instanceof FatVariableLengthGammaTransaction);
     }
 
     @Test

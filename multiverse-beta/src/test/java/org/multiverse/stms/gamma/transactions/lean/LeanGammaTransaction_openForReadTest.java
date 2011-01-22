@@ -35,7 +35,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
 
         T tx = newTransaction();
         try {
-            ref.openForRead(tx);
+            ref.openForRead(tx, LOCKMODE_NONE);
             fail();
         } catch (SpeculativeConfigurationError expected) {
         }
@@ -54,7 +54,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
 
         T tx = newTransaction();
         try {
-            ref.openForRead(tx);
+            ref.openForRead(tx, LOCKMODE_NONE);
             fail();
         } catch (SpeculativeConfigurationError expected) {
         }
@@ -73,7 +73,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
 
         T tx = newTransaction();
         try {
-            ref.openForRead(tx);
+            ref.openForRead(tx, LOCKMODE_NONE);
             fail();
         } catch (SpeculativeConfigurationError expected) {
         }
@@ -92,7 +92,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
 
         T tx = newTransaction();
         try {
-            ref.openForRead(tx);
+            ref.openForRead(tx, LOCKMODE_NONE);
             fail();
         } catch (SpeculativeConfigurationError expected) {
         }
@@ -115,7 +115,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
 
         T tx = newTransaction();
         try {
-            ref.openForRead(tx);
+            ref.openForRead(tx, LOCKMODE_NONE);
             fail();
         } catch (ReadWriteConflict expected) {
 
@@ -144,7 +144,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
         ref.getLock().acquire(otherTx, lockMode);
 
         T tx = newTransaction();
-        GammaRefTranlocal tranlocal = ref.openForRead(tx);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
 
         assertIsActive(tx);
         assertNotNull(tranlocal);
@@ -170,7 +170,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = newTransaction();
-        GammaRefTranlocal tranlocal = ref.openForRead(tx);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
 
         assertNotNull(tranlocal);
         assertSame(ref, tranlocal.owner);
@@ -191,8 +191,8 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = newTransaction();
-        GammaRefTranlocal first = ref.openForRead(tx);
-        GammaRefTranlocal tranlocal = ref.openForRead(tx);
+        GammaRefTranlocal first = ref.openForRead(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
 
         assertSame(first, tranlocal);
         assertNotNull(tranlocal);
@@ -214,8 +214,8 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = newTransaction();
-        GammaRefTranlocal first = ref.openForWrite(tx);
-        GammaRefTranlocal tranlocal = ref.openForRead(tx);
+        GammaRefTranlocal first = ref.openForWrite(tx, LOCKMODE_NONE);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
 
         assertSame(first, tranlocal);
         assertNotNull(tranlocal);
@@ -240,7 +240,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
         tx.prepare();
 
         try {
-            ref.openForRead(tx);
+            ref.openForRead(tx, LOCKMODE_NONE);
             fail();
         } catch (PreparedTransactionException expected) {
         }
@@ -261,7 +261,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
         tx.commit();
 
         try {
-            ref.openForRead(tx);
+            ref.openForRead(tx, LOCKMODE_NONE);
             fail();
         } catch (DeadTransactionException expected) {
         }
@@ -281,7 +281,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
         tx.abort();
 
         try {
-            ref.openForRead(tx);
+            ref.openForRead(tx, LOCKMODE_NONE);
             fail();
         } catch (DeadTransactionException expected) {
         }

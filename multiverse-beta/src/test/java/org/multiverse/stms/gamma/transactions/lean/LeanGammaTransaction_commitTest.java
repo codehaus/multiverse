@@ -47,7 +47,7 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaRefTranlocal tranlocal = ref.openForWrite(tx);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
         tranlocal.ref_value = initialValue;
         tx.commit();
 
@@ -72,7 +72,7 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaRefTranlocal tranlocal = ref.openForWrite(tx);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
         tranlocal.ref_value = newValue;
         tx.commit();
 
@@ -102,7 +102,7 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaRefTranlocal tranlocal = ref.openForWrite(tx);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
 
         GammaTransaction otherTx = stm.startDefaultTransaction();
         ref.getLock().acquire(otherTx, lockMode);
@@ -131,7 +131,7 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        GammaRefTranlocal tranlocal = ref.openForRead(tx);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
         tx.commit();
 
         assertIsCommitted(tx);

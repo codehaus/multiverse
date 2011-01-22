@@ -33,4 +33,10 @@ public interface GammaConstants extends MultiverseConstants {
     int TYPE_DOUBLE = 3;
     int TYPE_BOOLEAN = 4;
     int TYPE_REF = 5;
+
+    int TRANSACTIONTYPE_LEAN_MONO = 1;
+    int TRANSACTIONTYPE_LEAN_FIXED_LENGTH = 2;
+    int TRANSACTIONTYPE_FAT_MONO = 3;
+    int TRANSACTIONTYPE_FAT_FIXED_LENGTH = 4;
+    int TRANSACTIONTYPE_MAP = 5;
 }

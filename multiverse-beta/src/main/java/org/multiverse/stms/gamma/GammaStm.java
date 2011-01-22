@@ -7,8 +7,8 @@ import org.multiverse.collections.NaiveTransactionalCollectionFactory;
 import org.multiverse.stms.gamma.transactionalobjects.*;
 import org.multiverse.stms.gamma.transactions.*;
 import org.multiverse.stms.gamma.transactions.fat.FatFixedLengthGammaTransaction;
-import org.multiverse.stms.gamma.transactions.fat.FatMapGammaTransaction;
 import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransaction;
 
 import static org.multiverse.stms.gamma.ThreadLocalGammaTransactionPool.getThreadLocalGammaTransactionPool;
 
@@ -51,7 +51,7 @@ public final class GammaStm implements Stm {
 
     @Override
     public GammaTransaction startDefaultTransaction() {
-        return new FatMapGammaTransaction(this);
+        return new FatVariableLengthGammaTransaction(this);
     }
 
     @Override
@@ -343,10 +343,10 @@ public final class GammaStm implements Stm {
 
         @Override
         public GammaTransaction newTransaction(final GammaTransactionPool pool) {
-            FatMapGammaTransaction tx = pool.takeMap();
+            FatVariableLengthGammaTransaction tx = pool.takeMap();
 
             if (tx == null) {
-                tx = new FatMapGammaTransaction(config);
+                tx = new FatVariableLengthGammaTransaction(config);
             } else {
                 tx.init(config);
             }
@@ -410,9 +410,9 @@ public final class GammaStm implements Stm {
                 return tx;
 
             } else {
-                final FatMapGammaTransaction tx = pool.takeMap();
+                final FatVariableLengthGammaTransaction tx = pool.takeMap();
                 if (tx == null) {
-                    return new FatMapGammaTransaction(config);
+                    return new FatVariableLengthGammaTransaction(config);
                 }
 
                 tx.init(config);

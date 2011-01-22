@@ -3,11 +3,12 @@ package org.multiverse.stms.gamma.benchmarks;
 import org.benchy.BenchyUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 import org.multiverse.stms.gamma.transactions.lean.LeanFixedLengthGammaTransaction;
 
-public class LeanLinkedGammaBenchmark {
+public class LeanFixedLengthGammaBenchmark implements GammaConstants {
 
     private GammaStm stm;
 
@@ -25,7 +26,7 @@ public class LeanLinkedGammaBenchmark {
         long startMs = System.currentTimeMillis();
 
         for (long k = 0; k < txCount; k++) {
-            ref1.openForRead(tx);
+            ref1.openForRead(tx, LOCKMODE_NONE);
             tx.commit();
             tx.hardReset();
         }
@@ -50,8 +51,8 @@ public class LeanLinkedGammaBenchmark {
         long startMs = System.currentTimeMillis();
 
         for (long k = 0; k < txCount; k++) {
-            ref1.openForRead(tx);
-            ref2.openForRead(tx);
+            ref1.openForRead(tx, LOCKMODE_NONE);
+            ref2.openForRead(tx, LOCKMODE_NONE);
             tx.commit();
             tx.hardReset();
         }
@@ -77,9 +78,9 @@ public class LeanLinkedGammaBenchmark {
         long startMs = System.currentTimeMillis();
 
         for (long k = 0; k < txCount; k++) {
-            ref1.openForRead(tx);
-            ref2.openForRead(tx);
-            ref3.openForRead(tx);
+            ref1.openForRead(tx, LOCKMODE_NONE);
+            ref2.openForRead(tx, LOCKMODE_NONE);
+            ref3.openForRead(tx, LOCKMODE_NONE);
             tx.commit();
             tx.hardReset();
         }

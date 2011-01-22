@@ -1,12 +1,13 @@
 package org.multiverse.stms.gamma.transactions;
 
+import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.transactions.fat.FatFixedLengthGammaTransaction;
-import org.multiverse.stms.gamma.transactions.fat.FatMapGammaTransaction;
 import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransaction;
 import org.multiverse.stms.gamma.transactions.lean.LeanFixedLengthGammaTransaction;
 import org.multiverse.stms.gamma.transactions.lean.LeanMonoGammaTransaction;
 
-public class GammaTransactionPool {
+public class GammaTransactionPool implements GammaConstants {
 
     private final static boolean ENABLED = Boolean.parseBoolean(
             System.getProperty("org.multiverse.stm,beta.transactions.BetaTransactionPool.enabled", "true"));
@@ -22,7 +23,7 @@ public class GammaTransactionPool {
     private final LeanFixedLengthGammaTransaction[] poolLeanFixedLength = new LeanFixedLengthGammaTransaction[10];
     private int poolLeanFixedLengthIndex = -1;
 
-    private final FatMapGammaTransaction[] poolMap = new FatMapGammaTransaction[10];
+    private final FatVariableLengthGammaTransaction[] poolMap = new FatVariableLengthGammaTransaction[10];
     private int poolMapIndex = -1;
 
     public GammaTransactionPool() {
@@ -101,12 +102,12 @@ public class GammaTransactionPool {
      *
      * @return the taken FatArrayTreeGammaTransaction or null of none available.
      */
-    public FatMapGammaTransaction takeMap() {
+    public FatVariableLengthGammaTransaction takeMap() {
         if (!enabled || poolMapIndex == -1) {
             return null;
         }
 
-        FatMapGammaTransaction tx = poolMap[poolMapIndex];
+        FatVariableLengthGammaTransaction tx = poolMap[poolMapIndex];
         poolMap[poolMapIndex] = null;
         poolMapIndex--;
         return tx;
@@ -128,7 +129,7 @@ public class GammaTransactionPool {
         }
 
         switch (tx.transactionType) {
-            case GammaTransaction.POOL_TRANSACTIONTYPE_FAT_MONO:
+            case TRANSACTIONTYPE_FAT_MONO:
                 if (poolFatMonoIndex == poolFatMono.length - 1) {
                     return;
                 }
@@ -136,7 +137,7 @@ public class GammaTransactionPool {
                 poolFatMonoIndex++;
                 poolFatMono[poolFatMonoIndex] = (FatMonoGammaTransaction) tx;
                 break;
-            case GammaTransaction.POOL_TRANSACTIONTYPE_FAT_FIXED_LENGTH:
+            case TRANSACTIONTYPE_FAT_FIXED_LENGTH:
                 if (poolFatFixedLengthIndex == poolFatFixedLength.length - 1) {
                     return;
                 }
@@ -144,7 +145,7 @@ public class GammaTransactionPool {
                 poolFatFixedLengthIndex++;
                 poolFatFixedLength[poolFatFixedLengthIndex] = (FatFixedLengthGammaTransaction) tx;
                 break;
-            case GammaTransaction.POOL_TRANSACTIONTYPE_LEAN_MONO:
+            case TRANSACTIONTYPE_LEAN_MONO:
                 if (poolLeanMonoIndex == poolLeanMono.length - 1) {
                     return;
                 }
@@ -152,7 +153,7 @@ public class GammaTransactionPool {
                 poolLeanMonoIndex++;
                 poolLeanMono[poolLeanMonoIndex] = (LeanMonoGammaTransaction) tx;
                 break;
-            case GammaTransaction.POOL_TRANSACTIONTYPE_LEAN_FIXED_LENGTH:
+            case TRANSACTIONTYPE_LEAN_FIXED_LENGTH:
                 if (poolLeanFixedLengthIndex == poolLeanFixedLength.length - 1) {
                     return;
                 }
@@ -160,13 +161,13 @@ public class GammaTransactionPool {
                 poolLeanFixedLengthIndex++;
                 poolLeanFixedLength[poolLeanFixedLengthIndex] = (LeanFixedLengthGammaTransaction) tx;
                 break;
-            case GammaTransaction.POOL_TRANSACTIONTYPE_MAP:
+            case TRANSACTIONTYPE_MAP:
                 if (poolMapIndex == poolMap.length - 1) {
                     return;
                 }
 
                 poolMapIndex++;
-                poolMap[poolMapIndex] = (FatMapGammaTransaction) tx;
+                poolMap[poolMapIndex] = (FatVariableLengthGammaTransaction) tx;
                 break;
             default:
                 throw new IllegalArgumentException();

@@ -174,34 +174,6 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     }
 
 
-    @Override
-    public final void acquire(final LockMode desiredLockMode) {
-        final GammaTransaction tx = (GammaTransaction) getThreadLocalTransaction();
-
-        if (tx == null) {
-            throw new TransactionRequiredException();
-        }
-
-        acquire(tx, desiredLockMode);
-    }
-
-    @Override
-    public final void acquire(final Transaction tx, final LockMode desiredLockMode) {
-        acquire((GammaTransaction) tx, desiredLockMode);
-    }
-
-    public final void acquire(final GammaTransaction tx, final LockMode lockMode) {
-        if (tx == null) {
-            throw new NullPointerException();
-        }
-
-        if (lockMode == null) {
-            throw tx.abortAcquireOnNullLockMode(this);
-        }
-
-        openForRead(tx, lockMode.asInt());
-    }
-
     @SuppressWarnings({"SimplifiableIfStatement"})
     @Override
     public final boolean hasReadConflict(final GammaRefTranlocal tranlocal) {

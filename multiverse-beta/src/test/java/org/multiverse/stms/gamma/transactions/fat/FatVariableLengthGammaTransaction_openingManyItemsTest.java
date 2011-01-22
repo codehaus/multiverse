@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.multiverse.TestUtils.assertIsActive;
 
-public class FatMapGammaTransaction_openingManyItemsTest implements GammaConstants {
+public class FatVariableLengthGammaTransaction_openingManyItemsTest implements GammaConstants {
     private GammaStm stm;
 
     @Before
@@ -31,7 +31,7 @@ public class FatMapGammaTransaction_openingManyItemsTest implements GammaConstan
     }
 
     public void whenManyItems(boolean reading) {
-        FatMapGammaTransaction tx = new FatMapGammaTransaction(stm);
+        FatVariableLengthGammaTransaction tx = new FatVariableLengthGammaTransaction(stm);
 
         int refCount = 10000;
         GammaLongRef[] refs = new GammaLongRef[refCount];

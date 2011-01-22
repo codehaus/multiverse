@@ -10,18 +10,18 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
-public final class FatMapGammaTransaction extends GammaTransaction {
+public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
     public GammaRefTranlocal[] array;
     public int size = 0;
     public boolean hasReads = false;
 
-    public FatMapGammaTransaction(GammaStm stm) {
+    public FatVariableLengthGammaTransaction(GammaStm stm) {
         this(new GammaTransactionConfiguration(stm));
     }
 
-    public FatMapGammaTransaction(GammaTransactionConfiguration config) {
-        super(config, POOL_TRANSACTIONTYPE_MAP);
+    public FatVariableLengthGammaTransaction(GammaTransactionConfiguration config) {
+        super(config, TRANSACTIONTYPE_MAP);
         this.array = new GammaRefTranlocal[config.minimalArrayTreeSize];
     }
 

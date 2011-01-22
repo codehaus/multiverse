@@ -3,11 +3,12 @@ package org.multiverse.stms.gamma.benchmarks;
 import org.benchy.BenchyUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 import org.multiverse.stms.gamma.transactions.lean.LeanMonoGammaTransaction;
 
-public class LeanMonoGammaBenchmark {
+public class LeanMonoGammaBenchmark implements GammaConstants {
 
     private GammaStm stm;
 
@@ -25,7 +26,7 @@ public class LeanMonoGammaBenchmark {
         final long startMs = System.currentTimeMillis();
 
         for (long k = 0; k < txCount; k++) {
-            ref1.openForRead(tx);
+            ref1.openForRead(tx, LOCKMODE_NONE);
             tx.commit();
             tx.hardReset();
         }
@@ -47,7 +48,7 @@ public class LeanMonoGammaBenchmark {
         final long startMs = System.currentTimeMillis();
 
         for (long k = 0; k < txCount; k++) {
-            ref1.openForWrite(tx).ref_value = "foo";
+            ref1.openForWrite(tx, LOCKMODE_NONE).ref_value = "foo";
             tx.commit();
             tx.hardReset();
         }
