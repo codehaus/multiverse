@@ -65,7 +65,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public SpeculativeConfigurationError abortOpenForReadOrWriteOnExplicitLocking(AbstractGammaRef ref) {
-        config.setSpeculativeConfigurationToUseNonRefType();
+        config.setSpeculativeConfigurationToUseExplicitLocking();
         abortIfAlive();
         if (config.controlFlowErrorsReused) {
             return SpeculativeConfigurationError.INSTANCE;

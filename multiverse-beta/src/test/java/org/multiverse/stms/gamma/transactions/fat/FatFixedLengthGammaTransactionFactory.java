@@ -1,21 +1,22 @@
-package org.multiverse.stms.gamma;
+package org.multiverse.stms.gamma.transactions.fat;
 
+import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
 import org.multiverse.stms.gamma.transactions.GammaTransactionPool;
-import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransaction;
 
 import static org.multiverse.stms.gamma.ThreadLocalGammaTransactionPool.getThreadLocalGammaTransactionPool;
 
-public final class MapGammaTransactionFactory implements GammaTransactionFactory {
+public class FatFixedLengthGammaTransactionFactory implements GammaTransactionFactory {
+
     private final GammaTransactionConfiguration config;
 
-    public MapGammaTransactionFactory(GammaStm stm) {
+    public FatFixedLengthGammaTransactionFactory(GammaStm stm) {
         this(new GammaTransactionConfiguration(stm));
     }
 
-    public MapGammaTransactionFactory(GammaTransactionConfiguration config) {
+    public FatFixedLengthGammaTransactionFactory(GammaTransactionConfiguration config) {
         this.config = config;
     }
 
@@ -30,15 +31,15 @@ public final class MapGammaTransactionFactory implements GammaTransactionFactory
     }
 
     @Override
-    public GammaTransaction newTransaction() {
+    public FatFixedLengthGammaTransaction newTransaction() {
         return newTransaction(getThreadLocalGammaTransactionPool());
     }
 
     @Override
-    public GammaTransaction newTransaction(GammaTransactionPool pool) {
-        GammaTransaction tx = pool.takeMap();
+    public FatFixedLengthGammaTransaction newTransaction(GammaTransactionPool pool) {
+        FatFixedLengthGammaTransaction tx = pool.takeFatFixedLength();
         if (tx == null) {
-            tx = new FatVariableLengthGammaTransaction(config);
+            tx = new FatFixedLengthGammaTransaction(config);
         } else {
             tx.init(config);
         }

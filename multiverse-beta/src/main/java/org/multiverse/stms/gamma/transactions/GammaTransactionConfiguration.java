@@ -258,6 +258,16 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
     }
 
+    public void setSpeculativeConfigurationToUseExplicitLocking() {
+        while (true) {
+            SpeculativeGammaConfiguration current = speculativeConfiguration.get();
+            SpeculativeGammaConfiguration update = current.createWithLocksRequired();
+            if (speculativeConfiguration.compareAndSet(current, update)) {
+                return;
+            }
+        }
+    }
+
     public void needsMinimalTransactionLength(int newLength) {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();

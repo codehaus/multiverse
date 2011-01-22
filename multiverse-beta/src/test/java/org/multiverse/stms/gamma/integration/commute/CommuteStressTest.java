@@ -9,10 +9,10 @@ import org.multiverse.api.closures.AtomicLongClosure;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.LeanGammaAtomicBlock;
-import org.multiverse.stms.gamma.MapGammaTransactionFactory;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
+import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransactionFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
@@ -81,7 +81,7 @@ public class CommuteStressTest {
         public void doRun() throws Exception {
             GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
                     .setMaxRetries(10000);
-            AtomicBlock block = new LeanGammaAtomicBlock(new MapGammaTransactionFactory(config));
+            AtomicBlock block = new LeanGammaAtomicBlock(new FatVariableLengthGammaTransactionFactory(config));
 
             AtomicLongClosure commutingClosure = new AtomicLongClosure() {
                 @Override

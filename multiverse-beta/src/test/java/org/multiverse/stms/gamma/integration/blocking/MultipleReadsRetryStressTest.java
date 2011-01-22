@@ -7,9 +7,13 @@ import org.multiverse.TestUtils;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.stms.gamma.*;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.LeanGammaAtomicBlock;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
+import org.multiverse.stms.gamma.transactions.fat.FatFixedLengthGammaTransactionFactory;
+import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransactionFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
@@ -33,7 +37,7 @@ public class MultipleReadsRetryStressTest implements GammaConstants {
 
     @Test
     public void withMapTransactionAnd2Threads() throws InterruptedException {
-        MapGammaTransactionFactory txFactory = new MapGammaTransactionFactory(stm);
+        FatVariableLengthGammaTransactionFactory txFactory = new FatVariableLengthGammaTransactionFactory(stm);
         test(new LeanGammaAtomicBlock(txFactory), 10, 2);
     }
 
@@ -41,13 +45,13 @@ public class MultipleReadsRetryStressTest implements GammaConstants {
     public void withArrayTransactionAnd2Threads() throws InterruptedException {
         int refCount = 10;
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, refCount + 1);
-        ArrayGammaTransactionFactory txFactory = new ArrayGammaTransactionFactory(config);
+        FatFixedLengthGammaTransactionFactory txFactory = new FatFixedLengthGammaTransactionFactory(config);
         test(new LeanGammaAtomicBlock(txFactory), refCount, 2);
     }
 
     @Test
     public void withMapTransactionAnd5Threads() throws InterruptedException {
-        MapGammaTransactionFactory txFactory = new MapGammaTransactionFactory(stm);
+        FatVariableLengthGammaTransactionFactory txFactory = new FatVariableLengthGammaTransactionFactory(stm);
         test(new LeanGammaAtomicBlock(txFactory), 10, 5);
     }
 
@@ -55,7 +59,7 @@ public class MultipleReadsRetryStressTest implements GammaConstants {
     public void withArrayTransactionAnd5Threads() throws InterruptedException {
         int refCount = 10;
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, refCount + 1);
-        ArrayGammaTransactionFactory txFactory = new ArrayGammaTransactionFactory(config);
+        FatFixedLengthGammaTransactionFactory txFactory = new FatFixedLengthGammaTransactionFactory(config);
         test(new LeanGammaAtomicBlock(txFactory), refCount, 5);
     }
 

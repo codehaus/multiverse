@@ -1,22 +1,22 @@
-package org.multiverse.stms.gamma;
+package org.multiverse.stms.gamma.transactions.fat;
 
+import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
 import org.multiverse.stms.gamma.transactions.GammaTransactionPool;
-import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
 
 import static org.multiverse.stms.gamma.ThreadLocalGammaTransactionPool.getThreadLocalGammaTransactionPool;
 
-public class MonoGammaTransactionFactory implements GammaTransactionFactory {
+public class FatMonoGammaTransactionFactory implements GammaTransactionFactory {
 
     private final GammaTransactionConfiguration config;
 
-    public MonoGammaTransactionFactory(GammaStm stm) {
+    public FatMonoGammaTransactionFactory(GammaStm stm) {
         this(new GammaTransactionConfiguration(stm).setControlFlowErrorsReused(false));
     }
 
-    public MonoGammaTransactionFactory(GammaTransactionConfiguration config) {
+    public FatMonoGammaTransactionFactory(GammaTransactionConfiguration config) {
         this.config = config.setControlFlowErrorsReused(false);
     }
 

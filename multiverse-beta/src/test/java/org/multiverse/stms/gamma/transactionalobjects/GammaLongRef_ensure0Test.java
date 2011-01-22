@@ -9,10 +9,14 @@ import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.stms.gamma.*;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
+import org.multiverse.stms.gamma.transactions.fat.FatFixedLengthGammaTransactionFactory;
 import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransactionFactory;
+import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransactionFactory;
 
 import java.util.Collection;
 
@@ -41,9 +45,9 @@ public class GammaLongRef_ensure0Test implements GammaConstants {
     @Parameterized.Parameters
     public static Collection<TransactionFactory[]> configs() {
         return asList(
-                new TransactionFactory[]{new MapGammaTransactionFactory(new GammaStm())},
-                new TransactionFactory[]{new ArrayGammaTransactionFactory(new GammaStm())},
-                new TransactionFactory[]{new MonoGammaTransactionFactory(new GammaStm())}
+                new TransactionFactory[]{new FatVariableLengthGammaTransactionFactory(new GammaStm())},
+                new TransactionFactory[]{new FatFixedLengthGammaTransactionFactory(new GammaStm())},
+                new TransactionFactory[]{new FatMonoGammaTransactionFactory(new GammaStm())}
         );
     }
 

@@ -28,6 +28,34 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
     }
 
     @Test
+    public void whenExplicitLocking_thenSpeculativeConfigurationFailure() {
+        whenExplicitLocking(LockMode.Read);
+        whenExplicitLocking(LockMode.Write);
+        whenExplicitLocking(LockMode.Exclusive);
+    }
+
+    public void whenExplicitLocking(LockMode lockMode) {
+        String initialValue = "foo";
+        GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        T tx = newTransaction();
+        try {
+            ref.openForRead(tx, lockMode.asInt());
+            fail();
+        } catch (SpeculativeConfigurationError expected) {
+        }
+
+        assertIsAborted(tx);
+        assertRefHasNoLocks(ref);
+        assertSurplus(ref, 0);
+        assertReadonlyCount(ref, 0);
+        assertUpdateBiased(ref);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertTrue(tx.config.speculativeConfiguration.get().areLocksRequired);
+    }
+
+    @Test
     public void whenIntRef_thenSpeculativeConfigurationError() {
         int initialValue = 10;
         GammaIntRef ref = new GammaIntRef(stm, initialValue);
