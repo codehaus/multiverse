@@ -334,10 +334,6 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
             return true;
         }
 
-        if (arriveEnabled) {
-
-        }
-
         //doing a full conflict scan
         for (int k = 0; k < array.length; k++) {
             final GammaRefTranlocal tranlocal = array[k];

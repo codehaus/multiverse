@@ -272,12 +272,18 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 //JMM: nothing can jump behind the following statement
                 long readLong = 0;
                 Object readRef = null;
+                long readVersion;
                 if (type == TYPE_REF) {
-                    readRef = ref_value;
+                    do {
+                        readRef = ref_value;
+                        readVersion = version;
+                    } while (readRef != ref_value);
                 } else {
-                    readLong = long_value;
+                    do {
+                        readLong = long_value;
+                        readVersion = version;
+                    } while (readLong != long_value);
                 }
-                final long readVersion = version;
 
                 //JMM: the read for the arrive can't jump over the read of the active.
 
@@ -292,36 +298,22 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                     return false;
                 }
 
-                //JMM safety:
-                //The volatile read of active can't be reordered so that it jump in front of the volatile read of
-                //the orec-value when the arrive method is called.
-                //An instruction is allowed to jump in front of the write of orec-value, but it is not allowed to
-                //jump in front of the read or orec-value (volatile read happens before rule).
-                //This means that it isn't possible that a locked value illegally is seen as unlocked.
+                //noinspection ObjectEquality
+                if (readVersion == version) {
+                    tranlocal.owner = this;
+                    tranlocal.version = readVersion;
+                    tranlocal.setLockMode(LOCKMODE_NONE);
+                    tranlocal.setDepartObligation(arriveStatus == ARRIVE_NORMAL);
 
-                if (type == TYPE_REF) {
-                    //noinspection ObjectEquality
-                    if (readVersion == version && readRef == ref_value) {
-                        //at this point we are sure that the read was unlocked.
-                        tranlocal.owner = this;
-                        tranlocal.version = readVersion;
+                    if (type == TYPE_REF) {
                         tranlocal.ref_value = readRef;
                         tranlocal.ref_oldValue = readRef;
-                        tranlocal.setLockMode(LOCKMODE_NONE);
-                        tranlocal.setDepartObligation(arriveStatus == ARRIVE_NORMAL);
-                        return true;
-                    }
-                } else {
-                    if (readVersion == version && readLong == long_value) {
-                        //at this point we are sure that the read was unlocked.
-                        tranlocal.owner = this;
-                        tranlocal.version = readVersion;
+                    } else {
                         tranlocal.long_value = readLong;
                         tranlocal.long_oldValue = readLong;
-                        tranlocal.setLockMode(LOCKMODE_NONE);
-                        tranlocal.setDepartObligation(arriveStatus == ARRIVE_NORMAL);
-                        return true;
                     }
+
+                    return true;
                 }
 
                 //we are not lucky, the value has changed. But before retrying, we need to depart if the arrive was normal
@@ -792,8 +784,12 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         newNode.owner = this;
         while (true) {
             //JMM: nothing can jump behind the following statement
-            Object readRef = ref_value;
-            final long readVersion = version;
+            long readVersion;
+            Object readRef;
+            do {
+                readRef = ref_value;
+                readVersion = version;
+            } while (readRef != ref_value);
 
             //wait for the exclusive lock to come available.
             int spinCount = 64;
@@ -876,8 +872,12 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tranlocal.owner = this;
         for (; ;) {
             //JMM: nothing can jump behind the following statement
-            final Object readRef = ref_value;
-            final long readVersion = version;
+            Object readRef;
+            long readVersion;
+            do {
+                readRef = ref_value;
+                readVersion = version;
+            } while (readRef != ref_value);
 
             //wait for the exclusive lock to come available.
             int spinCount = 64;

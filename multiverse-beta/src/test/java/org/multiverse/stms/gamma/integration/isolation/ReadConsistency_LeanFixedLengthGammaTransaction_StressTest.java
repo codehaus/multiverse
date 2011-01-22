@@ -6,6 +6,12 @@ import org.multiverse.stms.gamma.LeanGammaAtomicBlock;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 import org.multiverse.stms.gamma.transactions.lean.LeanFixedLengthGammaTransactionFactory;
 
+/**
+ * The refCount in some cases is set to an unrealistic high value because
+ * normally you want to have a 10/20 refs inside max since a full conflict
+ * scan needs to be done. But it is a nice way to check if it still is able
+ * to deal with read consistency.
+ */
 public class ReadConsistency_LeanFixedLengthGammaTransaction_StressTest extends ReadConsistency_AbstractTest {
 
     private int refCount;
