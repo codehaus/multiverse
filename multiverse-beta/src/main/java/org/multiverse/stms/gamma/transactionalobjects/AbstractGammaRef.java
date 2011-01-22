@@ -871,7 +871,8 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tranlocal.mode = TRANLOCAL_READ;
         tranlocal.owner = this;
         for (; ;) {
-            //JMM: nothing can jump behind the following statement
+            //do the read of the version and ref. It needs to be repeated to make sure that the version we read, belongs to the
+            //value.
             Object readRef;
             long readVersion;
             do {
@@ -891,8 +892,8 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 }
             }
 
-            //check if the version and value we read are still the same, if they are not, we have read illegal memory,
-            //so we are going to try again.
+            //check if the version is still the same, if it is not, we have read illegal memory,
+            //In that case we are going to try again.
             if (readVersion == version) {
                 //at this point we are sure that the read was unlocked.
                 tranlocal.version = readVersion;

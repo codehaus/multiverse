@@ -27,18 +27,20 @@ import static org.multiverse.stms.gamma.benchmarks.BenchmarkUtils.transactionsPe
  *
  * @author Peter Veentjer
  */
-public class IsolationStressTest implements GammaConstants {
+public abstract class Isolation_AbstractTest implements GammaConstants {
 
     public long transactionsPerThread = 100 * 1000 * 1000;
     public final int threadCount = 2;
 
-    private GammaStm stm;
+    protected GammaStm stm;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
         stm = (GammaStm) getGlobalStmInstance();
     }
+
+    protected abstract AtomicBlock newBlock(LockMode lockMode, boolean dirtyCheckEnabled);
 
     @Test
     public void withNoLockingDirtyCheck() {
@@ -79,7 +81,6 @@ public class IsolationStressTest implements GammaConstants {
     public void withExclusiveLockNoDirtyCheck() {
         test(LockMode.Exclusive, false);
     }
-
 
     @Test
     public void withMixedSettings() {
@@ -158,12 +159,7 @@ public class IsolationStressTest implements GammaConstants {
 
         @Override
         public void doRun() {
-            AtomicBlock block = stm.newTransactionFactoryBuilder()
-                    .setDirtyCheckEnabled(dirtyCheckEnabled)
-                    .setSpeculativeConfigurationEnabled(false)
-                    .setWriteLockMode(lockMode)
-                    .setMaxRetries(10000)
-                    .newAtomicBlock();
+            AtomicBlock block = newBlock(lockMode, dirtyCheckEnabled);
 
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override

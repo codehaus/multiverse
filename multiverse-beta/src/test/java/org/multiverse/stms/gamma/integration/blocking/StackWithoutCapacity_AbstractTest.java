@@ -60,6 +60,8 @@ public abstract class StackWithoutCapacity_AbstractTest implements GammaConstant
         assertEquals(
                 new HashSet<Integer>(produceThread.producedItems),
                 new HashSet<Integer>(consumeThread.consumedItems));
+
+        System.out.println("Finished comparing content");
     }
 
     class ConsumeThread extends TestThread {
