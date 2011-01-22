@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
-import org.multiverse.stms.gamma.transactions.lean.LeanLinkedGammaTransaction;
+import org.multiverse.stms.gamma.transactions.lean.LeanFixedLengthGammaTransaction;
 
 public class LeanLinkedGammaBenchmark {
 
@@ -20,7 +20,7 @@ public class LeanLinkedGammaBenchmark {
     public void testRead1() {
         final long txCount = 1000 * 1000 * 1000;
         GammaRef<String> ref1 = new GammaRef<String>(stm);
-        LeanLinkedGammaTransaction tx = new LeanLinkedGammaTransaction(stm);
+        LeanFixedLengthGammaTransaction tx = new LeanFixedLengthGammaTransaction(stm);
 
         long startMs = System.currentTimeMillis();
 
@@ -45,7 +45,7 @@ public class LeanLinkedGammaBenchmark {
         final long txCount = 1000 * 1000 * 1000;
         GammaRef<String> ref1 = new GammaRef<String>(stm);
         GammaRef<String> ref2 = new GammaRef<String>(stm);
-        LeanLinkedGammaTransaction tx = new LeanLinkedGammaTransaction(stm);
+        LeanFixedLengthGammaTransaction tx = new LeanFixedLengthGammaTransaction(stm);
 
         long startMs = System.currentTimeMillis();
 
@@ -72,7 +72,7 @@ public class LeanLinkedGammaBenchmark {
         GammaRef<String> ref1 = new GammaRef<String>(stm);
         GammaRef<String> ref2 = new GammaRef<String>(stm);
         GammaRef<String> ref3 = new GammaRef<String>(stm);
-        LeanLinkedGammaTransaction tx = new LeanLinkedGammaTransaction(stm);
+        LeanFixedLengthGammaTransaction tx = new LeanFixedLengthGammaTransaction(stm);
 
         long startMs = System.currentTimeMillis();
 

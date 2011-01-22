@@ -7,7 +7,7 @@ import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
-import org.multiverse.stms.gamma.transactions.fat.FatLinkedGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatFixedLengthGammaTransaction;
 import org.multiverse.stms.gamma.transactions.fat.FatMapGammaTransaction;
 import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
 
@@ -21,7 +21,7 @@ public interface GammaObject extends GammaConstants {
 
     GammaRefTranlocal openForWrite(FatMonoGammaTransaction tx, int lockMode);
 
-    GammaRefTranlocal openForWrite(FatLinkedGammaTransaction tx, int lockMode);
+    GammaRefTranlocal openForWrite(FatFixedLengthGammaTransaction tx, int lockMode);
 
     GammaRefTranlocal openForWrite(FatMapGammaTransaction tx, int lockMode);
 
@@ -29,7 +29,7 @@ public interface GammaObject extends GammaConstants {
 
     GammaRefTranlocal openForRead(FatMonoGammaTransaction tx, int lockMode);
 
-    GammaRefTranlocal openForRead(FatLinkedGammaTransaction tx, int lockMode);
+    GammaRefTranlocal openForRead(FatFixedLengthGammaTransaction tx, int lockMode);
 
     GammaRefTranlocal openForRead(FatMapGammaTransaction tx, int lockMode);
 
@@ -39,7 +39,7 @@ public interface GammaObject extends GammaConstants {
 
     GammaRefTranlocal openForConstruction(FatMapGammaTransaction tx);
 
-    GammaRefTranlocal openForConstruction(FatLinkedGammaTransaction tx);
+    GammaRefTranlocal openForConstruction(FatFixedLengthGammaTransaction tx);
 
     /**
      * Tries to acquire a lock on a previous read/written tranlocal and checks for conflict.

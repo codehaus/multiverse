@@ -257,7 +257,7 @@ public abstract class FatGammaTransaction_commuteTest<T extends GammaTransaction
         LongFunction function = mock(LongFunction.class);
 
         try {
-            ref.commute((FatLinkedGammaTransaction) null, function);
+            ref.commute((FatFixedLengthGammaTransaction) null, function);
             fail();
         } catch (NullPointerException expected) {
 

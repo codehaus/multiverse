@@ -4,7 +4,7 @@ import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
 import org.multiverse.stms.gamma.transactions.GammaTransactionPool;
-import org.multiverse.stms.gamma.transactions.fat.FatLinkedGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatFixedLengthGammaTransaction;
 
 import static org.multiverse.stms.gamma.ThreadLocalGammaTransactionPool.getThreadLocalGammaTransactionPool;
 
@@ -31,15 +31,15 @@ public class ArrayGammaTransactionFactory implements GammaTransactionFactory {
     }
 
     @Override
-    public FatLinkedGammaTransaction newTransaction() {
+    public FatFixedLengthGammaTransaction newTransaction() {
         return newTransaction(getThreadLocalGammaTransactionPool());
     }
 
     @Override
-    public FatLinkedGammaTransaction newTransaction(GammaTransactionPool pool) {
-        FatLinkedGammaTransaction tx = pool.takeFatArray();
+    public FatFixedLengthGammaTransaction newTransaction(GammaTransactionPool pool) {
+        FatFixedLengthGammaTransaction tx = pool.takeFatFixedLength();
         if (tx == null) {
-            tx = new FatLinkedGammaTransaction(config);
+            tx = new FatFixedLengthGammaTransaction(config);
         } else {
             tx.init(config);
         }

@@ -11,7 +11,7 @@ import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
-public class FatArrayGammaTransaction_stressTest implements GammaConstants {
+public class FatFixedLengthGammaTransaction_stressTest implements GammaConstants {
 
     private GammaStm stm;
 
@@ -56,15 +56,15 @@ public class FatArrayGammaTransaction_stressTest implements GammaConstants {
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, refs.length);
         config.dirtyCheck = dirtyCheck;
 
-        FatLinkedGammaTransaction tx = null;
+        FatFixedLengthGammaTransaction tx = null;
         for (int transaction = 0; transaction < transactionCount; transaction++) {
 
             if (transactionReuse) {
                 if (tx == null) {
-                    tx = new FatLinkedGammaTransaction(config);
+                    tx = new FatFixedLengthGammaTransaction(config);
                 }
             } else {
-                tx = new FatLinkedGammaTransaction(config);
+                tx = new FatFixedLengthGammaTransaction(config);
             }
 
             for (int k = 0; k < refs.length; k++) {

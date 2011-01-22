@@ -19,9 +19,9 @@ import static org.multiverse.stms.gamma.GammaStmUtils.toDebugString;
 public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public final static int POOL_TRANSACTIONTYPE_LEAN_MONO = 1;
-    public final static int POOL_TRANSACTIONTYPE_LEAN_ARRAY = 2;
+    public final static int POOL_TRANSACTIONTYPE_LEAN_FIXED_LENGTH = 2;
     public final static int POOL_TRANSACTIONTYPE_FAT_MONO = 3;
-    public final static int POOL_TRANSACTIONTYPE_FAT_ARRAY = 4;
+    public final static int POOL_TRANSACTIONTYPE_FAT_FIXED_LENGTH = 4;
     public final static int POOL_TRANSACTIONTYPE_MAP = 5;
 
     public final GammaObjectPool pool = new GammaObjectPool();

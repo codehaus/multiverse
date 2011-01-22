@@ -7,7 +7,7 @@ import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
-import org.multiverse.stms.gamma.transactions.fat.FatLinkedGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatFixedLengthGammaTransaction;
 
 import static org.benchy.BenchyUtils.format;
 import static org.multiverse.TestUtils.joinAll;
@@ -86,7 +86,7 @@ public class MultipleUpdateDriver extends BenchmarkDriver implements GammaConsta
 
             GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, refs.length);
 
-            FatLinkedGammaTransaction tx = new FatLinkedGammaTransaction(config);
+            FatFixedLengthGammaTransaction tx = new FatFixedLengthGammaTransaction(config);
 
             long startMs = System.currentTimeMillis();
 

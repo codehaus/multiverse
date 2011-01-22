@@ -6,7 +6,7 @@ import org.multiverse.api.lifecycle.TransactionLifecycleListener;
 import org.multiverse.collections.NaiveTransactionalCollectionFactory;
 import org.multiverse.stms.gamma.transactionalobjects.*;
 import org.multiverse.stms.gamma.transactions.*;
-import org.multiverse.stms.gamma.transactions.fat.FatLinkedGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatFixedLengthGammaTransaction;
 import org.multiverse.stms.gamma.transactions.fat.FatMapGammaTransaction;
 import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
 
@@ -401,9 +401,9 @@ public final class GammaStm implements Stm {
 
             } else if (length <= config.arrayTransactionSize) {
 
-                final FatLinkedGammaTransaction tx = pool.takeFatArray();
+                final FatFixedLengthGammaTransaction tx = pool.takeFatFixedLength();
                 if (tx == null) {
-                    return new FatLinkedGammaTransaction(config);
+                    return new FatFixedLengthGammaTransaction(config);
                 }
 
                 tx.init(config);

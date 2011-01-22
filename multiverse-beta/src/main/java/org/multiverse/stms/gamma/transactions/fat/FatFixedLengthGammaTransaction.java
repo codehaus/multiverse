@@ -1,4 +1,4 @@
-package org.multiverse.stms.gamma.transactions.lean;
+package org.multiverse.stms.gamma.transactions.fat;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.ExplicitAbortException;
@@ -10,20 +10,19 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
-public final class LeanLinkedGammaTransaction extends GammaTransaction {
+public final class FatFixedLengthGammaTransaction extends GammaTransaction {
 
     public GammaRefTranlocal head;
     public int size = 0;
     public boolean hasReads = false;
     public final Listeners[] listenersArray;
 
-    public LeanLinkedGammaTransaction(final GammaStm stm) {
+    public FatFixedLengthGammaTransaction(final GammaStm stm) {
         this(new GammaTransactionConfiguration(stm));
     }
 
-    @SuppressWarnings({"ObjectAllocationInLoop"})
-    public LeanLinkedGammaTransaction(final GammaTransactionConfiguration config) {
-        super(config, POOL_TRANSACTIONTYPE_LEAN_ARRAY);
+    public FatFixedLengthGammaTransaction(final GammaTransactionConfiguration config) {
+        super(config, POOL_TRANSACTIONTYPE_FAT_FIXED_LENGTH);
 
         listenersArray = new Listeners[config.arrayTransactionSize];
 
@@ -41,53 +40,96 @@ public final class LeanLinkedGammaTransaction extends GammaTransaction {
     }
 
     public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
-        throw new UnsupportedOperationException();
+        if (!hasReads) {
+            return true;
+        }
+
+        if (config.readLockModeAsInt > LOCKMODE_NONE) {
+            return true;
+        }
+
+        //if(config.isolationLevel)
+
+        if (arriveEnabled) {
+
+        }
+
+        GammaRefTranlocal node = head;
+        while (node != null) {
+            //if we are at the end, we are done.
+            if (node.owner == null) {
+                break;
+            }
+
+            //lets skip the one we just added
+            //noinspection ObjectEquality
+            if (node != justAdded) {
+                //if there is a read conflict, we are doe
+                if (node.owner.hasReadConflict(node)) {
+                    return false;
+                }
+            }
+
+            node = node.next;
+        }
+
+        return true;
     }
 
     @Override
     public final void commit() {
-        int s = status;
-
-        if (s == TX_COMMITTED) {
+        if (status == TX_COMMITTED) {
             return;
         }
 
-        if (s != TX_ACTIVE && s != TX_PREPARED) {
+        if (status != TX_ACTIVE && status != TX_PREPARED) {
             throw abortCommitOnBadStatus();
         }
 
-        if (hasWrites) {
-            if (s == TX_ACTIVE) {
-                if (!prepareChainForCommit()) {
-                    throw abortOnReadWriteConflict();
+        if (abortOnly) {
+            abort();
+            throw new ExplicitAbortException();
+        }
+
+        if (size > 0) {
+            if (hasWrites) {
+                if (status == TX_ACTIVE) {
+                    if (!prepareChainForCommit()) {
+                        throw abortOnReadWriteConflict();
+                    }
                 }
+
+                final Listeners[] listenersArray = commitChain();
+                if (listenersArray != null) {
+                    Listeners.openAll(listenersArray, pool);
+                }
+            } else {
+                releaseChain(true);
             }
-
-            int listenersIndex = 0;
-            GammaRefTranlocal node = head;
-            do {
-                final AbstractGammaRef owner = node.owner;
-
-                if (owner == null) {
-                    break;
-                }
-
-                final Listeners listeners = owner.leanSafe(node);
-                if (listeners != null) {
-                    listenersArray[listenersIndex] = listeners;
-                    listenersIndex++;
-                }
-                node = node.next;
-            } while (node != null);
-
-            if (listenersArray != null) {
-                Listeners.openAll(listenersArray, pool);
-            }
-        } else {
-            releaseReadonlyChain();
         }
 
         status = TX_COMMITTED;
+    }
+
+    private Listeners[] commitChain() {
+        int listenersIndex = 0;
+
+        GammaRefTranlocal node = head;
+        do {
+            final AbstractGammaRef owner = node.owner;
+            if (owner == null) {
+                return listenersArray;
+            }
+
+            final Listeners listeners = owner.safe(node, pool);
+            if (listeners != null) {
+                listenersArray[listenersIndex] = listeners;
+                listenersIndex++;
+            }
+            node = node.next;
+        } while (node != null);
+
+        return listenersArray;
     }
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
@@ -99,10 +141,6 @@ public final class LeanLinkedGammaTransaction extends GammaTransaction {
 
             if (owner == null) {
                 return true;
-            }
-
-            if (node.mode == TRANLOCAL_READ) {
-                continue;
             }
 
             if (!owner.prepare(this, node)) {
@@ -125,57 +163,33 @@ public final class LeanLinkedGammaTransaction extends GammaTransaction {
             throw new DeadTransactionException();
         }
 
-        releaseChainForAbort();
+        releaseChain(false);
         status = TX_ABORTED;
     }
 
-    private void releaseChainForAbort() {
+    private void releaseChain(final boolean success) {
         GammaRefTranlocal node = head;
-        do {
+        while (node != null) {
             final AbstractGammaRef owner = node.owner;
 
             if (owner == null) {
                 return;
             }
 
-            if (node.isWrite()) {
-                if (node.getLockMode() == LOCKMODE_EXCLUSIVE) {
-                    if (node.hasDepartObligation()) {
-                        node.setDepartObligation(false);
-                        owner.departAfterFailureAndUnlock();
-                    } else {
-                        owner.unlockByUnregistered();
-                    }
-                }
+            if (success) {
+                owner.releaseAfterReading(node, pool);
+            } else {
+                owner.releaseAfterFailure(node, pool);
             }
 
-            node.owner = null;
-            node.ref_oldValue = null;
-            node.ref_value = null;
             node = node.next;
-        } while (node != null);
-    }
-
-    private void releaseReadonlyChain() {
-        GammaRefTranlocal node = head;
-        do {
-            final AbstractGammaRef owner = node.owner;
-
-            if (owner == null) {
-                return;
-            }
-
-            node.owner = null;
-            node.ref_oldValue = null;
-            node.ref_value = null;
-            node = node.next;
-        } while (node != null);
+        }
     }
 
     @Override
     public final GammaRefTranlocal getRefTranlocal(final AbstractGammaRef ref) {
         GammaRefTranlocal node = head;
-        do {
+        while (node != null) {
             //noinspection ObjectEquality
             if (node.owner == ref) {
                 return node;
@@ -186,7 +200,7 @@ public final class LeanLinkedGammaTransaction extends GammaTransaction {
             }
 
             node = node.next;
-        } while (node != null);
+        }
         return null;
     }
 

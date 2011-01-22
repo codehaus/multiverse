@@ -8,7 +8,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
-import org.multiverse.stms.gamma.transactions.fat.FatLinkedGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatFixedLengthGammaTransaction;
 import org.multiverse.stms.gamma.transactions.fat.FatMapGammaTransaction;
 import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
 
@@ -65,7 +65,7 @@ public class GammaAtomicBlock_speculativeTest implements GammaConstants {
 
         assertEquals(3, transactions.size());
         assertInstanceof(FatMonoGammaTransaction.class, transactions.get(0));
-        assertInstanceof(FatLinkedGammaTransaction.class, transactions.get(1));
+        assertInstanceof(FatFixedLengthGammaTransaction.class, transactions.get(1));
         assertInstanceof(FatMapGammaTransaction.class, transactions.get(2));
     }
 

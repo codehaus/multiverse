@@ -1,10 +1,10 @@
 package org.multiverse.stms.gamma.transactions.lean;
 
-public class LeanLinkedGammaTransaction_commitTest extends LeanGammaTransaction_commitTest<LeanLinkedGammaTransaction> {
+public class LeanFixedLengthGammaTransaction_commitTest extends LeanGammaTransaction_commitTest<LeanFixedLengthGammaTransaction> {
 
     @Override
-    public LeanLinkedGammaTransaction newTransaction() {
-        return new LeanLinkedGammaTransaction(stm);
+    public LeanFixedLengthGammaTransaction newTransaction() {
+        return new LeanFixedLengthGammaTransaction(stm);
     }
 
     @Override
