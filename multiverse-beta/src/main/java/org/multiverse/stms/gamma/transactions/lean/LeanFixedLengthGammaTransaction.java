@@ -25,10 +25,10 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
     public LeanFixedLengthGammaTransaction(final GammaTransactionConfiguration config) {
         super(config, TRANSACTIONTYPE_LEAN_FIXED_LENGTH);
 
-        listenersArray = new Listeners[config.arrayTransactionSize];
+        listenersArray = new Listeners[config.maxFixedLengthTransactionSize];
 
         GammaRefTranlocal h = null;
-        for (int k = 0; k < config.arrayTransactionSize; k++) {
+        for (int k = 0; k < config.maxFixedLengthTransactionSize; k++) {
             GammaRefTranlocal newNode = new GammaRefTranlocal();
             if (h != null) {
                 h.previous = newNode;

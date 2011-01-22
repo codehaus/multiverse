@@ -6,4 +6,9 @@ public class LeanMonoGammaTransaction_openForWriteTest extends LeanGammaTransact
     public LeanMonoGammaTransaction newTransaction() {
         return new LeanMonoGammaTransaction(stm);
     }
+
+    @Override
+    public int getMaximumLength() {
+        return 1;
+    }
 }

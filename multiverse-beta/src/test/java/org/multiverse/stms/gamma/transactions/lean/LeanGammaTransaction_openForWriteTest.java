@@ -27,6 +27,8 @@ public abstract class LeanGammaTransaction_openForWriteTest<T extends GammaTrans
 
     public abstract T newTransaction();
 
+    public abstract int getMaximumLength();
+
     @Test
     public void whenExplicitLocking_thenSpeculativeConfigurationFailure() {
         whenExplicitLocking(LockMode.Read);

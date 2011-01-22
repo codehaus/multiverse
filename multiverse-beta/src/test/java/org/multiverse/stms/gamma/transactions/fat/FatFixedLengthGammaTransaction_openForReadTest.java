@@ -16,6 +16,6 @@ public class FatFixedLengthGammaTransaction_openForReadTest extends FatGammaTran
 
     @Override
     protected int getMaxCapacity() {
-        return new GammaTransactionConfiguration(stm).arrayTransactionSize;
+        return new GammaTransactionConfiguration(stm).maxFixedLengthTransactionSize;
     }
 }

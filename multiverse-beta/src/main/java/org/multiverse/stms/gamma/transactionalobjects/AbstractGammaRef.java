@@ -509,7 +509,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (newNode == null) {
-            throw tx.abortOnTooSmallSize(config.arrayTransactionSize + 1);
+            throw tx.abortOnTooSmallSize(config.maxFixedLengthTransactionSize + 1);
         }
 
         newNode.owner = this;
@@ -659,7 +659,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (newNode == null) {
-            throw tx.abortOnTooSmallSize(config.arrayTransactionSize + 1);
+            throw tx.abortOnTooSmallSize(config.maxFixedLengthTransactionSize + 1);
         }
 
         initTranlocalForRead(config, newNode);
@@ -783,7 +783,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         //we have not found it, but there also is no spot available.
         if (newNode == null) {
-            throw tx.abortOnTooSmallSize(tx.config.arrayTransactionSize + 1);
+            throw tx.abortOnTooSmallSize(tx.config.maxFixedLengthTransactionSize + 1);
         }
 
         if (type != TYPE_REF) {
@@ -1160,7 +1160,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (newNode == null) {
-            throw tx.abortOnTooSmallSize(config.arrayTransactionSize + 1);
+            throw tx.abortOnTooSmallSize(config.maxFixedLengthTransactionSize + 1);
         }
 
         initTranlocalForWrite(config, newNode);
@@ -1338,7 +1338,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (newNode == null) {
-            throw tx.abortOnTooSmallSize(config.arrayTransactionSize + 1);
+            throw tx.abortOnTooSmallSize(config.maxFixedLengthTransactionSize + 1);
         }
 
         tx.size++;

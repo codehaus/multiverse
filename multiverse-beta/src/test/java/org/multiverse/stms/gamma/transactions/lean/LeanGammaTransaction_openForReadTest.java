@@ -22,6 +22,8 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
 
     public abstract T newTransaction();
 
+    public abstract int getMaximumLength();
+
     @Before
     public void setUp() {
         stm = new GammaStm();

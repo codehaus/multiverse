@@ -69,7 +69,8 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
             return SpeculativeConfigurationError.INSTANCE;
         }
         return new SpeculativeConfigurationError(
-                format("[%s] Failed to execute Ref.openForConstruction '%s', reason: the transaction is lean, but explicit attachments of constructed objects is required",
+                format("[%s] Failed to execute Ref.openForConstruction '%s', reason: the transaction is lean, " +
+                        "but explicit attachments of constructed objects is required",
                         config.familyName, toDebugString(ref)));
     }
 
@@ -80,7 +81,8 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
             return SpeculativeConfigurationError.INSTANCE;
         }
         return new SpeculativeConfigurationError(
-                format("[%s] Failed to execute Ref.openForRead/openForWrite '%s', reason: the transaction is lean, but explicit locking is required",
+                format("[%s] Failed to execute Ref.openForRead/openForWrite '%s', reason: the transaction is lean, " +
+                        "but explicit locking is required",
                         config.familyName, toDebugString(ref)));
     }
 
@@ -91,7 +93,8 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
             return SpeculativeConfigurationError.INSTANCE;
         }
         return new SpeculativeConfigurationError(
-                format("[%s] Failed to execute Ref.openForRead/openForWrite '%s', reason: the transaction is lean, but explicit locking is required",
+                format("[%s] Failed to execute Ref.openForRead/openForWrite '%s', reason: the transaction is lean," +
+                        " but explicit locking is required",
                         config.familyName, toDebugString(ref)));
 
     }
@@ -101,7 +104,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
         abortIfAlive();
         return new IllegalArgumentException(
-                format("[%s] Failed to execute Transaction.openForConstruction '%s', reason: the object is not new and has previous commits",
+                format("[%s] Failed to execute Ref.openForConstruction '%s', reason: the object is not new and has previous commits",
                         config.familyName, toDebugString(ref)));
     }
 
@@ -109,21 +112,21 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public final ReadonlyException abortOpenForWriteOnReadonly(GammaObject object) {
         abortIfAlive();
         return new ReadonlyException(
-                format("[%s] Failed to Transaction.openForWrite '%s', reason: the transaction is readonly",
+                format("[%s] Failed to Ref.openForWrite '%s', reason: the transaction is readonly",
                         config.familyName, toDebugString(object)));
     }
 
     public final IllegalTransactionStateException abortRetryOnNoRetryPossible() {
         abortIfAlive();
         throw new RetryNotPossibleException(
-                format("[%s] Failed to execute Transaction.retry, reason: there are no tracked reads",
+                format("[%s] Failed to execute Ref.retry, reason: there are no tracked reads",
                         config.familyName));
     }
 
     public final RetryNotAllowedException abortRetryOnNoBlockingAllowed() {
         abortIfAlive();
         return new RetryNotAllowedException(
-                format("[%s] Failed to execute Transaction.retry, reason: the transaction doesn't allow blocking",
+                format("[%s] Failed to execute Ref.retry, reason: the transaction doesn't allow blocking",
                         config.familyName));
 
     }
@@ -181,25 +184,27 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
             case TX_PREPARED:
                 abort();
                 return new PreparedTransactionException(
-                        format("[%s] Failed to execute Transaction.openForWrite '%s', reason: the transaction is prepared",
+                        format("[%s] Failed to execute Ref.openForWrite '%s', reason: the transaction is prepared",
                                 config.familyName, toDebugString(o)));
             case TX_ABORTED:
                 return new DeadTransactionException(
-                        format("[%s] Failed to execute Transaction.openForWrite '%s', reason: the transaction is aborted",
+                        format("[%s] Failed to execute Ref.openForWrite '%s', reason: the transaction is aborted",
                                 config.familyName, toDebugString(o)));
             case TX_COMMITTED:
                 return new DeadTransactionException(
-                        format("[%s] Failed to execute Transaction.openForWrite '%s', reason: the transaction is committed",
+                        format("[%s] Failed to execute Ref.openForWrite '%s', reason: the transaction is committed",
                                 config.familyName, toDebugString(o)));
             default:
                 throw new IllegalStateException();
         }
     }
 
-    public final StmMismatchException abortOpenForWriteOnBadStm(GammaObject ref) {
+    public final StmMismatchException abortOpenForWriteOnBadStm(GammaObject o) {
         abortIfAlive();
-        //todo: message
-        return new StmMismatchException("");
+        return new StmMismatchException(
+                format("[%s] Failed to execute Ref.openForWrite '%s', reason: the stm the ref was created with is a different" +
+                        " stm than the stm of the transaction",
+                        config.familyName, toDebugString(o)));
     }
 
 
@@ -208,15 +213,15 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
             case TX_PREPARED:
                 abort();
                 return new PreparedTransactionException(
-                        format("[%s] Failed to execute Transaction.openForRead '%s', reason: the transaction is prepared",
+                        format("[%s] Failed to execute Ref.openForRead '%s', reason: the transaction is prepared",
                                 config.familyName, toDebugString(object)));
             case TX_ABORTED:
                 return new DeadTransactionException(
-                        format("[%s] Failed to execute Transaction.openForRead '%s', reason: the transaction is aborted",
+                        format("[%s] Failed to execute Ref.openForRead '%s', reason: the transaction is aborted",
                                 config.familyName, toDebugString(object)));
             case TX_COMMITTED:
                 return new DeadTransactionException(
-                        format("[%s] Failed to execute Transaction.openForRead '%s', reason: the transaction is committed",
+                        format("[%s] Failed to execute Ref.openForRead '%s', reason: the transaction is committed",
                                 config.familyName, toDebugString(object)));
             default:
                 throw new IllegalStateException();
@@ -225,8 +230,10 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public final StmMismatchException abortOpenForReadOnBadStm(GammaObject o) {
         abortIfAlive();
-        //todo: message
-        return new StmMismatchException("");
+        return new StmMismatchException(
+                format("[%s] Failed to execute Ref.openForRead '%s', reason: the stm the ref was created with is a different" +
+                        " stm than the stm of the transaction",
+                        config.familyName, toDebugString(o)));
     }
 
 
@@ -235,15 +242,15 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
             case TX_PREPARED:
                 abort();
                 return new PreparedTransactionException(
-                        format("[%s] Failed to execute Transaction.openForConstruction '%s', reason: the transaction is prepared",
+                        format("[%s] Failed to execute Ref.openForConstruction '%s', reason: the transaction is prepared",
                                 config.familyName, toDebugString(o)));
             case TX_ABORTED:
                 return new DeadTransactionException(
-                        format("[%s] Failed to execute Transaction.openForConstruction '%s', reason: the transaction is aborted",
+                        format("[%s] Failed to execute Ref.openForConstruction '%s', reason: the transaction is aborted",
                                 config.familyName, toDebugString(o)));
             case TX_COMMITTED:
                 return new DeadTransactionException(
-                        format("[%s] Failed to execute Transaction.openForConstruction '%s', reason: the transaction is committed",
+                        format("[%s] Failed to execute Ref.openForConstruction '%s', reason: the transaction is committed",
                                 config.familyName, toDebugString(o)));
             default:
                 throw new IllegalStateException();
@@ -252,14 +259,17 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public final StmMismatchException abortOpenForConstructionOnBadStm(GammaObject o) {
         abortIfAlive();
-        //todo: message
-        return new StmMismatchException("");
+        return new StmMismatchException(
+                format("[%s] Failed to execute Ref.openForConstruction '%s', reason: the stm the ref was created with is a different" +
+                        " stm than the stm of the transaction",
+                        config.familyName, toDebugString(o)));
+
     }
 
     public ReadonlyException abortOpenForConstructionOnReadonly(GammaObject o) {
         abortIfAlive();
         return new ReadonlyException(
-                format("[%s] Failed to execute Transaction.openForConstruction '%s', reason: the transaction is readonly",
+                format("[%s] Failed to execute Ref.openForConstruction '%s', reason: the transaction is readonly",
                         config.familyName, toDebugString(o)));
 
     }
@@ -269,38 +279,40 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
             case TX_PREPARED:
                 abort();
                 return new PreparedTransactionException(
-                        format("[%s] Failed to execute Transaction.commute '%s' with reference '%s', reason: the transaction is prepared",
+                        format("[%s] Failed to execute Ref.commute '%s' with reference '%s', reason: the transaction is prepared",
                                 config.familyName, toDebugString(object), function));
             case TX_ABORTED:
                 return new DeadTransactionException(
-                        format("[%s] Failed to execute Transaction.commute '%s' with reference '%s', reason: the transaction is aborted",
+                        format("[%s] Failed to execute Ref.commute '%s' with reference '%s', reason: the transaction is aborted",
                                 config.familyName, toDebugString(object), function));
             case TX_COMMITTED:
                 return new DeadTransactionException(
-                        format("[%s] Failed to execute Transaction.commute '%s' with reference '%s', reason: the transaction is prepared",
+                        format("[%s] Failed to execute Ref.commute '%s' with reference '%s', reason: the transaction is prepared",
                                 config.familyName, toDebugString(object), function));
             default:
                 throw new IllegalStateException();
         }
     }
 
-    public StmMismatchException abortCommuteOnBadStm(GammaObject gammaLongRef) {
+    public StmMismatchException abortCommuteOnBadStm(GammaObject object) {
         abortIfAlive();
-        //todo: message
-        return new StmMismatchException("");
+        return new StmMismatchException(
+                format("[%s] Failed to execute Ref.commute '%s', reason: the stm the ref was created with is a different" +
+                        " stm than the stm of the transaction",
+                        config.familyName, toDebugString(object)));
     }
 
     public ReadonlyException abortCommuteOnReadonly(final GammaObject object) {
         abortIfAlive();
         return new ReadonlyException(
-                format("[%s] Failed to execute Transaction.commute '%s', reason: the transaction is readonly",
+                format("[%s] Failed to execute Ref.commute '%s', reason: the transaction is readonly",
                         config.familyName, toDebugString(object)));
     }
 
     public NullPointerException abortCommuteOnNullFunction(final GammaObject object) {
         abortIfAlive();
         return new NullPointerException(
-                format("[%s] Failed to execute Transaction.commute '%s', reason: the function is null",
+                format("[%s] Failed to execute Ref.commute '%s', reason: the function is null",
                         config.familyName, toDebugString(object)));
     }
 
@@ -361,6 +373,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public final IllegalTransactionStateException abortCommitOnBadStatus() {
+        abortIfAlive();
         return new DeadTransactionException(
                 format("[%s] Failed to execute Transaction.commit, reason: the transaction already is aborted",
                         config.familyName));
@@ -394,7 +407,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
 
-    public IllegalTransactionStateException abortEnsureOnBadStatus(AbstractGammaRef abstractGammaRef) {
+    public IllegalTransactionStateException abortEnsureOnBadStatus(AbstractGammaRef o) {
         switch (status) {
             case TX_ABORTED:
                 return new DeadTransactionException();
@@ -468,6 +481,8 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public final void setAbortOnly() {
         switch (status) {
             case TX_ACTIVE:
+
+
                 abortOnly = true;
                 break;
             case TX_PREPARED:
@@ -591,5 +606,4 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                 throw new IllegalStateException();
         }
     }
-
 }
