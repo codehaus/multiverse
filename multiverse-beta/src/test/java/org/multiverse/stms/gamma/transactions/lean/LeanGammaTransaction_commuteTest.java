@@ -27,7 +27,7 @@ public abstract class LeanGammaTransaction_commuteTest<T extends GammaTransactio
     public abstract T newTransaction();
 
     @Test
-    public void whenOpenedForConstruction_thenSpeculativeConfigurationError() {
+    public void whenCommute_thenSpeculativeConfigurationError() {
         String initialValue = "foo";
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -46,6 +46,7 @@ public abstract class LeanGammaTransaction_commuteTest<T extends GammaTransactio
         assertReadonlyCount(ref, 0);
         assertUpdateBiased(ref);
         assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertTrue(tx.getConfiguration().speculativeConfiguration.get().isCommuteRequired);
     }
 }
