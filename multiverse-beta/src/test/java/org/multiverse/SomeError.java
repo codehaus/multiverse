@@ -1,4 +1,4 @@
-package org.multiverse.stms.gamma;
+package org.multiverse;
 
 public class SomeError extends Error {
 }

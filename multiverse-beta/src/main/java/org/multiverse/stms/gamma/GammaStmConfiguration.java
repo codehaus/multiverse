@@ -26,12 +26,18 @@ public final class GammaStmConfiguration {
     public IsolationLevel isolationLevel = IsolationLevel.Snapshot;
 
     /**
-     * The default isolation level for all reads.
+     * The default isolation level for all reads. Putting this to a level higher than LockMode.None has the same
+     * effect as putting the isolationLevel to IsolationLevel.Serialized although the former approach will be
+     * pessimistic and the later be optimistic.
      */
     public LockMode readLockMode = LockMode.None;
 
     /**
      * The default isolation level for all writes. For a write also a read is acquired, so the highest one wins.
+     * <p/>
+     * Putting it the LockMode.Write gives the same behavior as you have with Oracle. Reads are still allowed (even
+     * though a WriteLock is allowed) only other transactions are not able to acquire a lock on it (whatever the lock
+     * should be).
      */
     public LockMode writeLockMode = LockMode.None;
 
@@ -97,7 +103,7 @@ public final class GammaStmConfiguration {
     /**
      * The maximum size size of a fixed length transaction. A fixed length transaction is very cheap compared to a variable length, but
      * the big problem of the fixed length is that it needs to do a full transaction scan to see if the desired data is there. So there is
-     * a point where the full scan gets more expensive (O(N) vs O(log n)) complexity.
+     * a point where the full scan gets more expensive (O(N) vs O(log n)) expensive.
      * <p/>
      * Atm there has not been put much research in finding the optimal size and it could differ from machine to machine.
      * <p/>
@@ -114,7 +120,7 @@ public final class GammaStmConfiguration {
 
     /**
      * With the trace level you have control if you get output of transactions executing. It helps with debugging. If the
-     * {@link org.multiverse.MultiverseConstants.___TracingEnabled} is not set to true, this value is ignored and the whole profiling
+     * org.multiverse.MultiverseConstants.___TracingEnabled is not set to true, this value is ignored and the whole profiling
      * stuff is removed by the JIT since it effectively has become dead code.
      */
     public TraceLevel traceLevel = TraceLevel.None;
@@ -143,58 +149,59 @@ public final class GammaStmConfiguration {
      */
     public void validate() {
         if (readLockMode == null) {
-            throw new IllegalStateException("readLockMode can't be null");
+            throw new IllegalStateException("[GammaStmConfiguration] readLockMode can't be null");
         }
 
         if (writeLockMode == null) {
-            throw new IllegalStateException("writeLockMode can't be null");
+            throw new IllegalStateException("[GammaStmConfiguration] writeLockMode can't be null");
         }
 
         if (writeLockMode.asInt() < readLockMode.asInt()) {
-            throw new IllegalStateException(format("writeLockMode [%s] can't be lower than readLockMode [%s]", writeLockMode, readLockMode));
+            throw new IllegalStateException(format("[GammaStmConfiguration] writeLockMode [%s] can't be lower than readLockMode [%s]",
+                    writeLockMode, readLockMode));
         }
 
         if (isolationLevel == null) {
-            throw new IllegalStateException("isolationLevel can't be null");
+            throw new IllegalStateException("[GammaStmConfiguration] isolationLevel can't be null");
         }
 
         if (isolationLevel.isWriteSkewAllowed() && !trackReads) {
-            throw new IllegalStateException(format("isolation level '%s' can't be combined with readtracking is false" +
-                    "since it is needed to prevent the writeskew problem", isolationLevel));
+            throw new IllegalStateException(format("[GammaStmConfiguration] isolation level '%s' can't be combined with " +
+                    "readtracking is false since it is needed to prevent the writeskew problem", isolationLevel));
         }
 
         if (blockingAllowed && !trackReads) {
-            throw new IllegalStateException("blockingAllowed can't be true if trackReads is false");
+            throw new IllegalStateException("[GammaStmConfiguration] blockingAllowed can't be true if trackReads is false");
         }
 
         if (spinCount < 0) {
-            throw new IllegalStateException("spinCount can't be smaller than 0, but was " + spinCount);
+            throw new IllegalStateException("[GammaStmConfiguration] spinCount can't be smaller than 0, but was " + spinCount);
         }
 
-        if (minimalVariableLengthTransactionSize < 0) {
-            throw new IllegalStateException("minimalArrayTreeSize can't be smaller than 0, but was "
+        if (minimalVariableLengthTransactionSize < 1) {
+            throw new IllegalStateException("[GammaStmConfiguration] minimalVariableLengthTransactionSize can't be smaller than 1, but was "
                     + minimalVariableLengthTransactionSize);
         }
 
         if (maxRetries < 0) {
-            throw new IllegalStateException("maxRetries can't be smaller than 0, but was " + maxRetries);
+            throw new IllegalStateException("[GammaStmConfiguration] maxRetries can't be smaller than 0, but was " + maxRetries);
         }
 
         if (maxFixedLengthTransactionSize < 2) {
-            throw new IllegalStateException("maxArrayTransactionSize can't be smaller than 2, but was "
+            throw new IllegalStateException("[GammaStmConfiguration] maxFixedLengthTransactionSize can't be smaller than 2, but was "
                     + maxFixedLengthTransactionSize);
         }
 
         if (backoffPolicy == null) {
-            throw new IllegalStateException("backoffPolicy can't be null");
+            throw new IllegalStateException("[GammaStmConfiguration] backoffPolicy can't be null");
         }
 
         if (traceLevel == null) {
-            throw new IllegalStateException("traceLevel can't be null");
+            throw new IllegalStateException("[GammaStmConfiguration] traceLevel can't be null");
         }
 
         if (propagationLevel == null) {
-            throw new IllegalStateException("propagationLevel can't be null");
+            throw new IllegalStateException("[GammaStmConfiguration] propagationLevel can't be null");
         }
     }
 }

@@ -2,11 +2,11 @@ package org.multiverse.stms.gamma.integration.composability;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.SomeUncheckedException;
 import org.multiverse.api.StmUtils;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.IntRef;
-import org.multiverse.stms.gamma.SomeUncheckedException;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.StmUtils.newIntRef;

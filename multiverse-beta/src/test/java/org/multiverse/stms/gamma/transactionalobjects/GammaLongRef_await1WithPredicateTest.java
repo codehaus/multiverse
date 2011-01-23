@@ -2,13 +2,13 @@ package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.SomeUncheckedException;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.api.predicates.LongPredicate;
 import org.multiverse.stms.gamma.GammaStm;
-import org.multiverse.stms.gamma.SomeUncheckedException;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.fail;

@@ -2,6 +2,8 @@ package org.multiverse.stms.gamma.transactions.fat;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.SomeError;
+import org.multiverse.SomeUncheckedException;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.AbortOnlyException;
@@ -12,8 +14,6 @@ import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
-import org.multiverse.stms.gamma.SomeError;
-import org.multiverse.stms.gamma.SomeUncheckedException;
 import org.multiverse.stms.gamma.transactionalobjects.*;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
