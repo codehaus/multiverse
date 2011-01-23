@@ -1,14 +1,12 @@
 package org.multiverse.stms.gamma.integration.classic;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.LockMode;
-import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.references.LongRef;
+import org.multiverse.stms.gamma.GammaStm;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -23,7 +21,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 /**
  * http://en.wikipedia.org/wiki/Readers-writers_problem
  */
-public class ReadersWritersProblemStressTest {
+public abstract class ReadersWritersProblem_AbstractTest {
 
     private long count = 3000;
     private int readerThreadCount = 10;
@@ -32,36 +30,21 @@ public class ReadersWritersProblemStressTest {
 
     private AtomicLong currentReaderCount = new AtomicLong();
     private AtomicLong currentWriterCount = new AtomicLong();
-    private Stm stm;
+    protected GammaStm stm;
+
+
+    protected abstract AtomicBlock newAcquiredBlock();
+
+    protected abstract AtomicBlock newAcquireBlock();
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
-        stm = getGlobalStmInstance();
+        stm = (GammaStm) getGlobalStmInstance();
     }
 
-    @Test
-    public void whenNoLocks() {
-        test(LockMode.None);
-    }
-
-    @Test
-    public void whenReadLock() {
-        test(LockMode.Read);
-    }
-
-    @Test
-    public void whenWriteLock() {
-        test(LockMode.Write);
-    }
-
-    @Test
-    public void whenExclusiveLock() {
-        test(LockMode.Exclusive);
-    }
-
-    public void test(LockMode lockMode) {
-        readWriteLock = new ReadersWritersLock(lockMode);
+    public void run() {
+        readWriteLock = new ReadersWritersLock();
 
         ReaderThread[] readers = createReaderThreads();
         WriterThread[] writers = createWriterThreads();
@@ -174,16 +157,9 @@ public class ReadersWritersProblemStressTest {
         private AtomicBlock acquireReadLockBlock;
         private AtomicBlock acquireWriteLockBlock;
 
-        public ReadersWritersLock(LockMode lockMode) {
-            acquireReadLockBlock = stm.newTransactionFactoryBuilder()
-                    .setReadLockMode(lockMode)
-                    .setMaxRetries(10000)
-                    .newAtomicBlock();
-
-            acquireWriteLockBlock = stm.newTransactionFactoryBuilder()
-                    .setReadLockMode(lockMode)
-                    .setMaxRetries(10000)
-                    .newAtomicBlock();
+        public ReadersWritersLock() {
+            acquireReadLockBlock = newAcquireBlock();
+            acquireWriteLockBlock = newAcquiredBlock();
         }
 
         public void acquireReadLock() {
@@ -220,4 +196,5 @@ public class ReadersWritersProblemStressTest {
             readerCount.atomicIncrementAndGet(-1);
         }
     }
+
 }

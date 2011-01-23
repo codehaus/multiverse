@@ -1,10 +1,8 @@
 package org.multiverse.stms.gamma.integration.classic;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
@@ -21,13 +19,16 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 /**
  * http://en.wikipedia.org/wiki/Producer-consumer_problem
  */
-public class ProducerConsumer_AbstractTest {
+public abstract class ProducerConsumer_AbstractTest {
 
     private Buffer buffer;
     private volatile boolean stop;
     private static final int MAX_CAPACITY = 100;
-    private LockMode lockMode;
-    private GammaStm stm;
+    protected GammaStm stm;
+
+    protected abstract AtomicBlock newPutBlock();
+
+    protected abstract AtomicBlock newTakeBlock();
 
     @Before
     public void setUp() {
@@ -36,28 +37,8 @@ public class ProducerConsumer_AbstractTest {
         stop = false;
     }
 
-    @Test
-    public void testNoLock() {
-        test(LockMode.None);
-    }
 
-    @Test
-    public void testReadLock() {
-        test(LockMode.Read);
-    }
-
-    @Test
-    public void testWriteLock() {
-        test(LockMode.Write);
-    }
-
-    @Test
-    public void testExclusiveLock() {
-        test(LockMode.Exclusive);
-    }
-
-    public void test(LockMode lockMode) {
-        this.lockMode = lockMode;
+    public void run() {
         buffer = new Buffer();
         ProducerThread producerThread = new ProducerThread();
         ConsumerThread consumerThread = new ConsumerThread();
@@ -117,13 +98,8 @@ public class ProducerConsumer_AbstractTest {
     class Buffer {
         private final IntRef size = newIntRef();
         private final IntRef[] items;
-        private final AtomicBlock takeBlock = stm.newTransactionFactoryBuilder()
-                .setReadLockMode(lockMode)
-                .newAtomicBlock();
-
-        private final AtomicBlock putBlock = stm.newTransactionFactoryBuilder()
-                .setReadLockMode(lockMode)
-                .newAtomicBlock();
+        private final AtomicBlock takeBlock = newTakeBlock();
+        private final AtomicBlock putBlock = newPutBlock();
 
 
         Buffer() {

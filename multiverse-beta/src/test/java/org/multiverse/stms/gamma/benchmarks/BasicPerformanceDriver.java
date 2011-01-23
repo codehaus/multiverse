@@ -1,6 +1,7 @@
 package org.multiverse.stms.gamma.benchmarks;
 
 import org.benchy.BenchyUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.MultiverseConstants;
 import org.multiverse.stms.gamma.GammaStm;
@@ -8,6 +9,7 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.utils.ToolUnsafe;
 import sun.misc.Unsafe;
 
+@Ignore
 public class BasicPerformanceDriver {
 
     public static void main(String[] args) {
