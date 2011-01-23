@@ -9,6 +9,8 @@ import org.multiverse.stms.gamma.transactions.*;
 import org.multiverse.stms.gamma.transactions.fat.FatFixedLengthGammaTransaction;
 import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
 import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransaction;
+import org.multiverse.stms.gamma.transactions.lean.LeanFixedLengthGammaTransaction;
+import org.multiverse.stms.gamma.transactions.lean.LeanMonoGammaTransaction;
 
 import static org.multiverse.stms.gamma.ThreadLocalGammaTransactionPool.getThreadLocalGammaTransactionPool;
 
@@ -74,6 +76,15 @@ public final class GammaStm implements Stm {
 
         GammaTransactionFactoryBuilderImpl(final GammaTransactionConfiguration config) {
             this.config = config;
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder setFat() {
+            if (config.isFat) {
+                return this;
+            }
+
+            return new GammaTransactionFactoryBuilderImpl(config.setFat());
         }
 
         @Override
@@ -391,23 +402,42 @@ public final class GammaStm implements Stm {
             final int length = speculativeConfiguration.minimalLength;
 
             if (length <= 1) {
-                FatMonoGammaTransaction tx = pool.takeFatMono();
-                if (tx == null) {
-                    return new FatMonoGammaTransaction(config);
-                }
+                if (speculativeConfiguration.isFat) {
+                    FatMonoGammaTransaction tx = pool.takeFatMono();
+                    if (tx == null) {
+                        return new FatMonoGammaTransaction(config);
+                    }
 
-                tx.init(config);
-                return tx;
+                    tx.init(config);
+                    return tx;
+                } else {
+                    LeanMonoGammaTransaction tx = pool.takeLeanMono();
+                    if (tx == null) {
+                        return new LeanMonoGammaTransaction(config);
+                    }
+
+                    tx.init(config);
+                    return tx;
+                }
 
             } else if (length <= config.maxFixedLengthTransactionSize) {
+                if (speculativeConfiguration.isFat) {
+                    final FatFixedLengthGammaTransaction tx = pool.takeFatFixedLength();
+                    if (tx == null) {
+                        return new FatFixedLengthGammaTransaction(config);
+                    }
 
-                final FatFixedLengthGammaTransaction tx = pool.takeFatFixedLength();
-                if (tx == null) {
-                    return new FatFixedLengthGammaTransaction(config);
+                    tx.init(config);
+                    return tx;
+                } else {
+                    final LeanFixedLengthGammaTransaction tx = pool.takeLeanFixedLength();
+                    if (tx == null) {
+                        return new LeanFixedLengthGammaTransaction(config);
+                    }
+
+                    tx.init(config);
+                    return tx;
                 }
-
-                tx.init(config);
-                return tx;
 
             } else {
                 final FatVariableLengthGammaTransaction tx = pool.takeMap();

@@ -6,7 +6,7 @@ import static java.lang.String.format;
 
 /**
  * Contains the default configuration for all transactions created by the GammaStm.
- *
+ * <p/>
  * Once the GammaStm has been created, changes on this structure are ignored.
  *
  * @author Peter Veentjer.
@@ -31,6 +31,7 @@ public final class GammaStmConfiguration {
     public BackoffPolicy backoffPolicy = ExponentialBackoffPolicy.MAX_100_MS;
     public TraceLevel traceLevel = TraceLevel.None;
     public boolean controlFlowErrorsReused = true;
+    public boolean isFat = false;
 
     /**
      * Checks if the configuration is valid.

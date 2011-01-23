@@ -38,9 +38,9 @@ public class GammaLongRef_await2WithPredicateTest {
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
+                .setFat()
                 .newTransactionFactory()
                 .newTransaction();
-
 
         try {
             ref.await(tx, newEqualsPredicate(initialValue + 1));

@@ -36,7 +36,10 @@ public class AbstractGammaObject_prepareTest implements GammaConstants {
     public void whenNormalRead(LockMode lockMode) {
         GammaLongRef ref = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newTransactionFactoryBuilder()
+                .setFat()
+                .newTransactionFactory()
+                .newTransaction();
         GammaRefTranlocal tranlocal = ref.openForRead(tx, lockMode.asInt());
 
         boolean success = ref.prepare(tx, tranlocal);
@@ -62,6 +65,7 @@ public class AbstractGammaObject_prepareTest implements GammaConstants {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
+                .setFat()
                 .setDirtyCheckEnabled(true)
                 .newTransactionFactory()
                 .newTransaction();
@@ -99,6 +103,7 @@ public class AbstractGammaObject_prepareTest implements GammaConstants {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
+                .setFat()
                 .setDirtyCheckEnabled(dirtyCheck)
                 .newTransactionFactory()
                 .newTransaction();
@@ -129,6 +134,7 @@ public class AbstractGammaObject_prepareTest implements GammaConstants {
         GammaLongRef ref = new GammaLongRef(stm);
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
+                .setFat()
                 .setDirtyCheckEnabled(false)
                 .newTransactionFactory()
                 .newTransaction();

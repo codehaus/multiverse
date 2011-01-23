@@ -9,6 +9,8 @@ public interface GammaTransactionFactoryBuilder extends TransactionFactoryBuilde
     @Override
     GammaTransactionConfiguration getTransactionConfiguration();
 
+    GammaTransactionFactoryBuilder setFat();
+
     @Override
     GammaTransactionFactoryBuilder setControlFlowErrorsReused(boolean reused);
 

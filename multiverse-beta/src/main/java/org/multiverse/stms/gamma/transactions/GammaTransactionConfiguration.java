@@ -36,7 +36,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public final String familyName;
     public final boolean isAnonymous;
     public boolean interruptible = false;
-    public boolean durable = false;
     public boolean readonly = false;
     public int spinCount = 16;
     public boolean dirtyCheck = true;
@@ -50,8 +49,10 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public long timeoutNs = Long.MAX_VALUE;
     public TraceLevel traceLevel = TraceLevel.None;
     public boolean controlFlowErrorsReused = false;
+    public boolean isFat = false;
 
     public ArrayList<TransactionListener> permanentListeners;
+
 
     public GammaTransactionConfiguration(GammaStm stm) {
         this(stm, new GammaStmConfiguration());
@@ -97,6 +98,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         this.controlFlowErrorsReused = configuration.controlFlowErrorsReused;
         this.familyName = "anonymoustransaction-" + idGenerator.incrementAndGet();
         this.isAnonymous = true;
+        this.isFat = configuration.isFat;
     }
 
     public GammaTransactionConfiguration(GammaStm stm, int maxFixedLengthTransactionSize) {
@@ -307,7 +309,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
 
         if (speculativeConfigEnabled) {
-            boolean isFat = !writeSkewAllowed;
+            boolean isFat = isFat();
 
             if (speculativeConfiguration.get() == null) {
                 SpeculativeGammaConfiguration newSpeculativeConfiguration = new SpeculativeGammaConfiguration(isFat);
@@ -316,6 +318,30 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
 
         return this;
+    }
+
+    private boolean isFat() {
+        if (isolationLevel != IsolationLevel.Snapshot) {
+            return true;
+        }
+
+        if (permanentListeners != null) {
+            return true;
+        }
+
+        if (readLockMode != LockMode.None) {
+            return true;
+        }
+
+        if (writeLockMode != LockMode.None) {
+            return true;
+        }
+
+        if (isFat) {
+            return true;
+        }
+
+        return false;
     }
 
     public GammaTransactionConfiguration setTimeoutNs(long timeoutNs) {
@@ -334,7 +360,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
         config.blockingAllowed = blockingAllowed;
-        config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
         config.backoffPolicy = backoffPolicy;
@@ -347,6 +372,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.isFat = isFat;
         return config;
     }
 
@@ -366,7 +392,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
         config.blockingAllowed = blockingAllowed;
-        config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
         config.backoffPolicy = backoffPolicy;
@@ -378,6 +403,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.isFat = isFat;
         return config;
     }
 
@@ -397,7 +423,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
         config.blockingAllowed = blockingAllowed;
-        config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
         config.backoffPolicy = backoffPolicy;
@@ -410,6 +435,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.isFat = isFat;
         return config;
     }
 
@@ -425,7 +451,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
         config.blockingAllowed = blockingAllowed;
-        config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
         config.backoffPolicy = backoffPolicy;
@@ -438,6 +463,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.isFat = isFat;
         return config;
     }
 
@@ -453,7 +479,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
         config.blockingAllowed = blockingAllowed;
-        config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
         config.backoffPolicy = backoffPolicy;
@@ -466,6 +491,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.isFat = isFat;
         return config;
     }
 
@@ -481,7 +507,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
         config.blockingAllowed = blockingAllowed;
-        config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
         config.backoffPolicy = backoffPolicy;
@@ -494,6 +519,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.isFat = isFat;
         return config;
     }
 
@@ -509,7 +535,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
         config.blockingAllowed = blockingAllowed;
-        config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
         config.backoffPolicy = backoffPolicy;
@@ -522,6 +547,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.isFat = isFat;
         return config;
     }
 
@@ -537,7 +563,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
         config.blockingAllowed = blockingEnabled;
-        config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
         config.backoffPolicy = backoffPolicy;
@@ -550,6 +575,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.isFat = isFat;
         return config;
     }
 
@@ -565,7 +591,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
         config.blockingAllowed = blockingAllowed;
-        config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
         config.backoffPolicy = backoffPolicy;
@@ -578,6 +603,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.isFat = isFat;
         return config;
     }
 
@@ -593,7 +619,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
         config.blockingAllowed = blockingAllowed;
-        config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
         config.backoffPolicy = backoffPolicy;
@@ -606,6 +631,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.isFat = isFat;
         return config;
     }
 
@@ -625,7 +651,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
         config.blockingAllowed = blockingAllowed;
-        config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
         config.backoffPolicy = backoffPolicy;
@@ -638,6 +663,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.isFat = isFat;
         return config;
     }
 
@@ -657,7 +683,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
         config.blockingAllowed = blockingAllowed;
-        config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
         config.backoffPolicy = backoffPolicy;
@@ -670,6 +695,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.isFat = isFat;
         return config;
     }
 
@@ -689,7 +715,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
         config.blockingAllowed = blockingAllowed;
-        config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
         config.backoffPolicy = backoffPolicy;
@@ -702,6 +727,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.isFat = isFat;
         return config;
     }
 
@@ -721,7 +747,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
         config.blockingAllowed = blockingAllowed;
-        config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
         config.backoffPolicy = backoffPolicy;
@@ -734,6 +759,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.isFat = isFat;
         return config;
     }
 
@@ -754,7 +780,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
         config.blockingAllowed = blockingAllowed;
-        config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
         config.backoffPolicy = backoffPolicy;
@@ -767,6 +792,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.isFat = isFat;
         return config;
     }
 
@@ -786,7 +812,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
         config.blockingAllowed = blockingAllowed;
-        config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
         config.backoffPolicy = backoffPolicy;
@@ -799,6 +824,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.isFat = isFat;
         return config;
     }
 
@@ -818,7 +844,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
         config.blockingAllowed = blockingAllowed;
-        config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
         config.backoffPolicy = backoffPolicy;
@@ -831,6 +856,36 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.isFat = isFat;
+        return config;
+    }
+
+
+    public GammaTransactionConfiguration setFat() {
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
+        config.readonly = readonly;
+        config.spinCount = spinCount;
+        config.readLockMode = readLockMode;
+        config.readLockModeAsInt = readLockMode.asInt();
+        config.writeLockMode = writeLockMode;
+        config.writeLockModeAsInt = writeLockMode.asInt();
+        config.dirtyCheck = dirtyCheck;
+        config.trackReads = trackReads;
+        config.maxRetries = maxRetries;
+        config.blockingAllowed = blockingAllowed;
+        config.speculativeConfigEnabled = speculativeConfigEnabled;
+        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
+        config.backoffPolicy = backoffPolicy;
+        config.interruptible = interruptible;
+        config.timeoutNs = timeoutNs;
+        config.traceLevel = traceLevel;
+        config.propagationLevel = propagationLevel;
+        config.permanentListeners = permanentListeners;
+        config.isolationLevel = isolationLevel;
+        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.isFat = true;
         return config;
     }
 
@@ -857,7 +912,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.trackReads = trackReads;
         config.maxRetries = maxRetries;
         config.blockingAllowed = blockingAllowed;
-        config.durable = durable;
         config.speculativeConfigEnabled = speculativeConfigEnabled;
         config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
         config.backoffPolicy = backoffPolicy;
@@ -900,5 +954,4 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
                 ", permanentListeners=" + permanentListeners +
                 '}';
     }
-
 }

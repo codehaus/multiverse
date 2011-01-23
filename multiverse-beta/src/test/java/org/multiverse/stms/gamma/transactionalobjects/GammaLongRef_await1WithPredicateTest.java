@@ -8,6 +8,7 @@ import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.api.predicates.LongPredicate;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.SomeUncheckedException;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.fail;
@@ -36,6 +37,7 @@ public class GammaLongRef_await1WithPredicateTest {
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
+                .setFat()
                 .newTransactionFactory()
                 .newTransaction();
         setThreadLocalTransaction(tx);
@@ -57,7 +59,11 @@ public class GammaLongRef_await1WithPredicateTest {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newTransactionFactoryBuilder()
+                .setFat()
+                .newTransactionFactory()
+                .newTransaction();
+
         setThreadLocalTransaction(tx);
 
         ref.await(newEqualsPredicate(initialValue));
@@ -75,7 +81,7 @@ public class GammaLongRef_await1WithPredicateTest {
 
         LongPredicate predicate = mock(LongPredicate.class);
 
-        when(predicate.evaluate(initialValue)).thenThrow(new MyException());
+        when(predicate.evaluate(initialValue)).thenThrow(new SomeUncheckedException());
 
         GammaTransaction tx = stm.startDefaultTransaction();
         setThreadLocalTransaction(tx);
@@ -83,15 +89,12 @@ public class GammaLongRef_await1WithPredicateTest {
         try {
             ref.await(predicate);
             fail();
-        } catch (MyException expected) {
+        } catch (SomeUncheckedException expected) {
         }
 
         assertIsAborted(tx);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
-    }
-
-    class MyException extends RuntimeException {
     }
 
     @Test
