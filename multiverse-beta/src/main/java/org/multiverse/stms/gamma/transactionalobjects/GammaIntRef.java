@@ -1,17 +1,20 @@
 package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.multiverse.api.Transaction;
+import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.IntFunction;
 import org.multiverse.api.predicates.IntPredicate;
 import org.multiverse.api.references.IntRef;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.stms.gamma.GammaStmUtils.asGammaTransaction;
 import static org.multiverse.stms.gamma.GammaStmUtils.getRequiredThreadLocalGammaTransaction;
+import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLocalGammaObjectPool;
 
 /**
  * @author Peter Veentjer.
@@ -133,8 +136,51 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     }
 
     private int atomicAlter(final IntFunction function, final boolean returnOld) {
-        //todo
-        throw new TodoException();
+        if (function == null) {
+            throw new NullPointerException("Function can't be null");
+        }
+
+        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
+
+        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+            throw new LockedException();
+        }
+
+        final int oldValue = (int) long_value;
+        int newValue;
+        boolean abort = true;
+        try {
+            newValue = function.call(oldValue);
+            abort = false;
+        } finally {
+            if (abort) {
+                departAfterFailureAndUnlock();
+            }
+        }
+
+        if (oldValue == newValue) {
+            if (arriveStatus == ARRIVE_UNREGISTERED) {
+                unlockByUnregistered();
+            } else {
+                departAfterReadingAndUnlock();
+            }
+
+            return oldValue;
+        }
+
+        long_value = newValue;
+        //noinspection NonAtomicOperationOnVolatileField
+        version++;
+
+        final Listeners listeners = ___removeListenersAfterWrite();
+
+        departAfterUpdateAndUnlock();
+
+        if (listeners != null) {
+            listeners.openAll(getThreadLocalGammaObjectPool());
+        }
+
+        return returnOld ? oldValue : newValue;
     }
 
     @Override

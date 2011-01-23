@@ -1,16 +1,18 @@
 package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.functions.Function;
 import org.multiverse.api.predicates.Predicate;
 import org.multiverse.api.references.Ref;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTransaction;
 import static org.multiverse.stms.gamma.GammaStmUtils.asGammaTransaction;
 import static org.multiverse.stms.gamma.GammaStmUtils.getRequiredThreadLocalGammaTransaction;
+import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLocalGammaObjectPool;
 
 /**
  * A {@link Ref} tailored for the {@link GammaStm}.
@@ -136,8 +138,51 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     private E atomicAlter(final Function<E> function, final boolean returnOld) {
-        //todo
-        throw new TodoException();
+        if (function == null) {
+            throw new NullPointerException("Function can't be null");
+        }
+
+        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
+
+        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+            throw new LockedException();
+        }
+
+        final E oldValue = (E) ref_value;
+        E newValue;
+        boolean abort = true;
+        try {
+            newValue = function.call(oldValue);
+            abort = false;
+        } finally {
+            if (abort) {
+                departAfterFailureAndUnlock();
+            }
+        }
+
+        if (oldValue == newValue) {
+            if (arriveStatus == ARRIVE_UNREGISTERED) {
+                unlockByUnregistered();
+            } else {
+                departAfterReadingAndUnlock();
+            }
+
+            return oldValue;
+        }
+
+        ref_value = newValue;
+        //noinspection NonAtomicOperationOnVolatileField
+        version++;
+
+        final Listeners listeners = ___removeListenersAfterWrite();
+
+        departAfterUpdateAndUnlock();
+
+        if (listeners != null) {
+            listeners.openAll(getThreadLocalGammaObjectPool());
+        }
+
+        return returnOld ? oldValue : newValue;
     }
 
     @Override
@@ -196,9 +241,43 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
 
     @Override
     public final boolean atomicCompareAndSet(final E expectedValue, final E newValue) {
-        //todo:
-        throw new TodoException();
+        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
+
+        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+            throw new LockedException();
+        }
+
+        final E currentValue = (E) ref_value;
+
+        if (currentValue != expectedValue) {
+            departAfterFailureAndUnlock();
+            return false;
+        }
+
+        if (expectedValue == newValue) {
+            if (arriveStatus == ARRIVE_UNREGISTERED) {
+                unlockByUnregistered();
+            } else {
+                departAfterReadingAndUnlock();
+            }
+
+            return true;
+        }
+
+        ref_value = newValue;
+        //noinspection NonAtomicOperationOnVolatileField
+        version++;
+        final Listeners listeners = ___removeListenersAfterWrite();
+
+        departAfterUpdateAndUnlock();
+
+        if (listeners != null) {
+            listeners.openAll(getThreadLocalGammaObjectPool());
+        }
+
+        return true;
     }
+
 
     @Override
     public final boolean isNull() {

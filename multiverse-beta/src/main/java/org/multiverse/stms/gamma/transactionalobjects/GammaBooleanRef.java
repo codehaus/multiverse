@@ -1,14 +1,16 @@
 package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.TodoException;
+import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.functions.BooleanFunction;
 import org.multiverse.api.predicates.BooleanPredicate;
 import org.multiverse.api.references.BooleanRef;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.multiverse.stms.gamma.GammaStmUtils.*;
+import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLocalGammaObjectPool;
 
 /**
  * A {@link BooleanRef} for the {@link GammaStm}.
@@ -184,10 +186,54 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
         return atomicAlter(function, true);
     }
 
-    public final boolean atomicAlter(final BooleanFunction function, boolean returnOld) {
-        //todo
-        throw new TodoException();
+    private boolean atomicAlter(final BooleanFunction function, final boolean returnOld) {
+        if (function == null) {
+            throw new NullPointerException("Function can't be null");
+        }
+
+        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
+
+        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+            throw new LockedException();
+        }
+
+        final boolean oldValue = longAsBoolean(long_value);
+        boolean newValue;
+        boolean abort = true;
+        try {
+            newValue = function.call(oldValue);
+            abort = false;
+        } finally {
+            if (abort) {
+                departAfterFailureAndUnlock();
+            }
+        }
+
+        if (oldValue == newValue) {
+            if (arriveStatus == ARRIVE_UNREGISTERED) {
+                unlockByUnregistered();
+            } else {
+                departAfterReadingAndUnlock();
+            }
+
+            return oldValue;
+        }
+
+        long_value = booleanAsLong(newValue);
+        //noinspection NonAtomicOperationOnVolatileField
+        version++;
+
+        final Listeners listeners = ___removeListenersAfterWrite();
+
+        departAfterUpdateAndUnlock();
+
+        if (listeners != null) {
+            listeners.openAll(getThreadLocalGammaObjectPool());
+        }
+
+        return returnOld ? oldValue : newValue;
     }
+
 
     @Override
     public final boolean atomicCompareAndSet(final boolean expectedValue, final boolean newValue) {

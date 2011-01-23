@@ -12,27 +12,9 @@
 
 - last readwrite conflict should show which transactional object caused it.
 
-- GammaBooleanRef.atomicAlter
-
-- GammaDoubleRef.atomicAlterSupport
-
 - GammaDoubleRef.atomicGetAndIncrement
 
-- GammaIntRef.atomicAlter
-
 - GammaIntRef.atomicIncrement
-
-- GammaRef.atomicGetAndSet
-
-- GammaRef.atomicAlter
-
-- GammaRef.atomicCompareAndSet
-
-- GammaMapTransaction.prepare and readlock level
-
-- GammaArrayTransaction.prepare and readlock level
-
-- GammaMonoTransaction.prepare and readlock level
 
 - listeners
 
@@ -47,6 +29,8 @@
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- GammaRef.atomicGetAndSet
 
 - fat atomic block for propagation needs to be migrated from beta to gamma engine
 
@@ -177,3 +161,20 @@
 - readonly
 
 - gamma stm now implements the stm interface
+
+- GammaBooleanRef.atomicAlter
+
+- GammaDoubleRef.atomicAlterSupport
+
+- GammaIntRef.atomicAlter
+
+- GammaRef.atomicAlter
+
+- GammaRef.atomicCompareAndSet
+
+- GammaMapTransaction.prepare and readlock level
+
+- GammaArrayTransaction.prepare and readlock level
+
+- GammaMonoTransaction.prepare and readlock level
+

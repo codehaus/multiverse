@@ -1,14 +1,17 @@
 package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.multiverse.api.Transaction;
+import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.DoubleFunction;
 import org.multiverse.api.predicates.DoublePredicate;
 import org.multiverse.api.references.DoubleRef;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.multiverse.stms.gamma.GammaStmUtils.*;
+import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLocalGammaObjectPool;
 
 public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef {
 
@@ -117,18 +120,62 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
 
     @Override
     public final double atomicAlterAndGet(final DoubleFunction function) {
-        return atomicAlterSupport(function, false);
+        return atomicAlter(function, false);
     }
 
     @Override
     public final double atomicGetAndAlter(final DoubleFunction function) {
-        return atomicAlterSupport(function, true);
+        return atomicAlter(function, true);
     }
 
-    public final double atomicAlterSupport(final DoubleFunction function, boolean returnOld) {
-        //todo:
-        throw new TodoException();
+    private double atomicAlter(final DoubleFunction function, final boolean returnOld) {
+        if (function == null) {
+            throw new NullPointerException("Function can't be null");
+        }
+
+        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
+
+        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+            throw new LockedException();
+        }
+
+        final double oldValue = longAsDouble(long_value);
+        double newValue;
+        boolean abort = true;
+        try {
+            newValue = function.call(oldValue);
+            abort = false;
+        } finally {
+            if (abort) {
+                departAfterFailureAndUnlock();
+            }
+        }
+
+        if (oldValue == newValue) {
+            if (arriveStatus == ARRIVE_UNREGISTERED) {
+                unlockByUnregistered();
+            } else {
+                departAfterReadingAndUnlock();
+            }
+
+            return oldValue;
+        }
+
+        long_value = doubleAsLong(newValue);
+        //noinspection NonAtomicOperationOnVolatileField
+        version++;
+
+        final Listeners listeners = ___removeListenersAfterWrite();
+
+        departAfterUpdateAndUnlock();
+
+        if (listeners != null) {
+            listeners.openAll(getThreadLocalGammaObjectPool());
+        }
+
+        return returnOld ? oldValue : newValue;
     }
+
 
     @Override
     public final double alterAndGet(final DoubleFunction function) {
