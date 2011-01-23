@@ -1,6 +1,4 @@
-package org.multiverse.stms.gamma;
-
-import org.multiverse.stms.gamma.transactions.GammaTransactionPool;
+package org.multiverse.stms.gamma.transactions;
 
 /**
  * A ThreadLocal that stores the {@link GammaTransactionPool}.

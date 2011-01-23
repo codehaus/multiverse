@@ -82,12 +82,12 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         this.readLockMode = configuration.readLockMode;
         this.writeLockMode = configuration.writeLockMode;
         this.dirtyCheck = configuration.dirtyCheck;
-        this.minimalArrayTreeSize = configuration.minimalArrayTreeSize;
+        this.minimalArrayTreeSize = configuration.minimalVariableLengthTransactionSize;
         this.trackReads = configuration.trackReads;
         this.blockingAllowed = configuration.blockingAllowed;
         this.maxRetries = configuration.maxRetries;
         this.speculativeConfigEnabled = configuration.speculativeConfigEnabled;
-        this.maxFixedLengthTransactionSize = configuration.maxArrayTransactionSize;
+        this.maxFixedLengthTransactionSize = configuration.maxFixedLengthTransactionSize;
         this.backoffPolicy = configuration.backoffPolicy;
         this.timeoutNs = configuration.timeoutNs;
         this.traceLevel = configuration.traceLevel;

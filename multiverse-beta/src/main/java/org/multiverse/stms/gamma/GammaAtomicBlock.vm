@@ -61,7 +61,7 @@ throw e.getCause();
     throw new NullPointerException();
     }
 
-    ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+    final ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
     GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.transactionPool;
     if (pool == null) {
     pool = new GammaTransactionPool();

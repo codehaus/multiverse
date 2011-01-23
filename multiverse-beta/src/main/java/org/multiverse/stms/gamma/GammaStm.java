@@ -12,7 +12,7 @@ import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransact
 import org.multiverse.stms.gamma.transactions.lean.LeanFixedLengthGammaTransaction;
 import org.multiverse.stms.gamma.transactions.lean.LeanMonoGammaTransaction;
 
-import static org.multiverse.stms.gamma.ThreadLocalGammaTransactionPool.getThreadLocalGammaTransactionPool;
+import static org.multiverse.stms.gamma.transactions.ThreadLocalGammaTransactionPool.getThreadLocalGammaTransactionPool;
 
 
 public final class GammaStm implements Stm {

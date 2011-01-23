@@ -51,14 +51,14 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             throw new NullPointerException();
         }
 
-        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
-        GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.transactionPool;
+        final ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.txPool;
         if (pool == null) {
             pool = new GammaTransactionPool();
-            transactionContainer.transactionPool = pool;
+            transactionContainer.txPool = pool;
         }
 
-        GammaTransaction tx = (GammaTransaction) transactionContainer.transaction;
+        GammaTransaction tx = (GammaTransaction) transactionContainer.tx;
         if (tx == null || !tx.isAlive()) {
             tx = null;
         }
@@ -69,7 +69,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             }
 
             tx = transactionFactory.newTransaction(pool);
-            transactionContainer.transaction = tx;
+            transactionContainer.tx = tx;
             boolean abort = true;
 
             try {
@@ -99,7 +99,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         GammaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
                         pool.put(old);
-                        transactionContainer.transaction = tx;
+                        transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
@@ -117,7 +117,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                 }
 
                 pool.put(tx);
-                transactionContainer.transaction = null;
+                transactionContainer.tx = null;
             }
         } catch (RuntimeException e) {
             throw e;
@@ -156,14 +156,14 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             throw new NullPointerException();
         }
 
-        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
-        GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.transactionPool;
+        final ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.txPool;
         if (pool == null) {
             pool = new GammaTransactionPool();
-            transactionContainer.transactionPool = pool;
+            transactionContainer.txPool = pool;
         }
 
-        GammaTransaction tx = (GammaTransaction) transactionContainer.transaction;
+        GammaTransaction tx = (GammaTransaction) transactionContainer.tx;
         if (tx == null || !tx.isAlive()) {
             tx = null;
         }
@@ -174,7 +174,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             }
 
             tx = transactionFactory.newTransaction(pool);
-            transactionContainer.transaction = tx;
+            transactionContainer.tx = tx;
             boolean abort = true;
 
             try {
@@ -204,7 +204,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         GammaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
                         pool.put(old);
-                        transactionContainer.transaction = tx;
+                        transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
@@ -222,7 +222,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                 }
 
                 pool.put(tx);
-                transactionContainer.transaction = null;
+                transactionContainer.tx = null;
             }
         } catch (RuntimeException e) {
             throw e;
@@ -261,14 +261,14 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             throw new NullPointerException();
         }
 
-        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
-        GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.transactionPool;
+        final ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.txPool;
         if (pool == null) {
             pool = new GammaTransactionPool();
-            transactionContainer.transactionPool = pool;
+            transactionContainer.txPool = pool;
         }
 
-        GammaTransaction tx = (GammaTransaction) transactionContainer.transaction;
+        GammaTransaction tx = (GammaTransaction) transactionContainer.tx;
         if (tx == null || !tx.isAlive()) {
             tx = null;
         }
@@ -279,7 +279,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             }
 
             tx = transactionFactory.newTransaction(pool);
-            transactionContainer.transaction = tx;
+            transactionContainer.tx = tx;
             boolean abort = true;
 
             try {
@@ -309,7 +309,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         GammaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
                         pool.put(old);
-                        transactionContainer.transaction = tx;
+                        transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
@@ -327,7 +327,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                 }
 
                 pool.put(tx);
-                transactionContainer.transaction = null;
+                transactionContainer.tx = null;
             }
         } catch (RuntimeException e) {
             throw e;
@@ -366,14 +366,14 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             throw new NullPointerException();
         }
 
-        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
-        GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.transactionPool;
+        final ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.txPool;
         if (pool == null) {
             pool = new GammaTransactionPool();
-            transactionContainer.transactionPool = pool;
+            transactionContainer.txPool = pool;
         }
 
-        GammaTransaction tx = (GammaTransaction) transactionContainer.transaction;
+        GammaTransaction tx = (GammaTransaction) transactionContainer.tx;
         if (tx == null || !tx.isAlive()) {
             tx = null;
         }
@@ -384,7 +384,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             }
 
             tx = transactionFactory.newTransaction(pool);
-            transactionContainer.transaction = tx;
+            transactionContainer.tx = tx;
             boolean abort = true;
 
             try {
@@ -414,7 +414,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         GammaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
                         pool.put(old);
-                        transactionContainer.transaction = tx;
+                        transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
@@ -432,7 +432,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                 }
 
                 pool.put(tx);
-                transactionContainer.transaction = null;
+                transactionContainer.tx = null;
             }
         } catch (RuntimeException e) {
             throw e;
@@ -471,14 +471,14 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             throw new NullPointerException();
         }
 
-        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
-        GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.transactionPool;
+        final ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.txPool;
         if (pool == null) {
             pool = new GammaTransactionPool();
-            transactionContainer.transactionPool = pool;
+            transactionContainer.txPool = pool;
         }
 
-        GammaTransaction tx = (GammaTransaction) transactionContainer.transaction;
+        GammaTransaction tx = (GammaTransaction) transactionContainer.tx;
         if (tx == null || !tx.isAlive()) {
             tx = null;
         }
@@ -489,7 +489,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             }
 
             tx = transactionFactory.newTransaction(pool);
-            transactionContainer.transaction = tx;
+            transactionContainer.tx = tx;
             boolean abort = true;
 
             try {
@@ -519,7 +519,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         GammaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
                         pool.put(old);
-                        transactionContainer.transaction = tx;
+                        transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
@@ -537,7 +537,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                 }
 
                 pool.put(tx);
-                transactionContainer.transaction = null;
+                transactionContainer.tx = null;
             }
         } catch (RuntimeException e) {
             throw e;
@@ -576,14 +576,14 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             throw new NullPointerException();
         }
 
-        ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
-        GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.transactionPool;
+        final ThreadLocalTransaction.Container transactionContainer = getThreadLocalTransactionContainer();
+        GammaTransactionPool pool = (GammaTransactionPool) transactionContainer.txPool;
         if (pool == null) {
             pool = new GammaTransactionPool();
-            transactionContainer.transactionPool = pool;
+            transactionContainer.txPool = pool;
         }
 
-        GammaTransaction tx = (GammaTransaction) transactionContainer.transaction;
+        GammaTransaction tx = (GammaTransaction) transactionContainer.tx;
         if (tx == null || !tx.isAlive()) {
             tx = null;
         }
@@ -595,7 +595,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             }
 
             tx = transactionFactory.newTransaction(pool);
-            transactionContainer.transaction = tx;
+            transactionContainer.tx = tx;
             boolean abort = true;
 
             try {
@@ -625,7 +625,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         GammaTransaction old = tx;
                         tx = transactionFactory.upgradeAfterSpeculativeFailure(tx, pool);
                         pool.put(old);
-                        transactionContainer.transaction = tx;
+                        transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
@@ -643,7 +643,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                 }
 
                 pool.put(tx);
-                transactionContainer.transaction = null;
+                transactionContainer.tx = null;
             }
         } catch (RuntimeException e) {
             throw e;

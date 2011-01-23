@@ -42,6 +42,7 @@ public class GammaAtomicBlock_speculativeTest implements GammaConstants {
 
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setSpeculativeConfigurationEnabled(true)
+                .setFat()
                 .newAtomicBlock();
 
         block.execute(new AtomicVoidClosure() {

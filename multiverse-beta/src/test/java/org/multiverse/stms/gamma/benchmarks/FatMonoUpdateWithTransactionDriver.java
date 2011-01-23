@@ -14,7 +14,7 @@ import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
 
 import static org.junit.Assert.assertEquals;
 
-public class MonoUpdateWithTransactionDriver implements GammaConstants {
+public class FatMonoUpdateWithTransactionDriver implements GammaConstants {
 
     private GammaStm stm;
 
@@ -24,7 +24,7 @@ public class MonoUpdateWithTransactionDriver implements GammaConstants {
     }
 
     public static void main(String[] srgs) {
-        MonoUpdateWithTransactionDriver driver = new MonoUpdateWithTransactionDriver();
+        FatMonoUpdateWithTransactionDriver driver = new FatMonoUpdateWithTransactionDriver();
         driver.setUp();
         driver.testNoLocking();
     }
@@ -56,6 +56,7 @@ public class MonoUpdateWithTransactionDriver implements GammaConstants {
         long initialVersion = ref.getVersion();
 
         final GammaAtomicBlock block = stm.newTransactionFactoryBuilder()
+                .setFat()
                 .setDirtyCheckEnabled(false)
                 .setWriteLockMode(writeLockMode)
                 .newAtomicBlock();

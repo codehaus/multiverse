@@ -7,7 +7,8 @@ import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransact
 import org.multiverse.stms.gamma.transactions.lean.LeanFixedLengthGammaTransaction;
 import org.multiverse.stms.gamma.transactions.lean.LeanMonoGammaTransaction;
 
-public class GammaTransactionPool implements GammaConstants {
+@SuppressWarnings({"ClassWithTooManyFields"})
+public final class GammaTransactionPool implements GammaConstants {
 
     private final static boolean ENABLED = Boolean.parseBoolean(
             System.getProperty("org.multiverse.stm,beta.transactions.BetaTransactionPool.enabled", "true"));
@@ -22,9 +23,8 @@ public class GammaTransactionPool implements GammaConstants {
     private int poolLeanMonoIndex = -1;
     private final LeanFixedLengthGammaTransaction[] poolLeanFixedLength = new LeanFixedLengthGammaTransaction[10];
     private int poolLeanFixedLengthIndex = -1;
-
-    private final FatVariableLengthGammaTransaction[] poolMap = new FatVariableLengthGammaTransaction[10];
-    private int poolMapIndex = -1;
+    private final FatVariableLengthGammaTransaction[] poolFatVariableLength = new FatVariableLengthGammaTransaction[10];
+    private int poolFatVariableLengthIndex = -1;
 
     public GammaTransactionPool() {
         enabled = ENABLED;
@@ -103,13 +103,13 @@ public class GammaTransactionPool implements GammaConstants {
      * @return the taken FatArrayTreeGammaTransaction or null of none available.
      */
     public FatVariableLengthGammaTransaction takeMap() {
-        if (!enabled || poolMapIndex == -1) {
+        if (!enabled || poolFatVariableLengthIndex == -1) {
             return null;
         }
 
-        FatVariableLengthGammaTransaction tx = poolMap[poolMapIndex];
-        poolMap[poolMapIndex] = null;
-        poolMapIndex--;
+        FatVariableLengthGammaTransaction tx = poolFatVariableLength[poolFatVariableLengthIndex];
+        poolFatVariableLength[poolFatVariableLengthIndex] = null;
+        poolFatVariableLengthIndex--;
         return tx;
     }
 
@@ -124,53 +124,59 @@ public class GammaTransactionPool implements GammaConstants {
             return;
         }
 
-        if (tx == null) {
-            throw new NullPointerException();
+        final int type = tx.transactionType;
+
+        if (type == TRANSACTIONTYPE_FAT_MONO) {
+            if (poolFatMonoIndex == poolFatMono.length - 1) {
+                return;
+            }
+
+            poolFatMonoIndex++;
+            poolFatMono[poolFatMonoIndex] = (FatMonoGammaTransaction) tx;
+            return;
         }
 
-        switch (tx.transactionType) {
-            case TRANSACTIONTYPE_FAT_MONO:
-                if (poolFatMonoIndex == poolFatMono.length - 1) {
-                    return;
-                }
+        if (type == TRANSACTIONTYPE_FAT_FIXED_LENGTH) {
+            if (poolFatFixedLengthIndex == poolFatFixedLength.length - 1) {
+                return;
+            }
 
-                poolFatMonoIndex++;
-                poolFatMono[poolFatMonoIndex] = (FatMonoGammaTransaction) tx;
-                break;
-            case TRANSACTIONTYPE_FAT_FIXED_LENGTH:
-                if (poolFatFixedLengthIndex == poolFatFixedLength.length - 1) {
-                    return;
-                }
-
-                poolFatFixedLengthIndex++;
-                poolFatFixedLength[poolFatFixedLengthIndex] = (FatFixedLengthGammaTransaction) tx;
-                break;
-            case TRANSACTIONTYPE_LEAN_MONO:
-                if (poolLeanMonoIndex == poolLeanMono.length - 1) {
-                    return;
-                }
-
-                poolLeanMonoIndex++;
-                poolLeanMono[poolLeanMonoIndex] = (LeanMonoGammaTransaction) tx;
-                break;
-            case TRANSACTIONTYPE_LEAN_FIXED_LENGTH:
-                if (poolLeanFixedLengthIndex == poolLeanFixedLength.length - 1) {
-                    return;
-                }
-
-                poolLeanFixedLengthIndex++;
-                poolLeanFixedLength[poolLeanFixedLengthIndex] = (LeanFixedLengthGammaTransaction) tx;
-                break;
-            case TRANSACTIONTYPE_FAT_VARIABLE_LENGTH:
-                if (poolMapIndex == poolMap.length - 1) {
-                    return;
-                }
-
-                poolMapIndex++;
-                poolMap[poolMapIndex] = (FatVariableLengthGammaTransaction) tx;
-                break;
-            default:
-                throw new IllegalArgumentException();
+            poolFatFixedLengthIndex++;
+            poolFatFixedLength[poolFatFixedLengthIndex] = (FatFixedLengthGammaTransaction) tx;
+            return;
         }
+
+        if (type == TRANSACTIONTYPE_LEAN_MONO) {
+            if (poolLeanMonoIndex == poolLeanMono.length - 1) {
+                return;
+            }
+
+            poolLeanMonoIndex++;
+            poolLeanMono[poolLeanMonoIndex] = (LeanMonoGammaTransaction) tx;
+            return;
+        }
+
+        if (type == TRANSACTIONTYPE_LEAN_FIXED_LENGTH) {
+            if (poolLeanFixedLengthIndex == poolLeanFixedLength.length - 1) {
+                return;
+            }
+
+            poolLeanFixedLengthIndex++;
+            poolLeanFixedLength[poolLeanFixedLengthIndex] = (LeanFixedLengthGammaTransaction) tx;
+            return;
+        }
+
+
+        if (type == TRANSACTIONTYPE_FAT_VARIABLE_LENGTH) {
+            if (poolFatVariableLengthIndex == poolFatVariableLength.length - 1) {
+                return;
+            }
+
+            poolFatVariableLengthIndex++;
+            poolFatVariableLength[poolFatVariableLengthIndex] = (FatVariableLengthGammaTransaction) tx;
+            return;
+        }
+
+        throw new IllegalArgumentException();
     }
 }

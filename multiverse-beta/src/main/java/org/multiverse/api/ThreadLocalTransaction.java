@@ -32,7 +32,7 @@ public final class ThreadLocalTransaction {
      * @return the threadlocal transaction.
      */
     public static Transaction getThreadLocalTransaction() {
-        return threadlocal.get().transaction;
+        return threadlocal.get().tx;
     }
 
     /**
@@ -57,7 +57,7 @@ public final class ThreadLocalTransaction {
      *          if no thread local transaction is found.
      */
     public static Transaction getRequiredThreadLocalTransaction() {
-        Transaction tx = threadlocal.get().transaction;
+        Transaction tx = threadlocal.get().tx;
 
         if (tx == null) {
             throw new TransactionRequiredException("No transaction is found on the ThreadLocalTransaction");
@@ -72,7 +72,7 @@ public final class ThreadLocalTransaction {
      * If a transaction is available, it isn't aborted or committed.
      */
     public static void clearThreadLocalTransaction() {
-        threadlocal.get().transaction = null;
+        threadlocal.get().tx = null;
     }
 
     /**
@@ -84,7 +84,7 @@ public final class ThreadLocalTransaction {
      * @param tx the new thread local transaction.
      */
     public static void setThreadLocalTransaction(Transaction tx) {
-        threadlocal.get().transaction = tx;
+        threadlocal.get().tx = tx;
     }
 
     //we don't want any instances.
@@ -93,7 +93,7 @@ public final class ThreadLocalTransaction {
     }
 
     public static class Container {
-        public Transaction transaction;
-        public Object transactionPool;
+        public Transaction tx;
+        public Object txPool;
     }
 }
