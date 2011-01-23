@@ -1,7 +1,7 @@
 package org.multiverse.stms.gamma.transactions.fat;
 
+import org.multiverse.api.exceptions.AbortOnlyException;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.ExplicitAbortException;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
@@ -88,7 +88,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
 
         if (abortOnly) {
             abort();
-            throw new ExplicitAbortException();
+            throw new AbortOnlyException();
         }
 
         if (size > 0) {
@@ -273,7 +273,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
 
         if (abortOnly) {
             abort();
-            throw new ExplicitAbortException();
+            throw new AbortOnlyException();
         }
 
         if (!prepareChainForCommit()) {

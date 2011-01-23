@@ -6,16 +6,16 @@ package org.multiverse.api.exceptions;
  *
  * @author Peter Veentjer.
  */
-public class ExplicitAbortException extends IllegalTransactionStateException {
+public class AbortOnlyException extends IllegalTransactionStateException {
 
-    public ExplicitAbortException() {
+    public AbortOnlyException() {
     }
 
-    public ExplicitAbortException(String message) {
+    public AbortOnlyException(String message) {
         super(message);
     }
 
-    public ExplicitAbortException(String message, Throwable cause) {
+    public AbortOnlyException(String message, Throwable cause) {
         super(message, cause);
     }
 }

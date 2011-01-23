@@ -127,7 +127,7 @@ public interface Transaction {
     /**
      * Signals that the only possible outcome of the Transaction is one that aborts. When the transaction prepares or
      * commits it checks if the transaction is marked for abort. If so, it will automatically aborted and an
-     * {@link org.multiverse.api.exceptions.ExplicitAbortException} is thrown.
+     * {@link org.multiverse.api.exceptions.AbortOnlyException} is thrown.
      * <p/>
      * This method is not threadsafe, so can only be called by the thread that used the transaction.
      *

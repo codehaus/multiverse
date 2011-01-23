@@ -4,8 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.TransactionStatus;
+import org.multiverse.api.exceptions.AbortOnlyException;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.ExplicitAbortException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.functions.Functions;
@@ -182,7 +182,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         try {
             tx.commit();
             fail();
-        } catch (ExplicitAbortException expected) {
+        } catch (AbortOnlyException expected) {
         }
 
         assertIsAborted(tx);
@@ -201,7 +201,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
             ref.set(tx, initialValue + 1);
             tx.commit();
             fail();
-        } catch (ExplicitAbortException expected) {
+        } catch (AbortOnlyException expected) {
         }
 
         assertIsAborted(tx);

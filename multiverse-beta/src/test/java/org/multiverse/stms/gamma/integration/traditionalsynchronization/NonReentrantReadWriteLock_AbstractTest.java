@@ -1,14 +1,12 @@
 package org.multiverse.stms.gamma.integration.traditionalsynchronization;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.gamma.GammaStm;
-import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -23,12 +21,11 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  *
  * @author Peter Veentjer.
  */
-public class NonReentrantReadWriteLockStressTest {
-    private GammaStm stm;
+public abstract class NonReentrantReadWriteLock_AbstractTest {
+    protected GammaStm stm;
     private int threadCount = 10;
     private ReadWriteLock readWriteLock;
     private volatile boolean stop;
-    private LockMode lockMode;
 
     @Before
     public void setUp() {
@@ -37,28 +34,15 @@ public class NonReentrantReadWriteLockStressTest {
         stop = false;
     }
 
-    @Test
-    public void testNoLocking() {
-        test(LockMode.None);
-    }
+    protected abstract AtomicBlock newReleaseWriteLockBlock();
 
-    @Test
-    public void testReadLock() {
-        test(LockMode.Read);
-    }
+    protected abstract AtomicBlock newAcquireWriteLockBlock();
 
-    @Test
-    public void testWriteLock() {
-        test(LockMode.Write);
-    }
+    protected abstract AtomicBlock newReleaseReadLockBlock();
 
-    @Test
-    public void testExclusiveLock() {
-        test(LockMode.Exclusive);
-    }
+    protected abstract AtomicBlock newAcquireReadLockBlock();
 
-    public void test(LockMode lockMode) {
-        this.lockMode = lockMode;
+    public void run() {
         readWriteLock = new ReadWriteLock();
 
         StressThread[] threads = new StressThread[threadCount];
@@ -99,21 +83,13 @@ public class NonReentrantReadWriteLockStressTest {
     }
 
     class ReadWriteLock {
-        final GammaLongRef lock = new GammaLongRef(stm);
+        final GammaRef<Long> lock = new GammaRef<Long>(stm, 0L);
         final AtomicLong readers = new AtomicLong();
         final AtomicLong writers = new AtomicLong();
-        final AtomicBlock acquireReadLockBlock = stm.newTransactionFactoryBuilder()
-                .setReadLockMode(lockMode)
-                .newAtomicBlock();
-        final AtomicBlock releaseReadLockBlock = stm.newTransactionFactoryBuilder()
-                .setReadLockMode(lockMode)
-                .newAtomicBlock();
-        final AtomicBlock acquireWriteLockBlock = stm.newTransactionFactoryBuilder()
-                .setReadLockMode(lockMode)
-                .newAtomicBlock();
-        final AtomicBlock releaseWriteLockBlock = stm.newTransactionFactoryBuilder()
-                .setReadLockMode(lockMode)
-                .newAtomicBlock();
+        final AtomicBlock acquireReadLockBlock = newAcquireReadLockBlock();
+        final AtomicBlock releaseReadLockBlock = newReleaseReadLockBlock();
+        final AtomicBlock acquireWriteLockBlock = newAcquireWriteLockBlock();
+        final AtomicBlock releaseWriteLockBlock = newReleaseWriteLockBlock();
 
 
         public void acquireReadLock() {
@@ -124,7 +100,7 @@ public class NonReentrantReadWriteLockStressTest {
                         retry();
                     }
 
-                    lock.increment();
+                    lock.set(lock.get() + 1);
                 }
             });
 
@@ -144,7 +120,7 @@ public class NonReentrantReadWriteLockStressTest {
                         throw new IllegalMonitorStateException();
                     }
 
-                    lock.decrement();
+                    lock.set(lock.get() - 1);
                 }
             });
         }
@@ -157,7 +133,7 @@ public class NonReentrantReadWriteLockStressTest {
                         retry();
                     }
 
-                    lock.set(-1);
+                    lock.set(-1L);
                 }
             });
 
@@ -176,9 +152,11 @@ public class NonReentrantReadWriteLockStressTest {
                         throw new IllegalMonitorStateException();
                     }
 
-                    lock.set(0);
+                    lock.set(0L);
                 }
             });
         }
     }
+
+
 }
