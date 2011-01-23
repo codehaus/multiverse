@@ -1,22 +1,17 @@
 package org.multiverse.stms.gamma.integration.traditionalsynchronization;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.gamma.GammaStm;
-import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
-import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
-import static org.multiverse.api.StmUtils.retry;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
@@ -25,15 +20,14 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  *
  * @author Peter Veentjer.
  */
-public class NonReentrantMutexStressTest {
+public abstract class NonReentrantMutex_AbstractTest {
 
     private volatile boolean stop;
     private int accountCount = 50;
 
     private int threadCount = processorCount() * 4;
     private ProtectedIntValue[] intValues;
-    private GammaStm stm;
-    private LockMode lockMode;
+    protected GammaStm stm;
 
     @Before
     public void setUp() {
@@ -42,30 +36,11 @@ public class NonReentrantMutexStressTest {
         stop = false;
     }
 
-    @Test
-    public void testNoLocking() {
-        test(LockMode.None);
-    }
+    protected abstract AtomicBlock newUnlockBlock();
 
-    @Test
-    public void testReadLock() {
-        test(LockMode.Read);
-    }
+    protected abstract AtomicBlock newLockBlock();
 
-    @Test
-    public void testWriteLock() {
-        test(LockMode.Write);
-    }
-
-    @Test
-    public void testExclusiveLock() {
-        test(LockMode.Exclusive);
-    }
-
-
-    public void test(LockMode lockMode) {
-        this.lockMode = lockMode;
-
+    public void run() {
         intValues = new ProtectedIntValue[accountCount];
         for (int k = 0; k < accountCount; k++) {
             intValues[k] = new ProtectedIntValue();
@@ -136,40 +111,26 @@ public class NonReentrantMutexStressTest {
     }
 
     class NonReentrantMutex {
-        final GammaLongRef locked = new GammaLongRef(stm, 0);
-        final AtomicBlock lockBlock = stm.newTransactionFactoryBuilder()
-                .setReadLockMode(lockMode)
-                .newAtomicBlock();
-        final AtomicBlock unlockBlock = stm.newTransactionFactoryBuilder()
-                .setReadLockMode(lockMode)
-                .newAtomicBlock();
+        final GammaRef locked = new GammaRef(stm, null);
+        final AtomicBlock lockBlock = newLockBlock();
+        final AtomicBlock unlockBlock = newUnlockBlock();
 
         final AtomicVoidClosure lockClosure = new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                GammaTransaction btx = (GammaTransaction) tx;
-
-                GammaRefTranlocal read = locked.openForRead(btx, LOCKMODE_NONE);
-                if (read.long_value == 1) {
-                    retry();
-                }
-
-                GammaRefTranlocal write = locked.openForWrite(btx, LOCKMODE_NONE);
-                write.long_value = 1;
+                locked.awaitNull(tx);
+                locked.set(tx, this);
             }
         };
 
         final AtomicVoidClosure unlockClosure = new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
-                GammaTransaction btx = (GammaTransaction) tx;
-
-                GammaRefTranlocal write = locked.openForWrite(btx, LOCKMODE_NONE);
-                if (write.long_value == 0) {
+                if (locked.isNull(tx)) {
                     throw new IllegalStateException();
                 }
 
-                write.long_value = 0;
+                locked.set(tx, null);
             }
         };
 
