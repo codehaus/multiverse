@@ -6,6 +6,7 @@ import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
+import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
 import static junit.framework.Assert.assertSame;
 import static org.junit.Assert.assertEquals;
@@ -31,9 +32,12 @@ public class FatVariableLengthGammaTransaction_openingManyItemsTest implements G
     }
 
     public void whenManyItems(boolean reading) {
-        FatVariableLengthGammaTransaction tx = new FatVariableLengthGammaTransaction(stm);
-
         int refCount = 10000;
+
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .setMaximumPoorMansConflictScanLength(refCount);
+        FatVariableLengthGammaTransaction tx = new FatVariableLengthGammaTransaction(config);
+
         GammaLongRef[] refs = new GammaLongRef[refCount];
         GammaRefTranlocal[] tranlocals = new GammaRefTranlocal[refCount];
         for (int k = 0; k < refCount; k++) {

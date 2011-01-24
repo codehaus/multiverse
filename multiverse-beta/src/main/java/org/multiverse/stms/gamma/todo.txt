@@ -24,6 +24,10 @@
 
 - look at the unlock after a write.
 
+- downsizing of the map transaction
+
+- selecting the right map transaction size based on previous executions.
+
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------

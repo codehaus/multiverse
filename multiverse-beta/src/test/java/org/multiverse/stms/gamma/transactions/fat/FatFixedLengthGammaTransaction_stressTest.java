@@ -53,7 +53,8 @@ public class FatFixedLengthGammaTransaction_stressTest implements GammaConstants
         Random random = new Random();
         int transactionCount = 100000;
 
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, refs.length);
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, refs.length)
+                .setMaximumPoorMansConflictScanLength(refs.length);
         config.dirtyCheck = dirtyCheck;
 
         FatFixedLengthGammaTransaction tx = null;

@@ -320,13 +320,11 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             throw new IllegalTransactionFactoryException(msg);
         }
 
-        if (speculativeConfigEnabled) {
-            boolean isFat = isFat();
+        final boolean isFat = isFat() && !speculativeConfigEnabled;
 
-            if (speculativeConfiguration.get() == null) {
-                SpeculativeGammaConfiguration newSpeculativeConfiguration = new SpeculativeGammaConfiguration(isFat);
-                speculativeConfiguration.compareAndSet(null, newSpeculativeConfiguration);
-            }
+        if (speculativeConfiguration.get() == null) {
+            SpeculativeGammaConfiguration newSpeculativeConfiguration = new SpeculativeGammaConfiguration(isFat);
+            speculativeConfiguration.compareAndSet(null, newSpeculativeConfiguration);
         }
 
         return this;
@@ -453,6 +451,40 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         return config;
     }
+
+    public GammaTransactionConfiguration setMaximumPoorMansConflictScanLength(int maximumPoorMansConflictScanLength) {
+        if (maximumPoorMansConflictScanLength < 0) {
+            throw new IllegalStateException();
+        }
+
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
+        config.readonly = readonly;
+        config.spinCount = spinCount;
+        config.readLockMode = readLockMode;
+        config.readLockModeAsInt = readLockModeAsInt;
+        config.writeLockMode = writeLockMode;
+        config.writeLockModeAsInt = writeLockModeAsInt;
+        config.dirtyCheck = dirtyCheck;
+        config.trackReads = trackReads;
+        config.maxRetries = maxRetries;
+        config.blockingAllowed = blockingAllowed;
+        config.speculativeConfigEnabled = speculativeConfigEnabled;
+        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
+        config.backoffPolicy = backoffPolicy;
+        config.interruptible = interruptible;
+        config.timeoutNs = timeoutNs;
+        config.traceLevel = traceLevel;
+        config.isolationLevel = isolationLevel;
+        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
+        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
+        config.propagationLevel = propagationLevel;
+        config.permanentListeners = permanentListeners;
+        config.controlFlowErrorsReused = controlFlowErrorsReused;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
+        config.isFat = isFat;
+        return config;
+    }
+
 
     public GammaTransactionConfiguration setReadTrackingEnabled(boolean trackReads) {
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);

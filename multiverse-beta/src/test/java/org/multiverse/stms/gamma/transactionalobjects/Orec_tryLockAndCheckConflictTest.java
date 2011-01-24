@@ -35,7 +35,7 @@ public class Orec_tryLockAndCheckConflictTest implements GammaConstants {
         updateBiased_whenOtherHasLocked(LockMode.Write, LockMode.Write, false);
         updateBiased_whenOtherHasLocked(LockMode.Write, LockMode.Exclusive, false);
 
-        //updateBiased_whenOtherHasLocked(LockMode.Commit, LockMode.None, false);
+        //updateBiased_whenOtherHasLocked(LockMode.Exclusive, LockMode.None, false);
         updateBiased_whenOtherHasLocked(LockMode.Exclusive, LockMode.Read, false);
         updateBiased_whenOtherHasLocked(LockMode.Exclusive, LockMode.Write, false);
         updateBiased_whenOtherHasLocked(LockMode.Exclusive, LockMode.Exclusive, false);

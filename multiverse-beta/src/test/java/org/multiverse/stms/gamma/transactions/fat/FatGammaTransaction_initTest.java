@@ -31,7 +31,7 @@ public abstract class FatGammaTransaction_initTest<T extends GammaTransaction> {
         T tx = newTransaction();
 
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm);
-
+        config.init();
         tx.init(config);
 
         assertSame(config, tx.getConfiguration());
