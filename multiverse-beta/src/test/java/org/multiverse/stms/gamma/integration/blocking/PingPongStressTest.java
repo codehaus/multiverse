@@ -87,6 +87,7 @@ public class PingPongStressTest {
         joinAll(threads);
 
         assertEquals(sum(threads), -ref.atomicGet());
+        System.out.println(stm.getGlobalConflictCounter().count());
     }
 
     private PingPongThread[] createThreads(AtomicBlock block, int threadCount) {
