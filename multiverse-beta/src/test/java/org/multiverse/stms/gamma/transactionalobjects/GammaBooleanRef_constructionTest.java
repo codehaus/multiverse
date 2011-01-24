@@ -12,9 +12,9 @@ import org.multiverse.stms.gamma.transactions.lean.LeanMonoGammaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsActive;
-import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasExclusiveLock;
+import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
-public class GammaRefConstructionTest {
+public class GammaBooleanRef_constructionTest {
 
     private GammaStm stm;
 
@@ -24,9 +24,29 @@ public class GammaRefConstructionTest {
     }
 
     @Test
+    public void whenInitialValueUsed() {
+        GammaBooleanRef ref = new GammaBooleanRef(stm, true);
+
+        assertVersionAndValue(ref, GammaObject.VERSION_UNCOMMITTED + 1, true);
+        assertRefHasNoLocks(ref);
+        assertReadonlyCount(ref, 0);
+        assertSurplus(ref, 0);
+    }
+
+    @Test
+    public void whenDefaultValueUsed() {
+        GammaBooleanRef ref = new GammaBooleanRef(stm);
+
+        assertVersionAndValue(ref, GammaObject.VERSION_UNCOMMITTED + 1, false);
+        assertRefHasNoLocks(ref);
+        assertReadonlyCount(ref, 0);
+        assertSurplus(ref, 0);
+    }
+
+    @Test
     public void withTransaction_whenFatMonoGammaTransactionUsed() {
         FatMonoGammaTransaction tx = new FatMonoGammaTransaction(stm);
-        GammaRef ref = new GammaRef(tx, 10);
+        GammaBooleanRef ref = new GammaBooleanRef(tx, true);
 
         assertIsActive(tx);
         assertRefHasExclusiveLock(ref, tx);
@@ -37,7 +57,7 @@ public class GammaRefConstructionTest {
     @Test
     public void withTransaction_whenFatFixedLengthGammaTransactionUsed() {
         FatFixedLengthGammaTransaction tx = new FatFixedLengthGammaTransaction(stm);
-        GammaRef ref = new GammaRef(tx, 10);
+        GammaBooleanRef ref = new GammaBooleanRef(tx, true);
 
         assertIsActive(tx);
         assertRefHasExclusiveLock(ref, tx);
@@ -48,7 +68,7 @@ public class GammaRefConstructionTest {
     @Test
     public void withTransaction_whenFatVariableLengthGammaTransactionUsed() {
         FatFixedLengthGammaTransaction tx = new FatFixedLengthGammaTransaction(stm);
-        GammaRef ref = new GammaRef(tx, 10);
+        GammaBooleanRef ref = new GammaBooleanRef(tx, true);
 
         assertIsActive(tx);
         assertRefHasExclusiveLock(ref, tx);
@@ -61,7 +81,7 @@ public class GammaRefConstructionTest {
         LeanFixedLengthGammaTransaction tx = new LeanFixedLengthGammaTransaction(stm);
 
         try {
-            new GammaRef(tx, 10);
+            new GammaBooleanRef(tx, true);
             fail();
         } catch (SpeculativeConfigurationError expected) {
         }
@@ -75,7 +95,7 @@ public class GammaRefConstructionTest {
         LeanMonoGammaTransaction tx = new LeanMonoGammaTransaction(stm);
 
         try {
-            new GammaRef(tx, 10);
+            new GammaBooleanRef(tx, true);
             fail();
         } catch (SpeculativeConfigurationError expected) {
         }
