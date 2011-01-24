@@ -20,6 +20,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
 
     public LeanMonoGammaTransaction(GammaTransactionConfiguration config) {
         super(config, TRANSACTIONTYPE_LEAN_MONO);
+        poorMansConflictScan = true;
     }
 
     @Override

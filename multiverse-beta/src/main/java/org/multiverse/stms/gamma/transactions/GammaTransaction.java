@@ -25,8 +25,8 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public long remainingTimeoutNs;
     public boolean hasWrites;
     public final int transactionType;
+    public boolean poorMansConflictScan;
 
-    public boolean arriveEnabled;
     public boolean abortOnly = false;
     public final RetryLatch listener = new DefaultRetryLatch();
 
@@ -51,31 +51,10 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
-    public SpeculativeConfigurationError abortCommuteOnCommuteRequired(AbstractGammaRef ref) {
-        config.setSpeculativeConfigurationToUseCommute();
-        abortIfAlive();
-        if (config.controlFlowErrorsReused) {
-            return SpeculativeConfigurationError.INSTANCE;
-        }
-        return new SpeculativeConfigurationError(
-                format("[%s] Failed to execute Ref.commute '%s', reason: the transaction is lean, but commute is required",
-                        config.familyName, toDebugString(ref)));
-    }
-
-    public SpeculativeConfigurationError abortOpenForConstructionRequired(AbstractGammaRef ref) {
-        config.setSpeculativeConfigurationToUseConstructedObjects();
-        abortIfAlive();
-        if (config.controlFlowErrorsReused) {
-            return SpeculativeConfigurationError.INSTANCE;
-        }
-        return new SpeculativeConfigurationError(
-                format("[%s] Failed to execute Ref.openForConstruction '%s', reason: the transaction is lean, " +
-                        "but explicit attachments of constructed objects is required",
-                        config.familyName, toDebugString(ref)));
-    }
+    // ================= open for read =============================
 
     public SpeculativeConfigurationError abortOpenForReadOrWriteOnExplicitLocking(AbstractGammaRef ref) {
-        config.setSpeculativeConfigurationToUseExplicitLocking();
+        config.updateSpeculativeConfigurationToUseExplicitLocking();
         abortIfAlive();
         if (config.controlFlowErrorsReused) {
             return SpeculativeConfigurationError.INSTANCE;
@@ -87,7 +66,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public SpeculativeConfigurationError abortOpenForReadOrWriteOnNonRefType(AbstractGammaRef ref) {
-        config.setSpeculativeConfigurationToUseNonRefType();
+        config.updateSpeculativeConfigurationToUseNonRefType();
         abortIfAlive();
         if (config.controlFlowErrorsReused) {
             return SpeculativeConfigurationError.INSTANCE;
@@ -99,15 +78,35 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     }
 
-    public final IllegalArgumentException abortOpenForConstructionOnBadReference(
-            final GammaObject ref) {
-
+    public final StmMismatchException abortOpenForReadOnBadStm(GammaObject o) {
         abortIfAlive();
-        return new IllegalArgumentException(
-                format("[%s] Failed to execute Ref.openForConstruction '%s', reason: the object is not new and has previous commits",
-                        config.familyName, toDebugString(ref)));
+        return new StmMismatchException(
+                format("[%s] Failed to execute Ref.openForRead '%s', reason: the stm the ref was created with is a different" +
+                        " stm than the stm of the transaction",
+                        config.familyName, toDebugString(o)));
     }
 
+    public final IllegalTransactionStateException abortOpenForReadOnBadStatus(GammaObject object) {
+        switch (status) {
+            case TX_PREPARED:
+                abort();
+                return new PreparedTransactionException(
+                        format("[%s] Failed to execute Ref.openForRead '%s', reason: the transaction is prepared",
+                                config.familyName, toDebugString(object)));
+            case TX_ABORTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Ref.openForRead '%s', reason: the transaction is aborted",
+                                config.familyName, toDebugString(object)));
+            case TX_COMMITTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Ref.openForRead '%s', reason: the transaction is committed",
+                                config.familyName, toDebugString(object)));
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+    // ============== open for write ============================
 
     public final ReadonlyException abortOpenForWriteOnReadonly(GammaObject object) {
         abortIfAlive();
@@ -115,6 +114,36 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                 format("[%s] Failed to Ref.openForWrite '%s', reason: the transaction is readonly",
                         config.familyName, toDebugString(object)));
     }
+
+    public final IllegalTransactionStateException abortOpenForWriteOnBadStatus(GammaObject o) {
+        switch (status) {
+            case TX_PREPARED:
+                abort();
+                return new PreparedTransactionException(
+                        format("[%s] Failed to execute Ref.openForWrite '%s', reason: the transaction is prepared",
+                                config.familyName, toDebugString(o)));
+            case TX_ABORTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Ref.openForWrite '%s', reason: the transaction is aborted",
+                                config.familyName, toDebugString(o)));
+            case TX_COMMITTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Ref.openForWrite '%s', reason: the transaction is committed",
+                                config.familyName, toDebugString(o)));
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+    public final StmMismatchException abortOpenForWriteOnBadStm(GammaObject o) {
+        abortIfAlive();
+        return new StmMismatchException(
+                format("[%s] Failed to execute Ref.openForWrite '%s', reason: the stm the ref was created with is a different" +
+                        " stm than the stm of the transaction",
+                        config.familyName, toDebugString(o)));
+    }
+
+    // ============================= retry ==============================
 
     public final IllegalTransactionStateException abortRetryOnNoRetryPossible() {
         abortIfAlive();
@@ -151,89 +180,16 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
-    public final IllegalTransactionStateException abortLocateOnBadStatus(GammaObject object) {
-        switch (status) {
-            case TX_PREPARED:
-                abort();
-                return new PreparedTransactionException(
-                        format("[%s] Failed to execute Transaction.locate '%s' , reason: the transaction is prepared",
-                                toDebugString(object), config.familyName));
-            case TX_ABORTED:
-                return new DeadTransactionException(
-                        format("[%s] Failed to execute Transaction.locate, '%s' reason: the transaction is aborted",
-                                toDebugString(object), config.familyName));
-            case TX_COMMITTED:
-                return new DeadTransactionException(
-                        format("[%s] Failed to execute Transaction.locate, '%s' reason: the transaction is committed",
-                                toDebugString(object), config.familyName));
-            default:
-                throw new IllegalStateException();
-        }
-    }
+    // ==========================  open for construction ===========================
 
-    public final NullPointerException abortLocateOnNullArgument() {
+
+    public final IllegalArgumentException abortOpenForConstructionOnBadReference(
+            final GammaObject ref) {
+
         abortIfAlive();
-        return new NullPointerException(
-                format("[%s] Failed to execute Transaction.locate, reason: the reference is null",
-                        config.familyName));
-
-    }
-
-    public final IllegalTransactionStateException abortOpenForWriteOnBadStatus(GammaObject o) {
-        switch (status) {
-            case TX_PREPARED:
-                abort();
-                return new PreparedTransactionException(
-                        format("[%s] Failed to execute Ref.openForWrite '%s', reason: the transaction is prepared",
-                                config.familyName, toDebugString(o)));
-            case TX_ABORTED:
-                return new DeadTransactionException(
-                        format("[%s] Failed to execute Ref.openForWrite '%s', reason: the transaction is aborted",
-                                config.familyName, toDebugString(o)));
-            case TX_COMMITTED:
-                return new DeadTransactionException(
-                        format("[%s] Failed to execute Ref.openForWrite '%s', reason: the transaction is committed",
-                                config.familyName, toDebugString(o)));
-            default:
-                throw new IllegalStateException();
-        }
-    }
-
-    public final StmMismatchException abortOpenForWriteOnBadStm(GammaObject o) {
-        abortIfAlive();
-        return new StmMismatchException(
-                format("[%s] Failed to execute Ref.openForWrite '%s', reason: the stm the ref was created with is a different" +
-                        " stm than the stm of the transaction",
-                        config.familyName, toDebugString(o)));
-    }
-
-
-    public final IllegalTransactionStateException abortOpenForReadOnBadStatus(GammaObject object) {
-        switch (status) {
-            case TX_PREPARED:
-                abort();
-                return new PreparedTransactionException(
-                        format("[%s] Failed to execute Ref.openForRead '%s', reason: the transaction is prepared",
-                                config.familyName, toDebugString(object)));
-            case TX_ABORTED:
-                return new DeadTransactionException(
-                        format("[%s] Failed to execute Ref.openForRead '%s', reason: the transaction is aborted",
-                                config.familyName, toDebugString(object)));
-            case TX_COMMITTED:
-                return new DeadTransactionException(
-                        format("[%s] Failed to execute Ref.openForRead '%s', reason: the transaction is committed",
-                                config.familyName, toDebugString(object)));
-            default:
-                throw new IllegalStateException();
-        }
-    }
-
-    public final StmMismatchException abortOpenForReadOnBadStm(GammaObject o) {
-        abortIfAlive();
-        return new StmMismatchException(
-                format("[%s] Failed to execute Ref.openForRead '%s', reason: the stm the ref was created with is a different" +
-                        " stm than the stm of the transaction",
-                        config.familyName, toDebugString(o)));
+        return new IllegalArgumentException(
+                format("[%s] Failed to execute Ref.openForConstruction '%s', reason: the object is not new and has previous commits",
+                        config.familyName, toDebugString(ref)));
     }
 
 
@@ -272,6 +228,31 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                 format("[%s] Failed to execute Ref.openForConstruction '%s', reason: the transaction is readonly",
                         config.familyName, toDebugString(o)));
 
+    }
+
+    public SpeculativeConfigurationError abortOpenForConstructionRequired(AbstractGammaRef ref) {
+        config.updateSpeculativeConfigurationToUseConstructedObjects();
+        abortIfAlive();
+        if (config.controlFlowErrorsReused) {
+            return SpeculativeConfigurationError.INSTANCE;
+        }
+        return new SpeculativeConfigurationError(
+                format("[%s] Failed to execute Ref.openForConstruction '%s', reason: the transaction is lean, " +
+                        "but explicit attachments of constructed objects is required",
+                        config.familyName, toDebugString(ref)));
+    }
+
+    // ============================== open for commute ======================
+
+    public SpeculativeConfigurationError abortCommuteOnCommuteRequired(AbstractGammaRef ref) {
+        config.updateSpeculativeConfigurationToUseCommute();
+        abortIfAlive();
+        if (config.controlFlowErrorsReused) {
+            return SpeculativeConfigurationError.INSTANCE;
+        }
+        return new SpeculativeConfigurationError(
+                format("[%s] Failed to execute Ref.commute '%s', reason: the transaction is lean, but commute is required",
+                        config.familyName, toDebugString(ref)));
     }
 
     public IllegalTransactionStateException abortCommuteOnBadStatus(final GammaObject object, final Function function) {
@@ -316,6 +297,37 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                         config.familyName, toDebugString(object)));
     }
 
+    // ==========================================
+
+    public final IllegalTransactionStateException abortLocateOnBadStatus(GammaObject object) {
+        switch (status) {
+            case TX_PREPARED:
+                abort();
+                return new PreparedTransactionException(
+                        format("[%s] Failed to execute Transaction.locate '%s' , reason: the transaction is prepared",
+                                toDebugString(object), config.familyName));
+            case TX_ABORTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.locate, '%s' reason: the transaction is aborted",
+                                toDebugString(object), config.familyName));
+            case TX_COMMITTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Transaction.locate, '%s' reason: the transaction is committed",
+                                toDebugString(object), config.familyName));
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+    public final NullPointerException abortLocateOnNullArgument() {
+        abortIfAlive();
+        return new NullPointerException(
+                format("[%s] Failed to execute Transaction.locate, reason: the reference is null",
+                        config.familyName));
+
+    }
+
+    // ====================== register ==========================================
 
     private NullPointerException abortRegisterOnNullListener() {
         abortIfAlive();
@@ -346,7 +358,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public SpeculativeConfigurationError abortRegisterOnListenerRequired() {
-        config.setSpeculativeConfigurationToUseListeners();
+        config.updateSpeculativeConfigurationToUseListeners();
         abortIfAlive();
         if (config.controlFlowErrorsReused) {
             return SpeculativeConfigurationError.INSTANCE;
@@ -422,14 +434,25 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
-    public final SpeculativeConfigurationError abortOnTooSmallSize(int minimalSize) {
-        config.needsMinimalTransactionLength(minimalSize);
+    public final SpeculativeConfigurationError abortOnTransactionTooSmall(int minimalSize) {
+        //todo:
+        config.updateSpeculativeConfigurationToUseMinimalTransactionLength(minimalSize);
         abortIfAlive();
         if (config.controlFlowErrorsReused) {
             return SpeculativeConfigurationError.INSTANCE;
-        } else {
-            return new SpeculativeConfigurationError();
         }
+
+        return new SpeculativeConfigurationError();
+    }
+
+    public final SpeculativeConfigurationError abortOnTransactionTooLargeForPoorMansConflictScan() {
+        config.updateSpeculativeConfigurationToUseRichMansConflictScan();
+        abortIfAlive();
+        if (config.controlFlowErrorsReused) {
+            return SpeculativeConfigurationError.INSTANCE;
+        }
+        //todo: correct message
+        return new SpeculativeConfigurationError();
     }
 
     public final boolean hasWrites() {
@@ -585,6 +608,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         if (config == null) {
             throw new NullPointerException();
         }
+
         this.config = config;
         hardReset();
     }

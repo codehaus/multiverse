@@ -20,6 +20,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
 
     public FatMonoGammaTransaction(GammaTransactionConfiguration config) {
         super(config, TRANSACTIONTYPE_FAT_MONO);
+        poorMansConflictScan = true;
     }
 
     @Override

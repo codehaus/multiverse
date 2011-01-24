@@ -50,7 +50,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public TraceLevel traceLevel = TraceLevel.None;
     public boolean controlFlowErrorsReused = false;
     public boolean isFat = false;
-    public int maximumFullConflictScanLength;
+    public int maximumPoorMansConflictScanLength;
 
     public ArrayList<TransactionListener> permanentListeners;
 
@@ -98,7 +98,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         this.controlFlowErrorsReused = configuration.controlFlowErrorsReused;
         this.familyName = "anonymoustransaction-" + idGenerator.incrementAndGet();
         this.isAnonymous = true;
-        this.maximumFullConflictScanLength = configuration.maximumFullConflictScanLength;
+        this.maximumPoorMansConflictScanLength = configuration.maximumPoorMansConflictScanLength;
         this.isFat = configuration.isFat;
     }
 
@@ -221,7 +221,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         return Collections.unmodifiableList(permanentListeners);
     }
 
-    public void setSpeculativeConfigurationToUseNonRefType() {
+    public void updateSpeculativeConfigurationToUseNonRefType() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
             SpeculativeGammaConfiguration update = current.createWithNonRefType();
@@ -231,7 +231,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
     }
 
-    public void setSpeculativeConfigurationTouseOrElse() {
+    public void updateSpeculativeConfigurationTouseOrElse() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
             SpeculativeGammaConfiguration update = current.createWithOrElseRequired();
@@ -241,7 +241,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
     }
 
-    public void setSpeculativeConfigurationToUseListeners() {
+    public void updateSpeculativeConfigurationToUseListeners() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
             SpeculativeGammaConfiguration update = current.createWithListenersRequired();
@@ -251,7 +251,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
     }
 
-    public void setSpeculativeConfigurationToUseCommute() {
+    public void updateSpeculativeConfigurationToUseCommute() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
             SpeculativeGammaConfiguration update = current.createWithCommuteRequired();
@@ -261,7 +261,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
     }
 
-    public void setSpeculativeConfigurationToUseExplicitLocking() {
+    public void updateSpeculativeConfigurationToUseExplicitLocking() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
             SpeculativeGammaConfiguration update = current.createWithLocksRequired();
@@ -271,7 +271,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
     }
 
-    public void setSpeculativeConfigurationToUseConstructedObjects() {
+    public void updateSpeculativeConfigurationToUseConstructedObjects() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
             SpeculativeGammaConfiguration next = current.createWithConstructedObjectsRequired();
@@ -282,7 +282,18 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
     }
 
-    public void needsMinimalTransactionLength(int newLength) {
+    public void updateSpeculativeConfigurationToUseRichMansConflictScan() {
+        while (true) {
+            SpeculativeGammaConfiguration current = speculativeConfiguration.get();
+            SpeculativeGammaConfiguration next = current.createWithRichMansConflictScan();
+
+            if (speculativeConfiguration.compareAndSet(current, next)) {
+                return;
+            }
+        }
+    }
+
+    public void updateSpeculativeConfigurationToUseMinimalTransactionLength(int newLength) {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
             SpeculativeGammaConfiguration next = current.createWithMinimalLength(newLength);
@@ -374,7 +385,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         return config;
     }
 
@@ -406,7 +417,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         return config;
     }
 
@@ -439,7 +450,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         return config;
     }
 
@@ -467,7 +478,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         config.isFat = isFat;
         return config;
     }
@@ -496,7 +507,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.propagationLevel = propagationLevel;
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         config.isFat = isFat;
         return config;
     }
@@ -526,7 +537,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         return config;
     }
 
@@ -555,7 +566,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         return config;
     }
 
@@ -584,7 +595,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         return config;
     }
 
@@ -613,7 +624,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         return config;
     }
 
@@ -642,7 +653,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         return config;
     }
 
@@ -675,7 +686,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         return config;
     }
 
@@ -708,7 +719,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         return config;
     }
 
@@ -741,7 +752,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         return config;
     }
 
@@ -774,7 +785,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.permanentListeners = permanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         return config;
     }
 
@@ -808,7 +819,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         return config;
     }
 
@@ -841,7 +852,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         return config;
     }
 
@@ -874,7 +885,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         return config;
     }
 
@@ -904,7 +915,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = true;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         return config;
     }
 
@@ -943,7 +954,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.propagationLevel = propagationLevel;
         config.permanentListeners = newPermanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.maximumFullConflictScanLength = maximumFullConflictScanLength;
+        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         return config;
     }
 
@@ -972,8 +983,9 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
                 ", readWriteConflictReuse=" + controlFlowErrorsReused +
                 ", interruptible=" + interruptible +
                 ", isFat=" + isFat +
-                ", maximumFullConflictScanLength=" + maximumFullConflictScanLength +
+                ", maximumFullConflictScanLength=" + maximumPoorMansConflictScanLength +
                 ", permanentListeners=" + permanentListeners +
                 '}';
     }
+
 }

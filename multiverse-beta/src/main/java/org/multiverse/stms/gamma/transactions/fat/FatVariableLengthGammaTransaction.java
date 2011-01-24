@@ -325,30 +325,6 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         }
     }
 
-    public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
-        if (!hasReads) {
-            return true;
-        }
-
-        if (config.readLockModeAsInt > LOCKMODE_NONE) {
-            return true;
-        }
-
-        //doing a full conflict scan
-        for (int k = 0; k < array.length; k++) {
-            final GammaRefTranlocal tranlocal = array[k];
-            //noinspection ObjectEquality
-            if (tranlocal == null || tranlocal == justAdded) {
-                continue;
-            }
-
-            if (tranlocal.owner.hasReadConflict(tranlocal)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
 
     @Override
     public final boolean softReset() {
@@ -370,9 +346,41 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         status = TX_ACTIVE;
         hasWrites = false;
         remainingTimeoutNs = config.timeoutNs;
+        poorMansConflictScan = !config.speculativeConfiguration.get().isRichMansConflictScanRequired;
         attempt = 1;
         size = 0;
         hasReads = false;
         abortOnly = false;
+    }
+
+    public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
+        if (!hasReads) {
+            return true;
+        }
+
+        if (config.readLockModeAsInt > LOCKMODE_NONE) {
+            return true;
+        }
+
+        if (poorMansConflictScan) {
+            if (size > config.maximumPoorMansConflictScanLength) {
+                throw abortOnTransactionTooLargeForPoorMansConflictScan();
+            }
+        }
+
+        //doing a full conflict scan
+        for (int k = 0; k < array.length; k++) {
+            final GammaRefTranlocal tranlocal = array[k];
+            //noinspection ObjectEquality
+            if (tranlocal == null || tranlocal == justAdded) {
+                continue;
+            }
+
+            if (tranlocal.owner.hasReadConflict(tranlocal)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

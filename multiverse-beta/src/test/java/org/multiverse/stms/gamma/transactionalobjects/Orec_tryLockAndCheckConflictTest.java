@@ -1,6 +1,7 @@
 package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.stms.gamma.GammaConstants;
@@ -105,7 +106,7 @@ public class Orec_tryLockAndCheckConflictTest implements GammaConstants {
                              LockMode expectedLockMode, int expectedSurplus) {
         GammaLongRef ref = new GammaLongRef(stm);
         GammaTransaction tx = stm.startDefaultTransaction();
-        tx.arriveEnabled = arriveNeeded;
+        tx.poorMansConflictScan = !arriveNeeded;
         GammaRefTranlocal tranlocal = ref.openForRead(tx, firstLockMode.asInt());
 
         boolean result = ref.tryLockAndCheckConflict(1, tranlocal, secondLockMode.asInt());
@@ -142,7 +143,7 @@ public class Orec_tryLockAndCheckConflictTest implements GammaConstants {
     public void readBiased(LockMode firstLockMode, LockMode secondLockMode, LockMode expectedLockMode) {
         GammaLongRef ref = makeReadBiased(new GammaLongRef(stm));
         GammaTransaction tx = stm.startDefaultTransaction();
-        tx.arriveEnabled = true;
+        tx.poorMansConflictScan = false;
         GammaRefTranlocal tranlocal = ref.openForRead(tx, firstLockMode.asInt());
 
         boolean result = ref.tryLockAndCheckConflict(1, tranlocal, secondLockMode.asInt());
@@ -154,7 +155,8 @@ public class Orec_tryLockAndCheckConflictTest implements GammaConstants {
         assertSurplus(ref, 1);
     }
 
-
+    @Test
+    @Ignore
     public void lockNotFree() {
 
     }

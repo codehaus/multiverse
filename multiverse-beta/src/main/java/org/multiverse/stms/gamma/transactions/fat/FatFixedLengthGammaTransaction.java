@@ -39,42 +39,6 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         head = h;
     }
 
-    public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
-        if (!hasReads) {
-            return true;
-        }
-
-        if (config.readLockModeAsInt > LOCKMODE_NONE) {
-            return true;
-        }
-
-        //if(config.isolationLevel)
-
-        if (arriveEnabled) {
-
-        }
-
-        GammaRefTranlocal node = head;
-        while (node != null) {
-            //if we are at the end, we are done.
-            if (node.owner == null) {
-                break;
-            }
-
-            //lets skip the one we just added
-            //noinspection ObjectEquality
-            if (node != justAdded) {
-                //if there is a read conflict, we are doe
-                if (node.owner.hasReadConflict(node)) {
-                    return false;
-                }
-            }
-
-            node = node.next;
-        }
-
-        return true;
-    }
 
     @Override
     public final void commit() {
@@ -301,6 +265,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         hasWrites = false;
         size = 0;
         remainingTimeoutNs = config.timeoutNs;
+        poorMansConflictScan = !config.speculativeConfiguration.get().isRichMansConflictScanRequired;
         attempt = 1;
         hasReads = false;
         abortOnly = false;
@@ -336,4 +301,44 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         newHead.previous = null;
         head = newHead;
     }
+
+    public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
+        if (!hasReads) {
+            return true;
+        }
+
+        if (config.readLockModeAsInt > LOCKMODE_NONE) {
+            return true;
+        }
+
+        //if(config.isolationLevel)
+
+        if (poorMansConflictScan) {
+            if (size > config.maximumPoorMansConflictScanLength) {
+                throw abortOnTransactionTooLargeForPoorMansConflictScan();
+            }
+        }
+
+        GammaRefTranlocal node = head;
+        while (node != null) {
+            //if we are at the end, we are done.
+            if (node.owner == null) {
+                break;
+            }
+
+            //lets skip the one we just added
+            //noinspection ObjectEquality
+            if (node != justAdded) {
+                //if there is a read conflict, we are doe
+                if (node.owner.hasReadConflict(node)) {
+                    return false;
+                }
+            }
+
+            node = node.next;
+        }
+
+        return true;
+    }
+
 }

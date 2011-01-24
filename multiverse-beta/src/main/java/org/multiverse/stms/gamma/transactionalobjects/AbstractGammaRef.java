@@ -45,7 +45,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     public final boolean flattenCommute(final GammaTransaction tx, final GammaRefTranlocal tranlocal, final int lockMode) {
         final GammaTransactionConfiguration config = tx.config;
 
-        if (!load(tranlocal, lockMode, config.spinCount, tx.arriveEnabled)) {
+        if (!load(tranlocal, lockMode, config.spinCount, !tx.poorMansConflictScan)) {
             return false;
         }
 
@@ -406,7 +406,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (tranlocal.owner != null) {
-            throw tx.abortOnTooSmallSize(2);
+            throw tx.abortOnTransactionTooSmall(2);
         }
 
         tx.hasWrites = true;
@@ -497,7 +497,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (newNode == null) {
-            throw tx.abortOnTooSmallSize(config.maxFixedLengthTransactionSize + 1);
+            throw tx.abortOnTransactionTooSmall(config.maxFixedLengthTransactionSize + 1);
         }
 
         newNode.owner = this;
@@ -579,11 +579,11 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (tranlocal.owner != null) {
-            throw tx.abortOnTooSmallSize(2);
+            throw tx.abortOnTransactionTooSmall(2);
         }
 
         initTranlocalForRead(config, tranlocal);
-        if (!load(tranlocal, lockMode, config.spinCount, tx.arriveEnabled)) {
+        if (!load(tranlocal, lockMode, config.spinCount, !tx.poorMansConflictScan)) {
             throw tx.abortOnReadWriteConflict();
         }
 
@@ -647,11 +647,11 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (newNode == null) {
-            throw tx.abortOnTooSmallSize(config.maxFixedLengthTransactionSize + 1);
+            throw tx.abortOnTransactionTooSmall(config.maxFixedLengthTransactionSize + 1);
         }
 
         initTranlocalForRead(config, newNode);
-        if (!load(newNode, desiredLockMode, config.spinCount, tx.arriveEnabled)) {
+        if (!load(newNode, desiredLockMode, config.spinCount, !tx.poorMansConflictScan)) {
             throw tx.abortOnReadWriteConflict();
         }
 
@@ -716,7 +716,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tx.attach(tranlocal, identityHash);
         tx.size++;
 
-        if (!load(tranlocal, desiredLockMode, config.spinCount, tx.arriveEnabled)) {
+        if (!load(tranlocal, desiredLockMode, config.spinCount, !tx.poorMansConflictScan)) {
             throw tx.abortOnReadWriteConflict();
         }
 
@@ -771,7 +771,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         //we have not found it, but there also is no spot available.
         if (newNode == null) {
-            throw tx.abortOnTooSmallSize(tx.config.maxFixedLengthTransactionSize + 1);
+            throw tx.abortOnTransactionTooSmall(tx.config.maxFixedLengthTransactionSize + 1);
         }
 
         final GammaTransactionConfiguration config = tx.config;
@@ -782,6 +782,11 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         if (type != TYPE_REF) {
             throw tx.abortOpenForReadOrWriteOnNonRefType(this);
+        }
+
+        int size = tx.size;
+        if (size > config.maximumPoorMansConflictScanLength) {
+            throw tx.abortOnTransactionTooLargeForPoorMansConflictScan();
         }
 
         //load it
@@ -819,7 +824,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             }
         }
 
-        tx.size++;
+        tx.size = size + 1;
         //lets put it in the front it isn't the first one that is opened.
         if (tx.size > 1) {
             tx.shiftInFront(newNode);
@@ -867,7 +872,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (tranlocal.owner != null) {
-            throw tx.abortOnTooSmallSize(2);
+            throw tx.abortOnTransactionTooSmall(2);
         }
 
         final GammaTransactionConfiguration config = tx.config;
@@ -1030,7 +1035,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tx.hasWrites = true;
 
         initTranlocalForWrite(config, tranlocal);
-        if (!load(tranlocal, desiredLockMode, config.spinCount, tx.arriveEnabled)) {
+        if (!load(tranlocal, desiredLockMode, config.spinCount, !tx.poorMansConflictScan)) {
             throw tx.abortOnReadWriteConflict();
         }
 
@@ -1093,11 +1098,11 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (tranlocal.owner != null) {
-            throw tx.abortOnTooSmallSize(2);
+            throw tx.abortOnTransactionTooSmall(2);
         }
 
         initTranlocalForWrite(config, tranlocal);
-        if (!load(tranlocal, desiredLockMode, config.spinCount, tx.arriveEnabled)) {
+        if (!load(tranlocal, desiredLockMode, config.spinCount, !tx.poorMansConflictScan)) {
             throw tx.abortOnReadWriteConflict();
         }
 
@@ -1169,11 +1174,11 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (newNode == null) {
-            throw tx.abortOnTooSmallSize(config.maxFixedLengthTransactionSize + 1);
+            throw tx.abortOnTransactionTooSmall(config.maxFixedLengthTransactionSize + 1);
         }
 
         initTranlocalForWrite(config, newNode);
-        if (!load(newNode, lockMode, config.spinCount, tx.arriveEnabled)) {
+        if (!load(newNode, lockMode, config.spinCount, !tx.poorMansConflictScan)) {
             throw tx.abortOnReadWriteConflict();
         }
 
@@ -1272,7 +1277,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (tranlocal.owner != null) {
-            throw tx.abortOnTooSmallSize(2);
+            throw tx.abortOnTransactionTooSmall(2);
         }
 
         tx.hasWrites = true;
@@ -1347,7 +1352,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (newNode == null) {
-            throw tx.abortOnTooSmallSize(config.maxFixedLengthTransactionSize + 1);
+            throw tx.abortOnTransactionTooSmall(config.maxFixedLengthTransactionSize + 1);
         }
 
         tx.size++;
