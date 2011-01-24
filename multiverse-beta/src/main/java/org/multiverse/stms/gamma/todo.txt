@@ -22,13 +22,13 @@
 
 - check read+locklevel & write+locklevel
 
-- once a commuting tranlocal is made read/write, should a conflict check be done?
-
 - look at the unlock after a write.
 
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- once a commuting tranlocal is made read/write, should a conflict check be done?
 
 - GammaRef.atomicGetAndSet
 
