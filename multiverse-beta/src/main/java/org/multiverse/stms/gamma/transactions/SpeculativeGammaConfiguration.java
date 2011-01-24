@@ -10,9 +10,10 @@ public final class SpeculativeGammaConfiguration {
     public final boolean isFat;
     public final boolean areLocksRequired;
     public final boolean constructedObjectsRequired;
+    public final boolean arriveDepartConflictScan;
 
     public SpeculativeGammaConfiguration(boolean fat) {
-        this(fat, fat, fat, fat, fat, fat, fat, fat ? Integer.MAX_VALUE : 1);
+        this(fat, fat, fat, fat, fat, fat, fat, fat, fat ? Integer.MAX_VALUE : 1);
     }
 
     public SpeculativeGammaConfiguration(
@@ -23,6 +24,7 @@ public final class SpeculativeGammaConfiguration {
             final boolean orelseRequired,
             final boolean areLocksRequired,
             final boolean constructedObjectsRequired,
+            final boolean arriveDepartConflictScan,
             final int minimalLength) {
 
         if (minimalLength < 0) {
@@ -35,6 +37,7 @@ public final class SpeculativeGammaConfiguration {
         this.isOrelseRequired = orelseRequired;
         this.isFat = fat;
         this.areLocksRequired = areLocksRequired;
+        this.arriveDepartConflictScan = arriveDepartConflictScan;
         this.constructedObjectsRequired = constructedObjectsRequired;
     }
 
@@ -55,6 +58,7 @@ public final class SpeculativeGammaConfiguration {
                 isOrelseRequired,
                 areLocksRequired,
                 constructedObjectsRequired,
+                arriveDepartConflictScan,
                 newMinimalLength
         );
     }
@@ -72,6 +76,7 @@ public final class SpeculativeGammaConfiguration {
                 isOrelseRequired,
                 true,
                 constructedObjectsRequired,
+                arriveDepartConflictScan,
                 minimalLength
         );
     }
@@ -89,6 +94,7 @@ public final class SpeculativeGammaConfiguration {
                 isOrelseRequired,
                 areLocksRequired,
                 true,
+                arriveDepartConflictScan,
                 minimalLength
         );
     }
@@ -106,6 +112,7 @@ public final class SpeculativeGammaConfiguration {
                 isOrelseRequired,
                 areLocksRequired,
                 constructedObjectsRequired,
+                arriveDepartConflictScan,
                 minimalLength
         );
     }
@@ -123,6 +130,7 @@ public final class SpeculativeGammaConfiguration {
                 true,
                 areLocksRequired,
                 constructedObjectsRequired,
+                arriveDepartConflictScan,
                 minimalLength);
     }
 
@@ -139,6 +147,7 @@ public final class SpeculativeGammaConfiguration {
                 isOrelseRequired,
                 areLocksRequired,
                 constructedObjectsRequired,
+                arriveDepartConflictScan,
                 minimalLength
         );
     }
@@ -156,6 +165,7 @@ public final class SpeculativeGammaConfiguration {
                 isOrelseRequired,
                 areLocksRequired,
                 constructedObjectsRequired,
+                arriveDepartConflictScan,
                 minimalLength
         );
     }
@@ -169,6 +179,7 @@ public final class SpeculativeGammaConfiguration {
                 ", isOrelseRequired=" + isOrelseRequired +
                 ", areLocksRequired=" + areLocksRequired +
                 ", minimalLength=" + minimalLength +
+                ", arriveDepartConflictScan=" + arriveDepartConflictScan +
                 ", constructedObjectsRequired=" + constructedObjectsRequired +
                 ", isFat=" + isFat +
                 '}';

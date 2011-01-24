@@ -14,7 +14,7 @@ import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasExclusiveLock;
 
-public class GammaLongRefConstructionTest {
+public class GammaLongRef_constructionTest {
 
     private GammaStm stm;
 

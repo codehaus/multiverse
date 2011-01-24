@@ -774,6 +774,12 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOnTooSmallSize(tx.config.maxFixedLengthTransactionSize + 1);
         }
 
+        final GammaTransactionConfiguration config = tx.config;
+
+        if (config.stm != stm) {
+            throw tx.abortOpenForReadOnBadStm(this);
+        }
+
         if (type != TYPE_REF) {
             throw tx.abortOpenForReadOrWriteOnNonRefType(this);
         }
@@ -862,6 +868,12 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         if (tranlocal.owner != null) {
             throw tx.abortOnTooSmallSize(2);
+        }
+
+        final GammaTransactionConfiguration config = tx.config;
+
+        if (config.stm != stm) {
+            throw tx.abortOpenForReadOnBadStm(this);
         }
 
         if (type != TYPE_REF) {

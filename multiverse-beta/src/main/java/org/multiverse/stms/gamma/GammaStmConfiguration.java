@@ -143,11 +143,23 @@ public final class GammaStmConfiguration {
     public boolean isFat = false;
 
     /**
+     * The maximum size of a transaction that is allowed to do a full conflict scan instead of arrive/depart operations. Arrive/depart
+     * is more expensive since it increased the pressure on refs that a full conflict scan for short transactions, but at a certain length
+     * of the transaction only needing to do a full conflict scan when the global conflict counter increases, becomes cheaper.
+     */
+    public int maximumFullConflictScanLength = 20;
+
+    /**
      * Checks if the configuration is valid.
      *
      * @throws IllegalStateException if the configuration isn't valid.
      */
     public void validate() {
+        if (maximumFullConflictScanLength < 0) {
+            throw new IllegalStateException("[GammaStmConfiguration] maximumFullConflictScanSize can't be smaller than 0, " +
+                    "maximumFullConflictScanSize was " + maxFixedLengthTransactionSize);
+        }
+
         if (readLockMode == null) {
             throw new IllegalStateException("[GammaStmConfiguration] readLockMode can't be null");
         }
