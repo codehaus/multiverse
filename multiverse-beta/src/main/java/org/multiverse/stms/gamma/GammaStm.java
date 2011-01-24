@@ -339,7 +339,7 @@ public final class GammaStm implements Stm {
         private final GammaTransactionConfiguration config;
 
         NonSpeculativeGammaTransactionFactory(final GammaTransactionConfiguration config) {
-            this.config = config;
+            this.config = config.init();
         }
 
         @Override
@@ -376,7 +376,7 @@ public final class GammaStm implements Stm {
         private final GammaTransactionConfiguration config;
 
         SpeculativeGammaTransactionFactory(final GammaTransactionConfiguration config) {
-            this.config = config;
+            this.config = config.init();
         }
 
         @Override

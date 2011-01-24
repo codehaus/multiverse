@@ -17,7 +17,7 @@ public class FatMonoGammaTransactionFactory implements GammaTransactionFactory {
     }
 
     public FatMonoGammaTransactionFactory(GammaTransactionConfiguration config) {
-        this.config = config.setControlFlowErrorsReused(false);
+        this.config = config.setControlFlowErrorsReused(false).init();
     }
 
     @Override

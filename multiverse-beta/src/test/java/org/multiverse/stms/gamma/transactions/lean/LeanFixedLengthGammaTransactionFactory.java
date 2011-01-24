@@ -21,7 +21,7 @@ public class LeanFixedLengthGammaTransactionFactory implements GammaTransactionF
     }
 
     public LeanFixedLengthGammaTransactionFactory(GammaTransactionConfiguration config) {
-        this.config = config;
+        this.config = config.init();
     }
 
     @Override

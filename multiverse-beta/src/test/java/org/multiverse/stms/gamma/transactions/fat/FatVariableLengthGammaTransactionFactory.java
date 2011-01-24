@@ -16,7 +16,7 @@ public final class FatVariableLengthGammaTransactionFactory implements GammaTran
     }
 
     public FatVariableLengthGammaTransactionFactory(GammaTransactionConfiguration config) {
-        this.config = config;
+        this.config = config.init();
     }
 
     @Override

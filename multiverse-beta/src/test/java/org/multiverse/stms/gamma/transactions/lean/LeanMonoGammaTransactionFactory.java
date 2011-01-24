@@ -17,7 +17,7 @@ public class LeanMonoGammaTransactionFactory implements GammaTransactionFactory 
     }
 
     public LeanMonoGammaTransactionFactory(GammaTransactionConfiguration config) {
-        this.config = config.setControlFlowErrorsReused(false);
+        this.config = config.setControlFlowErrorsReused(false).init();
     }
 
     @Override

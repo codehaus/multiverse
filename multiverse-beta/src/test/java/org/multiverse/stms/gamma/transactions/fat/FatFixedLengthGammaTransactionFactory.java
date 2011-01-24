@@ -17,7 +17,7 @@ public class FatFixedLengthGammaTransactionFactory implements GammaTransactionFa
     }
 
     public FatFixedLengthGammaTransactionFactory(GammaTransactionConfiguration config) {
-        this.config = config;
+        this.config = config.init();
     }
 
     @Override
