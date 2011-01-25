@@ -140,8 +140,8 @@ public abstract class Isolation_AbstractTest implements GammaConstants {
         System.out.printf("Performance:       %s transactions/second\n",
                 transactionsPerSecondAsString(transactionsPerThread, totalDurationMs, threadCount));
 
-        assertEquals(threadCount * transactionsPerThread, ref.atomicGet());
         System.out.println("ref.orec: " + ref.___toOrecString());
+        assertEquals(threadCount * transactionsPerThread, ref.atomicGet());
     }
 
     class UpdateThread extends TestThread {
