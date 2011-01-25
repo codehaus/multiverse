@@ -3,7 +3,7 @@ package org.multiverse.stms.gamma.integration.isolation;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.gamma.GammaStm;
-import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.assertEquals;
@@ -22,7 +22,8 @@ public class DirtyCheckTest {
 
     @Test
     public void whenNoDirtyCheckAndNonDirtyWrite() {
-        GammaLongRef ref = new GammaLongRef(stm);
+        String initialValue = "foo";
+        GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
@@ -30,33 +31,37 @@ public class DirtyCheckTest {
                 .newTransactionFactory()
                 .newTransaction();
 
-        ref.set(tx, 0);
+        ref.set(tx, initialValue);
         tx.commit();
 
-        assertEquals(0, ref.atomicGet());
-        assertVersionAndValue(ref, initialVersion + 1, 0);
+        assertEquals(initialValue, ref.atomicGet());
+        assertVersionAndValue(ref, initialVersion + 1, initialValue);
     }
 
     @Test
     public void whenNoDirtyCheckAndDirtyWrite() {
-        GammaLongRef ref = new GammaLongRef(stm);
+        String initialValue = "foo";
+        GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
+
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(false)
                 .newTransactionFactory()
                 .newTransaction();
 
-        ref.set(tx, 1);
+        String newValue = "bar";
+        ref.set(tx, newValue);
         tx.commit();
 
-        assertEquals(1, ref.atomicGet());
-        assertVersionAndValue(ref, initialVersion + 1, 1);
+        assertEquals(newValue, ref.atomicGet());
+        assertVersionAndValue(ref, initialVersion + 1, newValue);
     }
 
     @Test
     public void whenDirtyCheckAndNonDirtyWrite() {
-        GammaLongRef ref = new GammaLongRef(stm);
+        String initialValue = "foo";
+        GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
@@ -64,16 +69,17 @@ public class DirtyCheckTest {
                 .newTransactionFactory()
                 .newTransaction();
 
-        ref.set(tx, 0);
+        ref.set(tx, initialValue);
         tx.commit();
 
-        assertEquals(0, ref.atomicGet());
-        assertVersionAndValue(ref, initialVersion, 0);
+        assertEquals(initialValue, ref.atomicGet());
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
     public void whenDirtyCheckAndDirtyWrite() {
-        GammaLongRef ref = new GammaLongRef(stm);
+        String initialValue = "foo";
+        GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
@@ -81,10 +87,11 @@ public class DirtyCheckTest {
                 .newTransactionFactory()
                 .newTransaction();
 
-        ref.set(tx, 1);
+        String newValue = "bar";
+        ref.set(tx, newValue);
         tx.commit();
 
-        assertEquals(1, ref.atomicGet());
-        assertVersionAndValue(ref, initialVersion + 1, 1);
+        assertEquals(newValue, ref.atomicGet());
+        assertVersionAndValue(ref, initialVersion + 1, newValue);
     }
 }

@@ -1,16 +1,13 @@
 package org.multiverse.stms.gamma.integration.traditionalsynchronization;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.multiverse.TestThread;
 import org.multiverse.TestUtils;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.api.references.LongRef;
 import org.multiverse.stms.gamma.GammaStm;
-import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -24,8 +21,8 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  * A StressTest that checks if a the Semaphore; a traditional synchronization structure can be build
  * using an STM.
  */
-public class NonReentrantSemaphoreStressTest {
-    private GammaStm stm;
+public abstract class Semaphore_AbstractTest {
+    protected GammaStm stm;
     private volatile boolean stop;
     private int threadCount = 10;
     private int resourceCount = 5;
@@ -38,28 +35,12 @@ public class NonReentrantSemaphoreStressTest {
         stop = false;
     }
 
-    @Test
-    public void testNoLocking() {
-        test(LockMode.None);
-    }
+    protected abstract AtomicBlock newDownBlock();
 
-    @Test
-    public void testReadLock() {
-        test(LockMode.Read);
-    }
+    protected abstract AtomicBlock newUpBlock();
 
-    @Test
-    public void testWriteLock() {
-        test(LockMode.Write);
-    }
-
-    @Test
-    public void testExclusiveLock() {
-        test(LockMode.Exclusive);
-    }
-
-    public void test(LockMode lockMode) {
-        semaphore = new Semaphore(resourceCount, lockMode);
+    public void run() {
+        semaphore = new Semaphore(resourceCount);
 
         WorkerThread[] workers = new WorkerThread[threadCount];
         for (int k = 0; k < threadCount; k++) {
@@ -97,26 +78,20 @@ public class NonReentrantSemaphoreStressTest {
 
     class Semaphore {
 
-        private LongRef ref;
+        private GammaRef<Long> ref;
         private AtomicLong users = new AtomicLong();
-        private AtomicBlock upBlock;
-        private AtomicBlock downBlock;
+        private AtomicBlock upBlock = newUpBlock();
+        private AtomicBlock downBlock = newDownBlock();
 
-        public Semaphore(int initial, LockMode lockMode) {
-            ref = new GammaLongRef(stm, initial);
-            upBlock = stm.newTransactionFactoryBuilder()
-                    .setReadLockMode(lockMode)
-                    .newAtomicBlock();
-            downBlock = stm.newTransactionFactoryBuilder()
-                    .setReadLockMode(lockMode)
-                    .newAtomicBlock();
+        public Semaphore(int initial) {
+            ref = new GammaRef<Long>(stm, new Long(initial));
         }
 
         public void up() {
             upBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    ref.increment();
+                    ref.set(ref.get() + 1);
                 }
             });
 
@@ -136,9 +111,10 @@ public class NonReentrantSemaphoreStressTest {
                         retry();
                     }
 
-                    ref.decrement();
+                    ref.set(ref.get() - 1);
                 }
             });
         }
     }
+
 }

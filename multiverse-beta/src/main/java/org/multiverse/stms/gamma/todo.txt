@@ -2,13 +2,13 @@
                         to do
 --------------------------------------------------------------------
 
+- active logging on block?
+
 - commute: while commuting, no transaction accessed allowed.
 
 - readonly/readbiased
 
 - read consistency
-
-- speculative size for full conflict scan
 
 - last readwrite conflict should show which transactional object caused it.
 
@@ -31,6 +31,8 @@
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- speculative size for full conflict scan
 
 - once a commuting tranlocal is made read/write, should a conflict check be done?
 

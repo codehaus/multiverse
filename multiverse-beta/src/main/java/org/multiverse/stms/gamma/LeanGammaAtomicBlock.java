@@ -614,6 +614,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         }
                         tx.awaitUpdate();
                     } catch (SpeculativeConfigurationError e) {
+                        e.printStackTrace();
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a speculative configuration error",

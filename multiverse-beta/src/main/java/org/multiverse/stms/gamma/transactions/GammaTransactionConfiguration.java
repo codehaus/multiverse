@@ -316,7 +316,8 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
 
         if (readLockMode != LockMode.None && !trackReads) {
-            String msg = format("[%s] If readLockMode is [%s] , read tracking should be enabled", familyName, readLockMode);
+            String msg = format("[%s] If readLockMode is [%s] , read tracking should be enabled",
+                    familyName, readLockMode);
             throw new IllegalTransactionFactoryException(msg);
         }
 
@@ -324,6 +325,10 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
 
         if (speculativeConfiguration.get() == null) {
             SpeculativeGammaConfiguration newSpeculativeConfiguration = new SpeculativeGammaConfiguration(isFat);
+            if (maximumPoorMansConflictScanLength == 0) {
+                newSpeculativeConfiguration = newSpeculativeConfiguration.createWithRichMansConflictScan();
+            }
+
             speculativeConfiguration.compareAndSet(null, newSpeculativeConfiguration);
         }
 
@@ -348,6 +353,10 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
 
         if (isFat) {
+            return true;
+        }
+
+        if (dirtyCheck) {
             return true;
         }
 

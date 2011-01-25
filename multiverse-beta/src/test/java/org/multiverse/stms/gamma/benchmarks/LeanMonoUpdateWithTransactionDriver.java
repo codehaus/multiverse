@@ -23,15 +23,10 @@ public class LeanMonoUpdateWithTransactionDriver implements GammaConstants {
         stm = new GammaStm();
     }
 
-    public static void main(String[] srgs) throws Throwable {
+    public static void main(String[] args) {
         LeanMonoUpdateWithTransactionDriver driver = new LeanMonoUpdateWithTransactionDriver();
         driver.setUp();
-        try {
-            driver.test();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw e;
-        }
+        driver.test();
     }
 
     @Test
