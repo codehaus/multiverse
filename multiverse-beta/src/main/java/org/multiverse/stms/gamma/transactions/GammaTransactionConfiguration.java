@@ -321,7 +321,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             throw new IllegalTransactionFactoryException(msg);
         }
 
-        final boolean isFat = isFat() || !speculativeConfigEnabled;
+        final boolean isFat = isFat();
 
         if (speculativeConfiguration.get() == null) {
             SpeculativeGammaConfiguration newSpeculativeConfiguration = new SpeculativeGammaConfiguration(isFat);
@@ -336,6 +336,10 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     }
 
     private boolean isFat() {
+        if (speculativeConfigEnabled) {
+            return true;
+        }
+
         if (isolationLevel != IsolationLevel.Snapshot) {
             return true;
         }
