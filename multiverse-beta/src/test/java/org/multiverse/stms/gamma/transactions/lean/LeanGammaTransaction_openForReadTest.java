@@ -83,7 +83,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
         assertReadonlyCount(ref, 0);
         assertUpdateBiased(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertTrue(tx.config.speculativeConfiguration.get().areLocksRequired);
+        assertTrue(tx.config.speculativeConfiguration.get().areLocksDetected);
     }
 
     @Test

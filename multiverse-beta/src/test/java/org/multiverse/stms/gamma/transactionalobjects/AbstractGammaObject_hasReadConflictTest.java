@@ -29,6 +29,7 @@ public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
         GammaTransaction tx = stm.startDefaultTransaction();
         GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
 
+
         boolean hasReadConflict = ref.hasReadConflict(read);
 
         assertFalse(hasReadConflict);

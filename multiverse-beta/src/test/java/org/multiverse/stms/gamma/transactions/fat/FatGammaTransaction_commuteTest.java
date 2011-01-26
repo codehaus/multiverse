@@ -245,7 +245,6 @@ public abstract class FatGammaTransaction_commuteTest<T extends GammaTransaction
         }
 
         assertEquals(TransactionStatus.Aborted, tx.getStatus());
-        assertEquals(maxCapacity + 1, tx.getConfiguration().getSpeculativeConfiguration().minimalLength);
     }
 
     @Test

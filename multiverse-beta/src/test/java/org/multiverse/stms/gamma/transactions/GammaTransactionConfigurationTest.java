@@ -21,7 +21,7 @@ public class GammaTransactionConfigurationTest {
         GammaTransactionConfiguration txConfig = new GammaTransactionConfiguration(stm, stmConfig);
         txConfig.init();
 
-        assertTrue(txConfig.speculativeConfiguration.get().isRichMansConflictScanRequired);
+        assertTrue(txConfig.speculativeConfiguration.get().isRichMansConflictScanDetected);
     }
 
     @Test
@@ -29,10 +29,11 @@ public class GammaTransactionConfigurationTest {
         GammaStmConfiguration stmConfig = new GammaStmConfiguration();
         stmConfig.maximumPoorMansConflictScanLength = 10;
         stmConfig.speculativeConfigEnabled = true;
+        stmConfig.dirtyCheck = false;
         GammaStm stm = new GammaStm(stmConfig);
         GammaTransactionConfiguration txConfig = new GammaTransactionConfiguration(stm, stmConfig);
         txConfig.init();
 
-        assertFalse(txConfig.speculativeConfiguration.get().isRichMansConflictScanRequired);
+        assertFalse(txConfig.speculativeConfiguration.get().isRichMansConflictScanDetected);
     }
 }

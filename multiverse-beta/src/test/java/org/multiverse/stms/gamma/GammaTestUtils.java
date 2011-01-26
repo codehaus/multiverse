@@ -29,7 +29,7 @@ public class GammaTestUtils implements GammaConstants {
     }
 
     public static void assertSpeculativeConfigurationNonRefTypeRequired(GammaTransaction tx) {
-        assertTrue(tx.config.speculativeConfiguration.get().isNonRefTypeRequired);
+        assertTrue(tx.config.speculativeConfiguration.get().isNonRefTypeDetected);
     }
 
     public static void assertHasListeners(AbstractGammaObject ref, RetryLatch... listeners) {

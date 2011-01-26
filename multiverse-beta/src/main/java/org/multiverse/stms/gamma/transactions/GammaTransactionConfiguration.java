@@ -35,21 +35,21 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public int writeLockModeAsInt;
     public final String familyName;
     public final boolean isAnonymous;
-    public boolean interruptible = false;
-    public boolean readonly = false;
-    public int spinCount = 16;
-    public boolean dirtyCheck = true;
-    public int minimalArrayTreeSize = 4;
-    public boolean trackReads = true;
-    public boolean blockingAllowed = true;
+    public boolean interruptible;
+    public boolean readonly;
+    public int spinCount;
+    public boolean dirtyCheck;
+    public int minimalArrayTreeSize;
+    public boolean trackReads;
+    public boolean blockingAllowed;
     public int maxRetries;
-    public boolean speculativeConfigEnabled = true;
+    public boolean speculativeConfigEnabled;
     public int maxFixedLengthTransactionSize;
     public BackoffPolicy backoffPolicy;
-    public long timeoutNs = Long.MAX_VALUE;
-    public TraceLevel traceLevel = TraceLevel.None;
-    public boolean controlFlowErrorsReused = false;
-    public boolean isFat = false;
+    public long timeoutNs;
+    public TraceLevel traceLevel;
+    public boolean controlFlowErrorsReused;
+    public boolean isFat;
     public int maximumPoorMansConflictScanLength;
 
     public ArrayList<TransactionListener> permanentListeners;
@@ -58,16 +58,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         this(stm, new GammaStmConfiguration());
     }
 
-    public GammaTransactionConfiguration(GammaStm stm, String familyName, boolean isAnonymous) {
-        if (stm == null) {
-            throw new NullPointerException();
-        }
-
-        this.stm = stm;
-        this.familyName = familyName;
-        this.isAnonymous = isAnonymous;
-        this.globalConflictCounter = stm.globalConflictCounter;
-    }
 
     public GammaTransactionConfiguration(GammaStm stm, GammaStmConfiguration configuration) {
         if (stm == null) {
@@ -101,6 +91,18 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         this.maximumPoorMansConflictScanLength = configuration.maximumPoorMansConflictScanLength;
         this.isFat = configuration.isFat;
     }
+
+    private GammaTransactionConfiguration(GammaStm stm, String familyName, boolean isAnonymous) {
+        if (stm == null) {
+            throw new NullPointerException();
+        }
+
+        this.stm = stm;
+        this.familyName = familyName;
+        this.isAnonymous = isAnonymous;
+        this.globalConflictCounter = stm.globalConflictCounter;
+    }
+
 
     public GammaTransactionConfiguration(GammaStm stm, int maxFixedLengthTransactionSize) {
         this(stm);
@@ -224,7 +226,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public void updateSpeculativeConfigurationToUseNonRefType() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
-            SpeculativeGammaConfiguration update = current.createWithNonRefType();
+            SpeculativeGammaConfiguration update = current.newWithNonRefType();
             if (speculativeConfiguration.compareAndSet(current, update)) {
                 return;
             }
@@ -234,7 +236,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public void updateSpeculativeConfigurationTouseOrElse() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
-            SpeculativeGammaConfiguration update = current.createWithOrElseRequired();
+            SpeculativeGammaConfiguration update = current.newWithOrElseRequired();
             if (speculativeConfiguration.compareAndSet(current, update)) {
                 return;
             }
@@ -244,7 +246,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public void updateSpeculativeConfigurationToUseListeners() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
-            SpeculativeGammaConfiguration update = current.createWithListenersRequired();
+            SpeculativeGammaConfiguration update = current.newWithListenersRequired();
             if (speculativeConfiguration.compareAndSet(current, update)) {
                 return;
             }
@@ -254,7 +256,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public void updateSpeculativeConfigurationToUseCommute() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
-            SpeculativeGammaConfiguration update = current.createWithCommuteRequired();
+            SpeculativeGammaConfiguration update = current.newWithCommuteRequired();
             if (speculativeConfiguration.compareAndSet(current, update)) {
                 return;
             }
@@ -264,7 +266,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public void updateSpeculativeConfigurationToUseExplicitLocking() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
-            SpeculativeGammaConfiguration update = current.createWithLocksRequired();
+            SpeculativeGammaConfiguration update = current.newWithLocksRequired();
             if (speculativeConfiguration.compareAndSet(current, update)) {
                 return;
             }
@@ -274,7 +276,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public void updateSpeculativeConfigurationToUseConstructedObjects() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
-            SpeculativeGammaConfiguration next = current.createWithConstructedObjectsRequired();
+            SpeculativeGammaConfiguration next = current.newWithConstructedObjectsRequired();
 
             if (speculativeConfiguration.compareAndSet(current, next)) {
                 return;
@@ -285,7 +287,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public void updateSpeculativeConfigurationToUseRichMansConflictScan() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
-            SpeculativeGammaConfiguration next = current.createWithRichMansConflictScan();
+            SpeculativeGammaConfiguration next = current.newWithRichMansConflictScan();
 
             if (speculativeConfiguration.compareAndSet(current, next)) {
                 return;
@@ -296,7 +298,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public void updateSpeculativeConfigurationToUseMinimalTransactionLength(int newLength) {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
-            SpeculativeGammaConfiguration next = current.createWithMinimalLength(newLength);
+            SpeculativeGammaConfiguration next = current.newWithMinimalLength(newLength);
 
             if (speculativeConfiguration.compareAndSet(current, next)) {
                 return;
@@ -321,12 +323,35 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             throw new IllegalTransactionFactoryException(msg);
         }
 
-        final boolean isFat = isFat();
-
         if (speculativeConfiguration.get() == null) {
-            SpeculativeGammaConfiguration newSpeculativeConfiguration = new SpeculativeGammaConfiguration(isFat);
+            SpeculativeGammaConfiguration newSpeculativeConfiguration;
+            if (speculativeConfigEnabled) {
+
+                newSpeculativeConfiguration = new SpeculativeGammaConfiguration(
+                        false,
+                        false,//is commute required
+                        isFat(),
+                        false,//isNonRefTypeRequired
+                        false,//isOrElseRequired
+                        false,//areLockRequired
+                        false,//areConstructedObjectRequired
+                        false,//isRichmansConflictRequired
+                        1);
+            } else {
+                newSpeculativeConfiguration = new SpeculativeGammaConfiguration(
+                        true,
+                        true,
+                        true,
+                        true,
+                        true,
+                        true,
+                        true,
+                        true,
+                        Integer.MAX_VALUE);
+            }
+
             if (maximumPoorMansConflictScanLength == 0) {
-                newSpeculativeConfiguration = newSpeculativeConfiguration.createWithRichMansConflictScan();
+                newSpeculativeConfiguration = newSpeculativeConfiguration.newWithRichMansConflictScan();
             }
 
             speculativeConfiguration.compareAndSet(null, newSpeculativeConfiguration);
@@ -336,10 +361,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     }
 
     private boolean isFat() {
-        if (speculativeConfigEnabled) {
-            return true;
-        }
-
         if (isFat) {
             return true;
         }
@@ -397,6 +418,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -429,6 +451,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -471,6 +494,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
 
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         config.readonly = readonly;
         config.spinCount = spinCount;
         config.readLockMode = readLockMode;
@@ -495,9 +519,9 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         config.isFat = isFat;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
-
 
     public GammaTransactionConfiguration setReadTrackingEnabled(boolean trackReads) {
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
@@ -525,6 +549,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         config.isFat = isFat;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -554,6 +579,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
         config.isFat = isFat;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -583,6 +609,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -612,6 +639,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -641,6 +669,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -670,6 +699,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -699,6 +729,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -732,6 +763,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -765,6 +797,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -798,6 +831,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -831,6 +865,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -865,6 +900,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -898,6 +934,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -931,6 +968,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -961,6 +999,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = true;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -1000,6 +1039,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.permanentListeners = newPermanentListeners;
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 

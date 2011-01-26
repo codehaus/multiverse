@@ -52,7 +52,7 @@ public class GammaDoubleRef_constructionTest {
         assertIsActive(tx);
         assertRefHasExclusiveLock(ref, tx);
         assertTrue(tx.hasWrites);
-        assertFalse(tx.config.speculativeConfiguration.get().areConstructedObjectsRequired);
+        assertFalse(tx.config.speculativeConfiguration.get().areConstructedObjectsDetected);
     }
 
     @Test
@@ -63,7 +63,7 @@ public class GammaDoubleRef_constructionTest {
         assertIsActive(tx);
         assertRefHasExclusiveLock(ref, tx);
         assertTrue(tx.hasWrites);
-        assertFalse(tx.config.speculativeConfiguration.get().areConstructedObjectsRequired);
+        assertFalse(tx.config.speculativeConfiguration.get().areConstructedObjectsDetected);
     }
 
     @Test
@@ -74,7 +74,7 @@ public class GammaDoubleRef_constructionTest {
         assertIsActive(tx);
         assertRefHasExclusiveLock(ref, tx);
         assertTrue(tx.hasWrites);
-        assertFalse(tx.config.speculativeConfiguration.get().areConstructedObjectsRequired);
+        assertFalse(tx.config.speculativeConfiguration.get().areConstructedObjectsDetected);
     }
 
     @Test
@@ -88,7 +88,7 @@ public class GammaDoubleRef_constructionTest {
         }
 
         assertIsAborted(tx);
-        assertTrue(tx.config.speculativeConfiguration.get().areConstructedObjectsRequired);
+        assertTrue(tx.config.speculativeConfiguration.get().areConstructedObjectsDetected);
     }
 
     @Test
@@ -102,6 +102,6 @@ public class GammaDoubleRef_constructionTest {
         }
 
         assertIsAborted(tx);
-        assertTrue(tx.config.speculativeConfiguration.get().areConstructedObjectsRequired);
+        assertTrue(tx.config.speculativeConfiguration.get().areConstructedObjectsDetected);
     }
 }
