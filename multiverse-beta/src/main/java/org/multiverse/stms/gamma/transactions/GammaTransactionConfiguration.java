@@ -340,6 +340,10 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             return true;
         }
 
+        if (isFat) {
+            return true;
+        }
+
         if (isolationLevel != IsolationLevel.Snapshot) {
             return true;
         }
@@ -353,10 +357,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
 
         if (writeLockMode != LockMode.None) {
-            return true;
-        }
-
-        if (isFat) {
             return true;
         }
 
