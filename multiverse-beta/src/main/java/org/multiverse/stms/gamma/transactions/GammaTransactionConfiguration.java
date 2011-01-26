@@ -485,6 +485,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.controlFlowErrorsReused = controlFlowErrorsReused;
         config.isFat = isFat;
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
+        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 

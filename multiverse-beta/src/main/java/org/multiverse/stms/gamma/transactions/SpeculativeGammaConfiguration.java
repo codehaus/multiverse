@@ -13,7 +13,7 @@ public final class SpeculativeGammaConfiguration {
     public final boolean isFat;
     public final boolean areLocksDetected;
     public final boolean areConstructedObjectsDetected;
-    public final boolean isRichMansConflictScanDetected;
+    public final boolean isRichMansConflictScanRequired;
 
     /**
      * Creates a full speculative SpeculativeGammaConfiguration.
@@ -30,7 +30,7 @@ public final class SpeculativeGammaConfiguration {
             final boolean isOrelseDetected,
             final boolean areLocksDetected,
             final boolean areConstructedObjectsDetected,
-            final boolean isRichMansConflictScanDetected,
+            final boolean isRichMansConflictScanRequired,
             final int minimalLength) {
 
         if (minimalLength < 0) {
@@ -42,7 +42,7 @@ public final class SpeculativeGammaConfiguration {
         this.areListenersDetected = areListenersDetected;
         this.areLocksDetected = areLocksDetected;
         this.isCommuteDetected = isCommuteDetected;
-        this.isRichMansConflictScanDetected = isRichMansConflictScanDetected;
+        this.isRichMansConflictScanRequired = isRichMansConflictScanRequired;
         this.isNonRefTypeDetected = isNonRefTypeDetected;
         this.isOrelseDetected = isOrelseDetected;
         this.minimalLength = minimalLength;
@@ -59,7 +59,7 @@ public final class SpeculativeGammaConfiguration {
 
         return new SpeculativeGammaConfiguration(
                 areListenersDetected, isCommuteDetected, isFat, isNonRefTypeDetected, isOrelseDetected, areLocksDetected,
-                areConstructedObjectsDetected, isRichMansConflictScanDetected, newMinimalLength);
+                areConstructedObjectsDetected, isRichMansConflictScanRequired, newMinimalLength);
     }
 
     public SpeculativeGammaConfiguration newWithLocksRequired() {
@@ -69,7 +69,7 @@ public final class SpeculativeGammaConfiguration {
 
         return new SpeculativeGammaConfiguration(
                 areListenersDetected, isCommuteDetected, true, isNonRefTypeDetected, isOrelseDetected, true,
-                areConstructedObjectsDetected, isRichMansConflictScanDetected, minimalLength);
+                areConstructedObjectsDetected, isRichMansConflictScanRequired, minimalLength);
     }
 
     public SpeculativeGammaConfiguration newWithConstructedObjectsRequired() {
@@ -79,7 +79,7 @@ public final class SpeculativeGammaConfiguration {
 
         return new SpeculativeGammaConfiguration(
                 areListenersDetected, isCommuteDetected, true, isNonRefTypeDetected, isOrelseDetected, areLocksDetected,
-                true, isRichMansConflictScanDetected, minimalLength);
+                true, isRichMansConflictScanRequired, minimalLength);
     }
 
     public SpeculativeGammaConfiguration newWithListenersRequired() {
@@ -89,7 +89,7 @@ public final class SpeculativeGammaConfiguration {
 
         return new SpeculativeGammaConfiguration(
                 true, isCommuteDetected, true, isNonRefTypeDetected, isOrelseDetected, areLocksDetected,
-                areConstructedObjectsDetected, isRichMansConflictScanDetected, minimalLength);
+                areConstructedObjectsDetected, isRichMansConflictScanRequired, minimalLength);
     }
 
     public SpeculativeGammaConfiguration newWithOrElseRequired() {
@@ -99,7 +99,7 @@ public final class SpeculativeGammaConfiguration {
 
         return new SpeculativeGammaConfiguration(
                 areListenersDetected, isCommuteDetected, true, isNonRefTypeDetected, true, areLocksDetected,
-                areConstructedObjectsDetected, isRichMansConflictScanDetected, minimalLength);
+                areConstructedObjectsDetected, isRichMansConflictScanRequired, minimalLength);
     }
 
     public SpeculativeGammaConfiguration newWithNonRefType() {
@@ -109,7 +109,7 @@ public final class SpeculativeGammaConfiguration {
 
         return new SpeculativeGammaConfiguration(
                 areListenersDetected, isCommuteDetected, true, true, isOrelseDetected, areLocksDetected,
-                areConstructedObjectsDetected, isRichMansConflictScanDetected, minimalLength);
+                areConstructedObjectsDetected, isRichMansConflictScanRequired, minimalLength);
     }
 
     public SpeculativeGammaConfiguration newWithCommuteRequired() {
@@ -119,11 +119,11 @@ public final class SpeculativeGammaConfiguration {
 
         return new SpeculativeGammaConfiguration(
                 areListenersDetected, true, true, isNonRefTypeDetected, isOrelseDetected, areLocksDetected,
-                areConstructedObjectsDetected, isRichMansConflictScanDetected, minimalLength);
+                areConstructedObjectsDetected, isRichMansConflictScanRequired, minimalLength);
     }
 
     public SpeculativeGammaConfiguration newWithRichMansConflictScan() {
-        if (isRichMansConflictScanDetected) {
+        if (isRichMansConflictScanRequired) {
             return this;
         }
 
@@ -136,16 +136,14 @@ public final class SpeculativeGammaConfiguration {
     public String toString() {
         return "SpeculativeGammaConfiguration{" +
                 "areListenersRequired=" + areListenersDetected +
-                ", isCommuteRequired=" + isCommuteDetected +
-                ", isNonRefTypeRequired=" + isNonRefTypeDetected +
-                ", isOrelseRequired=" + isOrelseDetected +
-                ", areLocksRequired=" + areLocksDetected +
+                ", isCommuteDetected=" + isCommuteDetected +
+                ", isNonRefTypeDetected=" + isNonRefTypeDetected +
+                ", isOrelseDetected=" + isOrelseDetected +
+                ", isOrelseDetected=" + isOrelseDetected +
                 ", minimalLength=" + minimalLength +
-                ", richMansConflictScan=" + isRichMansConflictScanDetected +
-                ", constructedObjectsRequired=" + areConstructedObjectsDetected +
+                ", isRichMansConflictScanDetected=" + isRichMansConflictScanRequired +
+                ", areConstructedObjectsDetected=" + areConstructedObjectsDetected +
                 ", isFat=" + isFat +
                 '}';
     }
-
-
 }
