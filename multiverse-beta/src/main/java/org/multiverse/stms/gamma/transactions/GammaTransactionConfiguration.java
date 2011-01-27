@@ -107,8 +107,8 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         this.writeSkewAllowed = config.writeSkewAllowed;
         this.inconsistentReadAllowed = config.inconsistentReadAllowed;
         this.readLockMode = config.readLockMode;
-        this.writeLockMode = config.writeLockMode;
         this.readLockModeAsInt = config.readLockModeAsInt;
+        this.writeLockMode = config.writeLockMode;
         this.writeLockModeAsInt = config.writeLockModeAsInt;
         this.familyName = config.familyName;
         this.isAnonymous = config.isAnonymous;
@@ -333,6 +333,12 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
 
         if (blockingAllowed && !trackReads) {
             String msg = format("[%s] If blocking is allowed, read tracking should be enabled", familyName);
+            throw new IllegalTransactionFactoryException(msg);
+        }
+
+        if (readLockModeAsInt > writeLockModeAsInt) {
+            String msg = format("[%s] The used write LockMode [%s] should be equal or higher than the read LockMode [%s]",
+                    familyName, readLockMode, writeLockMode);
             throw new IllegalTransactionFactoryException(msg);
         }
 

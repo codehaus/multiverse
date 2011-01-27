@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.*;
+import org.multiverse.api.exceptions.IllegalTransactionFactoryException;
 import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
@@ -109,6 +110,50 @@ public class GammaStm_transactionFactoryBuilderTest {
         }
     }
 
+    @Test
+    public void whenReadWriteLockLevel() {
+        whenReadLockWriteLockLevel(LockMode.None, LockMode.None, true);
+        whenReadLockWriteLockLevel(LockMode.None, LockMode.Read, true);
+        whenReadLockWriteLockLevel(LockMode.None, LockMode.Write, true);
+        whenReadLockWriteLockLevel(LockMode.None, LockMode.Exclusive, true);
+
+        whenReadLockWriteLockLevel(LockMode.Read, LockMode.None, false);
+        whenReadLockWriteLockLevel(LockMode.Read, LockMode.Read, true);
+        whenReadLockWriteLockLevel(LockMode.Read, LockMode.Write, true);
+        whenReadLockWriteLockLevel(LockMode.Read, LockMode.Exclusive, true);
+
+        whenReadLockWriteLockLevel(LockMode.Write, LockMode.None, false);
+        whenReadLockWriteLockLevel(LockMode.Write, LockMode.Read, false);
+        whenReadLockWriteLockLevel(LockMode.Write, LockMode.Write, true);
+        whenReadLockWriteLockLevel(LockMode.Write, LockMode.Exclusive, true);
+
+        whenReadLockWriteLockLevel(LockMode.Exclusive, LockMode.None, false);
+        whenReadLockWriteLockLevel(LockMode.Exclusive, LockMode.Read, false);
+        whenReadLockWriteLockLevel(LockMode.Exclusive, LockMode.Write, false);
+        whenReadLockWriteLockLevel(LockMode.Exclusive, LockMode.Exclusive, true);
+    }
+
+    public void whenReadLockWriteLockLevel(LockMode readLock, LockMode writeLock, boolean success) {
+        if (success) {
+            GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
+                    .setReadLockMode(readLock)
+                    .setWriteLockMode(writeLock)
+                    .newTransactionFactory();
+
+            assertEquals(readLock, txFactory.getConfiguration().getReadLockMode());
+            assertEquals(writeLock, txFactory.getConfiguration().getWriteLockMode());
+        } else {
+            try {
+                stm.newTransactionFactoryBuilder()
+                        .setReadLockMode(readLock)
+                        .setWriteLockMode(writeLock)
+                        .newTransactionFactory();
+                fail();
+            } catch (IllegalTransactionFactoryException expected) {
+
+            }
+        }
+    }
 
     @Test
     public void whenReadtrackingDisabled() {
@@ -123,6 +168,7 @@ public class GammaStm_transactionFactoryBuilderTest {
     @Test
     public void whenSpeculativeConfigEnabled() {
         GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
+                .setDirtyCheckEnabled(false)
                 .setSpeculativeConfigurationEnabled(true)
                 .newTransactionFactory();
 

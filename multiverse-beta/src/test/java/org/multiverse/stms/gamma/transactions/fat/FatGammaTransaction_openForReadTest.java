@@ -308,42 +308,39 @@ public abstract class FatGammaTransaction_openForReadTest<T extends GammaTransac
 
     @Test
     public void lockLevel() {
-        lockLevel(LOCKMODE_NONE, LOCKMODE_NONE, LOCKMODE_NONE);
-        lockLevel(LOCKMODE_NONE, LOCKMODE_READ, LOCKMODE_READ);
-        lockLevel(LOCKMODE_NONE, LOCKMODE_WRITE, LOCKMODE_WRITE);
-        lockLevel(LOCKMODE_NONE, LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE);
+        lockLevel(LockMode.None, LockMode.None, LockMode.None);
+        lockLevel(LockMode.None, LockMode.Read, LockMode.Read);
+        lockLevel(LockMode.None, LockMode.Write, LockMode.Write);
+        lockLevel(LockMode.None, LockMode.Exclusive, LockMode.Exclusive);
 
-        lockLevel(LOCKMODE_READ, LOCKMODE_NONE, LOCKMODE_READ);
-        lockLevel(LOCKMODE_READ, LOCKMODE_READ, LOCKMODE_READ);
-        lockLevel(LOCKMODE_READ, LOCKMODE_WRITE, LOCKMODE_WRITE);
-        lockLevel(LOCKMODE_READ, LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE);
+        lockLevel(LockMode.Read, LockMode.Read, LockMode.Read);
+        lockLevel(LockMode.Read, LockMode.Write, LockMode.Write);
+        lockLevel(LockMode.Read, LockMode.Exclusive, LockMode.Exclusive);
 
-        lockLevel(LOCKMODE_WRITE, LOCKMODE_NONE, LOCKMODE_WRITE);
-        lockLevel(LOCKMODE_WRITE, LOCKMODE_READ, LOCKMODE_WRITE);
-        lockLevel(LOCKMODE_WRITE, LOCKMODE_WRITE, LOCKMODE_WRITE);
-        lockLevel(LOCKMODE_WRITE, LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE);
+        lockLevel(LockMode.Write, LockMode.Write, LockMode.Write);
+        lockLevel(LockMode.Write, LockMode.Exclusive, LockMode.Exclusive);
 
-        lockLevel(LOCKMODE_EXCLUSIVE, LOCKMODE_NONE, LOCKMODE_EXCLUSIVE);
-        lockLevel(LOCKMODE_EXCLUSIVE, LOCKMODE_READ, LOCKMODE_EXCLUSIVE);
-        lockLevel(LOCKMODE_EXCLUSIVE, LOCKMODE_WRITE, LOCKMODE_EXCLUSIVE);
-        lockLevel(LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE, LOCKMODE_EXCLUSIVE);
+        lockLevel(LockMode.Exclusive, LockMode.Exclusive, LockMode.Exclusive);
     }
 
-    public void lockLevel(int transactionReadLockMode, int readLockMode, int expectedReadLockMode) {
+    public void lockLevel(LockMode transactionReadLockMode, LockMode readLockMode, LockMode expectedReadLockMode) {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm);
-        config.readLockModeAsInt = transactionReadLockMode;
-        GammaTransaction tx = newTransaction(config);
-        GammaRefTranlocal tranlocal = ref.openForRead(tx, readLockMode);
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .setReadLockMode(transactionReadLockMode)
+                .setWriteLockMode(transactionReadLockMode);
 
-        assertEquals(expectedReadLockMode, tranlocal.getLockMode());
+
+        GammaTransaction tx = newTransaction(config);
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, readLockMode.asInt());
+
+        assertEquals(expectedReadLockMode.asInt(), tranlocal.getLockMode());
         assertEquals(TRANLOCAL_READ, tranlocal.getMode());
         assertIsActive(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertRefHasLockMode(ref, tx, expectedReadLockMode);
+        assertRefHasLockMode(ref, tx, expectedReadLockMode.asInt());
     }
 
     // ===================== lock upgrade ======================================

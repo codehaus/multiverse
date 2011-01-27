@@ -59,7 +59,6 @@ public class GammaStm_transactionFactoryValidationTest {
         builder.newTransactionFactory();
     }
 
-
     @Test
     public void whenLockLevelIsRead_thenAutomaticReadTrackingShouldBeEnabled() {
         GammaTransactionFactoryBuilder builder = stm.newTransactionFactoryBuilder()
