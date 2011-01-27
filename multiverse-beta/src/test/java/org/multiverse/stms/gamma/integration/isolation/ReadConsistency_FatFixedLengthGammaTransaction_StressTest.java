@@ -15,84 +15,84 @@ public class ReadConsistency_FatFixedLengthGammaTransaction_StressTest extends R
     public void poormansReadConsistency_with2Refs() {
         refCount = 2;
         poorMansReadConsistency = true;
-        test(refCount);
+        run(refCount);
     }
 
     @Test
     public void poormansReadConsistency_with4Refs() {
         refCount = 4;
         poorMansReadConsistency = true;
-        test(refCount);
+        run(refCount);
     }
 
     @Test
     public void poormansReadConsistency_with8Refs() {
         poorMansReadConsistency = true;
         refCount = 8;
-        test(refCount);
+        run(refCount);
     }
 
     @Test
     public void poormansReadConsistency_with16Refs() {
         poorMansReadConsistency = true;
         refCount = 16;
-        test(refCount);
+        run(refCount);
     }
 
     @Test
     public void poormansReadConsistency_with32Refs() {
         poorMansReadConsistency = true;
         refCount = 32;
-        test(refCount);
+        run(refCount);
     }
 
     @Test
     public void poormansReadConsistency_with64Refs() {
         poorMansReadConsistency = true;
         refCount = 64;
-        test(refCount);
+        run(refCount);
     }
 
     @Test
     public void richmansReadConsistency_with2Refs() {
         refCount = 2;
         poorMansReadConsistency = false;
-        test(refCount);
+        run(refCount);
     }
 
     @Test
     public void richmansReadConsistency_with4Refs() {
         refCount = 4;
         poorMansReadConsistency = false;
-        test(refCount);
+        run(refCount);
     }
 
     @Test
     public void richmansReadConsistency_with8Refs() {
         poorMansReadConsistency = false;
         refCount = 8;
-        test(refCount);
+        run(refCount);
     }
 
     @Test
     public void richmansReadConsistency_with16Refs() {
         poorMansReadConsistency = false;
         refCount = 16;
-        test(refCount);
+        run(refCount);
     }
 
     @Test
     public void richmansReadConsistency_with32Refs() {
         poorMansReadConsistency = false;
         refCount = 32;
-        test(refCount);
+        run(refCount);
     }
 
     @Test
     public void richmansReadConsistency_with64Refs() {
         poorMansReadConsistency = false;
         refCount = 64;
-        test(refCount);
+        run(refCount);
     }
 
     @Override

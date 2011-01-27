@@ -19,49 +19,49 @@ public class ReadConsistency_LeanFixedLengthGammaTransaction_StressTest extends 
     @Test
     public void testWith2Refs() {
         refCount = 2;
-        test(refCount);
+        run(refCount);
     }
 
     @Test
     public void testWith4Refs() {
         refCount = 4;
-        test(refCount);
+        run(refCount);
     }
 
     @Test
     public void testWith8Refs() {
         refCount = 8;
-        test(refCount);
+        run(refCount);
     }
 
     @Test
     public void testWith16Refs() {
         refCount = 16;
-        test(refCount);
+        run(refCount);
     }
 
     @Test
     public void testWith32Refs() {
         refCount = 32;
-        test(refCount);
+        run(refCount);
     }
 
     @Test
     public void testWith64Refs() {
         refCount = 64;
-        test(refCount);
+        run(refCount);
     }
 
     @Test
     public void testWith128Refs() {
         refCount = 128;
-        test(refCount);
+        run(refCount);
     }
 
     @Test
     public void testWith512Refs() {
         refCount = 512;
-        test(refCount);
+        run(refCount);
     }
 
     @Override

@@ -105,7 +105,7 @@ public abstract class ReadConsistency_AbstractTest {
 //    }
 //
 //
-    public void test(int refCount) {
+    public void run(int refCount) {
         refs = new GammaRef[refCount];
         for (int k = 0; k < refs.length; k++) {
             refs[k] = new GammaRef<String>(stm);
