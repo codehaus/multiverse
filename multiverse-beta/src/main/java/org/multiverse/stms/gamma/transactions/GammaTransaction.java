@@ -54,6 +54,13 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
+    public DeadTransactionException abortAbortOnAlreadyCommitted() {
+        return new DeadTransactionException(
+                format("[%s] Failed to execute transaction.abort, reason: the transaction is already committed",
+                        config.familyName));
+
+    }
+
     // ================= open for read =============================
 
     public SpeculativeConfigurationError abortOpenForReadOrWriteOnExplicitLocking(AbstractGammaRef ref) {

@@ -1,7 +1,6 @@
 package org.multiverse.stms.gamma.transactions.fat;
 
 import org.multiverse.api.exceptions.AbortOnlyException;
-import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
@@ -80,7 +79,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
         }
 
         if (status == TX_COMMITTED) {
-            throw new DeadTransactionException();
+            throw abortAbortOnAlreadyCommitted();
         }
 
         status = TX_ABORTED;
