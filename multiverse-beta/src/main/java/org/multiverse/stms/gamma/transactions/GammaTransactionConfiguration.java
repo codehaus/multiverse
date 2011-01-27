@@ -16,15 +16,21 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.String.format;
 
+/**
+ * A configuration object that contains the configuration for a GammaTransaction.
+ * <p/>
+ * GammaTransactionConfiguration object is considered to be immutable. The only mutable part if the speculative
+ * configuration that can get upgraded if enabled and speculations failed.
+ */
 @SuppressWarnings({"OverlyComplexClass", "ClassWithTooManyFields"})
 public final class GammaTransactionConfiguration implements TransactionConfiguration, GammaConstants {
 
     public final static AtomicLong idGenerator = new AtomicLong();
+    public final AtomicReference<SpeculativeGammaConfiguration> speculativeConfiguration
+            = new AtomicReference<SpeculativeGammaConfiguration>();
 
     public final GammaStm stm;
     public final GlobalConflictCounter globalConflictCounter;
-    public final AtomicReference<SpeculativeGammaConfiguration> speculativeConfiguration
-            = new AtomicReference<SpeculativeGammaConfiguration>();
     public PropagationLevel propagationLevel;
     public IsolationLevel isolationLevel;
     public boolean writeSkewAllowed;
@@ -33,8 +39,8 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public LockMode writeLockMode;
     public int readLockModeAsInt;
     public int writeLockModeAsInt;
-    public final String familyName;
-    public final boolean isAnonymous;
+    public String familyName;
+    public boolean isAnonymous;
     public boolean interruptible;
     public boolean readonly;
     public int spinCount;
@@ -43,7 +49,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public boolean trackReads;
     public boolean blockingAllowed;
     public int maxRetries;
-    public boolean speculativeConfigEnabled;
+    public boolean speculative;
     public int maxFixedLengthTransactionSize;
     public BackoffPolicy backoffPolicy;
     public long timeoutNs;
@@ -51,58 +57,79 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public boolean controlFlowErrorsReused;
     public boolean isFat;
     public int maximumPoorMansConflictScanLength;
-
     public ArrayList<TransactionListener> permanentListeners;
 
     public GammaTransactionConfiguration(GammaStm stm) {
         this(stm, new GammaStmConfiguration());
     }
 
-
-    public GammaTransactionConfiguration(GammaStm stm, GammaStmConfiguration configuration) {
-        if (stm == null) {
-            throw new NullPointerException();
-        }
-
+    public GammaTransactionConfiguration(GammaStm stm, GammaStmConfiguration config) {
         this.stm = stm;
         this.globalConflictCounter = stm.getGlobalConflictCounter();
-        this.interruptible = configuration.interruptible;
-        this.readonly = configuration.readonly;
-        this.spinCount = configuration.spinCount;
-        this.readLockMode = configuration.readLockMode;
-        this.writeLockMode = configuration.writeLockMode;
-        this.dirtyCheck = configuration.dirtyCheck;
-        this.minimalArrayTreeSize = configuration.minimalVariableLengthTransactionSize;
-        this.trackReads = configuration.trackReads;
-        this.blockingAllowed = configuration.blockingAllowed;
-        this.maxRetries = configuration.maxRetries;
-        this.speculativeConfigEnabled = configuration.speculativeConfigEnabled;
-        this.maxFixedLengthTransactionSize = configuration.maxFixedLengthTransactionSize;
-        this.backoffPolicy = configuration.backoffPolicy;
-        this.timeoutNs = configuration.timeoutNs;
-        this.traceLevel = configuration.traceLevel;
-        this.isolationLevel = configuration.isolationLevel;
+        this.interruptible = config.interruptible;
+        this.readonly = config.readonly;
+        this.spinCount = config.spinCount;
+        this.readLockMode = config.readLockMode;
+        this.readLockModeAsInt = config.readLockMode.asInt();
+        this.writeLockMode = config.writeLockMode;
+        this.writeLockModeAsInt = config.writeLockMode.asInt();
+        this.dirtyCheck = config.dirtyCheck;
+        this.minimalArrayTreeSize = config.minimalVariableLengthTransactionSize;
+        this.trackReads = config.trackReads;
+        this.blockingAllowed = config.blockingAllowed;
+        this.maxRetries = config.maxRetries;
+        this.speculative = config.speculativeConfigEnabled;
+        this.maxFixedLengthTransactionSize = config.maxFixedLengthTransactionSize;
+        this.backoffPolicy = config.backoffPolicy;
+        this.timeoutNs = config.timeoutNs;
+        this.traceLevel = config.traceLevel;
+        this.isolationLevel = config.isolationLevel;
         this.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
         this.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        this.propagationLevel = configuration.propagationLevel;
-        this.controlFlowErrorsReused = configuration.controlFlowErrorsReused;
+        this.propagationLevel = config.propagationLevel;
+        this.controlFlowErrorsReused = config.controlFlowErrorsReused;
         this.familyName = "anonymoustransaction-" + idGenerator.incrementAndGet();
         this.isAnonymous = true;
-        this.maximumPoorMansConflictScanLength = configuration.maximumPoorMansConflictScanLength;
-        this.isFat = configuration.isFat;
+        this.maximumPoorMansConflictScanLength = config.maximumPoorMansConflictScanLength;
+        this.isFat = config.isFat;
     }
 
-    private GammaTransactionConfiguration(GammaStm stm, String familyName, boolean isAnonymous) {
-        if (stm == null) {
-            throw new NullPointerException();
-        }
-
-        this.stm = stm;
-        this.familyName = familyName;
-        this.isAnonymous = isAnonymous;
-        this.globalConflictCounter = stm.globalConflictCounter;
+    /**
+     * Makes a clone of the given GammaTransactionConfiguration.
+     *
+     * @param config the GammaTransactionConfiguration to clone.
+     */
+    private GammaTransactionConfiguration(GammaTransactionConfiguration config) {
+        this.stm = config.stm;
+        this.globalConflictCounter = config.globalConflictCounter;
+        this.propagationLevel = config.propagationLevel;
+        this.isolationLevel = config.isolationLevel;
+        this.writeSkewAllowed = config.writeSkewAllowed;
+        this.inconsistentReadAllowed = config.inconsistentReadAllowed;
+        this.readLockMode = config.readLockMode;
+        this.writeLockMode = config.writeLockMode;
+        this.readLockModeAsInt = config.readLockModeAsInt;
+        this.writeLockModeAsInt = config.writeLockModeAsInt;
+        this.familyName = config.familyName;
+        this.isAnonymous = config.isAnonymous;
+        this.interruptible = config.interruptible;
+        this.readonly = config.readonly;
+        this.spinCount = config.spinCount;
+        this.dirtyCheck = config.dirtyCheck;
+        this.minimalArrayTreeSize = config.minimalArrayTreeSize;
+        this.trackReads = config.trackReads;
+        this.blockingAllowed = config.blockingAllowed;
+        this.maxRetries = config.maxRetries;
+        this.speculative = config.speculative;
+        this.maxFixedLengthTransactionSize = config.maxFixedLengthTransactionSize;
+        this.backoffPolicy = config.backoffPolicy;
+        this.timeoutNs = config.timeoutNs;
+        this.traceLevel = config.traceLevel;
+        this.controlFlowErrorsReused = config.controlFlowErrorsReused;
+        this.isFat = config.isFat;
+        this.maximumPoorMansConflictScanLength = config.maximumPoorMansConflictScanLength;
+        this.permanentListeners = config.permanentListeners;
     }
-
 
     public GammaTransactionConfiguration(GammaStm stm, int maxFixedLengthTransactionSize) {
         this(stm);
@@ -122,10 +149,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     @Override
     public IsolationLevel getIsolationLevel() {
         return isolationLevel;
-    }
-
-    public boolean hasTimeout() {
-        return timeoutNs != Long.MAX_VALUE;
     }
 
     @Override
@@ -157,13 +180,9 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         return backoffPolicy;
     }
 
-    public int getMaxFixedLengthTransactionSize() {
-        return maxFixedLengthTransactionSize;
-    }
-
     @Override
-    public boolean isSpeculativeConfigEnabled() {
-        return speculativeConfigEnabled;
+    public boolean isSpeculative() {
+        return speculative;
     }
 
     @Override
@@ -325,7 +344,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
 
         if (speculativeConfiguration.get() == null) {
             SpeculativeGammaConfiguration newSpeculativeConfiguration;
-            if (speculativeConfigEnabled) {
+            if (speculative) {
 
                 newSpeculativeConfiguration = new SpeculativeGammaConfiguration(
                         false,
@@ -393,32 +412,8 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             throw new IllegalArgumentException("timeoutNs can't be smaller than 0");
         }
 
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockModeAsInt;
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockModeAsInt;
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.isFat = isFat;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -427,31 +422,9 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             throw new NullPointerException("familyName can't be null");
         }
 
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, false);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockModeAsInt;
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockModeAsInt;
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.isFat = isFat;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
+        config.isAnonymous = false;
+        config.familyName = familyName;
         return config;
     }
 
@@ -460,32 +433,8 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             throw new IllegalArgumentException("maxRetries can't be smaller than 0");
         }
 
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockModeAsInt;
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockModeAsInt;
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.isFat = isFat;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -494,243 +443,50 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             throw new IllegalStateException();
         }
 
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockModeAsInt;
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockModeAsInt;
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.isFat = isFat;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
     public GammaTransactionConfiguration setReadTrackingEnabled(boolean trackReads) {
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockModeAsInt;
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockModeAsInt;
-        config.dirtyCheck = dirtyCheck;
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.isFat = isFat;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
     public GammaTransactionConfiguration setSpeculativeConfigurationEnabled(boolean speculativeConfigEnabled) {
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockModeAsInt;
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockModeAsInt;
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.isFat = isFat;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
+        config.speculative = speculativeConfigEnabled;
         return config;
     }
 
     public GammaTransactionConfiguration setReadonly(boolean readonly) {
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockModeAsInt;
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockModeAsInt;
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.isFat = isFat;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
     public GammaTransactionConfiguration setDirtyCheckEnabled(boolean dirtyCheck) {
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockModeAsInt;
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockModeAsInt;
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.isFat = isFat;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
-    public GammaTransactionConfiguration setBlockingAllowed(boolean blockingEnabled) {
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockModeAsInt;
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockModeAsInt;
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingEnabled;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.isFat = isFat;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
+    public GammaTransactionConfiguration setBlockingAllowed(boolean blockingAllowed) {
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
+        config.blockingAllowed = blockingAllowed;
         return config;
     }
 
     public GammaTransactionConfiguration setInterruptible(boolean interruptible) {
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockModeAsInt;
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockModeAsInt;
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.isFat = isFat;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
     public GammaTransactionConfiguration setControlFlowErrorsReused(boolean controlFlowErrorsReused) {
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockModeAsInt;
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockModeAsInt;
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.isFat = isFat;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -739,32 +495,8 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             throw new IllegalArgumentException("spinCount can't be smaller than 0");
         }
 
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.readonly = readonly;
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockModeAsInt;
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockModeAsInt;
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.isFat = isFat;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -773,32 +505,8 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             throw new NullPointerException("backoffPolicy can't be null");
         }
 
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockModeAsInt;
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockModeAsInt;
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.isFat = isFat;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -807,32 +515,8 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             throw new NullPointerException("traceLevel can't be null");
         }
 
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockModeAsInt;
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockModeAsInt;
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.traceLevel = traceLevel;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.isFat = isFat;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -841,32 +525,8 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             throw new NullPointerException();
         }
 
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockModeAsInt;
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockModeAsInt;
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.isFat = isFat;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -876,32 +536,10 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             throw new NullPointerException();
         }
 
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockModeAsInt;
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockModeAsInt;
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.isolationLevel = isolationLevel;
         config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.isFat = isFat;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -910,32 +548,9 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             throw new NullPointerException();
         }
 
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockModeAsInt;
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.writeLockMode = writeLockMode;
         config.writeLockModeAsInt = writeLockMode.asInt();
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.isFat = isFat;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -944,63 +559,16 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             throw new NullPointerException();
         }
 
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.readLockMode = readLockMode;
         config.readLockModeAsInt = readLockMode.asInt();
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockMode.asInt();
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.isFat = isFat;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
 
     public GammaTransactionConfiguration setFat() {
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockMode.asInt();
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockMode.asInt();
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.propagationLevel = propagationLevel;
-        config.permanentListeners = permanentListeners;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.isFat = true;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
@@ -1016,62 +584,43 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
         newPermanentListeners.add(listener);
 
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, familyName, isAnonymous);
-        config.readonly = readonly;
-        config.spinCount = spinCount;
-        config.readLockMode = readLockMode;
-        config.readLockModeAsInt = readLockModeAsInt;
-        config.writeLockMode = writeLockMode;
-        config.writeLockModeAsInt = writeLockModeAsInt;
-        config.dirtyCheck = dirtyCheck;
-        config.trackReads = trackReads;
-        config.maxRetries = maxRetries;
-        config.blockingAllowed = blockingAllowed;
-        config.speculativeConfigEnabled = speculativeConfigEnabled;
-        config.maxFixedLengthTransactionSize = maxFixedLengthTransactionSize;
-        config.backoffPolicy = backoffPolicy;
-        config.interruptible = interruptible;
-        config.timeoutNs = timeoutNs;
-        config.traceLevel = traceLevel;
-        config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.propagationLevel = propagationLevel;
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.permanentListeners = newPermanentListeners;
-        config.controlFlowErrorsReused = controlFlowErrorsReused;
-        config.maximumPoorMansConflictScanLength = maximumPoorMansConflictScanLength;
-        config.minimalArrayTreeSize = minimalArrayTreeSize;
         return config;
     }
 
     @Override
     public String toString() {
         return "GammaTransactionConfiguration{" +
-                "familyName='" + familyName +
+                "speculativeConfiguration=" + speculativeConfiguration +
+                ", globalConflictCounter=" + globalConflictCounter +
                 ", propagationLevel=" + propagationLevel +
                 ", isolationLevel=" + isolationLevel +
-                ", readLockMode =" + readLockMode +
-                ", writeLockMode =" + writeLockMode +
-                ", traceLevel=" + traceLevel +
+                ", writeSkewAllowed=" + writeSkewAllowed +
+                ", inconsistentReadAllowed=" + inconsistentReadAllowed +
+                ", readLockMode=" + readLockMode +
+                ", writeLockMode=" + writeLockMode +
+                ", readLockModeAsInt=" + readLockModeAsInt +
+                ", writeLockModeAsInt=" + writeLockModeAsInt +
+                ", familyName='" + familyName + '\'' +
+                ", isAnonymous=" + isAnonymous +
+                ", interruptible=" + interruptible +
                 ", readonly=" + readonly +
-                ", speculativeConfiguration=" + speculativeConfiguration +
                 ", spinCount=" + spinCount +
                 ", dirtyCheck=" + dirtyCheck +
                 ", minimalArrayTreeSize=" + minimalArrayTreeSize +
                 ", trackReads=" + trackReads +
-                ", maxRetries=" + maxRetries +
-                ", speculativeConfigEnabled=" + speculativeConfigEnabled +
-                ", maxArrayTransactionSize=" + maxFixedLengthTransactionSize +
-                ", isAnonymous=" + isAnonymous +
-                ", backoffPolicy=" + backoffPolicy +
                 ", blockingAllowed=" + blockingAllowed +
+                ", maxRetries=" + maxRetries +
+                ", speculativeConfigEnabled=" + speculative +
+                ", maxFixedLengthTransactionSize=" + maxFixedLengthTransactionSize +
+                ", backoffPolicy=" + backoffPolicy +
                 ", timeoutNs=" + timeoutNs +
-                ", readWriteConflictReuse=" + controlFlowErrorsReused +
-                ", interruptible=" + interruptible +
+                ", traceLevel=" + traceLevel +
+                ", controlFlowErrorsReused=" + controlFlowErrorsReused +
                 ", isFat=" + isFat +
-                ", maximumFullConflictScanLength=" + maximumPoorMansConflictScanLength +
+                ", maximumPoorMansConflictScanLength=" + maximumPoorMansConflictScanLength +
                 ", permanentListeners=" + permanentListeners +
                 '}';
     }
-
 }

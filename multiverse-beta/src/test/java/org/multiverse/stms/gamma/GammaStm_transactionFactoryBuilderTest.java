@@ -41,7 +41,7 @@ public class GammaStm_transactionFactoryBuilderTest {
         assertTrue(config.trackReads);
         assertTrue(config.blockingAllowed);
         assertEquals(1000, config.maxRetries);
-        assertTrue(config.isSpeculativeConfigEnabled());
+        assertTrue(config.isSpeculative());
         assertTrue(config.isAnonymous);
         assertSame(ExponentialBackoffPolicy.MAX_100_MS, config.getBackoffPolicy());
         assertEquals(Long.MAX_VALUE, config.getTimeoutNs());
@@ -128,7 +128,7 @@ public class GammaStm_transactionFactoryBuilderTest {
 
         GammaTransactionConfiguration configuration = txFactory.getConfiguration();
         assertFalse(configuration.getSpeculativeConfiguration().isFat);
-        assertTrue(configuration.isSpeculativeConfigEnabled());
+        assertTrue(configuration.isSpeculative());
     }
 
     @Test
@@ -141,7 +141,7 @@ public class GammaStm_transactionFactoryBuilderTest {
 
         GammaTransactionConfiguration configuration = txFactory.getConfiguration();
         assertTrue(configuration.getSpeculativeConfiguration().isFat);
-        assertTrue(configuration.isSpeculativeConfigEnabled());
+        assertTrue(configuration.isSpeculative());
     }
 
     @Test

@@ -298,7 +298,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         ref.openForWrite(tx, LOCKMODE_NONE).long_value++;
         tx.commit();
 
-        assertTrue(listeningTx.listener.isOpen());
+        assertTrue(listeningTx.retryListener.isOpen());
         assertNull(getField(ref, "listeners"));
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);

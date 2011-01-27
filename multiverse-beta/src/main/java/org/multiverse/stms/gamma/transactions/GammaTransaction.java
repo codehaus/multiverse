@@ -13,6 +13,8 @@ import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
+import java.util.List;
+
 import static java.lang.String.format;
 import static org.multiverse.stms.gamma.GammaStmUtils.toDebugString;
 
@@ -28,7 +30,8 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public boolean poorMansConflictScan;
 
     public boolean abortOnly = false;
-    public final RetryLatch listener = new DefaultRetryLatch();
+    public final RetryLatch retryListener = new DefaultRetryLatch();
+    public List<TransactionListener> listeners;
 
     public GammaTransaction(GammaTransactionConfiguration config, int transactionType) {
         config.init();
@@ -81,8 +84,8 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public final StmMismatchException abortOpenForReadOnBadStm(GammaObject o) {
         abortIfAlive();
         return new StmMismatchException(
-                format("[%s] Failed to execute Ref.openForRead '%s', reason: the stm the ref was created with is a different" +
-                        " stm than the stm of the transaction",
+                format("[%s] Failed to execute Ref.openForRead '%s', reason: the stm the ref was created " +
+                        "with is a different stm than the stm of the transaction",
                         config.familyName, toDebugString(o)));
     }
 
@@ -138,8 +141,8 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public final StmMismatchException abortOpenForWriteOnBadStm(GammaObject o) {
         abortIfAlive();
         return new StmMismatchException(
-                format("[%s] Failed to execute Ref.openForWrite '%s', reason: the stm the ref was created with is a different" +
-                        " stm than the stm of the transaction",
+                format("[%s] Failed to execute Ref.openForWrite '%s', reason: the stm the ref was created with " +
+                        "is a different stm than the stm of the transaction",
                         config.familyName, toDebugString(o)));
     }
 
@@ -188,7 +191,8 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
         abortIfAlive();
         return new IllegalArgumentException(
-                format("[%s] Failed to execute Ref.openForConstruction '%s', reason: the object is not new and has previous commits",
+                format("[%s] Failed to execute Ref.openForConstruction '%s', reason: the object is not new " +
+                        "and has previous commits",
                         config.familyName, toDebugString(ref)));
     }
 
@@ -216,8 +220,8 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public final StmMismatchException abortOpenForConstructionOnBadStm(GammaObject o) {
         abortIfAlive();
         return new StmMismatchException(
-                format("[%s] Failed to execute Ref.openForConstruction '%s', reason: the stm the ref was created with is a different" +
-                        " stm than the stm of the transaction",
+                format("[%s] Failed to execute Ref.openForConstruction '%s', reason: the stm the ref was " +
+                        "created with is a different stm than the stm of the transaction",
                         config.familyName, toDebugString(o)));
 
     }
@@ -335,7 +339,6 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                 format("[%s] Failed to execute Transaction.register , reason: the listener is null",
                         config.familyName));
     }
-
 
     private IllegalTransactionStateException abortRegisterOnBadStatus() {
         switch (status) {
@@ -545,7 +548,11 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
             throw abortRegisterOnListenerRequired();
         }
 
-        throw new TodoException();
+        if (listeners == null) {
+            listeners = pool.takeArrayList();
+        }
+
+        listeners.add(listener);
     }
 
     public abstract void hardReset();
@@ -576,19 +583,19 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public final void awaitUpdate() {
-        final long lockEra = listener.getEra();
+        final long lockEra = retryListener.getEra();
 
         if (config.timeoutNs == Long.MAX_VALUE) {
             if (config.isInterruptible()) {
-                listener.await(lockEra, config.familyName);
+                retryListener.await(lockEra, config.familyName);
             } else {
-                listener.awaitUninterruptible(lockEra);
+                retryListener.awaitUninterruptible(lockEra);
             }
         } else {
             if (config.isInterruptible()) {
-                remainingTimeoutNs = listener.awaitNanos(lockEra, remainingTimeoutNs, config.familyName);
+                remainingTimeoutNs = retryListener.awaitNanos(lockEra, remainingTimeoutNs, config.familyName);
             } else {
-                remainingTimeoutNs = listener.awaitNanosUninterruptible(lockEra, remainingTimeoutNs);
+                remainingTimeoutNs = retryListener.awaitNanosUninterruptible(lockEra, remainingTimeoutNs);
             }
 
             if (remainingTimeoutNs < 0) {

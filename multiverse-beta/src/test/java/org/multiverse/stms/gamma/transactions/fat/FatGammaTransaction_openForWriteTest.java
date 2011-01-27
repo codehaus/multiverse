@@ -144,6 +144,8 @@ public abstract class FatGammaTransaction_openForWriteTest<T extends GammaTransa
         assumeTrue(maxCapacity < Integer.MAX_VALUE);
 
         T tx = newTransaction();
+        System.out.println(tx.getConfiguration().getSpeculativeConfiguration().minimalLength);
+
         for (int k = 0; k < maxCapacity; k++) {
             GammaLongRef ref = new GammaLongRef(stm, 0);
             ref.openForWrite(tx, LOCKMODE_NONE);

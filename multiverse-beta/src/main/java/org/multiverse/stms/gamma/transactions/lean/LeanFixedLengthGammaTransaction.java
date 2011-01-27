@@ -220,8 +220,8 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
             throw abortRetryOnNoRetryPossible();
         }
 
-        listener.reset();
-        final long listenerEra = listener.getEra();
+        retryListener.reset();
+        final long listenerEra = retryListener.getEra();
 
         boolean furtherRegistrationNeeded = true;
         boolean atLeastOneRegistration = false;
@@ -231,7 +231,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
             final AbstractGammaRef owner = tranlocal.owner;
 
             if (furtherRegistrationNeeded) {
-                switch (owner.registerChangeListener(listener, tranlocal, pool, listenerEra)) {
+                switch (owner.registerChangeListener(retryListener, tranlocal, pool, listenerEra)) {
                     case REGISTRATION_DONE:
                         atLeastOneRegistration = true;
                         break;

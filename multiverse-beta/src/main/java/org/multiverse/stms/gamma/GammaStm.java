@@ -217,7 +217,7 @@ public final class GammaStm implements Stm {
 
         @Override
         public GammaTransactionFactoryBuilder setSpeculativeConfigurationEnabled(final boolean enabled) {
-            if (enabled == config.speculativeConfigEnabled) {
+            if (enabled == config.speculative) {
                 return this;
             }
 
@@ -271,7 +271,7 @@ public final class GammaStm implements Stm {
         public GammaTransactionFactory newTransactionFactory() {
             config.init();
 
-            if (config.isSpeculativeConfigEnabled()) {
+            if (config.isSpeculative()) {
                 return new SpeculativeGammaTransactionFactory(config);
             } else {
                 return new NonSpeculativeGammaTransactionFactory(config);

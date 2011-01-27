@@ -85,7 +85,7 @@ public interface TransactionConfiguration {
      * @return true if speculative configuration is enabled.
      * @see TransactionFactoryBuilder#setSpeculativeConfigurationEnabled(boolean)
      */
-    boolean isSpeculativeConfigEnabled();
+    boolean isSpeculative();
 
     /**
      * Returns the family name of this Transaction. Every transaction in principle should have a family name. This

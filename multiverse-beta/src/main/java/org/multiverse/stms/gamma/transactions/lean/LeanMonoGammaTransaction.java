@@ -174,11 +174,11 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
             throw abortRetryOnNoRetryPossible();
         }
 
-        listener.reset();
-        final long listenerEra = listener.getEra();
+        retryListener.reset();
+        final long listenerEra = retryListener.getEra();
 
         boolean atLeastOneRegistration = false;
-        switch (tranlocal.owner.registerChangeListener(listener, tranlocal, pool, listenerEra)) {
+        switch (tranlocal.owner.registerChangeListener(retryListener, tranlocal, pool, listenerEra)) {
             case REGISTRATION_DONE:
                 atLeastOneRegistration = true;
                 break;

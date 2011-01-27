@@ -8,8 +8,6 @@
 
 - readonly/readbiased
 
-- read consistency
-
 - last readwrite conflict should show which transactional object caused it.
 
 - GammaDoubleRef.atomicGetAndIncrement
@@ -31,6 +29,8 @@
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- read consistency
 
 - speculative size for full conflict scan
 
