@@ -7,5 +7,5 @@ import org.multiverse.api.Transaction;
  */
 public interface TransactionListener {
 
-    void notify(Transaction transaction, TransactionLifecycleEvent e);
+    void notify(Transaction transaction, TransactionEvent e);
 }

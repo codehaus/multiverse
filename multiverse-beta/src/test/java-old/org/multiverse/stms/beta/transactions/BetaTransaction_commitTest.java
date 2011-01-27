@@ -12,7 +12,7 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.functions.Functions;
-import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
+import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
@@ -393,7 +393,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         tx.register(listener2);
         tx.register(listener3);
 
-        doThrow(new MyException()).when(listener2).notify(tx, TransactionLifecycleEvent.PostCommit);
+        doThrow(new MyException()).when(listener2).notify(tx, TransactionEvent.PostCommit);
 
         try {
             tx.commit();
@@ -403,9 +403,9 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         }
 
         assertIsCommitted(tx);
-        verify(listener1).notify(tx, TransactionLifecycleEvent.PostCommit);
-        verify(listener2).notify(tx, TransactionLifecycleEvent.PostCommit);
-        verify(listener3, times(0)).notify(tx, TransactionLifecycleEvent.PostCommit);
+        verify(listener1).notify(tx, TransactionEvent.PostCommit);
+        verify(listener2).notify(tx, TransactionEvent.PostCommit);
+        verify(listener3, times(0)).notify(tx, TransactionEvent.PostCommit);
     }
 
     @Test
@@ -424,7 +424,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
 
         BetaTransaction tx = newTransaction(config);
 
-        doThrow(new MyException()).when(listener2).notify(tx, TransactionLifecycleEvent.PostCommit);
+        doThrow(new MyException()).when(listener2).notify(tx, TransactionEvent.PostCommit);
 
         try {
             tx.commit();
@@ -434,9 +434,9 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         }
 
         assertIsCommitted(tx);
-        verify(listener1).notify(tx, TransactionLifecycleEvent.PostCommit);
-        verify(listener2).notify(tx, TransactionLifecycleEvent.PostCommit);
-        verify(listener3, times(0)).notify(tx, TransactionLifecycleEvent.PostCommit);
+        verify(listener1).notify(tx, TransactionEvent.PostCommit);
+        verify(listener2).notify(tx, TransactionEvent.PostCommit);
+        verify(listener3, times(0)).notify(tx, TransactionEvent.PostCommit);
     }
 
     class MyException extends RuntimeException {
@@ -454,7 +454,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         tx.commit();
 
         assertIsCommitted(tx);
-        verify(listener).notify(tx, TransactionLifecycleEvent.PostCommit);
+        verify(listener).notify(tx, TransactionEvent.PostCommit);
     }
 
     @Test
@@ -469,7 +469,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         tx.commit();
 
         assertIsCommitted(tx);
-        verify(listener).notify(tx, TransactionLifecycleEvent.PostCommit);
+        verify(listener).notify(tx, TransactionEvent.PostCommit);
     }
 
     @Test
@@ -489,8 +489,8 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
 
         InOrder inOrder = inOrder(permanentListener, normalListener);
 
-        inOrder.verify(permanentListener).notify(tx, TransactionLifecycleEvent.PostCommit);
-        inOrder.verify(normalListener).notify(tx, TransactionLifecycleEvent.PostCommit);
+        inOrder.verify(permanentListener).notify(tx, TransactionEvent.PostCommit);
+        inOrder.verify(normalListener).notify(tx, TransactionEvent.PostCommit);
     }
 
     @Test
@@ -583,8 +583,8 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         tx.commit();
 
         assertEquals(2, listenerMock.events.size());
-        assertEquals(TransactionLifecycleEvent.PrePrepare, listenerMock.events.get(0));
-        assertEquals(TransactionLifecycleEvent.PostCommit, listenerMock.events.get(1));
+        assertEquals(TransactionEvent.PrePrepare, listenerMock.events.get(0));
+        assertEquals(TransactionEvent.PostCommit, listenerMock.events.get(1));
     }
 
     @Test
@@ -601,16 +601,16 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         tx.commit();
 
         assertEquals(2, listenerMock.events.size());
-        assertEquals(TransactionLifecycleEvent.PrePrepare, listenerMock.events.get(0));
-        assertEquals(TransactionLifecycleEvent.PostCommit, listenerMock.events.get(1));
+        assertEquals(TransactionEvent.PrePrepare, listenerMock.events.get(0));
+        assertEquals(TransactionEvent.PostCommit, listenerMock.events.get(1));
     }
 
     class TransactionLifecycleListenerMock implements TransactionListener {
         List<Transaction> transactions = new LinkedList<Transaction>();
-        List<TransactionLifecycleEvent> events = new LinkedList<TransactionLifecycleEvent>();
+        List<TransactionEvent> events = new LinkedList<TransactionEvent>();
 
         @Override
-        public void notify(Transaction transaction, TransactionLifecycleEvent e) {
+        public void notify(Transaction transaction, TransactionEvent e) {
             transactions.add(transaction);
             events.add(e);
         }

@@ -5,7 +5,7 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.*;
-import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
+import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.stms.beta.*;
 import org.multiverse.stms.beta.transactionalobjects.*;
 
@@ -2208,11 +2208,11 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
                     tranlocal.owner.___abort(this, tranlocal, pool);
                 }
                 if (config.permanentListeners != null) {
-                    notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
+                    notifyListeners(config.permanentListeners, TransactionEvent.PostAbort);
                 }
 
                 if (normalListeners != null) {
-                    notifyListeners(normalListeners, TransactionLifecycleEvent.PostAbort);
+                    notifyListeners(normalListeners, TransactionEvent.PostAbort);
                 }
                 break;
             case ABORTED:
@@ -2249,11 +2249,11 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         }
 
         if (config.permanentListeners != null) {
-            notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostCommit);
+            notifyListeners(config.permanentListeners, TransactionEvent.PostCommit);
         }
 
         if (normalListeners != null) {
-            notifyListeners(normalListeners, TransactionLifecycleEvent.PostCommit);
+            notifyListeners(normalListeners, TransactionEvent.PostCommit);
         }
     }
 
@@ -2335,11 +2335,11 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
         boolean abort = true;
         try {
             if (config.permanentListeners != null) {
-                notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PrePrepare);
+                notifyListeners(config.permanentListeners, TransactionEvent.PrePrepare);
             }
 
             if (normalListeners != null) {
-                notifyListeners(normalListeners, TransactionLifecycleEvent.PrePrepare);
+                notifyListeners(normalListeners, TransactionEvent.PrePrepare);
             }
 
             if (abortOnly) {
@@ -2439,11 +2439,11 @@ public final class FatArrayBetaTransaction extends AbstractFatBetaTransaction {
 
         status = ABORTED;
         if (config.permanentListeners != null) {
-            notifyListeners(config.permanentListeners, TransactionLifecycleEvent.PostAbort);
+            notifyListeners(config.permanentListeners, TransactionEvent.PostAbort);
         }
 
         if (normalListeners != null) {
-            notifyListeners(normalListeners, TransactionLifecycleEvent.PostAbort);
+            notifyListeners(normalListeners, TransactionEvent.PostAbort);
         }
 
         if (!atLeastOneRegistration) {

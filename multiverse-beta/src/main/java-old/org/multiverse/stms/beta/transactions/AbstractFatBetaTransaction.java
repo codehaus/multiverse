@@ -1,7 +1,7 @@
 package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
+import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.api.lifecycle.TransactionListener;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ public abstract class AbstractFatBetaTransaction extends BetaTransaction {
         super(poolTransactionType, config);
     }
 
-    protected final void notifyListeners(List<TransactionListener> listeners, TransactionLifecycleEvent event) {
+    protected final void notifyListeners(List<TransactionListener> listeners, TransactionEvent event) {
         if (listeners == null) {
             return;
         }

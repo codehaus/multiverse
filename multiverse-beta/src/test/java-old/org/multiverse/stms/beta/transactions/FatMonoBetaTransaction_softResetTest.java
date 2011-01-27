@@ -2,7 +2,7 @@ package org.multiverse.stms.beta.transactions;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
+import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
@@ -200,7 +200,7 @@ public class FatMonoBetaTransaction_softResetTest implements BetaStmConstants {
         boolean result = tx.softReset();
 
         assertTrue(result);
-        verify(listener).notify(tx, TransactionLifecycleEvent.PostAbort);
+        verify(listener).notify(tx, TransactionEvent.PostAbort);
         assertHasNoNormalListeners(tx);
     }
 

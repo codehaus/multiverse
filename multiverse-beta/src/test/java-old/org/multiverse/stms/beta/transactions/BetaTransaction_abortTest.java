@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
+import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.transactionalobjects.BetaLongRef;
@@ -132,7 +132,7 @@ public abstract class BetaTransaction_abortTest {
         tx.abort();
 
         assertEquals(1, listenerMock.events.size());
-        assertEquals(TransactionLifecycleEvent.PostAbort, listenerMock.events.get(0));
+        assertEquals(TransactionEvent.PostAbort, listenerMock.events.get(0));
     }
 
     @Test
@@ -149,15 +149,15 @@ public abstract class BetaTransaction_abortTest {
         tx.abort();
 
         assertEquals(1, listenerMock.events.size());
-        assertEquals(TransactionLifecycleEvent.PostAbort, listenerMock.events.get(0));
+        assertEquals(TransactionEvent.PostAbort, listenerMock.events.get(0));
     }
 
     class TransactionLifecycleListenerMock implements TransactionListener {
         List<Transaction> transactions = new LinkedList<Transaction>();
-        List<TransactionLifecycleEvent> events = new LinkedList<TransactionLifecycleEvent>();
+        List<TransactionEvent> events = new LinkedList<TransactionEvent>();
 
         @Override
-        public void notify(Transaction transaction, TransactionLifecycleEvent e) {
+        public void notify(Transaction transaction, TransactionEvent e) {
             transactions.add(transaction);
             events.add(e);
         }

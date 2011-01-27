@@ -5,7 +5,7 @@ package org.multiverse.api.lifecycle;
  *
  * @author Peter Veentjer.
  */
-public enum TransactionLifecycleEvent {
+public enum TransactionEvent {
 
     /**
      * Just before starting.

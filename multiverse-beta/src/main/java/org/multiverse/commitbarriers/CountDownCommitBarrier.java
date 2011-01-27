@@ -2,7 +2,7 @@ package org.multiverse.commitbarriers;
 
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
+import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.api.lifecycle.TransactionListener;
 
 import java.util.List;
@@ -236,10 +236,10 @@ public final class CountDownCommitBarrier extends CommitBarrier {
         }
 
         @Override
-        public void notify(Transaction tx, TransactionLifecycleEvent event) {
+        public void notify(Transaction tx, TransactionEvent event) {
             //todo: in the 0.6 release of multiverse this was pre-abort.. but since the pre-abort doesn't
             //exist anymore..
-            if (event != TransactionLifecycleEvent.PostAbort) {
+            if (event != TransactionEvent.PostAbort) {
                 return;
             }
 

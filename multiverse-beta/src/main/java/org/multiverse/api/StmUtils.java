@@ -5,7 +5,7 @@ import org.multiverse.api.collections.*;
 import org.multiverse.api.exceptions.ControlFlowError;
 import org.multiverse.api.exceptions.IllegalTransactionStateException;
 import org.multiverse.api.exceptions.TransactionRequiredException;
-import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
+import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.api.references.*;
 
@@ -635,9 +635,9 @@ public class StmUtils {
         Transaction tx = getRequiredThreadLocalTransaction();
         tx.register(new TransactionListener() {
             @Override
-            public void notify(Transaction tx, TransactionLifecycleEvent event) {
-                if (event == TransactionLifecycleEvent.PostCommit
-                        || event == TransactionLifecycleEvent.PostAbort) {
+            public void notify(Transaction tx, TransactionEvent event) {
+                if (event == TransactionEvent.PostCommit
+                        || event == TransactionEvent.PostAbort) {
                     task.run();
                 }
             }
@@ -666,8 +666,8 @@ public class StmUtils {
         Transaction tx = getRequiredThreadLocalTransaction();
         tx.register(new TransactionListener() {
             @Override
-            public void notify(Transaction tx, TransactionLifecycleEvent event) {
-                if (event == TransactionLifecycleEvent.PostCommit) {
+            public void notify(Transaction tx, TransactionEvent event) {
+                if (event == TransactionEvent.PostCommit) {
                     task.run();
                 }
             }
@@ -696,8 +696,8 @@ public class StmUtils {
         Transaction tx = getRequiredThreadLocalTransaction();
         tx.register(new TransactionListener() {
             @Override
-            public void notify(Transaction tx, TransactionLifecycleEvent event) {
-                if (event == TransactionLifecycleEvent.PostAbort) {
+            public void notify(Transaction tx, TransactionEvent event) {
+                if (event == TransactionEvent.PostAbort) {
                     task.run();
                 }
             }

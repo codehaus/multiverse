@@ -7,7 +7,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.LongFunction;
-import org.multiverse.api.lifecycle.TransactionLifecycleEvent;
+import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.beta.BetaStm;
 import org.multiverse.stms.beta.BetaStmConstants;
@@ -297,7 +297,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         RetryLatch latch = getFirstListener(ref);
 
         assertEquals(1, listenerMock.events.size());
-        assertEquals(TransactionLifecycleEvent.PostAbort, listenerMock.events.get(0));
+        assertEquals(TransactionEvent.PostAbort, listenerMock.events.get(0));
     }
 
     @Test
@@ -319,7 +319,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         }
 
         assertEquals(1, listenerMock.events.size());
-        assertEquals(TransactionLifecycleEvent.PostAbort, listenerMock.events.get(0));
+        assertEquals(TransactionEvent.PostAbort, listenerMock.events.get(0));
     }
 
     @Test
@@ -366,10 +366,10 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
 
     class TransactionLifecycleListenerMock implements TransactionListener {
         List<Transaction> transactions = new LinkedList<Transaction>();
-        List<TransactionLifecycleEvent> events = new LinkedList<TransactionLifecycleEvent>();
+        List<TransactionEvent> events = new LinkedList<TransactionEvent>();
 
         @Override
-        public void notify(Transaction transaction, TransactionLifecycleEvent e) {
+        public void notify(Transaction transaction, TransactionEvent e) {
             transactions.add(transaction);
             events.add(e);
         }

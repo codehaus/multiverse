@@ -2,6 +2,7 @@ package org.multiverse.stms.gamma.transactions.fat;
 
 import org.multiverse.api.exceptions.AbortOnlyException;
 import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
@@ -68,8 +69,9 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
             }
         }
 
-        status = TX_COMMITTED;
         tranlocal.owner = null;
+        status = TX_COMMITTED;
+        notifyListeners(TransactionEvent.PostCommit);
     }
 
     @Override
@@ -79,7 +81,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
         }
 
         if (status == TX_COMMITTED) {
-            throw abortAbortOnAlreadyCommitted();
+            throw failAbortOnAlreadyCommitted();
         }
 
         status = TX_ABORTED;
@@ -87,6 +89,8 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
         if (owner != null) {
             owner.releaseAfterFailure(tranlocal, pool);
         }
+
+        notifyListeners(TransactionEvent.PostAbort);
     }
 
     @Override

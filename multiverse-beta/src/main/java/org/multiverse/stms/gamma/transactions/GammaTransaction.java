@@ -6,6 +6,7 @@ import org.multiverse.api.blocking.DefaultRetryLatch;
 import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.Function;
+import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaObjectPool;
@@ -13,7 +14,7 @@ import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import static java.lang.String.format;
 import static org.multiverse.stms.gamma.GammaStmUtils.toDebugString;
@@ -31,12 +32,33 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public boolean abortOnly = false;
     public final RetryLatch retryListener = new DefaultRetryLatch();
-    public List<TransactionListener> listeners;
+    public ArrayList<TransactionListener> listeners;
 
     public GammaTransaction(GammaTransactionConfiguration config, int transactionType) {
         config.init();
         init(config);
         this.transactionType = transactionType;
+    }
+
+    protected void notifyListeners(TransactionEvent event) {
+        if (listeners != null) {
+            try {
+                for (int k = 0; k < listeners.size(); k++) {
+                    listeners.get(k).notify(this, event);
+                }
+            } finally {
+                listeners.clear();
+                pool.putArrayList(listeners);
+                listeners = null;
+            }
+        }
+
+        final ArrayList<TransactionListener> permanentListeners = config.permanentListeners;
+        if (permanentListeners != null) {
+            for (int k = 0; k < permanentListeners.size(); k++) {
+                permanentListeners.get(k).notify(this, event);
+            }
+        }
     }
 
     public final void abortIfAlive() {
@@ -54,7 +76,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
-    public DeadTransactionException abortAbortOnAlreadyCommitted() {
+    public DeadTransactionException failAbortOnAlreadyCommitted() {
         return new DeadTransactionException(
                 format("[%s] Failed to execute transaction.abort, reason: the transaction is already committed",
                         config.familyName));
