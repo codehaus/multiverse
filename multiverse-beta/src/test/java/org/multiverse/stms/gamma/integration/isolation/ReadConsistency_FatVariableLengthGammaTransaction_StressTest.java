@@ -11,49 +11,49 @@ public class ReadConsistency_FatVariableLengthGammaTransaction_StressTest extend
     private int refCount;
 
     @Test
-    public void testWith2Refs() {
+    public void poorMansConflictScan_testWith2Refs() {
         refCount = 2;
         run(refCount);
     }
 
     @Test
-    public void testWith4Refs() {
+    public void poorMansConflictScan_testWith4Refs() {
         refCount = 4;
         run(refCount);
     }
 
     @Test
-    public void testWith8Refs() {
+    public void poorMansConflictScan_testWith8Refs() {
         refCount = 8;
         run(refCount);
     }
 
     @Test
-    public void testWith16Refs() {
+    public void poorMansConflictScan_testWith16Refs() {
         refCount = 16;
         run(refCount);
     }
 
     @Test
-    public void testWith32Refs() {
+    public void poorMansConflictScan_testWith32Refs() {
         refCount = 32;
         run(refCount);
     }
 
     @Test
-    public void testWith128Refs() {
+    public void poorMansConflictScan_testWith128Refs() {
         refCount = 128;
         run(refCount);
     }
 
     @Test
-    public void testWith512Refs() {
+    public void poorMansConflictScan_testWith512Refs() {
         refCount = 512;
         run(refCount);
     }
 
     @Test
-    public void testWith2048Refs() {
+    public void poorMansConflictScan_testWith2048Refs() {
         refCount = 2048;
         run(refCount);
     }
