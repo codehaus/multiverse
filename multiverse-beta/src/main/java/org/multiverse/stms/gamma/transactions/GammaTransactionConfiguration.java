@@ -568,6 +568,10 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.readLockMode = readLockMode;
         config.readLockModeAsInt = readLockMode.asInt();
+        if (config.readLockModeAsInt > config.writeLockModeAsInt) {
+            config.writeLockMode = config.readLockMode;
+            config.writeLockModeAsInt = config.readLockModeAsInt;
+        }
         return config;
     }
 

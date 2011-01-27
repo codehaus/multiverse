@@ -66,6 +66,13 @@ public interface TransactionFactoryBuilder {
      * Sets the LockMode for all writes. For a write, always a read needs to be done, so if the ReadLockMode is
      * <p/>
      * Freshly constructed objects that are not committed, automatically are locked with an Exclusive lock.
+     * <p/>
+     * If the write LockMode is set after the read LockMode and the write LockMode is lower than the read LockMode,
+     * a IllegalTransactionFactoryException will be thrown when a TransactionFactory is created.
+     * <p/>
+     * If the write LockMode is set before the read LockMode and the write LockMode is lower than the read LockMode,
+     * the write LockMode automatically is upgraded to that of the read LockMode. This makes setting the readLock
+     * mode less of a nuisance.
      *
      * @param lockMode the LockMode to set.
      * @return the updated TransactionFactoryBuilder.

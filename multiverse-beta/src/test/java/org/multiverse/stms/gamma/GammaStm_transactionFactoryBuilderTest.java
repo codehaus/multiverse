@@ -111,29 +111,70 @@ public class GammaStm_transactionFactoryBuilderTest {
     }
 
     @Test
-    public void whenReadWriteLockLevel() {
-        whenReadLockWriteLockLevel(LockMode.None, LockMode.None, true);
-        whenReadLockWriteLockLevel(LockMode.None, LockMode.Read, true);
-        whenReadLockWriteLockLevel(LockMode.None, LockMode.Write, true);
-        whenReadLockWriteLockLevel(LockMode.None, LockMode.Exclusive, true);
+    public void whenReadLockModeOverridesWriteLockMode() {
+        whenReadLockModeOverridesWriteLockMode(LockMode.None, LockMode.None);
+        whenReadLockModeOverridesWriteLockMode(LockMode.None, LockMode.Read);
+        whenReadLockModeOverridesWriteLockMode(LockMode.None, LockMode.Write);
+        whenReadLockModeOverridesWriteLockMode(LockMode.None, LockMode.Exclusive);
 
-        whenReadLockWriteLockLevel(LockMode.Read, LockMode.None, false);
-        whenReadLockWriteLockLevel(LockMode.Read, LockMode.Read, true);
-        whenReadLockWriteLockLevel(LockMode.Read, LockMode.Write, true);
-        whenReadLockWriteLockLevel(LockMode.Read, LockMode.Exclusive, true);
+        whenReadLockModeOverridesWriteLockMode(LockMode.Read, LockMode.None);
+        whenReadLockModeOverridesWriteLockMode(LockMode.Read, LockMode.Read);
+        whenReadLockModeOverridesWriteLockMode(LockMode.Read, LockMode.Write);
+        whenReadLockModeOverridesWriteLockMode(LockMode.Read, LockMode.Exclusive);
 
-        whenReadLockWriteLockLevel(LockMode.Write, LockMode.None, false);
-        whenReadLockWriteLockLevel(LockMode.Write, LockMode.Read, false);
-        whenReadLockWriteLockLevel(LockMode.Write, LockMode.Write, true);
-        whenReadLockWriteLockLevel(LockMode.Write, LockMode.Exclusive, true);
+        whenReadLockModeOverridesWriteLockMode(LockMode.Write, LockMode.None);
+        whenReadLockModeOverridesWriteLockMode(LockMode.Write, LockMode.Read);
+        whenReadLockModeOverridesWriteLockMode(LockMode.Write, LockMode.Write);
+        whenReadLockModeOverridesWriteLockMode(LockMode.Write, LockMode.Exclusive);
 
-        whenReadLockWriteLockLevel(LockMode.Exclusive, LockMode.None, false);
-        whenReadLockWriteLockLevel(LockMode.Exclusive, LockMode.Read, false);
-        whenReadLockWriteLockLevel(LockMode.Exclusive, LockMode.Write, false);
-        whenReadLockWriteLockLevel(LockMode.Exclusive, LockMode.Exclusive, true);
+        whenReadLockModeOverridesWriteLockMode(LockMode.Exclusive, LockMode.None);
+        whenReadLockModeOverridesWriteLockMode(LockMode.Exclusive, LockMode.Read);
+        whenReadLockModeOverridesWriteLockMode(LockMode.Exclusive, LockMode.Write);
+        whenReadLockModeOverridesWriteLockMode(LockMode.Exclusive, LockMode.Exclusive);
     }
 
-    public void whenReadLockWriteLockLevel(LockMode readLock, LockMode writeLock, boolean success) {
+    public void whenReadLockModeOverridesWriteLockMode(LockMode readLockMode, LockMode writeLockMode) {
+        GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
+                .setWriteLockMode(writeLockMode)
+                .setReadLockMode(readLockMode)
+                .newTransactionFactory();
+
+        assertEquals(readLockMode, txFactory.getConfiguration().readLockMode);
+        assertEquals(readLockMode.asInt(), txFactory.getConfiguration().readLockModeAsInt);
+
+        if (readLockMode.asInt() > writeLockMode.asInt()) {
+            assertEquals(readLockMode, txFactory.getConfiguration().getWriteLockMode());
+            assertEquals(readLockMode.asInt(), txFactory.getConfiguration().writeLockModeAsInt);
+        } else {
+            assertEquals(writeLockMode, txFactory.getConfiguration().getWriteLockMode());
+            assertEquals(writeLockMode.asInt(), txFactory.getConfiguration().writeLockModeAsInt);
+        }
+    }
+
+    @Test
+    public void whenWriteLockModeOverridesReadLockMode() {
+        whenWriteLockModeOverridesReadLockMode(LockMode.None, LockMode.None, true);
+        whenWriteLockModeOverridesReadLockMode(LockMode.None, LockMode.Read, true);
+        whenWriteLockModeOverridesReadLockMode(LockMode.None, LockMode.Write, true);
+        whenWriteLockModeOverridesReadLockMode(LockMode.None, LockMode.Exclusive, true);
+
+        whenWriteLockModeOverridesReadLockMode(LockMode.Read, LockMode.None, false);
+        whenWriteLockModeOverridesReadLockMode(LockMode.Read, LockMode.Read, true);
+        whenWriteLockModeOverridesReadLockMode(LockMode.Read, LockMode.Write, true);
+        whenWriteLockModeOverridesReadLockMode(LockMode.Read, LockMode.Exclusive, true);
+
+        whenWriteLockModeOverridesReadLockMode(LockMode.Write, LockMode.None, false);
+        whenWriteLockModeOverridesReadLockMode(LockMode.Write, LockMode.Read, false);
+        whenWriteLockModeOverridesReadLockMode(LockMode.Write, LockMode.Write, true);
+        whenWriteLockModeOverridesReadLockMode(LockMode.Write, LockMode.Exclusive, true);
+
+        whenWriteLockModeOverridesReadLockMode(LockMode.Exclusive, LockMode.None, false);
+        whenWriteLockModeOverridesReadLockMode(LockMode.Exclusive, LockMode.Read, false);
+        whenWriteLockModeOverridesReadLockMode(LockMode.Exclusive, LockMode.Write, false);
+        whenWriteLockModeOverridesReadLockMode(LockMode.Exclusive, LockMode.Exclusive, true);
+    }
+
+    public void whenWriteLockModeOverridesReadLockMode(LockMode readLock, LockMode writeLock, boolean success) {
         if (success) {
             GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
                     .setReadLockMode(readLock)
@@ -150,7 +191,6 @@ public class GammaStm_transactionFactoryBuilderTest {
                         .newTransactionFactory();
                 fail();
             } catch (IllegalTransactionFactoryException expected) {
-
             }
         }
     }
