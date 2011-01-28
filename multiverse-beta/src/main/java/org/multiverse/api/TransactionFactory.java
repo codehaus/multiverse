@@ -17,9 +17,9 @@ public interface TransactionFactory {
     TransactionConfiguration getConfiguration();
 
     /**
-     * Starts a transaction.
+     * Creates a new transaction.
      *
-     * @return the started Transaction.
+     * @return the created Transaction.
      */
     Transaction newTransaction();
 }

@@ -19,6 +19,14 @@ import org.multiverse.api.references.RefFactoryBuilder;
 public interface Stm {
 
     /**
+     * Gets the {@link TransactionFactoryBuilder} that needs to be used to execute transactions on this Stm. See the
+     * {@link TransactionFactoryBuilder} for more info.
+     *
+     * @return the TransactionFactoryBuilder that needs to be used to execute transactions on this Stm.
+     */
+    TransactionFactoryBuilder newTransactionFactoryBuilder();
+
+    /**
      * Starts a default Transaction that is useful for testing/experimentation purposes. This method is purely
      * for easy to use access, but doesn't provide any configuration options. See the
      * {@link #newTransactionFactoryBuilder()} for something more configurable.
@@ -27,7 +35,7 @@ public interface Stm {
      *
      * @return the started default Transaction.
      */
-    Transaction startDefaultTransaction();
+    Transaction newDefaultTransaction();
 
     /**
      * Returns the default atomic block that is useful for testing/experimentation purposes. This method is purely
@@ -56,19 +64,16 @@ public interface Stm {
     RefFactory getDefaultRefFactory();
 
     /**
-     * Gets the {@link TransactionFactoryBuilder} that needs to be used to execute transactions on this Stm. See the
-     * {@link TransactionFactoryBuilder} for more info.
-     *
-     * @return the TransactionFactoryBuilder that needs to be used to execute transactions on this Stm.
-     */
-    TransactionFactoryBuilder newTransactionFactoryBuilder();
-
-    TransactionalCollectionsFactory getDefaultTransactionalCollectionFactory();
-
-    /**
      * Gets the {@link org.multiverse.api.references.RefFactoryBuilder}.
      *
      * @return the RefFactoryBuilder.
      */
     RefFactoryBuilder getRefFactoryBuilder();
+
+    /**
+     * Gets the default {@link TransactionalCollectionsFactory}.
+     *
+     * @return the default {@link TransactionalCollectionsFactory}.
+     */
+    TransactionalCollectionsFactory getDefaultTransactionalCollectionFactory();
 }

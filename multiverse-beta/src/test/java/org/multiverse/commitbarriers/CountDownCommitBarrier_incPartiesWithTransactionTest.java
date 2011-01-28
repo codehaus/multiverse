@@ -52,7 +52,7 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
     @Test
     public void whenTransactionPrepared() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(10);
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         tx.prepare();
 
         barrier.incParties(tx, 5);
@@ -67,7 +67,7 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
     public void whenTransactionAborted_thenDeadTransactionException() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(10);
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         tx.abort();
 
         try {
@@ -85,7 +85,7 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
     public void whenTransactionCommitted_thenDeadTransactionException() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(10);
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         tx.commit();
 
         try {
@@ -103,7 +103,7 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
     @Test
     public void whenZeroExtraParties() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(5);
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         barrier.incParties(tx, 0);
 
         assertEquals(5, barrier.getParties());
@@ -114,7 +114,7 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
     @Test
     public void whenPositiveNumber() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(10);
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         barrier.incParties(tx, 5);
 
         assertIsActive(tx);
@@ -127,7 +127,7 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
     public void whenPartiesAdded_thenAdditionalJoinsNeedToBeExecuted() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(2);
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         barrier.incParties(tx, 1);
 
         barrier.countDown();
@@ -143,7 +143,7 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
     public void whenTransactionAborted_thenPartiesRestored() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(2);
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         barrier.incParties(tx, 10);
 
         tx.abort();
@@ -177,7 +177,7 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         try {
             barrier.incParties(tx, 10);
             fail("Should have got CommitBarrierOpenException");
@@ -194,7 +194,7 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(0);
         barrier.countDown();
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
 
         try {
             barrier.incParties(tx, 1);

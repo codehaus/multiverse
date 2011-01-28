@@ -53,7 +53,7 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
     public void whenSingleReadLockAcquiredAndUpgradeToWriteLock_thenSuccess() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
-        ref.openForRead(stm.startDefaultTransaction(), LOCKMODE_READ);
+        ref.openForRead(stm.newDefaultTransaction(), LOCKMODE_READ);
 
         boolean result = ref.tryUpgradeReadLockToWriteOrExclusiveLock(1, false);
         assertTrue(result);
@@ -66,7 +66,7 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
     public void whenSingleReadLockAcquiredAndUpgradeToExclusiveLock_thenSuccess() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
-        ref.openForRead(stm.startDefaultTransaction(), LOCKMODE_READ);
+        ref.openForRead(stm.newDefaultTransaction(), LOCKMODE_READ);
 
         boolean result = ref.tryUpgradeReadLockToWriteOrExclusiveLock(1, true);
         assertTrue(result);
@@ -79,8 +79,8 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
     public void whenMultipleReadLocksAcquired_thenUpgradeToWriteLockFailure() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
-        ref.openForRead(stm.startDefaultTransaction(), LOCKMODE_READ);
-        ref.openForRead(stm.startDefaultTransaction(), LOCKMODE_READ);
+        ref.openForRead(stm.newDefaultTransaction(), LOCKMODE_READ);
+        ref.openForRead(stm.newDefaultTransaction(), LOCKMODE_READ);
 
         boolean result = ref.tryUpgradeReadLockToWriteOrExclusiveLock(1, false);
         assertFalse(result);
@@ -92,8 +92,8 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
     public void whenMultipleReadLocksAcquired_thenUpgradeToExclusiveLockFailure() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
-        ref.openForRead(stm.startDefaultTransaction(), LOCKMODE_READ);
-        ref.openForRead(stm.startDefaultTransaction(), LOCKMODE_READ);
+        ref.openForRead(stm.newDefaultTransaction(), LOCKMODE_READ);
+        ref.openForRead(stm.newDefaultTransaction(), LOCKMODE_READ);
 
         boolean result = ref.tryUpgradeReadLockToWriteOrExclusiveLock(1, true);
         assertFalse(result);
@@ -105,7 +105,7 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
     public void whenWriteLockAcquired_thenPanicError() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.openForRead(tx, LOCKMODE_WRITE);
 
         try {
@@ -123,7 +123,7 @@ public class Orec_tryUpgradeFromReadLockTest implements GammaConstants {
     public void whenExclusiveLockAcquired_thenPanicError() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.openForRead(tx, LOCKMODE_EXCLUSIVE);
 
         try {

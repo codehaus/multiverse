@@ -52,7 +52,7 @@ public final class GammaStm implements Stm {
     }
 
     @Override
-    public GammaTransaction startDefaultTransaction() {
+    public GammaTransaction newDefaultTransaction() {
         return new FatVariableLengthGammaTransaction(this);
     }
 

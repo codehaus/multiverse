@@ -21,7 +21,7 @@ public class PessimisticTest {
 
     @Test
     public void constructedObjectAutomaticallyIsLocked() {
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         GammaLongRef ref = new GammaLongRef(tx);
         ref.openForConstruction(tx);
 

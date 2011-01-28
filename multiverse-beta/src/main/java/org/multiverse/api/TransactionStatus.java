@@ -8,10 +8,6 @@ package org.multiverse.api;
 public enum TransactionStatus {
 
     /**
-     */
-    Undefined(false),
-
-    /**
      * When a Transaction is running.
      */
     Active(true),

@@ -48,7 +48,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyTest {
         barrier = new CountDownCommitBarrier(1);
 
         Thread.currentThread().interrupt();
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
 
         barrier.joinCommitUninterruptibly(tx);
 
@@ -59,7 +59,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyTest {
 
     @Test
     public void whenOpenAndTransactionActive() {
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         tx.prepare();
 
         barrier = new CountDownCommitBarrier(1);
@@ -71,7 +71,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyTest {
 
     @Test
     public void whenOpenAndTransactionPrepared() {
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         tx.prepare();
 
         barrier = new CountDownCommitBarrier(1);
@@ -93,7 +93,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyTest {
         assertAlive(t1, t2);
         assertTrue(barrier.isClosed());
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         barrier.joinCommitUninterruptibly(tx);
         joinAll(t1, t2);
 
@@ -102,7 +102,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyTest {
 
     @Test
     public void whenOpenAndTransactionAborted_thenDeadTransactionException() {
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         tx.abort();
 
         barrier = new CountDownCommitBarrier(1);
@@ -118,7 +118,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyTest {
 
     @Test
     public void whenOpenAndTransactionCommitted_thenDeadTransactionException() {
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         tx.commit();
 
         barrier = new CountDownCommitBarrier(1);
@@ -137,7 +137,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyTest {
         barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
 
         try {
             barrier.joinCommitUninterruptibly(tx);
@@ -151,9 +151,9 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyTest {
     @Test
     public void whenCommitted_thenCommitBarrierOpenException() {
         barrier = new CountDownCommitBarrier(1);
-        barrier.joinCommitUninterruptibly(stm.startDefaultTransaction());
+        barrier.joinCommitUninterruptibly(stm.newDefaultTransaction());
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         try {
             barrier.joinCommitUninterruptibly(tx);
             fail();

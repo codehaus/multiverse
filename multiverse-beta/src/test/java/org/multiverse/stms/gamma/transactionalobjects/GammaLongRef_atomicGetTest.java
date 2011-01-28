@@ -25,7 +25,7 @@ public class GammaLongRef_atomicGetTest {
     @Test(expected = LockedException.class)
     @Ignore
     public void whenUnconstructed() {
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         //GammaLongRef ref = new GammaLongRef(tx);
         //ref.atomicGet();
     }
@@ -34,7 +34,7 @@ public class GammaLongRef_atomicGetTest {
     public void whenActiveTransactionAvailable_thenIgnored() {
         GammaLongRef ref = new GammaLongRef(stm, 100);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         setThreadLocalTransaction(tx);
         ref.set(10);
 
@@ -57,7 +57,7 @@ public class GammaLongRef_atomicGetTest {
         GammaLongRef ref = new GammaLongRef(stm, 100);
         long version = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         try {
@@ -77,7 +77,7 @@ public class GammaLongRef_atomicGetTest {
         GammaLongRef ref = new GammaLongRef(stm, 100);
         long version = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         long result = ref.atomicGet();
@@ -104,7 +104,7 @@ public class GammaLongRef_atomicGetTest {
         GammaLongRef ref = makeReadBiased(new GammaLongRef(stm, 100));
         long version = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         try {
@@ -125,7 +125,7 @@ public class GammaLongRef_atomicGetTest {
         GammaLongRef ref = makeReadBiased(new GammaLongRef(stm, 100));
         long version = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         long result = ref.atomicGet();

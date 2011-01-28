@@ -28,6 +28,8 @@ public interface TransactionalObject {
 
     /**
      * Returns the current version of the transactional object. Each time an update happens, the value is increased.
+     * <p/>
+     * This method doesn't look at a ThreadLocalTransaction.
      *
      * @return the current version.
      */
@@ -84,10 +86,35 @@ public interface TransactionalObject {
      */
     String toDebugString();
 
+    /**
+     * Returns a String representation of the Object using the Transaction on the ThreadLocalTransaction.
+     *
+     * @return the toString representation
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     */
     @Override
     String toString();
 
+    /**
+     * Returns a String representation of the object using the provided transaction.
+     *
+     * @param tx the Transaction used.
+     * @return the String representation of the object.
+     * @throws NullPointerException if tx is null.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     */
     String toString(Transaction tx);
 
+    /**
+     * Returns a String representation of the object using the provided transaction without looking
+     * at a ThreadLocal transaction. The outputted value doesn't need to be consistent from some point
+     * in time, only a best effort.
+     *
+     * @return the String representation.
+     */
     String atomicToString();
 }

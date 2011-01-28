@@ -65,7 +65,7 @@ public abstract class LeanGammaTransaction_openForWriteTest<T extends GammaTrans
         GammaTransaction tx = newTransaction();
         ref1.openForWrite(tx, LOCKMODE_NONE);
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref1.getLock().acquire(otherTx, LockMode.Exclusive);
 
         try {
@@ -237,7 +237,7 @@ public abstract class LeanGammaTransaction_openForWriteTest<T extends GammaTrans
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         T tx = newTransaction();
@@ -267,7 +267,7 @@ public abstract class LeanGammaTransaction_openForWriteTest<T extends GammaTrans
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, lockMode);
 
         T tx = newTransaction();

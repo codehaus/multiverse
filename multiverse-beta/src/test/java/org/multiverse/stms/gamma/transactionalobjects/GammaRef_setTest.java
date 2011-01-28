@@ -30,7 +30,7 @@ public class GammaRef_setTest {
         long initialVersion = ref.getVersion();
         long initialOrec = ref.orec;
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         String newValue = "bar";
         String result = ref.set(tx, newValue);
 
@@ -47,7 +47,7 @@ public class GammaRef_setTest {
         long initialVersion = ref.getVersion();
         long initialOrec = ref.orec;
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         tx.prepare();
         try {
             ref.set(tx, "bar");
@@ -67,7 +67,7 @@ public class GammaRef_setTest {
         long initialVersion = ref.getVersion();
         long initialOrec = ref.orec;
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         tx.abort();
         try {
             ref.set(tx, "bar");
@@ -87,7 +87,7 @@ public class GammaRef_setTest {
         long initialVersion = ref.getVersion();
         long initialOrec = ref.orec;
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         tx.commit();
         try {
             ref.set(tx, "bar");

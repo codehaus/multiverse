@@ -58,7 +58,7 @@ public abstract class FatGammaTransaction_prepareTest<T extends GammaTransaction
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.openForRead(tx, readLockMode.asInt());
         tx.prepare();
 

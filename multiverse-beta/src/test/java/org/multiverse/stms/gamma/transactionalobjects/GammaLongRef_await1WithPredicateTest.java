@@ -83,7 +83,7 @@ public class GammaLongRef_await1WithPredicateTest {
 
         when(predicate.evaluate(initialValue)).thenThrow(new SomeUncheckedException());
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         setThreadLocalTransaction(tx);
 
         try {
@@ -103,7 +103,7 @@ public class GammaLongRef_await1WithPredicateTest {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         setThreadLocalTransaction(tx);
 
         try {
@@ -142,7 +142,7 @@ public class GammaLongRef_await1WithPredicateTest {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         setThreadLocalTransaction(tx);
         tx.prepare();
 
@@ -165,7 +165,7 @@ public class GammaLongRef_await1WithPredicateTest {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         setThreadLocalTransaction(tx);
         tx.abort();
 
@@ -188,7 +188,7 @@ public class GammaLongRef_await1WithPredicateTest {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         setThreadLocalTransaction(tx);
         tx.commit();
 

@@ -65,7 +65,7 @@ public class WriteSkewStressTest {
         }
 
         GammaLongRef account = user1.getRandomAccount();
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         account.openForWrite(tx, LOCKMODE_NONE).long_value = 1000;
         tx.commit();
     }

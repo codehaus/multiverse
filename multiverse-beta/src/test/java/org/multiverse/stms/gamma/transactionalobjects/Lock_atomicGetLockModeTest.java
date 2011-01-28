@@ -28,7 +28,7 @@ public class Lock_atomicGetLockModeTest {
     @Test
     public void whenReadLocked() {
         GammaLongRef ref = new GammaLongRef(stm);
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Read);
 
         LockMode lockMode = ref.atomicGetLockMode();
@@ -38,7 +38,7 @@ public class Lock_atomicGetLockModeTest {
     @Test
     public void whenWriteLocked() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Write);
 
         LockMode lockMode = ref.atomicGetLockMode();
@@ -48,7 +48,7 @@ public class Lock_atomicGetLockModeTest {
     @Test
     public void whenExclusiveLocked() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Exclusive);
 
         LockMode lockMode = ref.atomicGetLockMode();

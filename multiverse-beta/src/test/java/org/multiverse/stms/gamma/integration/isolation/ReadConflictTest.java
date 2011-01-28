@@ -27,7 +27,7 @@ public class ReadConflictTest {
     public void whenAlreadyReadThenNoConflict() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.get(tx);
 
         ref.atomicIncrementAndGet(1);
@@ -45,10 +45,10 @@ public class ReadConflictTest {
         GammaLongRef ref1 = new GammaLongRef(stm, 0);
         GammaLongRef ref2 = new GammaLongRef(stm, 0);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref1.get(tx);
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref1.set(otherTx, 1);
         ref2.set(otherTx, 1);
         otherTx.commit();

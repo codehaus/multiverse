@@ -169,7 +169,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         T tx = newTransaction();
@@ -199,7 +199,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, lockMode);
 
         T tx = newTransaction();
@@ -320,7 +320,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
         GammaTransaction tx = newTransaction();
         ref1.openForRead(tx, LOCKMODE_NONE);
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref1.getLock().acquire(otherTx, LockMode.Exclusive);
 
         try {

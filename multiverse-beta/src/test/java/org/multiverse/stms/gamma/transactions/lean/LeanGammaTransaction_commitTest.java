@@ -181,7 +181,7 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         T tx = newTransaction();
         GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, lockMode);
 
         try {

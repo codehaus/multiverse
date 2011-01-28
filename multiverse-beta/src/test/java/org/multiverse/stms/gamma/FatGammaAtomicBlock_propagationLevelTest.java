@@ -35,7 +35,7 @@ public class FatGammaAtomicBlock_propagationLevelTest implements GammaConstants 
                 .setPropagationLevel(PropagationLevel.Never)
                 .newAtomicBlock();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         setThreadLocalTransaction(otherTx);
 
         AtomicVoidClosure closure = mock(AtomicVoidClosure.class);
@@ -95,7 +95,7 @@ public class FatGammaAtomicBlock_propagationLevelTest implements GammaConstants 
                 .setPropagationLevel(PropagationLevel.Mandatory)
                 .newAtomicBlock();
 
-        final GammaTransaction otherTx = stm.startDefaultTransaction();
+        final GammaTransaction otherTx = stm.newDefaultTransaction();
         setThreadLocalTransaction(otherTx);
 
         AtomicIntClosure closure = new AtomicIntClosure() {
@@ -144,7 +144,7 @@ public class FatGammaAtomicBlock_propagationLevelTest implements GammaConstants 
                 .setPropagationLevel(PropagationLevel.Requires)
                 .newTransactionFactory();
 
-        final GammaTransaction existingTx = stm.startDefaultTransaction();
+        final GammaTransaction existingTx = stm.newDefaultTransaction();
         setThreadLocalTransaction(existingTx);
 
         final GammaLongRef ref = new GammaLongRef(stm);
@@ -199,7 +199,7 @@ public class FatGammaAtomicBlock_propagationLevelTest implements GammaConstants 
                 .setPropagationLevel(PropagationLevel.RequiresNew)
                 .newAtomicBlock();
 
-        final GammaTransaction otherTx = stm.startDefaultTransaction();
+        final GammaTransaction otherTx = stm.newDefaultTransaction();
         setThreadLocalTransaction(otherTx);
 
         final GammaLongRef ref = new GammaLongRef(stm, 10);
@@ -229,7 +229,7 @@ public class FatGammaAtomicBlock_propagationLevelTest implements GammaConstants 
                 .setPropagationLevel(PropagationLevel.Supports)
                 .newAtomicBlock();
 
-        final GammaTransaction otherTx = stm.startDefaultTransaction();
+        final GammaTransaction otherTx = stm.newDefaultTransaction();
         setThreadLocalTransaction(otherTx);
 
         AtomicIntClosure closure = new AtomicIntClosure() {

@@ -33,7 +33,7 @@ public class GammaRef_awaitNotNullAndGet1Test implements GammaConstants {
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         String result = ref.awaitNotNullAndGet(tx);
 
         assertSame(initialValue, result);
@@ -54,10 +54,10 @@ public class GammaRef_awaitNotNullAndGet1Test implements GammaConstants {
         GammaRef<String> ref = new GammaRef<String>(stm);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         try {
             ref.awaitNotNullAndGet(tx);
             fail();
@@ -76,10 +76,10 @@ public class GammaRef_awaitNotNullAndGet1Test implements GammaConstants {
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         String result = ref.awaitNotNullAndGet(tx);
 
         assertSame(initialValue, result);
@@ -134,7 +134,7 @@ public class GammaRef_awaitNotNullAndGet1Test implements GammaConstants {
         GammaRef<String> ref = new GammaRef<String>(stm);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         tx.prepare();
 
         try {
@@ -152,7 +152,7 @@ public class GammaRef_awaitNotNullAndGet1Test implements GammaConstants {
         GammaRef<String> ref = new GammaRef<String>(stm);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         tx.abort();
 
         try {
@@ -170,7 +170,7 @@ public class GammaRef_awaitNotNullAndGet1Test implements GammaConstants {
         GammaRef<String> ref = new GammaRef<String>(stm);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         tx.commit();
 
         try {

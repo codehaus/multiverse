@@ -59,7 +59,7 @@ public class GammaRef_isNullTest {
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         setThreadLocalTransaction(tx);
         assertFalse(ref.isNull());
         ref.set(tx, null);
@@ -75,7 +75,7 @@ public class GammaRef_isNullTest {
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         setThreadLocalTransaction(tx);
         tx.prepare();
 
@@ -97,7 +97,7 @@ public class GammaRef_isNullTest {
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         tx.commit();
         setThreadLocalTransaction(tx);
 
@@ -119,7 +119,7 @@ public class GammaRef_isNullTest {
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         tx.abort();
         setThreadLocalTransaction(tx);
 

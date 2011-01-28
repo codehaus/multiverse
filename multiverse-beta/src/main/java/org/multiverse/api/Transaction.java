@@ -8,8 +8,7 @@ import org.multiverse.api.lifecycle.TransactionListener;
  * <ul>
  * <li>Atomic: all or nothing gets committed (Failure atomicity)</li>
  * <li>Consistent : </li>
- * <li>Isolated: a
- * transaction is executed isolated from other transactions. Meaning that a transaction won't see changed made by
+ * <li>Isolated: a transaction is executed isolated from other transactions. Meaning that a transaction won't see changed made by
  * transactions executed concurrently, but it will see changes made by transaction completed before.</li>
  * </ul>
  * <p/>
@@ -23,15 +22,16 @@ import org.multiverse.api.lifecycle.TransactionListener;
  * could depend on threadlocals.
  * </dd>
  * <p/>
- * <dt>TransactionLifecycle</dt>
+ * <dt>TransactionListener</dt>
  * <dd>
  * It is possible to listen to a Transaction when it aborts, or commits. This can be done with the
- * {@link #register(org.multiverse.api.lifecycle.TransactionListener)}.* You can also register permanent lifecycle listeners (useful for a
- * product that uses Multiverse as lower level stm, look for the
- * {@link TransactionFactoryBuilder#addPermanentListener(org.multiverse.api.lifecycle.TransactionListener)}.
+ * {@link #register(org.multiverse.api.lifecycle.TransactionListener)}. You can also register permanent TransactionListener;
+ * useful for a product that uses Multiverse as lower level stm, look for the
+ * {@link TransactionFactoryBuilder#addPermanentListener(org.multiverse.api.lifecycle.TransactionListener).
  * <p/>
- * When the Transaction is reset, the normal lifecycle tasks are dropped and the permanent are not. So the lifecycle
- * task need to be registered again (this is easy because the transaction is executed again).
+ * When the Transaction is reset, the normal TransactionListeners are dropped and the permanent are not. So the TransactionListener
+ * need to be registered again (this is easy because the transaction is executed again, so the logic that registered
+ * the TransactionListener as well.
  * </dd>
  * </dl>
  *
@@ -41,6 +41,8 @@ public interface Transaction {
 
     /**
      * Returns the TransactionConfiguration used by this Transaction.
+     * <p/>
+     * Because the Transaction can be reused, the TransactionConfiguration used by this Transaction doesn't need to be constant.
      *
      * @return the TransactionConfiguration.
      */
@@ -55,7 +57,8 @@ public interface Transaction {
 
     /**
      * Gets the current attempt (so the number of tries this transaction already had). Value will
-     * always be equal or larger than 1.
+     * always be equal or larger than 1 (the first attempt returns 1). The maximum number of attempts for retrying is determined based
+     * on the  {@link TransactionConfiguration#getMaxRetries()}
      *
      * @return the current attempt.
      */
@@ -71,19 +74,20 @@ public interface Transaction {
     /**
      * Commits this Transaction. If the Transaction is:
      * <ol>
-     * <li>new: is is activated and following the same flow as an active transaction. This is done so that
-     * the lifecyclelisteners work.</li>
      * <li>active: it is prepared for commit and then committed</li>
      * <li>prepared: it is committed (so changes persisted). Once it is prepared, the commit is guaranteed to
      * succeed.</li>
      * <li>aborted: a DeadTransactionException is thrown</li>
      * <li>committed: a DeadTransactionException is thrown</li>
-     * </ol> So it is safe to call while active
-     * or prepared.
+     * </ol>
+     * So it is safe to call while active or prepared.
      * <p/>
-     * Transaction will be aborted if the commit does not succeed.
+     * Transaction will always be aborted if the commit does not succeed.
      * <p/>
      * Commit will not throw any validation exceptions after the transaction is prepared.
+     * <p/>
+     * If there are TransactionListeners (either normal ones or permanent ones) and they thrown a RuntimeException
+     * or Error, this will be rethrown.
      *
      * @throws org.multiverse.api.exceptions.ReadWriteConflict
      *          if the commit failed. Check the class hierarchy of the ReadWriteConflict for more information.
@@ -122,6 +126,16 @@ public interface Transaction {
      */
     void abort();
 
+    /**
+     * Retries the transaction. This call doesn't block, but if all goes well a RetryError is thrown which is caught by
+     * the AtomicBlock.
+     *
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *          if the transaction is not in a legal state for
+     *          this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
+     */
     void retry();
 
     /**
@@ -133,6 +147,8 @@ public interface Transaction {
      *
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if the transaction is not active.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     void setAbortOnly();
 
@@ -152,12 +168,11 @@ public interface Transaction {
      * complete successfully. After this call completes successfully, the transaction still can be used (unlike the
      * {@link #prepare()}.
      *
-     * @throws org.multiverse.api.exceptions.ReadWriteConflict
-     *          if one or more of the transactional objects
-     *          can't be ensured.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if the transaction is not in the correct
      *          state for this operation.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     void ensureWrites();
 
@@ -168,12 +183,18 @@ public interface Transaction {
      * <p/>
      * If a TransactionLifecycleListener is added more than once, it is executed more than once. No checks
      * are made. The permanent listeners are executed in the order they are added.
+     * <p/>
+     * If a TransactionLifecycleListener throws an Error/RuntimeException and the transaction still is alive,
+     * it is aborted. For compensating and deferred actions this is not an issue, but for the PrePrepare state
+     * or the state it could since the transaction is aborted.
      *
      * @param listener the listener to add.
-     * @throws NullPointerException if listener is null
+     * @throws NullPointerException if listener is null. If the transaction is still alive, it is aborted.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *                              if the transaction is not in the correct
      *                              state (e.g. aborted or committed).
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     void register(TransactionListener listener);
 }

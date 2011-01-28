@@ -59,7 +59,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.None);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
@@ -85,7 +85,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.None);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
@@ -112,7 +112,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.None);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
@@ -138,7 +138,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.None);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
@@ -164,7 +164,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Read);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
@@ -191,7 +191,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Read);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
@@ -218,7 +218,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Read);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
@@ -241,7 +241,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Read);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
@@ -264,7 +264,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
@@ -289,7 +289,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
@@ -310,7 +310,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
@@ -331,7 +331,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
@@ -352,7 +352,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
@@ -373,7 +373,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
@@ -394,7 +394,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
@@ -415,7 +415,7 @@ public class GammaLongRef_loadTest implements GammaConstants {
         GammaLongRef ref = newLongRef(initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();

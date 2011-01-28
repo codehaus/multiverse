@@ -144,7 +144,7 @@ public class CountDownCommitBarrier_joinCommitTest {
     public void whenTransactionAlreadyCommitted() throws InterruptedException {
         barrier = new CountDownCommitBarrier(1);
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         tx.commit();
 
         try {
@@ -161,7 +161,7 @@ public class CountDownCommitBarrier_joinCommitTest {
     public void whenTransactionAlreadyAborted_thenDeadTransactionException() throws InterruptedException {
         barrier = new CountDownCommitBarrier(1);
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         tx.abort();
 
         try {
@@ -179,7 +179,7 @@ public class CountDownCommitBarrier_joinCommitTest {
         barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
 
         try {
             barrier.joinCommit(tx);
@@ -195,7 +195,7 @@ public class CountDownCommitBarrier_joinCommitTest {
     public void whenCommitted_thenCommitBarrierOpenException() throws InterruptedException {
         barrier = new CountDownCommitBarrier(0);
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
 
         try {
             barrier.joinCommit(tx);

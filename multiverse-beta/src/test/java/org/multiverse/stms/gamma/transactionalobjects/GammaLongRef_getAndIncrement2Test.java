@@ -85,7 +85,7 @@ public class GammaLongRef_getAndIncrement2Test {
         GammaLongRef ref = new GammaLongRef(stm, 10);
         long version = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         tx.abort();
         try {
             ref.getAndIncrement(tx, 10);

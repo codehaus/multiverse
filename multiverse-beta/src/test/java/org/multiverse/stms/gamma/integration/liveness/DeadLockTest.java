@@ -28,8 +28,8 @@ public class DeadLockTest implements GammaConstants {
         GammaLongRef ref1 = new GammaLongRef(stm);
         GammaLongRef ref2 = new GammaLongRef(stm);
 
-        GammaTransaction tx1 = stm.startDefaultTransaction();
-        GammaTransaction tx2 = stm.startDefaultTransaction();
+        GammaTransaction tx1 = stm.newDefaultTransaction();
+        GammaTransaction tx2 = stm.newDefaultTransaction();
 
         ref1.openForWrite(tx1, LOCKMODE_EXCLUSIVE).long_value++;
         ref2.openForWrite(tx2, LOCKMODE_EXCLUSIVE).long_value++;

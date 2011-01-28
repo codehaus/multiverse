@@ -44,7 +44,7 @@ public class CountDownCommitBarrier_tryJoinCommitTest {
     @Test
     public void whenOpenAndTransactionCommitted_thenDeadTransactionException() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         tx.commit();
         try {
             barrier.tryJoinCommit(tx);
@@ -58,7 +58,7 @@ public class CountDownCommitBarrier_tryJoinCommitTest {
     @Test
     public void whenOpenAndTransactionAborted_DeadTransactionException() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         tx.abort();
         try {
             barrier.tryJoinCommit(tx);
@@ -74,7 +74,7 @@ public class CountDownCommitBarrier_tryJoinCommitTest {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         try {
             barrier.tryJoinCommit(tx);
             fail("Expecting CommitBarrierOpenException");
@@ -90,7 +90,7 @@ public class CountDownCommitBarrier_tryJoinCommitTest {
     public void whenCommitted_thenCommitBarrierOpenException() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(0);
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         try {
             barrier.tryJoinCommit(tx);
             fail("Expected CommitBarrierOpenException");

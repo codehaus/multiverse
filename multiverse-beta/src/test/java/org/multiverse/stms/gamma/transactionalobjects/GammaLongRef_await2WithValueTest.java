@@ -42,7 +42,7 @@ public class GammaLongRef_await2WithValueTest {
     @Test
     public void whenPreparedTransaction_thenPreparedTransactionException() {
         GammaLongRef ref = new GammaLongRef(stm);
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         tx.prepare();
 
         try {
@@ -57,7 +57,7 @@ public class GammaLongRef_await2WithValueTest {
     @Test
     public void whenAbortedTransaction_thenDeadTransactionException() {
         GammaLongRef ref = new GammaLongRef(stm);
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         tx.abort();
 
         try {
@@ -72,7 +72,7 @@ public class GammaLongRef_await2WithValueTest {
     @Test
     public void whenCommittedTransaction_thenDeadTransactionException() {
         GammaLongRef ref = new GammaLongRef(stm);
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         tx.abort();
 
         try {

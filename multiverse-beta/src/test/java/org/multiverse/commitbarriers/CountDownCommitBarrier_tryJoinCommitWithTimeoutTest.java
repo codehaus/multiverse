@@ -50,7 +50,7 @@ public class CountDownCommitBarrier_tryJoinCommitWithTimeoutTest {
     public void whenNullTimeout_thenNullPointerException() throws InterruptedException {
         barrier = new CountDownCommitBarrier(1);
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         try {
             barrier.tryJoinCommit(tx, 1, null);
             fail();
@@ -122,7 +122,7 @@ public class CountDownCommitBarrier_tryJoinCommitWithTimeoutTest {
         barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
 
         try {
             barrier.tryJoinCommit(tx, 1, TimeUnit.DAYS);
@@ -139,7 +139,7 @@ public class CountDownCommitBarrier_tryJoinCommitWithTimeoutTest {
     public void whenCommitted_thenCommitBarrierOpenException() throws InterruptedException {
         barrier = new CountDownCommitBarrier(0);
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
 
         try {
             barrier.tryJoinCommit(tx, 1, TimeUnit.DAYS);

@@ -98,12 +98,6 @@ public class TestUtils implements MultiverseConstants {
         assertFalse(format("both values are %s, but should not be equal", l2), l1 == l2);
     }
 
-    public static void assertIsNew(Transaction... transactions) {
-        for (Transaction tx : transactions) {
-            assertEquals(TransactionStatus.Undefined, tx.getStatus());
-        }
-    }
-
     public static void assertIsPrepared(Transaction... transactions) {
         for (Transaction tx : transactions) {
             assertEquals(TransactionStatus.Prepared, tx.getStatus());

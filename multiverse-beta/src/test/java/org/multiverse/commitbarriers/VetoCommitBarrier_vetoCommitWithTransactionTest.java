@@ -50,7 +50,7 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest implements GammaCon
     public void whenNoPendingTransactions() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         barrier.vetoCommit(tx);
 
         assertTrue(barrier.isCommitted());
@@ -97,7 +97,7 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest implements GammaCon
     public void whenTransactionFailedToPrepare_thenBarrierNotAbortedOrCommitted() {
         final GammaIntRef ref = new GammaIntRef(stm);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.get(tx);
 
         stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
@@ -123,7 +123,7 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest implements GammaCon
     public void whenTransactionAborted_thenDeadTransactionException() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         tx.abort();
 
         try {
@@ -140,7 +140,7 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest implements GammaCon
     public void whenTransactionCommitted_thenDeadTransactionException() {
         VetoCommitBarrier barrier = new VetoCommitBarrier();
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         tx.commit();
 
         try {
@@ -158,7 +158,7 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest implements GammaCon
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         barrier.atomicVetoCommit();
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         try {
             barrier.vetoCommit(tx);
             fail();
@@ -174,7 +174,7 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest implements GammaCon
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         barrier.abort();
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         try {
             barrier.vetoCommit(tx);
             fail();

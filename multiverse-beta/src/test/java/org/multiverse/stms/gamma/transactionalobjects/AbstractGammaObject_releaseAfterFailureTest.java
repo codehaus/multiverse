@@ -31,7 +31,7 @@ public class AbstractGammaObject_releaseAfterFailureTest implements GammaConstan
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         LongFunction function = mock(LongFunction.class);
         ref.commute(tx, function);
         GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);

@@ -27,7 +27,7 @@ public class GammaRef_atomicIsNullTest {
     public void whenPrivatized_thenLockedException() {
         GammaRef<String> ref = new GammaRef<String>(stm, null);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Exclusive);
 
         ref.atomicIsNull();
@@ -37,7 +37,7 @@ public class GammaRef_atomicIsNullTest {
     public void whenEnsured_thenSuccess() {
         GammaRef<String> ref = new GammaRef<String>(stm, null);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Write);
 
         boolean result = ref.atomicIsNull();
@@ -64,7 +64,7 @@ public class GammaRef_atomicIsNullTest {
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         setThreadLocalTransaction(tx);
         ref.set(tx, null);
 
@@ -94,7 +94,7 @@ public class GammaRef_atomicIsNullTest {
     public void whenAlreadyPrivatized() {
         GammaRef<String> ref = new GammaRef<String>(stm, "foo");
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Exclusive);
 
         try {
@@ -112,7 +112,7 @@ public class GammaRef_atomicIsNullTest {
     public void whenAlreadyEnsured() {
         GammaRef<String> ref = new GammaRef<String>(stm, "foo");
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Write);
 
         boolean result = ref.atomicIsNull();

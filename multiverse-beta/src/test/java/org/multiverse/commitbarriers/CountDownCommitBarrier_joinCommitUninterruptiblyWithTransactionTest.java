@@ -69,7 +69,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
     public void whenTransactionAborted_thenDeadTransactionException() {
         barrier = new CountDownCommitBarrier(1);
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         tx.abort();
         try {
             barrier.joinCommitUninterruptibly(tx);
@@ -86,7 +86,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
     public void whenTransactionCommitted_thenDeadTransactionException() {
         barrier = new CountDownCommitBarrier(1);
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         tx.commit();
         try {
             barrier.joinCommitUninterruptibly(tx);
@@ -207,7 +207,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
         barrier = new CountDownCommitBarrier(1);
         barrier.abort();
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         try {
             barrier.joinCommitUninterruptibly(tx);
             fail("Expecting CommitBarrierOpenException");
@@ -223,7 +223,7 @@ public class CountDownCommitBarrier_joinCommitUninterruptiblyWithTransactionTest
     public void whenCommitted_thenCommitBarrierOpenException() {
         barrier = new CountDownCommitBarrier(0);
 
-        Transaction tx = stm.startDefaultTransaction();
+        Transaction tx = stm.newDefaultTransaction();
         try {
             barrier.joinCommitUninterruptibly(tx);
             fail("Expecting CommitBarrierOpenException");

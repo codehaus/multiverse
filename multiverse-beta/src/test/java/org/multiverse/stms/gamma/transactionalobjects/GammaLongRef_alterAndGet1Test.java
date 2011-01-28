@@ -231,7 +231,7 @@ public class GammaLongRef_alterAndGet1Test {
 
         sleepMs(500);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         setThreadLocalTransaction(tx);
         ref.alterAndGet(newIncLongFunction());
         tx.commit();

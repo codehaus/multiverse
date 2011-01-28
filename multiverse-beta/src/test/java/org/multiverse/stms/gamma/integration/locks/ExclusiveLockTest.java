@@ -28,7 +28,7 @@ public class ExclusiveLockTest {
     public void whenUnlocked() {
         GammaLongRef ref = new GammaLongRef(stm, 10);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Exclusive);
 
         assertIsActive(tx);
@@ -39,10 +39,10 @@ public class ExclusiveLockTest {
     public void whenReadLockAlreadyAcquiredByOther_thenExclusiveLockNotPossible() {
         GammaLongRef ref = new GammaLongRef(stm);
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Read);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         try {
             ref.getLock().acquire(tx, LockMode.Exclusive);
             fail();
@@ -58,10 +58,10 @@ public class ExclusiveLockTest {
     public void whenExclusiveLockAlreadyAcquiredByOther_thenExclusiveLockNotPossible() {
         GammaLongRef ref = new GammaLongRef(stm);
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         try {
             ref.getLock().acquire(tx, LockMode.Exclusive);
             fail();
@@ -77,10 +77,10 @@ public class ExclusiveLockTest {
     public void whenWriteLockAlreadyAcquiredByOther_thenExclusiveLockNotPossible() {
         GammaLongRef ref = new GammaLongRef(stm);
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         try {
             ref.getLock().acquire(tx, LockMode.Exclusive);
             fail();
@@ -96,10 +96,10 @@ public class ExclusiveLockTest {
     public void whenExclusiveLockAcquiredByOther_thenReadNotPossible() {
         GammaLongRef ref = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Exclusive);
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         try {
             ref.get(otherTx);
             fail();
@@ -111,10 +111,10 @@ public class ExclusiveLockTest {
     public void whenPreviouslyReadByOtherThread_thenNoProblems() {
         GammaLongRef ref = new GammaLongRef(stm, 10);
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.get(otherTx);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Exclusive);
 
         long result = ref.get(otherTx);
@@ -125,10 +125,10 @@ public class ExclusiveLockTest {
     public void whenPreviouslyReadByOtherThread_thenWriteSuccessButExclusiveFails() {
         GammaLongRef ref = new GammaLongRef(stm, 10);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.get(tx);
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         ref.set(tx, 100);
@@ -147,10 +147,10 @@ public class ExclusiveLockTest {
     public void whenExclusiveLockAcquiredByOther_thenWriteNotAllowed() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         try {
             ref.set(tx, 100);
             fail();
@@ -165,7 +165,7 @@ public class ExclusiveLockTest {
     public void writeLockIsUpgradableToExclusiveLock() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Write);
         ref.getLock().acquire(tx, LockMode.Exclusive);
 
@@ -177,7 +177,7 @@ public class ExclusiveLockTest {
     public void whenReadLockAcquired_thenUpgradableToExclusiveLock() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Read);
         ref.getLock().acquire(tx, LockMode.Exclusive);
 
@@ -189,10 +189,10 @@ public class ExclusiveLockTest {
     public void whenReadLockAlsoAcquiredByOther_thenNotUpgradableToExclusiveLock() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Read);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Read);
 
         try {
@@ -212,7 +212,7 @@ public class ExclusiveLockTest {
     public void whenTransactionCommits_thenExclusiveLockReleased() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Exclusive);
         tx.commit();
 
@@ -224,7 +224,7 @@ public class ExclusiveLockTest {
     public void whenTransactionIsPrepared_thenExclusiveLockRemains() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Exclusive);
         tx.prepare();
 
@@ -236,7 +236,7 @@ public class ExclusiveLockTest {
     public void whenTransactionAborts_thenExclusiveLockIsReleased() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Exclusive);
         tx.abort();
 
@@ -248,7 +248,7 @@ public class ExclusiveLockTest {
     public void whenExclusiveLockAlreadyIsAcquired_thenReentrantExclusiveLockIsSuccess() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.getLock().acquire(tx, LockMode.Exclusive);
         ref.getLock().acquire(tx, LockMode.Exclusive);
 
@@ -260,7 +260,7 @@ public class ExclusiveLockTest {
     public void whenReadConflict_thenExclusiveLockFails() {
         GammaLongRef ref = new GammaLongRef(stm, 5);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         ref.get(tx);
 
         ref.atomicIncrementAndGet(1);

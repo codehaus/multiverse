@@ -101,7 +101,7 @@ public abstract class WriteSkew_AbstractTest<T extends GammaTransaction> {
         ref1.incrementAndGet(tx, 1);
         ref2.get(tx);
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref2.incrementAndGet(otherTx, 1);
 
         ref2.getLock().acquire(tx, readLockMode);
@@ -134,7 +134,7 @@ public abstract class WriteSkew_AbstractTest<T extends GammaTransaction> {
 
         ref1.incrementAndGet(tx, 1);
 
-        GammaTransaction otherTx = stm.startDefaultTransaction();
+        GammaTransaction otherTx = stm.newDefaultTransaction();
         ref2.incrementAndGet(otherTx, 1);
 
         ref2.getLock().acquire(tx, lockMode);

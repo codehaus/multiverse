@@ -59,7 +59,7 @@ public class GammaLongRef_await2WithPredicateTest {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
 
         ref.await(tx, newEqualsPredicate(initialValue));
 
@@ -77,7 +77,7 @@ public class GammaLongRef_await2WithPredicateTest {
 
         when(predicate.evaluate(initialValue)).thenThrow(new MyException());
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
 
         try {
             ref.await(tx, predicate);
@@ -98,7 +98,7 @@ public class GammaLongRef_await2WithPredicateTest {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
 
         try {
             ref.await(tx, null);
@@ -134,7 +134,7 @@ public class GammaLongRef_await2WithPredicateTest {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         tx.prepare();
 
         LongPredicate predicate = mock(LongPredicate.class);
@@ -155,7 +155,7 @@ public class GammaLongRef_await2WithPredicateTest {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         tx.abort();
 
         LongPredicate predicate = mock(LongPredicate.class);
@@ -176,7 +176,7 @@ public class GammaLongRef_await2WithPredicateTest {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         tx.commit();
 
         LongPredicate predicate = mock(LongPredicate.class);

@@ -42,7 +42,7 @@ public abstract class FatGammaTransaction_openForWriteTest<T extends GammaTransa
         GammaLongRef ref = new GammaLongRef(otherStm, initialValue);
         long initialVersion = ref.getVersion();
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
 
         try {
             ref.openForWrite(tx, LOCKMODE_NONE);
@@ -102,7 +102,7 @@ public abstract class FatGammaTransaction_openForWriteTest<T extends GammaTransa
     public void whenTransactionAbortOnly_thenWriteStillPossible() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         tx.setAbortOnly();
         GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
 
@@ -115,7 +115,7 @@ public abstract class FatGammaTransaction_openForWriteTest<T extends GammaTransa
     public void whenTransactionAbortOnly_thenRereadStillPossible() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         GammaRefTranlocal read = ref.openForWrite(tx, LOCKMODE_NONE);
         tx.setAbortOnly();
         GammaRefTranlocal reread = ref.openForWrite(tx, LOCKMODE_NONE);
