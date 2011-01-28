@@ -18,7 +18,7 @@ public enum IsolationLevel {
      * <p/>
      * Using the ReadCommitted isolation level can be dangerous since the consistency of the data is not guaranteed.
      * This is even more true for and updating transaction since it could leave objects in an inconsistent state. So
-     * it it very carefully.
+     * use it very carefully.
      */
     ReadCommitted(true, true, true),
 

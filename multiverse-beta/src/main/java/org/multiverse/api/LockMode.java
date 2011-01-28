@@ -37,13 +37,13 @@ public enum LockMode implements MultiverseConstants {
      */
     Exclusive(LOCKMODE_EXCLUSIVE);
 
-    private int lockMode;
+    private int lockModeAsInt;
 
-    private LockMode(int lockMode) {
-        this.lockMode = lockMode;
+    private LockMode(int lockModeAsInt) {
+        this.lockModeAsInt = lockModeAsInt;
     }
 
     public int asInt() {
-        return lockMode;
+        return lockModeAsInt;
     }
 }

@@ -10,15 +10,9 @@
 
 - last readwrite conflict should show which transactional object caused it.
 
-- GammaDoubleRef.atomicGetAndIncrement
-
-- GammaIntRef.atomicIncrement
-
 - listeners
 
 - permanent listeners
-
-- check read+locklevel & write+locklevel
 
 - look at the unlock after a write.
 
@@ -26,9 +20,16 @@
 
 - selecting the right map transaction size based on previous executions.
 
+- commute and locking
+
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
 
 - stacktrace is not filled for reused transactions. This helps to prevent developers from looking in the wrong place.
 
+- GammaDoubleRef.atomicGetAndIncrement
+
+- GammaIntRef.atomicIncrement
+
+- check read+locklevel & write+locklevel

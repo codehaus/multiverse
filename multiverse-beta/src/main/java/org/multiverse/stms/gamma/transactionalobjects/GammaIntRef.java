@@ -2,7 +2,6 @@ package org.multiverse.stms.gamma.transactionalobjects;
 
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LockedException;
-import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.IntFunction;
 import org.multiverse.api.predicates.IntPredicate;
@@ -253,8 +252,38 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     }
 
     private int atomicIncrement(final int amount, boolean returnOld) {
-        //todo
-        throw new TodoException();
+        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
+
+        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+            throw new LockedException();
+        }
+
+        final int oldValue = (int) long_value;
+
+        if (amount == 0) {
+            if (arriveStatus == ARRIVE_UNREGISTERED) {
+                unlockByUnregistered();
+            } else {
+                departAfterReadingAndUnlock();
+            }
+
+            return oldValue;
+        }
+
+        final int newValue = oldValue + amount;
+        long_value = newValue;
+        //noinspection NonAtomicOperationOnVolatileField
+        version++;
+
+        final Listeners listeners = ___removeListenersAfterWrite();
+
+        departAfterUpdateAndUnlock();
+
+        if (listeners != null) {
+            listeners.openAll(getThreadLocalGammaObjectPool());
+        }
+
+        return returnOld ? oldValue : newValue;
     }
 
     @Override
