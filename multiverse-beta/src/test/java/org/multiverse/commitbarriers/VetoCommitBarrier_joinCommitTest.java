@@ -25,7 +25,7 @@ public class VetoCommitBarrier_joinCommitTest {
     public void setUp() {
         stm = new GammaStm();
         txFactory = stm.newTransactionFactoryBuilder()
-                .setSpeculativeConfigurationEnabled(false)
+                .setSpeculative(false)
                 .newTransactionFactory();
         clearThreadLocalTransaction();
         clearCurrentThreadInterruptedStatus();
@@ -115,7 +115,7 @@ public class VetoCommitBarrier_joinCommitTest {
         @Override
         public void doRun() throws Exception {
             stm.newTransactionFactoryBuilder()
-                    .setSpeculativeConfigurationEnabled(false)
+                    .setSpeculative(false)
                     .setMaxRetries(0)
                     .newAtomicBlock()
                     .execute(new AtomicVoidClosure() {

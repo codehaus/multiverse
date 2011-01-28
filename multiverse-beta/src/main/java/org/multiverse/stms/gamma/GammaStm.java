@@ -47,7 +47,7 @@ public final class GammaStm implements Stm {
         this.defaultConfig = new GammaTransactionConfiguration(this, configuration)
                 .setSpinCount(spinCount);
         this.defaultAtomicBlock = newTransactionFactoryBuilder()
-                .setSpeculativeConfigurationEnabled(false)
+                .setSpeculative(false)
                 .newAtomicBlock();
     }
 
@@ -216,7 +216,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setSpeculativeConfigurationEnabled(final boolean enabled) {
+        public GammaTransactionFactoryBuilder setSpeculative(final boolean enabled) {
             if (enabled == config.speculative) {
                 return this;
             }

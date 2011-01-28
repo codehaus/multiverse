@@ -83,7 +83,7 @@ public interface TransactionConfiguration {
      * {@link org.multiverse.api.exceptions.SpeculativeConfigurationError}.
      *
      * @return true if speculative configuration is enabled.
-     * @see TransactionFactoryBuilder#setSpeculativeConfigurationEnabled(boolean)
+     * @see TransactionFactoryBuilder#setSpeculative(boolean)
      */
     boolean isSpeculative();
 

@@ -74,7 +74,7 @@ public class GammaLongRef_increment2Test {
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setReadonly(true)
-                .setSpeculativeConfigurationEnabled(false)
+                .setSpeculative(false)
                 .newTransactionFactory()
                 .newTransaction();
 

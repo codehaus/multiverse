@@ -26,7 +26,7 @@ public class IsolationLevelSnapshotTest {
         stm = (GammaStm) getGlobalStmInstance();
         clearThreadLocalTransaction();
         transactionFactory = stm.newTransactionFactoryBuilder()
-                .setSpeculativeConfigurationEnabled(false)
+                .setSpeculative(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
                 .newTransactionFactory();
     }

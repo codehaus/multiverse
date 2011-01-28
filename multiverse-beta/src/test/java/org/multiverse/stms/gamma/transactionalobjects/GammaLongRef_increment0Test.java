@@ -72,7 +72,7 @@ public class GammaLongRef_increment0Test {
 
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setReadonly(true)
-                .setSpeculativeConfigurationEnabled(false)
+                .setSpeculative(false)
                 .newTransactionFactory()
                 .newTransaction();
         setThreadLocalTransaction(tx);

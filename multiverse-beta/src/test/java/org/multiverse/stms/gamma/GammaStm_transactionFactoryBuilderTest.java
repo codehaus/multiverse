@@ -209,7 +209,7 @@ public class GammaStm_transactionFactoryBuilderTest {
     public void whenSpeculativeConfigEnabled() {
         GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
                 .setDirtyCheckEnabled(false)
-                .setSpeculativeConfigurationEnabled(true)
+                .setSpeculative(true)
                 .newTransactionFactory();
 
         GammaTransactionConfiguration configuration = txFactory.getConfiguration();
@@ -220,7 +220,7 @@ public class GammaStm_transactionFactoryBuilderTest {
     @Test
     public void whenWriteSkewNotAllowed() {
         GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
-                .setSpeculativeConfigurationEnabled(true)
+                .setSpeculative(true)
                 .setIsolationLevel(IsolationLevel.Serializable)
                 .newTransactionFactory();
 
@@ -234,7 +234,7 @@ public class GammaStm_transactionFactoryBuilderTest {
     @Ignore
     public void whenWriteSkewNotAllowedThenFatTransaction() {
         GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
-                .setSpeculativeConfigurationEnabled(true)
+                .setSpeculative(true)
                 .setIsolationLevel(IsolationLevel.Serializable)
                 .newTransactionFactory();
 

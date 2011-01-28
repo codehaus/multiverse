@@ -24,7 +24,7 @@ public class IsolationLevelReadCommittedTest {
         stm = (GammaStm) getGlobalStmInstance();
         clearThreadLocalTransaction();
         transactionFactory = stm.newTransactionFactoryBuilder()
-                .setSpeculativeConfigurationEnabled(false)
+                .setSpeculative(false)
                 .setIsolationLevel(IsolationLevel.ReadCommitted)
                 .newTransactionFactory();
     }
@@ -34,7 +34,7 @@ public class IsolationLevelReadCommittedTest {
         final GammaLongRef ref = new GammaLongRef(stm);
 
         transactionFactory = stm.newTransactionFactoryBuilder()
-                .setSpeculativeConfigurationEnabled(false)
+                .setSpeculative(false)
                 .setReadTrackingEnabled(true)
                 .setIsolationLevel(IsolationLevel.ReadCommitted)
                 .newTransactionFactory();
@@ -53,7 +53,7 @@ public class IsolationLevelReadCommittedTest {
         final GammaLongRef ref = makeReadBiased(new GammaLongRef(stm));
 
         transactionFactory = stm.newTransactionFactoryBuilder()
-                .setSpeculativeConfigurationEnabled(false)
+                .setSpeculative(false)
                 .setReadTrackingEnabled(false)
                 .setBlockingAllowed(false)
                 .setIsolationLevel(IsolationLevel.ReadCommitted)

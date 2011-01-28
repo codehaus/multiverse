@@ -181,7 +181,7 @@ public interface TransactionFactoryBuilder {
      * @param enabled indicates if speculative configuration should be enabled.
      * @return the updated TransactionFactoryBuilder
      */
-    TransactionFactoryBuilder setSpeculativeConfigurationEnabled(boolean enabled);
+    TransactionFactoryBuilder setSpeculative(boolean enabled);
 
     /**
      * Sets the the maximum count a transaction can be retried. The default is 1000. Setting it to a very low value

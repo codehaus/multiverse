@@ -54,7 +54,7 @@ public interface GammaTransactionFactoryBuilder extends TransactionFactoryBuilde
     GammaTransactionFactoryBuilder setReadTrackingEnabled(boolean enabled);
 
     @Override
-    GammaTransactionFactoryBuilder setSpeculativeConfigurationEnabled(boolean enabled);
+    GammaTransactionFactoryBuilder setSpeculative(boolean enabled);
 
     @Override
     GammaTransactionFactoryBuilder setMaxRetries(int maxRetries);

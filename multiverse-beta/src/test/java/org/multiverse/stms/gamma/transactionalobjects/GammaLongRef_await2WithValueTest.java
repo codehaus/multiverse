@@ -89,7 +89,7 @@ public class GammaLongRef_await2WithValueTest {
         GammaLongRef ref = new GammaLongRef(stm);
         GammaTransaction tx = stm.newTransactionFactoryBuilder()
                 .setBlockingAllowed(false)
-                .setSpeculativeConfigurationEnabled(false)
+                .setSpeculative(false)
                 .newTransactionFactory()
                 .newTransaction();
 
