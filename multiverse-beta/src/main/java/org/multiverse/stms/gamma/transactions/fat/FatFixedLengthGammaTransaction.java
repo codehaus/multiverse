@@ -60,7 +60,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
             if (hasWrites) {
                 if (status == TX_ACTIVE) {
                     GammaObject o = prepareChainForCommit();
-                    if (o != null) {
+                    if (o!=null) {
                         throw abortOnReadWriteConflict(o);
                     }
                 }
@@ -245,7 +245,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         }
 
         GammaObject o = prepareChainForCommit();
-        if (o != null) {
+        if (o!=null) {
             throw abortOnReadWriteConflict(o);
         }
 

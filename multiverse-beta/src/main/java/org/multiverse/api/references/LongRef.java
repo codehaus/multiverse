@@ -11,16 +11,16 @@ import org.multiverse.api.predicates.LongPredicate;
  * matter if there already is a transaction available (so the propagation level is Requires New).
  * For the other methods, always an transaction needs to be available, else you will get the
  * {@link org.multiverse.api.exceptions.TransactionRequiredException}.
- * <p/>
+ *
  * <h1>ControlFlowError</h1>
  * All non atomic methods are able to throw a (subclass) of the ControlFlowError. This error should
  * not be caught, it is task of the AtomicTemplate to do this.
- * <p/>
+ *
  * <h1>TransactionalExecutionException</h1>
  * Most of the methods can throw a {@link org.multiverse.api.exceptions.TransactionExecutionException}.
  * This exception can be caught, but in most cases you want to figure out what the cause is (e.g. because
  * there are too many retries) and solve that problem.
- * <p/>
+ *
  * <h1>Threadsafe</h1>
  * All methods are threadsafe.
  *
@@ -34,9 +34,7 @@ public interface LongRef extends TransactionalObject {
      * @param value the new value.
      * @return the old value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     long getAndSet(long value);
 
@@ -46,9 +44,7 @@ public interface LongRef extends TransactionalObject {
      * @param value the new value.
      * @return the new value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     long set(long value);
 
@@ -60,9 +56,7 @@ public interface LongRef extends TransactionalObject {
      * @return the old value
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     long set(Transaction tx, long value);
 
@@ -71,9 +65,7 @@ public interface LongRef extends TransactionalObject {
      *
      * @return the current value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      * @see #atomicGet()
      */
     long get();
@@ -85,9 +77,7 @@ public interface LongRef extends TransactionalObject {
      * @return the value stored in the ref.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     long get(Transaction tx);
 
@@ -99,7 +89,6 @@ public interface LongRef extends TransactionalObject {
      *
      * @return the current value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     long atomicGet();
 
@@ -120,7 +109,6 @@ public interface LongRef extends TransactionalObject {
      * @param newValue the new value.
      * @return the new value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     long atomicSet(long newValue);
 
@@ -131,7 +119,6 @@ public interface LongRef extends TransactionalObject {
      * @param newValue the new value.
      * @return the old value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     long atomicGetAndSet(long newValue);
 
@@ -143,9 +130,7 @@ public interface LongRef extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     long getAndSet(Transaction tx, long value);
 
@@ -163,9 +148,7 @@ public interface LongRef extends TransactionalObject {
      * @param function the function to apply to this reference.
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     void commute(LongFunction function);
 
@@ -182,13 +165,11 @@ public interface LongRef extends TransactionalObject {
      *
      * @param tx       the transaction used for this operation.
      * @param function the function to apply to this reference.
-     * @throws NullPointerException if function is null. If there is an active transaction, it will be aborted.
+     * @throws NullPointerException  if function is null. If there is an active transaction, it will be aborted.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
-    void commute(Transaction tx, LongFunction function);
+    void commute(Transaction tx,LongFunction function);
 
     /**
      * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
@@ -208,9 +189,7 @@ public interface LongRef extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if function is null. The Transaction will also be aborted.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     long alterAndGet(LongFunction function);
 
@@ -222,11 +201,9 @@ public interface LongRef extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if function or transaction is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
-    long alterAndGet(Transaction tx, LongFunction function);
+    long alterAndGet(Transaction tx,LongFunction function);
 
     /**
      * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
@@ -236,7 +213,6 @@ public interface LongRef extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     long atomicGetAndAlter(LongFunction function);
 
@@ -248,9 +224,7 @@ public interface LongRef extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if function is null. The transaction will be aborted as well.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     long getAndAlter(LongFunction function);
 
@@ -262,9 +236,7 @@ public interface LongRef extends TransactionalObject {
      * @return the old value
      * @throws NullPointerException if function or transaction is null. The transaction will be aborted as well.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     long getAndAlter(Transaction tx, LongFunction function);
 
@@ -272,10 +244,9 @@ public interface LongRef extends TransactionalObject {
      * Executes a compare and set atomically. This method doesn't care about any running transactions.
      *
      * @param expectedValue the expected value.
-     * @param newValue      the new value.
+     * @param newValue the new value.
      * @return true if the compareAndSwap was a success, false otherwise.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     boolean atomicCompareAndSet(long expectedValue, long newValue);
 
@@ -286,7 +257,6 @@ public interface LongRef extends TransactionalObject {
      * @param amount the amount to increase with.
      * @return the old value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     long atomicGetAndIncrement(long amount);
 
@@ -296,9 +266,7 @@ public interface LongRef extends TransactionalObject {
      * @param amount the amount to increment with.
      * @return the old value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     long getAndIncrement(long amount);
 
@@ -310,9 +278,7 @@ public interface LongRef extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     long getAndIncrement(Transaction tx, long amount);
 
@@ -323,7 +289,6 @@ public interface LongRef extends TransactionalObject {
      * @param amount the amount to increment with.
      * @return the new value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     long atomicIncrementAndGet(long amount);
 
@@ -333,9 +298,7 @@ public interface LongRef extends TransactionalObject {
      * @param amount the amount to increment with.
      * @return the new value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     long incrementAndGet(long amount);
 
@@ -347,9 +310,7 @@ public interface LongRef extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     long incrementAndGet(Transaction tx, long amount);
 
@@ -362,9 +323,7 @@ public interface LongRef extends TransactionalObject {
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     void increment();
 
@@ -377,9 +336,7 @@ public interface LongRef extends TransactionalObject {
      * @param tx the transaction this method lifts on.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     void increment(Transaction tx);
 
@@ -388,14 +345,12 @@ public interface LongRef extends TransactionalObject {
      * <p/>
      * This call is able to commute if there are no dependencies on the value in the
      * transaction. That is why this method doesn't have a return value.
-     * <p/>
+     *
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
      * @param amount the amount to increase with
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     void increment(long amount);
 
@@ -405,13 +360,11 @@ public interface LongRef extends TransactionalObject {
      * This call is able to commute if there are no dependencies on the value in the
      * transaction. That is why this method doesn't have a return value.
      *
-     * @param tx     the Transaction this method lifts on
+     * @param tx the Transaction this method lifts on
      * @param amount the amount to increment with
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     void increment(Transaction tx, long amount);
 
@@ -424,9 +377,7 @@ public interface LongRef extends TransactionalObject {
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     void decrement();
 
@@ -439,9 +390,7 @@ public interface LongRef extends TransactionalObject {
      * @param tx the transaction this method lifts on.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     void decrement(Transaction tx);
 
@@ -455,9 +404,7 @@ public interface LongRef extends TransactionalObject {
      *
      * @param amount the amount to decrement with
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     void decrement(long amount);
 
@@ -467,27 +414,23 @@ public interface LongRef extends TransactionalObject {
      * This call is able to commute if there are no dependencies on the value in the
      * transaction. That is why this method doesn't have a return value.
      *
-     * @param tx     the Transaction this method lifts on
+     * @param tx the Transaction this method lifts on
      * @param amount the amount to decrement with
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     void decrement(Transaction tx, long amount);
 
     /**
      * Awaits for the value to become the given value. If the value already has the
      * the specified value, the call continues, else a retry is done.
-     * <p/>
+     *
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
      * @param value the value to wait for.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     void await(long value);
 
@@ -495,15 +438,13 @@ public interface LongRef extends TransactionalObject {
      * Awaits for the reference to become the given value. If the value already has the
      * the specified value, the call continues, else a retry is done.
      *
-     * @param tx    the transaction this method lifts on
+     * @param tx the transaction this method lifts on
      * @param value the value to wait for.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
-    void await(Transaction tx, long value);
+    void await(Transaction tx,long value);
 
     /**
      * Awaits until the predicate holds.  If the value already evaluates to true, the call continues
@@ -514,9 +455,7 @@ public interface LongRef extends TransactionalObject {
      * @throws NullPointerException if predicate is null. When there is a non dead transaction,
      *                              it will be aborted.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     void await(LongPredicate predicate);
 
@@ -525,14 +464,12 @@ public interface LongRef extends TransactionalObject {
      * else a retry is done. If the predicate throws an exception, the transaction is aborted and the
      * throwable is propagated.
      *
-     * @param tx        the transaction used.
+     * @param tx the transaction used.
      * @param predicate the predicate to evaluate.
      * @throws NullPointerException if predicate is null or tx is null. When there is a non dead transaction,
      *                              it will be aborted.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     void await(Transaction tx, LongPredicate predicate);
 }

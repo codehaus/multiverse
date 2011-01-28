@@ -61,7 +61,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
         if (hasWrites) {
             if (s == TX_ACTIVE) {
                 GammaObject conflictingObject = prepareChainForCommit();
-                if (conflictingObject != null) {
+                if (conflictingObject!=null) {
                     throw abortOnReadWriteConflict(conflictingObject);
                 }
             }
@@ -281,7 +281,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
         }
 
         GammaObject conflictingObject = prepareChainForCommit();
-        if (conflictingObject != null) {
+        if (conflictingObject!=null) {
             throw abortOnReadWriteConflict(conflictingObject);
         }
 

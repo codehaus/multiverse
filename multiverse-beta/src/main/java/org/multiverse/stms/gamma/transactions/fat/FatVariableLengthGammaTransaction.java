@@ -121,7 +121,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
             if (hasWrites) {
                 if (status == TX_ACTIVE) {
                     GammaObject conflictingObject = doPrepare();
-                    if (conflictingObject != null) {
+                    if (conflictingObject!=null) {
                         throw abortOnReadWriteConflict(conflictingObject);
                     }
                 }
@@ -205,7 +205,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
         if (hasWrites) {
             GammaObject conflictingObject = doPrepare();
-            if (conflictingObject != null) {
+            if (conflictingObject!=null) {
                 throw abortOnReadWriteConflict(conflictingObject);
             }
         }

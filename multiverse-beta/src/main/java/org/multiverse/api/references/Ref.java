@@ -11,16 +11,16 @@ import org.multiverse.api.predicates.Predicate;
  * matter if there already is a transaction available (so the propagation level is Requires New).
  * For the other methods, always an transaction needs to be available, else you will get the
  * {@link org.multiverse.api.exceptions.TransactionRequiredException}.
- * <p/>
+ *
  * <h1>ControlFlowError</h1>
  * All non atomic methods are able to throw a (subclass) of the ControlFlowError. This error should
  * not be caught, it is task of the AtomicTemplate to do this.
- * <p/>
+ *
  * <h1>TransactionalExecutionException</h1>
  * Most of the methods can throw a {@link org.multiverse.api.exceptions.TransactionExecutionException}.
  * This exception can be caught, but in most cases you want to figure out what the cause is (e.g. because
  * there are too many retries) and solve that problem.
- * <p/>
+ *
  * <h1>Threadsafe</h1>
  * All methods are threadsafe.
  *
@@ -34,9 +34,7 @@ public interface Ref<E> extends TransactionalObject {
      * @param value the new value.
      * @return the old value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     E getAndSet(E value);
 
@@ -46,9 +44,7 @@ public interface Ref<E> extends TransactionalObject {
      * @param value the new value.
      * @return the new value.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     E set(E value);
 
@@ -60,9 +56,7 @@ public interface Ref<E> extends TransactionalObject {
      * @return the old value
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     E set(Transaction tx, E value);
 
@@ -71,9 +65,7 @@ public interface Ref<E> extends TransactionalObject {
      *
      * @return the current value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      * @see #atomicGet()
      */
     E get();
@@ -85,9 +77,7 @@ public interface Ref<E> extends TransactionalObject {
      * @return the value stored in the ref.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     E get(Transaction tx);
 
@@ -99,7 +89,6 @@ public interface Ref<E> extends TransactionalObject {
      *
      * @return the current value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     E atomicGet();
 
@@ -120,7 +109,6 @@ public interface Ref<E> extends TransactionalObject {
      * @param newValue the new value.
      * @return the new value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     E atomicSet(E newValue);
 
@@ -131,7 +119,6 @@ public interface Ref<E> extends TransactionalObject {
      * @param newValue the new value.
      * @return the old value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     E atomicGetAndSet(E newValue);
 
@@ -143,9 +130,7 @@ public interface Ref<E> extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     E getAndSet(Transaction tx, E value);
 
@@ -163,9 +148,7 @@ public interface Ref<E> extends TransactionalObject {
      * @param function the function to apply to this reference.
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     void commute(Function<E> function);
 
@@ -182,13 +165,11 @@ public interface Ref<E> extends TransactionalObject {
      *
      * @param tx       the transaction used for this operation.
      * @param function the function to apply to this reference.
-     * @throws NullPointerException if function is null. If there is an active transaction, it will be aborted.
+     * @throws NullPointerException  if function is null. If there is an active transaction, it will be aborted.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
-    void commute(Transaction tx, Function<E> function);
+    void commute(Transaction tx,Function<E> function);
 
     /**
      * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
@@ -208,9 +189,7 @@ public interface Ref<E> extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if function is null. The Transaction will also be aborted.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     E alterAndGet(Function<E> function);
 
@@ -222,11 +201,9 @@ public interface Ref<E> extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if function or transaction is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
-    E alterAndGet(Transaction tx, Function<E> function);
+    E alterAndGet(Transaction tx,Function<E> function);
 
     /**
      * Atomically applies the function to alterAndGet the value stored in this ref. This method doesn't care about
@@ -236,7 +213,6 @@ public interface Ref<E> extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if function is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     E atomicGetAndAlter(Function<E> function);
 
@@ -248,9 +224,7 @@ public interface Ref<E> extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if function is null. The transaction will be aborted as well.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     E getAndAlter(Function<E> function);
 
@@ -262,9 +236,7 @@ public interface Ref<E> extends TransactionalObject {
      * @return the old value
      * @throws NullPointerException if function or transaction is null. The transaction will be aborted as well.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     E getAndAlter(Transaction tx, Function<E> function);
 
@@ -272,10 +244,9 @@ public interface Ref<E> extends TransactionalObject {
      * Executes a compare and set atomically. This method doesn't care about any running transactions.
      *
      * @param expectedValue the expected value.
-     * @param newValue      the new value.
+     * @param newValue the new value.
      * @return true if the compareAndSwap was a success, false otherwise.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     boolean atomicCompareAndSet(E expectedValue, E newValue);
 
@@ -284,9 +255,7 @@ public interface Ref<E> extends TransactionalObject {
      *
      * @return true if null, false otherwise.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     boolean isNull();
 
@@ -297,9 +266,7 @@ public interface Ref<E> extends TransactionalObject {
      * @return true if the value is null, false otherwise.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     boolean isNull(Transaction tx);
 
@@ -308,21 +275,18 @@ public interface Ref<E> extends TransactionalObject {
      *
      * @return true if null, false otherwise.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      */
     boolean atomicIsNull();
 
     /**
      * Awaits for the value to become not null. If the value already is not null,
      * this call returns the stored value. If the value is null, a retry is done.
-     * <p/>
+     *
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
      * @return the stored value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     E awaitNotNullAndGet();
 
@@ -334,49 +298,41 @@ public interface Ref<E> extends TransactionalObject {
      * @return the stored value.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     E awaitNotNullAndGet(Transaction tx);
 
     /**
      * Awaits for the value to become null. If the value already is null,
      * this call continues. If the reference is not null, a retry is done.
-     * <p/>
+     *
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     void awaitNull();
 
-    /**
-     * Awaits for the value to become not null. If the value already is null,
-     * this call continues. If the value is not null, a retry is done.
-     *
-     * @param tx the transaction this method lifts on.
-     * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
+   /**
+    * Awaits for the value to become not null. If the value already is null,
+    * this call continues. If the value is not null, a retry is done.
+    *
+    * @param tx the transaction this method lifts on.
+    * @throws NullPointerException if tx is null.
+    * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    * @throws org.multiverse.api.exceptions.ControlFlowError
+    */
     void awaitNull(Transaction tx);
 
     /**
      * Awaits for the value to become the given value. If the value already has the
      * the specified value, the call continues, else a retry is done.
-     * <p/>
+     *
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
      * @param value the value to wait for.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     void await(E value);
 
@@ -384,15 +340,13 @@ public interface Ref<E> extends TransactionalObject {
      * Awaits for the reference to become the given value. If the value already has the
      * the specified value, the call continues, else a retry is done.
      *
-     * @param tx    the transaction this method lifts on
+     * @param tx the transaction this method lifts on
      * @param value the value to wait for.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
-    void await(Transaction tx, E value);
+    void await(Transaction tx,E value);
 
     /**
      * Awaits until the predicate holds.  If the value already evaluates to true, the call continues
@@ -403,9 +357,7 @@ public interface Ref<E> extends TransactionalObject {
      * @throws NullPointerException if predicate is null. When there is a non dead transaction,
      *                              it will be aborted.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     void await(Predicate<E> predicate);
 
@@ -414,14 +366,12 @@ public interface Ref<E> extends TransactionalObject {
      * else a retry is done. If the predicate throws an exception, the transaction is aborted and the
      * throwable is propagated.
      *
-     * @param tx        the transaction used.
+     * @param tx the transaction used.
      * @param predicate the predicate to evaluate.
      * @throws NullPointerException if predicate is null or tx is null. When there is a non dead transaction,
      *                              it will be aborted.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
      */
     void await(Transaction tx, Predicate<E> predicate);
 }
