@@ -31,6 +31,7 @@ public interface TransactionConfiguration {
      * be problematic when debugging.
      *
      * @return true if the ControlFlowError is reused.
+     * @see TransactionFactoryBuilder#setControlFlowErrorsReused(boolean)
      */
     boolean isControlFlowErrorsReused();
 
@@ -122,6 +123,7 @@ public interface TransactionConfiguration {
      * Gets the current LockMode for all reads.
      *
      * @return the current LockMode for all reads.
+     * @see TransactionFactoryBuilder#setReadLockMode(LockMode)
      */
     LockMode getReadLockMode();
 
@@ -129,6 +131,7 @@ public interface TransactionConfiguration {
      * Gets the current LockMode for all writes.
      *
      * @return the current LockMode for all writes.
+     * @see TransactionFactoryBuilder#setWriteLockMode(LockMode)
      */
     LockMode getWriteLockMode();
 
@@ -172,6 +175,7 @@ public interface TransactionConfiguration {
      * Returns an unmodifiable list containing all permanent TransactionListener.
      *
      * @return unmodifiable List containing all permanent TransactionListeners.
+     * @see TransactionFactoryBuilder#addPermanentListener(org.multiverse.api.lifecycle.TransactionListener)
      */
     List<TransactionListener> getPermanentListeners();
 
