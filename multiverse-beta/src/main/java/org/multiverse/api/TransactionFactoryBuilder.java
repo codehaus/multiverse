@@ -24,7 +24,7 @@ public interface TransactionFactoryBuilder {
     /**
      * Sets if ControlFlowErrors are reused. Normally you don't want to reuse them because they can be expensive
      * to create (especially the stacktrace) and they could be created very often. But for debugging purposes it
-     * can be quite annoying.
+     * can be quite annoying because you want to see the stacktrace.
      *
      * @param reused true if ControlFlowErrors should be reused.
      * @return the updated TransactionFactoryBuilder.
@@ -178,10 +178,10 @@ public interface TransactionFactoryBuilder {
      * a readonly non readtracking transaction and upgrade to an update or a read tracking once a write or retry
      * happens.
      *
-     * @param enabled indicates if speculative configuration should be enabled.
+     * @param speculative indicates if speculative configuration should be enabled.
      * @return the updated TransactionFactoryBuilder
      */
-    TransactionFactoryBuilder setSpeculative(boolean enabled);
+    TransactionFactoryBuilder setSpeculative(boolean speculative);
 
     /**
      * Sets the the maximum count a transaction can be retried. The default is 1000. Setting it to a very low value
