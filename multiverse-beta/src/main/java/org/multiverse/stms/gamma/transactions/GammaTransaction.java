@@ -474,8 +474,9 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
             return SpeculativeConfigurationError.INSTANCE;
         }
 
-        //todo: message
-        return new SpeculativeConfigurationError("");
+        return new SpeculativeConfigurationError(
+                format("[%s] Failed to execute opening a Ref, reason: the transaction is too small for this operation",
+                        config.familyName));
     }
 
     public final SpeculativeConfigurationError abortOnTransactionTooLargeForPoorMansConflictScan() {
@@ -484,8 +485,28 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         if (config.controlFlowErrorsReused) {
             return SpeculativeConfigurationError.INSTANCE;
         }
-        //todo: correct message
-        return new SpeculativeConfigurationError("");
+
+        return new SpeculativeConfigurationError(
+                format("[%s] Failed to execute evaluate the Transaction read consistency, reason: the transaction is large to be used" +
+                        " in combination for a poor mans conflictscan",
+                        config.familyName));
+    }
+
+    public final NullPointerException abortAcquireOnNullLockMode(GammaObject o) {
+        switch (status) {
+            case TX_ACTIVE:
+                abort();
+                return new NullPointerException();
+            case TX_PREPARED:
+                abort();
+                return new NullPointerException();
+            case TX_ABORTED:
+                return new NullPointerException();
+            case TX_COMMITTED:
+                return new NullPointerException();
+            default:
+                throw new IllegalStateException();
+        }
     }
 
     public final boolean hasWrites() {
@@ -585,28 +606,28 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         listeners.add(listener);
     }
 
+    /**
+     * Does a hard reset of an aborted/committed transaction. This means that it is made ready to be used by another
+     * transaction configuration.
+     */
     public abstract void hardReset();
 
+    /**
+     * Does a soft reset of an aborted/committed transaction. This method is called when the execution of a transaction
+     * fails, but needs to be retried again.
+     *
+     * @return if another attempt can be made, false otherwise.
+     */
     public abstract boolean softReset();
 
+    /**
+     * Gets the GammaRefTranlocal for a specific AbstractGammaRef. This method doesn't care about the state of a
+     * transaction.
+     *
+     * @param ref the AbstractGammaRef
+     * @return the found GammaRefTranlocal or null if not found.
+     */
     public abstract GammaRefTranlocal getRefTranlocal(AbstractGammaRef ref);
-
-    public final NullPointerException abortAcquireOnNullLockMode(GammaObject o) {
-        switch (status) {
-            case TX_ACTIVE:
-                abort();
-                return new NullPointerException();
-            case TX_PREPARED:
-                abort();
-                return new NullPointerException();
-            case TX_ABORTED:
-                return new NullPointerException();
-            case TX_COMMITTED:
-                return new NullPointerException();
-            default:
-                throw new IllegalStateException();
-        }
-    }
 
     public final boolean isAlive() {
         return status == TX_ACTIVE || status == TX_PREPARED;
