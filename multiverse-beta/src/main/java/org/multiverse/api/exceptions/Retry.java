@@ -15,8 +15,20 @@ public class Retry extends ControlFlowError {
 
     private static final long serialVersionUID = 0;
 
-    public final static Retry INSTANCE = new Retry();
+    public final static Retry INSTANCE = new Retry(false);
 
-    public Retry() {
+    private final boolean fillStackTrace;
+
+    public Retry(boolean fillStackTrace) {
+        this.fillStackTrace = fillStackTrace;
+    }
+
+    @Override
+    public StackTraceElement[] getStackTrace() {
+        if (fillStackTrace) {
+            return super.getStackTrace();
+        } else {
+            return new StackTraceElement[0];
+        }
     }
 }

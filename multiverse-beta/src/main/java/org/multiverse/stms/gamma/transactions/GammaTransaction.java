@@ -72,7 +72,8 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         if (config.controlFlowErrorsReused) {
             return ReadWriteConflict.INSTANCE;
         } else {
-            return new ReadWriteConflict();
+            //todo: good message
+            return new ReadWriteConflict("");
         }
     }
 
@@ -467,14 +468,14 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public final SpeculativeConfigurationError abortOnTransactionTooSmall(int minimalSize) {
-        //todo:
         config.updateSpeculativeConfigurationToUseMinimalTransactionLength(minimalSize);
         abortIfAlive();
         if (config.controlFlowErrorsReused) {
             return SpeculativeConfigurationError.INSTANCE;
         }
 
-        return new SpeculativeConfigurationError();
+        //todo: message
+        return new SpeculativeConfigurationError("");
     }
 
     public final SpeculativeConfigurationError abortOnTransactionTooLargeForPoorMansConflictScan() {
@@ -484,7 +485,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
             return SpeculativeConfigurationError.INSTANCE;
         }
         //todo: correct message
-        return new SpeculativeConfigurationError();
+        return new SpeculativeConfigurationError("");
     }
 
     public final boolean hasWrites() {

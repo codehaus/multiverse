@@ -202,7 +202,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
         if (config.controlFlowErrorsReused) {
             throw Retry.INSTANCE;
         } else {
-            throw new Retry();
+            throw new Retry(true);
         }
     }
 

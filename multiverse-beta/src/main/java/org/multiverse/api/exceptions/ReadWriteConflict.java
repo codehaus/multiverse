@@ -12,12 +12,15 @@ public class ReadWriteConflict extends ControlFlowError {
 
     private static final long serialVersionUID = 0;
 
-    public final static ReadWriteConflict INSTANCE = new ReadWriteConflict();
+    public final static ReadWriteConflict INSTANCE = new ReadWriteConflict(false);
+
+    private final boolean fillStackTrace;
 
     /**
      * Creates a new ReadWriteConflict.
      */
-    public ReadWriteConflict() {
+    public ReadWriteConflict(boolean fillStackTrace) {
+        this.fillStackTrace = fillStackTrace;
     }
 
     /**
@@ -27,6 +30,7 @@ public class ReadWriteConflict extends ControlFlowError {
      */
     public ReadWriteConflict(String message) {
         super(message);
+        fillStackTrace = true;
     }
 
     /**
@@ -37,5 +41,15 @@ public class ReadWriteConflict extends ControlFlowError {
      */
     public ReadWriteConflict(String message, Throwable cause) {
         super(message, cause);
+        fillStackTrace = true;
+    }
+
+    @Override
+    public StackTraceElement[] getStackTrace() {
+        if (fillStackTrace) {
+            return super.getStackTrace();
+        } else {
+            return new StackTraceElement[0];
+        }
     }
 }

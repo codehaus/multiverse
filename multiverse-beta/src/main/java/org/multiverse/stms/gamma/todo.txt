@@ -30,6 +30,8 @@
                         done
 --------------------------------------------------------------------
 
+- stacktrace is not filled for reused transactions. This helps to prevent developers from looking in the wrong place.
+
 - read consistency
 
 - speculative size for full conflict scan

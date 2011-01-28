@@ -12,13 +12,16 @@ package org.multiverse.api.exceptions;
 public class SpeculativeConfigurationError extends ControlFlowError {
 
     private static final long serialVersionUID = 0;
-        
-    public final static SpeculativeConfigurationError INSTANCE = new SpeculativeConfigurationError();
+
+    public final static SpeculativeConfigurationError INSTANCE = new SpeculativeConfigurationError(false);
+
+    private final boolean fillStackTrace;
 
     /**
      * Creates a SpeculativeConfigurationError.
      */
-    public SpeculativeConfigurationError() {
+    public SpeculativeConfigurationError(boolean fillStackTrace) {
+        this.fillStackTrace = fillStackTrace;
     }
 
     /**
@@ -28,6 +31,7 @@ public class SpeculativeConfigurationError extends ControlFlowError {
      */
     public SpeculativeConfigurationError(String message) {
         super(message);
+        this.fillStackTrace = true;
     }
 
     /**
@@ -38,5 +42,15 @@ public class SpeculativeConfigurationError extends ControlFlowError {
      */
     public SpeculativeConfigurationError(String message, Throwable cause) {
         super(message, cause);
+        this.fillStackTrace = true;
+    }
+
+    @Override
+    public StackTraceElement[] getStackTrace() {
+        if (fillStackTrace) {
+            return super.getStackTrace();
+        } else {
+            return new StackTraceElement[0];
+        }
     }
 }

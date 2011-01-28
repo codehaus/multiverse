@@ -171,7 +171,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
         if (config.controlFlowErrorsReused) {
             throw Retry.INSTANCE;
         } else {
-            throw new Retry();
+            throw new Retry(true);
         }
     }
 

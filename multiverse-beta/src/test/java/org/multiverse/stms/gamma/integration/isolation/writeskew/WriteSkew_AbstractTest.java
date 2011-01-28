@@ -9,20 +9,23 @@ import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class WriteSkewTest {
-    private GammaStm stm;
+public abstract class WriteSkew_AbstractTest<T extends GammaTransaction> {
+    protected GammaStm stm;
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
         stm = (GammaStm) getGlobalStmInstance();
     }
+
+    public abstract T newTransaction(GammaTransactionConfiguration config);
 
     @After
     public void tearDown() {
@@ -34,11 +37,11 @@ public class WriteSkewTest {
         GammaLongRef ref1 = new GammaLongRef(stm);
         GammaLongRef ref2 = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.newTransactionFactoryBuilder()
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
                 .setSpeculativeConfigurationEnabled(false)
-                .setIsolationLevel(IsolationLevel.Snapshot)
-                .newTransactionFactory()
-                .newTransaction();
+                .setIsolationLevel(IsolationLevel.Snapshot);
+
+        GammaTransaction tx = newTransaction(config);
 
         ref1.incrementAndGet(tx, 1);
         ref2.get(tx);
@@ -61,12 +64,12 @@ public class WriteSkewTest {
         GammaLongRef ref1 = new GammaLongRef(stm);
         GammaLongRef ref2 = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.newTransactionFactoryBuilder()
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
-                .setWriteLockMode(writeLockMode)
-                .newTransactionFactory()
-                .newTransaction();
+                .setWriteLockMode(writeLockMode);
+
+        GammaTransaction tx = newTransaction(config);
 
         ref1.incrementAndGet(tx, 1);
         ref2.get(tx);
@@ -88,12 +91,12 @@ public class WriteSkewTest {
         GammaLongRef ref1 = new GammaLongRef(stm);
         GammaLongRef ref2 = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.newTransactionFactoryBuilder()
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
                 .setSpeculativeConfigurationEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
-                .setReadLockMode(readLockMode)
-                .newTransactionFactory()
-                .newTransaction();
+                .setControlFlowErrorsReused(false);
+
+        GammaTransaction tx = newTransaction(config);
 
         ref1.incrementAndGet(tx, 1);
         ref2.get(tx);
@@ -101,10 +104,12 @@ public class WriteSkewTest {
         GammaTransaction otherTx = stm.startDefaultTransaction();
         ref2.incrementAndGet(otherTx, 1);
 
+        ref2.getLock().acquire(tx, readLockMode);
+
         try {
             otherTx.commit();
             fail();
-        } catch (ReadWriteConflict expected) {
+        } catch (ReadWriteConflict ignored) {
         }
 
         tx.commit();
@@ -121,11 +126,11 @@ public class WriteSkewTest {
         GammaLongRef ref1 = new GammaLongRef(stm);
         GammaLongRef ref2 = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.newTransactionFactoryBuilder()
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
                 .setSpeculativeConfigurationEnabled(false)
-                .setIsolationLevel(IsolationLevel.Snapshot)
-                .newTransactionFactory()
-                .newTransaction();
+                .setIsolationLevel(IsolationLevel.Snapshot);
+
+        GammaTransaction tx = newTransaction(config);
 
         ref1.incrementAndGet(tx, 1);
 
@@ -149,11 +154,11 @@ public class WriteSkewTest {
         GammaLongRef ref1 = new GammaLongRef(stm);
         GammaLongRef ref2 = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.newTransactionFactoryBuilder()
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
                 .setSpeculativeConfigurationEnabled(false)
-                .setIsolationLevel(IsolationLevel.Snapshot)
-                .newTransactionFactory()
-                .newTransaction();
+                .setIsolationLevel(IsolationLevel.Snapshot);
+
+        GammaTransaction tx = newTransaction(config);
 
         ref1.incrementAndGet(tx, 1);
         ref2.ensure(tx);
@@ -172,11 +177,12 @@ public class WriteSkewTest {
         GammaLongRef ref1 = new GammaLongRef(stm);
         GammaLongRef ref2 = new GammaLongRef(stm);
 
-        GammaTransaction tx = stm.newTransactionFactoryBuilder()
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
                 .setSpeculativeConfigurationEnabled(false)
-                .setIsolationLevel(IsolationLevel.Serializable)
-                .newTransactionFactory()
-                .newTransaction();
+                .setIsolationLevel(IsolationLevel.Serializable);
+
+        GammaTransaction tx = newTransaction(config);
+
         ref1.incrementAndGet(tx, 1);
         ref2.get(tx);
 
