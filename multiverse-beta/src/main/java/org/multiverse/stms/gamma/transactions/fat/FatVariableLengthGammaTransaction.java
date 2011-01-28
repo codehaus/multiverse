@@ -6,6 +6,7 @@ import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
@@ -119,8 +120,9 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         if (size > 0) {
             if (hasWrites) {
                 if (status == TX_ACTIVE) {
-                    if (!doPrepare()) {
-                        throw abortOnReadWriteConflict();
+                    GammaObject conflictingObject = doPrepare();
+                    if (conflictingObject != null) {
+                        throw abortOnReadWriteConflict(conflictingObject);
                     }
                 }
 
@@ -202,8 +204,9 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         }
 
         if (hasWrites) {
-            if (!doPrepare()) {
-                throw abortOnReadWriteConflict();
+            GammaObject conflictingObject = doPrepare();
+            if (conflictingObject != null) {
+                throw abortOnReadWriteConflict(conflictingObject);
             }
         }
 
@@ -211,7 +214,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
     }
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
-    private boolean doPrepare() {
+    private GammaObject doPrepare() {
         for (int k = 0; k < array.length; k++) {
             final GammaRefTranlocal tranlocal = array[k];
 
@@ -219,12 +222,14 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
                 continue;
             }
 
-            if (!tranlocal.owner.prepare(this, tranlocal)) {
-                return false;
+            AbstractGammaRef owner = tranlocal.owner;
+
+            if (!owner.prepare(this, tranlocal)) {
+                return owner;
             }
         }
 
-        return true;
+        return null;
     }
 
     @Override

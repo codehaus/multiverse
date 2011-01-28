@@ -78,6 +78,7 @@ public class GammaAtomicBlock_integrationTest implements GammaConstants {
 
             fail();
         } catch (TooManyRetriesException expected) {
+            expected.printStackTrace();
         }
     }
 

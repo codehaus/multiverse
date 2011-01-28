@@ -57,7 +57,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
             if (hasWrites) {
                 if (status == TX_ACTIVE) {
                     if (!owner.prepare(this, tranlocal)) {
-                        throw abortOnReadWriteConflict();
+                        throw abortOnReadWriteConflict(owner);
                     }
                 }
                 Listeners listeners = owner.safe(tranlocal, pool);
@@ -111,7 +111,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
         final AbstractGammaRef owner = tranlocal.owner;
         if (owner != null) {
             if (!owner.prepare(this, tranlocal)) {
-                throw abortOnReadWriteConflict();
+                throw abortOnReadWriteConflict(owner);
             }
         }
 

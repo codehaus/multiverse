@@ -67,13 +67,15 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
-    public final ReadWriteConflict abortOnReadWriteConflict() {
+    public final ReadWriteConflict abortOnReadWriteConflict(GammaObject object) {
         abortIfAlive();
-        if (config.controlFlowErrorsReused) {
-            return ReadWriteConflict.INSTANCE;
+
+        if (attempt == config.maxRetries || !config.controlFlowErrorsReused) {
+            return new ReadWriteConflict(
+                    format("[%s] Failed transaction, reason: object [%s] contains a read/write-conflict",
+                            config.familyName, toDebugString(object)));
         } else {
-            //todo: good message
-            return new ReadWriteConflict("");
+            return ReadWriteConflict.INSTANCE;
         }
     }
 

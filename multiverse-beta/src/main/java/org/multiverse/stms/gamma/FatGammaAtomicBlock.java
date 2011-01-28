@@ -113,7 +113,6 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                                             transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
                         }
                     }
-
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
@@ -139,7 +138,6 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                                             transactionConfiguration.familyName));
                         }
                     }
-
                     return closure.execute(null);
                 case RequiresNew:
                     if (tx == null) {
@@ -202,13 +200,14 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
     private <E> E execute(
             GammaTransaction tx, final ThreadLocalTransaction.Container transactionContainer, GammaTransactionPool pool, final AtomicClosure<E> closure) throws Exception {
+        Error cause = null;
 
         try {
             boolean abort = true;
-
             try {
                 do {
                     try {
+                        cause = null;
                         E result = closure.execute(tx);
                         tx.commit();
                         abort = false;
@@ -235,6 +234,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         pool.put(old);
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
+                        cause = e;
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
@@ -268,8 +268,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
         throw new TooManyRetriesException(
                 format("[%s] Maximum number of %s retries has been reached",
-                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
-
+                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()), cause);
     }
 
     @Override
@@ -348,7 +347,6 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                                             transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
                         }
                     }
-
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
@@ -374,7 +372,6 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                                             transactionConfiguration.familyName));
                         }
                     }
-
                     return closure.execute(null);
                 case RequiresNew:
                     if (tx == null) {
@@ -437,13 +434,14 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
     private int execute(
             GammaTransaction tx, final ThreadLocalTransaction.Container transactionContainer, GammaTransactionPool pool, final AtomicIntClosure closure) throws Exception {
+        Error cause = null;
 
         try {
             boolean abort = true;
-
             try {
                 do {
                     try {
+                        cause = null;
                         int result = closure.execute(tx);
                         tx.commit();
                         abort = false;
@@ -470,6 +468,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         pool.put(old);
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
+                        cause = e;
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
@@ -503,8 +502,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
         throw new TooManyRetriesException(
                 format("[%s] Maximum number of %s retries has been reached",
-                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
-
+                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()), cause);
     }
 
     @Override
@@ -583,7 +581,6 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                                             transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
                         }
                     }
-
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
@@ -609,7 +606,6 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                                             transactionConfiguration.familyName));
                         }
                     }
-
                     return closure.execute(null);
                 case RequiresNew:
                     if (tx == null) {
@@ -672,13 +668,14 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
     private long execute(
             GammaTransaction tx, final ThreadLocalTransaction.Container transactionContainer, GammaTransactionPool pool, final AtomicLongClosure closure) throws Exception {
+        Error cause = null;
 
         try {
             boolean abort = true;
-
             try {
                 do {
                     try {
+                        cause = null;
                         long result = closure.execute(tx);
                         tx.commit();
                         abort = false;
@@ -705,6 +702,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         pool.put(old);
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
+                        cause = e;
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
@@ -738,8 +736,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
         throw new TooManyRetriesException(
                 format("[%s] Maximum number of %s retries has been reached",
-                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
-
+                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()), cause);
     }
 
     @Override
@@ -818,7 +815,6 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                                             transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
                         }
                     }
-
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
@@ -844,7 +840,6 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                                             transactionConfiguration.familyName));
                         }
                     }
-
                     return closure.execute(null);
                 case RequiresNew:
                     if (tx == null) {
@@ -907,13 +902,14 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
     private double execute(
             GammaTransaction tx, final ThreadLocalTransaction.Container transactionContainer, GammaTransactionPool pool, final AtomicDoubleClosure closure) throws Exception {
+        Error cause = null;
 
         try {
             boolean abort = true;
-
             try {
                 do {
                     try {
+                        cause = null;
                         double result = closure.execute(tx);
                         tx.commit();
                         abort = false;
@@ -940,6 +936,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         pool.put(old);
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
+                        cause = e;
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
@@ -973,8 +970,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
         throw new TooManyRetriesException(
                 format("[%s] Maximum number of %s retries has been reached",
-                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
-
+                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()), cause);
     }
 
     @Override
@@ -1053,7 +1049,6 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                                             transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
                         }
                     }
-
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
@@ -1079,7 +1074,6 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                                             transactionConfiguration.familyName));
                         }
                     }
-
                     return closure.execute(null);
                 case RequiresNew:
                     if (tx == null) {
@@ -1142,13 +1136,14 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
     private boolean execute(
             GammaTransaction tx, final ThreadLocalTransaction.Container transactionContainer, GammaTransactionPool pool, final AtomicBooleanClosure closure) throws Exception {
+        Error cause = null;
 
         try {
             boolean abort = true;
-
             try {
                 do {
                     try {
+                        cause = null;
                         boolean result = closure.execute(tx);
                         tx.commit();
                         abort = false;
@@ -1175,6 +1170,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         pool.put(old);
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
+                        cause = e;
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
@@ -1208,8 +1204,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
         throw new TooManyRetriesException(
                 format("[%s] Maximum number of %s retries has been reached",
-                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
-
+                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()), cause);
     }
 
     @Override
@@ -1290,7 +1285,6 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                                             transactionConfiguration.familyName, tx.getConfiguration().getFamilyName()));
                         }
                     }
-
                     closure.execute(tx);
                     return;
                 case Never:
@@ -1317,7 +1311,6 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                                             transactionConfiguration.familyName));
                         }
                     }
-
                     closure.execute(null);
                     return;
                 case RequiresNew:
@@ -1384,13 +1377,14 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
     private void execute(
             GammaTransaction tx, final ThreadLocalTransaction.Container transactionContainer, GammaTransactionPool pool, final AtomicVoidClosure closure) throws Exception {
+        Error cause = null;
 
         try {
             boolean abort = true;
-
             try {
                 do {
                     try {
+                        cause = null;
                         closure.execute(tx);
                         tx.commit();
                         abort = false;
@@ -1417,6 +1411,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         pool.put(old);
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
+                        cause = e;
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
@@ -1450,8 +1445,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
         throw new TooManyRetriesException(
                 format("[%s] Maximum number of %s retries has been reached",
-                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
-
+                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()), cause);
     }
 
 }

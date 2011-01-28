@@ -64,13 +64,13 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
 
         if (status == TX_ACTIVE) {
             if (owner.version != version) {
-                throw abortOnReadWriteConflict();
+                throw abortOnReadWriteConflict(owner);
             }
 
             int arriveStatus = owner.tryLockAndArrive(64, LOCKMODE_EXCLUSIVE);
 
             if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
-                throw abortOnReadWriteConflict();
+                throw abortOnReadWriteConflict(owner);
             }
 
             if (owner.version != version) {
@@ -79,7 +79,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
                 } else {
                     owner.unlockByUnregistered();
                 }
-                throw abortOnReadWriteConflict();
+                throw abortOnReadWriteConflict(owner);
             }
         }
 
@@ -142,7 +142,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
         final AbstractGammaRef owner = tranlocal.owner;
         if (owner != null) {
             if (!owner.prepare(this, tranlocal)) {
-                throw abortOnReadWriteConflict();
+                throw abortOnReadWriteConflict(owner);
             }
         }
 

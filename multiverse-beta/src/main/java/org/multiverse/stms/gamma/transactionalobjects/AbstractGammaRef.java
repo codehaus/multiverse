@@ -563,7 +563,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
             if (mode == TRANLOCAL_COMMUTING) {
                 if (!flattenCommute(tx, tranlocal, lockMode)) {
-                    throw tx.abortOnReadWriteConflict();
+                    throw tx.abortOnReadWriteConflict(this);
                 }
 
                 return tranlocal;
@@ -571,7 +571,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
             if (lockMode > tranlocal.getLockMode()) {
                 if (!tryLockAndCheckConflict(config.spinCount, tranlocal, lockMode)) {
-                    throw tx.abortOnReadWriteConflict();
+                    throw tx.abortOnReadWriteConflict(this);
                 }
             }
 
@@ -584,7 +584,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         initTranlocalForRead(config, tranlocal);
         if (!load(tranlocal, lockMode, config.spinCount, !tx.poorMansConflictScan)) {
-            throw tx.abortOnReadWriteConflict();
+            throw tx.abortOnReadWriteConflict(this);
         }
 
         return tranlocal;
@@ -630,7 +630,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
             if (mode == TRANLOCAL_COMMUTING) {
                 if (!flattenCommute(tx, found, desiredLockMode)) {
-                    throw tx.abortOnReadWriteConflict();
+                    throw tx.abortOnReadWriteConflict(this);
                 }
 
                 return found;
@@ -638,7 +638,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
             if (desiredLockMode > found.getLockMode()) {
                 if (!tryLockAndCheckConflict(config.spinCount, found, desiredLockMode)) {
-                    throw tx.abortOnReadWriteConflict();
+                    throw tx.abortOnReadWriteConflict(this);
                 }
             }
 
@@ -652,7 +652,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         initTranlocalForRead(config, newNode);
         if (!load(newNode, desiredLockMode, config.spinCount, !tx.poorMansConflictScan)) {
-            throw tx.abortOnReadWriteConflict();
+            throw tx.abortOnReadWriteConflict(this);
         }
 
         tx.size++;
@@ -660,7 +660,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         if (tx.hasReads) {
             if (!tx.isReadConsistent(newNode)) {
-                throw tx.abortOnReadWriteConflict();
+                throw tx.abortOnReadWriteConflict(this);
             }
         } else {
             tx.hasReads = true;
@@ -696,7 +696,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
             if (mode == TRANLOCAL_COMMUTING) {
                 if (!flattenCommute(tx, tranlocal, desiredLockMode)) {
-                    throw tx.abortOnReadWriteConflict();
+                    throw tx.abortOnReadWriteConflict(this);
                 }
 
                 return tranlocal;
@@ -704,7 +704,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
             if (desiredLockMode > tranlocal.getLockMode()) {
                 if (!tryLockAndCheckConflict(config.spinCount, tranlocal, desiredLockMode)) {
-                    throw tx.abortOnReadWriteConflict();
+                    throw tx.abortOnReadWriteConflict(this);
                 }
             }
 
@@ -717,12 +717,12 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tx.size++;
 
         if (!load(tranlocal, desiredLockMode, config.spinCount, !tx.poorMansConflictScan)) {
-            throw tx.abortOnReadWriteConflict();
+            throw tx.abortOnReadWriteConflict(this);
         }
 
         if (tx.hasReads) {
             if (!tx.isReadConsistent(tranlocal)) {
-                throw tx.abortOnReadWriteConflict();
+                throw tx.abortOnReadWriteConflict(this);
             }
         } else {
             tx.hasReads = true;
@@ -810,7 +810,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 }
                 spinCount--;
                 if (spinCount < 0) {
-                    throw tx.abortOnReadWriteConflict();
+                    throw tx.abortOnReadWriteConflict(this);
                 }
             }
 
@@ -842,7 +842,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 }
 
                 if (node != newNode && (owner.hasExclusiveLock() || owner.version != node.version)) {
-                    throw tx.abortOnReadWriteConflict();
+                    throw tx.abortOnReadWriteConflict(this);
                 }
 
                 node = node.next;
@@ -905,7 +905,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 }
                 spinCount--;
                 if (spinCount < 0) {
-                    throw tx.abortOnReadWriteConflict();
+                    throw tx.abortOnReadWriteConflict(this);
                 }
             }
 
@@ -1012,14 +1012,14 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
             if (mode == TRANLOCAL_COMMUTING) {
                 if (!flattenCommute(tx, tranlocal, desiredLockMode)) {
-                    throw tx.abortOnReadWriteConflict();
+                    throw tx.abortOnReadWriteConflict(this);
                 }
                 return tranlocal;
             }
 
             if (desiredLockMode > tranlocal.getLockMode()) {
                 if (!tryLockAndCheckConflict(config.spinCount, tranlocal, desiredLockMode)) {
-                    throw tx.abortOnReadWriteConflict();
+                    throw tx.abortOnReadWriteConflict(this);
                 }
             }
 
@@ -1036,12 +1036,12 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         initTranlocalForWrite(config, tranlocal);
         if (!load(tranlocal, desiredLockMode, config.spinCount, !tx.poorMansConflictScan)) {
-            throw tx.abortOnReadWriteConflict();
+            throw tx.abortOnReadWriteConflict(this);
         }
 
         if (tx.hasReads) {
             if (!tx.isReadConsistent(tranlocal)) {
-                throw tx.abortOnReadWriteConflict();
+                throw tx.abortOnReadWriteConflict(this);
             }
         } else {
             tx.hasReads = true;
@@ -1080,14 +1080,14 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
             if (mode == TRANLOCAL_COMMUTING) {
                 if (!flattenCommute(tx, tranlocal, desiredLockMode)) {
-                    throw tx.abortOnReadWriteConflict();
+                    throw tx.abortOnReadWriteConflict(this);
                 }
                 return tranlocal;
             }
 
             if (desiredLockMode > tranlocal.getLockMode()) {
                 if (!tryLockAndCheckConflict(config.spinCount, tranlocal, desiredLockMode)) {
-                    throw tx.abortOnReadWriteConflict();
+                    throw tx.abortOnReadWriteConflict(this);
                 }
             }
 
@@ -1103,7 +1103,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         initTranlocalForWrite(config, tranlocal);
         if (!load(tranlocal, desiredLockMode, config.spinCount, !tx.poorMansConflictScan)) {
-            throw tx.abortOnReadWriteConflict();
+            throw tx.abortOnReadWriteConflict(this);
         }
 
         tx.hasWrites = true;
@@ -1156,14 +1156,14 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
             if (mode == TRANLOCAL_COMMUTING) {
                 if (!flattenCommute(tx, found, lockMode)) {
-                    throw tx.abortOnReadWriteConflict();
+                    throw tx.abortOnReadWriteConflict(this);
                 }
                 return found;
             }
 
             if (lockMode > found.getLockMode()) {
                 if (!tryLockAndCheckConflict(config.spinCount, found, lockMode)) {
-                    throw tx.abortOnReadWriteConflict();
+                    throw tx.abortOnReadWriteConflict(this);
                 }
             }
 
@@ -1179,12 +1179,12 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         initTranlocalForWrite(config, newNode);
         if (!load(newNode, lockMode, config.spinCount, !tx.poorMansConflictScan)) {
-            throw tx.abortOnReadWriteConflict();
+            throw tx.abortOnReadWriteConflict(this);
         }
 
         if (tx.hasReads) {
             if (!tx.isReadConsistent(newNode)) {
-                throw tx.abortOnReadWriteConflict();
+                throw tx.abortOnReadWriteConflict(this);
             }
         } else {
             tx.hasReads = true;

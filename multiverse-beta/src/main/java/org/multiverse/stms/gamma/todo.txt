@@ -8,8 +8,6 @@
 
 - readonly/readbiased
 
-- last readwrite conflict should show which transactional object caused it.
-
 - listeners
 
 - permanent listeners
@@ -25,6 +23,8 @@
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- last readwrite conflict should show which transactional object caused it.
 
 - stacktrace is not filled for reused transactions. This helps to prevent developers from looking in the wrong place.
 

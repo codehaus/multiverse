@@ -6,6 +6,7 @@ import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
@@ -58,8 +59,9 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         if (size > 0) {
             if (hasWrites) {
                 if (status == TX_ACTIVE) {
-                    if (!prepareChainForCommit()) {
-                        throw abortOnReadWriteConflict();
+                    GammaObject o = prepareChainForCommit();
+                    if (o != null) {
+                        throw abortOnReadWriteConflict(o);
                     }
                 }
 
@@ -98,24 +100,24 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
     }
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
-    private boolean prepareChainForCommit() {
+    private AbstractGammaRef prepareChainForCommit() {
         GammaRefTranlocal node = head;
 
         do {
             final AbstractGammaRef owner = node.owner;
 
             if (owner == null) {
-                return true;
+                return null;
             }
 
             if (!owner.prepare(this, node)) {
-                return false;
+                return owner;
             }
 
             node = node.next;
         } while (node != null);
 
-        return true;
+        return null;
     }
 
     @Override
@@ -242,8 +244,9 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
             throw new AbortOnlyException();
         }
 
-        if (!prepareChainForCommit()) {
-            throw abortOnReadWriteConflict();
+        GammaObject o = prepareChainForCommit();
+        if (o != null) {
+            throw abortOnReadWriteConflict(o);
         }
 
         status = TX_PREPARED;

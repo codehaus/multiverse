@@ -24,4 +24,14 @@ public class TooManyRetriesException extends RetryException {
     public TooManyRetriesException(String message) {
         super(message);
     }
+
+    /**
+     * Creates a new TooManyRetriesException with the provided message.
+     *
+     * @param message the message of the exception
+     * @param cause   the cause of the exception
+     */
+    public TooManyRetriesException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

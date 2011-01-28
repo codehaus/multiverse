@@ -6,6 +6,7 @@ import org.multiverse.api.exceptions.Retry;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
@@ -59,8 +60,9 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
 
         if (hasWrites) {
             if (s == TX_ACTIVE) {
-                if (!prepareChainForCommit()) {
-                    throw abortOnReadWriteConflict();
+                GammaObject conflictingObject = prepareChainForCommit();
+                if (conflictingObject != null) {
+                    throw abortOnReadWriteConflict(conflictingObject);
                 }
             }
 
@@ -92,14 +94,14 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
     }
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
-    private boolean prepareChainForCommit() {
+    private GammaObject prepareChainForCommit() {
         GammaRefTranlocal node = head;
 
         do {
             final AbstractGammaRef owner = node.owner;
 
             if (owner == null) {
-                return true;
+                return null;
             }
 
             if (node.mode == TRANLOCAL_READ) {
@@ -108,26 +110,26 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
 
             final long version = node.version;
             if (owner.version != version) {
-                return false;
+                return owner;
             }
 
             int arriveStatus = owner.tryLockAndArrive(64, LOCKMODE_EXCLUSIVE);
 
             if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
-                return false;
+                return owner;
             }
 
             node.hasDepartObligation = arriveStatus == ARRIVE_NORMAL;
             node.lockMode = LOCKMODE_EXCLUSIVE;
 
             if (owner.version != version) {
-                return false;
+                return owner;
             }
 
             node = node.next;
         } while (node != null);
 
-        return true;
+        return null;
     }
 
     @Override
@@ -278,8 +280,9 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
             throw new AbortOnlyException();
         }
 
-        if (!prepareChainForCommit()) {
-            throw abortOnReadWriteConflict();
+        GammaObject conflictingObject = prepareChainForCommit();
+        if (conflictingObject != null) {
+            throw abortOnReadWriteConflict(conflictingObject);
         }
 
         status = TX_PREPARED;

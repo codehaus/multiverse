@@ -63,6 +63,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             tx = null;
         }
 
+        Throwable cause = null;
         try {
             if (tx != null && tx.isAlive()) {
                 return closure.execute(tx);
@@ -71,10 +72,10 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             tx = transactionFactory.newTransaction(pool);
             transactionContainer.tx = tx;
             boolean abort = true;
-
             try {
                 do {
                     try {
+                        cause = null;
                         E result = closure.execute(tx);
                         tx.commit();
                         abort = false;
@@ -101,6 +102,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         pool.put(old);
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
+                        cause = e;
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
@@ -134,8 +136,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
         throw new TooManyRetriesException(
                 format("[%s] Maximum number of %s retries has been reached",
-                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
-
+                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()), cause);
     }
 
     @Override
@@ -168,6 +169,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             tx = null;
         }
 
+        Throwable cause = null;
         try {
             if (tx != null && tx.isAlive()) {
                 return closure.execute(tx);
@@ -176,10 +178,10 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             tx = transactionFactory.newTransaction(pool);
             transactionContainer.tx = tx;
             boolean abort = true;
-
             try {
                 do {
                     try {
+                        cause = null;
                         int result = closure.execute(tx);
                         tx.commit();
                         abort = false;
@@ -206,6 +208,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         pool.put(old);
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
+                        cause = e;
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
@@ -239,8 +242,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
         throw new TooManyRetriesException(
                 format("[%s] Maximum number of %s retries has been reached",
-                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
-
+                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()), cause);
     }
 
     @Override
@@ -273,6 +275,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             tx = null;
         }
 
+        Throwable cause = null;
         try {
             if (tx != null && tx.isAlive()) {
                 return closure.execute(tx);
@@ -281,10 +284,10 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             tx = transactionFactory.newTransaction(pool);
             transactionContainer.tx = tx;
             boolean abort = true;
-
             try {
                 do {
                     try {
+                        cause = null;
                         long result = closure.execute(tx);
                         tx.commit();
                         abort = false;
@@ -311,6 +314,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         pool.put(old);
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
+                        cause = e;
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
@@ -344,8 +348,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
         throw new TooManyRetriesException(
                 format("[%s] Maximum number of %s retries has been reached",
-                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
-
+                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()), cause);
     }
 
     @Override
@@ -378,6 +381,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             tx = null;
         }
 
+        Throwable cause = null;
         try {
             if (tx != null && tx.isAlive()) {
                 return closure.execute(tx);
@@ -386,10 +390,10 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             tx = transactionFactory.newTransaction(pool);
             transactionContainer.tx = tx;
             boolean abort = true;
-
             try {
                 do {
                     try {
+                        cause = null;
                         double result = closure.execute(tx);
                         tx.commit();
                         abort = false;
@@ -416,6 +420,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         pool.put(old);
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
+                        cause = e;
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
@@ -449,8 +454,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
         throw new TooManyRetriesException(
                 format("[%s] Maximum number of %s retries has been reached",
-                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
-
+                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()), cause);
     }
 
     @Override
@@ -483,6 +487,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             tx = null;
         }
 
+        Throwable cause = null;
         try {
             if (tx != null && tx.isAlive()) {
                 return closure.execute(tx);
@@ -491,10 +496,10 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             tx = transactionFactory.newTransaction(pool);
             transactionContainer.tx = tx;
             boolean abort = true;
-
             try {
                 do {
                     try {
+                        cause = null;
                         boolean result = closure.execute(tx);
                         tx.commit();
                         abort = false;
@@ -521,6 +526,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         pool.put(old);
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
+                        cause = e;
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
@@ -554,8 +560,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
         throw new TooManyRetriesException(
                 format("[%s] Maximum number of %s retries has been reached",
-                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
-
+                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()), cause);
     }
 
     @Override
@@ -588,6 +593,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             tx = null;
         }
 
+        Throwable cause = null;
         try {
             if (tx != null && tx.isAlive()) {
                 closure.execute(tx);
@@ -597,10 +603,10 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
             tx = transactionFactory.newTransaction(pool);
             transactionContainer.tx = tx;
             boolean abort = true;
-
             try {
                 do {
                     try {
+                        cause = null;
                         closure.execute(tx);
                         tx.commit();
                         abort = false;
@@ -614,7 +620,6 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         }
                         tx.awaitUpdate();
                     } catch (SpeculativeConfigurationError e) {
-                        e.printStackTrace();
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a speculative configuration error",
@@ -628,6 +633,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         pool.put(old);
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
+                        cause = e;
                         if (___TracingEnabled) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
@@ -661,7 +667,7 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock {
 
         throw new TooManyRetriesException(
                 format("[%s] Maximum number of %s retries has been reached",
-                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()));
-
+                        transactionConfiguration.getFamilyName(), transactionConfiguration.getMaxRetries()), cause);
     }
+
 }
