@@ -148,10 +148,9 @@ public class TestUtils implements MultiverseConstants {
     }
 
     public static long getStressTestDurationMs(long defaultDuration) {
-        String value = System.getProperty("org.multiverse.integrationtest.durationMs", "" + defaultDuration);
+        String value = System.getProperty("org.multiverse.integrationtest.durationMs", String.valueOf(defaultDuration));
         return Long.parseLong(value);
     }
-
 
     public static void assertIsInterrupted(Thread t) {
         assertTrue(t.isInterrupted());
@@ -246,5 +245,4 @@ public class TestUtils implements MultiverseConstants {
 
         return durationMs;
     }
-
 }

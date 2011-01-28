@@ -66,6 +66,8 @@ public interface Transaction {
 
     /**
      * Gets the remaining timeout in nanoseconds. Long.MAX_VALUE indicates that no timeout is used.
+     * <p/>
+     * The remaining timeout only is decreased if a transaction blocks.
      *
      * @return the remaining timeout.
      */
@@ -177,14 +179,14 @@ public interface Transaction {
     void ensureWrites();
 
     /**
-     * Registers a TransactionLifecycleListener. Every time a transaction is retried, the listener needs to
+     * Registers a TransactionListener. Every time a transaction is retried, the listener needs to
      * be registered again if you want the task to be executed again. If you want a permanent listener, have
      * a look at the {@link TransactionFactoryBuilder#addPermanentListener(org.multiverse.api.lifecycle.TransactionListener)}.
      * <p/>
-     * If a TransactionLifecycleListener is added more than once, it is executed more than once. No checks
+     * If a TransactionListener is added more than once, it is executed more than once. No checks
      * are made. The permanent listeners are executed in the order they are added.
      * <p/>
-     * If a TransactionLifecycleListener throws an Error/RuntimeException and the transaction still is alive,
+     * If a TransactionListener throws an Error/RuntimeException and the transaction still is alive,
      * it is aborted. For compensating and deferred actions this is not an issue, but for the PrePrepare state
      * or the state it could since the transaction is aborted.
      *
