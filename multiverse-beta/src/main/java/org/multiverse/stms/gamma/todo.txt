@@ -20,6 +20,8 @@
 
 - commute and locking
 
+- set abortonly needs to be speculative, so not available on the lean transactions.
+
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------

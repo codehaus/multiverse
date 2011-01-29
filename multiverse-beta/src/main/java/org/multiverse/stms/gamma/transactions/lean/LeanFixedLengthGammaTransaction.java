@@ -1,7 +1,5 @@
 package org.multiverse.stms.gamma.transactions.lean;
 
-import org.multiverse.api.exceptions.AbortOnlyException;
-import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
@@ -139,7 +137,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
         }
 
         if (status == TX_COMMITTED) {
-            throw new DeadTransactionException();
+            throw failAbortOnAlreadyCommitted();
         }
 
         releaseChainForAbort();
@@ -273,11 +271,6 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
 
         if (status != TX_ACTIVE) {
             throw abortPrepareOnBadStatus();
-        }
-
-        if (abortOnly) {
-            abort();
-            throw new AbortOnlyException();
         }
 
         GammaObject conflictingObject = prepareChainForCommit();

@@ -1,6 +1,5 @@
 package org.multiverse.stms.gamma.transactions.fat;
 
-import org.multiverse.api.exceptions.AbortOnlyException;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.stms.gamma.GammaStm;
@@ -47,8 +46,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
         }
 
         if (abortOnly) {
-            abort();
-            throw new AbortOnlyException();
+            throw abortCommitOnAbortOnly();
         }
 
         final AbstractGammaRef owner = tranlocal.owner;
@@ -104,8 +102,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
         }
 
         if (abortOnly) {
-            abort();
-            throw new AbortOnlyException();
+            throw abortPrepareOnAbortOnly();
         }
 
         final AbstractGammaRef owner = tranlocal.owner;

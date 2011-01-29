@@ -61,10 +61,30 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
+    private boolean isLean() {
+        return transactionType == TRANSACTIONTYPE_LEAN_MONO || transactionType == TRANSACTIONTYPE_LEAN_FIXED_LENGTH;
+    }
+
     public final void abortIfAlive() {
         if (isAlive()) {
             abort();
         }
+    }
+
+    public AbortOnlyException abortPrepareOnAbortOnly() {
+        abortIfAlive();
+
+        return new AbortOnlyException(
+                format("[%s] Failed to execute transaction.prepare, reason: the transaction was configured as abortOnly",
+                        config.familyName));
+    }
+
+    public AbortOnlyException abortCommitOnAbortOnly() {
+        abortIfAlive();
+
+        return new AbortOnlyException(
+                format("[%s] Failed to execute transaction.commit, reason: the transaction was configured as abortOnly",
+                        config.familyName));
     }
 
     public final ReadWriteConflict abortOnReadWriteConflict(GammaObject object) {
@@ -91,6 +111,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public SpeculativeConfigurationError abortOpenForReadOrWriteOnExplicitLocking(AbstractGammaRef ref) {
         config.updateSpeculativeConfigurationToUseExplicitLocking();
         abortIfAlive();
+
         if (config.controlFlowErrorsReused) {
             return SpeculativeConfigurationError.INSTANCE;
         }
@@ -103,6 +124,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public SpeculativeConfigurationError abortOpenForReadOrWriteOnNonRefType(AbstractGammaRef ref) {
         config.updateSpeculativeConfigurationToUseNonRefType();
         abortIfAlive();
+
         if (config.controlFlowErrorsReused) {
             return SpeculativeConfigurationError.INSTANCE;
         }
@@ -560,7 +582,19 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public final void setAbortOnly() {
         switch (status) {
             case TX_ACTIVE:
+                if (isLean()) {
+                    config.updateSpeculativeConfigureToUseAbortOnly();
+                    abort();
 
+                    if (config.controlFlowErrorsReused) {
+                        throw SpeculativeConfigurationError.INSTANCE;
+                    }
+
+                    throw new SpeculativeConfigurationError(
+                            format("[%s] Failed to execute Transaction.setAbortOnly, reason: the transaction is lean, " +
+                                    "but a fat one is required for dealing with the abortOnly",
+                                    config.familyName));
+                }
 
                 abortOnly = true;
                 break;

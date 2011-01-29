@@ -31,6 +31,7 @@ public class SpeculativeGammaConfigurationTest {
         assertFalse(config.isOrelseDetected);
         assertFalse(config.areListenersDetected);
         assertFalse(config.areLocksDetected);
+        assertFalse(config.isAbortOnlyDetected);
         assertEquals(1, config.minimalLength);
     }
 
@@ -45,6 +46,22 @@ public class SpeculativeGammaConfigurationTest {
         assertFalse(config.isOrelseDetected);
         assertFalse(config.areListenersDetected);
         assertFalse(config.areLocksDetected);
+        assertFalse(config.isAbortOnlyDetected);
+        assertEquals(1, config.minimalLength);
+    }
+
+      @Test
+    public void createWithAbortOnly() {
+        SpeculativeGammaConfiguration config = new SpeculativeGammaConfiguration()
+                .newWithAbortOnly();
+
+        assertFalse(config.isNonRefTypeDetected);
+        assertTrue(config.isFat);
+        assertFalse(config.isCommuteDetected);
+        assertFalse(config.isOrelseDetected);
+        assertFalse(config.areListenersDetected);
+        assertFalse(config.areLocksDetected);
+        assertTrue(config.isAbortOnlyDetected);
         assertEquals(1, config.minimalLength);
     }
 
@@ -59,6 +76,7 @@ public class SpeculativeGammaConfigurationTest {
         assertFalse(config.isOrelseDetected);
         assertFalse(config.areListenersDetected);
         assertFalse(config.areLocksDetected);
+        assertFalse(config.isAbortOnlyDetected);
         assertEquals(1, config.minimalLength);
     }
 
@@ -73,6 +91,7 @@ public class SpeculativeGammaConfigurationTest {
         assertFalse(config.isOrelseDetected);
         assertTrue(config.areListenersDetected);
         assertFalse(config.areLocksDetected);
+        assertFalse(config.isAbortOnlyDetected);
         assertEquals(1, config.minimalLength);
     }
 
@@ -87,6 +106,7 @@ public class SpeculativeGammaConfigurationTest {
         assertTrue(config.isOrelseDetected);
         assertFalse(config.areListenersDetected);
         assertFalse(config.areLocksDetected);
+        assertFalse(config.isAbortOnlyDetected);
         assertEquals(1, config.minimalLength);
     }
 
@@ -101,6 +121,7 @@ public class SpeculativeGammaConfigurationTest {
         assertFalse(config.isOrelseDetected);
         assertFalse(config.areListenersDetected);
         assertFalse(config.areLocksDetected);
+        assertFalse(config.isAbortOnlyDetected);
         assertEquals(10, config.minimalLength);
     }
 
@@ -115,6 +136,7 @@ public class SpeculativeGammaConfigurationTest {
         assertFalse(config.isOrelseDetected);
         assertFalse(config.areListenersDetected);
         assertTrue(config.areLocksDetected);
+        assertFalse(config.isAbortOnlyDetected);
         assertEquals(1, config.minimalLength);
     }
 }
