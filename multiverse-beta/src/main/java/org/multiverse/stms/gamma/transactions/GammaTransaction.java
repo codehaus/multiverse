@@ -503,7 +503,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                         config.familyName));
     }
 
-    public final SpeculativeConfigurationError abortOnTransactionTooLargeForPoorMansConflictScan() {
+    public final SpeculativeConfigurationError abortOnTransactionTooBigForPoorMansConflictScan() {
         config.updateSpeculativeConfigurationToUseRichMansConflictScan();
         abortIfAlive();
         if (config.controlFlowErrorsReused) {

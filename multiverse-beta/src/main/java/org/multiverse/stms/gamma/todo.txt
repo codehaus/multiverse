@@ -16,15 +16,15 @@
 
 - look at the unlock after a write.
 
-- downsizing of the map transaction on hard reset.
-
-- selecting the right map transaction size based on previous executions.
-
 - commute and locking
 
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- downsizing of the map transaction on hard reset.
+
+- selecting the right map transaction size based on previous executions.
 
 - set abortonly needs to be speculative, so not available on the lean transactions.
 

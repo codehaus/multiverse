@@ -15,6 +15,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
     public GammaRefTranlocal head;
     public int size = 0;
     public boolean hasReads = false;
+    public long lastConflictCount;
     public final Listeners[] listenersArray;
 
     public FatFixedLengthGammaTransaction(final GammaStm stm) {
@@ -314,14 +315,24 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
             return true;
         }
 
-        //if(config.isolationLevel)
-
         if (poorMansConflictScan) {
             if (size > config.maximumPoorMansConflictScanLength) {
-                throw abortOnTransactionTooLargeForPoorMansConflictScan();
+                throw abortOnTransactionTooBigForPoorMansConflictScan();
             }
+
+            //we are going to fall through to do a full conflict scan
+        } else{
+            final long currentConflictCount = config.globalConflictCounter.count();
+
+            if(lastConflictCount == currentConflictCount){
+                return true;
+            }
+
+            lastConflictCount = currentConflictCount;
+            //we are going to fall through to do a full conflict scan
         }
 
+        //doing a full conflict scan
         GammaRefTranlocal node = head;
         while (node != null) {
             //if we are at the end, we are done.

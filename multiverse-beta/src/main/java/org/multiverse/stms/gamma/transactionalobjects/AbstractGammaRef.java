@@ -663,6 +663,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 throw tx.abortOnReadWriteConflict(this);
             }
         } else {
+            tx.lastConflictCount = tx.config.globalConflictCounter.count();
             tx.hasReads = true;
         }
 
@@ -725,6 +726,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 throw tx.abortOnReadWriteConflict(this);
             }
         } else {
+            tx.lastConflictCount = tx.config.globalConflictCounter.count();
             tx.hasReads = true;
         }
 
@@ -786,7 +788,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         int size = tx.size;
         if (size > config.maximumPoorMansConflictScanLength) {
-            throw tx.abortOnTransactionTooLargeForPoorMansConflictScan();
+            throw tx.abortOnTransactionTooBigForPoorMansConflictScan();
         }
 
         //load it
@@ -1045,6 +1047,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             }
         } else {
             tx.hasReads = true;
+            tx.lastConflictCount = tx.config.globalConflictCounter.count();
         }
 
         return tranlocal;
@@ -1188,6 +1191,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             }
         } else {
             tx.hasReads = true;
+            tx.lastConflictCount = tx.config.globalConflictCounter.count();
         }
 
         tx.hasReads = true;

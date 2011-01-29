@@ -1,8 +1,8 @@
 package org.multiverse.stms.gamma;
 
 import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
-
-import java.util.concurrent.atomic.AtomicLong;
+import org.multiverse.utils.ToolUnsafe;
+import sun.misc.Unsafe;
 
 /**
  * The GlobalConflictCounter is used as a mechanism for guaranteeing read consistency. Depending on the configuration of the
@@ -20,14 +20,28 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public final class GlobalConflictCounter {
 
-    private final AtomicLong counter = new AtomicLong(0);
+    protected static final Unsafe unsafe = ToolUnsafe.getUnsafe();
+
+    private final static long counterOffset;
+
+    static {
+           try {
+               counterOffset = unsafe.objectFieldOffset(
+                       GlobalConflictCounter.class.getDeclaredField("counter"));
+           } catch (Exception ex) {
+               throw new Error(ex);
+           }
+       }
+
+
+    private volatile long counter = 0;
 
     public void signalConflict(GammaObject object) {
-        long count = counter.get();
-        counter.compareAndSet(count, count + 1);
+        final long oldCount = counter;
+        unsafe.compareAndSwapLong(this, counterOffset, oldCount, oldCount + 1);
     }
 
     public long count() {
-        return counter.get();
+        return counter;
     }
 }

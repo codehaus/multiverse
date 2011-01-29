@@ -11,11 +11,13 @@ import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 import org.multiverse.stms.gamma.transactions.SpeculativeGammaConfiguration;
 
+@SuppressWarnings({"OverlyComplexClass"})
 public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
     public GammaRefTranlocal[] array;
     public int size = 0;
     public boolean hasReads = false;
+    public long lastConflictCount;
 
     public FatVariableLengthGammaTransaction(GammaStm stm) {
         this(new GammaTransactionConfiguration(stm));
@@ -375,8 +377,19 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
         if (poorMansConflictScan) {
             if (size > config.maximumPoorMansConflictScanLength) {
-                throw abortOnTransactionTooLargeForPoorMansConflictScan();
+                throw abortOnTransactionTooBigForPoorMansConflictScan();
             }
+
+            //we are going to fall through to do a full conflict scan
+        } else {
+            final long currentConflictCount = config.globalConflictCounter.count();
+
+            if (lastConflictCount == currentConflictCount) {
+                return true;
+            }
+
+            lastConflictCount = currentConflictCount;
+            //we are going to fall through to do a full conflict scan
         }
 
         //doing a full conflict scan
