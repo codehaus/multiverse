@@ -325,7 +325,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
             final long currentConflictCount = config.globalConflictCounter.count();
 
             if(lastConflictCount == currentConflictCount){
-                return true;
+            //    return true;
             }
 
             lastConflictCount = currentConflictCount;

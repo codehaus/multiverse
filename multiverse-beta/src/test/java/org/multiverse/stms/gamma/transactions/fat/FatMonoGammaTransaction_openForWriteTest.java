@@ -1,7 +1,16 @@
 package org.multiverse.stms.gamma.transactions.fat;
 
+import org.junit.Test;
+import org.multiverse.api.exceptions.ReadWriteConflict;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
+
+import static org.junit.Assert.*;
+import static org.multiverse.TestUtils.assertIsAborted;
+import static org.multiverse.TestUtils.assertIsActive;
+import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class FatMonoGammaTransaction_openForWriteTest extends FatGammaTransaction_openForWriteTest {
 
@@ -18,4 +27,6 @@ public class FatMonoGammaTransaction_openForWriteTest extends FatGammaTransactio
     protected int getMaxCapacity() {
         return 1;
     }
+
+
 }

@@ -651,6 +651,11 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         initTranlocalForRead(config, newNode);
+        final boolean hasReads = tx.hasReads;
+        if (!hasReads) {
+            tx.lastConflictCount = config.globalConflictCounter.count();
+        }
+
         if (!load(newNode, desiredLockMode, config.spinCount, !tx.poorMansConflictScan)) {
             throw tx.abortOnReadWriteConflict(this);
         }
@@ -658,13 +663,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tx.size++;
         tx.shiftInFront(newNode);
 
-        if (tx.hasReads) {
-            if (!tx.isReadConsistent(newNode)) {
-                throw tx.abortOnReadWriteConflict(this);
-            }
-        } else {
-            tx.lastConflictCount = tx.config.globalConflictCounter.count();
+        if (!hasReads) {
             tx.hasReads = true;
+        } else if (!tx.isReadConsistent(newNode)) {
+            throw tx.abortOnReadWriteConflict(this);
         }
 
         return newNode;
@@ -717,17 +719,19 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tx.attach(tranlocal, identityHash);
         tx.size++;
 
+        final boolean hasReads = tx.hasReads;
+        if (!hasReads) {
+            tx.lastConflictCount = config.globalConflictCounter.count();
+        }
+
         if (!load(tranlocal, desiredLockMode, config.spinCount, !tx.poorMansConflictScan)) {
             throw tx.abortOnReadWriteConflict(this);
         }
 
-        if (tx.hasReads) {
-            if (!tx.isReadConsistent(tranlocal)) {
-                throw tx.abortOnReadWriteConflict(this);
-            }
-        } else {
-            tx.lastConflictCount = tx.config.globalConflictCounter.count();
+        if (!hasReads) {
             tx.hasReads = true;
+        } else if (!tx.isReadConsistent(tranlocal)) {
+            throw tx.abortOnReadWriteConflict(this);
         }
 
         return tranlocal;
@@ -1036,18 +1040,20 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tx.size++;
         tx.hasWrites = true;
 
+        final boolean hasReads = tx.hasReads;
+        if (!hasReads) {
+            tx.lastConflictCount = config.globalConflictCounter.count();
+        }
+
         initTranlocalForWrite(config, tranlocal);
         if (!load(tranlocal, desiredLockMode, config.spinCount, !tx.poorMansConflictScan)) {
             throw tx.abortOnReadWriteConflict(this);
         }
 
-        if (tx.hasReads) {
-            if (!tx.isReadConsistent(tranlocal)) {
-                throw tx.abortOnReadWriteConflict(this);
-            }
-        } else {
+        if (!hasReads) {
             tx.hasReads = true;
-            tx.lastConflictCount = tx.config.globalConflictCounter.count();
+        } else if (!tx.isReadConsistent(tranlocal)) {
+            throw tx.abortOnReadWriteConflict(this);
         }
 
         return tranlocal;
@@ -1181,20 +1187,22 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         initTranlocalForWrite(config, newNode);
+
+        final boolean hasReads = tx.hasReads;
+        if (!hasReads) {
+            tx.lastConflictCount = config.globalConflictCounter.count();
+        }
+
         if (!load(newNode, lockMode, config.spinCount, !tx.poorMansConflictScan)) {
             throw tx.abortOnReadWriteConflict(this);
         }
 
-        if (tx.hasReads) {
-            if (!tx.isReadConsistent(newNode)) {
-                throw tx.abortOnReadWriteConflict(this);
-            }
-        } else {
+        if (!hasReads) {
             tx.hasReads = true;
-            tx.lastConflictCount = tx.config.globalConflictCounter.count();
+        } else if (!tx.isReadConsistent(newNode)) {
+            throw tx.abortOnReadWriteConflict(this);
         }
 
-        tx.hasReads = true;
         tx.hasWrites = true;
         tx.size++;
         tx.shiftInFront(newNode);
@@ -1219,7 +1227,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         } else if (type == TRANSACTIONTYPE_FAT_VARIABLE_LENGTH) {
             openForCommute((FatVariableLengthGammaTransaction) tx, function);
         } else {
-            throw tx.abortCommuteOnCommuteRequired(this);
+            throw tx.abortCommuteOnCommuteDetected(this);
         }
     }
 

@@ -341,9 +341,9 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         }
 
         status = TX_ACTIVE;
+        hasReads = false;
         hasWrites = false;
         size = 0;
-        hasReads = false;
         abortOnly = false;
         attempt++;
         return true;
@@ -352,12 +352,14 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
     @Override
     public final void hardReset() {
         status = TX_ACTIVE;
-        hasWrites = false;
-        remainingTimeoutNs = config.timeoutNs;
-        attempt = 1;
-        size = 0;
         hasReads = false;
+        hasWrites = false;
+        size = 0;
         abortOnly = false;
+
+        attempt = 1;
+        remainingTimeoutNs = config.timeoutNs;
+        //todo: only change when the array size is different.
         if (array != null) {
             pool.putTranlocalArray(array);
         }
@@ -374,6 +376,8 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         if (config.readLockModeAsInt > LOCKMODE_NONE) {
             return true;
         }
+
+        //todo: isolation level check.
 
         if (poorMansConflictScan) {
             if (size > config.maximumPoorMansConflictScanLength) {

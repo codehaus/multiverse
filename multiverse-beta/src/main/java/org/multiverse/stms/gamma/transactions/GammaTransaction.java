@@ -302,7 +302,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     // ============================== open for commute ======================
 
-    public SpeculativeConfigurationError abortCommuteOnCommuteRequired(AbstractGammaRef ref) {
+    public SpeculativeConfigurationError abortCommuteOnCommuteDetected(AbstractGammaRef ref) {
         config.updateSpeculativeConfigurationToUseCommute();
         abortIfAlive();
         if (config.controlFlowErrorsReused) {

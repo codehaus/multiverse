@@ -20,19 +20,17 @@ import sun.misc.Unsafe;
  */
 public final class GlobalConflictCounter {
 
-    protected static final Unsafe unsafe = ToolUnsafe.getUnsafe();
-
-    private final static long counterOffset;
+    private static final Unsafe unsafe = ToolUnsafe.getUnsafe();
+    private static final long counterOffset;
 
     static {
-           try {
-               counterOffset = unsafe.objectFieldOffset(
-                       GlobalConflictCounter.class.getDeclaredField("counter"));
-           } catch (Exception ex) {
-               throw new Error(ex);
-           }
-       }
-
+        try {
+            counterOffset = unsafe.objectFieldOffset(
+                    GlobalConflictCounter.class.getDeclaredField("counter"));
+        } catch (Exception ex) {
+            throw new Error("Failed to initialize the GlobalConflictCounter",ex);
+        }
+    }
 
     private volatile long counter = 0;
 
