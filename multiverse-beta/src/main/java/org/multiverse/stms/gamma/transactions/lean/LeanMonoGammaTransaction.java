@@ -8,6 +8,10 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
+/**
+ * A Lean GammaTransaction implementation that is optimized for dealing with only a single
+ * transactional reference.
+ */
 public final class LeanMonoGammaTransaction extends GammaTransaction {
 
     public final GammaRefTranlocal tranlocal = new GammaRefTranlocal();
@@ -208,7 +212,6 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
         status = TX_ACTIVE;
         hasWrites = false;
         attempt++;
-        abortOnly = false;
         return true;
     }
 
@@ -217,7 +220,6 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
         hasWrites = false;
         remainingTimeoutNs = config.timeoutNs;
         attempt = 1;
-        abortOnly = false;
     }
 
     public final boolean isReadConsistent(GammaRefTranlocal justAdded) {

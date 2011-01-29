@@ -21,6 +21,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         this(new GammaTransactionConfiguration(stm));
     }
 
+    @SuppressWarnings({"ObjectAllocationInLoop"})
     public FatFixedLengthGammaTransaction(final GammaTransactionConfiguration config) {
         super(config, TRANSACTIONTYPE_FAT_FIXED_LENGTH);
 
@@ -342,5 +343,4 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
 
         return true;
     }
-
 }

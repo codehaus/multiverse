@@ -9,6 +9,7 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
+import org.multiverse.stms.gamma.transactions.SpeculativeGammaConfiguration;
 
 public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
@@ -119,7 +120,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
             if (hasWrites) {
                 if (status == TX_ACTIVE) {
                     GammaObject conflictingObject = doPrepare();
-                    if (conflictingObject!=null) {
+                    if (conflictingObject != null) {
                         throw abortOnReadWriteConflict(conflictingObject);
                     }
                 }
@@ -198,12 +199,12 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         }
 
         if (abortOnly) {
-           throw abortPrepareOnAbortOnly();
+            throw abortPrepareOnAbortOnly();
         }
 
         if (hasWrites) {
-            GammaObject conflictingObject = doPrepare();
-            if (conflictingObject!=null) {
+            final GammaObject conflictingObject = doPrepare();
+            if (conflictingObject != null) {
                 throw abortOnReadWriteConflict(conflictingObject);
             }
         }
@@ -331,7 +332,6 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         }
     }
 
-
     @Override
     public final boolean softReset() {
         if (attempt >= config.getMaxRetries()) {
@@ -352,11 +352,14 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         status = TX_ACTIVE;
         hasWrites = false;
         remainingTimeoutNs = config.timeoutNs;
-        poorMansConflictScan = !config.speculativeConfiguration.get().isRichMansConflictScanRequired;
         attempt = 1;
         size = 0;
         hasReads = false;
         abortOnly = false;
+        pool.putTranlocalArray(array);
+        array = pool.takeTranlocalArray(config.minimalArrayTreeSize);
+        final SpeculativeGammaConfiguration speculativeConfig = config.speculativeConfiguration.get();
+        poorMansConflictScan = !speculativeConfig.isRichMansConflictScanRequired;
     }
 
     public final boolean isReadConsistent(GammaRefTranlocal justAdded) {

@@ -2,7 +2,7 @@
                         to do
 --------------------------------------------------------------------
 
-- active logging on block?
+- conflict detection & fast conflict detection beginning if the richmans conflict scan is used.
 
 - commute: while commuting, no transaction accessed allowed.
 
@@ -12,6 +12,8 @@
 
 - permanent listeners
 
+- pre/post start listeners and fat gamma block
+
 - look at the unlock after a write.
 
 - downsizing of the map transaction on hard reset.
@@ -20,11 +22,11 @@
 
 - commute and locking
 
-- set abortonly needs to be speculative, so not available on the lean transactions.
-
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- set abortonly needs to be speculative, so not available on the lean transactions.
 
 - last readwrite conflict should show which transactional object caused it.
 

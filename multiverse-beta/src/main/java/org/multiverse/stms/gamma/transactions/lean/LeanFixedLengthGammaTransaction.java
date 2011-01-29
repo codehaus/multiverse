@@ -9,6 +9,9 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
+/**
+ * A Lean GammaTransaction that is optimized for a fixed number of GammaRefs.
+ */
 public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
 
     public GammaRefTranlocal head;
@@ -301,7 +304,6 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
         remainingTimeoutNs = config.timeoutNs;
         attempt = 1;
         hasReads = false;
-        abortOnly = false;
     }
 
     @Override
@@ -314,7 +316,6 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
         hasWrites = false;
         size = 0;
         hasReads = false;
-        abortOnly = false;
         attempt++;
         return true;
     }
