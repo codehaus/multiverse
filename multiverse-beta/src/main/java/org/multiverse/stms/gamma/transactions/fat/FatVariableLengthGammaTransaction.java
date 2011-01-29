@@ -356,7 +356,9 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         size = 0;
         hasReads = false;
         abortOnly = false;
-        pool.putTranlocalArray(array);
+        if (array != null) {
+            pool.putTranlocalArray(array);
+        }
         array = pool.takeTranlocalArray(config.minimalArrayTreeSize);
         final SpeculativeGammaConfiguration speculativeConfig = config.speculativeConfiguration.get();
         poorMansConflictScan = !speculativeConfig.isRichMansConflictScanRequired;
