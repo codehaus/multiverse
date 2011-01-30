@@ -88,7 +88,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
                 return listenersArray;
             }
 
-            final Listeners listeners = owner.safe(node, pool);
+            final Listeners listeners = owner.commit(node, pool);
             if (listeners != null) {
                 listenersArray[listenersIndex] = listeners;
                 listenersIndex++;

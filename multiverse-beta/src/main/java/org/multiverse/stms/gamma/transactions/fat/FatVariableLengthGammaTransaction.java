@@ -158,7 +158,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
             array[k] = null;
 
             final AbstractGammaRef owner = tranlocal.owner;
-            final Listeners listeners = owner.safe(tranlocal, pool);
+            final Listeners listeners = owner.commit(tranlocal, pool);
             if (listeners != null) {
                 if (listenersArray == null) {
                     listenersArray = pool.takeListenersArray(size - itemCount);

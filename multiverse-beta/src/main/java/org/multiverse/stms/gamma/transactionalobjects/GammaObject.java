@@ -11,7 +11,7 @@ public interface GammaObject extends GammaConstants {
 
     int VERSION_UNCOMMITTED = 0;
 
-    Listeners safe(GammaRefTranlocal tranlocal, GammaObjectPool pool);
+    Listeners commit(GammaRefTranlocal tranlocal, GammaObjectPool pool);
 
     /**
      * Tries to acquire a lock on a previous read/written tranlocal and checks for conflict.

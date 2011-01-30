@@ -30,6 +30,24 @@ public class FatFixedLengthGammaTransaction_openForWriteTest extends FatGammaTra
     }
 
     @Test
+       public void richmansConflict_multipleReadsOnSameRef() {
+           GammaLongRef ref = new GammaLongRef(stm);
+
+           GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                   .setMaximumPoorMansConflictScanLength(0);
+
+           FatFixedLengthGammaTransaction tx1 = new FatFixedLengthGammaTransaction(config);
+           FatFixedLengthGammaTransaction tx2 = new FatFixedLengthGammaTransaction(config);
+           FatFixedLengthGammaTransaction tx3 = new FatFixedLengthGammaTransaction(config);
+
+           ref.openForWrite(tx1, LOCKMODE_NONE);
+           ref.openForWrite(tx2, LOCKMODE_NONE);
+           ref.openForWrite(tx3, LOCKMODE_NONE);
+
+           assertSurplus(ref, 3);
+       }
+
+    @Test
     public void richmansConflictScan_whenFirstRead() {
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
                 .setMaximumPoorMansConflictScanLength(0);

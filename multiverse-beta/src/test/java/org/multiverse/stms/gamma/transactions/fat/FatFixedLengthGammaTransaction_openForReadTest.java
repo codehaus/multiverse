@@ -10,8 +10,6 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
-import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasNoLocks;
-import static org.multiverse.stms.gamma.GammaTestUtils.assertVersionAndValue;
 
 public class FatFixedLengthGammaTransaction_openForReadTest extends FatGammaTransaction_openForReadTest<FatFixedLengthGammaTransaction> {
 
@@ -31,15 +29,33 @@ public class FatFixedLengthGammaTransaction_openForReadTest extends FatGammaTran
     }
 
     @Test
-    public void richmansConflictScan_whenFirstRead() {
+    public void richmansConflict_multipleReadsOnSameRef() {
+        GammaLongRef ref = new GammaLongRef(stm);
+
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
                 .setMaximumPoorMansConflictScanLength(0);
 
+        FatFixedLengthGammaTransaction tx1 = new FatFixedLengthGammaTransaction(config);
+        FatFixedLengthGammaTransaction tx2 = new FatFixedLengthGammaTransaction(config);
+        FatFixedLengthGammaTransaction tx3 = new FatFixedLengthGammaTransaction(config);
+
+        ref.openForRead(tx1, LOCKMODE_NONE);
+        ref.openForRead(tx2, LOCKMODE_NONE);
+        ref.openForRead(tx3, LOCKMODE_NONE);
+
+        assertSurplus(ref, 3);
+    }
+
+    @Test
+    public void richmansConflictScan_whenFirstRead() {
         causeLotsOfConflicts(stm);
 
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
+
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .setMaximumPoorMansConflictScanLength(0);
 
         FatFixedLengthGammaTransaction tx = new FatFixedLengthGammaTransaction(config);
         GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
@@ -99,7 +115,7 @@ public class FatFixedLengthGammaTransaction_openForReadTest extends FatGammaTran
         assertRefHasNoLocks(ref2);
     }
 
-     @Test
+    @Test
     public void richmansConflictScan_whenConflict() {
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
                 .setMaximumPoorMansConflictScanLength(0);
@@ -117,10 +133,10 @@ public class FatFixedLengthGammaTransaction_openForReadTest extends FatGammaTran
 
         ref1.atomicIncrementAndGet(1);
 
-        try{
+        try {
             ref2.openForRead(tx, LOCKMODE_NONE);
             fail();
-        }catch(ReadWriteConflict expected){
+        } catch (ReadWriteConflict expected) {
 
         }
 

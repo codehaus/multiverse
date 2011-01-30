@@ -108,7 +108,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     }
 
     @Override
-    public final Listeners safe(final GammaRefTranlocal tranlocal, final GammaObjectPool pool) {
+    public final Listeners commit(final GammaRefTranlocal tranlocal, final GammaObjectPool pool) {
         if (!tranlocal.isDirty) {
             releaseAfterReading(tranlocal, pool);
             return null;

@@ -58,7 +58,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
                         throw abortOnReadWriteConflict(owner);
                     }
                 }
-                Listeners listeners = owner.safe(tranlocal, pool);
+                Listeners listeners = owner.commit(tranlocal, pool);
                 if (listeners != null) {
                     listeners.openAll(pool);
                 }

@@ -29,6 +29,24 @@ public class FatVariableLengthGammaTransaction_openForReadTest extends FatGammaT
     }
 
     @Test
+    public void richmansConflict_multipleReadsOnSameRef() {
+        GammaLongRef ref = new GammaLongRef(stm);
+
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .setMaximumPoorMansConflictScanLength(0);
+
+        FatFixedLengthGammaTransaction tx1 = new FatFixedLengthGammaTransaction(config);
+        FatVariableLengthGammaTransaction tx2 = new FatVariableLengthGammaTransaction(config);
+        FatVariableLengthGammaTransaction tx3 = new FatVariableLengthGammaTransaction(config);
+
+        ref.openForRead(tx1, LOCKMODE_NONE);
+        ref.openForRead(tx2, LOCKMODE_NONE);
+        ref.openForRead(tx3, LOCKMODE_NONE);
+
+        assertSurplus(ref, 3);
+    }
+
+    @Test
     public void richmansConflictScan_whenFirstRead() {
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
                 .setMaximumPoorMansConflictScanLength(0);
@@ -97,7 +115,7 @@ public class FatVariableLengthGammaTransaction_openForReadTest extends FatGammaT
         assertRefHasNoLocks(ref2);
     }
 
-     @Test
+    @Test
     public void richmansConflictScan_whenConflict() {
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
                 .setMaximumPoorMansConflictScanLength(0);
@@ -115,10 +133,10 @@ public class FatVariableLengthGammaTransaction_openForReadTest extends FatGammaT
 
         ref1.atomicIncrementAndGet(1);
 
-        try{
+        try {
             ref2.openForRead(tx, LOCKMODE_NONE);
             fail();
-        }catch(ReadWriteConflict expected){
+        } catch (ReadWriteConflict expected) {
 
         }
 

@@ -20,7 +20,7 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
 public abstract class AbstractGammaObject implements GammaObject, Lock {
 
     //it is important that the maximum threshold is not larger than 1023 (there are 10 bits for the readonly count)
-    private static final int READBIASED_THRESHOLD = 16;
+    private static final int READBIASED_THRESHOLD = 128;
 
     public static final long MASK_EXCLUSIVELOCK = 0x8000000000000000L;
     public static final long MASK_UPDATELOCK = 0x4000000000000000L;
