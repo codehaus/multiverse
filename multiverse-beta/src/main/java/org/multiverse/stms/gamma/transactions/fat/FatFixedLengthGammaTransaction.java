@@ -319,13 +319,12 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
             if (size > config.maximumPoorMansConflictScanLength) {
                 throw abortOnTransactionTooBigForPoorMansConflictScan();
             }
-
             //we are going to fall through to do a full conflict scan
         } else{
             final long currentConflictCount = config.globalConflictCounter.count();
 
             if(lastConflictCount == currentConflictCount){
-            //    return true;
+                return true;
             }
 
             lastConflictCount = currentConflictCount;

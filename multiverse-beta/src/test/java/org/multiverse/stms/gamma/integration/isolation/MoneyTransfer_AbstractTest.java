@@ -1,5 +1,6 @@
 package org.multiverse.stms.gamma.integration.isolation;
 
+import org.junit.After;
 import org.junit.Before;
 import org.multiverse.TestThread;
 import org.multiverse.api.AtomicBlock;
@@ -31,6 +32,14 @@ public abstract class MoneyTransfer_AbstractTest {
         stm = (GammaStm) getGlobalStmInstance();
     }
 
+    @After
+    public void tearDown() {
+        System.out.println("Stm.GlobalConflictCount: " + stm.getGlobalConflictCounter().count());
+        for (GammaLongRef ref : accounts) {
+            System.out.println(ref.toDebugString());
+        }
+    }
+
     protected abstract AtomicBlock newAtomicBlock();
 
     public void run(int accountCount, int threadCount) {
@@ -54,6 +63,7 @@ public abstract class MoneyTransfer_AbstractTest {
         joinAll(threads);
 
         assertEquals(initialAmount, getTotal());
+
     }
 
     private long getTotal() {

@@ -121,7 +121,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                         config.familyName, toDebugString(ref)));
     }
 
-    public SpeculativeConfigurationError abortOpenForReadOrWriteOnNonRefType(AbstractGammaRef ref) {
+    public SpeculativeConfigurationError abortOpenForReadOnNonRefTypeDetected(AbstractGammaRef ref) {
         config.updateSpeculativeConfigurationToUseNonRefType();
         abortIfAlive();
 

@@ -126,6 +126,7 @@ public class ReadConsistency_FatVariableLengthGammaTransaction_StressTest extend
     @Override
     protected AtomicBlock createReadBlock() {
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .setMaxRetries(10000)
                 .setMaximumPoorMansConflictScanLength(poorMansReadConsistency ? Integer.MAX_VALUE : 0);
         return new LeanGammaAtomicBlock(new FatVariableLengthGammaTransactionFactory(config));
     }
@@ -133,6 +134,7 @@ public class ReadConsistency_FatVariableLengthGammaTransaction_StressTest extend
     @Override
     protected AtomicBlock createWriteBlock() {
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .setMaxRetries(10000)
                 .setMaximumPoorMansConflictScanLength(poorMansReadConsistency ? Integer.MAX_VALUE : 0);
         return new LeanGammaAtomicBlock(new FatVariableLengthGammaTransactionFactory(config));
     }

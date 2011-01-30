@@ -659,20 +659,20 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             long surplus = getSurplus(current);
             if (surplus == 0) {
                 throw new PanicError(
-                        "Can't ___departAfterReadingAndUnlock if there is no surplus: " + toOrecString(current));
+                        "Can't departAfterReadingAndUnlock if there is no surplus: " + toOrecString(current));
             }
 
             int readLockCount = getReadLockCount(current);
 
             if (readLockCount == 0 && !hasWriteOrExclusiveLock(current)) {
                 throw new PanicError(
-                        "Can't ___departAfterReadingAndUnlock if the lock is not acquired " + toOrecString(current));
+                        "Can't departAfterReadingAndUnlock if the lock is not acquired " + toOrecString(current));
             }
 
             boolean isReadBiased = isReadBiased(current);
             if (isReadBiased) {
                 throw new PanicError(
-                        "Can't ___departAfterReadingAndUnlock when readbiased orec " + toOrecString(current));
+                        "Can't departAfterReadingAndUnlock when readbiased orec " + toOrecString(current));
             }
 
             int readonlyCount = getReadonlyCount(current);
@@ -712,14 +712,14 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
             if (!hasExclusiveLock(current)) {
                 throw new PanicError(
-                        "Can't ___departAfterUpdateAndUnlock is the commit lock is not acquired " + toOrecString(current));
+                        "Can't departAfterUpdateAndUnlock is the commit lock is not acquired " + toOrecString(current));
             }
 
             long surplus = getSurplus(current);
 
             if (surplus == 0) {
                 throw new PanicError(
-                        "Can't ___departAfterUpdateAndUnlock is there is no surplus " + toOrecString(current));
+                        "Can't departAfterUpdateAndUnlock is there is no surplus " + toOrecString(current));
             }
 
             boolean conflict;
