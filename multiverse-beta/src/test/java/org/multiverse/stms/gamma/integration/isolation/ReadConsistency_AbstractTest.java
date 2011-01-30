@@ -106,7 +106,6 @@ public abstract class ReadConsistency_AbstractTest {
         }
     }
 
-
     public class ReadThread extends TestThread {
 
         public ReadThread(int id) {

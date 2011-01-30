@@ -27,8 +27,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
     public LeanFixedLengthGammaTransaction(final GammaTransactionConfiguration config) {
         super(config, TRANSACTIONTYPE_LEAN_FIXED_LENGTH);
 
-        poorMansConflictScan = true;
-        listenersArray = new Listeners[config.maxFixedLengthTransactionSize];
+       listenersArray = new Listeners[config.maxFixedLengthTransactionSize];
 
         GammaRefTranlocal h = null;
         for (int k = 0; k < config.maxFixedLengthTransactionSize; k++) {

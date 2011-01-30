@@ -165,7 +165,7 @@ public abstract class Isolation_AbstractTest implements GammaConstants {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
-                    btx.poorMansConflictScan = true;
+                    btx.richmansMansConflictScan = false;
                     ref.openForWrite(btx, LOCKMODE_NONE).long_value++;
                 }
             };

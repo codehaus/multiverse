@@ -28,13 +28,13 @@ public class ReadBiasedWithPeriodicUpdateTest implements GammaConstants {
 
         for (int l = 0; l < 100; l++) {
             GammaTransaction tx = new FatMonoGammaTransaction(stm);
-            tx.poorMansConflictScan = false;
+            tx.richmansMansConflictScan = true;
             ref.openForWrite(tx, LOCKMODE_NONE).long_value++;
             tx.commit();
 
             for (int k = 0; k < 1000; k++) {
                 GammaTransaction readonlyTx = new FatMonoGammaTransaction(stm);
-                readonlyTx.poorMansConflictScan = false;
+                readonlyTx.richmansMansConflictScan = true;
                 ref.openForRead(readonlyTx, LOCKMODE_NONE);
                 readonlyTx.commit();
             }

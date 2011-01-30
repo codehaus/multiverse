@@ -365,7 +365,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         }
         array = pool.takeTranlocalArray(config.minimalArrayTreeSize);
         final SpeculativeGammaConfiguration speculativeConfig = config.speculativeConfiguration.get();
-        poorMansConflictScan = !speculativeConfig.isRichMansConflictScanRequired;
+        richmansMansConflictScan = speculativeConfig.isRichMansConflictScanRequired;
     }
 
     public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
@@ -379,13 +379,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
         //todo: isolation level check.
 
-        if (poorMansConflictScan) {
-            if (size > config.maximumPoorMansConflictScanLength) {
-                throw abortOnTransactionTooBigForPoorMansConflictScan();
-            }
-
-            //we are going to fall through to do a full conflict scan
-        } else {
+        if (richmansMansConflictScan) {
             final long currentConflictCount = config.globalConflictCounter.count();
 
             if (lastConflictCount == currentConflictCount) {
@@ -394,6 +388,9 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
             lastConflictCount = currentConflictCount;
             //we are going to fall through to do a full conflict scan
+
+        } else if (size > config.maximumPoorMansConflictScanLength) {
+            throw abortOnTransactionTooBigForPoorMansConflictScan();
         }
 
         //doing a full conflict scan

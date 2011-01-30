@@ -28,7 +28,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public long remainingTimeoutNs;
     public boolean hasWrites;
     public final int transactionType;
-    public boolean poorMansConflictScan;
+    public boolean richmansMansConflictScan;
 
     public boolean abortOnly = false;
     public final RetryLatch retryListener = new DefaultRetryLatch();

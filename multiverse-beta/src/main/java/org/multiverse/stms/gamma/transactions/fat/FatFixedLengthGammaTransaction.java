@@ -60,7 +60,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
             if (hasWrites) {
                 if (status == TX_ACTIVE) {
                     GammaObject o = prepareChainForCommit();
-                    if (o!=null) {
+                    if (o != null) {
                         throw abortOnReadWriteConflict(o);
                     }
                 }
@@ -244,7 +244,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         }
 
         GammaObject o = prepareChainForCommit();
-        if (o!=null) {
+        if (o != null) {
             throw abortOnReadWriteConflict(o);
         }
 
@@ -269,7 +269,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         hasWrites = false;
         size = 0;
         remainingTimeoutNs = config.timeoutNs;
-        poorMansConflictScan = !config.speculativeConfiguration.get().isRichMansConflictScanRequired;
+        richmansMansConflictScan = config.speculativeConfiguration.get().isRichMansConflictScanRequired;
         attempt = 1;
         hasReads = false;
         abortOnly = false;
@@ -315,20 +315,17 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
             return true;
         }
 
-        if (poorMansConflictScan) {
-            if (size > config.maximumPoorMansConflictScanLength) {
-                throw abortOnTransactionTooBigForPoorMansConflictScan();
-            }
-            //we are going to fall through to do a full conflict scan
-        } else{
+        if (richmansMansConflictScan) {
             final long currentConflictCount = config.globalConflictCounter.count();
 
-            if(lastConflictCount == currentConflictCount){
+            if (lastConflictCount == currentConflictCount) {
                 return true;
             }
 
             lastConflictCount = currentConflictCount;
             //we are going to fall through to do a full conflict scan
+        } else if (size > config.maximumPoorMansConflictScanLength) {
+            throw abortOnTransactionTooBigForPoorMansConflictScan();
         }
 
         //doing a full conflict scan
