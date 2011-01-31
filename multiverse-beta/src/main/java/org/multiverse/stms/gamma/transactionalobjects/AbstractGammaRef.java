@@ -295,8 +295,9 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                     return false;
                 }
 
+                //todo: the hasExclusiveLock has been added to figure out the race problem with read consistency.
                 //noinspection ObjectEquality
-                if (readVersion == version) {
+                if (readVersion == version && !hasExclusiveLock()) {
                     tranlocal.owner = this;
                     tranlocal.version = readVersion;
                     tranlocal.setLockMode(LOCKMODE_NONE);
@@ -309,6 +310,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                         tranlocal.long_value = readLong;
                         tranlocal.long_oldValue = readLong;
                     }
+
 
                     return true;
                 }
@@ -528,6 +530,197 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
     }
 
+    public final GammaRefTranlocal openForRead(final LeanMonoGammaTransaction tx, int lockMode) {
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortOpenForReadOnBadStatus(this);
+        }
+
+        if (lockMode != LOCKMODE_NONE) {
+            throw tx.abortOpenForReadOrWriteOnExplicitLocking(this);
+        }
+
+        final GammaRefTranlocal tranlocal = tx.tranlocal;
+
+        //noinspection ObjectEquality
+        if (tranlocal.owner == this) {
+            return tranlocal;
+        }
+
+        if (tranlocal.owner != null) {
+            throw tx.abortOnTransactionTooSmall(2);
+        }
+
+        final GammaTransactionConfiguration config = tx.config;
+
+        if (config.stm != stm) {
+            throw tx.abortOpenForReadOnBadStm(this);
+        }
+
+        if (type != TYPE_REF) {
+            throw tx.abortOpenForReadOnNonRefTypeDetected(this);
+        }
+
+        tranlocal.mode = TRANLOCAL_READ;
+        tranlocal.owner = this;
+        for (; ;) {
+            //do the read of the version and ref. It needs to be repeated to make sure that the version we read, belongs to the
+            //value.
+            Object readRef;
+            long readVersion;
+            do {
+                readRef = ref_value;
+                readVersion = version;
+            } while (readRef != ref_value);
+
+            //wait for the exclusive lock to come available.
+            int spinCount = 64;
+            for (; ;) {
+                if (!hasExclusiveLock()) {
+                    break;
+                }
+                spinCount--;
+                if (spinCount < 0) {
+                    throw tx.abortOnReadWriteConflict(this);
+                }
+            }
+
+            //check if the version is still the same, if it is not, we have read illegal memory,
+            //In that case we are going to try again.
+            if (readVersion == version) {
+                //at this point we are sure that the read was unlocked.
+                tranlocal.version = readVersion;
+                tranlocal.ref_value = readRef;
+                break;
+            }
+        }
+
+        return tranlocal;
+    }
+
+    public final GammaRefTranlocal openForRead(final LeanFixedLengthGammaTransaction tx, int lockMode) {
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortOpenForReadOnBadStatus(this);
+        }
+
+        if (lockMode != LOCKMODE_NONE) {
+            throw tx.abortOpenForReadOrWriteOnExplicitLocking(this);
+        }
+
+        if (tx.head.owner == this) {
+            return tx.head;
+        }
+
+        //look inside the transaction if it already is opened for read or otherwise look for an empty spot to
+        //place the read.
+        GammaRefTranlocal found = null;
+        GammaRefTranlocal newNode = null;
+        GammaRefTranlocal node = tx.head;
+        while (true) {
+            if (node == null) {
+                break;
+            } else if (node.owner == this) {
+                found = node;
+                break;
+            } else if (node.owner == null) {
+                newNode = node;
+                break;
+            } else {
+                node = node.next;
+            }
+        }
+
+        //we have found it.
+        if (found != null) {
+            tx.shiftInFront(found);
+            return found;
+        }
+
+        //we have not found it, but there also is no spot available.
+        if (newNode == null) {
+            throw tx.abortOnTransactionTooSmall(tx.config.maxFixedLengthTransactionSize + 1);
+        }
+
+        final GammaTransactionConfiguration config = tx.config;
+
+        if (config.stm != stm) {
+            throw tx.abortOpenForReadOnBadStm(this);
+        }
+
+        if (type != TYPE_REF) {
+            throw tx.abortOpenForReadOnNonRefTypeDetected(this);
+        }
+
+        int size = tx.size;
+        if (size > config.maximumPoorMansConflictScanLength) {
+            throw tx.abortOnRichmanConflictScanDetected();
+        }
+
+        //load it
+        newNode.mode = TRANLOCAL_READ;
+        newNode.isDirty = false;
+        newNode.owner = this;
+        while (true) {
+            //JMM: nothing can jump behind the following statement
+            long readVersion;
+            Object readRef;
+            do {
+                readRef = ref_value;
+                readVersion = version;
+            } while (readRef != ref_value);
+
+            //wait for the exclusive lock to come available.
+            int spinCount = 64;
+            for (; ;) {
+                if (!hasExclusiveLock()) {
+                    break;
+                }
+                spinCount--;
+                if (spinCount < 0) {
+                    throw tx.abortOnReadWriteConflict(this);
+                }
+            }
+
+            //check if the version and value we read are still the same, if they are not, we have read illegal memory,
+            //so we are going to try again.
+            if (readVersion == version && readRef == ref_value) {
+                //at this point we are sure that the read was unlocked.
+                newNode.version = readVersion;
+                newNode.ref_value = readRef;
+                break;
+            }
+        }
+
+        tx.size = size + 1;
+        //lets put it in the front it isn't the first one that is opened.
+        if (tx.size > 1) {
+            tx.shiftInFront(newNode);
+        }
+
+        //check if the transaction still is read consistent.
+        if (tx.hasReads) {
+            node = tx.head;
+            do {
+                //if we are at the end, we are done.
+                final AbstractGammaRef owner = node.owner;
+
+                if (owner == null) {
+                    break;
+                }
+
+                if (node != newNode && (owner.hasExclusiveLock() || owner.version != node.version)) {
+                    throw tx.abortOnReadWriteConflict(this);
+                }
+
+                node = node.next;
+            } while (node != null);
+        } else {
+            tx.hasReads = true;
+        }
+
+        //we are done, the load was correct and the transaction still is read consistent.
+        return newNode;
+    }
+
     private static void initTranlocalForRead(final GammaTransactionConfiguration config, final GammaRefTranlocal tranlocal) {
         tranlocal.isDirty = false;
         tranlocal.mode = TRANLOCAL_READ;
@@ -662,7 +855,8 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOnReadWriteConflict(this);
         }
 
-        if (hasReadsBeforeLoading && !tx.isReadConsistent(newNode)) {
+        //if (hasReadsBeforeLoading && !tx.isReadConsistent(newNode)) {
+        if (!tx.isReadConsistent(newNode)) {
             throw tx.abortOnReadWriteConflict(this);
         }
 
@@ -727,203 +921,14 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOnReadWriteConflict(this);
         }
 
-        if (hasReadsBeforeLoading && !tx.isReadConsistent(tranlocal)) {
+        //if (hasReadsBeforeLoading && !tx.isReadConsistent(tranlocal)) {
+        if (!tx.isReadConsistent(tranlocal)) {
             throw tx.abortOnReadWriteConflict(this);
         }
 
         return tranlocal;
     }
 
-    public final GammaRefTranlocal openForRead(final LeanFixedLengthGammaTransaction tx, int lockMode) {
-        if (tx.status != TX_ACTIVE) {
-            throw tx.abortOpenForReadOnBadStatus(this);
-        }
-
-        if (lockMode != LOCKMODE_NONE) {
-            throw tx.abortOpenForReadOrWriteOnExplicitLocking(this);
-        }
-
-        if (tx.head.owner == this) {
-            return tx.head;
-        }
-
-        //look inside the transaction if it already is opened for read or otherwise look for an empty spot to
-        //place the read.
-        GammaRefTranlocal found = null;
-        GammaRefTranlocal newNode = null;
-        GammaRefTranlocal node = tx.head;
-        while (true) {
-            if (node == null) {
-                break;
-            } else if (node.owner == this) {
-                found = node;
-                break;
-            } else if (node.owner == null) {
-                newNode = node;
-                break;
-            } else {
-                node = node.next;
-            }
-        }
-
-        //we have found it.
-        if (found != null) {
-            tx.shiftInFront(found);
-            return found;
-        }
-
-        //we have not found it, but there also is no spot available.
-        if (newNode == null) {
-            throw tx.abortOnTransactionTooSmall(tx.config.maxFixedLengthTransactionSize + 1);
-        }
-
-        final GammaTransactionConfiguration config = tx.config;
-
-        if (config.stm != stm) {
-            throw tx.abortOpenForReadOnBadStm(this);
-        }
-
-        if (type != TYPE_REF) {
-            throw tx.abortOpenForReadOnNonRefTypeDetected(this);
-        }
-
-        int size = tx.size;
-        if (size > config.maximumPoorMansConflictScanLength) {
-            throw tx.abortOnTransactionTooBigForPoorMansConflictScan();
-        }
-
-        //load it
-        newNode.mode = TRANLOCAL_READ;
-        newNode.isDirty = false;
-        newNode.owner = this;
-        while (true) {
-            //JMM: nothing can jump behind the following statement
-            long readVersion;
-            Object readRef;
-            do {
-                readRef = ref_value;
-                readVersion = version;
-            } while (readRef != ref_value);
-
-            //wait for the exclusive lock to come available.
-            int spinCount = 64;
-            for (; ;) {
-                if (!hasExclusiveLock()) {
-                    break;
-                }
-                spinCount--;
-                if (spinCount < 0) {
-                    throw tx.abortOnReadWriteConflict(this);
-                }
-            }
-
-            //check if the version and value we read are still the same, if they are not, we have read illegal memory,
-            //so we are going to try again.
-            if (readVersion == version && readRef == ref_value) {
-                //at this point we are sure that the read was unlocked.
-                newNode.version = readVersion;
-                newNode.ref_value = readRef;
-                break;
-            }
-        }
-
-        tx.size = size + 1;
-        //lets put it in the front it isn't the first one that is opened.
-        if (tx.size > 1) {
-            tx.shiftInFront(newNode);
-        }
-
-        //check if the transaction still is read consistent.
-        if (tx.hasReads) {
-            node = tx.head;
-            do {
-                //if we are at the end, we are done.
-                final AbstractGammaRef owner = node.owner;
-
-                if (owner == null) {
-                    break;
-                }
-
-                if (node != newNode && (owner.hasExclusiveLock() || owner.version != node.version)) {
-                    throw tx.abortOnReadWriteConflict(this);
-                }
-
-                node = node.next;
-            } while (node != null);
-        } else {
-            tx.hasReads = true;
-        }
-
-        //we are done, the load was correct and the transaction still is read consistent.
-        return newNode;
-    }
-
-    public final GammaRefTranlocal openForRead(final LeanMonoGammaTransaction tx, int lockMode) {
-        if (tx.status != TX_ACTIVE) {
-            throw tx.abortOpenForReadOnBadStatus(this);
-        }
-
-        if (lockMode != LOCKMODE_NONE) {
-            throw tx.abortOpenForReadOrWriteOnExplicitLocking(this);
-        }
-
-        final GammaRefTranlocal tranlocal = tx.tranlocal;
-
-        //noinspection ObjectEquality
-        if (tranlocal.owner == this) {
-            return tranlocal;
-        }
-
-        if (tranlocal.owner != null) {
-            throw tx.abortOnTransactionTooSmall(2);
-        }
-
-        final GammaTransactionConfiguration config = tx.config;
-
-        if (config.stm != stm) {
-            throw tx.abortOpenForReadOnBadStm(this);
-        }
-
-        if (type != TYPE_REF) {
-            throw tx.abortOpenForReadOnNonRefTypeDetected(this);
-        }
-
-        tranlocal.mode = TRANLOCAL_READ;
-        tranlocal.owner = this;
-        for (; ;) {
-            //do the read of the version and ref. It needs to be repeated to make sure that the version we read, belongs to the
-            //value.
-            Object readRef;
-            long readVersion;
-            do {
-                readRef = ref_value;
-                readVersion = version;
-            } while (readRef != ref_value);
-
-            //wait for the exclusive lock to come available.
-            int spinCount = 64;
-            for (; ;) {
-                if (!hasExclusiveLock()) {
-                    break;
-                }
-                spinCount--;
-                if (spinCount < 0) {
-                    throw tx.abortOnReadWriteConflict(this);
-                }
-            }
-
-            //check if the version is still the same, if it is not, we have read illegal memory,
-            //In that case we are going to try again.
-            if (readVersion == version) {
-                //at this point we are sure that the read was unlocked.
-                tranlocal.version = readVersion;
-                tranlocal.ref_value = readRef;
-                break;
-            }
-        }
-
-        return tranlocal;
-    }
 
     // ============================================================================================
     // =============================== open for write =============================================
@@ -981,77 +986,6 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tranlocal.isDirty = !config.dirtyCheck;
         tranlocal.mode = TRANLOCAL_WRITE;
         tranlocal.writeSkewCheck = config.isolationLevel == IsolationLevel.Serializable;
-    }
-
-    public final GammaRefTranlocal openForWrite(final FatVariableLengthGammaTransaction tx, int desiredLockMode) {
-        if (tx.status != TX_ACTIVE) {
-            throw tx.abortOpenForWriteOnBadStatus(this);
-        }
-
-        final GammaTransactionConfiguration config = tx.config;
-
-        //noinspection ObjectEquality
-        if (config.stm != stm) {
-            throw tx.abortOpenForWriteOnBadStm(this);
-        }
-
-        if (config.readonly) {
-            throw tx.abortOpenForWriteOnReadonly(this);
-        }
-
-        desiredLockMode = config.writeLockModeAsInt <= desiredLockMode ? desiredLockMode : config.writeLockModeAsInt;
-
-        final int identityHash = identityHashCode();
-
-        final int indexOf = tx.indexOf(this, identityHash);
-        if (indexOf > -1) {
-            final GammaRefTranlocal tranlocal = tx.array[indexOf];
-            final int mode = tranlocal.mode;
-
-            if (mode == TRANLOCAL_CONSTRUCTING) {
-                return tranlocal;
-            }
-
-            if (mode == TRANLOCAL_COMMUTING) {
-                if (!flattenCommute(tx, tranlocal, desiredLockMode)) {
-                    throw tx.abortOnReadWriteConflict(this);
-                }
-                return tranlocal;
-            }
-
-            if (desiredLockMode > tranlocal.getLockMode()) {
-                if (!tryLockAndCheckConflict(config.spinCount, tranlocal, desiredLockMode)) {
-                    throw tx.abortOnReadWriteConflict(this);
-                }
-            }
-
-            tx.hasWrites = true;
-            tranlocal.setDirty(!config.dirtyCheck);
-            tranlocal.mode = TRANLOCAL_WRITE;
-            return tranlocal;
-        }
-
-        final GammaRefTranlocal tranlocal = tx.pool.take(this);
-        initTranlocalForWrite(config, tranlocal);
-        tx.attach(tranlocal, identityHash);
-        tx.size++;
-        tx.hasWrites = true;
-
-        final boolean hasReadsBeforeLoading = tx.hasReads;
-        if (!hasReadsBeforeLoading) {
-            tx.hasReads = true;
-            tx.lastConflictCount = config.globalConflictCounter.count();
-        }
-
-        if (!load(tranlocal, desiredLockMode, config.spinCount, tx.richmansMansConflictScan)) {
-            throw tx.abortOnReadWriteConflict(this);
-        }
-
-        if (hasReadsBeforeLoading && !tx.isReadConsistent(tranlocal)) {
-            throw tx.abortOnReadWriteConflict(this);
-        }
-
-        return tranlocal;
     }
 
     public final GammaRefTranlocal openForWrite(final FatMonoGammaTransaction tx, int desiredLockMode) {
@@ -1113,6 +1047,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tx.hasWrites = true;
         return tranlocal;
     }
+
 
     public final GammaRefTranlocal openForWrite(final FatFixedLengthGammaTransaction tx, int lockMode) {
         if (tx.status != TX_ACTIVE) {
@@ -1195,13 +1130,87 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOnReadWriteConflict(this);
         }
 
-        if (hasReadsBeforeLoading && !tx.isReadConsistent(newNode)) {
+        //if (hasReadsBeforeLoading && !tx.isReadConsistent(newNode)) {
+        if (!tx.isReadConsistent(newNode)) {
             throw tx.abortOnReadWriteConflict(this);
         }
 
         tx.shiftInFront(newNode);
         return newNode;
     }
+
+    public final GammaRefTranlocal openForWrite(final FatVariableLengthGammaTransaction tx, int desiredLockMode) {
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortOpenForWriteOnBadStatus(this);
+        }
+
+        final GammaTransactionConfiguration config = tx.config;
+
+        //noinspection ObjectEquality
+        if (config.stm != stm) {
+            throw tx.abortOpenForWriteOnBadStm(this);
+        }
+
+        if (config.readonly) {
+            throw tx.abortOpenForWriteOnReadonly(this);
+        }
+
+        desiredLockMode = config.writeLockModeAsInt <= desiredLockMode ? desiredLockMode : config.writeLockModeAsInt;
+
+        final int identityHash = identityHashCode();
+
+        final int indexOf = tx.indexOf(this, identityHash);
+        if (indexOf > -1) {
+            final GammaRefTranlocal tranlocal = tx.array[indexOf];
+            final int mode = tranlocal.mode;
+
+            if (mode == TRANLOCAL_CONSTRUCTING) {
+                return tranlocal;
+            }
+
+            if (mode == TRANLOCAL_COMMUTING) {
+                if (!flattenCommute(tx, tranlocal, desiredLockMode)) {
+                    throw tx.abortOnReadWriteConflict(this);
+                }
+                return tranlocal;
+            }
+
+            if (desiredLockMode > tranlocal.getLockMode()) {
+                if (!tryLockAndCheckConflict(config.spinCount, tranlocal, desiredLockMode)) {
+                    throw tx.abortOnReadWriteConflict(this);
+                }
+            }
+
+            tx.hasWrites = true;
+            tranlocal.setDirty(!config.dirtyCheck);
+            tranlocal.mode = TRANLOCAL_WRITE;
+            return tranlocal;
+        }
+
+        final GammaRefTranlocal tranlocal = tx.pool.take(this);
+        initTranlocalForWrite(config, tranlocal);
+        tx.attach(tranlocal, identityHash);
+        tx.size++;
+        tx.hasWrites = true;
+
+        final boolean hasReadsBeforeLoading = tx.hasReads;
+        if (!hasReadsBeforeLoading) {
+            tx.hasReads = true;
+            tx.lastConflictCount = config.globalConflictCounter.count();
+        }
+
+        if (!load(tranlocal, desiredLockMode, config.spinCount, tx.richmansMansConflictScan)) {
+            throw tx.abortOnReadWriteConflict(this);
+        }
+
+        //hasReadsBeforeLoading &&
+        if (!tx.isReadConsistent(tranlocal)) {
+            throw tx.abortOnReadWriteConflict(this);
+        }
+
+        return tranlocal;
+    }
+
 
     // ============================================================================================
     // ================================= open for commute =========================================

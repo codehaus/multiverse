@@ -370,34 +370,47 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
     public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
         if (!hasReads) {
+            System.out.println("called without reads");
             return true;
         }
 
         if (config.readLockModeAsInt > LOCKMODE_NONE) {
+            System.out.println("called with readLockMode > NONE");
             return true;
         }
 
         //todo: isolation level check.
 
         if (richmansMansConflictScan) {
-            final long currentConflictCount = config.globalConflictCounter.count();
+            final long conflictCount = config.globalConflictCounter.count();
 
-            if (lastConflictCount == currentConflictCount) {
+            if (lastConflictCount == conflictCount) {
+                //problem: it can be that either
+                //- the global conflict counter has not been increased yet:
+                //       ---if the global conflict counter has not been increased yet, then either
+                //              - the data is not changed: so the readset is still valid.
+                //              - the data has an exclusive read: no inconsistent readset can be created.
+                //- the conflict counter is incremented, and a conflict scan is done, but no conflict is found.
+                //      -- this can't happen (unless the conflict check if broken) since either the ref
+                //      is still locked, or the value/version has changed.
                 return true;
             }
 
-            lastConflictCount = currentConflictCount;
+            lastConflictCount = conflictCount;
             //we are going to fall through to do a full conflict scan
-
         } else if (size > config.maximumPoorMansConflictScanLength) {
-            throw abortOnTransactionTooBigForPoorMansConflictScan();
+            throw abortOnRichmanConflictScanDetected();
         }
 
         //doing a full conflict scan
         for (int k = 0; k < array.length; k++) {
             final GammaRefTranlocal tranlocal = array[k];
             //noinspection ObjectEquality
-            if (tranlocal == null || tranlocal == justAdded) {
+
+            //final boolean skip = tranlocal == null
+            //        || (!richmansMansConflictScan && justAdded == tranlocal);
+
+            if (tranlocal == null) {
                 continue;
             }
 

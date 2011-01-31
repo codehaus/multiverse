@@ -176,6 +176,9 @@ public class GammaTestUtils implements GammaConstants {
 
     public static void assertLockMode(AbstractGammaObject orec, int lockMode) {
         assertEquals(lockMode, orec.atomicGetLockModeAsInt());
+        if(lockMode!=LOCKMODE_READ){
+            assertEquals(0, orec.getReadLockCount());
+        }
     }
 
     public static void assertSurplus(AbstractGammaObject orec, int expectedSurplus) {

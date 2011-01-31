@@ -18,6 +18,10 @@
 
 - commute and locking
 
+- when a transaction commits, how often does it need to send out a globalconflictcounter.inc. Can't this be done once?
+
+- constructing objects and check for read consistency.
+
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------

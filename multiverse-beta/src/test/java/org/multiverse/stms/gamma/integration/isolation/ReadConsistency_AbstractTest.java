@@ -9,12 +9,23 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransaction;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertSame;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
+/**
+ * Question: could the problem be in the quick release mechanism?
+ *
+ * Problem?
+ * if a writing transaction has done n updates (and has released the updates) and has m to go.
+ * If a reading transaction reads the n updates, there is no reason for the updating transaction to cause
+ * a conflict since they are no conflicting arrives on the part if has already completes. If the reading transactions
+ * hits the n+1 update, it is allowed to see a different value than it already has read...
+ * problem.. the n updates it has read, already contains the new values, so reading another new value is no problem.
+ */
 public abstract class ReadConsistency_AbstractTest {
 
     private GammaRef<String>[] refs;
@@ -31,7 +42,7 @@ public abstract class ReadConsistency_AbstractTest {
         stm = (GammaStm) getGlobalStmInstance();
     }
 
-      @After
+    @After
     public void tearDown() {
         System.out.println("Stm.GlobalConflictCount: " + stm.getGlobalConflictCounter().count());
         for (GammaRef ref : refs) {
@@ -84,8 +95,21 @@ public abstract class ReadConsistency_AbstractTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
-                    for (GammaRef<String> ref : refs) {
-                        ref.set(btx, value);
+                    FatVariableLengthGammaTransaction t = (FatVariableLengthGammaTransaction)btx;
+                    long initialLc = t.lastConflictCount;
+                    String initial = refs[0].get(btx);
+
+                    for (int k = 0; k < refs.length; k++) {
+                        long olGc = stm.globalConflictCounter.count();
+                        long olLc = t.lastConflictCount;
+                        String s = refs[k].getAndSet(tx, value);
+                        if(s!=initial){
+
+                            System.out.println("--------------------------------------------------");
+                            System.out.println("lc: "+t.lastConflictCount+ " gc; "+stm.getGlobalConflictCounter().count()+" oldGc "+ olGc+" oldLc:"+olLc+" initialLc "+initialLc);
+                            System.out.println("--------------------------------------------------");
+                        }
+                        assertSame("failed at " + k, initial, s);
                     }
                 }
             };
@@ -124,9 +148,8 @@ public abstract class ReadConsistency_AbstractTest {
                     String initial = refs[0].get(btx);
 
                     for (int k = 1; k < refs.length; k++) {
-                        if (refs[k].get(btx) != initial) {
-                            fail();
-                        }
+                        String s = refs[k].get(btx);
+                        assertSame("failed at " + k, initial, s);
                     }
                 }
             };

@@ -177,7 +177,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     @SuppressWarnings({"SimplifiableIfStatement"})
     @Override
     public final boolean hasReadConflict(final GammaRefTranlocal tranlocal) {
-        if (tranlocal.getLockMode() != LOCKMODE_NONE) {
+        if (tranlocal.lockMode != LOCKMODE_NONE) {
             return false;
         }
 
@@ -680,7 +680,8 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             surplus--;
 
             if (readonlyCount < READBIASED_THRESHOLD) {
-                readonlyCount++;
+                //readonlyCount++;
+                //todo: needs to be enabled again
             }
 
             if (surplus == 0 && readonlyCount == READBIASED_THRESHOLD) {
@@ -739,7 +740,8 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
             if (conflict && !conflictSend) {
                 stm.globalConflictCounter.signalConflict(this);
-                conflictSend = true;
+                //todo: enable again
+                //conflictSend = true;
             }
 
             if (surplus == 0) {
@@ -944,7 +946,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 "Orec(hasExclusiveLock=%s, hasUpdateLock=%s, readLocks=%s, surplus=%s, isReadBiased=%s, readonlyCount=%s)",
                 hasExclusiveLock(value),
                 hasWriteLock(value),
-                getReadonlyCount(value),
+                getReadLockCount(value),
                 getSurplus(value),
                 isReadBiased(value),
                 getReadonlyCount(value));

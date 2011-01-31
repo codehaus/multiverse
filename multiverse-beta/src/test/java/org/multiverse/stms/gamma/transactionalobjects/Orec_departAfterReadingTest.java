@@ -45,7 +45,6 @@ public class Orec_departAfterReadingTest {
         assertReadonlyCount(orec, 1);
         assertUpdateBiased(orec);
         assertLockMode(orec, LOCKMODE_NONE);
-
     }
 
     @Test

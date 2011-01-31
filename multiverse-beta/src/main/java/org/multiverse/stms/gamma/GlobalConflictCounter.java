@@ -38,9 +38,11 @@ public final class GlobalConflictCounter {
     public final AtomicLong count = new AtomicLong();
 
     public void signalConflict(GammaObject object) {
-        final long oldCount = count.get();
-        count.compareAndSet(oldCount, oldCount+1);
+        //final long oldCount = count.get();
+        //count.compareAndSet(oldCount, oldCount+1);
         //unsafe.compareAndSwapLong(this, counterOffset, oldCount, oldCount + 1);
+        //todo: needs to be set to a relaxed increment
+        count.incrementAndGet();
     }
 
     public long count() {

@@ -325,7 +325,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
             lastConflictCount = currentConflictCount;
             //we are going to fall through to do a full conflict scan
         } else if (size > config.maximumPoorMansConflictScanLength) {
-            throw abortOnTransactionTooBigForPoorMansConflictScan();
+            throw abortOnRichmanConflictScanDetected();
         }
 
         //doing a full conflict scan
@@ -336,14 +336,13 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
                 break;
             }
 
-            //lets skip the one we just added
-            //noinspection ObjectEquality
-            if (node != justAdded) {
-                //if there is a read conflict, we are doe
-                if (node.owner.hasReadConflict(node)) {
-                    return false;
-                }
+            //final boolean check = richmansMansConflictScan || node != justAdded;
+            //if (check) {
+            //if there is a read conflict, we are doe
+            if (node.owner.hasReadConflict(node)) {
+                return false;
             }
+            //}
 
             node = node.next;
         }
