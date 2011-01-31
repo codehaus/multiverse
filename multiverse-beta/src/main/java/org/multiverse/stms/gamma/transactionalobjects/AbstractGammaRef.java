@@ -241,9 +241,9 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         departAfterUpdateAndUnlock();
-        tranlocal.setLockMode(LOCKMODE_NONE);
+        tranlocal.lockMode = LOCKMODE_NONE;
         tranlocal.owner = null;
-        tranlocal.setDepartObligation(false);
+        tranlocal.hasDepartObligation = false;
     }
 
     public final void releaseAfterReading(final GammaRefTranlocal tranlocal, final GammaObjectPool pool) {
@@ -268,59 +268,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tranlocal.owner = null;
     }
 
-    public final boolean load(final GammaRefTranlocal tranlocal, final int lockMode, int spinCount, final boolean arriveNeeded) {
-        if (lockMode == LOCKMODE_NONE) {
-            while (true) {
-                //JMM: nothing can jump behind the following statement
-                long readLong = 0;
-                Object readRef = null;
-                long readVersion;
-                if (type == TYPE_REF) {
-                    do {
-                        readRef = ref_value;
-                        readVersion = version;
-                    } while (readRef != ref_value);
-                } else {
-                    do {
-                        readLong = long_value;
-                        readVersion = version;
-                    } while (readLong != long_value);
-                }
+    public final boolean load(
+            final GammaRefTranlocal tranlocal, final int lockMode, int spinCount, final boolean arriveNeeded) {
 
-                int arriveStatus = arriveNeeded
-                        ? arrive(spinCount)
-                        : (waitForExclusiveLockToBecomeFree(spinCount) ? ARRIVE_UNREGISTERED : ARRIVE_LOCK_NOT_FREE);
-
-                if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
-                    return false;
-                }
-
-                //todo: the hasExclusiveLock has been added to figure out the race problem with read consistency.
-                //noinspection ObjectEquality
-                if (readVersion == version && !hasExclusiveLock()) {
-                    tranlocal.owner = this;
-                    tranlocal.version = readVersion;
-                    tranlocal.setLockMode(LOCKMODE_NONE);
-                    tranlocal.setDepartObligation(arriveStatus == ARRIVE_NORMAL);
-
-                    if (type == TYPE_REF) {
-                        tranlocal.ref_value = readRef;
-                        tranlocal.ref_oldValue = readRef;
-                    } else {
-                        tranlocal.long_value = readLong;
-                        tranlocal.long_oldValue = readLong;
-                    }
-
-
-                    return true;
-                }
-
-                //we are not lucky, the value has changed. But before retrying, we need to depart if the arrive was normal
-                if (arriveStatus == ARRIVE_NORMAL) {
-                    departAfterFailure();
-                }
-            }
-        } else {
+        if (lockMode != LOCKMODE_NONE) {
             final int arriveStatus = tryLockAndArrive(spinCount, lockMode);
 
             if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
@@ -342,13 +293,71 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             tranlocal.setDepartObligation(arriveStatus == ARRIVE_NORMAL);
             return true;
         }
+
+        while (true) {
+            long readLong = 0;
+            Object readRef = null;
+            long readVersion;
+            if (type == TYPE_REF) {
+                do {
+                    readRef = ref_value;
+                    readVersion = version;
+                } while (readRef != ref_value);
+            } else {
+                do {
+                    readLong = long_value;
+                    readVersion = version;
+                } while (readLong != long_value);
+            }
+
+            if(!arriveNeeded){
+                throw new RuntimeException();
+            }
+
+             final int arriveStatus = arriveNeeded
+                    ? arrive(spinCount)
+                    : (waitForExclusiveLockToBecomeFree(spinCount) ? ARRIVE_UNREGISTERED : ARRIVE_LOCK_NOT_FREE);
+
+            if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+                return false;
+            }
+
+            if(arriveStatus == ARRIVE_UNREGISTERED){
+                throw new RuntimeException();
+            }
+
+            //If the version hasn't changed, the value can't have changed either because the value always is changed
+            //before the value is changed.
+            //todo: the hasExclusiveLock has been added to figure out the race problem with read consistency.
+            //noinspection ObjectEquality
+            if (version == readVersion) {
+                tranlocal.owner = this;
+                tranlocal.version = readVersion;
+                tranlocal.lockMode = LOCKMODE_NONE;
+                tranlocal.hasDepartObligation = arriveStatus == ARRIVE_NORMAL;
+
+                if (type == TYPE_REF) {
+                    tranlocal.ref_value = readRef;
+                    tranlocal.ref_oldValue = readRef;
+                } else {
+                    tranlocal.long_value = readLong;
+                    tranlocal.long_oldValue = readLong;
+                }
+
+                return true;
+            }
+
+            //we are not lucky, the value has changed. But before retrying, we need to depart if the arrive was normal
+            if (arriveStatus == ARRIVE_NORMAL) {
+                departAfterFailure();
+            }
+        }
     }
 
     public final GammaRefTranlocal openForConstruction(GammaTransaction tx) {
         if (tx == null) {
             throw new NullPointerException();
         }
-
 
         final int type = tx.transactionType;
 

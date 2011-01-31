@@ -540,7 +540,6 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return ARRIVE_LOCK_NOT_FREE;
     }
 
-
     public final int tryExclusiveLockAndArrive(int spinCount) {
         do {
             final long current = orec;
@@ -633,7 +632,8 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
             int readonlyCount = getReadonlyCount(current);
             if (readonlyCount < READBIASED_THRESHOLD) {
-                readonlyCount++;
+                //todo: needs to be enabled again, but it prevent turning the ref in readbiased
+                //readonlyCount++;
             }
 
             surplus--;
@@ -745,7 +745,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             }
 
             if (surplus == 0) {
-                orec = 0;
+               orec = 0;
                 return surplus;
             }
 
@@ -800,6 +800,9 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             } else {
                 next = setReadLockCount(next, lockMode - 1);
             }
+
+            //todo: if a there is no surplus and exclusive lock is held, the same trick as with the releaseAfterUpdate
+            //can be applied that prevent a cas.
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
                 return surplus;

@@ -98,6 +98,7 @@ public class ReadConsistency_FatFixedLengthGammaTransaction_StressTest extends R
     @Override
     protected AtomicBlock createReadBlock() {
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, refCount)
+                .setDirtyCheckEnabled(false)
                 .setMaximumPoorMansConflictScanLength(poorMansReadConsistency ? Integer.MAX_VALUE : 0);
 
         return new LeanGammaAtomicBlock(new FatFixedLengthGammaTransactionFactory(config));
@@ -106,6 +107,7 @@ public class ReadConsistency_FatFixedLengthGammaTransaction_StressTest extends R
     @Override
     protected AtomicBlock createWriteBlock() {
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm, refCount)
+                .setDirtyCheckEnabled(false)
                 .setMaximumPoorMansConflictScanLength(poorMansReadConsistency ? Integer.MAX_VALUE : 0);
 
         return new LeanGammaAtomicBlock(new FatFixedLengthGammaTransactionFactory(config));

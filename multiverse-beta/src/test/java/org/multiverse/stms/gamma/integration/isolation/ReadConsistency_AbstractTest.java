@@ -9,7 +9,6 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
-import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransaction;
 
 import static org.junit.Assert.assertSame;
 import static org.multiverse.TestUtils.*;
@@ -95,21 +94,12 @@ public abstract class ReadConsistency_AbstractTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
-                    FatVariableLengthGammaTransaction t = (FatVariableLengthGammaTransaction)btx;
-                    long initialLc = t.lastConflictCount;
                     String initial = refs[0].get(btx);
 
                     for (int k = 0; k < refs.length; k++) {
-                        long olGc = stm.globalConflictCounter.count();
-                        long olLc = t.lastConflictCount;
-                        String s = refs[k].getAndSet(tx, value);
-                        if(s!=initial){
-
-                            System.out.println("--------------------------------------------------");
-                            System.out.println("lc: "+t.lastConflictCount+ " gc; "+stm.getGlobalConflictCounter().count()+" oldGc "+ olGc+" oldLc:"+olLc+" initialLc "+initialLc);
-                            System.out.println("--------------------------------------------------");
-                        }
-                        assertSame("failed at " + k, initial, s);
+                        refs[k].openForWrite(btx, LOCKMODE_NONE).ref_value=value;
+                        //String s = refs[k].getAndSet(tx, value);
+                        //assertSame("failed at " + k, initial, s);
                     }
                 }
             };
@@ -145,10 +135,10 @@ public abstract class ReadConsistency_AbstractTest {
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
 
-                    String initial = refs[0].get(btx);
+                    String initial = (String)refs[0].openForRead(btx, LOCKMODE_NONE).ref_value;
 
                     for (int k = 1; k < refs.length; k++) {
-                        String s = refs[k].get(btx);
+                        String s = (String)refs[k].openForRead(btx, LOCKMODE_NONE).ref_value;
                         assertSame("failed at " + k, initial, s);
                     }
                 }
