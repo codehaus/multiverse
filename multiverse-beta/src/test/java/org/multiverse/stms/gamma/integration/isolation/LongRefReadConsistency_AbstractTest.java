@@ -10,7 +10,7 @@ import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -98,7 +98,7 @@ public abstract class LongRefReadConsistency_AbstractTest {
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
                     for (int k = 0; k < refs.length; k++) {
-                        refs[k].set(btx, value);
+                        refs[k].incrementAndGet(btx,1);
                     }
                 }
             };
@@ -138,7 +138,7 @@ public abstract class LongRefReadConsistency_AbstractTest {
 
                     for (int k = 1; k < refs.length; k++) {
                         long s = refs[k].get(btx);
-                        assertSame("failed at " + k, initial, s);
+                        assertEquals("failed at " + k, initial, s);
                     }
                 }
             };

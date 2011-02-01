@@ -25,18 +25,18 @@ public final class FatVariableLengthGammaTransactionFactory implements GammaTran
     }
 
     @Override
-    public GammaTransaction upgradeAfterSpeculativeFailure(GammaTransaction failingTransaction, GammaTransactionPool pool) {
+    public FatVariableLengthGammaTransaction upgradeAfterSpeculativeFailure(GammaTransaction failingTransaction, GammaTransactionPool pool) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public GammaTransaction newTransaction() {
+    public FatVariableLengthGammaTransaction newTransaction() {
         return newTransaction(getThreadLocalGammaTransactionPool());
     }
 
     @Override
-    public GammaTransaction newTransaction(GammaTransactionPool pool) {
-        GammaTransaction tx = pool.takeMap();
+    public FatVariableLengthGammaTransaction newTransaction(GammaTransactionPool pool) {
+        FatVariableLengthGammaTransaction tx = pool.takeMap();
         if (tx == null) {
             tx = new FatVariableLengthGammaTransaction(config);
         } else {

@@ -311,9 +311,9 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
             return true;
         }
 
-        if (config.readLockModeAsInt > LOCKMODE_NONE) {
-            return true;
-        }
+        //if (config.readLockModeAsInt > LOCKMODE_NONE) {
+        //    return true;
+        //}
 
         if (richmansMansConflictScan) {
             final long currentConflictCount = config.globalConflictCounter.count();

@@ -370,12 +370,10 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
     public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
         if (!hasReads) {
-            System.out.println("called without reads");
             return true;
         }
 
         if (config.readLockModeAsInt > LOCKMODE_NONE) {
-            System.out.println("called with readLockMode > NONE");
             return true;
         }
 

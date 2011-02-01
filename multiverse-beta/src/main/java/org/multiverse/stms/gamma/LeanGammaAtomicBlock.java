@@ -597,6 +597,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
         Throwable cause = null;
         try{
             if(tx != null && tx.isAlive()){
+                System.out.println("Existing transaction found");
                 closure.execute(tx);
                 return;
             }
@@ -613,6 +614,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         abort = false;
                         return;
                     } catch (Retry e) {
+                        System.out.println("retry");
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
@@ -621,6 +623,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         }
                         tx.awaitUpdate();
                     } catch (SpeculativeConfigurationError e) {
+                        System.out.println("speculative failure");
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a speculative configuration error",
@@ -634,6 +637,9 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         pool.put(old);
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
+                        if(tx.status!=GammaConstants.TX_ABORTED){
+                            throw new RuntimeException();
+                        }
                         cause = e;
                         if(___TracingEnabled){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {

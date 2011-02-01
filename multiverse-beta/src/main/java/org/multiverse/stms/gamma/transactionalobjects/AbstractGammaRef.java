@@ -300,14 +300,14 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             long readVersion;
             if (type == TYPE_REF) {
                 do {
+                    readVersion = version;
                     readRef = ref_value;
-                    readVersion = version;
-                } while (readRef != ref_value);
+                } while (readVersion!=version);
             } else {
-                do {
-                    readLong = long_value;
-                    readVersion = version;
-                } while (readLong != long_value);
+                 do {
+                     readVersion = version;
+                     readLong = long_value;
+                } while (readVersion != version);
             }
 
              final int arriveStatus = arriveNeeded
@@ -726,6 +726,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tranlocal.isDirty = false;
         tranlocal.mode = TRANLOCAL_READ;
         tranlocal.writeSkewCheck = config.isolationLevel == IsolationLevel.Serializable;
+        //todo: can be removed, but are added to narrow down the inconsistency bug
+        tranlocal.ref_value = null;
+        tranlocal.ref_oldValue = null;
+        tranlocal.version = -1;
     }
 
     public final GammaRefTranlocal openForRead(final FatMonoGammaTransaction tx, int lockMode) {

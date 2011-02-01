@@ -69,10 +69,9 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
             threads[k] = new UpdatingThread(k);
         }
 
-
         startAll(readingThreads);
         startAll(threads);
-        sleepMs(300 * 1000);
+        sleepMs(30 * 1000);
         stop = true;
         sleepMs(1000);
         for (GammaLongRef ref : refs) {
@@ -85,8 +84,11 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
     }
 
     class UpdatingThread extends TestThread {
+        private int id;
+
         public UpdatingThread(int id) {
             super("UpdatingThread-" + id);
+            this.id = id;
         }
 
         @Override
@@ -346,7 +348,7 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
             boolean success = false;
             while (!success) {
                 fullRead(write);
-                assertReadConsistent();
+                assertReadConsistent(tx);
                 try {
                     tx.commit();
                     success = true;
@@ -382,21 +384,6 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
 
         }
 
-        private void assertReadConsistent() {
-            long version = tx.getRefTranlocal(refs[0]).version;
-            long value = tx.getRefTranlocal(refs[0]).long_value;
-            for (int k = 1; k < refs.length; k++) {
-                boolean b = version == tx.getRefTranlocal(refs[k]).version
-                        && value == tx.getRefTranlocal(refs[k]).long_value;
-
-                if (!b) {
-                    System.out.println("Inconsistency detected");
-                    inconstencyDetected.compareAndSet(false, true);
-                    stop = true;
-                    break;
-                }
-            }
-        }
     }
 
     class VariableReadingThread extends TestThread {
@@ -429,7 +416,7 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
             boolean success = false;
             while (!success) {
                 fullRead(write);
-                assertReadConsistent();
+                assertReadConsistent(tx);
                 try {
                     tx.commit();
                     success = true;
@@ -465,21 +452,7 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
             }
         }
 
-        private void assertReadConsistent() {
-            long version = tx.getRefTranlocal(refs[0]).version;
-            Object value = tx.getRefTranlocal(refs[0]).ref_value;
-            for (int k = 1; k < refs.length; k++) {
-                boolean b = version == tx.getRefTranlocal(refs[k]).version
-                        && value == tx.getRefTranlocal(refs[k]).ref_value;
 
-                if (!b) {
-                    System.out.println("Inconsistency detected");
-                    inconstencyDetected.compareAndSet(false, true);
-                    stop = true;
-                    break;
-                }
-            }
-        }
     }
 
     class VariableReadingWithBlockThread extends TestThread {
@@ -536,7 +509,10 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
             }
         }
 
-        private void assertReadConsistent(GammaTransaction tx) {
+
+    }
+
+      private void assertReadConsistent(GammaTransaction tx) {
             long version = tx.getRefTranlocal(refs[0]).version;
             long value = refs[0].get(tx);
             for (int k = 1; k < refs.length; k++) {
@@ -551,5 +527,4 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
                 }
             }
         }
-    }
 }
