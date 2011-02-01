@@ -12,7 +12,7 @@ import org.multiverse.stms.gamma.transactions.lean.LeanFixedLengthGammaTransacti
  * scan needs to be done. But it is a nice way to check if it still is able
  * to deal with read consistency.
  */
-public class ReadConsistency_LeanFixedLengthGammaTransaction_StressTest extends ReadConsistency_AbstractTest {
+public class RefReadConsistency_LeanFixedLengthGammaTransaction_StressTest extends RefReadConsistency_AbstractTest {
 
     private int refCount;
 

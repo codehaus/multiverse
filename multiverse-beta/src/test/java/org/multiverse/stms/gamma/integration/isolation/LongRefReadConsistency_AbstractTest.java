@@ -7,7 +7,7 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.gamma.GammaStm;
-import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.assertSame;
@@ -25,9 +25,9 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  * hits the n+1 update, it is allowed to see a different value than it already has read...
  * problem.. the n updates it has read, already contains the new values, so reading another new value is no problem.
  */
-public abstract class ReadConsistency_AbstractTest {
+public abstract class LongRefReadConsistency_AbstractTest {
 
-    private GammaRef<String>[] refs;
+    private GammaLongRef[] refs;
 
     private int readerCount = 10;
     private int writerCount = 2;
@@ -44,7 +44,7 @@ public abstract class ReadConsistency_AbstractTest {
     @After
     public void tearDown() {
         System.out.println("Stm.GlobalConflictCount: " + stm.getGlobalConflictCounter().count());
-        for (GammaRef ref : refs) {
+        for (GammaLongRef ref : refs) {
             System.out.println(ref.toDebugString());
         }
     }
@@ -54,9 +54,9 @@ public abstract class ReadConsistency_AbstractTest {
     protected abstract AtomicBlock createWriteBlock();
 
     public void run(int refCount) {
-        refs = new GammaRef[refCount];
+        refs = new GammaLongRef[refCount];
         for (int k = 0; k < refs.length; k++) {
-            refs[k] = new GammaRef<String>(stm);
+            refs[k] = new GammaLongRef(stm);
         }
 
         ReadThread[] readerThreads = new ReadThread[readerCount];
@@ -81,25 +81,24 @@ public abstract class ReadConsistency_AbstractTest {
 
     public class WriterThread extends TestThread {
 
+        private int id;
+
         public WriterThread(int id) {
             super("WriterThread-" + id);
+            this.id = id;
         }
 
         @Override
         public void doRun() throws Exception {
-            final String value = getName();
+            final long value = id;
 
             AtomicBlock block = createWriteBlock();
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
-                    String initial = refs[0].get(btx);
-
                     for (int k = 0; k < refs.length; k++) {
-                        refs[k].openForWrite(btx, LOCKMODE_NONE).ref_value=value;
-                        //String s = refs[k].getAndSet(tx, value);
-                        //assertSame("failed at " + k, initial, s);
+                        refs[k].set(btx, value);
                     }
                 }
             };
@@ -135,10 +134,10 @@ public abstract class ReadConsistency_AbstractTest {
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
 
-                    String initial = (String)refs[0].openForRead(btx, LOCKMODE_NONE).ref_value;
+                    long initial =refs[0].get(btx);
 
                     for (int k = 1; k < refs.length; k++) {
-                        String s = (String)refs[k].openForRead(btx, LOCKMODE_NONE).ref_value;
+                        long s = refs[k].get(btx);
                         assertSame("failed at " + k, initial, s);
                     }
                 }

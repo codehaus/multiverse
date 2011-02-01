@@ -6,7 +6,7 @@ import org.multiverse.stms.gamma.LeanGammaAtomicBlock;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransactionFactory;
 
-public class ReadConsistency_FatVariableLengthGammaTransaction_StressTest extends ReadConsistency_AbstractTest {
+public class LongRefReadConsistency_FatVariableLengthGammaTransaction_StressTest extends LongRefReadConsistency_AbstractTest {
 
     private int refCount;
     private boolean poorMansReadConsistency;

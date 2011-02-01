@@ -310,20 +310,12 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 } while (readLong != long_value);
             }
 
-            if(!arriveNeeded){
-                throw new RuntimeException();
-            }
-
              final int arriveStatus = arriveNeeded
                     ? arrive(spinCount)
                     : (waitForExclusiveLockToBecomeFree(spinCount) ? ARRIVE_UNREGISTERED : ARRIVE_LOCK_NOT_FREE);
 
             if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
                 return false;
-            }
-
-            if(arriveStatus == ARRIVE_UNREGISTERED){
-                throw new RuntimeException();
             }
 
             //If the version hasn't changed, the value can't have changed either because the value always is changed

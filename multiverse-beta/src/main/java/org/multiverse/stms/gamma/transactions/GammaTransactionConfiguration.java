@@ -472,7 +472,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         return config;
     }
 
-    public GammaTransactionConfiguration setSpeculativeConfigurationEnabled(boolean speculativeConfigEnabled) {
+    public GammaTransactionConfiguration setSpeculative(boolean speculativeConfigEnabled) {
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.speculative = speculativeConfigEnabled;
         return config;

@@ -222,7 +222,7 @@ public final class GammaStm implements Stm {
             }
 
             return new GammaTransactionFactoryBuilderImpl(
-                    config.setSpeculativeConfigurationEnabled(enabled));
+                    config.setSpeculative(enabled));
         }
 
         @Override
