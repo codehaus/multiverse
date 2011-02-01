@@ -9,7 +9,7 @@ import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.stms.gamma.*;
 import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
@@ -28,10 +28,10 @@ import static org.multiverse.TestUtils.*;
  * with refs it fails
  * with longs it succeeds.
  */
-public class LongOrec_ReadConsistencyTest implements GammaConstants {
+public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
 
     private GammaStm stm;
-    private GammaLongRef[] refs;
+    private GammaRef[] refs;
     private volatile boolean stop;
     private final AtomicBoolean inconstencyDetected = new AtomicBoolean();
 
@@ -43,7 +43,7 @@ public class LongOrec_ReadConsistencyTest implements GammaConstants {
 
     @After
     public void after() {
-        for (GammaLongRef ref : refs) {
+        for (GammaRef ref : refs) {
             System.out.println(ref.toDebugString());
         }
     }
@@ -54,9 +54,9 @@ public class LongOrec_ReadConsistencyTest implements GammaConstants {
         int readingThreadCount = 10;
         int writingThreadCount = 2;
 
-        refs = new GammaLongRef[refCount];
+        refs = new GammaRef[refCount];
         for (int k = 0; k < refs.length; k++) {
-            refs[k] = new GammaLongRef(stm,0);
+            refs[k] = new GammaRef(stm,0);
         }
 
         VariableReadingWithBlockThread[] readingThreads = new VariableReadingWithBlockThread[readingThreadCount];
@@ -75,7 +75,7 @@ public class LongOrec_ReadConsistencyTest implements GammaConstants {
         sleepMs(300 * 1000);
         stop = true;
         sleepMs(1000);
-        for (GammaLongRef ref : refs) {
+        for (GammaRef ref : refs) {
             System.out.println(ref.toDebugString());
         }
 
@@ -98,8 +98,8 @@ public class LongOrec_ReadConsistencyTest implements GammaConstants {
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    for (GammaLongRef ref : refs) {
-                        ref.incrementAndGet(1);
+                    for (GammaRef ref : refs) {
+                        ref.set(getName());
                     }
                 }
             };
@@ -161,7 +161,7 @@ public class LongOrec_ReadConsistencyTest implements GammaConstants {
 
         private boolean fullWrite() {
             for (int k = 0; k < refs.length; k++) {
-                GammaLongRef ref = refs[k];
+                GammaRef ref = refs[k];
                 GammaRefTranlocal tranlocal = tranlocals[k];
 
                 if (!ref.tryLockAfterNormalArrive(64, LOCKMODE_EXCLUSIVE)) {
@@ -190,7 +190,7 @@ public class LongOrec_ReadConsistencyTest implements GammaConstants {
             for (; ;) {
                 lastConflictCount = stm.getGlobalConflictCounter().count();
                 for (int k = 0; k < refs.length; k++) {
-                    GammaLongRef ref = refs[k];
+                    GammaRef ref = refs[k];
                     GammaRefTranlocal tranlocal = tranlocals[k];
                     if (!ref.load(tranlocal, LOCKMODE_NONE, 64, true)) {
                         releaseChainAfterFailure();
@@ -368,7 +368,7 @@ public class LongOrec_ReadConsistencyTest implements GammaConstants {
                             refs[k].openForWrite(tx, LOCKMODE_NONE);
                         } else {
                             GammaRefTranlocal tranlocal = refs[k].openForRead(tx, LOCKMODE_NONE);
-                            tranlocal.long_value = tranlocal.version + 1;
+                            tranlocal.ref_value = getName();
                         }
                         if (k == refs.length - 1) {
                             return;
@@ -384,10 +384,10 @@ public class LongOrec_ReadConsistencyTest implements GammaConstants {
 
         private void assertReadConsistent() {
             long version = tx.getRefTranlocal(refs[0]).version;
-            long value = tx.getRefTranlocal(refs[0]).long_value;
+            Object value = tx.getRefTranlocal(refs[0]).ref_value;
             for (int k = 1; k < refs.length; k++) {
                 boolean b = version == tx.getRefTranlocal(refs[k]).version
-                        && value == tx.getRefTranlocal(refs[k]).long_value;
+                        && value == tx.getRefTranlocal(refs[k]).ref_value;
 
                 if (!b) {
                     System.out.println("Inconsistency detected");
@@ -525,7 +525,7 @@ public class LongOrec_ReadConsistencyTest implements GammaConstants {
             for (int k = 0; k < refs.length; k++) {
                 if (write) {
                     GammaRefTranlocal tranlocal = refs[k].openForRead(tx, LOCKMODE_NONE);
-                    tranlocal.long_value = tranlocal.version+1;
+                    tranlocal.ref_value = getName();
                 } else {
                     refs[k].openForWrite(tx, LOCKMODE_NONE);
                 }
@@ -538,10 +538,10 @@ public class LongOrec_ReadConsistencyTest implements GammaConstants {
 
         private void assertReadConsistent(GammaTransaction tx) {
             long version = tx.getRefTranlocal(refs[0]).version;
-            long value = tx.getRefTranlocal(refs[0]).long_value;
+            Object value = tx.getRefTranlocal(refs[0]).ref_value;
             for (int k = 1; k < refs.length; k++) {
                 boolean b = version == tx.getRefTranlocal(refs[k]).version
-                        && value == tx.getRefTranlocal(refs[k]).long_value;
+                        && value == tx.getRefTranlocal(refs[k]).ref_value;
 
                 if (!b) {
                     System.out.println("Inconsistency detected");
