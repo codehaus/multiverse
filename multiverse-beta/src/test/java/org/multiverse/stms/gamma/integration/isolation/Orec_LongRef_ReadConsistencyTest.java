@@ -538,10 +538,10 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
 
         private void assertReadConsistent(GammaTransaction tx) {
             long version = tx.getRefTranlocal(refs[0]).version;
-            long value = tx.getRefTranlocal(refs[0]).long_value;
+            long value = refs[0].get(tx);
             for (int k = 1; k < refs.length; k++) {
                 boolean b = version == tx.getRefTranlocal(refs[k]).version
-                        && value == tx.getRefTranlocal(refs[k]).long_value;
+                        && value == refs[k].get(tx);
 
                 if (!b) {
                     System.out.println("Inconsistency detected");
