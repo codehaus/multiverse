@@ -689,6 +689,8 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 readonlyCount = 0;
             }
 
+            //todo: if exclusive lock is acquired and no readers/then cheap write
+
             long next = current;
             if (readLockCount > 0) {
                 next = setReadLockCount(next, readLockCount - 1);

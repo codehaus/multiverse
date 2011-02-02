@@ -17,7 +17,7 @@ import static java.lang.System.getProperty;
  */
 public interface MultiverseConstants {
 
-    boolean ___BugshakerEnabled =
+    boolean SHAKE_BUGS =
             parseBoolean(getProperty("org.multiverse.bugshaker.enabled", "false"));
 
     boolean ___TracingEnabled =

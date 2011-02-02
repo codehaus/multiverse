@@ -7,7 +7,11 @@ import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.stms.gamma.*;
+import org.multiverse.stms.gamma.GammaAtomicBlock;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaObjectPool;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.LeanGammaAtomicBlock;
 import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
@@ -20,9 +24,7 @@ import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransact
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 
 /**
@@ -36,11 +38,22 @@ public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
     private GammaRef[] refs;
     private volatile boolean stop;
     private final AtomicBoolean inconstencyDetected = new AtomicBoolean();
+    private final long durationMs = 360 * 1000;
+    private int refCount = 256;
+    private int writingThreadCount;
+    private int readingThreadCount;
 
     @Before
     public void setUp() {
         stm = new GammaStm();
         stop = false;
+        inconstencyDetected.set(false);
+        readingThreadCount = 10;
+        writingThreadCount = 2;
+        refs = new GammaRef[refCount];
+        for (int k = 0; k < refs.length; k++) {
+            refs[k] = new GammaRef(stm, 0);
+        }
     }
 
     @After
@@ -48,42 +61,6 @@ public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
         for (GammaRef ref : refs) {
             System.out.println(ref.toDebugString());
         }
-    }
-
-    @Test
-    public void test() {
-        int refCount = 100;
-        int readingThreadCount = 10;
-        int writingThreadCount = 2;
-
-        refs = new GammaRef[refCount];
-        for (int k = 0; k < refs.length; k++) {
-            refs[k] = new GammaRef(stm, 0);
-        }
-
-        BasicReadThread[] readingThreads = new BasicReadThread[readingThreadCount];
-        for (int k = 0; k < readingThreads.length; k++) {
-            readingThreads[k] = new BasicReadThread(k);
-        }
-
-        //UpdatingThread[] updatingThreads = new UpdatingThread[writingThreadCount];
-        //for (int k = 0; k < updatingThreads.length; k++) {
-        //    updatingThreads[k] = new UpdatingThread(k);
-        //}
-
-
-        startAll(readingThreads);
-        //startAll(updatingThreads);
-        sleepMs(300 * 1000);
-        stop = true;
-        sleepMs(1000);
-        for (GammaRef ref : refs) {
-            System.out.println(ref.toDebugString());
-        }
-
-        joinAll(readingThreads);
-        //joinAll(updatingThreads);
-        assertFalse(inconstencyDetected.get());
     }
 
     class UpdatingThread extends TestThread {
@@ -105,7 +82,6 @@ public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     for (GammaRef ref : refs) {
-
                         ref.set(tx, name);
                     }
                 }
@@ -122,6 +98,28 @@ public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
                 }
             }
         }
+    }
+
+    @Test
+    public void basicTest() {
+        BasicReadThread[] readingThreads = new BasicReadThread[readingThreadCount];
+        for (int k = 0; k < readingThreads.length; k++) {
+            readingThreads[k] = new BasicReadThread(k);
+        }
+
+        UpdatingThread[] updatingThreads = new UpdatingThread[writingThreadCount];
+        for (int k = 0; k < updatingThreads.length; k++) {
+            updatingThreads[k] = new UpdatingThread(k);
+        }
+
+        startAll(readingThreads);
+        startAll(updatingThreads);
+        sleepMs(durationMs);
+        stop = true;
+        sleepMs(1000);
+        joinAll(readingThreads);
+        joinAll(updatingThreads);
+        assertFalse(inconstencyDetected.get());
     }
 
     class BasicReadThread extends TestThread {
@@ -206,10 +204,14 @@ public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
                         break;
                     }
 
-                    if(k==0){
-                         v = tranlocal.ref_value;
-                    }else{
-                        assertEquals(v, tranlocal.ref_value);
+                    if (k == 0) {
+                        v = tranlocal.ref_value;
+                    } else {
+                        if (v != tranlocal.ref_value) {
+                            System.out.println("Inconsistency detected");
+                            stop = true;
+                            fail();
+                        }
                     }
 
                     if (k == refs.length - 1) {
@@ -314,6 +316,33 @@ public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
         }
     }
 
+    @Test
+    public void testFixedLengthTransactionUsingReadThread() {
+        FixedLengthTransactionUsingReadThread[] readingThreads = new FixedLengthTransactionUsingReadThread[readingThreadCount];
+        for (int k = 0; k < readingThreads.length; k++) {
+            readingThreads[k] = new FixedLengthTransactionUsingReadThread(k);
+        }
+
+        UpdatingThread[] updatingThreads = new UpdatingThread[writingThreadCount];
+        for (int k = 0; k < updatingThreads.length; k++) {
+            updatingThreads[k] = new UpdatingThread(k);
+        }
+
+        startAll(readingThreads);
+        startAll(updatingThreads);
+
+        sleepMs(durationMs);
+        stop = true;
+        sleepMs(1000);
+        for (GammaRef ref : refs) {
+            System.out.println(ref.toDebugString());
+        }
+
+        joinAll(readingThreads);
+        joinAll(updatingThreads);
+        assertFalse(inconstencyDetected.get());
+    }
+
     class FixedLengthTransactionUsingReadThread extends TestThread {
 
         public final FatFixedLengthGammaTransaction tx = new FatFixedLengthGammaTransaction(
@@ -385,10 +414,7 @@ public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
                 }
             }
         }
-
-
     }
-
 
     class FixedLengthTransactionReadingThread extends TestThread {
 
@@ -522,8 +548,6 @@ public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
                 }
             }
         }
-
-
     }
 
     class VariableReadingWithBlockThread extends TestThread {
@@ -636,19 +660,19 @@ public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
 
     }
 
-      private void assertReadConsistent(GammaTransaction tx) {
-            long version = tx.getRefTranlocal(refs[0]).version;
-            Object value = tx.getRefTranlocal(refs[0]).ref_value;
-            for (int k = 1; k < refs.length; k++) {
-                boolean badVersion = version != tx.getRefTranlocal(refs[k]).version;
-                boolean badValue = value != tx.getRefTranlocal(refs[k]).ref_value;
+    private void assertReadConsistent(GammaTransaction tx) {
+        long version = tx.getRefTranlocal(refs[0]).version;
+        Object value = tx.getRefTranlocal(refs[0]).ref_value;
+        for (int k = 1; k < refs.length; k++) {
+            boolean badVersion = version != tx.getRefTranlocal(refs[k]).version;
+            boolean badValue = value != tx.getRefTranlocal(refs[k]).ref_value;
 
-                if (badValue || badVersion) {
-                    System.out.printf("Inconsistency detected badValue=%s badVersion=%s\n", badValue, badVersion);
-                    inconstencyDetected.compareAndSet(false, true);
-                    stop = true;
-                    break;
-                }
+            if (badValue || badVersion) {
+                System.out.printf("Inconsistency detected badValue=%s badVersion=%s\n", badValue, badVersion);
+                inconstencyDetected.compareAndSet(false, true);
+                stop = true;
+                break;
             }
         }
+    }
 }

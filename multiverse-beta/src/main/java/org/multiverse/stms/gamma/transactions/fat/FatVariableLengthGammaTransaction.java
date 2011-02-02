@@ -11,6 +11,8 @@ import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 import org.multiverse.stms.gamma.transactions.SpeculativeGammaConfiguration;
 
+import static org.multiverse.utils.Bugshaker.shakeBugs;
+
 @SuppressWarnings({"OverlyComplexClass"})
 public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
@@ -148,17 +150,19 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
         int listenersIndex = 0;
         int itemCount = 0;
+        //first write everything without releasing
         for (int k = 0; k < array.length; k++) {
+            if(SHAKE_BUGS){shakeBugs();}
+
             final GammaRefTranlocal tranlocal = array[k];
 
             if (tranlocal == null) {
                 continue;
             }
 
-            array[k] = null;
-
             final AbstractGammaRef owner = tranlocal.owner;
-            final Listeners listeners = owner.commit(tranlocal, pool);
+            final Listeners listeners = owner.commit_writeWithoutRelease(tranlocal, pool);
+
             if (listeners != null) {
                 if (listenersArray == null) {
                     listenersArray = pool.takeListenersArray(size - itemCount);
@@ -169,6 +173,20 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
             }
             pool.put(tranlocal);
             itemCount++;
+        }
+
+        //now release the resources
+        for (int k = 0; k < array.length; k++) {
+            if(SHAKE_BUGS){shakeBugs();}
+
+            final GammaRefTranlocal tranlocal = array[k];
+
+            if (tranlocal == null) {
+                continue;
+            }
+
+            array[k] = null;
+            tranlocal.owner.commit_release(tranlocal, pool);
         }
 
         return listenersArray;
@@ -217,13 +235,15 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     private GammaObject doPrepare() {
         for (int k = 0; k < array.length; k++) {
+            if(SHAKE_BUGS){shakeBugs();}
+
             final GammaRefTranlocal tranlocal = array[k];
 
             if (tranlocal == null) {
                 continue;
             }
 
-            AbstractGammaRef owner = tranlocal.owner;
+            final AbstractGammaRef owner = tranlocal.owner;
 
             if (!owner.prepare(this, tranlocal)) {
                 return owner;
@@ -380,17 +400,11 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         //todo: isolation level check.
 
         if (richmansMansConflictScan) {
+            if(SHAKE_BUGS){shakeBugs();}
+
             final long conflictCount = config.globalConflictCounter.count();
 
             if (lastConflictCount == conflictCount) {
-                //problem: it can be that either
-                //- the global conflict counter has not been increased yet:
-                //       ---if the global conflict counter has not been increased yet, then either
-                //              - the data is not changed: so the readset is still valid.
-                //              - the data has an exclusive read: no inconsistent readset can be created.
-                //- the conflict counter is incremented, and a conflict scan is done, but no conflict is found.
-                //      -- this can't happen (unless the conflict check if broken) since either the ref
-                //      is still locked, or the value/version has changed.
                 return true;
             }
 
@@ -411,6 +425,8 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
             if (tranlocal == null) {
                 continue;
             }
+
+            if(SHAKE_BUGS){shakeBugs();}
 
             if (tranlocal.owner.hasReadConflict(tranlocal)) {
                 return false;

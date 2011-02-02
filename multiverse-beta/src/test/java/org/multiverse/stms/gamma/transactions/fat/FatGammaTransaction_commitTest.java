@@ -48,7 +48,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
         assertIsCommitted(tx);
         assertRefHasNoLocks(ref);
-        assertVersionAndValue(ref, GammaObject.VERSION_UNCOMMITTED + 1, initialValue);
+        assertVersionAndValue(ref, VERSION_UNCOMMITTED + 1, initialValue);
         assertSurplus(ref, 0);
         assertReadonlyCount(ref, 0);
         assertUpdateBiased(ref);
@@ -63,7 +63,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
         assertIsCommitted(tx);
         assertRefHasNoLocks(ref);
-        assertVersionAndValue(ref, GammaObject.VERSION_UNCOMMITTED + 1, initialValue);
+        assertVersionAndValue(ref, VERSION_UNCOMMITTED + 1, initialValue);
         assertSurplus(ref, 0);
         assertReadonlyCount(ref, 0);
         assertUpdateBiased(ref);
@@ -78,7 +78,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
         assertIsCommitted(tx);
         assertRefHasNoLocks(ref);
-        assertVersionAndValue(ref, GammaObject.VERSION_UNCOMMITTED + 1, initialValue);
+        assertVersionAndValue(ref, VERSION_UNCOMMITTED + 1, initialValue);
         assertSurplus(ref, 0);
         assertReadonlyCount(ref, 0);
         assertUpdateBiased(ref);
@@ -93,7 +93,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
         assertIsCommitted(tx);
         assertRefHasNoLocks(ref);
-        assertVersionAndValue(ref, GammaObject.VERSION_UNCOMMITTED + 1, initialValue);
+        assertVersionAndValue(ref, VERSION_UNCOMMITTED + 1, initialValue);
         assertSurplus(ref, 0);
         assertReadonlyCount(ref, 0);
         assertUpdateBiased(ref);
@@ -108,7 +108,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
         assertIsCommitted(tx);
         assertRefHasNoLocks(ref);
-        assertVersionAndValue(ref, GammaObject.VERSION_UNCOMMITTED + 1, initialValue);
+        assertVersionAndValue(ref, VERSION_UNCOMMITTED + 1, initialValue);
         assertSurplus(ref, 0);
         assertReadonlyCount(ref, 0);
         assertUpdateBiased(ref);

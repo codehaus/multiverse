@@ -10,6 +10,8 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
+import static org.multiverse.utils.Bugshaker.shakeBugs;
+
 public final class FatFixedLengthGammaTransaction extends GammaTransaction {
 
     public GammaRefTranlocal head;
@@ -83,6 +85,8 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
 
         GammaRefTranlocal node = head;
         do {
+            if(SHAKE_BUGS){shakeBugs();}
+
             final AbstractGammaRef owner = node.owner;
             if (owner == null) {
                 return listenersArray;
@@ -105,6 +109,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
 
         do {
             final AbstractGammaRef owner = node.owner;
+            if(SHAKE_BUGS){shakeBugs();}
 
             if (owner == null) {
                 return null;
@@ -316,6 +321,8 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         //}
 
         if (richmansMansConflictScan) {
+            if(SHAKE_BUGS){shakeBugs();}
+
             final long currentConflictCount = config.globalConflictCounter.count();
 
             if (lastConflictCount == currentConflictCount) {
@@ -331,6 +338,8 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         //doing a full conflict scan
         GammaRefTranlocal node = head;
         while (node != null) {
+            if(SHAKE_BUGS){shakeBugs();}
+
             //if we are at the end, we are done.
             if (node.owner == null) {
                 break;

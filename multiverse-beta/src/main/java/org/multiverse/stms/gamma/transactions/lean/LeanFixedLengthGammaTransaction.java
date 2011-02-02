@@ -75,7 +75,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
                     break;
                 }
 
-                final Listeners listeners = owner.leanSafe(node);
+                final Listeners listeners = owner.leanCommit(node);
                 if (listeners != null) {
                     listenersArray[listenersIndex] = listeners;
                     listenersIndex++;

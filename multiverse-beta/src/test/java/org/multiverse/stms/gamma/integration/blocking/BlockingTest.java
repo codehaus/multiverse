@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.LongRefAwaitThread;
+import org.multiverse.stms.gamma.transactionalobjects.gammalongref.LongRefAwaitThread;
 
 import static org.multiverse.TestUtils.assertAlive;
 import static org.multiverse.TestUtils.sleepMs;

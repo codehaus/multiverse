@@ -23,6 +23,7 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
 import static org.multiverse.stms.gamma.GammaStmUtils.asGammaTransaction;
 import static org.multiverse.stms.gamma.GammaStmUtils.getRequiredThreadLocalGammaTransaction;
 import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLocalGammaObjectPool;
+import static org.multiverse.utils.Bugshaker.shakeBugs;
 
 @SuppressWarnings({"OverlyComplexClass", "OverlyCoupledClass"})
 public abstract class AbstractGammaRef extends AbstractGammaObject {
@@ -136,7 +137,43 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         return listenerAfterWrite;
     }
 
-    public final Listeners leanSafe(final GammaRefTranlocal tranlocal) {
+    public final Listeners commit_writeWithoutRelease(final GammaRefTranlocal tranlocal, final GammaObjectPool pool) {
+        if (!tranlocal.isDirty) {
+            return null;
+        }
+
+        if (type == TYPE_REF) {
+            ref_value = tranlocal.ref_value;
+            //we need to set them to null to prevent memory leaks.
+            tranlocal.ref_value = null;
+            tranlocal.ref_oldValue = null;
+        } else {
+            long_value = tranlocal.long_value;
+        }
+
+        version = tranlocal.version + 1;
+
+        Listeners listenerAfterWrite = listeners;
+
+        if (listenerAfterWrite != null) {
+            listenerAfterWrite = ___removeListenersAfterWrite();
+        }
+
+        return listenerAfterWrite;
+    }
+
+    public final void commit_release(final GammaRefTranlocal tranlocal, final GammaObjectPool pool) {
+        if (!tranlocal.isDirty()) {
+            releaseAfterReading(tranlocal, pool);
+            return;
+        }
+
+        releaseAfterUpdate(tranlocal, pool);
+    }
+
+    public final Listeners leanCommit(final GammaRefTranlocal tranlocal) {
+        assert type == TYPE_REF;
+
         if (tranlocal.mode == TRANLOCAL_READ) {
             tranlocal.ref_value = null;
             tranlocal.owner = null;
@@ -144,7 +181,6 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         ref_value = tranlocal.ref_value;
-
         version = tranlocal.version + 1;
 
         Listeners listenerAfterWrite = listeners;
@@ -181,17 +217,13 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (!tranlocal.isDirty()) {
-            boolean isDirty;
-            if (type == TYPE_REF) {
-                //noinspection ObjectEquality
-                isDirty = tranlocal.ref_value != tranlocal.ref_oldValue;
-            } else {
-                isDirty = tranlocal.long_value != tranlocal.long_oldValue;
-            }
+            final boolean isDirty = type == TYPE_REF
+                    ? tranlocal.ref_value != tranlocal.ref_oldValue
+                    : tranlocal.long_value != tranlocal.long_oldValue;
 
             if (!isDirty) {
-                return !tranlocal.writeSkewCheck ||
-                        tryLockAndCheckConflict(tx.config.spinCount, tranlocal, LOCKMODE_READ);
+                return !tranlocal.writeSkewCheck
+                        || tryLockAndCheckConflict(tx.config.spinCount, tranlocal, LOCKMODE_READ);
             }
 
             tranlocal.setDirty(true);
@@ -281,16 +313,16 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             tranlocal.owner = this;
             tranlocal.version = version;
             if (type == TYPE_REF) {
-                final Object v = ref_value;
-                tranlocal.ref_value = v;
-                tranlocal.ref_oldValue = v;
+                final Object value = ref_value;
+                tranlocal.ref_value = value;
+                tranlocal.ref_oldValue = value;
             } else {
-                final long v = long_value;
-                tranlocal.long_value = v;
-                tranlocal.long_oldValue = v;
+                final long value = long_value;
+                tranlocal.long_value = value;
+                tranlocal.long_oldValue = value;
             }
-            tranlocal.setLockMode(lockMode);
-            tranlocal.setDepartObligation(arriveStatus == ARRIVE_NORMAL);
+            tranlocal.lockMode = lockMode;
+            tranlocal.hasDepartObligation = arriveStatus == ARRIVE_NORMAL;
             return true;
         }
 
@@ -302,15 +334,25 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 do {
                     readVersion = version;
                     readRef = ref_value;
-                } while (readVersion!=version);
+                    if (SHAKE_BUGS) {
+                        shakeBugs();
+                    }
+                } while (readVersion != version);
             } else {
-                 do {
-                     readVersion = version;
-                     readLong = long_value;
+                do {
+                    readVersion = version;
+                    readLong = long_value;
+                    if (SHAKE_BUGS) {
+                        shakeBugs();
+                    }
                 } while (readVersion != version);
             }
 
-             final int arriveStatus = arriveNeeded
+            if (SHAKE_BUGS) {
+                shakeBugs();
+            }
+
+            final int arriveStatus = arriveNeeded
                     ? arrive(spinCount)
                     : (waitForExclusiveLockToBecomeFree(spinCount) ? ARRIVE_UNREGISTERED : ARRIVE_LOCK_NOT_FREE);
 
@@ -318,10 +360,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 return false;
             }
 
-            //If the version hasn't changed, the value can't have changed either because the value always is changed
-            //before the value is changed.
-            //todo: the hasExclusiveLock has been added to figure out the race problem with read consistency.
-            //noinspection ObjectEquality
+            if (SHAKE_BUGS) {
+                shakeBugs();
+            }
+
             if (version == readVersion) {
                 tranlocal.owner = this;
                 tranlocal.version = readVersion;
@@ -1594,6 +1636,8 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     }
 
     public final long atomicSetLong(final long newValue, boolean returnOld) {
+        assert type != TYPE_REF;
+
         final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
 
         if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
@@ -1629,6 +1673,8 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     }
 
     public final Object atomicSetObject(final Object newValue, boolean returnOld) {
+        assert type == TYPE_REF;
+
         final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
 
         if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {

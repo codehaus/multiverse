@@ -5,17 +5,27 @@ import java.util.concurrent.locks.LockSupport;
 import static java.lang.Thread.yield;
 
 /**
- * Contains some utility functions for shaking out bugs.
+ * Contains some utility functions for shaking out bugs. It can be used by adding this method is the code like
+ * this:
+ * <pre>
+ * if(MultiverseConstants.___BugshakerEnabled){Bugshaker.shakeBugs();}
+ * </pre>
+ * Since the ___BugshakerEnabled field is final, it can be removed by the JIT is the bugshaking is disabled so
+ * there is no overhead.
+ *
+ * At the moment the Bugshaker is not configurable, but will
  *
  * @author Peter Veentjer
  */
 public class Bugshaker {
 
     /**
-     * Delays a random amount of time.
+     * Delays a random amount of time. What essentially happens is that a random number is selected and one in the
+     * n cases, a sleep is done and one in the n cases a yield is done.
      */
     public static void shakeBugs() {
         int random = ThreadLocalRandom.current().nextInt(100);
+
         if (random == 10) {
             sleepUs(10);
         } else if (random == 20) {

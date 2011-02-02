@@ -7,7 +7,11 @@ import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.stms.gamma.*;
+import org.multiverse.stms.gamma.GammaAtomicBlock;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.GammaObjectPool;
+import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.LeanGammaAtomicBlock;
 import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
@@ -34,11 +38,25 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
     private GammaLongRef[] refs;
     private volatile boolean stop;
     private final AtomicBoolean inconstencyDetected = new AtomicBoolean();
+    private int readingThreadCount;
+    private int writingThreadCount;
+    private int refCount;
+    private int durationMs;
 
     @Before
     public void setUp() {
         stm = new GammaStm();
         stop = false;
+        refCount = 128;
+        readingThreadCount = 10;
+        writingThreadCount = 2;
+        durationMs = 300 * 1000;
+
+        refs = new GammaLongRef[refCount];
+        for (int k = 0; k < refs.length; k++) {
+            refs[k] = new GammaLongRef(stm, 0);
+        }
+        inconstencyDetected.set(false);
     }
 
     @After
@@ -50,18 +68,10 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
 
     @Test
     public void test() {
-        int refCount = 1024;
-        int readingThreadCount = 10;
-        int writingThreadCount = 2;
-
-        refs = new GammaLongRef[refCount];
-        for (int k = 0; k < refs.length; k++) {
-            refs[k] = new GammaLongRef(stm, 0);
-        }
-
-        VariableReadingWithBlockThread[] readingThreads = new VariableReadingWithBlockThread[readingThreadCount];
+        FatVariableLengthTransactionWithBlockThread[] readingThreads =
+                new FatVariableLengthTransactionWithBlockThread[readingThreadCount];
         for (int k = 0; k < readingThreads.length; k++) {
-            readingThreads[k] = new VariableReadingWithBlockThread(k);
+            readingThreads[k] = new FatVariableLengthTransactionWithBlockThread(k);
         }
 
         UpdatingThread[] threads = new UpdatingThread[writingThreadCount];
@@ -71,13 +81,8 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
 
         startAll(readingThreads);
         startAll(threads);
-        sleepMs(30 * 1000);
+        sleepMs(durationMs);
         stop = true;
-        sleepMs(1000);
-        for (GammaLongRef ref : refs) {
-            System.out.println(ref.toDebugString());
-        }
-
         joinAll(readingThreads);
         joinAll(threads);
         assertFalse(inconstencyDetected.get());
@@ -451,15 +456,13 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
                 }
             }
         }
-
-
     }
 
-    class VariableReadingWithBlockThread extends TestThread {
+    class FatVariableLengthTransactionWithBlockThread extends TestThread {
 
         private LeanGammaAtomicBlock block;
 
-        public VariableReadingWithBlockThread(int id) {
+        public FatVariableLengthTransactionWithBlockThread(int id) {
             super("VariableReadingWithBlockThread-" + id);
         }
 
@@ -496,6 +499,7 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
 
         private void fullRead(GammaTransaction tx) {
             long value = refs[0].get(tx);
+
             for (int k = 0; k < refs.length; k++) {
                 assertEquals(value, refs[k].openForWrite(tx, LOCKMODE_NONE).long_value);
             }

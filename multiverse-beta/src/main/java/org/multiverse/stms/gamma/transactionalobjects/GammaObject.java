@@ -9,8 +9,6 @@ import org.multiverse.stms.gamma.Listeners;
 
 public interface GammaObject extends GammaConstants {
 
-    int VERSION_UNCOMMITTED = 0;
-
     Listeners commit(GammaRefTranlocal tranlocal, GammaObjectPool pool);
 
     /**
