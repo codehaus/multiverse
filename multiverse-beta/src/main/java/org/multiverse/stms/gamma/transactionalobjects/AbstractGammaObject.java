@@ -288,7 +288,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     }
 
     private static void yieldIfNeeded(final int remainingSpins) {
-        if (remainingSpins % ___SpinYield == 0 && remainingSpins > 0) {
+        if (remainingSpins % SPIN_YIELD == 0 && remainingSpins > 0) {
             //noinspection CallToThreadYield
             Thread.yield();
         }

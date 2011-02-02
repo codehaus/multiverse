@@ -17,20 +17,27 @@ import static java.lang.System.getProperty;
  */
 public interface MultiverseConstants {
 
+    /**
+     * Indicates of the bugshaker is enabled (for more information see the
+     * {@link org.multiverse.utils.Bugshaker}. If disabled, no overhead because it
+     * can be removed by the JIT.
+     */
     boolean SHAKE_BUGS =
             parseBoolean(getProperty("org.multiverse.bugshaker.enabled", "false"));
 
+    /**
+     * Indicates if tracing (so seeing what is going on inside transactions) is
+     * enabled. Normally this causes overhead of not used, with this flag the complete
+     * tracing logic can be removed by the JIT if disabled).
+     */
     boolean TRACING_ENABLED =
             parseBoolean(getProperty("org.multiverse.tracing.enabled", "false"));
-
-    boolean PROFILING_ENABLED =
-            parseBoolean(getProperty("org.multiverse.profiling.enabled", "false"));
 
     /**
      * Indicates how often the system should yield when it is spinning. When a thread is
      * yielded, it gives the opportunity to another thread to make progress.
      */
-    int ___SpinYield =
+    int SPIN_YIELD =
             parseInt(getProperty("org.multiverse.spinYield", "32"));
 
     final int LOCKMODE_NONE = 0;
