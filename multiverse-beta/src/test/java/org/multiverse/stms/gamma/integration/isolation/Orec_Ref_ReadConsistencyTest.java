@@ -395,7 +395,7 @@ public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
                 tx.size++;
 
                 if (!tx.hasReads) {
-                    tx.lastConflictCount = stm.globalConflictCounter.count();
+                    tx.localConflictCount = stm.globalConflictCounter.count();
                     tx.hasReads = true;
                 }
 

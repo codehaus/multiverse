@@ -74,7 +74,7 @@ public class FatVariableLengthGammaTransaction_openForWriteTest extends FatGamma
 
         assertIsActive(tx);
         assertTrue(tx.hasReads);
-        assertEquals(stm.getGlobalConflictCounter().count(), tx.lastConflictCount);
+        assertEquals(stm.getGlobalConflictCounter().count(), tx.localConflictCount);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasNoLocks(ref);
     }
@@ -112,7 +112,7 @@ public class FatVariableLengthGammaTransaction_openForWriteTest extends FatGamma
 
         assertIsActive(tx);
         assertTrue(tx.hasReads);
-        assertEquals(newConflictCount, tx.lastConflictCount);
+        assertEquals(newConflictCount, tx.localConflictCount);
         assertVersionAndValue(ref2, initialVersion2, initialValue2);
         assertRefHasNoLocks(ref2);
     }

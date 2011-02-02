@@ -19,7 +19,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
     public GammaRefTranlocal[] array;
     public int size = 0;
     public boolean hasReads = false;
-    public long lastConflictCount;
+    public long localConflictCount;
 
     public FatVariableLengthGammaTransaction(GammaStm stm) {
         this(new GammaTransactionConfiguration(stm));
@@ -404,11 +404,11 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
             final long conflictCount = config.globalConflictCounter.count();
 
-            if (lastConflictCount == conflictCount) {
+            if (localConflictCount == conflictCount) {
                 return true;
             }
 
-            lastConflictCount = conflictCount;
+            localConflictCount = conflictCount;
             //we are going to fall through to do a full conflict scan
         } else if (size > config.maximumPoorMansConflictScanLength) {
             throw abortOnRichmanConflictScanDetected();
