@@ -56,7 +56,7 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
 
         refs = new GammaLongRef[refCount];
         for (int k = 0; k < refs.length; k++) {
-            refs[k] = new GammaLongRef(stm,0);
+            refs[k] = new GammaLongRef(stm, 0);
         }
 
         VariableReadingWithBlockThread[] readingThreads = new VariableReadingWithBlockThread[readingThreadCount];
@@ -475,7 +475,7 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
 
             long iteration = 0;
             while (!stop) {
-                singleRun(System.nanoTime() % 10 == 0 && false);
+                singleRun();
                 iteration++;
 
                 if (iteration % 1000 == 0) {
@@ -484,47 +484,37 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
             }
         }
 
-        private void singleRun(final boolean write) {
+        private void singleRun() {
             block.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    fullRead((GammaTransaction) tx, write);
+                    fullRead((GammaTransaction) tx);
                     assertReadConsistent((GammaTransaction) tx);
                 }
             });
         }
 
-        private void fullRead(GammaTransaction tx, boolean write) {
+        private void fullRead(GammaTransaction tx) {
+            long value = refs[0].get(tx);
             for (int k = 0; k < refs.length; k++) {
-                if (write) {
-                    GammaRefTranlocal tranlocal = refs[k].openForRead(tx, LOCKMODE_NONE);
-                    tranlocal.long_value = tranlocal.version+1;
-                } else {
-                    refs[k].openForWrite(tx, LOCKMODE_NONE);
-                }
-
-                if (k == refs.length - 1) {
-                    return;
-                }
+                assertEquals(value, refs[k].openForWrite(tx, LOCKMODE_NONE).long_value);
             }
         }
-
-
     }
 
-      private void assertReadConsistent(GammaTransaction tx) {
-            long version = tx.getRefTranlocal(refs[0]).version;
-            long value = refs[0].get(tx);
-            for (int k = 1; k < refs.length; k++) {
-                boolean b = version == tx.getRefTranlocal(refs[k]).version
-                        && value == refs[k].get(tx);
+    private void assertReadConsistent(GammaTransaction tx) {
+        long version = tx.getRefTranlocal(refs[0]).version;
+        long value = refs[0].get(tx);
+        for (int k = 1; k < refs.length; k++) {
+            boolean b = version == tx.getRefTranlocal(refs[k]).version
+                    && value == refs[k].get(tx);
 
-                if (!b) {
-                    System.out.println("Inconsistency detected");
-                    inconstencyDetected.compareAndSet(false, true);
-                    stop = true;
-                    break;
-                }
+            if (!b) {
+                System.out.println("Inconsistency detected");
+                inconstencyDetected.compareAndSet(false, true);
+                stop = true;
+                break;
             }
         }
+    }
 }

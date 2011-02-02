@@ -12,12 +12,11 @@ import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * Question: could the problem be in the quick release mechanism?
- *
+ * <p/>
  * Problem?
  * if a writing transaction has done n updates (and has released the updates) and has m to go.
  * If a reading transaction reads the n updates, there is no reason for the updating transaction to cause
@@ -38,7 +37,7 @@ public abstract class LongRefReadConsistency_AbstractTest {
     public void setUp() {
         clearThreadLocalTransaction();
         stop = false;
-        stm = (GammaStm) getGlobalStmInstance();
+        stm = new GammaStm();
     }
 
     @After
@@ -98,7 +97,7 @@ public abstract class LongRefReadConsistency_AbstractTest {
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
                     for (int k = 0; k < refs.length; k++) {
-                        refs[k].incrementAndGet(btx,1);
+                        refs[k].set(btx, id);
                     }
                 }
             };
@@ -134,7 +133,11 @@ public abstract class LongRefReadConsistency_AbstractTest {
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
 
-                    long initial =refs[0].get(btx);
+                    for (int k = 0; k < refs.length; k++) {
+                        refs[k].get(btx);
+                    }
+
+                    long initial = refs[0].get(btx);
 
                     for (int k = 1; k < refs.length; k++) {
                         long s = refs[k].get(btx);

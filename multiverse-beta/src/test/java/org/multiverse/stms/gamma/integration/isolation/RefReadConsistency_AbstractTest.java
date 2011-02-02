@@ -94,7 +94,7 @@ public abstract class RefReadConsistency_AbstractTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
-                    String initial = refs[0].get(btx);
+                    //String initial = refs[0].get(btx);
 
                     for (int k = 0; k < refs.length; k++) {
                         refs[k].openForWrite(btx, LOCKMODE_NONE).ref_value=value;
