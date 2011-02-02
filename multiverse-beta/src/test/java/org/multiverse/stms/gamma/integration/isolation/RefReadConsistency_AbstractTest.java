@@ -10,14 +10,16 @@ import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
-import static org.junit.Assert.assertSame;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.junit.Assert.assertFalse;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
 /**
  * Question: could the problem be in the quick release mechanism?
- *
+ * <p/>
  * Problem?
  * if a writing transaction has done n updates (and has released the updates) and has m to go.
  * If a reading transaction reads the n updates, there is no reason for the updating transaction to cause
@@ -28,6 +30,7 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
 public abstract class RefReadConsistency_AbstractTest {
 
     private GammaRef<String>[] refs;
+    private final AtomicBoolean inconsistencyDetected = new AtomicBoolean();
 
     private int readerCount = 10;
     private int writerCount = 2;
@@ -39,6 +42,7 @@ public abstract class RefReadConsistency_AbstractTest {
         clearThreadLocalTransaction();
         stop = false;
         stm = (GammaStm) getGlobalStmInstance();
+        inconsistencyDetected.set(false);
     }
 
     @After
@@ -77,6 +81,7 @@ public abstract class RefReadConsistency_AbstractTest {
         stop = true;
         joinAll(readerThreads);
         joinAll(writerThreads);
+        assertFalse("Inconsistency detected", inconsistencyDetected.get());
     }
 
     public class WriterThread extends TestThread {
@@ -97,7 +102,7 @@ public abstract class RefReadConsistency_AbstractTest {
                     //String initial = refs[0].get(btx);
 
                     for (int k = 0; k < refs.length; k++) {
-                        refs[k].openForWrite(btx, LOCKMODE_NONE).ref_value=value;
+                        refs[k].openForWrite(btx, LOCKMODE_NONE).ref_value = value;
                         //String s = refs[k].getAndSet(tx, value);
                         //assertSame("failed at " + k, initial, s);
                     }
@@ -135,11 +140,15 @@ public abstract class RefReadConsistency_AbstractTest {
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
 
-                    String initial = (String)refs[0].openForRead(btx, LOCKMODE_NONE).ref_value;
+                    String initial = (String) refs[0].openForRead(btx, LOCKMODE_NONE).ref_value;
 
                     for (int k = 1; k < refs.length; k++) {
-                        String s = (String)refs[k].openForRead(btx, LOCKMODE_NONE).ref_value;
-                        assertSame("failed at " + k, initial, s);
+                        String s = (String) refs[k].openForRead(btx, LOCKMODE_NONE).ref_value;
+                        if (s != initial) {
+                            System.out.println("Inconsistency detected");
+                            inconsistencyDetected.set(true);
+                            stop = true;
+                        }
                     }
                 }
             };

@@ -611,9 +611,9 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             Object readRef;
             long readVersion;
             do {
-                readRef = ref_value;
                 readVersion = version;
-            } while (readRef != ref_value);
+                readRef = ref_value;
+            } while (readVersion != version);
 
             //wait for the exclusive lock to come available.
             int spinCount = 64;
@@ -707,9 +707,9 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             long readVersion;
             Object readRef;
             do {
-                readRef = ref_value;
                 readVersion = version;
-            } while (readRef != ref_value);
+                readRef = ref_value;
+            } while (readVersion != version);
 
             //wait for the exclusive lock to come available.
             int spinCount = 64;

@@ -26,6 +26,8 @@
                         done
 --------------------------------------------------------------------
 
+- lean loads now also have the correct version/ref/version read.
+
 - downsizing of the map transaction on hard reset.
 
 - selecting the right map transaction size based on previous executions.
