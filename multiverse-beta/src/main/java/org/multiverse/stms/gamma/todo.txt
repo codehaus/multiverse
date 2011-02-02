@@ -18,11 +18,27 @@
 
 - commute and locking
 
+- fast conflict detection fails.
+
 - when a transaction commits, how often does it need to send out a globalconflictcounter.inc. Can't this be done once?
 
 - constructing objects and check for read consistency.
 
 - commuting objects and check for read consistency once loaded
+
+- bug shaker needs to be added to lean transactions
+
+- fast/slow release of commit locks.. choose one since currently 2 different
+approaches are used (for trying to figure out if it is causing the consistency bug)
+
+- optimize the tx-pool logic (instead of using an array, use a single linked list)
+
+- read biased stuff needs to be re-enabled.
+
+- fast 'write' on orec.depart when exclusive lock and no surplus
+
+- fast readset validation on committing transaction if the conflict counter has not changed
+needs more research.
 
 --------------------------------------------------------------------
                         done

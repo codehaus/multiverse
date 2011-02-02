@@ -111,7 +111,7 @@ private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                     format("[%s] Has 'Requires' propagation level and no transaction found, starting a new transaction",
@@ -128,7 +128,7 @@ private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.
                         return execute(tx, transactionContainer, pool, closure);
 #end
                     } else {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                     format("[%s] Has 'Requires' propagation level, and existing transaction [%s] found",
@@ -145,7 +145,7 @@ private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.
                     }
                 case Mandatory:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                     format("[%s] Has 'Mandatory' propagation level, and no transaction is found",
@@ -157,7 +157,7 @@ private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.
                                     transactionConfiguration.familyName));
                         }
 
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                             logger.info(
                                 format("[%s] Has 'Mandatory' propagation level and transaction [%s] found",
@@ -172,7 +172,7 @@ private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.
 #end
                 case Never:
                     if (tx != null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                     format("[%s] Has 'Never' propagation level, but transaction [%s] is found",
@@ -187,7 +187,7 @@ private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.
                             );
                     }
 
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                             logger.info(
                                 format("[%s] Has 'Never' propagation level and no transaction is found",
@@ -202,7 +202,7 @@ private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.
 #end
                 case RequiresNew:
                     if (tx == null) {
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                     format("[%s] Has 'RequiresNew' propagation level and no transaction is found, starting new transaction",
@@ -219,7 +219,7 @@ private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.
                         return execute(tx, transactionContainer, pool, closure);
 #end
                     } else {
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                     format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
@@ -242,7 +242,7 @@ private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.
                         }
                     }
                 case Supports:
-                    if(___TracingEnabled){
+                    if(TRACING_ENABLED){
                         if(tx!=null){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
@@ -303,7 +303,7 @@ private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.
                         return result;
 #end
                     } catch (Retry e) {
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
                                     transactionConfiguration.familyName));
@@ -311,7 +311,7 @@ private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.
                         }
                         tx.awaitUpdate();
                     } catch (SpeculativeConfigurationError e) {
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a speculative configuration error",
                                     transactionConfiguration.familyName));
@@ -325,7 +325,7 @@ private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
                         cause = e;
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
                                     transactionConfiguration.familyName));
@@ -349,7 +349,7 @@ private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.
             throw new InvisibleCheckedException(e);
         }
 
-        if(___TracingEnabled){
+        if(TRACING_ENABLED){
             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                 logger.info(format("[%s] Maximum number of %s retries has been reached",
                     transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));

@@ -148,6 +148,8 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
     private Listeners[] commitArray() {
         Listeners[] listenersArray = null;
 
+        config.globalConflictCounter.signalConflict(null);
+
         int listenersIndex = 0;
         int itemCount = 0;
         //first write everything without releasing

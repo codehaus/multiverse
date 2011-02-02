@@ -32,6 +32,7 @@ public abstract class LongRefReadConsistency_AbstractTest {
 
     private int readerCount = 10;
     private int writerCount = 2;
+    private long durationMs = 10 * 60 * 1000;
     private volatile boolean stop;
     protected GammaStm stm;
     protected final AtomicBoolean inconsistencyDetected = new AtomicBoolean();
@@ -74,7 +75,6 @@ public abstract class LongRefReadConsistency_AbstractTest {
 
         startAll(readerThreads);
         startAll(writerThreads);
-        int durationMs = 30 * 1000;
         System.out.printf("Running for %s milliseconds\n", durationMs);
         sleepMs(getStressTestDurationMs(durationMs));
         stop = true;
@@ -143,7 +143,7 @@ public abstract class LongRefReadConsistency_AbstractTest {
                         if(initial!=s){
                             inconsistencyDetected.set(true);
                             stop = true;
-                            System.out.println("Inconsistency detected");
+                            System.out.printf("Inconsistency detected at index %s!!\n",k);
                         }
                     }
                 }

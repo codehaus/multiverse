@@ -82,8 +82,6 @@ non permanent.
 
 - and what about 'snapshots'? so only doing it 1 of the n calls.
 
-- bug shaker
-
 - ref: the registerRetrylatch should also do the abort.
 
 - is it possible to combine pessimistic locking with blocking? What if a transaction wants to wait for a lock
@@ -195,29 +193,9 @@ performance.
 
     - problem with the registration in the retry itself.
 
-- tracing
-
-- when hard reset is done, no new local conflict counter is created, so still attached to the old
-globalconflict counter.
-
 - lifecyclelistener
 
     - listeners are not cleaned after abort/commit, so still a potential memory leak
-
-- inconsistent read
-
-    - read uncommitted isolation level
-
-    - when an inconsistent read is done, instead of going through the arrive and depart, do it faster.
-    The arrive/depart is needed for consistency, but when an inconsistent read is done, it isn't needed.
-
-    - improved testing in the transaction for read committed isolation level
-
-    - implement read on transaction.
-
-- the tranlocal.openForRead needs to have the conflict stuff added
-
-- the tranlocal.openForWrite needs to have the conflict stuff added
 
 - javadoc should be upped to codehaus
 

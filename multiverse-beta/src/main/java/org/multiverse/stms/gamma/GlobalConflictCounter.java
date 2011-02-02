@@ -4,8 +4,6 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.utils.ToolUnsafe;
 import sun.misc.Unsafe;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 /**
  * The GlobalConflictCounter is used as a mechanism for guaranteeing read consistency. Depending on the configuration of the
  * transaction, if a transaction does a read, it also makes the read semi visible (only the number of readers are interesting
@@ -30,22 +28,18 @@ public final class GlobalConflictCounter {
             counterOffset = unsafe.objectFieldOffset(
                     GlobalConflictCounter.class.getDeclaredField("counter"));
         } catch (Exception ex) {
-            throw new Error("Failed to initialize the GlobalConflictCounter",ex);
+            throw new Error("Failed to initialize the GlobalConflictCounter", ex);
         }
     }
 
     private volatile long counter = 0;
-    public final AtomicLong count = new AtomicLong();
 
     public void signalConflict(GammaObject object) {
-        final long oldCount = count.get();
-        count.compareAndSet(oldCount, oldCount+1);
-        //unsafe.compareAndSwapLong(this, counterOffset, oldCount, oldCount + 1);
-        //todo: needs to be set to a relaxed increment
-        //count.incrementAndGet();
+        final long oldCount = counter;
+        unsafe.compareAndSwapLong(this, counterOffset, oldCount, oldCount + 1);
     }
 
     public long count() {
-        return count.get();
+        return counter;
     }
 }

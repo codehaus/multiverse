@@ -34,6 +34,7 @@ public abstract class RefReadConsistency_AbstractTest {
 
     private int readerCount = 10;
     private int writerCount = 2;
+    private int durationMs = 5 * 60 * 1000;
     private volatile boolean stop;
     protected GammaStm stm;
 
@@ -75,7 +76,6 @@ public abstract class RefReadConsistency_AbstractTest {
 
         startAll(readerThreads);
         startAll(writerThreads);
-        int durationMs = 30 * 1000;
         System.out.printf("Running for %s milliseconds\n", durationMs);
         sleepMs(getStressTestDurationMs(durationMs));
         stop = true;
@@ -145,7 +145,7 @@ public abstract class RefReadConsistency_AbstractTest {
                     for (int k = 1; k < refs.length; k++) {
                         String s = (String) refs[k].openForRead(btx, LOCKMODE_NONE).ref_value;
                         if (s != initial) {
-                            System.out.println("Inconsistency detected");
+                            System.out.printf("Inconsistency detected at index %s!!!\n",k);
                             inconsistencyDetected.set(true);
                             stop = true;
                         }

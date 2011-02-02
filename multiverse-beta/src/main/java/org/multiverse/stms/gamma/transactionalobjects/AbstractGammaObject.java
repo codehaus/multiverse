@@ -741,7 +741,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             }
 
             if (conflict && !conflictSend) {
-                stm.globalConflictCounter.signalConflict(this);
+               // stm.globalConflictCounter.signalConflict(this);
                 //todo: enable again
                 //conflictSend = true;
             }
