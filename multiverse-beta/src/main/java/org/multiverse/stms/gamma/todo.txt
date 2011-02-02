@@ -22,6 +22,8 @@
 
 - constructing objects and check for read consistency.
 
+- commuting objects and check for read consistency once loaded
+
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------

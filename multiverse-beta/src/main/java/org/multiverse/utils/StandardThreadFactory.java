@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Peter Veentjer.
  */
+@SuppressWarnings({"ClassWithTooManyConstructors"})
 public final class StandardThreadFactory implements ThreadFactory {
 
     private static final AtomicInteger poolNumber = new AtomicInteger(1);

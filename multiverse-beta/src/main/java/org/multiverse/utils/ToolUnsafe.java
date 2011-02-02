@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
  * @author Peter Veentjer
  */
 public class ToolUnsafe {
+
     private ToolUnsafe() {
     } // dummy private constructor
 

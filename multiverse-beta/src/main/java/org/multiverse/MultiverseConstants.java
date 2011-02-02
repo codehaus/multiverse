@@ -20,10 +20,10 @@ public interface MultiverseConstants {
     boolean SHAKE_BUGS =
             parseBoolean(getProperty("org.multiverse.bugshaker.enabled", "false"));
 
-    boolean ___TracingEnabled =
+    boolean TRACING_ENABLED =
             parseBoolean(getProperty("org.multiverse.tracing.enabled", "false"));
 
-    boolean ___ProfilingEnabled =
+    boolean PROFILING_ENABLED =
             parseBoolean(getProperty("org.multiverse.profiling.enabled", "false"));
 
     /**

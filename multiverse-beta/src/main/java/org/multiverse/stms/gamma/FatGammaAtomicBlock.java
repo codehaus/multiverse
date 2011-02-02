@@ -70,7 +70,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Requires' propagation level and no transaction found, starting a new transaction",
@@ -82,7 +82,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         transactionContainer.tx = tx;
                         return execute(tx, transactionContainer, pool, closure);
                     } else {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Requires' propagation level, and existing transaction [%s] found",
@@ -94,7 +94,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     }
                 case Mandatory:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Mandatory' propagation level, and no transaction is found",
@@ -106,7 +106,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                                         transactionConfiguration.familyName));
                     }
 
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                             logger.info(
                                     format("[%s] Has 'Mandatory' propagation level and transaction [%s] found",
@@ -116,7 +116,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Never' propagation level, but transaction [%s] is found",
@@ -131,7 +131,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         );
                     }
 
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                             logger.info(
                                     format("[%s] Has 'Never' propagation level and no transaction is found",
@@ -141,7 +141,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     return closure.execute(null);
                 case RequiresNew:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'RequiresNew' propagation level and no transaction is found, starting new transaction",
@@ -153,7 +153,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         transactionContainer.tx = tx;
                         return execute(tx, transactionContainer, pool, closure);
                     } else {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
@@ -171,7 +171,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         }
                     }
                 case Supports:
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (tx != null) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
@@ -213,7 +213,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         abort = false;
                         return result;
                     } catch (Retry e) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
@@ -221,7 +221,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         }
                         tx.awaitUpdate();
                     } catch (SpeculativeConfigurationError e) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a speculative configuration error",
                                         transactionConfiguration.familyName));
@@ -235,7 +235,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
                         cause = e;
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
                                         transactionConfiguration.familyName));
@@ -259,7 +259,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
             throw new InvisibleCheckedException(e);
         }
 
-        if (___TracingEnabled) {
+        if (TRACING_ENABLED) {
             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                 logger.info(format("[%s] Maximum number of %s retries has been reached",
                         transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
@@ -304,7 +304,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Requires' propagation level and no transaction found, starting a new transaction",
@@ -316,7 +316,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         transactionContainer.tx = tx;
                         return execute(tx, transactionContainer, pool, closure);
                     } else {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Requires' propagation level, and existing transaction [%s] found",
@@ -328,7 +328,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     }
                 case Mandatory:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Mandatory' propagation level, and no transaction is found",
@@ -340,7 +340,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                                         transactionConfiguration.familyName));
                     }
 
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                             logger.info(
                                     format("[%s] Has 'Mandatory' propagation level and transaction [%s] found",
@@ -350,7 +350,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Never' propagation level, but transaction [%s] is found",
@@ -365,7 +365,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         );
                     }
 
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                             logger.info(
                                     format("[%s] Has 'Never' propagation level and no transaction is found",
@@ -375,7 +375,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     return closure.execute(null);
                 case RequiresNew:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'RequiresNew' propagation level and no transaction is found, starting new transaction",
@@ -387,7 +387,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         transactionContainer.tx = tx;
                         return execute(tx, transactionContainer, pool, closure);
                     } else {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
@@ -405,7 +405,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         }
                     }
                 case Supports:
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (tx != null) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
@@ -447,7 +447,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         abort = false;
                         return result;
                     } catch (Retry e) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
@@ -455,7 +455,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         }
                         tx.awaitUpdate();
                     } catch (SpeculativeConfigurationError e) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a speculative configuration error",
                                         transactionConfiguration.familyName));
@@ -469,7 +469,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
                         cause = e;
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
                                         transactionConfiguration.familyName));
@@ -493,7 +493,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
             throw new InvisibleCheckedException(e);
         }
 
-        if (___TracingEnabled) {
+        if (TRACING_ENABLED) {
             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                 logger.info(format("[%s] Maximum number of %s retries has been reached",
                         transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
@@ -538,7 +538,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Requires' propagation level and no transaction found, starting a new transaction",
@@ -550,7 +550,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         transactionContainer.tx = tx;
                         return execute(tx, transactionContainer, pool, closure);
                     } else {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Requires' propagation level, and existing transaction [%s] found",
@@ -562,7 +562,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     }
                 case Mandatory:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Mandatory' propagation level, and no transaction is found",
@@ -574,7 +574,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                                         transactionConfiguration.familyName));
                     }
 
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                             logger.info(
                                     format("[%s] Has 'Mandatory' propagation level and transaction [%s] found",
@@ -584,7 +584,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Never' propagation level, but transaction [%s] is found",
@@ -599,7 +599,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         );
                     }
 
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                             logger.info(
                                     format("[%s] Has 'Never' propagation level and no transaction is found",
@@ -609,7 +609,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     return closure.execute(null);
                 case RequiresNew:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'RequiresNew' propagation level and no transaction is found, starting new transaction",
@@ -621,7 +621,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         transactionContainer.tx = tx;
                         return execute(tx, transactionContainer, pool, closure);
                     } else {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
@@ -639,7 +639,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         }
                     }
                 case Supports:
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (tx != null) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
@@ -681,7 +681,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         abort = false;
                         return result;
                     } catch (Retry e) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
@@ -689,7 +689,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         }
                         tx.awaitUpdate();
                     } catch (SpeculativeConfigurationError e) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a speculative configuration error",
                                         transactionConfiguration.familyName));
@@ -703,7 +703,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
                         cause = e;
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
                                         transactionConfiguration.familyName));
@@ -727,7 +727,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
             throw new InvisibleCheckedException(e);
         }
 
-        if (___TracingEnabled) {
+        if (TRACING_ENABLED) {
             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                 logger.info(format("[%s] Maximum number of %s retries has been reached",
                         transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
@@ -772,7 +772,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Requires' propagation level and no transaction found, starting a new transaction",
@@ -784,7 +784,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         transactionContainer.tx = tx;
                         return execute(tx, transactionContainer, pool, closure);
                     } else {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Requires' propagation level, and existing transaction [%s] found",
@@ -796,7 +796,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     }
                 case Mandatory:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Mandatory' propagation level, and no transaction is found",
@@ -808,7 +808,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                                         transactionConfiguration.familyName));
                     }
 
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                             logger.info(
                                     format("[%s] Has 'Mandatory' propagation level and transaction [%s] found",
@@ -818,7 +818,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Never' propagation level, but transaction [%s] is found",
@@ -833,7 +833,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         );
                     }
 
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                             logger.info(
                                     format("[%s] Has 'Never' propagation level and no transaction is found",
@@ -843,7 +843,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     return closure.execute(null);
                 case RequiresNew:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'RequiresNew' propagation level and no transaction is found, starting new transaction",
@@ -855,7 +855,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         transactionContainer.tx = tx;
                         return execute(tx, transactionContainer, pool, closure);
                     } else {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
@@ -873,7 +873,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         }
                     }
                 case Supports:
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (tx != null) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
@@ -915,7 +915,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         abort = false;
                         return result;
                     } catch (Retry e) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
@@ -923,7 +923,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         }
                         tx.awaitUpdate();
                     } catch (SpeculativeConfigurationError e) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a speculative configuration error",
                                         transactionConfiguration.familyName));
@@ -937,7 +937,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
                         cause = e;
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
                                         transactionConfiguration.familyName));
@@ -961,7 +961,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
             throw new InvisibleCheckedException(e);
         }
 
-        if (___TracingEnabled) {
+        if (TRACING_ENABLED) {
             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                 logger.info(format("[%s] Maximum number of %s retries has been reached",
                         transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
@@ -1006,7 +1006,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Requires' propagation level and no transaction found, starting a new transaction",
@@ -1018,7 +1018,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         transactionContainer.tx = tx;
                         return execute(tx, transactionContainer, pool, closure);
                     } else {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Requires' propagation level, and existing transaction [%s] found",
@@ -1030,7 +1030,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     }
                 case Mandatory:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Mandatory' propagation level, and no transaction is found",
@@ -1042,7 +1042,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                                         transactionConfiguration.familyName));
                     }
 
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                             logger.info(
                                     format("[%s] Has 'Mandatory' propagation level and transaction [%s] found",
@@ -1052,7 +1052,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     return closure.execute(tx);
                 case Never:
                     if (tx != null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Never' propagation level, but transaction [%s] is found",
@@ -1067,7 +1067,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         );
                     }
 
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                             logger.info(
                                     format("[%s] Has 'Never' propagation level and no transaction is found",
@@ -1077,7 +1077,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     return closure.execute(null);
                 case RequiresNew:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'RequiresNew' propagation level and no transaction is found, starting new transaction",
@@ -1089,7 +1089,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         transactionContainer.tx = tx;
                         return execute(tx, transactionContainer, pool, closure);
                     } else {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
@@ -1107,7 +1107,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         }
                     }
                 case Supports:
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (tx != null) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
@@ -1149,7 +1149,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         abort = false;
                         return result;
                     } catch (Retry e) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
@@ -1157,7 +1157,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         }
                         tx.awaitUpdate();
                     } catch (SpeculativeConfigurationError e) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a speculative configuration error",
                                         transactionConfiguration.familyName));
@@ -1171,7 +1171,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
                         cause = e;
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
                                         transactionConfiguration.familyName));
@@ -1195,7 +1195,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
             throw new InvisibleCheckedException(e);
         }
 
-        if (___TracingEnabled) {
+        if (TRACING_ENABLED) {
             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                 logger.info(format("[%s] Maximum number of %s retries has been reached",
                         transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
@@ -1240,7 +1240,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
             switch (propagationLevel) {
                 case Requires:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Requires' propagation level and no transaction found, starting a new transaction",
@@ -1253,7 +1253,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         execute(tx, transactionContainer, pool, closure);
                         return;
                     } else {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Requires' propagation level, and existing transaction [%s] found",
@@ -1266,7 +1266,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     }
                 case Mandatory:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Mandatory' propagation level, and no transaction is found",
@@ -1278,7 +1278,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                                         transactionConfiguration.familyName));
                     }
 
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                             logger.info(
                                     format("[%s] Has 'Mandatory' propagation level and transaction [%s] found",
@@ -1289,7 +1289,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     return;
                 case Never:
                     if (tx != null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'Never' propagation level, but transaction [%s] is found",
@@ -1304,7 +1304,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         );
                     }
 
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                             logger.info(
                                     format("[%s] Has 'Never' propagation level and no transaction is found",
@@ -1315,7 +1315,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                     return;
                 case RequiresNew:
                     if (tx == null) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'RequiresNew' propagation level and no transaction is found, starting new transaction",
@@ -1328,7 +1328,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         execute(tx, transactionContainer, pool, closure);
                         return;
                     } else {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
                                         format("[%s] Has 'RequiresNew' propagationLevel and existing transaction [%s] was found",
@@ -1347,7 +1347,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         }
                     }
                 case Supports:
-                    if (___TracingEnabled) {
+                    if (TRACING_ENABLED) {
                         if (tx != null) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(
@@ -1390,7 +1390,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         abort = false;
                         return;
                     } catch (Retry e) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
                                         transactionConfiguration.familyName));
@@ -1398,7 +1398,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         }
                         tx.awaitUpdate();
                     } catch (SpeculativeConfigurationError e) {
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a speculative configuration error",
                                         transactionConfiguration.familyName));
@@ -1412,7 +1412,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
                         cause = e;
-                        if (___TracingEnabled) {
+                        if (TRACING_ENABLED) {
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
                                         transactionConfiguration.familyName));
@@ -1436,7 +1436,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock {
             throw new InvisibleCheckedException(e);
         }
 
-        if (___TracingEnabled) {
+        if (TRACING_ENABLED) {
             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                 logger.info(format("[%s] Maximum number of %s retries has been reached",
                         transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));

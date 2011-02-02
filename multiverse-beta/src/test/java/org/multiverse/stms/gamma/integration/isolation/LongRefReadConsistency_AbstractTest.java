@@ -10,7 +10,9 @@ import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
-import static org.junit.Assert.assertEquals;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.junit.Assert.assertFalse;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
@@ -32,12 +34,14 @@ public abstract class LongRefReadConsistency_AbstractTest {
     private int writerCount = 2;
     private volatile boolean stop;
     protected GammaStm stm;
+    protected final AtomicBoolean inconsistencyDetected = new AtomicBoolean();
 
     @Before
     public void setUp() {
         clearThreadLocalTransaction();
         stop = false;
         stm = new GammaStm();
+        inconsistencyDetected.set(false);
     }
 
     @After
@@ -76,6 +80,7 @@ public abstract class LongRefReadConsistency_AbstractTest {
         stop = true;
         joinAll(readerThreads);
         joinAll(writerThreads);
+        assertFalse(inconsistencyDetected.get());
     }
 
     public class WriterThread extends TestThread {
@@ -89,8 +94,6 @@ public abstract class LongRefReadConsistency_AbstractTest {
 
         @Override
         public void doRun() throws Exception {
-            final long value = id;
-
             AtomicBlock block = createWriteBlock();
             AtomicVoidClosure closure = new AtomicVoidClosure() {
                 @Override
@@ -133,15 +136,15 @@ public abstract class LongRefReadConsistency_AbstractTest {
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
 
-                    for (int k = 0; k < refs.length; k++) {
-                        refs[k].get(btx);
-                    }
-
                     long initial = refs[0].get(btx);
 
                     for (int k = 1; k < refs.length; k++) {
                         long s = refs[k].get(btx);
-                        assertEquals("failed at " + k, initial, s);
+                        if(initial!=s){
+                            inconsistencyDetected.set(true);
+                            stop = true;
+                            System.out.println("Inconsistency detected");
+                        }
                     }
                 }
             };

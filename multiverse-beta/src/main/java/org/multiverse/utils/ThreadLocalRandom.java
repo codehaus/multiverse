@@ -2,6 +2,7 @@ package org.multiverse.utils;
 
 import java.util.Random;
 
+@SuppressWarnings({"ClassWithTooManyFields"})
 public class ThreadLocalRandom extends Random {
     // same constants as Random, but must be redeclared because private
     private final static long multiplier = 0x5DEECE66DL;
@@ -61,6 +62,7 @@ public class ThreadLocalRandom extends Random {
      *
      * @throws UnsupportedOperationException always
      */
+    @Override
     public void setSeed(long seed) {
         if (initialized)
             throw new UnsupportedOperationException();

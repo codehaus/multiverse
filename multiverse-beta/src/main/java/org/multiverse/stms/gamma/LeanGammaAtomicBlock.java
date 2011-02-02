@@ -82,7 +82,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         abort = false;
                         return result;
                     } catch (Retry e) {
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
                                     transactionConfiguration.familyName));
@@ -90,7 +90,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         }
                         tx.awaitUpdate();
                     } catch (SpeculativeConfigurationError e) {
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a speculative configuration error",
                                     transactionConfiguration.familyName));
@@ -104,7 +104,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
                         cause = e;
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
                                     transactionConfiguration.familyName));
@@ -128,7 +128,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
             throw new InvisibleCheckedException(e);
         }
 
-        if(___TracingEnabled){
+        if(TRACING_ENABLED){
             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                 logger.info(format("[%s] Maximum number of %s retries has been reached",
                     transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
@@ -188,7 +188,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         abort = false;
                         return result;
                     } catch (Retry e) {
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
                                     transactionConfiguration.familyName));
@@ -196,7 +196,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         }
                         tx.awaitUpdate();
                     } catch (SpeculativeConfigurationError e) {
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a speculative configuration error",
                                     transactionConfiguration.familyName));
@@ -210,7 +210,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
                         cause = e;
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
                                     transactionConfiguration.familyName));
@@ -234,7 +234,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
             throw new InvisibleCheckedException(e);
         }
 
-        if(___TracingEnabled){
+        if(TRACING_ENABLED){
             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                 logger.info(format("[%s] Maximum number of %s retries has been reached",
                     transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
@@ -294,7 +294,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         abort = false;
                         return result;
                     } catch (Retry e) {
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
                                     transactionConfiguration.familyName));
@@ -302,7 +302,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         }
                         tx.awaitUpdate();
                     } catch (SpeculativeConfigurationError e) {
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a speculative configuration error",
                                     transactionConfiguration.familyName));
@@ -316,7 +316,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
                         cause = e;
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
                                     transactionConfiguration.familyName));
@@ -340,7 +340,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
             throw new InvisibleCheckedException(e);
         }
 
-        if(___TracingEnabled){
+        if(TRACING_ENABLED){
             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                 logger.info(format("[%s] Maximum number of %s retries has been reached",
                     transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
@@ -400,7 +400,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         abort = false;
                         return result;
                     } catch (Retry e) {
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
                                     transactionConfiguration.familyName));
@@ -408,7 +408,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         }
                         tx.awaitUpdate();
                     } catch (SpeculativeConfigurationError e) {
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a speculative configuration error",
                                     transactionConfiguration.familyName));
@@ -422,7 +422,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
                         cause = e;
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
                                     transactionConfiguration.familyName));
@@ -446,7 +446,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
             throw new InvisibleCheckedException(e);
         }
 
-        if(___TracingEnabled){
+        if(TRACING_ENABLED){
             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                 logger.info(format("[%s] Maximum number of %s retries has been reached",
                     transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
@@ -506,7 +506,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         abort = false;
                         return result;
                     } catch (Retry e) {
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
                                     transactionConfiguration.familyName));
@@ -514,7 +514,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         }
                         tx.awaitUpdate();
                     } catch (SpeculativeConfigurationError e) {
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a speculative configuration error",
                                     transactionConfiguration.familyName));
@@ -528,7 +528,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
                         cause = e;
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
                                     transactionConfiguration.familyName));
@@ -552,7 +552,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
             throw new InvisibleCheckedException(e);
         }
 
-        if(___TracingEnabled){
+        if(TRACING_ENABLED){
             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                 logger.info(format("[%s] Maximum number of %s retries has been reached",
                     transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));
@@ -615,7 +615,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         return;
                     } catch (Retry e) {
                         System.out.println("retry");
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
                                     transactionConfiguration.familyName));
@@ -624,7 +624,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         tx.awaitUpdate();
                     } catch (SpeculativeConfigurationError e) {
                         System.out.println("speculative failure");
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a speculative configuration error",
                                     transactionConfiguration.familyName));
@@ -641,7 +641,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                             throw new RuntimeException();
                         }
                         cause = e;
-                        if(___TracingEnabled){
+                        if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a read or write conflict",
                                     transactionConfiguration.familyName));
@@ -665,7 +665,7 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
             throw new InvisibleCheckedException(e);
         }
 
-        if(___TracingEnabled){
+        if(TRACING_ENABLED){
             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                 logger.info(format("[%s] Maximum number of %s retries has been reached",
                     transactionConfiguration.familyName, transactionConfiguration.getMaxRetries()));

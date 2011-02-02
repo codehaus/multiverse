@@ -8,7 +8,7 @@ import static java.lang.Thread.yield;
  * Contains some utility functions for shaking out bugs. It can be used by adding this method is the code like
  * this:
  * <pre>
- * if(MultiverseConstants.___BugshakerEnabled){Bugshaker.shakeBugs();}
+ * if(MultiverseConstants.SHAKE_BUGS){shakeBugs();}
  * </pre>
  * Since the ___BugshakerEnabled field is final, it can be removed by the JIT is the bugshaking is disabled so
  * there is no overhead.
