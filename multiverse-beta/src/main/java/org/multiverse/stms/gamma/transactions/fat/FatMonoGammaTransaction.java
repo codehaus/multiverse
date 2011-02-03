@@ -189,6 +189,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
         return true;
     }
 
+    @Override
     public final void hardReset() {
         status = TX_ACTIVE;
         hasWrites = false;
@@ -198,6 +199,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
         commitConflict = false;
     }
 
+    @Override
     public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
         return true;
     }

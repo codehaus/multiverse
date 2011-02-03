@@ -43,6 +43,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
         head = h;
     }
 
+    @Override
     public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
         throw new UnsupportedOperationException();
     }
@@ -305,6 +306,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
         return getRefTranlocal(o);
     }
 
+    @Override
     public final void hardReset() {
         status = TX_ACTIVE;
         hasWrites = false;

@@ -143,7 +143,6 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         notifyListeners(TransactionEvent.PostCommit);
     }
 
-
     private Listeners[] commitArray() {
         Listeners[] listenersArray = null;
 
@@ -379,6 +378,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         commitConflict = false;
     }
 
+    @Override
     public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
         if (!hasReads) {
             return true;

@@ -277,6 +277,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         return getRefTranlocal(o);
     }
 
+    @Override
     public final void hardReset() {
         status = TX_ACTIVE;
         hasWrites = false;
@@ -321,6 +322,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         head = newHead;
     }
 
+    @Override
     public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
         if (!hasReads) {
             return true;

@@ -221,6 +221,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
         return true;
     }
 
+    @Override
     public final void hardReset() {
         commitConflict = false;
         status = TX_ACTIVE;
@@ -229,6 +230,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
         attempt = 1;
     }
 
+    @Override
     public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
         return true;
     }
