@@ -1,6 +1,5 @@
 package org.multiverse.stms.gamma.transactions.lean;
 
-import org.multiverse.api.exceptions.Retry;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
@@ -8,6 +7,8 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
+
+import static org.multiverse.utils.Bugshaker.shakeBugs;
 
 /**
  * A Lean GammaTransaction that is optimized for a fixed number of GammaRefs.
@@ -27,7 +28,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
     public LeanFixedLengthGammaTransaction(final GammaTransactionConfiguration config) {
         super(config, TRANSACTIONTYPE_LEAN_FIXED_LENGTH);
 
-       listenersArray = new Listeners[config.maxFixedLengthTransactionSize];
+        listenersArray = new Listeners[config.maxFixedLengthTransactionSize];
 
         GammaRefTranlocal h = null;
         for (int k = 0; k < config.maxFixedLengthTransactionSize; k++) {
@@ -61,9 +62,13 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
         if (hasWrites) {
             if (s == TX_ACTIVE) {
                 GammaObject conflictingObject = prepareChainForCommit();
-                if (conflictingObject!=null) {
+                if (conflictingObject != null) {
                     throw abortOnReadWriteConflict(conflictingObject);
                 }
+            }
+
+            if (commitConflict) {
+                config.globalConflictCounter.signalConflict();
             }
 
             int listenersIndex = 0;
@@ -74,6 +79,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
                 if (owner == null) {
                     break;
                 }
+                shakeBugs();
 
                 final Listeners listeners = owner.leanCommit(node);
                 if (listeners != null) {
@@ -95,14 +101,17 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     private GammaObject prepareChainForCommit() {
-        GammaRefTranlocal node = head;
+        commitConflict = true;
 
+        GammaRefTranlocal node = head;
         do {
             final AbstractGammaRef owner = node.owner;
 
             if (owner == null) {
                 return null;
             }
+
+            shakeBugs();
 
             if (node.mode == TRANLOCAL_READ) {
                 continue;
@@ -113,7 +122,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
                 return owner;
             }
 
-            int arriveStatus = owner.tryLockAndArrive(64, LOCKMODE_EXCLUSIVE);
+            int arriveStatus = owner.arriveAndLock(64, LOCKMODE_EXCLUSIVE);
 
             if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
                 return owner;
@@ -155,6 +164,8 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
                 return;
             }
 
+            shakeBugs();
+
             if (node.isWrite()) {
                 if (node.getLockMode() == LOCKMODE_EXCLUSIVE) {
                     if (node.hasDepartObligation()) {
@@ -182,6 +193,8 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
             if (owner == null) {
                 return;
             }
+
+            shakeBugs();
 
             node.owner = null;
             node.ref_oldValue = null;
@@ -258,11 +271,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
             throw abortRetryOnNoRetryPossible();
         }
 
-        if (config.controlFlowErrorsReused) {
-            throw Retry.INSTANCE;
-        } else {
-            throw new Retry(true);
-        }
+        throw newRetryError();
     }
 
     @Override
@@ -276,7 +285,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
         }
 
         GammaObject conflictingObject = prepareChainForCommit();
-        if (conflictingObject!=null) {
+        if (conflictingObject != null) {
             throw abortOnReadWriteConflict(conflictingObject);
         }
 
@@ -302,6 +311,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
         size = 0;
         remainingTimeoutNs = config.timeoutNs;
         attempt = 1;
+        commitConflict = false;
         hasReads = false;
     }
 
@@ -311,6 +321,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
             return false;
         }
 
+        commitConflict = false;
         status = TX_ACTIVE;
         hasWrites = false;
         size = 0;

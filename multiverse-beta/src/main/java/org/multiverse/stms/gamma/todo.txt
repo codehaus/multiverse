@@ -28,11 +28,6 @@
 
 - commuting objects and check for read consistency once loaded
 
-- bug shaker needs to be added to lean transactions
-
-- fast/slow release of commit locks.. choose one since currently 2 different
-approaches are used (for trying to figure out if it is causing the consistency bug)
-
 - optimize the tx-pool logic (instead of using an array, use a single linked list)..
 transactions can also act as node (no need to introduce additional datastructures).
 
@@ -43,9 +38,16 @@ transactions can also act as node (no need to introduce additional datastructure
 - fast readset validation on committing transaction if the conflict counter has not changed
 needs more research.
 
+- stripe of conflict counters.
+
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- bug shaker needs to be added to lean transactions
+
+- fast/slow release of commit locks.. choose one since currently 2 different
+approaches are used (for trying to figure out if it is causing the consistency bug)
 
 - lean loads now also have the correct version/ref/version read.
 

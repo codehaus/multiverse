@@ -53,7 +53,7 @@ public class Orec_tryLockAfterNormalArriveTest {
     @Test
     public void updateBiased_acquireExclusiveLock_whenWriteLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
-        orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        orec.arriveAndLock(1, LOCKMODE_WRITE);
 
         orec.arrive(1);
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_EXCLUSIVE);
@@ -69,7 +69,7 @@ public class Orec_tryLockAfterNormalArriveTest {
     public void updateBiased_acquireExclusiveLock_whenExclusiveLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
-        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_EXCLUSIVE);
 
@@ -84,7 +84,7 @@ public class Orec_tryLockAfterNormalArriveTest {
     public void updateBiased_acquireExclusiveLock_whenReadLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
-        orec.tryLockAndArrive(1, LOCKMODE_READ);
+        orec.arriveAndLock(1, LOCKMODE_READ);
 
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_EXCLUSIVE);
 
@@ -131,7 +131,7 @@ public class Orec_tryLockAfterNormalArriveTest {
     public void updateBiased_acquireWriteLock_whenWriteLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
-        orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        orec.arriveAndLock(1, LOCKMODE_WRITE);
 
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_WRITE);
 
@@ -146,7 +146,7 @@ public class Orec_tryLockAfterNormalArriveTest {
     public void updateBiased_acquireWriteLock_whenExclusiveLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
-        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_WRITE);
 
@@ -161,7 +161,7 @@ public class Orec_tryLockAfterNormalArriveTest {
     public void updateBiased_acquireWriteLock_whenReadLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
-        orec.tryLockAndArrive(1, LOCKMODE_READ);
+        orec.arriveAndLock(1, LOCKMODE_READ);
 
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_WRITE);
 
@@ -209,7 +209,7 @@ public class Orec_tryLockAfterNormalArriveTest {
     public void updateBiased_acquireReadLock_whenWriteLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
-        orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        orec.arriveAndLock(1, LOCKMODE_WRITE);
 
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_READ);
 
@@ -224,7 +224,7 @@ public class Orec_tryLockAfterNormalArriveTest {
     public void updateBiased_acquireReadLock_whenExclusiveLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
-        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_READ);
 
@@ -239,7 +239,7 @@ public class Orec_tryLockAfterNormalArriveTest {
     public void updateBiased_acquireReadLock_whenReadLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
-        orec.tryLockAndArrive(1, LOCKMODE_READ);
+        orec.arriveAndLock(1, LOCKMODE_READ);
 
         boolean result = orec.tryLockAfterNormalArrive(1, LOCKMODE_READ);
 

@@ -137,40 +137,6 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         return listenerAfterWrite;
     }
 
-    public final Listeners commit_writeWithoutRelease(final GammaRefTranlocal tranlocal, final GammaObjectPool pool) {
-        if (!tranlocal.isDirty) {
-            return null;
-        }
-
-        if (type == TYPE_REF) {
-            ref_value = tranlocal.ref_value;
-            //we need to set them to null to prevent memory leaks.
-            tranlocal.ref_value = null;
-            tranlocal.ref_oldValue = null;
-        } else {
-            long_value = tranlocal.long_value;
-        }
-
-        version = tranlocal.version + 1;
-
-        Listeners listenerAfterWrite = listeners;
-
-        if (listenerAfterWrite != null) {
-            listenerAfterWrite = ___removeListenersAfterWrite();
-        }
-
-        return listenerAfterWrite;
-    }
-
-    public final void commit_release(final GammaRefTranlocal tranlocal, final GammaObjectPool pool) {
-        if (!tranlocal.isDirty()) {
-            releaseAfterReading(tranlocal, pool);
-            return;
-        }
-
-        releaseAfterUpdate(tranlocal, pool);
-    }
-
     public final Listeners leanCommit(final GammaRefTranlocal tranlocal) {
         assert type == TYPE_REF;
 
@@ -304,7 +270,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             final GammaRefTranlocal tranlocal, final int lockMode, int spinCount, final boolean arriveNeeded) {
 
         if (lockMode != LOCKMODE_NONE) {
-            final int arriveStatus = tryLockAndArrive(spinCount, lockMode);
+            final int arriveStatus = arriveAndLock(spinCount, lockMode);
 
             if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
                 return false;
@@ -334,23 +300,17 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 do {
                     readVersion = version;
                     readRef = ref_value;
-                    if (SHAKE_BUGS) {
-                        shakeBugs();
-                    }
+                    shakeBugs();
                 } while (readVersion != version);
             } else {
                 do {
                     readVersion = version;
                     readLong = long_value;
-                    if (SHAKE_BUGS) {
-                        shakeBugs();
-                    }
+                    shakeBugs();
                 } while (readVersion != version);
             }
 
-            if (SHAKE_BUGS) {
-                shakeBugs();
-            }
+            shakeBugs();
 
             final int arriveStatus = arriveNeeded
                     ? arrive(spinCount)
@@ -360,9 +320,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 return false;
             }
 
-            if (SHAKE_BUGS) {
-                shakeBugs();
-            }
+            shakeBugs();
 
             if (version == readVersion) {
                 tranlocal.owner = this;
@@ -613,11 +571,15 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             do {
                 readVersion = version;
                 readRef = ref_value;
+                shakeBugs();
+
             } while (readVersion != version);
 
             //wait for the exclusive lock to come available.
             int spinCount = 64;
             for (; ;) {
+                shakeBugs();
+
                 if (!hasExclusiveLock()) {
                     break;
                 }
@@ -626,6 +588,8 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                     throw tx.abortOnReadWriteConflict(this);
                 }
             }
+
+            shakeBugs();
 
             //check if the version is still the same, if it is not, we have read illegal memory,
             //In that case we are going to try again.
@@ -709,11 +673,13 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             do {
                 readVersion = version;
                 readRef = ref_value;
+                shakeBugs();
             } while (readVersion != version);
 
             //wait for the exclusive lock to come available.
             int spinCount = 64;
             for (; ;) {
+                shakeBugs();
                 if (!hasExclusiveLock()) {
                     break;
                 }
@@ -722,6 +688,8 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                     throw tx.abortOnReadWriteConflict(this);
                 }
             }
+            shakeBugs();
+
 
             //check if the version and value we read are still the same, if they are not, we have read illegal memory,
             //so we are going to try again.
@@ -743,12 +711,14 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         if (tx.hasReads) {
             node = tx.head;
             do {
-                //if we are at the end, we are done.
                 final AbstractGammaRef owner = node.owner;
 
+                //if we are at the end, we are done.
                 if (owner == null) {
                     break;
                 }
+
+                shakeBugs();
 
                 if (node != newNode && (owner.hasExclusiveLock() || owner.version != node.version)) {
                     throw tx.abortOnReadWriteConflict(this);

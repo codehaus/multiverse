@@ -56,12 +56,11 @@ public class Orec_departAfterFailureAndUnlockTest implements GammaConstants {
     @Test
     public void whenUpdateBiasedAndHasMultipleReadLocks() {
         AbstractGammaObject orec = new GammaLongRef(stm);
-        orec.tryLockAndArrive(1, LOCKMODE_READ);
-        orec.tryLockAndArrive(1, LOCKMODE_READ);
+        orec.arriveAndLock(1, LOCKMODE_READ);
+        orec.arriveAndLock(1, LOCKMODE_READ);
 
-        long result = orec.departAfterFailureAndUnlock();
+        orec.departAfterFailureAndUnlock();
 
-        assertEquals(1, result);
         assertLockMode(orec, LOCKMODE_READ);
         assertReadLockCount(orec, 1);
         assertSurplus(orec, 1);
@@ -72,11 +71,10 @@ public class Orec_departAfterFailureAndUnlockTest implements GammaConstants {
     @Test
     public void whenUpdateBiasedAndHasSingleReadLock() {
         AbstractGammaObject orec = new GammaLongRef(stm);
-        orec.tryLockAndArrive(1, LOCKMODE_READ);
+        orec.arriveAndLock(1, LOCKMODE_READ);
 
-        long result = orec.departAfterFailureAndUnlock();
+        orec.departAfterFailureAndUnlock();
 
-        assertEquals(0, result);
         assertLockMode(orec, LOCKMODE_NONE);
         assertSurplus(orec, 0);
         assertReadonlyCount(orec, 0);
@@ -87,10 +85,9 @@ public class Orec_departAfterFailureAndUnlockTest implements GammaConstants {
     @Test
     public void whenUpdateBiasedAndHasWriteLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
-        orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        orec.arriveAndLock(1, LOCKMODE_WRITE);
 
-        long result = orec.departAfterFailureAndUnlock();
-        assertEquals(0, result);
+        orec.departAfterFailureAndUnlock();
         assertLockMode(orec, LOCKMODE_NONE);
         assertSurplus(orec, 0);
         assertReadonlyCount(orec, 0);
@@ -101,10 +98,9 @@ public class Orec_departAfterFailureAndUnlockTest implements GammaConstants {
     @Test
     public void whenUpdateBiasedAndHasExclusiveLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
-        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
-        long result = orec.departAfterFailureAndUnlock();
-        assertEquals(0, result);
+        orec.departAfterFailureAndUnlock();
         assertLockMode(orec, LOCKMODE_NONE);
         assertSurplus(orec, 0);
         assertReadonlyCount(orec, 0);

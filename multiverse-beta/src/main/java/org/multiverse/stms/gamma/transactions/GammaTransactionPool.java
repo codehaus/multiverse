@@ -7,11 +7,16 @@ import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransact
 import org.multiverse.stms.gamma.transactions.lean.LeanFixedLengthGammaTransaction;
 import org.multiverse.stms.gamma.transactions.lean.LeanMonoGammaTransaction;
 
+/**
+ * A pool for pooling GammaTransactions.
+ *
+ * @author Peter Veentjer.
+ */
 @SuppressWarnings({"ClassWithTooManyFields"})
 public final class GammaTransactionPool implements GammaConstants {
 
     private final static boolean ENABLED = Boolean.parseBoolean(
-            System.getProperty("org.multiverse.stm,beta.transactions.BetaTransactionPool.enabled", "true"));
+            System.getProperty("org.multiverse.stm.gamma.transactions.GammaTransactionPool.enabled", "true"));
 
     private final boolean enabled;
 

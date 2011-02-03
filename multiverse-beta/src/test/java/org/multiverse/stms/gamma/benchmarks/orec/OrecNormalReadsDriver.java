@@ -36,7 +36,7 @@ public class OrecNormalReadsDriver extends BenchmarkDriver implements GammaConst
             if (arriveStatus == ARRIVE_NORMAL) {
                 _orec.departAfterReading();
             } else {
-                _orec.tryLockAndArrive(0, LOCKMODE_EXCLUSIVE);
+                _orec.arriveAndLock(0, LOCKMODE_EXCLUSIVE);
                 _orec.departAfterUpdateAndUnlock();
             }
         }

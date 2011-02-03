@@ -23,7 +23,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     public void updateBiased_acquireExclusiveLock_whenUnlocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        int result = orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
         assertEquals(ARRIVE_NORMAL, result);
         assertSurplus(orec, 1);
@@ -35,9 +35,9 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     @Test
     public void updateBiased_acquireExclusiveLock_whenWriteLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
-        orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        orec.arriveAndLock(1, LOCKMODE_WRITE);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        int result = orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
@@ -49,9 +49,9 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     @Test
     public void updateBiased_acquireExclusiveLock_whenExclusiveLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
-        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        int result = orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
@@ -63,9 +63,9 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     @Test
     public void updateBiased_acquireExclusiveLock_whenReadLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
-        orec.tryLockAndArrive(1, LOCKMODE_READ);
+        orec.arriveAndLock(1, LOCKMODE_READ);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        int result = orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
@@ -80,7 +80,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     public void updateBiased_acquireWriteLock_whenUnlocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        int result = orec.arriveAndLock(1, LOCKMODE_WRITE);
 
         assertEquals(ARRIVE_NORMAL, result);
         assertSurplus(orec, 1);
@@ -92,9 +92,9 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     @Test
     public void updateBiased_acquireWriteLock_whenWriteLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
-        orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        orec.arriveAndLock(1, LOCKMODE_WRITE);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        int result = orec.arriveAndLock(1, LOCKMODE_WRITE);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
@@ -106,9 +106,9 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     @Test
     public void updateBiased_acquireWriteLock_whenExclusiveLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
-        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        int result = orec.arriveAndLock(1, LOCKMODE_WRITE);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
@@ -120,9 +120,9 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     @Test
     public void updateBiased_acquireWriteLock_whenReadLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
-        orec.tryLockAndArrive(1, LOCKMODE_READ);
+        orec.arriveAndLock(1, LOCKMODE_READ);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        int result = orec.arriveAndLock(1, LOCKMODE_WRITE);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
@@ -137,7 +137,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     public void updateBiased_acquireReadLock_whenUnlocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_READ);
+        int result = orec.arriveAndLock(1, LOCKMODE_READ);
 
         assertEquals(ARRIVE_NORMAL, result);
         assertSurplus(orec, 1);
@@ -149,9 +149,9 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     @Test
     public void updateBiased_acquireReadLock_whenWriteLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
-        orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        orec.arriveAndLock(1, LOCKMODE_WRITE);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_READ);
+        int result = orec.arriveAndLock(1, LOCKMODE_READ);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
@@ -163,9 +163,9 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     @Test
     public void updateBiased_acquireReadLock_whenExclusiveLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
-        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_READ);
+        int result = orec.arriveAndLock(1, LOCKMODE_READ);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
@@ -177,9 +177,9 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     @Test
     public void updateBiased_acquireReadLock_whenReadLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
-        orec.tryLockAndArrive(1, LOCKMODE_READ);
+        orec.arriveAndLock(1, LOCKMODE_READ);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_READ);
+        int result = orec.arriveAndLock(1, LOCKMODE_READ);
 
         assertEquals(ARRIVE_NORMAL, result);
         assertSurplus(orec, 2);
@@ -194,7 +194,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     public void readBiased_acquireExclusiveLock_whenUnlocked() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        int result = orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
         assertEquals(ARRIVE_UNREGISTERED, result);
         assertSurplus(orec, 1);
@@ -206,9 +206,9 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     @Test
     public void readBiased_acquireExclusiveLock_whenWriteLocked() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
-        orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        orec.arriveAndLock(1, LOCKMODE_WRITE);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        int result = orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
@@ -220,9 +220,9 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     @Test
     public void readBiased_acquireExclusiveLock_whenExclusiveLocked() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
-        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        int result = orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
@@ -234,9 +234,9 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     @Test
     public void readBiased_acquireExclusiveLock_whenReadLocked() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
-        orec.tryLockAndArrive(1, LOCKMODE_READ);
+        orec.arriveAndLock(1, LOCKMODE_READ);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        int result = orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
@@ -251,7 +251,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     public void readBiased_acquireWriteLock_whenUnlocked() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        int result = orec.arriveAndLock(1, LOCKMODE_WRITE);
 
         assertEquals(ARRIVE_UNREGISTERED, result);
         assertSurplus(orec, 1);
@@ -263,9 +263,9 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     @Test
     public void readBiased_acquireWriteLock_whenWriteLocked() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
-        orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        orec.arriveAndLock(1, LOCKMODE_WRITE);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        int result = orec.arriveAndLock(1, LOCKMODE_WRITE);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
@@ -277,9 +277,9 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     @Test
     public void readBiased_acquireWriteLock_whenExclusiveLocked() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
-        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        int result = orec.arriveAndLock(1, LOCKMODE_WRITE);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
@@ -291,9 +291,9 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     @Test
     public void readBiased_acquireWriteLock_whenReadLocked() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
-        orec.tryLockAndArrive(1, LOCKMODE_READ);
+        orec.arriveAndLock(1, LOCKMODE_READ);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        int result = orec.arriveAndLock(1, LOCKMODE_WRITE);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
@@ -308,7 +308,7 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     public void readBiased_acquireReadLock_whenUnlocked() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_READ);
+        int result = orec.arriveAndLock(1, LOCKMODE_READ);
 
         assertEquals(ARRIVE_UNREGISTERED, result);
         assertSurplus(orec, 1);
@@ -320,9 +320,9 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     @Test
     public void readBiased_acquireReadLock_whenWriteLocked() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
-        orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        orec.arriveAndLock(1, LOCKMODE_WRITE);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_READ);
+        int result = orec.arriveAndLock(1, LOCKMODE_READ);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
@@ -334,9 +334,9 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     @Test
     public void readBiased_acquireReadLock_whenExclusiveLocked() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
-        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_READ);
+        int result = orec.arriveAndLock(1, LOCKMODE_READ);
 
         assertEquals(ARRIVE_LOCK_NOT_FREE, result);
         assertSurplus(orec, 1);
@@ -348,9 +348,9 @@ public class Orec_tryLockAndArriveTest implements GammaConstants {
     @Test
     public void readBiased_acquireReadLock_whenReadLocked() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
-        orec.tryLockAndArrive(1, LOCKMODE_READ);
+        orec.arriveAndLock(1, LOCKMODE_READ);
 
-        int result = orec.tryLockAndArrive(1, LOCKMODE_READ);
+        int result = orec.arriveAndLock(1, LOCKMODE_READ);
 
         assertEquals(ARRIVE_UNREGISTERED, result);
         assertSurplus(orec, 1);

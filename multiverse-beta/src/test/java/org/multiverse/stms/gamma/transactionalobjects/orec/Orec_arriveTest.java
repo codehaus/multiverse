@@ -49,7 +49,7 @@ public class Orec_arriveTest implements GammaConstants {
     @Test
     public void whenUpdateBiasedAndLockedForCommit_thenLockNotFree() {
         AbstractGammaObject orec = new GammaLongRef(stm);
-        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
         int result = orec.arrive(1);
 
@@ -63,7 +63,7 @@ public class Orec_arriveTest implements GammaConstants {
     @Test
     public void whenUpdateBiasedAndLockedForUpdate_thenUnregisteredArrive() {
         AbstractGammaObject orec = new GammaLongRef(stm);
-        orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        orec.arriveAndLock(1, LOCKMODE_WRITE);
 
         int result = orec.arrive(1);
 

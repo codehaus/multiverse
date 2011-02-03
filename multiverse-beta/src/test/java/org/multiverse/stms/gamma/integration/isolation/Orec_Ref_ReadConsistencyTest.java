@@ -27,17 +27,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 
-/**
- * Conclusion so far:
- * with refs it fails
- * with longs it succeeds.
- */
 public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
 
     private GammaStm stm;
     private GammaRef[] refs;
     private volatile boolean stop;
-    private final AtomicBoolean inconstencyDetected = new AtomicBoolean();
+    private final AtomicBoolean inconsistencyDetected = new AtomicBoolean();
     private final long durationMs = 360 * 1000;
     private int refCount = 256;
     private int writingThreadCount;
@@ -47,7 +42,7 @@ public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
     public void setUp() {
         stm = new GammaStm();
         stop = false;
-        inconstencyDetected.set(false);
+        inconsistencyDetected.set(false);
         readingThreadCount = 10;
         writingThreadCount = 2;
         refs = new GammaRef[refCount];
@@ -119,7 +114,7 @@ public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
         sleepMs(1000);
         joinAll(readingThreads);
         joinAll(updatingThreads);
-        assertFalse(inconstencyDetected.get());
+        assertFalse(inconsistencyDetected.get());
     }
 
     class BasicReadThread extends TestThread {
@@ -234,7 +229,7 @@ public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
                     } else {
                         System.out.printf("Inconsistency detected on bad version %s %s\n", tranlocals[k].version, firstTranlocal.version);
                     }
-                    inconstencyDetected.compareAndSet(false, true);
+                    inconsistencyDetected.compareAndSet(false, true);
                     stop = true;
                     break;
                 }
@@ -340,7 +335,7 @@ public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
 
         joinAll(readingThreads);
         joinAll(updatingThreads);
-        assertFalse(inconstencyDetected.get());
+        assertFalse(inconsistencyDetected.get());
     }
 
     class FixedLengthTransactionUsingReadThread extends TestThread {
@@ -669,7 +664,7 @@ public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
 
             if (badValue || badVersion) {
                 System.out.printf("Inconsistency detected badValue=%s badVersion=%s\n", badValue, badVersion);
-                inconstencyDetected.compareAndSet(false, true);
+                inconsistencyDetected.compareAndSet(false, true);
                 stop = true;
                 break;
             }

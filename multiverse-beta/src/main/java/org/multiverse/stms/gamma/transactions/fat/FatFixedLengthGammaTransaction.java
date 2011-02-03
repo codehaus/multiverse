@@ -1,6 +1,5 @@
 package org.multiverse.stms.gamma.transactions.fat;
 
-import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
@@ -12,6 +11,11 @@ import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
 import static org.multiverse.utils.Bugshaker.shakeBugs;
 
+/**
+ * A Fat {@link GammaTransaction} (supporting all features) but has a fixed capacity.
+ *
+ * @author Peter Veentjer.
+ */
 public final class FatFixedLengthGammaTransaction extends GammaTransaction {
 
     public GammaRefTranlocal head;
@@ -81,13 +85,17 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
     }
 
     private Listeners[] commitChain() {
-        int listenersIndex = 0;
+        if (commitConflict) {
+            config.globalConflictCounter.signalConflict();
+        }
 
+        int listenersIndex = 0;
         GammaRefTranlocal node = head;
         do {
-            if(SHAKE_BUGS){shakeBugs();}
+            shakeBugs();
 
             final AbstractGammaRef owner = node.owner;
+            //if we are at the end, we can return the listenersArray.
             if (owner == null) {
                 return listenersArray;
             }
@@ -105,16 +113,19 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     private AbstractGammaRef prepareChainForCommit() {
+        //todo: needs to be determined
+        commitConflict = true;
+
         GammaRefTranlocal node = head;
 
         do {
             final AbstractGammaRef owner = node.owner;
-            if(SHAKE_BUGS){shakeBugs();}
 
             if (owner == null) {
                 return null;
             }
 
+            shakeBugs();
             if (!owner.prepare(this, node)) {
                 return owner;
             }
@@ -149,6 +160,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
                 return;
             }
 
+            shakeBugs();
             if (success) {
                 owner.releaseAfterReading(node, pool);
             } else {
@@ -227,11 +239,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
             throw abortRetryOnNoRetryPossible();
         }
 
-        if (config.controlFlowErrorsReused) {
-            throw Retry.INSTANCE;
-        } else {
-            throw new Retry(true);
-        }
+        throw newRetryError();
     }
 
     @Override
@@ -273,6 +281,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         status = TX_ACTIVE;
         hasWrites = false;
         size = 0;
+        commitConflict = false;
         remainingTimeoutNs = config.timeoutNs;
         richmansMansConflictScan = config.speculativeConfiguration.get().isRichMansConflictScanRequired;
         attempt = 1;
@@ -286,6 +295,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
             return false;
         }
 
+        commitConflict = false;
         status = TX_ACTIVE;
         hasWrites = false;
         size = 0;
@@ -316,12 +326,12 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
             return true;
         }
 
-        //if (config.readLockModeAsInt > LOCKMODE_NONE) {
-        //    return true;
-        //}
+        if (config.readLockModeAsInt > LOCKMODE_NONE) {
+            return true;
+        }
 
         if (richmansMansConflictScan) {
-            if(SHAKE_BUGS){shakeBugs();}
+            shakeBugs();
 
             final long currentConflictCount = config.globalConflictCounter.count();
 
@@ -338,7 +348,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         //doing a full conflict scan
         GammaRefTranlocal node = head;
         while (node != null) {
-            if(SHAKE_BUGS){shakeBugs();}
+            shakeBugs();
 
             //if we are at the end, we are done.
             if (node.owner == null) {

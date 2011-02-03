@@ -19,6 +19,11 @@ import java.util.ArrayList;
 import static java.lang.String.format;
 import static org.multiverse.stms.gamma.GammaStmUtils.toDebugString;
 
+/**
+ * Abstract GammaTransaction to be used by all the concrete GammaTransaction implementations.
+ *
+ * @author Peter Veentjer.
+ */
 public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public final GammaObjectPool pool = new GammaObjectPool();
@@ -29,7 +34,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public boolean hasWrites;
     public final int transactionType;
     public boolean richmansMansConflictScan;
-
+    public boolean commitConflict;
     public boolean abortOnly = false;
     public final RetryLatch retryListener = new DefaultRetryLatch();
     public ArrayList<TransactionListener> listeners;
@@ -59,6 +64,10 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                 permanentListeners.get(k).notify(this, event);
             }
         }
+    }
+
+    protected Retry newRetryError() {
+        return config.controlFlowErrorsReused ? Retry.INSTANCE : new Retry(true);
     }
 
     private boolean isLean() {

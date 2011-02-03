@@ -19,7 +19,7 @@ public class GammaTestUtils implements GammaConstants {
 
     public static void causeLotsOfConflicts(GammaStm stm){
         for(int k=0;k<100;k++){
-            stm.getGlobalConflictCounter().signalConflict(new GammaLongRef(stm));
+            stm.getGlobalConflictCounter().signalConflict();
         }
     }
 

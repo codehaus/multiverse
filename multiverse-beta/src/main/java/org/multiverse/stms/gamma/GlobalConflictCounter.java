@@ -34,7 +34,7 @@ public final class GlobalConflictCounter {
 
     private volatile long counter = 0;
 
-    public void signalConflict(GammaObject object) {
+    public void signalConflict() {
         final long oldCount = counter;
         unsafe.compareAndSwapLong(this, counterOffset, oldCount, oldCount + 1);
     }

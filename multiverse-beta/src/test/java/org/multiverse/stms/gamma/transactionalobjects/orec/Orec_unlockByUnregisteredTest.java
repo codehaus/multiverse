@@ -56,7 +56,7 @@ public class Orec_unlockByUnregisteredTest {
     @Test
     public void readBiased_whenReadLockedAcquiredOnce() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
-        orec.tryLockAndArrive(1, LOCKMODE_READ);
+        orec.arriveAndLock(1, LOCKMODE_READ);
 
         orec.unlockByUnregistered();
         assertLockMode(orec, LockMode.None);
@@ -66,9 +66,9 @@ public class Orec_unlockByUnregisteredTest {
     @Test
     public void readBiased_whenReadLockAcquiredMultipleTimes() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
-        orec.tryLockAndArrive(1, LOCKMODE_READ);
-        orec.tryLockAndArrive(1, LOCKMODE_READ);
-        orec.tryLockAndArrive(1, LOCKMODE_READ);
+        orec.arriveAndLock(1, LOCKMODE_READ);
+        orec.arriveAndLock(1, LOCKMODE_READ);
+        orec.arriveAndLock(1, LOCKMODE_READ);
 
         orec.unlockByUnregistered();
         assertLockMode(orec, LockMode.Read);
@@ -79,7 +79,7 @@ public class Orec_unlockByUnregisteredTest {
     @Test
     public void readBiased_whenWriteLockAcquired() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
-        orec.tryLockAndArrive(1, LOCKMODE_WRITE);
+        orec.arriveAndLock(1, LOCKMODE_WRITE);
 
         orec.unlockByUnregistered();
         assertLockMode(orec, LockMode.None);
@@ -89,7 +89,7 @@ public class Orec_unlockByUnregisteredTest {
     @Test
     public void readBiased_whenExclusiveLockAcquired() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
-        orec.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
 
         orec.unlockByUnregistered();
 

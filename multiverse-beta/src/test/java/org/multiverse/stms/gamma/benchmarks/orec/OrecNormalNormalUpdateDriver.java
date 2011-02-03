@@ -74,7 +74,7 @@ public class OrecNormalNormalUpdateDriver extends BenchmarkDriver implements Gam
                 if (arriveStatus == ARRIVE_NORMAL) {
                     orec.tryLockAfterNormalArrive(0, LOCKMODE_EXCLUSIVE);
                 } else {
-                    orec.tryLockAndArrive(0, LOCKMODE_EXCLUSIVE);
+                    orec.arriveAndLock(0, LOCKMODE_EXCLUSIVE);
                 }
                 orec.departAfterUpdateAndUnlock();
             }

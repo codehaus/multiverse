@@ -1,5 +1,7 @@
 package org.multiverse.utils;
 
+import org.multiverse.MultiverseConstants;
+
 import java.util.concurrent.locks.LockSupport;
 
 import static java.lang.Thread.yield;
@@ -12,18 +14,25 @@ import static java.lang.Thread.yield;
  * </pre>
  * Since the ___BugshakerEnabled field is final, it can be removed by the JIT is the bugshaking is disabled so
  * there is no overhead.
- *
+ * <p/>
  * At the moment the Bugshaker is not configurable, but will
  *
  * @author Peter Veentjer
  */
-public class Bugshaker {
+public class Bugshaker implements MultiverseConstants {
+
+    public static void shakeBugs() {
+        if (SHAKE_BUGS) {
+            doShakeBugs();
+        }
+    }
 
     /**
      * Delays a random amount of time. What essentially happens is that a random number is selected and one in the
      * n cases, a sleep is done and one in the n cases a yield is done.
      */
-    public static void shakeBugs() {
+    @SuppressWarnings({"CallToThreadYield"})
+    public static void doShakeBugs() {
         int random = ThreadLocalRandom.current().nextInt(100);
 
         if (random == 10) {

@@ -1,6 +1,11 @@
 package org.multiverse.stms.gamma;
 
-import org.multiverse.api.*;
+import org.multiverse.api.BackoffPolicy;
+import org.multiverse.api.ExponentialBackoffPolicy;
+import org.multiverse.api.IsolationLevel;
+import org.multiverse.api.LockMode;
+import org.multiverse.api.PropagationLevel;
+import org.multiverse.api.TraceLevel;
 
 import static java.lang.String.format;
 
@@ -156,21 +161,25 @@ public final class GammaStmConfiguration {
      */
     public void validate() {
         if (maximumPoorMansConflictScanLength < 0) {
-            throw new IllegalStateException("[GammaStmConfiguration] maximumFullConflictScanSize can't be smaller than 0, " +
-                    "maximumFullConflictScanSize was " + maxFixedLengthTransactionSize);
+            throw new IllegalStateException(
+                    "[GammaStmConfiguration] maximumFullConflictScanSize can't be smaller than 0, " +
+                            "maximumFullConflictScanSize was " + maxFixedLengthTransactionSize);
         }
 
         if (readLockMode == null) {
-            throw new IllegalStateException("[GammaStmConfiguration] readLockMode can't be null");
+            throw new IllegalStateException(
+                    "[GammaStmConfiguration] readLockMode can't be null");
         }
 
         if (writeLockMode == null) {
-            throw new IllegalStateException("[GammaStmConfiguration] writeLockMode can't be null");
+            throw new IllegalStateException(
+                    "[GammaStmConfiguration] writeLockMode can't be null");
         }
 
         if (writeLockMode.asInt() < readLockMode.asInt()) {
-            throw new IllegalStateException(format("[GammaStmConfiguration] writeLockMode [%s] can't be lower than readLockMode [%s]",
-                    writeLockMode, readLockMode));
+            throw new IllegalStateException(
+                    format("[GammaStmConfiguration] writeLockMode [%s] can't be lower than readLockMode [%s]",
+                            writeLockMode, readLockMode));
         }
 
         if (isolationLevel == null) {
@@ -178,29 +187,35 @@ public final class GammaStmConfiguration {
         }
 
         if (isolationLevel.isWriteSkewAllowed() && !trackReads) {
-            throw new IllegalStateException(format("[GammaStmConfiguration] isolation level '%s' can't be combined with " +
-                    "readtracking is false since it is needed to prevent the writeskew problem", isolationLevel));
+            throw new IllegalStateException(
+                    format("[GammaStmConfiguration] isolation level '%s' can't be combined with readtracking"+
+                            "is false since it is needed to prevent the writeskew problem", isolationLevel));
         }
 
         if (blockingAllowed && !trackReads) {
-            throw new IllegalStateException("[GammaStmConfiguration] blockingAllowed can't be true if trackReads is false");
+            throw new IllegalStateException(
+                    "[GammaStmConfiguration] blockingAllowed can't be true if trackReads is false");
         }
 
         if (spinCount < 0) {
-            throw new IllegalStateException("[GammaStmConfiguration] spinCount can't be smaller than 0, but was " + spinCount);
+            throw new IllegalStateException(
+                    "[GammaStmConfiguration] spinCount can't be smaller than 0, but was " + spinCount);
         }
 
         if (minimalVariableLengthTransactionSize < 1) {
-            throw new IllegalStateException("[GammaStmConfiguration] minimalVariableLengthTransactionSize can't be smaller than 1, but was "
+            throw new IllegalStateException(
+                    "[GammaStmConfiguration] minimalVariableLengthTransactionSize can't be smaller than 1, but was "
                     + minimalVariableLengthTransactionSize);
         }
 
         if (maxRetries < 0) {
-            throw new IllegalStateException("[GammaStmConfiguration] maxRetries can't be smaller than 0, but was " + maxRetries);
+            throw new IllegalStateException(
+                    "[GammaStmConfiguration] maxRetries can't be smaller than 0, but was " + maxRetries);
         }
 
         if (maxFixedLengthTransactionSize < 2) {
-            throw new IllegalStateException("[GammaStmConfiguration] maxFixedLengthTransactionSize can't be smaller than 2, but was "
+            throw new IllegalStateException(
+                    "[GammaStmConfiguration] maxFixedLengthTransactionSize can't be smaller than 2, but was "
                     + maxFixedLengthTransactionSize);
         }
 

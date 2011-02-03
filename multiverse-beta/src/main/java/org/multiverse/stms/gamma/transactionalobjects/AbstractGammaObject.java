@@ -190,7 +190,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
     protected final int arriveAndAcquireExclusiveLockOrBackoff() {
         for (int k = 0; k <= stm.defaultMaxRetries; k++) {
-            final int arriveStatus = tryExclusiveLockAndArrive(stm.spinCount);
+            final int arriveStatus = arriveAndAcquireExclusiveLock(stm.spinCount);
 
             if (arriveStatus != ARRIVE_LOCK_NOT_FREE) {
                 return arriveStatus;
@@ -328,7 +328,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 }
             } else {
                 //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
-                final int arriveStatus = tryLockAndArrive(spinCount, desiredLockMode);
+                final int arriveStatus = arriveAndLock(spinCount, desiredLockMode);
 
                 if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
                     return false;
@@ -405,6 +405,12 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return getReadLockCount(orec);
     }
 
+    /**
+     * Arrives. The Arrive is needed for the fast conflict detection (rich mans conflict).
+     *
+     * @param spinCount the maximum number of times to spin if the exclusive lock is acquired.
+     * @return the arrive status.
+     */
     public final int arrive(int spinCount) {
         do {
             final long current = orec;
@@ -441,6 +447,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return ARRIVE_LOCK_NOT_FREE;
     }
 
+    //todo: here the conflict count should be returned,
     public final boolean tryUpgradeReadLockToWriteOrExclusiveLock(int spinCount, final boolean exclusiveLock) {
         do {
             final long current = orec;
@@ -473,6 +480,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return false;
     }
 
+    //todo: here the conflict count should be returned,
     public final void upgradeWriteLockToExclusiveLock() {
         while (true) {
             final long current = orec;
@@ -482,7 +490,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             }
 
             if (!hasWriteLock(current)) {
-                throw new PanicError("Can't upgradeToExclusiveLock if the updateLock is not acquired");
+                throw new PanicError("WriteLock is not acquired");
             }
 
             long next = setExclusiveLock(current, true);
@@ -494,7 +502,8 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
     }
 
-    public final int tryLockAndArrive(int spinCount, final int lockMode) {
+    //todo: here the conflict count should be returned,
+    public final int arriveAndLock(int spinCount, final int lockMode) {
         do {
             final long current = orec;
 
@@ -540,7 +549,14 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return ARRIVE_LOCK_NOT_FREE;
     }
 
-    public final int tryExclusiveLockAndArrive(int spinCount) {
+    /**
+     * Tries to acquire the exclusive lock and arrive.
+     *
+     * @param spinCount the maximum number of spins when it is locked.
+     * @return the arrive-status.
+     */
+    //todo: here the conflict count should be returned,
+    public final int arriveAndAcquireExclusiveLock(int spinCount) {
         do {
             final long current = orec;
 
@@ -575,6 +591,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return ARRIVE_LOCK_NOT_FREE;
     }
 
+    //todo: here the conflict count should be returned,
     public final boolean tryLockAfterNormalArrive(int spinCount, final int lockMode) {
         do {
             final long current = orec;
@@ -616,6 +633,9 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return false;
     }
 
+    /**
+     * Departs after a successful read is done and no lock was acquired.
+     */
     public final void departAfterReading() {
         while (true) {
             final long current = orec;
@@ -652,6 +672,10 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
     }
 
+    /**
+     * Departs after a successful read is done and release the lock (it doesn't matter which lock is acquired as long is
+     * it is a read/write/exclusive lock.
+     */
     public final void departAfterReadingAndUnlock() {
         while (true) {
             final long current = orec;
@@ -708,24 +732,21 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
     }
 
-    public final long departAfterUpdateAndUnlock() {
-        boolean conflictSend = false;
+    public final void departAfterUpdateAndUnlock() {
         while (true) {
             final long current = orec;
 
             if (!hasExclusiveLock(current)) {
                 throw new PanicError(
-                        "Can't departAfterUpdateAndUnlock is the commit lock is not acquired " + toOrecString(current));
+                        "Can't departAfterUpdateAndUnlock if the commit lock is not acquired " + toOrecString(current));
             }
 
             long surplus = getSurplus(current);
-
             if (surplus == 0) {
                 throw new PanicError(
                         "Can't departAfterUpdateAndUnlock is there is no surplus " + toOrecString(current));
             }
 
-            boolean conflict;
             if (isReadBiased(current)) {
                 if (surplus > 1) {
                     throw new PanicError(
@@ -733,33 +754,30 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 }
 
                 //there always is a conflict when a readbiased orec is updated.
-                conflict = true;
                 surplus = 0;
             } else {
                 surplus--;
-                conflict = surplus > 0;
-            }
-
-            if (conflict && !conflictSend) {
-               // stm.globalConflictCounter.signalConflict(this);
-                //todo: enable again
-                //conflictSend = true;
             }
 
             if (surplus == 0) {
-               orec = 0;
-                return surplus;
+                orec = 0;
+                return;
             }
 
             final long next = setSurplus(0, surplus);
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
-                return surplus;
+                return;
             }
         }
     }
 
-    public final long departAfterFailureAndUnlock() {
+    /**
+     * Departs after a transaction fails and has an arrive on this Orec. It doesn't matter what the lock level
+     * is, as long as it is higher than LOCKMODE_NONE. This call can safely be made on a read or update biased
+     * ref.
+     */
+    public final void departAfterFailureAndUnlock() {
         while (true) {
             final long current = orec;
 
@@ -774,24 +792,18 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
             if (lockMode == 0) {
                 throw new PanicError(
-                        "Can't ___departAfterFailureAndUnlock if the lock was not acquired " + toOrecString(current));
+                        "No lock was not acquired " + toOrecString(current));
             }
 
             long surplus = getSurplus(current);
             if (surplus == 0) {
                 throw new PanicError(
-                        "Can't ___departAfterFailureAndUnlock if there is no surplus " + toOrecString(current));
+                        "There is no surplus " + toOrecString(current));
             }
 
             //we can only decrease the surplus if it is not read biased. Because with a read biased
             //orec, we have no idea how many readers there are.
-            if (isReadBiased(current)) {
-                if (surplus > 1) {
-                    throw new PanicError(
-                            "Can't ___departAfterFailureAndUnlock with a surplus larger than 1 if " +
-                                    "the orec is read biased " + toOrecString(current));
-                }
-            } else {
+            if (!isReadBiased(current)) {
                 surplus--;
             }
 
@@ -807,17 +819,20 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             //can be applied that prevent a cas.
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
-                return surplus;
+                return;
             }
         }
     }
 
+    /**
+     * Departs after failure.
+     */
     public final void departAfterFailure() {
         while (true) {
             final long current = orec;
 
             if (isReadBiased(current)) {
-                throw new PanicError("Can't departAfterFailure when orec is readbiased:" + toOrecString(current));
+                throw new PanicError("Orec is readbiased:" + toOrecString(current));
             }
 
             long surplus = getSurplus(current);
@@ -831,7 +846,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             } else {
                 if (surplus == 0) {
                     throw new PanicError(
-                            "Can't departAfterFailure if there is no surplus " + toOrecString(current));
+                            "There is no surplus " + toOrecString(current));
                 }
             }
             surplus--;
@@ -865,7 +880,6 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 throw new PanicError(
                         "Can't ___unlockByReadBiased if it isn't locked " + toOrecString(current));
             }
-
 
             if (getSurplus(current) > 1) {
                 throw new PanicError(

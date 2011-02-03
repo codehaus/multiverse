@@ -1,6 +1,5 @@
 package org.multiverse.stms.gamma.transactions.fat;
 
-import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
@@ -148,13 +147,15 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
     private Listeners[] commitArray() {
         Listeners[] listenersArray = null;
 
-        config.globalConflictCounter.signalConflict(null);
+        if (commitConflict) {
+            config.globalConflictCounter.signalConflict();
+        }
 
         int listenersIndex = 0;
         int itemCount = 0;
         //first write everything without releasing
         for (int k = 0; k < array.length; k++) {
-            if(SHAKE_BUGS){shakeBugs();}
+            shakeBugs();
 
             final GammaRefTranlocal tranlocal = array[k];
 
@@ -163,7 +164,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
             }
 
             final AbstractGammaRef owner = tranlocal.owner;
-            final Listeners listeners = owner.commit_writeWithoutRelease(tranlocal, pool);
+            final Listeners listeners = owner.commit(tranlocal, pool);
 
             if (listeners != null) {
                 if (listenersArray == null) {
@@ -176,29 +177,17 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
             pool.put(tranlocal);
             itemCount++;
         }
-
-        //now release the resources
-        for (int k = 0; k < array.length; k++) {
-            if(SHAKE_BUGS){shakeBugs();}
-
-            final GammaRefTranlocal tranlocal = array[k];
-
-            if (tranlocal == null) {
-                continue;
-            }
-
-            array[k] = null;
-            tranlocal.owner.commit_release(tranlocal, pool);
-        }
-
         return listenersArray;
     }
 
     private void releaseArray(boolean success) {
         for (int k = 0; k < array.length; k++) {
+
             final GammaRefTranlocal tranlocal = array[k];
 
             if (tranlocal != null) {
+                shakeBugs();
+
                 array[k] = null;
                 if (success) {
                     tranlocal.owner.releaseAfterReading(tranlocal, pool);
@@ -236,8 +225,10 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     private GammaObject doPrepare() {
+        commitConflict = true;
+
         for (int k = 0; k < array.length; k++) {
-            if(SHAKE_BUGS){shakeBugs();}
+            shakeBugs();
 
             final GammaRefTranlocal tranlocal = array[k];
 
@@ -349,11 +340,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
             throw abortRetryOnNoRetryPossible();
         }
 
-        if (config.controlFlowErrorsReused) {
-            throw Retry.INSTANCE;
-        } else {
-            throw new Retry(true);
-        }
+        throw newRetryError();
     }
 
     @Override
@@ -368,6 +355,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         size = 0;
         abortOnly = false;
         attempt++;
+        commitConflict = false;
         return true;
     }
 
@@ -388,6 +376,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         array = pool.takeTranlocalArray(config.minimalArrayTreeSize);
         final SpeculativeGammaConfiguration speculativeConfig = config.speculativeConfiguration.get();
         richmansMansConflictScan = speculativeConfig.isRichMansConflictScanRequired;
+        commitConflict = false;
     }
 
     public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
@@ -402,7 +391,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         //todo: isolation level check.
 
         if (richmansMansConflictScan) {
-            if(SHAKE_BUGS){shakeBugs();}
+            shakeBugs();
 
             final long conflictCount = config.globalConflictCounter.count();
 
@@ -428,7 +417,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
                 continue;
             }
 
-            if(SHAKE_BUGS){shakeBugs();}
+            shakeBugs();
 
             if (tranlocal.owner.hasReadConflict(tranlocal)) {
                 return false;

@@ -26,7 +26,7 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     public GammaBooleanRef(final GammaTransaction tx, final boolean value) {
         super(tx.getConfiguration().stm, TYPE_BOOLEAN);
 
-        tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+        arriveAndLock(1, LOCKMODE_EXCLUSIVE);
         GammaRefTranlocal tranlocal = openForConstruction(tx);
         tranlocal.long_value = booleanAsLong(value);
     }

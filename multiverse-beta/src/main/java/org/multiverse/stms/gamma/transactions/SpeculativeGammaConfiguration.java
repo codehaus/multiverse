@@ -1,6 +1,12 @@
 package org.multiverse.stms.gamma.transactions;
 
 /**
+ * The GammaStm uses a speculative mechanism (if enabled) to learn from executing transactions. Transactions start
+ * cheap and with a lot of features disabled, but once the speculation failed, the SpeculativeGammaConfguration
+ * is 'updated'.
+ *
+ * This class is immutable.
+ *
  * @author Peter Veentjer.
  */
 public final class SpeculativeGammaConfiguration {
@@ -61,8 +67,9 @@ public final class SpeculativeGammaConfiguration {
         }
 
         return new SpeculativeGammaConfiguration(
-                areListenersDetected, isCommuteDetected, isFat, isNonRefTypeDetected, isOrelseDetected, areLocksDetected,
-                areConstructedObjectsDetected, isRichMansConflictScanRequired,isAbortOnlyDetected, newMinimalLength);
+                areListenersDetected, isCommuteDetected, isFat, isNonRefTypeDetected, isOrelseDetected,
+                areLocksDetected, areConstructedObjectsDetected, isRichMansConflictScanRequired,
+                isAbortOnlyDetected, newMinimalLength);
     }
 
     public SpeculativeGammaConfiguration newWithLocksRequired() {

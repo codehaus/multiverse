@@ -28,7 +28,7 @@ public class BasicPerformanceDriver {
 
 
         for (long k = 0; k < transactionCount; k++) {
-            ref.tryLockAndArrive(1, MultiverseConstants.LOCKMODE_EXCLUSIVE);
+            ref.arriveAndLock(1, MultiverseConstants.LOCKMODE_EXCLUSIVE);
             //ref.orec = 0;
             ref.departAfterUpdateAndUnlock();
         }

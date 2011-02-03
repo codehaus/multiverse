@@ -88,7 +88,7 @@ public class GammaRef_consistentLoadStressTest implements GammaConstants {
         public void doRun() throws Exception {
             int k=0;
             while(!stop){
-                int arriveStatus = ref.tryLockAndArrive(1, LOCKMODE_EXCLUSIVE);
+                int arriveStatus = ref.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
                 if(arriveStatus == ARRIVE_LOCK_NOT_FREE){
                     continue;
                 }

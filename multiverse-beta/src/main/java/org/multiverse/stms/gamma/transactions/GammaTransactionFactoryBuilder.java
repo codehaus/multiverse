@@ -1,9 +1,19 @@
 package org.multiverse.stms.gamma.transactions;
 
-import org.multiverse.api.*;
+import org.multiverse.api.BackoffPolicy;
+import org.multiverse.api.IsolationLevel;
+import org.multiverse.api.LockMode;
+import org.multiverse.api.PropagationLevel;
+import org.multiverse.api.TraceLevel;
+import org.multiverse.api.TransactionFactoryBuilder;
 import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.gamma.GammaAtomicBlock;
 
+/**
+ * A {@link TransactionFactoryBuilder} tailored for the {@link org.multiverse.stms.gamma.GammaStm}.
+ *
+ * @author Peter Veentjer.
+ */
 public interface GammaTransactionFactoryBuilder extends TransactionFactoryBuilder {
 
     @Override

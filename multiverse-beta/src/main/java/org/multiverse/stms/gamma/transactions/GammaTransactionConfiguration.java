@@ -21,6 +21,8 @@ import static java.lang.String.format;
  * <p/>
  * GammaTransactionConfiguration object is considered to be immutable. The only mutable part if the speculative
  * configuration that can get upgraded if enabled and speculations failed.
+ *
+ * @author Peter Veentjer.
  */
 @SuppressWarnings({"OverlyComplexClass", "ClassWithTooManyFields"})
 public final class GammaTransactionConfiguration implements TransactionConfiguration, GammaConstants {

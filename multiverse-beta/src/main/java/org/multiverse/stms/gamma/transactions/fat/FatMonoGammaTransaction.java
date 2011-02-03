@@ -1,6 +1,5 @@
 package org.multiverse.stms.gamma.transactions.fat;
 
-import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
@@ -54,10 +53,17 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
         if (owner != null) {
             if (hasWrites) {
                 if (status == TX_ACTIVE) {
+                    commitConflict = true;
+
                     if (!owner.prepare(this, tranlocal)) {
                         throw abortOnReadWriteConflict(owner);
                     }
                 }
+
+                if (commitConflict) {
+                    config.globalConflictCounter.signalConflict();
+                }
+
                 Listeners listeners = owner.commit(tranlocal, pool);
                 if (listeners != null) {
                     listeners.openAll(pool);
@@ -107,6 +113,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
 
         final AbstractGammaRef owner = tranlocal.owner;
         if (owner != null) {
+            commitConflict = true;
             if (!owner.prepare(this, tranlocal)) {
                 throw abortOnReadWriteConflict(owner);
             }
@@ -165,11 +172,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
             throw abortRetryOnNoRetryPossible();
         }
 
-        if (config.controlFlowErrorsReused) {
-            throw Retry.INSTANCE;
-        } else {
-            throw new Retry(true);
-        }
+        throw newRetryError();
     }
 
     @Override
@@ -182,6 +185,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
         hasWrites = false;
         attempt++;
         abortOnly = false;
+        commitConflict = false;
         return true;
     }
 
@@ -191,6 +195,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
         remainingTimeoutNs = config.timeoutNs;
         attempt = 1;
         abortOnly = false;
+        commitConflict = false;
     }
 
     public final boolean isReadConsistent(GammaRefTranlocal justAdded) {

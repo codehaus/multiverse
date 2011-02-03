@@ -4,6 +4,11 @@ import org.multiverse.api.BackoffPolicy;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
 
+/**
+ * An abstract {@link GammaAtomicBlock} implementation.
+ *
+ * @author Peter Veentjer.
+ */
 public abstract class AbstractGammaAtomicBlock implements GammaAtomicBlock {
     protected final GammaTransactionFactory transactionFactory;
     protected final GammaTransactionConfiguration transactionConfiguration;

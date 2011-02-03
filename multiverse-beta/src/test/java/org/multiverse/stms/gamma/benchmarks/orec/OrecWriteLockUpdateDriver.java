@@ -32,7 +32,7 @@ public class OrecWriteLockUpdateDriver extends BenchmarkDriver implements GammaC
         final GammaLongRef _orec = orec;
 
         for (long k = 0; k < _cycles; k++) {
-            _orec.tryLockAndArrive(0, LOCKMODE_WRITE);
+            _orec.arriveAndLock(0, LOCKMODE_WRITE);
             _orec.upgradeWriteLockToExclusiveLock();
             _orec.departAfterUpdateAndUnlock();
         }

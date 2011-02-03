@@ -1,12 +1,13 @@
 package org.multiverse.stms.gamma.transactions.lean;
 
-import org.multiverse.api.exceptions.Retry;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
+
+import static org.multiverse.utils.Bugshaker.shakeBugs;
 
 /**
  * A Lean GammaTransaction implementation that is optimized for dealing with only a single
@@ -63,12 +64,13 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
 
         long version = tranlocal.version;
 
+        //if the transaction still is active, we need to prepare the transaction.
         if (status == TX_ACTIVE) {
             if (owner.version != version) {
                 throw abortOnReadWriteConflict(owner);
             }
 
-            int arriveStatus = owner.tryLockAndArrive(64, LOCKMODE_EXCLUSIVE);
+            int arriveStatus = owner.arriveAndLock(64, LOCKMODE_EXCLUSIVE);
 
             if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
                 throw abortOnReadWriteConflict(owner);
@@ -82,8 +84,15 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
                 }
                 throw abortOnReadWriteConflict(owner);
             }
+
+            commitConflict = true;
         }
 
+        if (commitConflict) {
+            config.globalConflictCounter.signalConflict();
+        }
+
+        shakeBugs();
         owner.ref_value = tranlocal.ref_value;
         owner.version = version + 1;
 
@@ -115,7 +124,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
         }
 
         if (status == TX_COMMITTED) {
-           throw failAbortOnAlreadyCommitted();
+            throw failAbortOnAlreadyCommitted();
         }
 
         status = TX_ABORTED;
@@ -137,6 +146,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
 
         final AbstractGammaRef owner = tranlocal.owner;
         if (owner != null) {
+            commitConflict = true;
             if (!owner.prepare(this, tranlocal)) {
                 throw abortOnReadWriteConflict(owner);
             }
@@ -195,11 +205,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
             throw abortRetryOnNoRetryPossible();
         }
 
-        if (config.controlFlowErrorsReused) {
-            throw Retry.INSTANCE;
-        } else {
-            throw new Retry(true);
-        }
+        throw newRetryError();
     }
 
     @Override
@@ -208,6 +214,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
             return false;
         }
 
+        commitConflict = false;
         status = TX_ACTIVE;
         hasWrites = false;
         attempt++;
@@ -215,6 +222,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
     }
 
     public final void hardReset() {
+        commitConflict = false;
         status = TX_ACTIVE;
         hasWrites = false;
         remainingTimeoutNs = config.timeoutNs;
