@@ -21,6 +21,8 @@
 - fast conflict detection fails.
 
 - when a transaction commits, how often does it need to send out a globalconflictcounter.inc. Can't this be done once?
+    - prepare needs to be fixed to send back: OK_BUT_CONFLICT, OK_NO_CONFLICT, FALSE
+    - when the exclusive lock is acquired before committing, also the conflict info needs to be stored.
 
 - constructing objects and check for read consistency.
 
@@ -31,7 +33,8 @@
 - fast/slow release of commit locks.. choose one since currently 2 different
 approaches are used (for trying to figure out if it is causing the consistency bug)
 
-- optimize the tx-pool logic (instead of using an array, use a single linked list)
+- optimize the tx-pool logic (instead of using an array, use a single linked list)..
+transactions can also act as node (no need to introduce additional datastructures).
 
 - read biased stuff needs to be re-enabled.
 
