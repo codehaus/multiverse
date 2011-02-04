@@ -56,10 +56,10 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
                     if (!owner.prepare(this, tranlocal)) {
                         throw abortOnReadWriteConflict(owner);
                     }
+                }
 
-                    if (commitConflict) {
-                        config.globalConflictCounter.signalConflict();
-                    }
+                if (commitConflict) {
+                    config.globalConflictCounter.signalConflict();
                 }
 
                 Listeners listeners = owner.commit(tranlocal, pool);
@@ -113,10 +113,6 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
         if (owner != null) {
             if (!owner.prepare(this, tranlocal)) {
                 throw abortOnReadWriteConflict(owner);
-            }
-
-            if (commitConflict) {
-                config.globalConflictCounter.signalConflict();
             }
         }
 

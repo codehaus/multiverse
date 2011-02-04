@@ -142,7 +142,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
             throw new NullPointerException("Function can't be null");
         }
 
-        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
+        final int arriveStatus = arriveAndExclusiveLockOrBackoff();
 
         if (arriveStatus == FAILURE) {
             throw new LockedException();
@@ -168,6 +168,10 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
             }
 
             return oldValue;
+        }
+
+        if ((arriveStatus & MASK_CONFLICT) != 0) {
+            stm.globalConflictCounter.signalConflict();
         }
 
         ref_value = newValue;
@@ -241,7 +245,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
 
     @Override
     public final boolean atomicCompareAndSet(final E expectedValue, final E newValue) {
-        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
+        final int arriveStatus = arriveAndExclusiveLockOrBackoff();
 
         if (arriveStatus == FAILURE) {
             throw new LockedException();
@@ -262,6 +266,10 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
             }
 
             return true;
+        }
+
+        if ((arriveStatus & MASK_CONFLICT) != 0) {
+            stm.globalConflictCounter.signalConflict();
         }
 
         ref_value = newValue;

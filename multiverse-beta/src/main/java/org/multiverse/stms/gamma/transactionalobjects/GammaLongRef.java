@@ -133,7 +133,7 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
             throw new NullPointerException("Function can't be null");
         }
 
-        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
+        final int arriveStatus = arriveAndExclusiveLockOrBackoff();
 
         if (arriveStatus == FAILURE) {
             throw new LockedException();
@@ -159,6 +159,10 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
             }
 
             return oldValue;
+        }
+
+        if ((arriveStatus & MASK_CONFLICT) != 0) {
+            stm.globalConflictCounter.signalConflict();
         }
 
         long_value = newValue;
@@ -265,7 +269,7 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
 
     @Override
     public final long atomicIncrementAndGet(final long amount) {
-        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
+        final int arriveStatus = arriveAndExclusiveLockOrBackoff();
 
         if (arriveStatus == FAILURE) {
             throw new LockedException();
@@ -281,6 +285,10 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
             }
 
             return oldValue;
+        }
+
+        if ((arriveStatus & MASK_CONFLICT) != 0) {
+            stm.globalConflictCounter.signalConflict();
         }
 
         final long newValue = oldValue + amount;

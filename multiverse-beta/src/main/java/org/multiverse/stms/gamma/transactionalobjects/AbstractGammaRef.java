@@ -1614,7 +1614,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     public final long atomicSetLong(final long newValue, boolean returnOld) {
         assert type != TYPE_REF;
 
-        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
+        final int arriveStatus = arriveAndExclusiveLockOrBackoff();
 
         if (arriveStatus == FAILURE) {
             throw new LockedException();
@@ -1630,6 +1630,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             }
 
             return newValue;
+        }
+
+        if ((arriveStatus & MASK_CONFLICT) != 0) {
+            stm.globalConflictCounter.signalConflict();
         }
 
         long_value = newValue;
@@ -1651,7 +1655,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     public final Object atomicSetObject(final Object newValue, boolean returnOld) {
         assert type == TYPE_REF;
 
-        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
+        final int arriveStatus = arriveAndExclusiveLockOrBackoff();
 
         if (arriveStatus == FAILURE) {
             throw new LockedException();
@@ -1667,6 +1671,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             }
 
             return newValue;
+        }
+
+        if ((arriveStatus & MASK_CONFLICT) != 0) {
+            stm.globalConflictCounter.signalConflict();
         }
 
         ref_value = newValue;
@@ -1686,7 +1694,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     }
 
     public final boolean atomicCompareAndSetLong(final long expectedValue, final long newValue) {
-        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
+        final int arriveStatus = arriveAndExclusiveLockOrBackoff();
 
         if (arriveStatus == FAILURE) {
             throw new LockedException();
@@ -1707,6 +1715,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             }
 
             return true;
+        }
+
+        if ((arriveStatus & MASK_CONFLICT) != 0) {
+            stm.globalConflictCounter.signalConflict();
         }
 
         long_value = newValue;

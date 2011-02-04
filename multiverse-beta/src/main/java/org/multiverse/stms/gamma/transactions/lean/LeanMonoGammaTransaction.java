@@ -85,9 +85,13 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
                 throw abortOnReadWriteConflict(owner);
             }
 
-            if (commitConflict) {
-                config.globalConflictCounter.signalConflict();
+            if((arriveStatus & MASK_CONFLICT)!=0){
+                commitConflict = true;
             }
+        }
+
+        if (commitConflict) {
+            config.globalConflictCounter.signalConflict();
         }
 
         shakeBugs();
@@ -100,7 +104,6 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
             listeners = owner.___removeListenersAfterWrite();
         }
 
-        //todo: content of this method can be inlined here.
         owner.departAfterUpdateAndUnlock();
 
         tranlocal.owner = null;
@@ -146,10 +149,6 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
         if (owner != null) {
             if (!owner.prepare(this, tranlocal)) {
                 throw abortOnReadWriteConflict(owner);
-            }
-
-            if (commitConflict) {
-                config.globalConflictCounter.signalConflict();
             }
         }
 

@@ -29,82 +29,6 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         this.array = new GammaRefTranlocal[config.minimalArrayTreeSize];
     }
 
-    public final float getUsage() {
-        return (size * 1.0f) / array.length;
-    }
-
-    public final int size() {
-        return size;
-    }
-
-    public final int indexOf(final AbstractGammaRef ref, final int hash) {
-        int jump = 0;
-        boolean goLeft = true;
-
-        do {
-            final int offset = goLeft ? -jump : jump;
-            final int index = (hash + offset) % array.length;
-
-            final GammaRefTranlocal current = array[index];
-            if (current == null || current.owner == null) {
-                return -1;
-            }
-
-            //noinspection ObjectEquality
-            if (current.owner == ref) {
-                return index;
-            }
-
-            final int currentHash = current.owner.identityHashCode();
-            goLeft = currentHash > hash;
-            jump = jump == 0 ? 1 : jump * 2;
-        } while (jump < array.length);
-
-        return -1;
-    }
-
-    public final void attach(final GammaRefTranlocal tranlocal, final int hash) {
-        int jump = 0;
-        boolean goLeft = true;
-
-        do {
-            final int offset = goLeft ? -jump : jump;
-            final int index = (hash + offset) % array.length;
-
-            GammaRefTranlocal current = array[index];
-            if (current == null) {
-                array[index] = tranlocal;
-                return;
-            }
-
-            final int currentHash = current.owner.identityHashCode();
-            goLeft = currentHash > hash;
-            jump = jump == 0 ? 1 : jump * 2;
-        } while (jump < array.length);
-
-        expand();
-        attach(tranlocal, hash);
-    }
-
-    private void expand() {
-        GammaRefTranlocal[] oldArray = array;
-        int newSize = oldArray.length * 2;
-        array = pool.takeTranlocalArray(newSize);
-
-        for (int k = 0; k < oldArray.length; k++) {
-            final GammaRefTranlocal tranlocal = oldArray[k];
-
-            if (tranlocal == null) {
-                continue;
-            }
-
-            oldArray[k] = null;
-            attach(tranlocal, tranlocal.owner.identityHashCode());
-        }
-
-        pool.putTranlocalArray(oldArray);
-    }
-
     @Override
     public final void commit() {
         if (status == TX_COMMITTED) {
@@ -126,10 +50,10 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
                     if (conflictingObject != null) {
                         throw abortOnReadWriteConflict(conflictingObject);
                     }
+                }
 
-                    if (commitConflict) {
-                        config.globalConflictCounter.signalConflict();
-                    }
+                if (commitConflict) {
+                    config.globalConflictCounter.signalConflict();
                 }
 
                 Listeners[] listenersArray = commitArray();
@@ -220,10 +144,6 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
             final GammaObject conflictingObject = doPrepare();
             if (conflictingObject != null) {
                 throw abortOnReadWriteConflict(conflictingObject);
-            }
-
-            if (commitConflict) {
-                config.globalConflictCounter.signalConflict();
             }
         }
 
@@ -431,5 +351,81 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         }
 
         return true;
+    }
+
+    public final float getUsage() {
+        return (size * 1.0f) / array.length;
+    }
+
+    public final int size() {
+        return size;
+    }
+
+    public final int indexOf(final AbstractGammaRef ref, final int hash) {
+        int jump = 0;
+        boolean goLeft = true;
+
+        do {
+            final int offset = goLeft ? -jump : jump;
+            final int index = (hash + offset) % array.length;
+
+            final GammaRefTranlocal current = array[index];
+            if (current == null || current.owner == null) {
+                return -1;
+            }
+
+            //noinspection ObjectEquality
+            if (current.owner == ref) {
+                return index;
+            }
+
+            final int currentHash = current.owner.identityHashCode();
+            goLeft = currentHash > hash;
+            jump = jump == 0 ? 1 : jump * 2;
+        } while (jump < array.length);
+
+        return -1;
+    }
+
+    public final void attach(final GammaRefTranlocal tranlocal, final int hash) {
+        int jump = 0;
+        boolean goLeft = true;
+
+        do {
+            final int offset = goLeft ? -jump : jump;
+            final int index = (hash + offset) % array.length;
+
+            GammaRefTranlocal current = array[index];
+            if (current == null) {
+                array[index] = tranlocal;
+                return;
+            }
+
+            final int currentHash = current.owner.identityHashCode();
+            goLeft = currentHash > hash;
+            jump = jump == 0 ? 1 : jump * 2;
+        } while (jump < array.length);
+
+        expand();
+        attach(tranlocal, hash);
+    }
+
+    private void expand() {
+        GammaRefTranlocal[] oldArray = array;
+        int newSize = oldArray.length * 2;
+        array = pool.takeTranlocalArray(newSize);
+
+        for (int k = 0; k < oldArray.length; k++) {
+            final GammaRefTranlocal tranlocal = oldArray[k];
+
+            if (tranlocal == null) {
+                continue;
+            }
+
+            oldArray[k] = null;
+            attach(tranlocal, tranlocal.owner.identityHashCode());
+        }
+
+        pool.putTranlocalArray(oldArray);
     }
 }

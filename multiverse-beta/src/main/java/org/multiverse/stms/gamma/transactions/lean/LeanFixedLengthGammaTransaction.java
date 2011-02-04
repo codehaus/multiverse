@@ -66,11 +66,10 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
                 if (conflictingObject != null) {
                     throw abortOnReadWriteConflict(conflictingObject);
                 }
+            }
 
-                if (commitConflict) {
-                    config.globalConflictCounter.signalConflict();
-                }
-
+            if (commitConflict) {
+                config.globalConflictCounter.signalConflict();
             }
 
             int listenersIndex = 0;
@@ -126,6 +125,10 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
 
             if (arriveStatus == FAILURE) {
                 return owner;
+            }
+
+            if ((arriveStatus & MASK_CONFLICT) != 0) {
+                commitConflict = true;
             }
 
             node.hasDepartObligation = (arriveStatus & MASK_UNREGISTERED) == 0;
@@ -287,10 +290,6 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
         final GammaObject conflictingObject = prepareChainForCommit();
         if (conflictingObject != null) {
             throw abortOnReadWriteConflict(conflictingObject);
-        }
-
-        if (commitConflict) {
-            config.globalConflictCounter.signalConflict();
         }
 
         status = TX_PREPARED;

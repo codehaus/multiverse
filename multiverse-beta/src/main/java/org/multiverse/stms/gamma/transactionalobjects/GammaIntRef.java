@@ -140,7 +140,7 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
             throw new NullPointerException("Function can't be null");
         }
 
-        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
+        final int arriveStatus = arriveAndExclusiveLockOrBackoff();
 
         if (arriveStatus == FAILURE) {
             throw new LockedException();
@@ -166,6 +166,10 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
             }
 
             return oldValue;
+        }
+
+        if ((arriveStatus & MASK_CONFLICT) != 0) {
+            stm.globalConflictCounter.signalConflict();
         }
 
         long_value = newValue;
@@ -253,7 +257,7 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     }
 
     private int atomicIncrement(final int amount, boolean returnOld) {
-        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
+        final int arriveStatus = arriveAndExclusiveLockOrBackoff();
 
         if (arriveStatus == FAILURE) {
             throw new LockedException();
@@ -269,6 +273,10 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
             }
 
             return oldValue;
+        }
+
+        if ((arriveStatus & MASK_CONFLICT) != 0) {
+            stm.globalConflictCounter.signalConflict();
         }
 
         final int newValue = oldValue + amount;

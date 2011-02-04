@@ -189,7 +189,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return tranlocal.version != version;
     }
 
-    protected final int arriveAndAcquireExclusiveLockOrBackoff() {
+    protected final int arriveAndExclusiveLockOrBackoff() {
         for (int k = 0; k <= stm.defaultMaxRetries; k++) {
             final int arriveStatus = arriveAndExclusiveLock(stm.spinCount);
 

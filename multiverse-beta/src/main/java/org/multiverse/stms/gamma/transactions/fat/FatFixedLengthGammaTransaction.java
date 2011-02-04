@@ -69,10 +69,10 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
                     if (o != null) {
                         throw abortOnReadWriteConflict(o);
                     }
+                }
 
-                    if (commitConflict) {
-                        config.globalConflictCounter.signalConflict();
-                    }
+                if (commitConflict) {
+                    config.globalConflictCounter.signalConflict();
                 }
 
                 final Listeners[] listenersArray = commitChain();
@@ -256,10 +256,6 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         GammaObject o = prepareChainForCommit();
         if (o != null) {
             throw abortOnReadWriteConflict(o);
-        }
-
-        if (commitConflict) {
-            config.globalConflictCounter.signalConflict();
         }
 
         status = TX_PREPARED;

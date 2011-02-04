@@ -191,7 +191,7 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
             throw new NullPointerException("Function can't be null");
         }
 
-        final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
+        final int arriveStatus = arriveAndExclusiveLockOrBackoff();
 
         if (arriveStatus == FAILURE) {
             throw new LockedException();
@@ -217,6 +217,10 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
             }
 
             return oldValue;
+        }
+
+        if ((arriveStatus & MASK_CONFLICT) != 0) {
+            stm.globalConflictCounter.signalConflict();
         }
 
         long_value = booleanAsLong(newValue);
