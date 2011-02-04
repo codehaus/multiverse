@@ -70,14 +70,14 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
                 throw abortOnReadWriteConflict(owner);
             }
 
-           final int arriveStatus = owner.arriveAndLock(64, LOCKMODE_EXCLUSIVE);
+            final int arriveStatus = owner.arriveAndExclusiveLock(64);
 
-            if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+            if (arriveStatus == FAILURE) {
                 throw abortOnReadWriteConflict(owner);
             }
 
             if (owner.version != version) {
-                if (arriveStatus == ARRIVE_NORMAL) {
+                if ((arriveStatus & MASK_UNREGISTERED) == 0) {
                     owner.departAfterFailureAndUnlock();
                 } else {
                     owner.unlockByUnregistered();

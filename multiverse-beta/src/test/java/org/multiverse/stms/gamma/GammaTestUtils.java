@@ -17,8 +17,8 @@ import static org.multiverse.TestUtils.getField;
 
 public class GammaTestUtils implements GammaConstants {
 
-    public static void causeLotsOfConflicts(GammaStm stm){
-        for(int k=0;k<100;k++){
+    public static void causeLotsOfConflicts(GammaStm stm) {
+        for (int k = 0; k < 100; k++) {
             stm.getGlobalConflictCounter().signalConflict();
         }
     }
@@ -116,22 +116,6 @@ public class GammaTestUtils implements GammaConstants {
         }
     }
 
-    // public static void assertVersionAndValue(GammaBooleanRef ref, long version, boolean value) {
-    //    Assert.assertEquals("version doesn't match", version, ref.getVersion());
-    //    Assert.assertEquals("value doesn't match", value, ref.___weakRead());
-    //}
-
-    //public static void assertVersionAndValue(GammaDoubleRef ref, long version, double value) {
-    //    Assert.assertEquals("version doesn't match", version, ref.getVersion());
-    //    assertEqualsDouble("value doesn't match", value, ref.___weakRead());
-    //}
-
-
-    //public static void assertVersionAndValue(GammaIntRef ref, long version, int value) {
-    //    Assert.assertEquals("version doesn't match", version, ref.getVersion());
-    //    Assert.assertEquals("value doesn't match", value, ref.___weakRead());
-    //}
-
     public static void assertVersionAndValue(GammaLongRef ref, long version, long value) {
         Assert.assertEquals("version doesn't match", version, ref.getVersion());
         Assert.assertEquals("value doesn't match", value, ref.atomicWeakGet());
@@ -157,12 +141,6 @@ public class GammaTestUtils implements GammaConstants {
         Assert.assertSame("value doesn't match", value, ref.atomicWeakGet());
     }
 
-
-    //public static void assertVersionAndValue(GammaRef ref, long version, Object value) {
-    //    Assert.assertEquals("version doesn't match", version, ref.getVersion());
-    //    assertSame("value doesn't match", value, ref.___weakRead());
-    //}
-
     public static void assertReadLockCount(AbstractGammaObject orec, int readLockCount) {
         if (readLockCount > 0) {
             assertEquals(LOCKMODE_READ, orec.atomicGetLockModeAsInt());
@@ -176,7 +154,7 @@ public class GammaTestUtils implements GammaConstants {
 
     public static void assertLockMode(AbstractGammaObject orec, int lockMode) {
         assertEquals(lockMode, orec.atomicGetLockModeAsInt());
-        if(lockMode!=LOCKMODE_READ){
+        if (lockMode != LOCKMODE_READ) {
             assertEquals(0, orec.getReadLockCount());
         }
     }

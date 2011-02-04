@@ -18,6 +18,7 @@ import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLoca
 /**
  * @author Peter Veentjer.
  */
+@SuppressWarnings({"OverlyComplexClass"})
 public final class GammaIntRef extends AbstractGammaRef implements IntRef {
 
     public GammaIntRef(final GammaTransaction tx) {
@@ -141,7 +142,7 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
 
         final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
 
-        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+        if (arriveStatus == FAILURE) {
             throw new LockedException();
         }
 
@@ -158,7 +159,7 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
         }
 
         if (oldValue == newValue) {
-            if (arriveStatus == ARRIVE_UNREGISTERED) {
+            if ((arriveStatus & MASK_UNREGISTERED) != 0) {
                 unlockByUnregistered();
             } else {
                 departAfterReadingAndUnlock();
@@ -254,14 +255,14 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     private int atomicIncrement(final int amount, boolean returnOld) {
         final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
 
-        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+        if (arriveStatus == FAILURE) {
             throw new LockedException();
         }
 
         final int oldValue = (int) long_value;
 
         if (amount == 0) {
-            if (arriveStatus == ARRIVE_UNREGISTERED) {
+            if ((arriveStatus & MASK_UNREGISTERED) != 0) {
                 unlockByUnregistered();
             } else {
                 departAfterReadingAndUnlock();

@@ -9,15 +9,15 @@ import org.multiverse.MultiverseConstants;
  */
 public interface GammaConstants extends MultiverseConstants {
 
-    int ARRIVE_NORMAL = 0;
-    int ARRIVE_UNREGISTERED = 1;
-    int ARRIVE_LOCK_NOT_FREE = 2;
+    int FAILURE = 0;
+    int MASK_SUCCESS = 1;
+    int MASK_UNREGISTERED = MASK_SUCCESS * 2;
+    int MASK_CONFLICT = MASK_UNREGISTERED * 2;
 
     int REGISTRATION_DONE = 0;
     int REGISTRATION_NOT_NEEDED = 1;
     int REGISTRATION_NONE = 2;
 
-    int TRANLOCAL_UNUSED = 0;
     int TRANLOCAL_CONSTRUCTING = 1;
     int TRANLOCAL_WRITE = 2;
     int TRANLOCAL_COMMUTING = 3;

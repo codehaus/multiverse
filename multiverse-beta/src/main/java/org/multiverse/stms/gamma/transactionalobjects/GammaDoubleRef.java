@@ -134,7 +134,7 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
 
         final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
 
-        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+        if (arriveStatus == FAILURE) {
             throw new LockedException();
         }
 
@@ -151,7 +151,7 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
         }
 
         if (oldValue == newValue) {
-            if (arriveStatus == ARRIVE_UNREGISTERED) {
+            if ((arriveStatus & MASK_UNREGISTERED) != 0) {
                 unlockByUnregistered();
             } else {
                 departAfterReadingAndUnlock();
@@ -266,14 +266,14 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
     private double atomicIncrement(final double amount, boolean returnOld) {
         final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
 
-        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+        if (arriveStatus == FAILURE) {
             throw new LockedException();
         }
 
         final double oldValue = longAsDouble(long_value);
 
         if (amount == 0) {
-            if (arriveStatus == ARRIVE_UNREGISTERED) {
+            if ((arriveStatus & MASK_UNREGISTERED) != 0) {
                 unlockByUnregistered();
             } else {
                 departAfterReadingAndUnlock();

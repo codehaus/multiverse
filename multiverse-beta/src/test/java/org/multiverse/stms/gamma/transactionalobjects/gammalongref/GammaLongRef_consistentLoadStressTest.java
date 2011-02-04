@@ -7,6 +7,7 @@ import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -51,6 +52,7 @@ public class GammaLongRef_consistentLoadStressTest implements GammaConstants {
     }
 
     class ReadThread extends TestThread {
+        private final GammaTransaction tx = stm.newDefaultTransaction();
         public ReadThread(int id) {
             super("ReadThread-" + id);
         }
@@ -60,7 +62,7 @@ public class GammaLongRef_consistentLoadStressTest implements GammaConstants {
             GammaRefTranlocal tranlocal = new GammaRefTranlocal();
             int k = 0;
             while (!stop) {
-                boolean success = ref.load(tranlocal, LOCKMODE_NONE, 100, true);
+                boolean success = ref.load(tx,tranlocal, LOCKMODE_NONE, 100, true);
                 if (success) {
                     if (tranlocal.version != tranlocal.long_value) {
                         inconsistencyCount.incrementAndGet();
@@ -88,11 +90,11 @@ public class GammaLongRef_consistentLoadStressTest implements GammaConstants {
             int k=0;
             while (!stop) {
                 int arriveStatus = ref.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
-                if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+                if (arriveStatus == FAILURE) {
                     continue;
                 }
 
-                if (arriveStatus == ARRIVE_UNREGISTERED) {
+                if ((arriveStatus & MASK_UNREGISTERED)!=0) {
                     throw new RuntimeException();
                 }
 

@@ -63,14 +63,14 @@ public class RawUpdateDriver implements GammaConstants {
         final long startMs = System.currentTimeMillis();
         if (lockMode == LOCKMODE_EXCLUSIVE) {
             for (long k = 0; k < txCount; k++) {
-                ref.load(tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
+                ref.load(tx,tranlocal, LOCKMODE_EXCLUSIVE, 1, false);
                 ref.orec = 0;
                 //ref.releaseAfterUpdate(tranlocal, pool);
             }
 
         } else {
             for (long k = 0; k < txCount; k++) {
-                ref.load(tranlocal, lockMode, 1, false);
+                ref.load(tx,tranlocal, lockMode, 1, false);
                 ref.tryLockAndCheckConflict(tx, tranlocal, 1, LOCKMODE_EXCLUSIVE);
                 //ref.releaseAfterUpdate(tranlocal, pool);
                 ref.orec = 0;

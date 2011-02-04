@@ -122,13 +122,13 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
                 return owner;
             }
 
-            int arriveStatus = owner.arriveAndLock(64, LOCKMODE_EXCLUSIVE);
+            int arriveStatus = owner.arriveAndExclusiveLock(64);
 
-            if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+            if (arriveStatus == FAILURE) {
                 return owner;
             }
 
-            node.hasDepartObligation = arriveStatus == ARRIVE_NORMAL;
+            node.hasDepartObligation = (arriveStatus & MASK_UNREGISTERED) == 0;
             node.lockMode = LOCKMODE_EXCLUSIVE;
 
             if (owner.version != version) {

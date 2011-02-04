@@ -46,7 +46,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     public final boolean flattenCommute(final GammaTransaction tx, final GammaRefTranlocal tranlocal, final int lockMode) {
         final GammaTransactionConfiguration config = tx.config;
 
-        if (!load(tranlocal, lockMode, config.spinCount, tx.richmansMansConflictScan)) {
+        if (!load(tx, tranlocal, lockMode, config.spinCount, tx.richmansMansConflictScan)) {
             return false;
         }
 
@@ -267,12 +267,12 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     }
 
     public final boolean load(
-            final GammaRefTranlocal tranlocal, final int lockMode, int spinCount, final boolean arriveNeeded) {
+            final GammaTransaction tx, final GammaRefTranlocal tranlocal, final int lockMode, int spinCount, final boolean arriveNeeded) {
 
         if (lockMode != LOCKMODE_NONE) {
-            final int arriveStatus = arriveAndLock(spinCount, lockMode);
+            final int result = arriveAndLock(spinCount, lockMode);
 
-            if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+            if (result == FAILURE) {
                 return false;
             }
 
@@ -288,7 +288,8 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 tranlocal.long_oldValue = value;
             }
             tranlocal.lockMode = lockMode;
-            tranlocal.hasDepartObligation = arriveStatus == ARRIVE_NORMAL;
+            tranlocal.hasDepartObligation = (result & MASK_UNREGISTERED) == 0;
+            tx.commitConflict = (result & MASK_CONFLICT) != 0;
             return true;
         }
 
@@ -312,11 +313,16 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
             shakeBugs();
 
-            final int arriveStatus = arriveNeeded
-                    ? arrive(spinCount)
-                    : (waitForExclusiveLockToBecomeFree(spinCount) ? ARRIVE_UNREGISTERED : ARRIVE_LOCK_NOT_FREE);
+            int arriveStatus;
+            if (arriveNeeded) {
+                arriveStatus = arrive(spinCount);
+            } else if (waitForExclusiveLockToBecomeFree(spinCount)) {
+                arriveStatus = MASK_SUCCESS + MASK_UNREGISTERED;
+            } else {
+                arriveStatus = FAILURE;
+            }
 
-            if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+            if (arriveStatus == FAILURE) {
                 return false;
             }
 
@@ -326,7 +332,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 tranlocal.owner = this;
                 tranlocal.version = readVersion;
                 tranlocal.lockMode = LOCKMODE_NONE;
-                tranlocal.hasDepartObligation = arriveStatus == ARRIVE_NORMAL;
+                tranlocal.hasDepartObligation = (arriveStatus & MASK_UNREGISTERED) == 0;
 
                 if (type == TYPE_REF) {
                     tranlocal.ref_value = readRef;
@@ -340,7 +346,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             }
 
             //we are not lucky, the value has changed. But before retrying, we need to depart if the arrive was normal
-            if (arriveStatus == ARRIVE_NORMAL) {
+            if ((arriveStatus & MASK_UNREGISTERED) == 0) {
                 departAfterFailure();
             }
         }
@@ -792,7 +798,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         initTranlocalForRead(config, tranlocal);
-        if (!load(tranlocal, lockMode, config.spinCount, tx.richmansMansConflictScan)) {
+        if (!load(tx, tranlocal, lockMode, config.spinCount, tx.richmansMansConflictScan)) {
             throw tx.abortOnReadWriteConflict(this);
         }
 
@@ -868,7 +874,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             tx.hasReads = true;
         }
 
-        if (!load(newNode, desiredLockMode, config.spinCount, tx.richmansMansConflictScan)) {
+        if (!load(tx, newNode, desiredLockMode, config.spinCount, tx.richmansMansConflictScan)) {
             throw tx.abortOnReadWriteConflict(this);
         }
 
@@ -934,7 +940,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             tx.localConflictCount = config.globalConflictCounter.count();
         }
 
-        if (!load(tranlocal, desiredLockMode, config.spinCount, tx.richmansMansConflictScan)) {
+        if (!load(tx, tranlocal, desiredLockMode, config.spinCount, tx.richmansMansConflictScan)) {
             throw tx.abortOnReadWriteConflict(this);
         }
 
@@ -1057,7 +1063,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         initTranlocalForWrite(config, tranlocal);
-        if (!load(tranlocal, desiredLockMode, config.spinCount, tx.richmansMansConflictScan)) {
+        if (!load(tx, tranlocal, desiredLockMode, config.spinCount, tx.richmansMansConflictScan)) {
             throw tx.abortOnReadWriteConflict(this);
         }
 
@@ -1143,7 +1149,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             tx.localConflictCount = config.globalConflictCounter.count();
         }
 
-        if (!load(newNode, lockMode, config.spinCount, tx.richmansMansConflictScan)) {
+        if (!load(tx, newNode, lockMode, config.spinCount, tx.richmansMansConflictScan)) {
             throw tx.abortOnReadWriteConflict(this);
         }
 
@@ -1216,7 +1222,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             tx.localConflictCount = config.globalConflictCounter.count();
         }
 
-        if (!load(tranlocal, desiredLockMode, config.spinCount, tx.richmansMansConflictScan)) {
+        if (!load(tx, tranlocal, desiredLockMode, config.spinCount, tx.richmansMansConflictScan)) {
             throw tx.abortOnReadWriteConflict(this);
         }
 
@@ -1610,14 +1616,14 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
 
-        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+        if (arriveStatus == FAILURE) {
             throw new LockedException();
         }
 
         final long oldValue = long_value;
 
         if (oldValue == newValue) {
-            if (arriveStatus == ARRIVE_UNREGISTERED) {
+            if ((arriveStatus & MASK_UNREGISTERED) != 0) {
                 unlockByUnregistered();
             } else {
                 departAfterReadingAndUnlock();
@@ -1647,14 +1653,14 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
 
-        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+        if (arriveStatus == FAILURE) {
             throw new LockedException();
         }
 
         final Object oldValue = ref_value;
 
         if (oldValue == newValue) {
-            if (arriveStatus == ARRIVE_UNREGISTERED) {
+            if ((arriveStatus & MASK_UNREGISTERED) != 0) {
                 unlockByUnregistered();
             } else {
                 departAfterReadingAndUnlock();
@@ -1682,7 +1688,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     public final boolean atomicCompareAndSetLong(final long expectedValue, final long newValue) {
         final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
 
-        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+        if (arriveStatus == FAILURE) {
             throw new LockedException();
         }
 
@@ -1694,7 +1700,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (expectedValue == newValue) {
-            if (arriveStatus == ARRIVE_UNREGISTERED) {
+            if ((arriveStatus & MASK_UNREGISTERED) != 0) {
                 unlockByUnregistered();
             } else {
                 departAfterReadingAndUnlock();

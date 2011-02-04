@@ -144,7 +144,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
 
         final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
 
-        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+        if (arriveStatus == FAILURE) {
             throw new LockedException();
         }
 
@@ -161,7 +161,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
         }
 
         if (oldValue == newValue) {
-            if (arriveStatus == ARRIVE_UNREGISTERED) {
+            if ((arriveStatus & MASK_UNREGISTERED) != 0) {
                 unlockByUnregistered();
             } else {
                 departAfterReadingAndUnlock();
@@ -243,7 +243,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     public final boolean atomicCompareAndSet(final E expectedValue, final E newValue) {
         final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
 
-        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+        if (arriveStatus == FAILURE) {
             throw new LockedException();
         }
 
@@ -255,7 +255,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
         }
 
         if (expectedValue == newValue) {
-            if (arriveStatus == ARRIVE_UNREGISTERED) {
+            if ((arriveStatus & MASK_UNREGISTERED) != 0) {
                 unlockByUnregistered();
             } else {
                 departAfterReadingAndUnlock();

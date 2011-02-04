@@ -193,7 +193,7 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
 
         final int arriveStatus = arriveAndAcquireExclusiveLockOrBackoff();
 
-        if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+        if (arriveStatus == FAILURE) {
             throw new LockedException();
         }
 
@@ -210,7 +210,7 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
         }
 
         if (oldValue == newValue) {
-            if (arriveStatus == ARRIVE_UNREGISTERED) {
+            if ((arriveStatus & MASK_UNREGISTERED) != 0) {
                 unlockByUnregistered();
             } else {
                 departAfterReadingAndUnlock();

@@ -33,7 +33,7 @@ public class OrecReadBiasedReadDriver extends BenchmarkDriver implements GammaCo
 
         for (long k = 0; k < _cycles; k++) {
             int arriveStatus = _orec.arrive(0);
-            if (arriveStatus == ARRIVE_NORMAL) {
+            if ((arriveStatus & MASK_UNREGISTERED) == 0) {
                 _orec.departAfterReading();
             }
         }

@@ -191,16 +191,16 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
     protected final int arriveAndAcquireExclusiveLockOrBackoff() {
         for (int k = 0; k <= stm.defaultMaxRetries; k++) {
-            final int arriveStatus = arriveAndAcquireExclusiveLock(stm.spinCount);
+            final int arriveStatus = arriveAndExclusiveLock(stm.spinCount);
 
-            if (arriveStatus != ARRIVE_LOCK_NOT_FREE) {
+            if (arriveStatus != FAILURE) {
                 return arriveStatus;
             }
 
             stm.defaultBackoffPolicy.delayedUninterruptible(k + 1);
         }
 
-        return ARRIVE_LOCK_NOT_FREE;
+        return FAILURE;
     }
 
     //a controlled jmm problem here since identityHashCode is not synchronized/volatile/final.
@@ -319,12 +319,12 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             }
 
             if (tranlocal.hasDepartObligation()) {
-                int result = tryLockAfterNormalArrive(spinCount, desiredLockMode);
-                if (result == -1) {
+                int result = lockAfterArrive(spinCount, desiredLockMode);
+                if (result == FAILURE) {
                     return false;
                 }
 
-                if (result > 0) {
+                if ((result & MASK_CONFLICT) != 0) {
                     tx.commitConflict = true;
                 }
 
@@ -335,16 +335,20 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 }
             } else {
                 //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
-                final int arriveStatus = arriveAndLock(spinCount, desiredLockMode);
+                final int result = arriveAndLock(spinCount, desiredLockMode);
 
-                if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
+                if (result == FAILURE) {
                     return false;
                 }
 
                 tranlocal.setLockMode(desiredLockMode);
 
-                if (arriveStatus == ARRIVE_NORMAL) {
-                    tranlocal.setDepartObligation(true);
+                if ((result & MASK_UNREGISTERED) == 0) {
+                    tranlocal.hasDepartObligation = true;
+                }
+
+                if ((result & MASK_CONFLICT) != 0) {
+                    tx.commitConflict = true;
                 }
 
                 if (version != expectedVersion) {
@@ -439,7 +443,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 if (surplus == 0) {
                     surplus = 1;
                 } else if (surplus == 1) {
-                    return ARRIVE_UNREGISTERED;
+                    return MASK_SUCCESS + MASK_UNREGISTERED;
                 } else {
                     throw new PanicError("Surplus for a readbiased orec can never be larger than 1");
                 }
@@ -450,11 +454,17 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             final long next = setSurplus(current, surplus);
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
-                return isReadBiased ? ARRIVE_UNREGISTERED : ARRIVE_NORMAL;
+                int result = MASK_SUCCESS;
+
+                if (isReadBiased) {
+                    result += MASK_UNREGISTERED;
+                }
+
+                return result;
             }
         } while (spinCount >= 0);
 
-        return ARRIVE_LOCK_NOT_FREE;
+        return FAILURE;
     }
 
     //todo: here the conflict count should be returned,
@@ -525,11 +535,15 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         }
     }
 
-    //todo: here the conflict count should be returned,
+    /**
+     * Arrives and tries to acquire the lock. If one of them fails, there will not be any state change.
+     *
+     * @param spinCount the maximum number of times to spin to wait for the lock to come available.
+     * @param lockMode  the desired lockmode. It isn't allowed to be LOCKMODE_NONE.
+     * @return the result of this operation.
+     */
     public final int arriveAndLock(int spinCount, final int lockMode) {
-        if (true) {
-            throw new TodoException();
-        }
+        assert lockMode != LOCKMODE_NONE;
 
         do {
             final long current = orec;
@@ -542,7 +556,8 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 continue;
             }
 
-            long surplus = getSurplus(current);
+            long currentSurplus = getSurplus(current);
+            long surplus = currentSurplus;
             boolean isReadBiased = isReadBiased(current);
 
             if (isReadBiased) {
@@ -557,22 +572,30 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
             long next = setSurplus(current, surplus);
 
-            if (lockMode != LOCKMODE_NONE) {
-                if (lockMode == LOCKMODE_READ) {
-                    next = setReadLockCount(next, getReadLockCount(current) + 1);
-                } else if (lockMode == LOCKMODE_WRITE) {
-                    next = setWriteLock(next, true);
-                } else if (lockMode == LOCKMODE_EXCLUSIVE) {
-                    next = setExclusiveLock(next, true);
-                }
+            if (lockMode == LOCKMODE_EXCLUSIVE) {
+                next = setExclusiveLock(next, true);
+            } else if (lockMode == LOCKMODE_READ) {
+                next = setReadLockCount(next, getReadLockCount(current) + 1);
+            } else if (lockMode == LOCKMODE_WRITE) {
+                next = setWriteLock(next, true);
             }
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
-                return isReadBiased ? ARRIVE_UNREGISTERED : ARRIVE_NORMAL;
+                int result = MASK_SUCCESS;
+
+                if (isReadBiased) {
+                    result += MASK_UNREGISTERED;
+                }
+
+                if (lockMode == LOCKMODE_EXCLUSIVE && currentSurplus > 0) {
+                    result += MASK_CONFLICT;
+                }
+
+                return result;
             }
         } while (spinCount >= 0);
 
-        return ARRIVE_LOCK_NOT_FREE;
+        return FAILURE;
     }
 
     /**
@@ -581,12 +604,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
      * @param spinCount the maximum number of spins when it is locked.
      * @return the arrive-status.
      */
-    //todo: here the conflict count should be returned,
-    public final int arriveAndAcquireExclusiveLock(int spinCount) {
-        if (true) {
-            throw new TodoException();
-        }
-
+    public final int arriveAndExclusiveLock(int spinCount) {
         do {
             final long current = orec;
 
@@ -613,23 +631,29 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             next = setExclusiveLock(next, true);
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
-                return isReadBiased ? ARRIVE_UNREGISTERED : ARRIVE_NORMAL;
+                int result = MASK_SUCCESS;
+
+                if (isReadBiased) {
+                    result += MASK_UNREGISTERED;
+                }
+
+                return result;
             }
         } while (spinCount >= 0);
 
-        return ARRIVE_LOCK_NOT_FREE;
+        return FAILURE;
     }
 
     /**
-     * -1 indicates failure
-     * 0 indicates success and no conflict
-     * 1 indicates success but commit conflict
+     * Arrives and tries to acquire the lock. If one of them fails, there will not be any state change.
      *
-     * @param spinCount
-     * @param lockMode
+     * @param spinCount the maximum number of times to spin if a lock is acquired.
+     * @param lockMode  the desired lockMode. This is not allowed to be LOCKMODE_NONE.
      * @return
      */
-    public final int tryLockAfterNormalArrive(int spinCount, final int lockMode) {
+    public final int lockAfterArrive(int spinCount, final int lockMode) {
+        assert lockMode != LOCKMODE_NONE;
+
         do {
             final long current = orec;
 
@@ -645,31 +669,32 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 continue;
             }
 
-            if (getSurplus(current) == 0) {
+            final long currentSurplus = getSurplus(current);
+            if (currentSurplus == 0) {
                 throw new PanicError("There is no surplus (so if it didn't do a read before)" + toOrecString(current));
             }
 
             long next = current;
-            if (lockMode != LOCKMODE_NONE) {
-                if (lockMode == LOCKMODE_READ) {
-                    next = setReadLockCount(next, getReadLockCount(current) + 1);
-                } else if (lockMode == LOCKMODE_EXCLUSIVE) {
-                    next = setExclusiveLock(next, true);
-                } else {
-                    next = setWriteLock(current, true);
-                }
+            if (lockMode == LOCKMODE_READ) {
+                next = setReadLockCount(next, getReadLockCount(current) + 1);
+            } else if (lockMode == LOCKMODE_EXCLUSIVE) {
+                next = setExclusiveLock(next, true);
+            } else {
+                next = setWriteLock(current, true);
             }
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
-                if (isReadBiased(current)) {
-                    throw new TodoException();
-                } else {
-                    return getSurplus(current) == 1 ? 0 : 1;
+                int result = MASK_SUCCESS;
+
+                if (lockMode == LOCKMODE_EXCLUSIVE && currentSurplus > 1) {
+                    result += MASK_CONFLICT;
                 }
+
+                return result;
             }
         } while (spinCount >= 0);
 
-        return -1;
+        return FAILURE;
     }
 
     /**
@@ -694,8 +719,11 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
             int readonlyCount = getReadonlyCount(current);
             if (readonlyCount < READBIASED_THRESHOLD) {
-                //todo: needs to be enabled again, but it prevent turning the ref in readbiased
-                //readonlyCount++;
+                readonlyCount++;
+            }
+
+            if (surplus <= 1 && hasAnyLock(current)) {
+                throw new PanicError("There is not enough surplus " + toOrecString(current));
             }
 
             surplus--;
@@ -747,8 +775,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             surplus--;
 
             if (readonlyCount < READBIASED_THRESHOLD) {
-                //readonlyCount++;
-                //todo: needs to be enabled again
+                readonlyCount++;
             }
 
             if (surplus == 0 && readonlyCount == READBIASED_THRESHOLD) {
@@ -1005,7 +1032,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
     private static String toOrecString(final long value) {
         return format(
-                "Orec(hasExclusiveLock=%s, hasUpdateLock=%s, readLocks=%s, surplus=%s, isReadBiased=%s, readonlyCount=%s)",
+                "Orec(hasExclusiveLock=%s, hasWriteLock=%s, readLocks=%s, surplus=%s, isReadBiased=%s, readonlyCount=%s)",
                 hasExclusiveLock(value),
                 hasWriteLock(value),
                 getReadLockCount(value),

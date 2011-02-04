@@ -53,7 +53,7 @@ public class Orec_departAfterFailureTest {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
         orec.arrive(1);
-        orec.tryLockAfterNormalArrive(1, LOCKMODE_EXCLUSIVE);
+        orec.lockAfterArrive(1, LOCKMODE_EXCLUSIVE);
 
         orec.departAfterFailure();
 
@@ -68,7 +68,7 @@ public class Orec_departAfterFailureTest {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
         orec.arrive(1);
-        orec.tryLockAfterNormalArrive(1, LOCKMODE_WRITE);
+        orec.lockAfterArrive(1, LOCKMODE_WRITE);
 
         orec.departAfterFailure();
 

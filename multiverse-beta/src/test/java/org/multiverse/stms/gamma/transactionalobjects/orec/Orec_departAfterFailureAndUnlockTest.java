@@ -8,8 +8,8 @@ import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.multiverse.TestUtils.assertOrecValue;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class Orec_departAfterFailureAndUnlockTest implements GammaConstants {
@@ -21,25 +21,23 @@ public class Orec_departAfterFailureAndUnlockTest implements GammaConstants {
         stm = new GammaStm();
     }
 
-
     @Test
     public void whenUpdateBiasedNotLocked_thenPanicError() {
         AbstractGammaObject orec = new GammaLongRef(stm);
+        long orecValue = orec.orec;
         try {
             orec.departAfterFailureAndUnlock();
             fail();
         } catch (PanicError ex) {
         }
 
-        assertLockMode(orec, LOCKMODE_NONE);
-        assertSurplus(orec, 0);
-        assertReadonlyCount(orec, 0);
-        assertUpdateBiased(orec);
+        assertOrecValue(orec, orecValue);
     }
 
     @Test
     public void whenReadBiasedAndNotLocked_thenPanicError() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
+        long orecValue = orec.orec;
 
         try {
             orec.departAfterFailureAndUnlock();
@@ -47,10 +45,7 @@ public class Orec_departAfterFailureAndUnlockTest implements GammaConstants {
         } catch (PanicError expected) {
         }
 
-        assertLockMode(orec, LOCKMODE_NONE);
-        assertSurplus(orec, 0);
-        assertReadonlyCount(orec, 0);
-        assertReadBiased(orec);
+        assertOrecValue(orec, orecValue);
     }
 
     @Test
@@ -95,6 +90,21 @@ public class Orec_departAfterFailureAndUnlockTest implements GammaConstants {
         assertReadLockCount(orec, 0);
     }
 
+     @Test
+    public void whenUpdateBiasedAndHasWriteLockedAndSurplus() {
+        AbstractGammaObject orec = new GammaLongRef(stm);
+        orec.arrive(1);
+        orec.arrive(1);
+        orec.arriveAndLock(1, LOCKMODE_WRITE);
+
+        orec.departAfterFailureAndUnlock();
+        assertLockMode(orec, LOCKMODE_NONE);
+        assertSurplus(orec, 2);
+        assertReadonlyCount(orec, 0);
+        assertUpdateBiased(orec);
+        assertReadLockCount(orec, 0);
+    }
+
     @Test
     public void whenUpdateBiasedAndHasExclusiveLocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
@@ -103,6 +113,21 @@ public class Orec_departAfterFailureAndUnlockTest implements GammaConstants {
         orec.departAfterFailureAndUnlock();
         assertLockMode(orec, LOCKMODE_NONE);
         assertSurplus(orec, 0);
+        assertReadonlyCount(orec, 0);
+        assertUpdateBiased(orec);
+        assertReadLockCount(orec, 0);
+    }
+
+    @Test
+    public void whenUpdateBiasedAndHasExclusiveLockedAndSurplus() {
+        AbstractGammaObject orec = new GammaLongRef(stm);
+        orec.arrive(1);
+        orec.arrive(2);
+        orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
+
+        orec.departAfterFailureAndUnlock();
+        assertLockMode(orec, LOCKMODE_NONE);
+        assertSurplus(orec, 2);
         assertReadonlyCount(orec, 0);
         assertUpdateBiased(orec);
         assertReadLockCount(orec, 0);

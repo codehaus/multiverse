@@ -8,6 +8,7 @@ import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 
 import static junit.framework.Assert.assertEquals;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class Orec_arriveTest implements GammaConstants {
@@ -19,12 +20,16 @@ public class Orec_arriveTest implements GammaConstants {
         stm = new GammaStm();
     }
 
+    // ======================= update biased ==============================
+
     @Test
-    public void whenUpdateBiasedNotLockedAndNoSurplus_thenNormalArrive() {
+    public void updateBiased_whenNotLockedAndNoSurplus_thenNormalArrive() {
         AbstractGammaObject orec = new GammaLongRef(stm, 0);
+
         int result = orec.arrive(1);
 
-        assertEquals(ARRIVE_NORMAL, result);
+        assertHasMasks(result, MASK_SUCCESS);
+        assertNotHasMasks(result, MASK_CONFLICT, MASK_UNREGISTERED);
         assertSurplus(orec, 1);
         assertReadonlyCount(orec, 0);
         assertUpdateBiased(orec);
@@ -32,14 +37,15 @@ public class Orec_arriveTest implements GammaConstants {
     }
 
     @Test
-    public void whenUpdateBiasedAndNotLockedAndSurplus_thenNormalArrive() {
+    public void updateBiased_whenNotLockedAndSurplus_thenNormalArrive() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
         orec.arrive(1);
 
         int result = orec.arrive(1);
 
-        assertEquals(ARRIVE_NORMAL, result);
+        assertHasMasks(result, MASK_SUCCESS);
+        assertNotHasMasks(result, MASK_CONFLICT, MASK_UNREGISTERED);
         assertUpdateBiased(orec);
         assertSurplus(orec, 3);
         assertReadonlyCount(orec, 0);
@@ -47,40 +53,42 @@ public class Orec_arriveTest implements GammaConstants {
     }
 
     @Test
-    public void whenUpdateBiasedAndLockedForCommit_thenLockNotFree() {
+    public void updateBiased_whenExclusiveLock_thenLockNotFree() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
+        long orecValue = orec.orec;
 
         int result = orec.arrive(1);
 
-        assertEquals(ARRIVE_LOCK_NOT_FREE, result);
-        assertSurplus(orec, 1);
-        assertReadonlyCount(orec, 0);
-        assertUpdateBiased(orec);
-        assertLockMode(orec, LOCKMODE_EXCLUSIVE);
+        assertEquals(FAILURE, result);
+        assertOrecValue(orec, orecValue);
     }
 
     @Test
-    public void whenUpdateBiasedAndLockedForUpdate_thenUnregisteredArrive() {
+    public void updateBiased_whenWriteLock_thenArriveSuccess() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arriveAndLock(1, LOCKMODE_WRITE);
 
         int result = orec.arrive(1);
 
-        assertEquals(ARRIVE_NORMAL, result);
+        assertHasMasks(result, MASK_SUCCESS);
+        assertNotHasMasks(result, MASK_CONFLICT, MASK_CONFLICT);
         assertSurplus(orec, 2);
         assertReadonlyCount(orec, 0);
         assertUpdateBiased(orec);
         assertLockMode(orec, LOCKMODE_WRITE);
     }
 
+    // ======================= read biased ==============================
+
     @Test
-    public void whenReadBiasedAndNoSurplus() {
+    public void readBiased_whenNoSurplus() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
 
         int result = orec.arrive(1);
 
-        assertEquals(ARRIVE_UNREGISTERED, result);
+        assertHasMasks(result, MASK_SUCCESS, MASK_UNREGISTERED);
+        assertNotHasMasks(result, MASK_CONFLICT);
         assertLockMode(orec, LOCKMODE_NONE);
         assertSurplus(orec, 1);
         assertReadBiased(orec);
@@ -88,16 +96,52 @@ public class Orec_arriveTest implements GammaConstants {
     }
 
     @Test
-    public void whenReadBiasedAndSurplus_thenCallIgnored() {
+    public void readBiased_whenSurplus_thenCallIgnored() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
         orec.arrive(1);
+        long orecValue = orec.orec;
+        int result = orec.arrive(1);
+
+        assertHasMasks(result, MASK_SUCCESS, MASK_UNREGISTERED);
+        assertNotHasMasks(result, MASK_CONFLICT);
+        assertOrecValue(orec, orecValue);
+    }
+
+    @Test
+    public void readBiased_whenReadLockAcquired() {
+        AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
+        orec.arriveAndLock(1, LOCKMODE_READ);
+        long orecValue = orec.orec;
 
         int result = orec.arrive(1);
 
-        assertEquals(ARRIVE_UNREGISTERED, result);
-        assertLockMode(orec, LOCKMODE_NONE);
-        assertSurplus(orec, 1);
-        assertReadBiased(orec);
-        assertReadonlyCount(orec, 0);
+        assertHasMasks(result, MASK_SUCCESS, MASK_UNREGISTERED);
+        assertNotHasMasks(result, MASK_CONFLICT);
+        assertOrecValue(orec, orecValue);
+    }
+
+    @Test
+    public void readBiased_whenWriteLockAcquired() {
+         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
+        orec.arriveAndLock(1, LOCKMODE_WRITE);
+        long orecValue = orec.orec;
+
+        int result = orec.arrive(1);
+
+        assertHasMasks(result, MASK_SUCCESS, MASK_UNREGISTERED);
+        assertNotHasMasks(result, MASK_CONFLICT);
+        assertOrecValue(orec, orecValue);
+    }
+
+    @Test
+    public void readBiased_whenExclusiveLockAquired() {
+         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
+        orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
+        long orecValue = orec.orec;
+
+        int result = orec.arrive(1);
+
+        assertFailure(result);
+        assertOrecValue(orec, orecValue);
     }
 }

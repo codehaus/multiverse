@@ -3,6 +3,8 @@ package org.multiverse;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.blocking.RetryLatch;
+import org.multiverse.stms.gamma.GammaConstants;
+import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaObject;
 import org.multiverse.utils.Bugshaker;
 import org.multiverse.utils.ThreadLocalRandom;
 
@@ -20,6 +22,27 @@ import static org.junit.Assert.*;
  * @author Peter Veentjer
  */
 public class TestUtils implements MultiverseConstants {
+
+    public static void assertOrecValue(AbstractGammaObject object, long expected){
+        assertEquals(expected, object.orec);
+    }
+
+    public static void assertFailure(int value){
+        assertEquals(GammaConstants.FAILURE, value);
+    }
+
+    public static void assertHasMasks(int value, int... masks) {
+        for (int mask : masks) {
+            assertTrue((value & mask) > 0);
+        }
+    }
+
+    public static void assertNotHasMasks(int value, int... masks) {
+        for (int mask : masks) {
+            assertTrue((value & mask) == 0);
+        }
+    }
+
 
     public static void clearCurrentThreadInterruptedStatus() {
         Thread.interrupted();

@@ -67,7 +67,7 @@ public class OrecCommitLockUpdateDriver extends BenchmarkDriver implements Gamma
 
             for (long k = 0; k < _cycles; k++) {
                 int arriveStatus = _orec.arriveAndLock(0, LOCKMODE_EXCLUSIVE);
-                if (arriveStatus != ARRIVE_NORMAL) {
+                if ((arriveStatus & MASK_UNREGISTERED) != 0) {
                     _orec.arriveAndLock(0, LOCKMODE_EXCLUSIVE);
                 }
                 _orec.departAfterUpdateAndUnlock();

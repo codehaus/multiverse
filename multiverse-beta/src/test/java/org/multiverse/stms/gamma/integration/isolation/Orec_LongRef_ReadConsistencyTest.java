@@ -129,6 +129,7 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
         private GammaRefTranlocal[] tranlocals;
         private long lastConflictCount = stm.getGlobalConflictCounter().count();
         private GammaObjectPool pool = new GammaObjectPool();
+        private GammaTransaction dummyTx = stm.newDefaultTransaction();
 
         public ReadingThread(int id) {
             super("ReadingThread-" + id);
@@ -199,31 +200,11 @@ public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
                 for (int k = 0; k < refs.length; k++) {
                     GammaLongRef ref = refs[k];
                     GammaRefTranlocal tranlocal = tranlocals[k];
-                    if (!ref.load(tranlocal, LOCKMODE_NONE, 64, true)) {
+                    if (!ref.load(dummyTx,tranlocal, LOCKMODE_NONE, 64, true)) {
                         releaseChainAfterFailure();
                         break;
                     }
 
-                    //if(!tranlocal.hasDepartObligation){
-                    //    throw new RuntimeException();
-                    //}
-
-//                    long firstVersion = ref.version;
-//
-//                    int arriveStatus = ref.arrive(64);
-//
-//                    if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
-//                        releaseChainAfterFailure();
-//                        break;
-//                    }
-//
-//                    tranlocal.hasDepartObligation = true;
-//                    if (ref.version != firstVersion) {
-//                        releaseChainAfterFailure();
-//                        break;
-//                    }
-//
-//                    tranlocal.version = firstVersion;
                     if (!isReadConsistent()) {
                         releaseChainAfterFailure();
                         break;

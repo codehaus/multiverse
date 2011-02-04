@@ -33,7 +33,7 @@ public class OrecNormalUpdateDriver extends BenchmarkDriver implements GammaCons
 
         for (long k = 0; k < _cycles; k++) {
             _orec.arrive(1);
-            _orec.tryLockAfterNormalArrive(1, LOCKMODE_EXCLUSIVE);
+            _orec.lockAfterArrive(1, LOCKMODE_EXCLUSIVE);
             _orec.departAfterUpdateAndUnlock();
         }
     }

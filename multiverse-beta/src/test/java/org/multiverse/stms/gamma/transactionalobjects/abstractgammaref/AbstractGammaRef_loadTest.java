@@ -8,6 +8,7 @@ import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.*;
 import static org.multiverse.stms.gamma.GammaTestUtils.assertLockMode;
@@ -37,11 +38,12 @@ public class AbstractGammaRef_loadTest implements GammaConstants {
     public void whenLongRef(LockMode lockMode, boolean arriveNeeded) {
         long initialValue = 100;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        GammaTransaction tx = stm.newDefaultTransaction();
         long initialVersion = ref.getVersion();
 
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
 
-        boolean result = ref.load(tranlocal, lockMode.asInt(), 1, arriveNeeded);
+        boolean result = ref.load(tx,tranlocal, lockMode.asInt(), 1, arriveNeeded);
 
         assertTrue(result);
         assertSame(ref, tranlocal.owner);
@@ -77,9 +79,10 @@ public class AbstractGammaRef_loadTest implements GammaConstants {
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
+        GammaTransaction tx = stm.newDefaultTransaction();
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
 
-        boolean result = ref.load(tranlocal, lockMode.asInt(), 1, arriveNeeded);
+        boolean result = ref.load(tx,tranlocal, lockMode.asInt(), 1, arriveNeeded);
 
         assertTrue(result);
         assertSame(ref, tranlocal.owner);
