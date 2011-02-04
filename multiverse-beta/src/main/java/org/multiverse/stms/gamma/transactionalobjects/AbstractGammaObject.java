@@ -362,7 +362,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
         //if a readlock is acquired, we need to upgrade it to a write/exclusive-lock
         if (currentLockMode == LOCKMODE_READ) {
-            if (!tryUpgradeReadLockToWriteOrExclusiveLock(spinCount, desiredLockMode == LOCKMODE_EXCLUSIVE)) {
+            if (!upgradeReadLock(spinCount, desiredLockMode == LOCKMODE_EXCLUSIVE)) {
                 return false;
             }
 
@@ -468,7 +468,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     }
 
     //todo: here the conflict count should be returned,
-    public final boolean tryUpgradeReadLockToWriteOrExclusiveLock(int spinCount, final boolean exclusiveLock) {
+    public final boolean upgradeReadLock(int spinCount, final boolean exclusiveLock) {
         if (true) {
             throw new TodoException();
         }
