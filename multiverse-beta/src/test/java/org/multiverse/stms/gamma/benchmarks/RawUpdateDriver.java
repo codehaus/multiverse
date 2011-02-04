@@ -71,7 +71,7 @@ public class RawUpdateDriver implements GammaConstants {
         } else {
             for (long k = 0; k < txCount; k++) {
                 ref.load(tranlocal, lockMode, 1, false);
-                ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_EXCLUSIVE);
+                ref.tryLockAndCheckConflict(tx, tranlocal, 1, LOCKMODE_EXCLUSIVE);
                 //ref.releaseAfterUpdate(tranlocal, pool);
                 ref.orec = 0;
             }

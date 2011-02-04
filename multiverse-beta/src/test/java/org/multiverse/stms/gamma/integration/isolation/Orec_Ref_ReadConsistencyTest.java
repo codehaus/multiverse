@@ -160,10 +160,10 @@ public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
                 GammaRef ref = refs[k];
                 GammaRefTranlocal tranlocal = tranlocals[k];
 
-                if (!ref.tryLockAfterNormalArrive(64, LOCKMODE_EXCLUSIVE)) {
-                    releaseChainAfterFailure();
-                    return false;
-                }
+                //if (!ref.tryLockAfterNormalArrive(64, LOCKMODE_EXCLUSIVE)) {
+                //    releaseChainAfterFailure();
+                //    return false;
+                //}
 
                 tranlocal.lockMode = LOCKMODE_EXCLUSIVE;
 

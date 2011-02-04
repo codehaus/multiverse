@@ -1,14 +1,7 @@
 package org.multiverse.stms.gamma.transactionalobjects.orec;
 
 import org.junit.Before;
-import org.junit.Test;
-import org.multiverse.api.exceptions.PanicError;
 import org.multiverse.stms.gamma.GammaStm;
-import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaObject;
-import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-
-import static org.junit.Assert.*;
-import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class Orec_tryLockAfterNormalArriveTest {
 
@@ -19,6 +12,7 @@ public class Orec_tryLockAfterNormalArriveTest {
         stm = new GammaStm();
     }
 
+    /*
     @Test
     public void updateBiased_acquireExclusiveLock_whenUnlocked() {
         AbstractGammaObject orec = new GammaLongRef(stm);
@@ -298,5 +292,5 @@ public class Orec_tryLockAfterNormalArriveTest {
         assertReadBiased(orec);
         assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_NONE);
-    }
+    }        */
 }

@@ -66,10 +66,11 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
                 if (conflictingObject != null) {
                     throw abortOnReadWriteConflict(conflictingObject);
                 }
-            }
 
-            if (commitConflict) {
-                config.globalConflictCounter.signalConflict();
+                if (commitConflict) {
+                    config.globalConflictCounter.signalConflict();
+                }
+
             }
 
             int listenersIndex = 0;
@@ -102,8 +103,6 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     private GammaObject prepareChainForCommit() {
-        commitConflict = true;
-
         GammaRefTranlocal node = head;
         do {
             final AbstractGammaRef owner = node.owner;
@@ -285,9 +284,13 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
             throw abortPrepareOnBadStatus();
         }
 
-        GammaObject conflictingObject = prepareChainForCommit();
+        final GammaObject conflictingObject = prepareChainForCommit();
         if (conflictingObject != null) {
             throw abortOnReadWriteConflict(conflictingObject);
+        }
+
+        if (commitConflict) {
+            config.globalConflictCounter.signalConflict();
         }
 
         status = TX_PREPARED;

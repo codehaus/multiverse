@@ -69,6 +69,10 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
                     if (o != null) {
                         throw abortOnReadWriteConflict(o);
                     }
+
+                    if (commitConflict) {
+                        config.globalConflictCounter.signalConflict();
+                    }
                 }
 
                 final Listeners[] listenersArray = commitChain();
@@ -85,10 +89,6 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
     }
 
     private Listeners[] commitChain() {
-        if (commitConflict) {
-            config.globalConflictCounter.signalConflict();
-        }
-
         int listenersIndex = 0;
         GammaRefTranlocal node = head;
         do {
@@ -113,9 +113,6 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     private AbstractGammaRef prepareChainForCommit() {
-        //todo: needs to be determined
-        commitConflict = true;
-
         GammaRefTranlocal node = head;
 
         do {
@@ -261,6 +258,10 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
             throw abortOnReadWriteConflict(o);
         }
 
+        if (commitConflict) {
+            config.globalConflictCounter.signalConflict();
+        }
+
         status = TX_PREPARED;
     }
 
@@ -282,12 +283,12 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         status = TX_ACTIVE;
         hasWrites = false;
         size = 0;
-        commitConflict = false;
         remainingTimeoutNs = config.timeoutNs;
         richmansMansConflictScan = config.speculativeConfiguration.get().isRichMansConflictScanRequired;
         attempt = 1;
         hasReads = false;
         abortOnly = false;
+        commitConflict = false;
     }
 
     @Override

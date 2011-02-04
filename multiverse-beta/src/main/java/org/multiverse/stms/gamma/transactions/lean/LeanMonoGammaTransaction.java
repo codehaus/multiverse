@@ -62,7 +62,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
             return;
         }
 
-        long version = tranlocal.version;
+        final long version = tranlocal.version;
 
         //if the transaction still is active, we need to prepare the transaction.
         if (status == TX_ACTIVE) {
@@ -70,7 +70,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
                 throw abortOnReadWriteConflict(owner);
             }
 
-            int arriveStatus = owner.arriveAndLock(64, LOCKMODE_EXCLUSIVE);
+           final int arriveStatus = owner.arriveAndLock(64, LOCKMODE_EXCLUSIVE);
 
             if (arriveStatus == ARRIVE_LOCK_NOT_FREE) {
                 throw abortOnReadWriteConflict(owner);
@@ -85,11 +85,9 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
                 throw abortOnReadWriteConflict(owner);
             }
 
-            commitConflict = true;
-        }
-
-        if (commitConflict) {
-            config.globalConflictCounter.signalConflict();
+            if (commitConflict) {
+                config.globalConflictCounter.signalConflict();
+            }
         }
 
         shakeBugs();
@@ -146,9 +144,12 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
 
         final AbstractGammaRef owner = tranlocal.owner;
         if (owner != null) {
-            commitConflict = true;
             if (!owner.prepare(this, tranlocal)) {
                 throw abortOnReadWriteConflict(owner);
+            }
+
+            if (commitConflict) {
+                config.globalConflictCounter.signalConflict();
             }
         }
 

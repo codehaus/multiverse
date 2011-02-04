@@ -31,7 +31,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         GammaTransaction tx = stm.newDefaultTransaction();
         GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_NONE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_NONE);
 
         assertTrue(result);
         assertFalse(tranlocal.hasDepartObligation());
@@ -49,7 +49,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         GammaTransaction tx = stm.newDefaultTransaction();
         GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_READ);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_READ);
 
         assertTrue(result);
         assertTrue(tranlocal.hasDepartObligation());
@@ -68,7 +68,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         GammaTransaction tx = stm.newDefaultTransaction();
         GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_WRITE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_WRITE);
 
         assertTrue(result);
         assertTrue(tranlocal.hasDepartObligation());
@@ -86,7 +86,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         GammaTransaction tx = stm.newDefaultTransaction();
         GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_EXCLUSIVE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_EXCLUSIVE);
 
         assertTrue(result);
         assertTrue(tranlocal.hasDepartObligation());
@@ -106,7 +106,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         GammaTransaction tx = stm.newDefaultTransaction();
         GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_READ);
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_NONE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_NONE);
 
         assertTrue(result);
         assertTrue(tranlocal.hasDepartObligation());
@@ -125,7 +125,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         GammaTransaction tx = stm.newDefaultTransaction();
         GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_READ);
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_READ);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_READ);
 
         assertTrue(result);
         assertTrue(tranlocal.hasDepartObligation());
@@ -148,7 +148,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Read);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_READ);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_READ);
 
         assertTrue(result);
         assertTrue(tranlocal.hasDepartObligation());
@@ -167,7 +167,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         GammaTransaction tx = stm.newDefaultTransaction();
         GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_READ);
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_WRITE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_WRITE);
 
         assertTrue(result);
 
@@ -190,7 +190,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Read);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_WRITE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_WRITE);
 
         assertFalse(result);
         assertTrue(tranlocal.hasDepartObligation());
@@ -209,7 +209,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         GammaTransaction tx = stm.newDefaultTransaction();
         GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_READ);
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_EXCLUSIVE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_EXCLUSIVE);
 
         assertTrue(result);
         assertTrue(tranlocal.hasDepartObligation());
@@ -231,7 +231,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Read);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_EXCLUSIVE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_EXCLUSIVE);
 
         assertFalse(result);
         assertTrue(tranlocal.hasDepartObligation());
@@ -250,7 +250,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         GammaTransaction tx = stm.newDefaultTransaction();
         GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_WRITE);
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_NONE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_NONE);
 
         assertTrue(result);
         assertTrue(tranlocal.hasDepartObligation());
@@ -268,7 +268,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         GammaTransaction tx = stm.newDefaultTransaction();
         GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_WRITE);
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_READ);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_READ);
 
         assertTrue(result);
         assertTrue(tranlocal.hasDepartObligation());
@@ -286,7 +286,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         GammaTransaction tx = stm.newDefaultTransaction();
         GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_WRITE);
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_WRITE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_WRITE);
 
         assertTrue(result);
         assertTrue(tranlocal.hasDepartObligation());
@@ -304,7 +304,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         GammaTransaction tx = stm.newDefaultTransaction();
         GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_WRITE);
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_EXCLUSIVE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_EXCLUSIVE);
 
         assertTrue(result);
         assertTrue(tranlocal.hasDepartObligation());
@@ -322,7 +322,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         GammaTransaction tx = stm.newDefaultTransaction();
         GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_EXCLUSIVE);
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_NONE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_NONE);
 
         assertTrue(result);
         assertTrue(tranlocal.hasDepartObligation());
@@ -340,7 +340,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         GammaTransaction tx = stm.newDefaultTransaction();
         GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_EXCLUSIVE);
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_READ);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_READ);
 
         assertTrue(result);
         assertTrue(tranlocal.hasDepartObligation());
@@ -358,7 +358,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         GammaTransaction tx = stm.newDefaultTransaction();
         GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_EXCLUSIVE);
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_WRITE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_WRITE);
 
         assertTrue(result);
         assertTrue(tranlocal.hasDepartObligation());
@@ -376,7 +376,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         GammaTransaction tx = stm.newDefaultTransaction();
         GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_EXCLUSIVE);
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_EXCLUSIVE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_EXCLUSIVE);
 
         assertTrue(result);
         assertTrue(tranlocal.hasDepartObligation());
@@ -399,7 +399,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         ref.atomicIncrementAndGet(1);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_NONE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_NONE);
 
         assertTrue(result);
         assertFalse(tranlocal.hasDepartObligation());
@@ -420,7 +420,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         ref.atomicIncrementAndGet(1);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_READ);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_READ);
 
         assertFalse(result);
         assertFalse(tranlocal.hasDepartObligation());
@@ -441,7 +441,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         ref.atomicIncrementAndGet(1);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_WRITE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_WRITE);
 
         assertFalse(result);
         assertFalse(tranlocal.hasDepartObligation());
@@ -462,7 +462,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
 
         ref.atomicIncrementAndGet(1);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_EXCLUSIVE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_EXCLUSIVE);
 
         assertFalse(result);
         assertFalse(tranlocal.hasDepartObligation());
@@ -486,7 +486,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Read);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_NONE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_NONE);
 
         assertTrue(result);
         assertFalse(tranlocal.hasDepartObligation());
@@ -509,7 +509,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Read);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_READ);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_READ);
 
         assertTrue(result);
         assertTrue(tranlocal.hasDepartObligation());
@@ -532,7 +532,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Read);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_WRITE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_WRITE);
 
         assertFalse(result);
         assertFalse(tranlocal.hasDepartObligation());
@@ -555,7 +555,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Read);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_EXCLUSIVE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_EXCLUSIVE);
 
         assertFalse(result);
         assertFalse(tranlocal.hasDepartObligation());
@@ -578,7 +578,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_NONE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_NONE);
 
         assertTrue(result);
         assertFalse(tranlocal.hasDepartObligation());
@@ -600,7 +600,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_READ);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_READ);
 
         assertFalse(result);
         assertFalse(tranlocal.hasDepartObligation());
@@ -622,7 +622,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_WRITE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_WRITE);
 
         assertFalse(result);
         assertFalse(tranlocal.hasDepartObligation());
@@ -644,7 +644,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_EXCLUSIVE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_EXCLUSIVE);
 
         assertFalse(result);
         assertFalse(tranlocal.hasDepartObligation());
@@ -666,7 +666,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_NONE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_NONE);
 
         assertTrue(result);
         assertFalse(tranlocal.hasDepartObligation());
@@ -688,7 +688,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_READ);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_READ);
 
         assertFalse(result);
         assertFalse(tranlocal.hasDepartObligation());
@@ -710,7 +710,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_WRITE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_WRITE);
 
         assertFalse(result);
         assertFalse(tranlocal.hasDepartObligation());
@@ -732,7 +732,7 @@ public class AbstractGammaObject_tryLockAndCheckConflictTest implements GammaCon
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, LOCKMODE_EXCLUSIVE);
+        boolean result = ref.tryLockAndCheckConflict(tx,tranlocal, 1, LOCKMODE_EXCLUSIVE);
 
         assertFalse(result);
         assertFalse(tranlocal.hasDepartObligation());

@@ -173,7 +173,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         if (mode == TRANLOCAL_READ) {
             return !tranlocal.writeSkewCheck
-                    || tryLockAndCheckConflict(tx.config.spinCount, tranlocal, LOCKMODE_READ);
+                    || tryLockAndCheckConflict(tx, tranlocal, tx.config.spinCount, LOCKMODE_READ);
         }
 
         if (mode == TRANLOCAL_COMMUTING) {
@@ -189,13 +189,13 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
             if (!isDirty) {
                 return !tranlocal.writeSkewCheck
-                        || tryLockAndCheckConflict(tx.config.spinCount, tranlocal, LOCKMODE_READ);
+                        || tryLockAndCheckConflict(tx, tranlocal, tx.config.spinCount, LOCKMODE_READ);
             }
 
             tranlocal.setDirty(true);
         }
 
-        return tryLockAndCheckConflict(tx.config.spinCount, tranlocal, LOCKMODE_EXCLUSIVE);
+        return tryLockAndCheckConflict(tx, tranlocal, tx.config.spinCount, LOCKMODE_EXCLUSIVE);
     }
 
     public final void releaseAfterFailure(final GammaRefTranlocal tranlocal, final GammaObjectPool pool) {
@@ -779,7 +779,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             }
 
             if (lockMode > tranlocal.getLockMode()) {
-                if (!tryLockAndCheckConflict(config.spinCount, tranlocal, lockMode)) {
+                if (!tryLockAndCheckConflict(tx, tranlocal, config.spinCount, lockMode)) {
                     throw tx.abortOnReadWriteConflict(this);
                 }
             }
@@ -846,7 +846,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             }
 
             if (desiredLockMode > found.getLockMode()) {
-                if (!tryLockAndCheckConflict(config.spinCount, found, desiredLockMode)) {
+                if (!tryLockAndCheckConflict(tx, found, config.spinCount, desiredLockMode)) {
                     throw tx.abortOnReadWriteConflict(this);
                 }
             }
@@ -915,7 +915,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             }
 
             if (desiredLockMode > tranlocal.getLockMode()) {
-                if (!tryLockAndCheckConflict(config.spinCount, tranlocal, desiredLockMode)) {
+                if (!tryLockAndCheckConflict(tx, tranlocal, config.spinCount, desiredLockMode)) {
                     throw tx.abortOnReadWriteConflict(this);
                 }
             }
@@ -1041,7 +1041,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             }
 
             if (desiredLockMode > tranlocal.getLockMode()) {
-                if (!tryLockAndCheckConflict(config.spinCount, tranlocal, desiredLockMode)) {
+                if (!tryLockAndCheckConflict(tx, tranlocal, config.spinCount, desiredLockMode)) {
                     throw tx.abortOnReadWriteConflict(this);
                 }
             }
@@ -1118,7 +1118,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             }
 
             if (lockMode > found.getLockMode()) {
-                if (!tryLockAndCheckConflict(config.spinCount, found, lockMode)) {
+                if (!tryLockAndCheckConflict(tx, found, config.spinCount, lockMode)) {
                     throw tx.abortOnReadWriteConflict(this);
                 }
             }
@@ -1193,7 +1193,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             }
 
             if (desiredLockMode > tranlocal.getLockMode()) {
-                if (!tryLockAndCheckConflict(config.spinCount, tranlocal, desiredLockMode)) {
+                if (!tryLockAndCheckConflict(tx, tranlocal, config.spinCount, desiredLockMode)) {
                     throw tx.abortOnReadWriteConflict(this);
                 }
             }
@@ -1537,7 +1537,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         final GammaRefTranlocal tranlocal = tx.locate(this);
         if (tranlocal != null) {
-            return tryLockAndCheckConflict(config.spinCount, tranlocal, desiredLockMode.asInt());
+            return tryLockAndCheckConflict(tx, tranlocal, config.spinCount, desiredLockMode.asInt());
         }
 
         throw new TodoException();

@@ -126,6 +126,10 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
                     if (conflictingObject != null) {
                         throw abortOnReadWriteConflict(conflictingObject);
                     }
+
+                    if (commitConflict) {
+                        config.globalConflictCounter.signalConflict();
+                    }
                 }
 
                 Listeners[] listenersArray = commitArray();
@@ -217,6 +221,10 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
             if (conflictingObject != null) {
                 throw abortOnReadWriteConflict(conflictingObject);
             }
+
+            if (commitConflict) {
+                config.globalConflictCounter.signalConflict();
+            }
         }
 
         status = TX_PREPARED;
@@ -224,8 +232,6 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     private GammaObject doPrepare() {
-        commitConflict = true;
-
         for (int k = 0; k < array.length; k++) {
             shakeBugs();
 

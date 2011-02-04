@@ -24,7 +24,7 @@ import static org.multiverse.stms.gamma.GammaStmUtils.toDebugString;
  *
  * @author Peter Veentjer.
  */
-public abstract class GammaTransaction implements GammaConstants, Transaction {
+public abstract class GammaTransaction  implements GammaConstants, Transaction {
 
     public final GammaObjectPool pool = new GammaObjectPool();
     public int status = TX_ACTIVE;
@@ -34,10 +34,10 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public boolean hasWrites;
     public final int transactionType;
     public boolean richmansMansConflictScan;
-    public boolean commitConflict;
     public boolean abortOnly = false;
     public final RetryLatch retryListener = new DefaultRetryLatch();
     public ArrayList<TransactionListener> listeners;
+    public boolean commitConflict;
 
     public GammaTransaction(GammaTransactionConfiguration config, int transactionType) {
         config.init();

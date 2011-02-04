@@ -50,7 +50,9 @@ public class Orec_tryLockAndCheckConflictTest implements GammaConstants {
 
         ref.openForRead(stm.newDefaultTransaction(), otherLockMode.asInt());
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, thisLockMode.asInt());
+
+        //todo: null transaction
+        boolean result = ref.tryLockAndCheckConflict(null, tranlocal, 1, thisLockMode.asInt());
 
         assertEquals(success, result);
         //assertEquals(expectedLockMode.asInt(), tranlocal.getLockMode());
@@ -111,7 +113,7 @@ public class Orec_tryLockAndCheckConflictTest implements GammaConstants {
         tx.richmansMansConflictScan = arriveNeeded;
         GammaRefTranlocal tranlocal = ref.openForRead(tx, firstLockMode.asInt());
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, secondLockMode.asInt());
+        boolean result = ref.tryLockAndCheckConflict(tx, tranlocal, 1, secondLockMode.asInt());
 
         assertTrue(result);
         assertEquals(expectedLockMode.asInt(), tranlocal.getLockMode());
@@ -148,7 +150,7 @@ public class Orec_tryLockAndCheckConflictTest implements GammaConstants {
         tx.richmansMansConflictScan = true;
         GammaRefTranlocal tranlocal = ref.openForRead(tx, firstLockMode.asInt());
 
-        boolean result = ref.tryLockAndCheckConflict(1, tranlocal, secondLockMode.asInt());
+        boolean result = ref.tryLockAndCheckConflict(tx, tranlocal, 1, secondLockMode.asInt());
 
         assertTrue(result);
         assertFalse(tranlocal.hasDepartObligation());

@@ -6,6 +6,7 @@ import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
+import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 public interface GammaObject extends GammaConstants {
 
@@ -20,12 +21,13 @@ public interface GammaObject extends GammaConstants {
      * <p/>
      * If the can't be acquired, no changes are made on the tranlocal.
      *
-     * @param spinCount       the maximum number of times to spin
+     *
      * @param tranlocal       the tranlocal
+     * @param spinCount       the maximum number of times to spin
      * @param desiredLockMode
      * @return true if the lock was acquired successfully and there was no conflict.
      */
-    boolean tryLockAndCheckConflict(int spinCount, GammaRefTranlocal tranlocal, int desiredLockMode);
+    boolean tryLockAndCheckConflict(GammaTransaction tx, GammaRefTranlocal tranlocal, int spinCount, int desiredLockMode);
 
     boolean hasReadConflict(GammaRefTranlocal tranlocal);
 
