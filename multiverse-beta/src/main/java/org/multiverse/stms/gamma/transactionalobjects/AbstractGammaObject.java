@@ -23,12 +23,12 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     //it is important that the maximum threshold is not larger than 1023 (there are 10 bits for the readonly count)
     private static final int READBIASED_THRESHOLD = 128;
 
-    public static final long MASK_EXCLUSIVELOCK = 0x8000000000000000L;
-    public static final long MASK_UPDATELOCK = 0x4000000000000000L;
-    public static final long MASK_READBIASED = 0x2000000000000000L;
-    public static final long MASK_READLOCKS = 0x1FFFFF0000000000L;
-    public static final long MASK_SURPLUS = 0x000000FFFFFFFE00L;
-    public static final long MASK_READONLY_COUNT = 0x00000000000003FFL;
+    public static final long MASK_OREC_EXCLUSIVELOCK = 0x8000000000000000L;
+    public static final long MASK_OREC_UPDATELOCK = 0x4000000000000000L;
+    public static final long MASK_OREC_READBIASED = 0x2000000000000000L;
+    public static final long MASK_OREC_READLOCKS = 0x1FFFFF0000000000L;
+    public static final long MASK_OREC_SURPLUS = 0x000000FFFFFFFE00L;
+    public static final long MASK_OREC_READONLY_COUNT = 0x00000000000003FFL;
 
     protected static final Unsafe ___unsafe = ToolUnsafe.getUnsafe();
     protected static final long listenersOffset;
@@ -614,7 +614,8 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 continue;
             }
 
-            long surplus = getSurplus(current);
+            final long currentSurplus = getSurplus(current);
+            long surplus = currentSurplus;
             boolean isReadBiased = isReadBiased(current);
 
             if (isReadBiased) {
@@ -635,6 +636,10 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
                 if (isReadBiased) {
                     result += MASK_UNREGISTERED;
+                }
+
+                if (currentSurplus > 0) {
+                    result += MASK_CONFLICT;
                 }
 
                 return result;
@@ -975,59 +980,59 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     }
 
     public static long setReadLockCount(final long value, final long readLockCount) {
-        return (value & ~MASK_READLOCKS) | (readLockCount << 40);
+        return (value & ~MASK_OREC_READLOCKS) | (readLockCount << 40);
     }
 
     public static int getReadLockCount(final long value) {
-        return (int) ((value & MASK_READLOCKS) >> 40);
+        return (int) ((value & MASK_OREC_READLOCKS) >> 40);
     }
 
     public static long setExclusiveLock(final long value, final boolean exclusiveLock) {
-        return (value & ~MASK_EXCLUSIVELOCK) | ((exclusiveLock ? 1L : 0L) << 63);
+        return (value & ~MASK_OREC_EXCLUSIVELOCK) | ((exclusiveLock ? 1L : 0L) << 63);
     }
 
     public static boolean hasWriteOrExclusiveLock(final long value) {
-        return ((value & (MASK_EXCLUSIVELOCK + MASK_UPDATELOCK)) != 0);
+        return ((value & (MASK_OREC_EXCLUSIVELOCK + MASK_OREC_UPDATELOCK)) != 0);
     }
 
     public static boolean hasAnyLock(final long value) {
-        return ((value & (MASK_EXCLUSIVELOCK + MASK_UPDATELOCK + MASK_READLOCKS)) != 0);
+        return ((value & (MASK_OREC_EXCLUSIVELOCK + MASK_OREC_UPDATELOCK + MASK_OREC_READLOCKS)) != 0);
     }
 
     public static boolean hasExclusiveLock(final long value) {
-        return (value & MASK_EXCLUSIVELOCK) != 0;
+        return (value & MASK_OREC_EXCLUSIVELOCK) != 0;
     }
 
     public static boolean isReadBiased(final long value) {
-        return (value & MASK_READBIASED) != 0;
+        return (value & MASK_OREC_READBIASED) != 0;
     }
 
     public static long setIsReadBiased(final long value, final boolean isReadBiased) {
-        return (value & ~MASK_READBIASED) | ((isReadBiased ? 1L : 0L) << 61);
+        return (value & ~MASK_OREC_READBIASED) | ((isReadBiased ? 1L : 0L) << 61);
     }
 
     public static boolean hasWriteLock(final long value) {
-        return (value & MASK_UPDATELOCK) != 0;
+        return (value & MASK_OREC_UPDATELOCK) != 0;
     }
 
     public static long setWriteLock(final long value, final boolean updateLock) {
-        return (value & ~MASK_UPDATELOCK) | ((updateLock ? 1L : 0L) << 62);
+        return (value & ~MASK_OREC_UPDATELOCK) | ((updateLock ? 1L : 0L) << 62);
     }
 
     public static int getReadonlyCount(final long value) {
-        return (int) (value & MASK_READONLY_COUNT);
+        return (int) (value & MASK_OREC_READONLY_COUNT);
     }
 
     public static long setReadonlyCount(final long value, final int readonlyCount) {
-        return (value & ~MASK_READONLY_COUNT) | readonlyCount;
+        return (value & ~MASK_OREC_READONLY_COUNT) | readonlyCount;
     }
 
     public static long setSurplus(final long value, final long surplus) {
-        return (value & ~MASK_SURPLUS) | (surplus << 10);
+        return (value & ~MASK_OREC_SURPLUS) | (surplus << 10);
     }
 
     public static long getSurplus(final long value) {
-        return (value & MASK_SURPLUS) >> 10;
+        return (value & MASK_OREC_SURPLUS) >> 10;
     }
 
     private static String toOrecString(final long value) {

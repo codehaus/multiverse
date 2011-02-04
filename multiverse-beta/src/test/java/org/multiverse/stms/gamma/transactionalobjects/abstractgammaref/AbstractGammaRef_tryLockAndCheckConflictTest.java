@@ -1,4 +1,4 @@
-package org.multiverse.stms.gamma.transactionalobjects.orec;
+package org.multiverse.stms.gamma.transactionalobjects.abstractgammaref;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -13,7 +13,7 @@ import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import static org.junit.Assert.*;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
-public class Orec_tryLockAndCheckConflictTest implements GammaConstants {
+public class AbstractGammaRef_tryLockAndCheckConflictTest implements GammaConstants {
 
     private GammaStm stm;
 
