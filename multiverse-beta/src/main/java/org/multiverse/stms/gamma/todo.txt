@@ -38,6 +38,8 @@ needs more research.
                         done
 --------------------------------------------------------------------
 
+- conflict check has been cleaned up on the fat-variable/fixed-length transaction
+
 - read biased stuff needs to be re-enabled.
 
 - fast conflict detection fails.

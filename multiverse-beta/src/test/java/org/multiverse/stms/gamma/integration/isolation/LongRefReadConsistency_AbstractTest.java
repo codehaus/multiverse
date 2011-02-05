@@ -32,7 +32,7 @@ public abstract class LongRefReadConsistency_AbstractTest {
 
     private int readerCount = 10;
     private int writerCount = 2;
-    private long durationMs = 10 * 60 * 1000;
+    private long durationMs = 1 * 60 * 1000;
     private volatile boolean stop;
     protected GammaStm stm;
     protected final AtomicBoolean inconsistencyDetected = new AtomicBoolean();

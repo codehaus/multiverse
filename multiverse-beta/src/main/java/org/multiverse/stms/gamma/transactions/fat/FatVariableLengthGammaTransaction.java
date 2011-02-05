@@ -333,19 +333,14 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
         //doing a full conflict scan
         for (int k = 0; k < array.length; k++) {
-            final GammaRefTranlocal tranlocal = array[k];
-            //noinspection ObjectEquality
-
-            //final boolean skip = tranlocal == null
-            //        || (!richmansMansConflictScan && justAdded == tranlocal);
-
-            if (tranlocal == null) {
-                continue;
-            }
-
             shakeBugs();
 
-            if (tranlocal.owner.hasReadConflict(tranlocal)) {
+            final GammaRefTranlocal tranlocal = array[k];
+
+            //noinspection ObjectEquality
+            final boolean skip = tranlocal == null|| (!richmansMansConflictScan && justAdded == tranlocal);
+
+            if (!skip && tranlocal.owner.hasReadConflict(tranlocal)) {
                 return false;
             }
         }

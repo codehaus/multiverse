@@ -354,13 +354,10 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
                 break;
             }
 
-            //final boolean check = richmansMansConflictScan || node != justAdded;
-            //if (check) {
-            //if there is a read conflict, we are doe
-            if (node.owner.hasReadConflict(node)) {
+            final boolean skip = !richmansMansConflictScan && node == justAdded;
+            if (!skip && node.owner.hasReadConflict(node)) {
                 return false;
             }
-            //}
 
             node = node.next;
         }
