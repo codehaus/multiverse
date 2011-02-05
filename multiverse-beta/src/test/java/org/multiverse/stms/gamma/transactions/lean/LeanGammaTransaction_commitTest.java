@@ -67,7 +67,7 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         assertRefHasNoLocks(ref1);
         assertSurplus(ref1, 0);
         assertVersionAndValue(ref1, initialVersion1 + 1, updateValue1);
-        assertUpdateBiased(ref1);
+        assertWriteBiased(ref1);
         assertNull(tranlocal1.owner);
         assertNull(tranlocal1.ref_value);
         assertFalse(tranlocal1.hasDepartObligation);
@@ -75,7 +75,7 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         assertRefHasNoLocks(ref2);
         assertSurplus(ref2, 0);
         assertVersionAndValue(ref2, initialVersion2 + 1, updateValue2);
-        assertUpdateBiased(ref2);
+        assertWriteBiased(ref2);
         assertNull(tranlocal2.owner);
         assertNull(tranlocal2.ref_value);
         assertFalse(tranlocal2.hasDepartObligation);
@@ -102,7 +102,7 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         assertRefHasNoLocks(ref1);
         assertSurplus(ref1, 0);
         assertVersionAndValue(ref1, initialVersion1 + 1, initialValue1);
-        assertUpdateBiased(ref1);
+        assertWriteBiased(ref1);
         assertNull(tranlocal1.owner);
         assertNull(tranlocal1.ref_value);
         assertFalse(tranlocal1.hasDepartObligation);
@@ -110,7 +110,7 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         assertRefHasNoLocks(ref2);
         assertSurplus(ref2, 0);
         assertVersionAndValue(ref2, initialVersion2 + 1, initialValue2);
-        assertUpdateBiased(ref2);
+        assertWriteBiased(ref2);
         assertNull(tranlocal2.owner);
         assertNull(tranlocal2.ref_value);
         assertFalse(tranlocal2.hasDepartObligation);
@@ -134,7 +134,7 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         assertIsCommitted(tx);
         assertSurplus(ref, 0);
         assertReadonlyCount(ref, 0);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertIsCommitted(tx);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue);
@@ -159,7 +159,7 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         assertIsCommitted(tx);
         assertSurplus(ref, 0);
         assertReadonlyCount(ref, 0);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertIsCommitted(tx);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, newValue);
@@ -191,7 +191,7 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         }
 
         assertIsAborted(tx);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertReadonlyCount(ref, 0);
         assertSurplus(ref, 1);
         assertNull(tranlocal.owner);
@@ -218,7 +218,7 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         assertRefHasNoLocks(ref);
         assertSurplus(ref, 0);
         assertReadonlyCount(ref, 0);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 

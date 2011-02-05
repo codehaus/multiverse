@@ -167,7 +167,7 @@ public class GammaTestUtils implements GammaConstants {
         if (readBiased) {
             assertReadBiased(orec);
         } else {
-            assertUpdateBiased(orec);
+            assertWriteBiased(orec);
         }
     }
 
@@ -175,7 +175,7 @@ public class GammaTestUtils implements GammaConstants {
         assertTrue(orec.isReadBiased());
     }
 
-    public static void assertUpdateBiased(AbstractGammaObject orec) {
+    public static void assertWriteBiased(AbstractGammaObject orec) {
         assertFalse(orec.isReadBiased());
     }
 

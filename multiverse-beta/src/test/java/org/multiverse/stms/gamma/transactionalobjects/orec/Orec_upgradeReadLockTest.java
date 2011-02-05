@@ -21,10 +21,10 @@ public class Orec_upgradeReadLockTest implements GammaConstants {
         stm = new GammaStm();
     }
 
-    // ================================ update biased ===================================
+    // ================================ write biased ===================================
 
     @Test
-    public void updateBiased_whenNoLockAcquiredAndUpgradeToWriteLock_thenPanicError() {
+    public void writeBiased_whenNoLockAcquiredAndUpgradeToWriteLock_thenPanicError() {
         GammaLongRef orec = new GammaLongRef(stm, 0);
         long orecValue = orec.orec;
 
@@ -38,7 +38,7 @@ public class Orec_upgradeReadLockTest implements GammaConstants {
     }
 
     @Test
-    public void updateBiased_whenNoLockAcquiredAndUpgradeToExclusiveLock_thenPanicError() {
+    public void writeBiased_whenNoLockAcquiredAndUpgradeToExclusiveLock_thenPanicError() {
         GammaLongRef orec = new GammaLongRef(stm, 0);
         long orecValue = orec.orec;
 
@@ -52,7 +52,7 @@ public class Orec_upgradeReadLockTest implements GammaConstants {
     }
 
     @Test
-    public void updateBiased_whenWriteLockAcquired_thenPanicError() {
+    public void writeBiased_whenWriteLockAcquired_thenPanicError() {
         GammaLongRef orec = new GammaLongRef(stm, 0);
 
         orec.arriveAndLock(1, LOCKMODE_WRITE);
@@ -68,7 +68,7 @@ public class Orec_upgradeReadLockTest implements GammaConstants {
     }
 
     @Test
-    public void updateBiased_whenExclusiveLockAcquired_thenPanicError() {
+    public void writeBiased_whenExclusiveLockAcquired_thenPanicError() {
         GammaLongRef orec = new GammaLongRef(stm, 0);
 
         orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
@@ -84,7 +84,7 @@ public class Orec_upgradeReadLockTest implements GammaConstants {
     }
 
     @Test
-    public void updateBiased_whenSingleReadLockAcquiredAndUpgradeToWriteLockAndNoSurplus_thenSuccess() {
+    public void writeBiased_whenSingleReadLockAcquiredAndUpgradeToWriteLockAndNoSurplus_thenSuccess() {
         GammaLongRef orec = new GammaLongRef(stm, 0);
 
         orec.arriveAndLock(1, LOCKMODE_READ);
@@ -96,11 +96,11 @@ public class Orec_upgradeReadLockTest implements GammaConstants {
         assertTrue(orec.hasWriteLock());
         assertReadLockCount(orec, 0);
         assertSurplus(orec, 1);
-        assertUpdateBiased(orec);
+        assertWriteBiased(orec);
     }
 
     @Test
-    public void updateBiased_whenSingleReadLockAcquiredAndUpgradeToWriteLockAndSurplus_thenSuccess() {
+    public void writeBiased_whenSingleReadLockAcquiredAndUpgradeToWriteLockAndSurplus_thenSuccess() {
         GammaLongRef orec = new GammaLongRef(stm, 0);
 
         orec.arrive(1);
@@ -113,11 +113,11 @@ public class Orec_upgradeReadLockTest implements GammaConstants {
         assertTrue(orec.hasWriteLock());
         assertReadLockCount(orec, 0);
         assertSurplus(orec, 2);
-        assertUpdateBiased(orec);
+        assertWriteBiased(orec);
     }
 
     @Test
-    public void updateBiased_whenSingleReadLockAcquiredAndUpgradeToExclusiveLockAndNoSurplus_thenSuccess() {
+    public void writeBiased_whenSingleReadLockAcquiredAndUpgradeToExclusiveLockAndNoSurplus_thenSuccess() {
         GammaLongRef orec = new GammaLongRef(stm, 0);
         orec.arriveAndLock(1, LOCKMODE_READ);
 
@@ -129,11 +129,11 @@ public class Orec_upgradeReadLockTest implements GammaConstants {
         assertReadLockCount(orec, 0);
         assertSurplus(orec, 1);
         assertReadonlyCount(orec, 0);
-        assertUpdateBiased(orec);
+        assertWriteBiased(orec);
     }
 
     @Test
-    public void updateBiased_whenSingleReadLockAcquiredAndUpgradeToExclusiveAndSurplus_thenConflict() {
+    public void writeBiased_whenSingleReadLockAcquiredAndUpgradeToExclusiveAndSurplus_thenConflict() {
         GammaLongRef orec = new GammaLongRef(stm, 0);
         orec.arrive(1);
         orec.arriveAndLock(1, LOCKMODE_READ);
@@ -145,11 +145,11 @@ public class Orec_upgradeReadLockTest implements GammaConstants {
         assertReadLockCount(orec, 0);
         assertSurplus(orec, 2);
         assertReadonlyCount(orec, 0);
-        assertUpdateBiased(orec);
+        assertWriteBiased(orec);
     }
 
     @Test
-    public void updateBiased_whenMultipleReadLocksAcquired_thenUpgradeToWriteLockFailure() {
+    public void writeeBiased_whenMultipleReadLocksAcquired_thenUpgradeToWriteLockFailure() {
         GammaLongRef orec = new GammaLongRef(stm, 0);
         orec.arriveAndLock(1, LOCKMODE_READ);
         orec.arriveAndLock(1, LOCKMODE_READ);
@@ -162,7 +162,7 @@ public class Orec_upgradeReadLockTest implements GammaConstants {
     }
 
     @Test
-    public void updateBiased_whenMultipleReadLocksAcquired_thenUpgradeToExclusiveLockFailure() {
+    public void writeBiased_whenMultipleReadLocksAcquired_thenUpgradeToExclusiveLockFailure() {
         GammaLongRef orec = new GammaLongRef(stm, 0);
         orec.arriveAndLock(1, LOCKMODE_READ);
         orec.arriveAndLock(1, LOCKMODE_READ);

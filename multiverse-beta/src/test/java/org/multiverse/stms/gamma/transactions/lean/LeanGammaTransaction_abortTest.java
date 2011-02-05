@@ -46,7 +46,7 @@ public abstract class LeanGammaTransaction_abortTest<T extends GammaTransaction>
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertSurplus(ref, 0);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertReadonlyCount(ref, 0);
         assertRefHasNoLocks(ref);
 
@@ -68,7 +68,7 @@ public abstract class LeanGammaTransaction_abortTest<T extends GammaTransaction>
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertSurplus(ref, 0);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertReadonlyCount(ref, 0);
         assertRefHasNoLocks(ref);
 

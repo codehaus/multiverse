@@ -52,7 +52,7 @@ public abstract class FatGammaTransaction_abortTest<T extends GammaTransaction> 
 
         assertLockMode(ref, LOCKMODE_EXCLUSIVE);
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertVersionAndValue(ref, 0, 0);
         assertFalse(write.hasDepartObligation());
         assertTrue(write.isConstructing());

@@ -43,7 +43,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
 
         assertEquals(2, result);
         assertRefHasNoLocks(ref);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertSurplus(ref, 0);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
     }
@@ -63,7 +63,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasNoLocks(ref);
         assertSurplus(ref, 0);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
 
         assertEquals(initialValue, result);
         assertRefHasNoLocks(ref);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertSurplus(ref, 0);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
     }
@@ -106,7 +106,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
 
         verifyZeroInteractions(function);
         assertRefHasExclusiveLock(ref, otherTx);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertSurplus(ref, 1);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -128,7 +128,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
 
         assertRefHasWriteLock(ref, otherTx);
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertReadonlyCount(ref, 0);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -151,7 +151,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
 
         verifyZeroInteractions(function);
         assertRefHasWriteLock(ref, otherTx);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertSurplus(ref, 1);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }

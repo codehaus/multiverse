@@ -13,7 +13,8 @@ import static java.lang.String.format;
  * Contains the default configuration for all transactions created by the GammaStm. With the TransactionFactoryBuilder,
  * this behavior can be overridden.
  * <p/>
- * Once the GammaStm has been created, changes on this structure are ignored.
+ * Once the GammaStm has been created, changes on this structure are ignored because the content of this configuration
+ * is copied.
  *
  * @author Peter Veentjer.
  */

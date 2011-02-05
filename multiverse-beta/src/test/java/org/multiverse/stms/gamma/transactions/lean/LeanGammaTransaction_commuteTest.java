@@ -44,7 +44,7 @@ public abstract class LeanGammaTransaction_commuteTest<T extends GammaTransactio
         assertRefHasNoLocks(ref);
         assertSurplus(ref, 0);
         assertReadonlyCount(ref, 0);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertTrue(tx.getConfiguration().speculativeConfiguration.get().isCommuteDetected);

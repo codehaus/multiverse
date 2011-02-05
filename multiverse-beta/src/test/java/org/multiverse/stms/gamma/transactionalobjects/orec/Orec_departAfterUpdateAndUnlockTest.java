@@ -20,10 +20,10 @@ public class Orec_departAfterUpdateAndUnlockTest {
         stm = new GammaStm();
     }
 
-    // ================ update biased ===============================
+    // ================ write biased ===============================
 
     @Test
-    public void updateBiased_whenNotLockedAndNoSurplus_thenPanicError() {
+    public void writeBiased_whenNotLockedAndNoSurplus_thenPanicError() {
         AbstractGammaObject orec = new GammaLongRef(stm);
 
         long orecValue = orec.orec;
@@ -37,7 +37,7 @@ public class Orec_departAfterUpdateAndUnlockTest {
     }
 
     @Test
-    public void updateBiased_whenNotLockedAndSurplus_thenPanicError() {
+    public void writeBiased_whenNotLockedAndSurplus_thenPanicError() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
         orec.arrive(1);
@@ -53,7 +53,7 @@ public class Orec_departAfterUpdateAndUnlockTest {
     }
 
     @Test
-    public void updateBiased_whenLockedAndNoAdditionalSurplus() {
+    public void writeBiased_whenLockedAndNoAdditionalSurplus() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
         orec.lockAfterArrive(1, LOCKMODE_EXCLUSIVE);
@@ -62,12 +62,12 @@ public class Orec_departAfterUpdateAndUnlockTest {
 
         assertLockMode(orec, LOCKMODE_NONE);
         assertSurplus(orec, 0);
-        assertUpdateBiased(orec);
+        assertWriteBiased(orec);
         assertReadonlyCount(orec, 0);
     }
 
     @Test
-    public void updateBiased_whenLockedAndAdditionalSurplus() {
+    public void writeBiased_whenLockedAndAdditionalSurplus() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
         orec.arrive(1);
@@ -78,12 +78,12 @@ public class Orec_departAfterUpdateAndUnlockTest {
 
         assertLockMode(orec, LOCKMODE_NONE);
         assertSurplus(orec, 2);
-        assertUpdateBiased(orec);
+        assertWriteBiased(orec);
         assertReadonlyCount(orec, 0);
     }
 
     @Test
-    public void updateBiased_whenWriteLock_thenPanicError() {
+    public void writeBiased_whenWriteLock_thenPanicError() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arriveAndLock(1, LOCKMODE_WRITE);
 
@@ -98,7 +98,7 @@ public class Orec_departAfterUpdateAndUnlockTest {
     }
 
     @Test
-    public void updateBiased_whenReadLockAcquired_thenPanicError() {
+    public void writeBiased_whenReadLockAcquired_thenPanicError() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arriveAndLock(1, LOCKMODE_READ);
 
@@ -112,7 +112,7 @@ public class Orec_departAfterUpdateAndUnlockTest {
         assertOrecValue(orec, orecValue);
     }
 
-    // ================ update biased ===============================
+    // ================ read biased ===============================
 
       @Test
     public void readBiased_whenNotLockedAndNoSurplus_thenPanicError() {
@@ -152,7 +152,7 @@ public class Orec_departAfterUpdateAndUnlockTest {
 
         assertLockMode(orec, LOCKMODE_NONE);
         assertSurplus(orec, 0);
-        assertUpdateBiased(orec);
+        assertWriteBiased(orec);
         assertReadonlyCount(orec, 0);
     }
 
@@ -165,7 +165,7 @@ public class Orec_departAfterUpdateAndUnlockTest {
 
         assertLockMode(orec, LOCKMODE_NONE);
         assertSurplus(orec, 0);
-        assertUpdateBiased(orec);
+        assertWriteBiased(orec);
         assertReadonlyCount(orec, 0);
     }
 

@@ -35,7 +35,7 @@ public class AtomicReadBiasedWithPeriodicUpdateTest {
         }
 
         assertSurplus(ref, 0);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertRefHasNoLocks(ref);
 
         System.out.println("orec: " + ref.___toOrecString());

@@ -40,7 +40,7 @@ public class GammaLongRef_atomicSetTest {
         assertNull(getThreadLocalTransaction());
         assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertVersionAndValue(ref, initialVersion + 1, newValue);
     }
 
@@ -62,7 +62,7 @@ public class GammaLongRef_atomicSetTest {
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertVersionAndValue(ref, initialVersion + 1, newValue);
     }
 
@@ -119,7 +119,7 @@ public class GammaLongRef_atomicSetTest {
         assertNull(getThreadLocalTransaction());
         assertSurplus(ref, 0);
         assertRefHasNoLocks(ref);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
     }
 
     @Test

@@ -47,7 +47,6 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         head = h;
     }
 
-
     @Override
     public final void commit() {
         if (status == TX_COMMITTED) {
@@ -109,6 +108,28 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         } while (node != null);
 
         return listenersArray;
+    }
+
+    @Override
+    public final void prepare() {
+        if (status == TX_PREPARED) {
+            return;
+        }
+
+        if (status != TX_ACTIVE) {
+            throw abortPrepareOnBadStatus();
+        }
+
+        if (abortOnly) {
+            throw abortPrepareOnAbortOnly();
+        }
+
+        GammaObject o = prepareChainForCommit();
+        if (o != null) {
+            throw abortOnReadWriteConflict(o);
+        }
+
+        status = TX_PREPARED;
     }
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
@@ -239,27 +260,6 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         throw newRetryError();
     }
 
-    @Override
-    public final void prepare() {
-        if (status == TX_PREPARED) {
-            return;
-        }
-
-        if (status != TX_ACTIVE) {
-            throw abortPrepareOnBadStatus();
-        }
-
-        if (abortOnly) {
-            throw abortPrepareOnAbortOnly();
-        }
-
-        GammaObject o = prepareChainForCommit();
-        if (o != null) {
-            throw abortOnReadWriteConflict(o);
-        }
-
-        status = TX_PREPARED;
-    }
 
     @Override
     public final GammaRefTranlocal locate(AbstractGammaRef o) {

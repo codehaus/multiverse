@@ -81,7 +81,7 @@ public class GammaLongRef_get1Test {
         assertEquals(100, value);
         assertRefHasExclusiveLock(ref, tx);
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertIsActive(tx);
         assertEquals(version, ref.getVersion());
         assertEquals(100, ref.long_value);
@@ -100,7 +100,7 @@ public class GammaLongRef_get1Test {
         assertEquals(100, value);
         assertRefHasWriteLock(ref, tx);
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertIsActive(tx);
         assertVersionAndValue(ref, version, 100);
     }
@@ -118,7 +118,7 @@ public class GammaLongRef_get1Test {
         assertEquals(100, value);
         assertRefHasReadLock(ref, tx);
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertIsActive(tx);
         assertVersionAndValue(ref, version, 100);
     }
@@ -141,7 +141,7 @@ public class GammaLongRef_get1Test {
 
         assertRefHasExclusiveLock(ref, otherTx);
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertIsActive(otherTx);
         assertIsAborted(tx);
         assertVersionAndValue(ref, version, 100);
@@ -163,7 +163,7 @@ public class GammaLongRef_get1Test {
         assertEquals(100, value);
         assertRefHasWriteLock(ref, otherTx);
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertIsActive(otherTx);
         assertIsActive(tx);
         assertVersionAndValue(ref, version, 100);

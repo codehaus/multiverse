@@ -320,10 +320,6 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
      * @return true if there was at least one conflict write.
      */
     public final boolean upgradeWriteLock() {
-        if (true) {
-            throw new TodoException();
-        }
-
         while (true) {
             final long current = orec;
 

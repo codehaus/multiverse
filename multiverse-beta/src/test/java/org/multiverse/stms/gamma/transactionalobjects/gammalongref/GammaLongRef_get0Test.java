@@ -83,7 +83,7 @@ public class GammaLongRef_get0Test {
         assertEquals(100, value);
         assertRefHasExclusiveLock(ref, tx);
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertEquals(version, ref.getVersion());
@@ -104,7 +104,7 @@ public class GammaLongRef_get0Test {
         assertEquals(100, value);
         assertRefHasWriteLock(ref, tx);
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, version, 100);
@@ -129,7 +129,7 @@ public class GammaLongRef_get0Test {
 
         assertRefHasExclusiveLock(ref, otherTx);
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertIsActive(otherTx);
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
@@ -152,7 +152,7 @@ public class GammaLongRef_get0Test {
         assertEquals(100, value);
         assertRefHasWriteLock(ref, otherTx);
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertIsActive(otherTx);
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());

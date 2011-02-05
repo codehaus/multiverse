@@ -69,7 +69,7 @@ public class FatVariableLengthGammaTransaction_openForWriteTest extends FatGamma
         assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
         assertEquals(TRANLOCAL_WRITE, tranlocal.mode);
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertReadonlyCount(ref, 0);
 
         assertIsActive(tx);
@@ -107,7 +107,7 @@ public class FatVariableLengthGammaTransaction_openForWriteTest extends FatGamma
         assertEquals(LOCKMODE_NONE, tranlocal2.lockMode);
         assertEquals(TRANLOCAL_WRITE, tranlocal2.mode);
         assertSurplus(ref2, 1);
-        assertUpdateBiased(ref2);
+        assertWriteBiased(ref2);
         assertReadonlyCount(ref2, 0);
 
         assertIsActive(tx);
@@ -143,7 +143,7 @@ public class FatVariableLengthGammaTransaction_openForWriteTest extends FatGamma
         }
 
         assertSurplus(ref2, 0);
-        assertUpdateBiased(ref2);
+        assertWriteBiased(ref2);
         assertReadonlyCount(ref2, 0);
 
         assertIsAborted(tx);

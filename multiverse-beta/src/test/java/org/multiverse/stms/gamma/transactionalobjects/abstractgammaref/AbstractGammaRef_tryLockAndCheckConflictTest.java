@@ -26,24 +26,24 @@ public class AbstractGammaRef_tryLockAndCheckConflictTest implements GammaConsta
     //conflicts
 
     @Test
-    public void updateBiased_whenOtherHasLocked() {
-        updateBiased_whenOtherHasLocked(LockMode.Read, LockMode.None, true);
-        updateBiased_whenOtherHasLocked(LockMode.Read, LockMode.Read, true);
-        updateBiased_whenOtherHasLocked(LockMode.Read, LockMode.Write, false);
-        updateBiased_whenOtherHasLocked(LockMode.Read, LockMode.Exclusive, false);
+    public void writeBiased_whenOtherHasLocked() {
+        writeBiased_whenOtherHasLocked(LockMode.Read, LockMode.None, true);
+        writeBiased_whenOtherHasLocked(LockMode.Read, LockMode.Read, true);
+        writeBiased_whenOtherHasLocked(LockMode.Read, LockMode.Write, false);
+        writeBiased_whenOtherHasLocked(LockMode.Read, LockMode.Exclusive, false);
 
-        updateBiased_whenOtherHasLocked(LockMode.Write, LockMode.None, true);
-        updateBiased_whenOtherHasLocked(LockMode.Write, LockMode.Read, false);
-        updateBiased_whenOtherHasLocked(LockMode.Write, LockMode.Write, false);
-        updateBiased_whenOtherHasLocked(LockMode.Write, LockMode.Exclusive, false);
+        writeBiased_whenOtherHasLocked(LockMode.Write, LockMode.None, true);
+        writeBiased_whenOtherHasLocked(LockMode.Write, LockMode.Read, false);
+        writeBiased_whenOtherHasLocked(LockMode.Write, LockMode.Write, false);
+        writeBiased_whenOtherHasLocked(LockMode.Write, LockMode.Exclusive, false);
 
-        //updateBiased_whenOtherHasLocked(LockMode.Exclusive, LockMode.None, false);
-        updateBiased_whenOtherHasLocked(LockMode.Exclusive, LockMode.Read, false);
-        updateBiased_whenOtherHasLocked(LockMode.Exclusive, LockMode.Write, false);
-        updateBiased_whenOtherHasLocked(LockMode.Exclusive, LockMode.Exclusive, false);
+        //write_whenOtherHasLocked(LockMode.Exclusive, LockMode.None, false);
+        writeBiased_whenOtherHasLocked(LockMode.Exclusive, LockMode.Read, false);
+        writeBiased_whenOtherHasLocked(LockMode.Exclusive, LockMode.Write, false);
+        writeBiased_whenOtherHasLocked(LockMode.Exclusive, LockMode.Exclusive, false);
     }
 
-    public void updateBiased_whenOtherHasLocked(LockMode otherLockMode, LockMode thisLockMode, boolean success) {
+    public void writeBiased_whenOtherHasLocked(LockMode otherLockMode, LockMode thisLockMode, boolean success) {
         GammaLongRef ref = new GammaLongRef(stm);
         //tx.arriveEnabled = arriveNeeded;
         GammaRefTranlocal tranlocal = ref.openForRead(stm.newDefaultTransaction(), LOCKMODE_NONE);
@@ -61,53 +61,53 @@ public class AbstractGammaRef_tryLockAndCheckConflictTest implements GammaConsta
     }
 
     @Test
-    public void updateBiased_whenLockFreeAndArriveNeeded() {
-        updateBiased(true, LockMode.None, LockMode.None, LockMode.None, 1);
-        updateBiased(true, LockMode.None, LockMode.Read, LockMode.Read, 1);
-        updateBiased(true, LockMode.None, LockMode.Write, LockMode.Write, 1);
-        updateBiased(true, LockMode.None, LockMode.Exclusive, LockMode.Exclusive, 1);
+    public void writeBiased_whenLockFreeAndArriveNeeded() {
+        writeBiased(true, LockMode.None, LockMode.None, LockMode.None, 1);
+        writeBiased(true, LockMode.None, LockMode.Read, LockMode.Read, 1);
+        writeBiased(true, LockMode.None, LockMode.Write, LockMode.Write, 1);
+        writeBiased(true, LockMode.None, LockMode.Exclusive, LockMode.Exclusive, 1);
 
-        updateBiased(true, LockMode.Read, LockMode.None, LockMode.Read, 1);
-        updateBiased(true, LockMode.Read, LockMode.Read, LockMode.Read, 1);
-        updateBiased(true, LockMode.Read, LockMode.Write, LockMode.Write, 1);
-        updateBiased(true, LockMode.Read, LockMode.Exclusive, LockMode.Exclusive, 1);
+        writeBiased(true, LockMode.Read, LockMode.None, LockMode.Read, 1);
+        writeBiased(true, LockMode.Read, LockMode.Read, LockMode.Read, 1);
+        writeBiased(true, LockMode.Read, LockMode.Write, LockMode.Write, 1);
+        writeBiased(true, LockMode.Read, LockMode.Exclusive, LockMode.Exclusive, 1);
 
-        updateBiased(true, LockMode.Write, LockMode.None, LockMode.Write, 1);
-        updateBiased(true, LockMode.Write, LockMode.Read, LockMode.Write, 1);
-        updateBiased(true, LockMode.Write, LockMode.Write, LockMode.Write, 1);
-        updateBiased(true, LockMode.Write, LockMode.Exclusive, LockMode.Exclusive, 1);
+        writeBiased(true, LockMode.Write, LockMode.None, LockMode.Write, 1);
+        writeBiased(true, LockMode.Write, LockMode.Read, LockMode.Write, 1);
+        writeBiased(true, LockMode.Write, LockMode.Write, LockMode.Write, 1);
+        writeBiased(true, LockMode.Write, LockMode.Exclusive, LockMode.Exclusive, 1);
 
-        updateBiased(true, LockMode.Exclusive, LockMode.None, LockMode.Exclusive, 1);
-        updateBiased(true, LockMode.Exclusive, LockMode.Read, LockMode.Exclusive, 1);
-        updateBiased(true, LockMode.Exclusive, LockMode.Write, LockMode.Exclusive, 1);
-        updateBiased(true, LockMode.Exclusive, LockMode.Exclusive, LockMode.Exclusive, 1);
+        writeBiased(true, LockMode.Exclusive, LockMode.None, LockMode.Exclusive, 1);
+        writeBiased(true, LockMode.Exclusive, LockMode.Read, LockMode.Exclusive, 1);
+        writeBiased(true, LockMode.Exclusive, LockMode.Write, LockMode.Exclusive, 1);
+        writeBiased(true, LockMode.Exclusive, LockMode.Exclusive, LockMode.Exclusive, 1);
     }
 
     @Test
-    public void updateBiased_whenLockFreeAndNoArriveNeeded() {
-        updateBiased(false, LockMode.None, LockMode.None, LockMode.None, 0);
-        updateBiased(false, LockMode.None, LockMode.Read, LockMode.Read, 1);
-        updateBiased(false, LockMode.None, LockMode.Write, LockMode.Write, 1);
-        updateBiased(false, LockMode.None, LockMode.Exclusive, LockMode.Exclusive, 1);
+    public void writeBiased_whenLockFreeAndNoArriveNeeded() {
+        writeBiased(false, LockMode.None, LockMode.None, LockMode.None, 0);
+        writeBiased(false, LockMode.None, LockMode.Read, LockMode.Read, 1);
+        writeBiased(false, LockMode.None, LockMode.Write, LockMode.Write, 1);
+        writeBiased(false, LockMode.None, LockMode.Exclusive, LockMode.Exclusive, 1);
 
-        updateBiased(false, LockMode.Read, LockMode.None, LockMode.Read, 1);
-        updateBiased(false, LockMode.Read, LockMode.Read, LockMode.Read, 1);
-        updateBiased(false, LockMode.Read, LockMode.Write, LockMode.Write, 1);
-        updateBiased(false, LockMode.Read, LockMode.Exclusive, LockMode.Exclusive, 1);
+        writeBiased(false, LockMode.Read, LockMode.None, LockMode.Read, 1);
+        writeBiased(false, LockMode.Read, LockMode.Read, LockMode.Read, 1);
+        writeBiased(false, LockMode.Read, LockMode.Write, LockMode.Write, 1);
+        writeBiased(false, LockMode.Read, LockMode.Exclusive, LockMode.Exclusive, 1);
 
-        updateBiased(false, LockMode.Write, LockMode.None, LockMode.Write, 1);
-        updateBiased(false, LockMode.Write, LockMode.Read, LockMode.Write, 1);
-        updateBiased(false, LockMode.Write, LockMode.Write, LockMode.Write, 1);
-        updateBiased(false, LockMode.Write, LockMode.Exclusive, LockMode.Exclusive, 1);
+        writeBiased(false, LockMode.Write, LockMode.None, LockMode.Write, 1);
+        writeBiased(false, LockMode.Write, LockMode.Read, LockMode.Write, 1);
+        writeBiased(false, LockMode.Write, LockMode.Write, LockMode.Write, 1);
+        writeBiased(false, LockMode.Write, LockMode.Exclusive, LockMode.Exclusive, 1);
 
-        updateBiased(false, LockMode.Exclusive, LockMode.None, LockMode.Exclusive, 1);
-        updateBiased(false, LockMode.Exclusive, LockMode.Read, LockMode.Exclusive, 1);
-        updateBiased(false, LockMode.Exclusive, LockMode.Write, LockMode.Exclusive, 1);
-        updateBiased(false, LockMode.Exclusive, LockMode.Exclusive, LockMode.Exclusive, 1);
+        writeBiased(false, LockMode.Exclusive, LockMode.None, LockMode.Exclusive, 1);
+        writeBiased(false, LockMode.Exclusive, LockMode.Read, LockMode.Exclusive, 1);
+        writeBiased(false, LockMode.Exclusive, LockMode.Write, LockMode.Exclusive, 1);
+        writeBiased(false, LockMode.Exclusive, LockMode.Exclusive, LockMode.Exclusive, 1);
     }
 
-    public void updateBiased(boolean arriveNeeded, LockMode firstLockMode, LockMode secondLockMode,
-                             LockMode expectedLockMode, int expectedSurplus) {
+    public void writeBiased(boolean arriveNeeded, LockMode firstLockMode, LockMode secondLockMode,
+                            LockMode expectedLockMode, int expectedSurplus) {
         GammaLongRef ref = new GammaLongRef(stm);
         GammaTransaction tx = stm.newDefaultTransaction();
         tx.richmansMansConflictScan = arriveNeeded;

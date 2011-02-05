@@ -81,7 +81,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
         assertRefHasNoLocks(ref);
         assertSurplus(ref, 0);
         assertReadonlyCount(ref, 0);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertTrue(tx.config.speculativeConfiguration.get().areLocksDetected);
     }
@@ -183,7 +183,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
         assertIsAborted(tx);
         assertRefHasExclusiveLock(ref, otherTx);
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertReadonlyCount(ref, 0);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
@@ -217,7 +217,7 @@ public abstract class LeanGammaTransaction_openForReadTest<T extends GammaTransa
 
         assertRefHasLockMode(ref, otherTx, lockMode.asInt());
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertReadonlyCount(ref, 0);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }

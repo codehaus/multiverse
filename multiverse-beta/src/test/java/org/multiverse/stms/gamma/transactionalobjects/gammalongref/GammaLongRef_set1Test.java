@@ -87,7 +87,7 @@ public class GammaLongRef_set1Test {
         assertEquals(20, value);
         assertRefHasNoLocks(ref);
         assertSurplus(ref, 0);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertVersionAndValue(ref, version, 10);
 
         tx.commit();
@@ -97,7 +97,7 @@ public class GammaLongRef_set1Test {
         assertSame(tx, getThreadLocalTransaction());
         assertRefHasNoLocks(ref);
         assertSurplus(ref, 0);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
     }
 
     @Test
@@ -122,7 +122,7 @@ public class GammaLongRef_set1Test {
         otherTx.abort();
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertSurplus(ref, 0);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertRefHasNoLocks(ref);
         assertSame(tx, getThreadLocalTransaction());
     }
@@ -144,7 +144,7 @@ public class GammaLongRef_set1Test {
         assertEquals(initialValue, result);
         assertRefHasNoLocks(ref);
         assertSurplus(ref, 0);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -163,7 +163,7 @@ public class GammaLongRef_set1Test {
 
         assertRefHasNoLocks(ref);
         assertSurplus(ref, 0);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -181,7 +181,7 @@ public class GammaLongRef_set1Test {
         assertEquals(200, value);
         assertRefHasExclusiveLock(ref, tx);
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, version, 100);
@@ -201,7 +201,7 @@ public class GammaLongRef_set1Test {
         assertEquals(200, value);
         assertRefHasWriteLock(ref, tx);
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, version, 100);
@@ -226,7 +226,7 @@ public class GammaLongRef_set1Test {
 
         assertRefHasExclusiveLock(ref, otherTx);
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertIsActive(otherTx);
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
@@ -248,7 +248,7 @@ public class GammaLongRef_set1Test {
         assertEquals(200, value);
         assertRefHasWriteLock(ref, otherTx);
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertIsActive(otherTx);
         assertIsActive(tx);
         assertSame(tx, getThreadLocalTransaction());
@@ -263,7 +263,7 @@ public class GammaLongRef_set1Test {
 
         assertRefHasWriteLock(ref, otherTx);
         assertSurplus(ref, 1);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertIsActive(otherTx);
         assertIsAborted(tx);
         assertSame(tx, getThreadLocalTransaction());
@@ -291,7 +291,7 @@ public class GammaLongRef_set1Test {
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertSame(tx, getThreadLocalTransaction());
         assertSurplus(ref, 0);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertRefHasNoLocks(ref);
     }
 
@@ -315,7 +315,7 @@ public class GammaLongRef_set1Test {
         assertIsCommitted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertSurplus(ref, 0);
-        assertUpdateBiased(ref);
+        assertWriteBiased(ref);
         assertRefHasNoLocks(ref);
         assertSame(tx, getThreadLocalTransaction());
     }

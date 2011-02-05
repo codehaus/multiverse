@@ -20,10 +20,10 @@ public class Orec_arriveTest implements GammaConstants {
         stm = new GammaStm();
     }
 
-    // ======================= update biased ==============================
+    // ======================= write biased ==============================
 
     @Test
-    public void updateBiased_whenNotLockedAndNoSurplus_thenNormalArrive() {
+    public void writeBiased_whenNotLockedAndNoSurplus_thenNormalArrive() {
         AbstractGammaObject orec = new GammaLongRef(stm, 0);
 
         int result = orec.arrive(1);
@@ -32,12 +32,12 @@ public class Orec_arriveTest implements GammaConstants {
         assertNotHasMasks(result, MASK_CONFLICT, MASK_UNREGISTERED);
         assertSurplus(orec, 1);
         assertReadonlyCount(orec, 0);
-        assertUpdateBiased(orec);
+        assertWriteBiased(orec);
         assertLockMode(orec, LOCKMODE_NONE);
     }
 
     @Test
-    public void updateBiased_whenNotLockedAndSurplus_thenNormalArrive() {
+    public void writeBiased_whenNotLockedAndSurplus_thenNormalArrive() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
         orec.arrive(1);
@@ -46,14 +46,14 @@ public class Orec_arriveTest implements GammaConstants {
 
         assertHasMasks(result, MASK_SUCCESS);
         assertNotHasMasks(result, MASK_CONFLICT, MASK_UNREGISTERED);
-        assertUpdateBiased(orec);
+        assertWriteBiased(orec);
         assertSurplus(orec, 3);
         assertReadonlyCount(orec, 0);
         assertLockMode(orec, LOCKMODE_NONE);
     }
 
     @Test
-    public void updateBiased_whenExclusiveLock_thenLockNotFree() {
+    public void writeBiased_whenExclusiveLock_thenLockNotFree() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
         long orecValue = orec.orec;
@@ -65,7 +65,7 @@ public class Orec_arriveTest implements GammaConstants {
     }
 
     @Test
-    public void updateBiased_whenWriteLock_thenArriveSuccess() {
+    public void writeBiased_whenWriteLock_thenArriveSuccess() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arriveAndLock(1, LOCKMODE_WRITE);
 
@@ -75,7 +75,7 @@ public class Orec_arriveTest implements GammaConstants {
         assertNotHasMasks(result, MASK_CONFLICT, MASK_CONFLICT);
         assertSurplus(orec, 2);
         assertReadonlyCount(orec, 0);
-        assertUpdateBiased(orec);
+        assertWriteBiased(orec);
         assertLockMode(orec, LOCKMODE_WRITE);
     }
 
