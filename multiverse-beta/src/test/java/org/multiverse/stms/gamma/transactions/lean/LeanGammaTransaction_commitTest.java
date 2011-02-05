@@ -61,15 +61,20 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
     @Test
     public void whenUnused() {
         T tx = newTransaction();
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         tx.commit();
 
         assertIsCommitted();
         assertClearedAfterCommit();
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenMultipleDirtyWrites() {
         assumeTrue(getMaximumLength() > 1);
+
+        long globalConflictCount = stm.globalConflictCounter.count();
 
         String initialValue1 = "foo1";
         String updateValue1 = "bar1";
@@ -104,11 +109,15 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         assertNull(tranlocal2.owner);
         assertNull(tranlocal2.ref_value);
         assertFalse(tranlocal2.hasDepartObligation);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenMultipleNonDirtyWrites() {
         assumeTrue(getMaximumLength() > 1);
+
+        long globalConflictCount = stm.globalConflictCounter.count();
 
         String initialValue1 = "foo1";
         GammaRef<String> ref1 = new GammaRef<String>(stm, initialValue1);
@@ -139,11 +148,15 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         assertNull(tranlocal2.owner);
         assertNull(tranlocal2.ref_value);
         assertFalse(tranlocal2.hasDepartObligation);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
 
     @Test
     public void whenNonDirtyUpdate() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         String initialValue = "foo";
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -164,10 +177,14 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue);
         assertIsCommitted(tx);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenDirtyUpdate() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         String initialValue = "foo";
         String newValue = "bar";
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
@@ -189,6 +206,8 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, newValue);
         assertIsCommitted(tx);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
@@ -199,6 +218,8 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
     }
 
     protected void whenLockedByOtherAndWrite(LockMode lockMode) {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         String initialValue = "foo";
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -224,10 +245,13 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         assertNull(tranlocal.ref_oldValue);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasLockMode(ref, otherTx, lockMode.asInt());
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenNormalRead() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         String initialValue = "foo";
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -245,20 +269,26 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         assertReadonlyCount(ref, 0);
         assertWriteBiased(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenAlreadyPreparedAndUnused() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         T tx = newTransaction();
         tx.prepare();
 
         tx.commit();
 
         assertIsCommitted(tx);
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenAlreadyCommitted() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         String initialValue = "foo";
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -271,10 +301,13 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         assertIsCommitted(tx);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenAlreadyAborted() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         T tx = newTransaction();
         tx.abort();
 
@@ -285,5 +318,6 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
         }
 
         assertIsAborted(tx);
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 }

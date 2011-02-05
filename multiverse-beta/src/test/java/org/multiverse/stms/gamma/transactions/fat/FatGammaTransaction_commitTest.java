@@ -64,6 +64,8 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
     @Test
     public void whenContainsConstructedIntRef() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         T tx = newTransaction();
         int initialValue = 10;
         GammaIntRef ref = new GammaIntRef(tx, initialValue);
@@ -75,10 +77,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertSurplus(ref, 0);
         assertReadonlyCount(ref, 0);
         assertWriteBiased(ref);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenContainsConstructedBooleanRef() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         T tx = newTransaction();
         boolean initialValue = true;
         GammaBooleanRef ref = new GammaBooleanRef(tx, initialValue);
@@ -90,10 +96,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertSurplus(ref, 0);
         assertReadonlyCount(ref, 0);
         assertWriteBiased(ref);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenContainsConstructedDoubleRef() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         T tx = newTransaction();
         double initialValue = 10;
         GammaDoubleRef ref = new GammaDoubleRef(tx, initialValue);
@@ -105,10 +115,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertSurplus(ref, 0);
         assertReadonlyCount(ref, 0);
         assertWriteBiased(ref);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenContainsConstructedRef() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         T tx = newTransaction();
         String initialValue = "foo";
         GammaRef<String> ref = new GammaRef<String>(tx, initialValue);
@@ -120,10 +134,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertSurplus(ref, 0);
         assertReadonlyCount(ref, 0);
         assertWriteBiased(ref);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenContainsConstructedLongRef() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         T tx = newTransaction();
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(tx, initialValue);
@@ -135,10 +153,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertSurplus(ref, 0);
         assertReadonlyCount(ref, 0);
         assertWriteBiased(ref);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenCommuteThrowsRuntimeException() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -157,10 +179,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasNoLocks(ref);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenCommuteThrowsError() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -179,10 +205,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasNoLocks(ref);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenContainsCommute() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
 
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
@@ -195,10 +225,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertIsCommitted(tx);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
         assertRefHasNoLocks(ref);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void abortOnly_whenUnused() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         T tx = newTransaction();
         tx.setAbortOnly();
 
@@ -209,10 +243,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         }
 
         assertIsAborted(tx);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void abortOnly_whenDirty() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -229,10 +267,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenBooleanRef() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         boolean initialValue = false;
         GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -243,10 +285,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
         assertVersionAndValue(ref, initialVersion + 1, true);
         assertRefHasNoLocks(ref);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenIntRef() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         int initialValue = 10;
         GammaIntRef ref = new GammaIntRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -257,10 +303,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
         assertRefHasNoLocks(ref);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenLongRef() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -271,10 +321,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
         assertRefHasNoLocks(ref);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenDoubleRef() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         double initialValue = 10;
         GammaDoubleRef ref = new GammaDoubleRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -285,10 +339,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
         assertRefHasNoLocks(ref);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenRef() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         String initialValue = "foo";
         GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -300,10 +358,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
         assertVersionAndValue(ref, initialVersion + 1, "bar");
         assertRefHasNoLocks(ref);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenContainsListener() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -325,19 +387,26 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertNull(getField(ref, "listeners"));
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenUnused() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         GammaTransaction tx = newTransaction();
 
         tx.commit();
 
         assertEquals(TransactionStatus.Committed, tx.getStatus());
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenConflict() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -362,6 +431,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertEquals(initialValue + 1, ref.long_value);
         assertEquals(initialVersion + 1, ref.version);
         assertCleaned(tx);
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     //todo: dirty checking
@@ -369,6 +439,8 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
     @Test
     public void whenContainsDirtyWrite() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -383,10 +455,13 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertEquals(initialValue + 1, ref.long_value);
         assertEquals(initialVersion + 1, ref.version);
         assertCleaned(tx);
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenMultipleCommitsUsingNewTransaction() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -400,10 +475,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
         assertEquals(initialValue + txCount, ref.long_value);
         assertEquals(initialVersion + txCount, ref.version);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenMultipleCommitsUsingSame() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -418,10 +497,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
         assertEquals(initialValue + txCount, ref.long_value);
         assertEquals(initialVersion + txCount, ref.version);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenPreparedAndContainsRead() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -437,10 +520,13 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.version);
         assertCleaned(tx);
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenPreparedAndContainsWrite() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -457,6 +543,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertEquals(initialValue + 1, ref.long_value);
         assertEquals(initialVersion + 1, ref.version);
         assertCleaned(tx);
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     // ================================ dirty check ================================
@@ -475,6 +562,8 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
     }
 
     public void whenContainsRead(boolean prepareFirst, LockMode readLockMode) {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -490,6 +579,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertLockMode(ref, LockMode.None);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertCleaned(tx);
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     // ================================ dirty check ================================
@@ -501,6 +591,8 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
     }
 
     public void dirty_whenNoDirtyCheckAndNoDirtyWrite(boolean prepareFirst) {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -521,6 +613,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertEquals(initialVersion + 1, ref.version);
         assertCleaned(tx);
         assertRefHasNoLocks(ref);
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
@@ -530,6 +623,8 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
     }
 
     public void dirty_whenNoDirtyCheckAndDirtyWrite(boolean prepareFirst) {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -551,6 +646,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertEquals(initialVersion + 1, ref.version);
         assertCleaned(tx);
         assertRefHasNoLocks(ref);
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
@@ -560,6 +656,8 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
     }
 
     public void dirty_whenDirtyCheckAndNoDirtyWrite(boolean prepareFirst) {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -579,6 +677,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertEquals(initialVersion, ref.version);
         assertCleaned(tx);
         assertRefHasNoLocks(ref);
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
@@ -588,6 +687,8 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
     }
 
     public void dirty_whenDirtyCheckAndDirtyWrite(boolean prepareFirst) {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -608,6 +709,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertEquals(initialVersion + 1, ref.version);
         assertCleaned(tx);
         assertRefHasNoLocks(ref);
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
 
@@ -615,6 +717,8 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
     @Test
     public void conflict_dirty_whenReadLockedByOther() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -636,10 +740,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasReadLock(ref, otherTx);
         assertReadLockCount(ref, 1);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void conflict_dirty_whenWriteLockedByOther() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -660,10 +768,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasWriteLock(ref, otherTx);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void conflict_dirty_whenExclusiveLockedByOther() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -684,22 +796,30 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasExclusiveLock(ref, otherTx);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     // ========================= states ==================================
 
     @Test
     public void whenPreparedAndUnused() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         T tx = newTransaction();
         tx.prepare();
 
         tx.commit();
         assertIsCommitted(tx);
         assertCleaned(tx);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenAborted_thenDeadTransactionException() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         T tx = newTransaction();
         tx.abort();
 
@@ -711,10 +831,14 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
         assertEquals(TransactionStatus.Aborted, tx.getStatus());
         assertCleaned(tx);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 
     @Test
     public void whenCommitted_thenIgnored() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
         T tx = newTransaction();
         tx.commit();
 
@@ -722,5 +846,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
         assertEquals(TransactionStatus.Committed, tx.getStatus());
         assertCleaned(tx);
+
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 }
