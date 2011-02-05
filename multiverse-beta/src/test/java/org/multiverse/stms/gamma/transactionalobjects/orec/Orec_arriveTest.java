@@ -122,7 +122,7 @@ public class Orec_arriveTest implements GammaConstants {
 
     @Test
     public void readBiased_whenWriteLockAcquired() {
-         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
+        AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
         orec.arriveAndLock(1, LOCKMODE_WRITE);
         long orecValue = orec.orec;
 
@@ -135,7 +135,7 @@ public class Orec_arriveTest implements GammaConstants {
 
     @Test
     public void readBiased_whenExclusiveLockAquired() {
-         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
+        AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
         orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
         long orecValue = orec.orec;
 

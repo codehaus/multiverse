@@ -301,17 +301,17 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 do {
                     readVersion = version;
                     readRef = ref_value;
-                    shakeBugs();
+                    if(SHAKE_BUGS) shakeBugs();
                 } while (readVersion != version);
             } else {
                 do {
                     readVersion = version;
                     readLong = long_value;
-                    shakeBugs();
+                    if(SHAKE_BUGS) shakeBugs();
                 } while (readVersion != version);
             }
 
-            shakeBugs();
+            if(SHAKE_BUGS) shakeBugs();
 
             int arriveStatus;
             if (arriveNeeded) {
@@ -326,7 +326,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 return false;
             }
 
-            shakeBugs();
+            if(SHAKE_BUGS) shakeBugs();
 
             if (version == readVersion) {
                 tranlocal.owner = this;
@@ -577,14 +577,14 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             do {
                 readVersion = version;
                 readRef = ref_value;
-                shakeBugs();
+                if(SHAKE_BUGS) shakeBugs();
 
             } while (readVersion != version);
 
             //wait for the exclusive lock to come available.
             int spinCount = 64;
             for (; ;) {
-                shakeBugs();
+                if(SHAKE_BUGS) shakeBugs();
 
                 if (!hasExclusiveLock()) {
                     break;
@@ -595,7 +595,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 }
             }
 
-            shakeBugs();
+            if(SHAKE_BUGS) shakeBugs();
 
             //check if the version is still the same, if it is not, we have read illegal memory,
             //In that case we are going to try again.
@@ -679,13 +679,13 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             do {
                 readVersion = version;
                 readRef = ref_value;
-                shakeBugs();
+                if(SHAKE_BUGS) shakeBugs();
             } while (readVersion != version);
 
             //wait for the exclusive lock to come available.
             int spinCount = 64;
             for (; ;) {
-                shakeBugs();
+                if(SHAKE_BUGS) shakeBugs();
                 if (!hasExclusiveLock()) {
                     break;
                 }
@@ -694,8 +694,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                     throw tx.abortOnReadWriteConflict(this);
                 }
             }
-            shakeBugs();
-
+            if(SHAKE_BUGS) shakeBugs();
 
             //check if the version and value we read are still the same, if they are not, we have read illegal memory,
             //so we are going to try again.
@@ -724,7 +723,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                     break;
                 }
 
-                shakeBugs();
+                if(SHAKE_BUGS) shakeBugs();
 
                 if (node != newNode && (owner.hasExclusiveLock() || owner.version != node.version)) {
                     throw tx.abortOnReadWriteConflict(this);
@@ -1772,6 +1771,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
      * <p/>
      * If the can't be acquired, no changes are made on the tranlocal.
      *
+     * @param tx
      * @param tranlocal       the tranlocal
      * @param spinCount       the maximum number of times to spin
      * @param desiredLockMode
@@ -1859,8 +1859,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         //so we have the write lock, its needs to be upgraded to a commit lock.
         if (upgradeWriteLock()) {
-            //todo:
-            throw new TodoException();
+            tx.commitConflict = true;
         }
 
         tranlocal.setLockMode(LOCKMODE_EXCLUSIVE);

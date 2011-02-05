@@ -90,7 +90,7 @@ public class Orec_departAfterFailureAndUnlockTest implements GammaConstants {
         assertReadLockCount(orec, 0);
     }
 
-     @Test
+    @Test
     public void whenUpdateBiasedAndHasWriteLockedAndSurplus() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);

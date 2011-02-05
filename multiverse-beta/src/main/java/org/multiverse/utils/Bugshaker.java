@@ -19,20 +19,14 @@ import static java.lang.Thread.yield;
  *
  * @author Peter Veentjer
  */
-public class Bugshaker implements MultiverseConstants {
-
-    public static void shakeBugs() {
-        if (SHAKE_BUGS) {
-            doShakeBugs();
-        }
-    }
+public final class Bugshaker implements MultiverseConstants {
 
     /**
      * Delays a random amount of time. What essentially happens is that a random number is selected and one in the
      * n cases, a sleep is done and one in the n cases a yield is done.
      */
     @SuppressWarnings({"CallToThreadYield"})
-    public static void doShakeBugs() {
+    public static void shakeBugs() {
         int random = ThreadLocalRandom.current().nextInt(100);
 
         if (random == 10) {
@@ -46,6 +40,8 @@ public class Bugshaker implements MultiverseConstants {
      * Delays a number of microseconds. Having a delay smaller than a microsecond doesn't provide
      * value since the minimum delay is a few microseconds.
      *
+     * If the delay is smaller than 0, the call is ignored.
+     *
      * @param delayUs the number of microseconds to delay.
      */
     public static void sleepUs(long delayUs) {
@@ -58,7 +54,6 @@ public class Bugshaker implements MultiverseConstants {
     }
 
     //we don't want any instances
-
     private Bugshaker() {
     }
 }

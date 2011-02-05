@@ -9,6 +9,7 @@ import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
 import static org.multiverse.utils.Bugshaker.shakeBugs;
 
+
 /**
  * A Lean GammaTransaction implementation that is optimized for dealing with only a single
  * transactional reference.
@@ -94,7 +95,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
             config.globalConflictCounter.signalConflict();
         }
 
-        shakeBugs();
+        if(SHAKE_BUGS) shakeBugs();
         owner.ref_value = tranlocal.ref_value;
         owner.version = version + 1;
 

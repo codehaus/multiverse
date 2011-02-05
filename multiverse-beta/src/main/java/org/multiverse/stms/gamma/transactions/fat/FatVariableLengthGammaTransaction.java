@@ -82,7 +82,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         int itemCount = 0;
         //first write everything without releasing
         for (int k = 0; k < array.length; k++) {
-            shakeBugs();
+            if(SHAKE_BUGS) shakeBugs();
 
             final GammaRefTranlocal tranlocal = array[k];
 
@@ -113,7 +113,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
             final GammaRefTranlocal tranlocal = array[k];
 
             if (tranlocal != null) {
-                shakeBugs();
+                if(SHAKE_BUGS) shakeBugs();
 
                 array[k] = null;
                 if (success) {
@@ -153,7 +153,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     private GammaObject doPrepare() {
         for (int k = 0; k < array.length; k++) {
-            shakeBugs();
+            if(SHAKE_BUGS) shakeBugs();
 
             final GammaRefTranlocal tranlocal = array[k];
 
@@ -317,7 +317,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         //todo: isolation level check.
 
         if (richmansMansConflictScan) {
-            shakeBugs();
+            if(SHAKE_BUGS) shakeBugs();
 
             final long conflictCount = config.globalConflictCounter.count();
 
@@ -333,7 +333,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
         //doing a full conflict scan
         for (int k = 0; k < array.length; k++) {
-            shakeBugs();
+            if(SHAKE_BUGS) shakeBugs();
 
             final GammaRefTranlocal tranlocal = array[k];
 

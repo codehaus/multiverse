@@ -34,11 +34,15 @@ needs more research.
 
 - testing: atomic change operations and globalconflictcounter increment
 
-- Orec_upgradeWriteLockTest
+- upgrade writelock test should be checked for callees, making sure that the conflict flag is set correct on the tx.
+
+- repar: GammaAtomicBlock_speculativeTest
 
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- Orec_upgradeWriteLockTest
 
 - configurable read biased threshold
 

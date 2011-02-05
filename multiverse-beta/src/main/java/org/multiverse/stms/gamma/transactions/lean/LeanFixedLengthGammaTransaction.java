@@ -10,6 +10,7 @@ import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
 import static org.multiverse.utils.Bugshaker.shakeBugs;
 
+
 /**
  * A Lean GammaTransaction that is optimized for a fixed number of GammaRefs.
  */
@@ -80,7 +81,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
                 if (owner == null) {
                     break;
                 }
-                shakeBugs();
+                if (SHAKE_BUGS) shakeBugs();
 
                 final Listeners listeners = owner.leanCommit(node);
                 if (listeners != null) {
@@ -110,7 +111,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
                 return null;
             }
 
-            shakeBugs();
+            if (SHAKE_BUGS) shakeBugs();
 
             if (node.mode == TRANLOCAL_READ) {
                 continue;
@@ -167,7 +168,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
                 return;
             }
 
-            shakeBugs();
+            if(SHAKE_BUGS) shakeBugs();
 
             if (node.isWrite()) {
                 if (node.getLockMode() == LOCKMODE_EXCLUSIVE) {
@@ -197,7 +198,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
                 return;
             }
 
-            shakeBugs();
+            if(SHAKE_BUGS) shakeBugs();
 
             node.owner = null;
             node.ref_oldValue = null;

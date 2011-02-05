@@ -47,11 +47,13 @@ public class GammaAtomicBlock_speculativeTest implements GammaConstants {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setSpeculative(true)
                 .setControlFlowErrorsReused(false)
+                .setDirtyCheckEnabled(false)
                 .newAtomicBlock();
 
         block.execute(new AtomicVoidClosure() {
             @Override
             public void execute(Transaction tx) throws Exception {
+                System.out.println(tx.getClass());
                 assertSame(tx, getThreadLocalTransaction());
                 GammaTransaction btx = (GammaTransaction) tx;
                 assertEquals(attempt.get(), tx.getAttempt());
@@ -110,6 +112,7 @@ public class GammaAtomicBlock_speculativeTest implements GammaConstants {
         final Function<String> function = mock(Function.class);
 
         AtomicBlock block = stm.newTransactionFactoryBuilder()
+                .setDirtyCheckEnabled(false)
                 .setSpeculative(true)
                 .newAtomicBlock();
 
@@ -133,6 +136,7 @@ public class GammaAtomicBlock_speculativeTest implements GammaConstants {
 
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setSpeculative(true)
+                .setDirtyCheckEnabled(false)
                 .newAtomicBlock();
 
         block.execute(new AtomicVoidClosure() {
@@ -157,6 +161,7 @@ public class GammaAtomicBlock_speculativeTest implements GammaConstants {
 
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setSpeculative(true)
+                .setDirtyCheckEnabled(false)
                 .newAtomicBlock();
 
         block.execute(new AtomicVoidClosure() {
@@ -180,6 +185,7 @@ public class GammaAtomicBlock_speculativeTest implements GammaConstants {
 
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setSpeculative(true)
+                .setDirtyCheckEnabled(false)
                 .newAtomicBlock();
 
         block.execute(new AtomicVoidClosure() {
@@ -243,6 +249,7 @@ public class GammaAtomicBlock_speculativeTest implements GammaConstants {
         AtomicBlock block = stm.newTransactionFactoryBuilder()
                 .setTimeoutNs(1000)
                 .setSpeculative(true)
+                .setDirtyCheckEnabled(false)
                 .newAtomicBlock();
 
         block.execute(new AtomicVoidClosure() {

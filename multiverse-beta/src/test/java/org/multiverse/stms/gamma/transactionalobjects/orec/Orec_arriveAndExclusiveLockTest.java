@@ -41,8 +41,8 @@ public class Orec_arriveAndExclusiveLockTest implements GammaConstants {
 
         int result = orec.arriveAndExclusiveLock(1);
 
-        assertHasMasks(result, MASK_SUCCESS,MASK_CONFLICT);
-        assertNotHasMasks(result,  MASK_UNREGISTERED);
+        assertHasMasks(result, MASK_SUCCESS, MASK_CONFLICT);
+        assertNotHasMasks(result, MASK_UNREGISTERED);
         assertWriteBiased(orec);
         assertSurplus(orec, 2);
         assertReadonlyCount(orec, 0);

@@ -91,7 +91,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         int listenersIndex = 0;
         GammaRefTranlocal node = head;
         do {
-            shakeBugs();
+            if(SHAKE_BUGS) shakeBugs();
 
             final AbstractGammaRef owner = node.owner;
             //if we are at the end, we can return the listenersArray.
@@ -143,7 +143,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
                 return null;
             }
 
-            shakeBugs();
+            if(SHAKE_BUGS) shakeBugs();
             if (!owner.prepare(this, node)) {
                 return owner;
             }
@@ -178,7 +178,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
                 return;
             }
 
-            shakeBugs();
+            if(SHAKE_BUGS) shakeBugs();
             if (success) {
                 owner.releaseAfterReading(node, pool);
             } else {
@@ -330,7 +330,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         }
 
         if (richmansMansConflictScan) {
-            shakeBugs();
+            if(SHAKE_BUGS) shakeBugs();
 
             final long currentConflictCount = config.globalConflictCounter.count();
 
@@ -347,7 +347,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         //doing a full conflict scan
         GammaRefTranlocal node = head;
         while (node != null) {
-            shakeBugs();
+            if(SHAKE_BUGS) shakeBugs();
 
             //if we are at the end, we are done.
             if (node.owner == null) {

@@ -114,7 +114,7 @@ public class Orec_departAfterUpdateAndUnlockTest {
 
     // ================ read biased ===============================
 
-      @Test
+    @Test
     public void readBiased_whenNotLockedAndNoSurplus_thenPanicError() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
 
