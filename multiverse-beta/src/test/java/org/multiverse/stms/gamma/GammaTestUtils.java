@@ -17,6 +17,10 @@ import static org.multiverse.TestUtils.getField;
 
 public class GammaTestUtils implements GammaConstants {
 
+    public static void assertGlobalConflictCount(GammaStm stm, long expected){
+        assertEquals(expected, stm.globalConflictCounter.count());
+    }
+
     public static void causeLotsOfConflicts(GammaStm stm) {
         for (int k = 0; k < 100; k++) {
             stm.getGlobalConflictCounter().signalConflict();

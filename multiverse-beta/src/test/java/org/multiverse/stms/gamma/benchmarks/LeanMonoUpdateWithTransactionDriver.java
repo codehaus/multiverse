@@ -1,6 +1,5 @@
 package org.multiverse.stms.gamma.benchmarks;
 
-import org.benchy.BenchyUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
@@ -12,7 +11,9 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 import org.multiverse.stms.gamma.transactions.lean.LeanMonoGammaTransaction;
 import org.multiverse.stms.gamma.transactions.lean.LeanMonoGammaTransactionFactory;
 
+import static org.benchy.BenchyUtils.operationsPerSecondPerThreadAsString;
 import static org.junit.Assert.assertEquals;
+import static org.multiverse.stms.gamma.GammaTestUtils.assertGlobalConflictCount;
 
 public class LeanMonoUpdateWithTransactionDriver implements GammaConstants {
 
@@ -47,6 +48,7 @@ public class LeanMonoUpdateWithTransactionDriver implements GammaConstants {
 
         System.out.println("Starting");
         long startMs = System.currentTimeMillis();
+        long globalConflictCount = stm.getGlobalConflictCounter().count();
 
         for (long k = 0; k < txCount; k++) {
             block.execute(closure);
@@ -55,12 +57,13 @@ public class LeanMonoUpdateWithTransactionDriver implements GammaConstants {
         long durationMs = System.currentTimeMillis() - startMs;
         System.out.println("finished");
 
-        String s = BenchyUtils.operationsPerSecondPerThreadAsString(txCount, durationMs, 1);
+        String s = operationsPerSecondPerThreadAsString(txCount, durationMs, 1);
 
         System.out.printf("Duration %s ms\n", durationMs);
         System.out.printf("Performance is %s transactions/second/thread\n", s);
 
         //assertEquals(txCount, ref.long_value);
         assertEquals(txCount + initialVersion, ref.version);
+        assertGlobalConflictCount(stm, globalConflictCount);
     }
 }
