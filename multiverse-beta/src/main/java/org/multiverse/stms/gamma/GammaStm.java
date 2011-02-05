@@ -33,6 +33,8 @@ public final class GammaStm implements Stm {
     public final GammaTransactionConfiguration defaultConfig;
     public final NaiveTransactionalCollectionFactory defaultTransactionalCollectionFactory
             = new NaiveTransactionalCollectionFactory(this);
+    public final int readBiasedThreshold;
+
 
     public GammaStm() {
         this(new GammaStmConfiguration());
@@ -49,6 +51,7 @@ public final class GammaStm implements Stm {
         this.defaultAtomicBlock = newTransactionFactoryBuilder()
                 .setSpeculative(false)
                 .newAtomicBlock();
+        this.readBiasedThreshold = configuration.readBiasedThreshold;
     }
 
     @Override

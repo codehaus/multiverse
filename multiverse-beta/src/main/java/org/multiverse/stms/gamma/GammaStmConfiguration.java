@@ -155,11 +155,30 @@ public final class GammaStmConfiguration {
     public int maximumPoorMansConflictScanLength = 20;
 
     /**
+     * The number of times a transactional object is only read before becoming readbiased. The advantage of a readBiased transactional object
+     * is that you don't need to arrive/depart (richmans conflict scan), but the disadvantage is that it could cause transactions to do
+     * full conflict scans even though they are not required.
+     */
+    public int readBiasedThreshold = 128;
+
+    /**
      * Checks if the configuration is valid.
      *
      * @throws IllegalStateException if the configuration isn't valid.
      */
     public void validate() {
+        if(readBiasedThreshold<0){
+            throw new IllegalStateException(
+                    "[GammaStmConfiguration] readBiasedThreshold can't be smaller than 0, " +
+                            "readBiasedThreshold was " + readBiasedThreshold);
+        }
+
+        if(readBiasedThreshold>1023){
+            throw new IllegalStateException(
+                    "[GammaStmConfiguration] readBiasedThreshold can't be larger than 1023, " +
+                            "readBiasedThreshold was " + readBiasedThreshold);
+        }
+
         if (maximumPoorMansConflictScanLength < 0) {
             throw new IllegalStateException(
                     "[GammaStmConfiguration] maximumFullConflictScanSize can't be smaller than 0, " +

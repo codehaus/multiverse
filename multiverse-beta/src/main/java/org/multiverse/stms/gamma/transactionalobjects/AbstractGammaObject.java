@@ -18,9 +18,6 @@ import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactio
 @SuppressWarnings({"OverlyComplexClass"})
 public abstract class AbstractGammaObject implements GammaObject, Lock {
 
-    //it is important that the maximum threshold is not larger than 1023 (there are 10 bits for the readonly count)
-    private static final int READBIASED_THRESHOLD = 128;
-
     public static final long MASK_OREC_EXCLUSIVELOCK = 0x8000000000000000L;
     public static final long MASK_OREC_UPDATELOCK = 0x4000000000000000L;
     public static final long MASK_OREC_READBIASED = 0x2000000000000000L;
@@ -57,8 +54,13 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     //This field has a controlled JMM problem (just like the hashcode of String).
     protected int identityHashCode;
 
+    //it is important that the maximum threshold is not larger than 1023 (there are 10 bits for the readonly count)
+    private final int readBiasedThreshold;
+
     public AbstractGammaObject(GammaStm stm) {
+        assert stm!=null;
         this.stm = stm;
+        this.readBiasedThreshold = stm.readBiasedThreshold;
     }
 
     @Override
@@ -203,7 +205,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     }
 
     public final int getReadBiasedThreshold() {
-        return READBIASED_THRESHOLD;
+        return readBiasedThreshold;
     }
 
     public final long getSurplus() {
@@ -530,7 +532,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             }
 
             int readonlyCount = getReadonlyCount(current);
-            if (readonlyCount < READBIASED_THRESHOLD) {
+            if (readonlyCount < readBiasedThreshold) {
                 readonlyCount++;
             }
 
@@ -540,7 +542,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
             surplus--;
             final boolean hasExclusiveLock = hasExclusiveLock(current);
-            if (!hasExclusiveLock && surplus == 0 && readonlyCount == READBIASED_THRESHOLD) {
+            if (!hasExclusiveLock && surplus == 0 && readonlyCount == readBiasedThreshold) {
                 isReadBiased = true;
                 readonlyCount = 0;
             }
@@ -586,11 +588,11 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
 
             surplus--;
 
-            if (readonlyCount < READBIASED_THRESHOLD) {
+            if (readonlyCount < readBiasedThreshold) {
                 readonlyCount++;
             }
 
-            if (surplus == 0 && readonlyCount == READBIASED_THRESHOLD) {
+            if (surplus == 0 && readonlyCount == readBiasedThreshold) {
                 isReadBiased = true;
                 readonlyCount = 0;
             }

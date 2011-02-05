@@ -34,11 +34,15 @@ needs more research.
 
 - testing: atomic change operations and globalconflictcounter increment
 
-- upgrade readlock
+- Orec_upgradeWriteLockTest
 
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- configurable read biased threshold
+
+- upgrade readlock
 
 - some ref based methods should be moved from the gamma object to the abstractgamma ref
 
