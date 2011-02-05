@@ -918,12 +918,10 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                             "there must be at least 2 readers, the thread that acquired the lock, " +
                                     "and the calling thread " + toOrecString(current));
                 }
-            } else {
-                if (surplus == 0) {
-                    throw new PanicError(
-                            "There is no surplus " + toOrecString(current));
-                }
+            } else if (surplus == 0) {
+                throw new PanicError("There is no surplus " + toOrecString(current));
             }
+
             surplus--;
 
             long next = setSurplus(current, surplus);
@@ -952,14 +950,14 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             }
 
             if (lockMode == 0) {
-                throw new PanicError(
-                        "Can't ___unlockByReadBiased if it isn't locked " + toOrecString(current));
+                throw new PanicError("No Lock " + toOrecString(current));
             }
 
             if (getSurplus(current) > 1) {
-                throw new PanicError(
-                        "Surplus for a readbiased orec never can be larger than 1 " + toOrecString(current));
+                throw new PanicError("Surplus for readbiased orec larger than 1 " + toOrecString(current));
             }
+
+            //todo: cheap write
 
             long next = current;
             if (lockMode > 0) {

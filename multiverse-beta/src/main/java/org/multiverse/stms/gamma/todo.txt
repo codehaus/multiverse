@@ -18,20 +18,12 @@
 
 - commute and locking
 
-- fast conflict detection fails.
-
-- when a transaction commits, how often does it need to send out a globalconflictcounter.inc. Can't this be done once?
-    - prepare needs to be fixed to send back: OK_BUT_CONFLICT, OK_NO_CONFLICT, FALSE
-    - when the exclusive lock is acquired before committing, also the conflict info needs to be stored.
-
 - constructing objects and check for read consistency.
 
 - commuting objects and check for read consistency once loaded
 
 - optimize the tx-pool logic (instead of using an array, use a single linked list)..
 transactions can also act as node (no need to introduce additional datastructures).
-
-- read biased stuff needs to be re-enabled.
 
 - fast 'write' on orec.depart when exclusive lock and no surplus
 
@@ -40,9 +32,19 @@ needs more research.
 
 - stripe of conflict counters.
 
+- testing: atomic change operations and globalconflictcounter increment
+
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- read biased stuff needs to be re-enabled.
+
+- fast conflict detection fails.
+
+- when a transaction commits, how often does it need to send out a globalconflictcounter.inc. Can't this be done once?
+    - prepare needs to be fixed to send back: OK_BUT_CONFLICT, OK_NO_CONFLICT, FALSE
+    - when the exclusive lock is acquired before committing, also the conflict info needs to be stored.
 
 - bug shaker needs to be added to lean transactions
 

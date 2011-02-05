@@ -34,7 +34,7 @@ public abstract class RefReadConsistency_AbstractTest {
 
     private int readerCount = 10;
     private int writerCount = 2;
-    private int durationMs = 5 * 60 * 1000;
+    private int durationMs = 20 * 60 * 1000;
     private volatile boolean stop;
     protected GammaStm stm;
 
