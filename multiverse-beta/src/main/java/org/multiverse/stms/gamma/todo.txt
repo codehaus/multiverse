@@ -36,11 +36,11 @@ needs more research.
 
 - upgrade writelock test should be checked for callees, making sure that the conflict flag is set correct on the tx.
 
-- repar: GammaAtomicBlock_speculativeTest
-
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- repair: GammaAtomicBlock_speculativeTest
 
 - Orec_upgradeWriteLockTest
 

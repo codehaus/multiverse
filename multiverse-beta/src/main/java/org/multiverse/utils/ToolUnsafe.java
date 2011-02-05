@@ -9,10 +9,7 @@ import java.lang.reflect.Field;
  *
  * @author Peter Veentjer
  */
-public class ToolUnsafe {
-
-    private ToolUnsafe() {
-    } // dummy private constructor
+public final class ToolUnsafe {
 
     /**
      * Fetch the Unsafe.  Use With Caution.
@@ -26,11 +23,15 @@ public class ToolUnsafe {
         }
 
         try {
-            final Field fld = Unsafe.class.getDeclaredField("theUnsafe");
-            fld.setAccessible(true);
-            return (Unsafe) fld.get(ToolUnsafe.class);
+            final Field field = Unsafe.class.getDeclaredField("theUnsafe");
+            field.setAccessible(true);
+            return (Unsafe) field.get(ToolUnsafe.class);
         } catch (Exception e) {
-            throw new RuntimeException("Could not obtain access to sun.misc.Unsafe", e);
+            throw new RuntimeException("Could not access sun.misc.Unsafe", e);
         }
+    }
+
+    //we don't want instances.
+    private ToolUnsafe() {
     }
 }

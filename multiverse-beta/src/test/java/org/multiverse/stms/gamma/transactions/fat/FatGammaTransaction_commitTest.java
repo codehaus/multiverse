@@ -40,6 +40,29 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
     protected abstract void assertCleaned(T transaction);
 
     @Test
+    public void conflict_whenArriveByOther(){
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        T tx = newTransaction();
+        long newValue = 1;
+        ref.set(tx, newValue);
+
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .setMaximumPoorMansConflictScanLength(0);
+
+        FatVariableLengthGammaTransaction otherTx = new FatVariableLengthGammaTransaction(config);
+        ref.get(otherTx);
+
+        long globalConflictCount = stm.globalConflictCounter.count();
+        tx.commit();
+
+        assertGlobalConflictCount(stm, globalConflictCount+1);
+        assertVersionAndValue(ref, initialVersion+1, newValue);
+    }
+
+    @Test
     public void whenContainsConstructedIntRef() {
         T tx = newTransaction();
         int initialValue = 10;

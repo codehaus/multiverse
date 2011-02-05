@@ -9,6 +9,8 @@ import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
+import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransaction;
 
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
@@ -32,6 +34,29 @@ public abstract class LeanGammaTransaction_commitTest<T extends GammaTransaction
     public abstract void assertClearedAfterCommit();
 
     public abstract void assertClearedAfterAbort();
+
+    @Test
+    public void conflict_whenReadByOther(){
+        String initialValue = null;
+        GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        T tx = newTransaction();
+        String newValue = "bar";
+        ref.set(tx, newValue);
+
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .setMaximumPoorMansConflictScanLength(0);
+
+        FatVariableLengthGammaTransaction otherTx = new FatVariableLengthGammaTransaction(config);
+        ref.get(otherTx);
+
+        long globalConflictCount = stm.globalConflictCounter.count();
+        tx.commit();
+
+        assertGlobalConflictCount(stm, globalConflictCount+1);
+        assertVersionAndValue(ref, initialVersion+1, newValue);
+    }
 
     @Test
     public void whenUnused() {

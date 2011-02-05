@@ -101,6 +101,24 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
         status = TX_COMMITTED;
     }
 
+    @Override
+    public final void prepare() {
+        if (status == TX_PREPARED) {
+            return;
+        }
+
+        if (status != TX_ACTIVE) {
+            throw abortPrepareOnBadStatus();
+        }
+
+        final GammaObject conflictingObject = prepareChainForCommit();
+        if (conflictingObject != null) {
+            throw abortOnReadWriteConflict(conflictingObject);
+        }
+
+        status = TX_PREPARED;
+    }
+
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     private GammaObject prepareChainForCommit() {
         GammaRefTranlocal node = head;
@@ -168,7 +186,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
                 return;
             }
 
-            if(SHAKE_BUGS) shakeBugs();
+            if (SHAKE_BUGS) shakeBugs();
 
             if (node.isWrite()) {
                 if (node.getLockMode() == LOCKMODE_EXCLUSIVE) {
@@ -198,7 +216,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
                 return;
             }
 
-            if(SHAKE_BUGS) shakeBugs();
+            if (SHAKE_BUGS) shakeBugs();
 
             node.owner = null;
             node.ref_oldValue = null;
@@ -278,23 +296,6 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
         throw newRetryError();
     }
 
-    @Override
-    public final void prepare() {
-        if (status == TX_PREPARED) {
-            return;
-        }
-
-        if (status != TX_ACTIVE) {
-            throw abortPrepareOnBadStatus();
-        }
-
-        final GammaObject conflictingObject = prepareChainForCommit();
-        if (conflictingObject != null) {
-            throw abortOnReadWriteConflict(conflictingObject);
-        }
-
-        status = TX_PREPARED;
-    }
 
     @Override
     public final GammaRefTranlocal locate(AbstractGammaRef o) {

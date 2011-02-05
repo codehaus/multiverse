@@ -37,6 +37,22 @@ public abstract class FatGammaTransaction_openForReadTest<T extends GammaTransac
 
 
     @Test
+    public void whenArrive(){
+        //the mono transaction doesn't support (or need) the richmans conflict
+        assumeTrue(getMaxCapacity()>1);
+
+        GammaLongRef ref = new GammaLongRef(stm);
+
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .setMaximumPoorMansConflictScanLength(0);
+
+        T tx = newTransaction(config);
+        ref.openForRead(tx, LOCKMODE_NONE);
+
+        assertSurplus(ref, 1);
+    }
+
+    @Test
     public void whenStmMismatch() {
         GammaStm otherStm = new GammaStm();
         long initialValue = 10;
