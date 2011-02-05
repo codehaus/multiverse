@@ -8,6 +8,7 @@ import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 
 import static org.junit.Assert.fail;
+import static org.multiverse.TestUtils.assertOrecValue;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class Orec_departAfterFailureTest {
@@ -22,6 +23,7 @@ public class Orec_departAfterFailureTest {
     @Test
     public void whenUpdateBiasedAndNoSurplusAndNotLocked_thenPanicError() {
         AbstractGammaObject orec = new GammaLongRef(stm);
+        long orecValue = orec.orec;
 
         try {
             orec.departAfterFailure();
@@ -29,10 +31,7 @@ public class Orec_departAfterFailureTest {
         } catch (PanicError expected) {
         }
 
-        assertSurplus(orec, 0);
-        assertWriteBiased(orec);
-        assertLockMode(orec, LOCKMODE_NONE);
-        assertReadonlyCount(orec, 0);
+        assertOrecValue(orec, orecValue);
     }
 
     @Test
@@ -84,22 +83,20 @@ public class Orec_departAfterFailureTest {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
 
         orec.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
-
+        long orecValue = orec.orec;
         try {
             orec.departAfterFailure();
             fail();
         } catch (PanicError expected) {
         }
 
-        assertLockMode(orec, LOCKMODE_EXCLUSIVE);
-        assertSurplus(orec, 1);
-        assertReadBiased(orec);
-        assertReadonlyCount(orec, 0);
+        assertOrecValue(orec, orecValue);
     }
 
     @Test
     public void whenReadBiasedAndNotLocked_thenPanicError() {
         AbstractGammaObject orec = makeReadBiased(new GammaLongRef(stm));
+        long orecValue = orec.orec;
 
         try {
             orec.departAfterFailure();
@@ -107,9 +104,6 @@ public class Orec_departAfterFailureTest {
         } catch (PanicError expected) {
         }
 
-        assertLockMode(orec, LOCKMODE_NONE);
-        assertSurplus(orec, 0);
-        assertReadBiased(orec);
-        assertReadonlyCount(orec, 0);
+        assertOrecValue(orec, orecValue);
     }
 }

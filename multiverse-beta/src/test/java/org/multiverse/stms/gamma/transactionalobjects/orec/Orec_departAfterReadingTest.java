@@ -149,7 +149,6 @@ public class Orec_departAfterReadingTest {
             orec.departAfterReading();
             fail();
         } catch (PanicError expected) {
-
         }
 
         assertOrecValue(orec, orecValue);
@@ -164,7 +163,6 @@ public class Orec_departAfterReadingTest {
             orec.departAfterReading();
             fail();
         } catch (PanicError expected) {
-
         }
 
         assertOrecValue(orec, orecValue);

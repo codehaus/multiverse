@@ -134,7 +134,7 @@ public class Orec_upgradeWriteLockTest implements GammaConstants {
 
         boolean result = orec.upgradeWriteLock();
 
-        assertFalse(result);
+        assertTrue(result);
         assertSurplus(orec, 1);
         assertLockMode(orec, LOCKMODE_EXCLUSIVE);
         assertReadBiased(orec);
@@ -150,7 +150,7 @@ public class Orec_upgradeWriteLockTest implements GammaConstants {
         boolean result = orec.upgradeWriteLock();
 
         assertTrue(result);
-        assertSurplus(orec, 2);
+        assertSurplus(orec, 1);
         assertLockMode(orec, LOCKMODE_EXCLUSIVE);
         assertReadBiased(orec);
         assertReadonlyCount(orec, 0);

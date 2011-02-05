@@ -28,7 +28,7 @@ public class Orec_departAfterFailureAndUnlockTest implements GammaConstants {
         try {
             orec.departAfterFailureAndUnlock();
             fail();
-        } catch (PanicError ex) {
+        } catch (PanicError expected) {
         }
 
         assertOrecValue(orec, orecValue);

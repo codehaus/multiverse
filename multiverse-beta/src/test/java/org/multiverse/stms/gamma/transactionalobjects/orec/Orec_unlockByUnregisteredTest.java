@@ -9,6 +9,7 @@ import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 
 import static org.junit.Assert.fail;
+import static org.multiverse.TestUtils.assertOrecValue;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class Orec_unlockByUnregisteredTest {
@@ -23,34 +24,30 @@ public class Orec_unlockByUnregisteredTest {
     @Test
     public void whenUpdateBiasedAndNoSurplus_thenPanicError() {
         AbstractGammaObject orec = new GammaLongRef(stm);
+        long orecValue = orec.orec;
 
         try {
             orec.unlockByUnregistered();
             fail();
         } catch (PanicError expected) {
-
         }
 
-        assertWriteBiased(orec);
-        assertSurplus(orec, 0);
-        assertLockMode(orec, LockMode.None);
+        assertOrecValue(orec, orecValue);
     }
 
     @Test
     public void whenUpdateBiasedAndNotLocked_thenPanicError() {
         AbstractGammaObject orec = new GammaLongRef(stm);
         orec.arrive(1);
+        long orecValue = orec.orec;
 
         try {
             orec.unlockByUnregistered();
             fail();
         } catch (PanicError expected) {
-
         }
 
-        assertWriteBiased(orec);
-        assertSurplus(orec, 1);
-        assertLockMode(orec, LockMode.None);
+        assertOrecValue(orec, orecValue);
     }
 
     @Test
