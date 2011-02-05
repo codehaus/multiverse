@@ -1,26 +1,10 @@
 package org.multiverse.stms.gamma.transactions;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class SpeculativeGammaConfigurationTest {
-
-    @Ignore
-    @Test
-    public void whenFat() {
-        /*
-        SpeculativeGammaConfiguration config = new SpeculativeGammaConfiguration(true);
-        assertTrue(config.isNonRefTypeRequired);
-        assertTrue(config.isFat);
-        assertTrue(config.isCommuteRequired);
-        assertTrue(config.isOrelseRequired);
-        assertTrue(config.areListenersRequired);
-        assertTrue(config.areLocksRequired);
-        assertEquals(Integer.MAX_VALUE, config.minimalLength);
-        */
-    }
 
     @Test
     public void whenLean() {

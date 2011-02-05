@@ -14,8 +14,6 @@
 
 - pre/post start listeners and fat gamma block
 
-- look at the unlock after a write.
-
 - commute and locking
 
 - constructing objects and check for read consistency.
@@ -34,13 +32,15 @@ needs more research.
 
 - testing: atomic change operations and globalconflictcounter increment
 
-- upgrade writelock test should be checked for callees, making sure that the conflict flag is set correct on the tx.
-
-- prepare and global conflict counter functionality
-
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- upgrade writelock test should be checked for callees, making sure that the conflict flag is set correct on the tx.
+
+- look at the unlock after a write.
+
+- prepare and global conflict counter functionality
 
 - commit and testing of global conflict counter increment.
 
