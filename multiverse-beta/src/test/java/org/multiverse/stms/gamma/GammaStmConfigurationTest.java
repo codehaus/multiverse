@@ -1,6 +1,7 @@
 package org.multiverse.stms.gamma;
 
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 
 public class GammaStmConfigurationTest {
 
@@ -47,6 +48,14 @@ public class GammaStmConfigurationTest {
     }
 
     @Test(expected = IllegalStateException.class)
+    public void writeLockMode_whenSmallerThanReadLockMode() {
+        GammaStmConfiguration config = new GammaStmConfiguration();
+        config.writeLockMode = LockMode.None;
+        config.readLockMode = LockMode.Exclusive;
+        config.validate();
+    }
+
+    @Test(expected = IllegalStateException.class)
     public void backoffPolicy_whenNull() {
         GammaStmConfiguration config = new GammaStmConfiguration();
         config.backoffPolicy = null;
@@ -88,11 +97,25 @@ public class GammaStmConfigurationTest {
         config.validate();
     }
 
-    public boolean blockingAllowed = true;
+    @Test(expected = IllegalStateException.class)
+    public void minimalVariableLengthTransactionSize_whenSmallerThan1() {
+        GammaStmConfiguration config = new GammaStmConfiguration();
+        config.minimalVariableLengthTransactionSize = 0;
+        config.validate();
+    }
 
-    public long timeoutNs = Long.MAX_VALUE;
+    @Test(expected = IllegalStateException.class)
+    public void blockingAllowed_whenNoReadTracking() {
+        GammaStmConfiguration config = new GammaStmConfiguration();
+        config.blockingAllowed = true;
+        config.trackReads = false;
+        config.validate();
+    }
 
-    public int minimalVariableLengthTransactionSize = 4;
-
-    public boolean trackReads = true;
+    @Test(expected = IllegalStateException.class)
+    public void timeout_whenSmallerThanZero() {
+        GammaStmConfiguration config = new GammaStmConfiguration();
+        config.timeoutNs = -1;
+        config.validate();
+    }
 }

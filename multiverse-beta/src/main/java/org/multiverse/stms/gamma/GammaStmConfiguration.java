@@ -167,6 +167,12 @@ public final class GammaStmConfiguration {
      * @throws IllegalStateException if the configuration isn't valid.
      */
     public void validate() {
+        if(timeoutNs<0){
+            throw new IllegalStateException(
+                    "[GammaStmConfiguration] timeoutNs can't be smaller than 0, " +
+                            "timeoutNs was " + timeoutNs);
+        }
+
         if(readBiasedThreshold<0){
             throw new IllegalStateException(
                     "[GammaStmConfiguration] readBiasedThreshold can't be smaller than 0, " +
