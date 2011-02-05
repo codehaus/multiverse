@@ -36,9 +36,13 @@ needs more research.
 
 - upgrade writelock test should be checked for callees, making sure that the conflict flag is set correct on the tx.
 
+- prepare and global conflict counter functionality
+
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- commit and testing of global conflict counter increment.
 
 - repair: GammaAtomicBlock_speculativeTest
 
