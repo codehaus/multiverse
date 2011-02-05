@@ -1,4 +1,4 @@
-package org.multiverse.stms.gamma.transactionalobjects.abstractgammaobject;
+package org.multiverse.stms.gamma.transactionalobjects.abstractgammaref;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
-public class AbstractGammaObject_hasReadConflictTest implements GammaConstants {
+public class AbstractGammaRef_hasReadConflictTest implements GammaConstants {
     private GammaStm stm;
 
     @Before

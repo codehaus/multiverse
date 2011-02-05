@@ -3,6 +3,7 @@ package org.multiverse.stms.gamma.transactionalobjects;
 import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
+import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.exceptions.TransactionRequiredException;
@@ -108,7 +109,6 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
     }
 
-    @Override
     public final Listeners commit(final GammaRefTranlocal tranlocal, final GammaObjectPool pool) {
         if (!tranlocal.isDirty) {
             releaseAfterReading(tranlocal, pool);
@@ -1761,5 +1761,212 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         openForRead(tx, lockMode.asInt());
+    }
+
+    /**
+          * Tries to acquire a lock on a previous read/written tranlocal and checks for conflict.
+          * <p/>
+          * If the lockMode == LOCKMODE_NONE, this call is ignored.
+          * <p/>
+          * The call to this method can safely made if the current lock level is higher the the desired LockMode.
+          * <p/>
+          * If the can't be acquired, no changes are made on the tranlocal.
+          *
+          *
+          * @param tranlocal       the tranlocal
+          * @param spinCount       the maximum number of times to spin
+          * @param desiredLockMode
+          * @return true if the lock was acquired successfully and there was no conflict.
+          */
+      public final boolean tryLockAndCheckConflict(
+              final GammaTransaction tx,
+              final GammaRefTranlocal tranlocal,
+              final int spinCount,
+              final int desiredLockMode) {
+
+          final int currentLockMode = tranlocal.getLockMode();
+
+          //if the currentLockMode mode is higher or equal than the desired lockmode, we are done.
+          if (currentLockMode >= desiredLockMode) {
+              return true;
+          }
+
+          //no lock currently is acquired, lets acquire it.
+          if (currentLockMode == LOCKMODE_NONE) {
+              final long expectedVersion = tranlocal.version;
+
+              //if the version already is different, there is a conflict, we are done since since the lock doesn't need to be acquired.
+              if (expectedVersion != version) {
+                  return false;
+              }
+
+              if (tranlocal.hasDepartObligation()) {
+                  int result = lockAfterArrive(spinCount, desiredLockMode);
+                  if (result == FAILURE) {
+                      return false;
+                  }
+
+                  if ((result & MASK_CONFLICT) != 0) {
+                      tx.commitConflict = true;
+                  }
+
+                  if (version != expectedVersion) {
+                      tranlocal.setDepartObligation(false);
+                      departAfterFailureAndUnlock();
+                      return false;
+                  }
+              } else {
+                  //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
+                  final int result = arriveAndLock(spinCount, desiredLockMode);
+
+                  if (result == FAILURE) {
+                      return false;
+                  }
+
+                  tranlocal.setLockMode(desiredLockMode);
+
+                  if ((result & MASK_UNREGISTERED) == 0) {
+                      tranlocal.hasDepartObligation = true;
+                  }
+
+                  if ((result & MASK_CONFLICT) != 0) {
+                      tx.commitConflict = true;
+                  }
+
+                  if (version != expectedVersion) {
+                      return false;
+                  }
+              }
+
+              tranlocal.setLockMode(desiredLockMode);
+              return true;
+          }
+
+          //if a readlock is acquired, we need to upgrade it to a write/exclusive-lock
+          if (currentLockMode == LOCKMODE_READ) {
+              if (!upgradeReadLock(spinCount, desiredLockMode == LOCKMODE_EXCLUSIVE)) {
+                  return false;
+              }
+
+              tranlocal.setLockMode(desiredLockMode);
+              return true;
+          }
+
+          //so we have the write lock, its needs to be upgraded to a commit lock.
+          if (upgradeWriteLockToExclusiveLock()) {
+              //todo:
+              throw new TodoException();
+          }
+          tranlocal.setLockMode(LOCKMODE_EXCLUSIVE);
+          return true;
+      }
+
+     public final int registerChangeListener(
+            final RetryLatch latch,
+            final GammaRefTranlocal tranlocal,
+            final GammaObjectPool pool,
+            final long listenerEra) {
+
+        if (tranlocal.isCommuting() || tranlocal.isConstructing()) {
+            return REGISTRATION_NONE;
+        }
+
+        final long version = tranlocal.version;
+
+        if (version != this.version) {
+            //if it currently already contains a different version, we are done.
+            latch.open(listenerEra);
+            return REGISTRATION_NOT_NEEDED;
+        }
+
+        //we are going to register the listener since the current value still matches with is active.
+        //But it could be that the registration completes after the write has happened.
+
+        Listeners update = pool.takeListeners();
+        //update.threadName = Thread.currentThread().getName();
+        update.listener = latch;
+        update.listenerEra = listenerEra;
+
+        //we need to do this in a loop because other register thread could be contending for the same
+        //listeners field.
+        while (true) {
+            if (version != this.version) {
+                //if it currently already contains a different version, we are done.
+                latch.open(listenerEra);
+                return REGISTRATION_NOT_NEEDED;
+            }
+
+            //the listeners object is mutable, but as long as it isn't yet registered, this calling
+            //thread has full ownership of it.
+            final Listeners current = listeners;
+            update.next = current;
+
+            //lets try to register our listeners.
+            final boolean registered = ___unsafe.compareAndSwapObject(this, listenersOffset, current, update);
+            if (!registered) {
+                //so we are contending with another register thread, so lets try it again. Since the compareAndSwap
+                //didn't succeed, we know that the current thread still has exclusive ownership on the Listeners object
+                //so we can try to register it again, but now with the newly found listeners
+                continue;
+            }
+
+            //the registration was a success. We need to make sure that the ___version hasn't changed.
+            //JMM: the volatile read of ___version can't jump in front of the unsafe.compareAndSwap.
+            if (version == this.version) {
+                //we are lucky, the registration was done successfully and we managed to cas the listener
+                //before the update (since the update we are interested in, hasn't happened yet). This means that
+                //the updating thread is now responsible for notifying the listeners. Retrieval of the most recently
+                //published listener, always happens after the version is updated
+                return REGISTRATION_DONE;
+            }
+
+            //the version has changed, so an interesting write has happened. No registration is needed.
+            //JMM: the unsafe.compareAndSwap can't jump over the volatile read this.___version.
+            //the update has taken place, we need to check if our listeners still is in place.
+            //if it is, it should be removed and the listeners notified. If the listeners already has changed,
+            //it is the task for the other to do the listener cleanup and notify them
+            while (true) {
+                update = listeners;
+                final boolean removed = ___unsafe.compareAndSwapObject(this, listenersOffset, update, null);
+
+                if (!removed) {
+                    continue;
+                }
+
+                if (update != null) {
+                    //we have complete ownership of the listeners that are removed, so lets open them.
+                    update.openAll(pool);
+                }
+                return REGISTRATION_NOT_NEEDED;
+            }
+        }
+    }
+
+
+    @SuppressWarnings({"SimplifiableIfStatement"})
+    public final boolean hasReadConflict(final GammaRefTranlocal tranlocal) {
+        if (tranlocal.lockMode != LOCKMODE_NONE) {
+            return false;
+        }
+
+        if (hasExclusiveLock()) {
+            return true;
+        }
+
+        return tranlocal.version != version;
+    }
+
+    protected final int arriveAndExclusiveLockOrBackoff() {
+        for (int k = 0; k <= stm.defaultMaxRetries; k++) {
+            final int arriveStatus = arriveAndExclusiveLock(stm.spinCount);
+
+            if (arriveStatus != FAILURE) {
+                return arriveStatus;
+            }
+
+            stm.defaultBackoffPolicy.delayedUninterruptible(k + 1);
+        }
+
+        return FAILURE;
     }
 }

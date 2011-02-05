@@ -1,7 +1,6 @@
-package org.multiverse.stms.gamma.transactionalobjects.abstractgammaobject;
+package org.multiverse.stms.gamma.transactionalobjects.abstractgammaref;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.blocking.DefaultRetryLatch;
@@ -22,7 +21,7 @@ import static org.multiverse.TestUtils.getField;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
-public class AbstractGammaObject_registerChangeListenerTest implements GammaConstants {
+public class AbstractGammaRef_registerChangeListenerTest implements GammaConstants {
     private GammaStm stm;
     private GammaObjectPool pool;
 
@@ -34,7 +33,6 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
     }
 
     @Test
-    @Ignore
     public void whenCommuting() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
@@ -173,21 +171,19 @@ public class AbstractGammaObject_registerChangeListenerTest implements GammaCons
     }
 
     @Test
-    @Ignore
     public void whenConstructed_thenNoRegistration() {
-        /*
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         GammaLongRef ref = new GammaLongRef(tx);
-        GammaTranlocal read = tx.openForConstruction(ref);
+        GammaRefTranlocal read = tx.locate(ref);
 
         RetryLatch latch = new DefaultRetryLatch();
         long listenerEra = latch.getEra();
-        int result = ref.___registerChangeListener(latch, read, pool, listenerEra);
+        int result = ref.registerChangeListener(latch, read, pool, listenerEra);
 
         assertEquals(REGISTRATION_NONE, result);
         assertHasNoListeners(ref);
         assertFalse(latch.isOpen());
-        */
+
     }
 
     @Test
