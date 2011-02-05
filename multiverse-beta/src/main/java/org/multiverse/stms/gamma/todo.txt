@@ -34,6 +34,8 @@ needs more research.
 
 - testing: atomic change operations and globalconflictcounter increment
 
+- upgrade readlock
+
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------

@@ -1764,104 +1764,110 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     }
 
     /**
-          * Tries to acquire a lock on a previous read/written tranlocal and checks for conflict.
-          * <p/>
-          * If the lockMode == LOCKMODE_NONE, this call is ignored.
-          * <p/>
-          * The call to this method can safely made if the current lock level is higher the the desired LockMode.
-          * <p/>
-          * If the can't be acquired, no changes are made on the tranlocal.
-          *
-          *
-          * @param tranlocal       the tranlocal
-          * @param spinCount       the maximum number of times to spin
-          * @param desiredLockMode
-          * @return true if the lock was acquired successfully and there was no conflict.
-          */
-      public final boolean tryLockAndCheckConflict(
-              final GammaTransaction tx,
-              final GammaRefTranlocal tranlocal,
-              final int spinCount,
-              final int desiredLockMode) {
+     * Tries to acquire a lock on a previous read/written tranlocal and checks for conflict.
+     * <p/>
+     * If the lockMode == LOCKMODE_NONE, this call is ignored.
+     * <p/>
+     * The call to this method can safely made if the current lock level is higher the the desired LockMode.
+     * <p/>
+     * If the can't be acquired, no changes are made on the tranlocal.
+     *
+     * @param tranlocal       the tranlocal
+     * @param spinCount       the maximum number of times to spin
+     * @param desiredLockMode
+     * @return true if the lock was acquired successfully and there was no conflict.
+     */
+    public final boolean tryLockAndCheckConflict(
+            final GammaTransaction tx,
+            final GammaRefTranlocal tranlocal,
+            final int spinCount,
+            final int desiredLockMode) {
 
-          final int currentLockMode = tranlocal.getLockMode();
+        final int currentLockMode = tranlocal.getLockMode();
 
-          //if the currentLockMode mode is higher or equal than the desired lockmode, we are done.
-          if (currentLockMode >= desiredLockMode) {
-              return true;
-          }
+        //if the currentLockMode mode is higher or equal than the desired lockmode, we are done.
+        if (currentLockMode >= desiredLockMode) {
+            return true;
+        }
 
-          //no lock currently is acquired, lets acquire it.
-          if (currentLockMode == LOCKMODE_NONE) {
-              final long expectedVersion = tranlocal.version;
+        //no lock currently is acquired, lets acquire it.
+        if (currentLockMode == LOCKMODE_NONE) {
+            final long expectedVersion = tranlocal.version;
 
-              //if the version already is different, there is a conflict, we are done since since the lock doesn't need to be acquired.
-              if (expectedVersion != version) {
-                  return false;
-              }
+            //if the version already is different, there is a conflict, we are done since since the lock doesn't need to be acquired.
+            if (expectedVersion != version) {
+                return false;
+            }
 
-              if (tranlocal.hasDepartObligation()) {
-                  int result = lockAfterArrive(spinCount, desiredLockMode);
-                  if (result == FAILURE) {
-                      return false;
-                  }
+            if (tranlocal.hasDepartObligation()) {
+                int result = lockAfterArrive(spinCount, desiredLockMode);
+                if (result == FAILURE) {
+                    return false;
+                }
 
-                  if ((result & MASK_CONFLICT) != 0) {
-                      tx.commitConflict = true;
-                  }
+                if ((result & MASK_CONFLICT) != 0) {
+                    tx.commitConflict = true;
+                }
 
-                  if (version != expectedVersion) {
-                      tranlocal.setDepartObligation(false);
-                      departAfterFailureAndUnlock();
-                      return false;
-                  }
-              } else {
-                  //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
-                  final int result = arriveAndLock(spinCount, desiredLockMode);
+                if (version != expectedVersion) {
+                    tranlocal.setDepartObligation(false);
+                    departAfterFailureAndUnlock();
+                    return false;
+                }
+            } else {
+                //we need to arrive as well because the the tranlocal was readbiased, and no real arrive was done.
+                final int result = arriveAndLock(spinCount, desiredLockMode);
 
-                  if (result == FAILURE) {
-                      return false;
-                  }
+                if (result == FAILURE) {
+                    return false;
+                }
 
-                  tranlocal.setLockMode(desiredLockMode);
+                tranlocal.setLockMode(desiredLockMode);
 
-                  if ((result & MASK_UNREGISTERED) == 0) {
-                      tranlocal.hasDepartObligation = true;
-                  }
+                if ((result & MASK_UNREGISTERED) == 0) {
+                    tranlocal.hasDepartObligation = true;
+                }
 
-                  if ((result & MASK_CONFLICT) != 0) {
-                      tx.commitConflict = true;
-                  }
+                if ((result & MASK_CONFLICT) != 0) {
+                    tx.commitConflict = true;
+                }
 
-                  if (version != expectedVersion) {
-                      return false;
-                  }
-              }
+                if (version != expectedVersion) {
+                    return false;
+                }
+            }
 
-              tranlocal.setLockMode(desiredLockMode);
-              return true;
-          }
+            tranlocal.setLockMode(desiredLockMode);
+            return true;
+        }
 
-          //if a readlock is acquired, we need to upgrade it to a write/exclusive-lock
-          if (currentLockMode == LOCKMODE_READ) {
-              if (!upgradeReadLock(spinCount, desiredLockMode == LOCKMODE_EXCLUSIVE)) {
-                  return false;
-              }
+        //if a readlock is acquired, we need to upgrade it to a write/exclusive-lock
+        if (currentLockMode == LOCKMODE_READ) {
+            int result = upgradeReadLock(spinCount, desiredLockMode == LOCKMODE_EXCLUSIVE);
 
-              tranlocal.setLockMode(desiredLockMode);
-              return true;
-          }
+            if (result == FAILURE) {
+                return false;
+            }
 
-          //so we have the write lock, its needs to be upgraded to a commit lock.
-          if (upgradeWriteLockToExclusiveLock()) {
-              //todo:
-              throw new TodoException();
-          }
-          tranlocal.setLockMode(LOCKMODE_EXCLUSIVE);
-          return true;
-      }
+            if ((result & MASK_CONFLICT) != 0) {
+                tx.commitConflict = true;
+            }
 
-     public final int registerChangeListener(
+            tranlocal.setLockMode(desiredLockMode);
+            return true;
+        }
+
+        //so we have the write lock, its needs to be upgraded to a commit lock.
+        if (upgradeWriteLock()) {
+            //todo:
+            throw new TodoException();
+        }
+
+        tranlocal.setLockMode(LOCKMODE_EXCLUSIVE);
+        return true;
+    }
+
+    public final int registerChangeListener(
             final RetryLatch latch,
             final GammaRefTranlocal tranlocal,
             final GammaObjectPool pool,

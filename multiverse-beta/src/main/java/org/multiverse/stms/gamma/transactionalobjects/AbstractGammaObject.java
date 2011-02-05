@@ -271,11 +271,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     }
 
     //todo: here the conflict count should be returned,
-    public final boolean upgradeReadLock(int spinCount, final boolean exclusiveLock) {
-        if (true) {
-            throw new TodoException();
-        }
-
+    public final int upgradeReadLock(int spinCount, final boolean exclusiveLock) {
         do {
             final long current = orec;
 
@@ -300,11 +296,19 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             }
 
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
-                return true;
+                int result = MASK_SUCCESS;
+
+                if (exclusiveLock) {
+                    if (isReadBiased(current) || getSurplus(current) > 1) {
+                        result += MASK_CONFLICT;
+                    }
+                }
+
+                return result;
             }
         } while (spinCount >= 0);
 
-        return false;
+        return FAILURE;
     }
 
 
@@ -313,7 +317,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
      *
      * @return true if there was at least one conflict write.
      */
-    public final boolean upgradeWriteLockToExclusiveLock() {
+    public final boolean upgradeWriteLock() {
         if (true) {
             throw new TodoException();
         }
