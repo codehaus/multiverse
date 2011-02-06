@@ -30,4 +30,6 @@ needs more research.
                         done
 --------------------------------------------------------------------
 
+- try locking was removed (moved to 0.8).
+
 - ensure now also is part of the speculative stuff.

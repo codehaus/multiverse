@@ -23,7 +23,7 @@ package org.multiverse.api;
  * <p/>
  * <h2>Blocking</h2>
  * Atm it isn't possible to block on a lock. So what happens is that some spinning is done and then some retries
- * in combination with backoffs. In the 0.8 release blocking will be added as well. The exact behavior will be
+ * in combination with backoffs. In the 0.8 release blocking will probably be added. The exact behavior will be
  * made configurable by some LockAcquisition policy.
  * <p/>
  * Important:
@@ -46,6 +46,10 @@ public interface Lock {
      * Gets the LockMode the transaction stored in the the {@link ThreadLocalTransaction} has on this Lock.
      *
      * @return the LockMode.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     LockMode getLockMode();
 
@@ -54,6 +58,10 @@ public interface Lock {
      *
      * @param tx the Lock
      * @return the LockMode the transaction has on the Lock.
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *
      */
     LockMode getLockMode(Transaction tx);
 

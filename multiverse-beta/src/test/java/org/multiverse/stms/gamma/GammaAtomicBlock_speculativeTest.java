@@ -131,6 +131,32 @@ public class GammaAtomicBlock_speculativeTest implements GammaConstants {
     }
 
     @Test
+    public void whenEnsure() {
+        final List<GammaTransaction> transactions = new LinkedList<GammaTransaction>();
+        final GammaRef<String> ref = new GammaRef<String>(stm);
+
+        AtomicBlock block = stm.newTransactionFactoryBuilder()
+                .setDirtyCheckEnabled(false)
+                .setSpeculative(true)
+                .newAtomicBlock();
+
+        block.execute(new AtomicVoidClosure() {
+            @Override
+            public void execute(Transaction tx) throws Exception {
+                GammaTransaction btx = (GammaTransaction) tx;
+                transactions.add(btx);
+                ref.get(btx);
+                ref.ensure(btx);
+            }
+        });
+
+        assertEquals(2, transactions.size());
+        assertTrue(transactions.get(0) instanceof LeanMonoGammaTransaction);
+        assertTrue(transactions.get(1) instanceof FatMonoGammaTransaction);
+    }
+
+
+    @Test
     public void whenConstructing() {
         final List<GammaTransaction> transactions = new LinkedList<GammaTransaction>();
 
