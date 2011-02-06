@@ -8,18 +8,22 @@ package org.multiverse.commitbarriers;
  */
 public class CommitBarrierOpenException extends IllegalStateException {
 
-    public CommitBarrierOpenException() {
+    /**
+     * Creates a new CommitBarrierOpenException with the provided message.
+     *
+     * @param message the message
+     */
+    public CommitBarrierOpenException(String message) {
+        super(message);
     }
 
-    public CommitBarrierOpenException(String s) {
-        super(s);
-    }
-
+    /**
+     * Creates a new CommitBarrierOpenException with the provided message and cause.
+     *
+     * @param message the message
+     * @param cause the cause
+     */
     public CommitBarrierOpenException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    public CommitBarrierOpenException(Throwable cause) {
-        super(cause);
     }
 }

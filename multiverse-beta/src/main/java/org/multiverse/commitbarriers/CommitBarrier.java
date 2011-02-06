@@ -474,7 +474,7 @@ public abstract class CommitBarrier {
         } else if (isAborted()) {
             tx.abort();
             throw new IllegalStateException(
-                    format("[%s] Didn't expect to encounter an aborted transaction",
+                    format("[%s] Didn't expect to encounter an aborted CommitBarrier",
                             tx.getConfiguration().getFamilyName()));
         }
     }
@@ -525,14 +525,14 @@ public abstract class CommitBarrier {
 
         lock.lock();
         try {
-            switch (getStatus()) {
+            switch (status) {
                 case Closed:
                     tx.prepare();
                     addJoiner();
                     if (isLastParty()) {
                         tasks = signalCommit();
                     } else {
-                        while (getStatus() == Status.Closed) {
+                        while (status == Status.Closed) {
                             try {
                                 statusCondition.await();
                             } catch (InterruptedException ex) {
@@ -583,7 +583,7 @@ public abstract class CommitBarrier {
         List<Runnable> postCommitTasks = new ArrayList<Runnable>();
         lock.lock();
         try {
-            switch (getStatus()) {
+            switch (status) {
                 case Closed:
                     tx.prepare();
                     addJoiner();
@@ -591,7 +591,7 @@ public abstract class CommitBarrier {
                     if (isLastParty()) {
                         postCommitTasks = signalCommit();
                     } else {
-                        while (getStatus() == Status.Closed) {
+                        while (status == Status.Closed) {
                             statusCondition.awaitUninterruptibly();
                         }
                     }
@@ -637,34 +637,32 @@ public abstract class CommitBarrier {
         boolean abort = true;
         lock.lock();
         try {
-            try {
-                switch (getStatus()) {
-                    case Closed:
-                        tx.prepare();
-                        addJoiner();
+            switch (status) {
+                case Closed:
+                    tx.prepare();
+                    addJoiner();
 
-                        if (isLastParty()) {
-                            postCommitTasks = signalCommit();
-                            abort = false;
-                        } else {
-                            postCommitTasks = signalAborted();
-                        }
-                        break;
-                    case Aborted:
-                        String abortMsg = format("[%s] Can't call tryJoinCommit on already aborted " +
-                                "CountDownCommitBarrier", tx.getConfiguration().getFamilyName());
-                        throw new CommitBarrierOpenException(abortMsg);
-                    case Committed:
-                        String commitMsg = format("[%s] Can't call tryJoinCommit on already committed " +
-                                "CountDownCommitBarrier", tx.getConfiguration().getFamilyName());
-                        throw new CommitBarrierOpenException(commitMsg);
-                    default:
-                        throw new IllegalStateException();
-                }
-            } finally {
-                lock.unlock();
+                    if (isLastParty()) {
+                        postCommitTasks = signalCommit();
+                        abort = false;
+                    } else {
+                        postCommitTasks = signalAborted();
+                    }
+                    break;
+                case Aborted:
+                    String abortMsg = format("[%s] Can't call tryJoinCommit on already aborted " +
+                            "CountDownCommitBarrier", tx.getConfiguration().getFamilyName());
+                    throw new CommitBarrierOpenException(abortMsg);
+                case Committed:
+                    String commitMsg = format("[%s] Can't call tryJoinCommit on already committed " +
+                            "CountDownCommitBarrier", tx.getConfiguration().getFamilyName());
+                    throw new CommitBarrierOpenException(commitMsg);
+                default:
+                    throw new IllegalStateException();
             }
+
         } finally {
+            lock.unlock();
             if (abort) {
                 tx.abort();
             } else {
@@ -708,14 +706,14 @@ public abstract class CommitBarrier {
 
         lock.lock();
         try {
-            switch (getStatus()) {
+            switch (status) {
                 case Closed:
                     tx.prepare();
                     addJoiner();
                     if (isLastParty()) {
                         postCommitTasks = signalCommit();
                     } else {
-                        while (getStatus() == Status.Closed) {
+                        while (status == Status.Closed) {
                             try {
                                 timeoutNs = statusCondition.awaitNanos(timeoutNs);
                                 if (timeoutNs <= 0) {
@@ -777,11 +775,11 @@ public abstract class CommitBarrier {
 
         lock.lock();
         try {
-            switch (getStatus()) {
+            switch (status) {
                 case Closed:
                     tx.prepare();
                     addJoiner();
-                    while (getStatus() == Status.Closed) {
+                    while (status == Status.Closed) {
                         try {
                             timeoutNs = statusCondition.awaitNanos(timeoutNs);
                             if (timeoutNs <= 0) {
