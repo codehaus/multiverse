@@ -43,7 +43,7 @@ public class MonoUpdateDriver implements GammaConstants {
     }
 
     @Test
-    public void testWriteCommit() {
+    public void testExclusiveLock() {
         test(LockMode.Exclusive);
     }
 

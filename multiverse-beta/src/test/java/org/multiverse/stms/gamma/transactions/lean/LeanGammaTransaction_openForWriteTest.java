@@ -1,6 +1,7 @@
 package org.multiverse.stms.gamma.transactions.lean;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.DeadTransactionException;
@@ -290,8 +291,8 @@ public abstract class LeanGammaTransaction_openForWriteTest<T extends GammaTrans
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
-
     @Test
+    @Ignore
     public void whenOverflowing() {
 
     }

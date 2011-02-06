@@ -80,7 +80,6 @@ public class GammaLongRef_consistentLoadStressTest implements GammaConstants {
 
     class UpdateThread extends TestThread {
 
-
         public UpdateThread(int id) {
             super("UpdateThread-" + id);
         }

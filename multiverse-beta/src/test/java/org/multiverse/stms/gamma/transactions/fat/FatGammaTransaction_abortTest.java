@@ -41,7 +41,6 @@ public abstract class FatGammaTransaction_abortTest<T extends GammaTransaction> 
     }
 
     @Test
-    @Ignore
     public void locking_whenHasConstructed_thenRemainLocked() {
         GammaTransaction tx = newTransaction();
         GammaLongRef ref = new GammaLongRef(tx);

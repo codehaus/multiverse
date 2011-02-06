@@ -614,7 +614,6 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         abort = false;
                         return;
                     } catch (Retry e) {
-                        System.out.println("retry");
                         if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
@@ -623,7 +622,6 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         }
                         tx.awaitUpdate();
                     } catch (SpeculativeConfigurationError e) {
-                        System.out.println("speculative failure");
                         if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a speculative configuration error",
