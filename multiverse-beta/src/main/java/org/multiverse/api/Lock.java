@@ -93,35 +93,4 @@ public interface Lock {
      *                              be aborted.
      */
     void acquire(Transaction tx, LockMode desiredLockMode);
-
-    /**
-     * Tries to acquire a lock.
-     * <p/>
-     * If the lock can't be acquired or if a conflict is detected, false is returned. True otherwise.
-     *
-     * @param desiredLockMode the desired LockMode.
-     * @return true if the Lock was acquired successfully, false otherwise.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    boolean tryAcquire(LockMode desiredLockMode);
-
-    /**
-     * Tries to acquire a lock.
-     * <p/>
-     * If the lock can't be acquired or if a conflict is detected, false is returned. True otherwise.
-     *
-     * @param tx              the Transaction used for this operation.
-     * @param desiredLockMode the desired lockmode.
-     * @return true if the Lock was acquired successfully, false otherwise.
-     * @throws NullPointerException if tx or LockMode is null. If LockMode is null and an active
-     *                              transaction is available, it will be aborted.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    boolean tryAcquire(Transaction tx, LockMode desiredLockMode);
 }

@@ -5,7 +5,6 @@ import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.LockedException;
-import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.api.functions.*;
 import org.multiverse.stms.gamma.GammaObjectPool;
@@ -39,14 +38,9 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         this.type = type;
     }
 
-    public final int getType() {
-        return type;
-    }
-
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     public final boolean flattenCommute(final GammaTransaction tx, final GammaRefTranlocal tranlocal, final int lockMode) {
         final GammaTransactionConfiguration config = tx.config;
-
 
         //todo: the local conflict counter should be set if available.
 
@@ -954,11 +948,9 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         return tranlocal;
     }
 
-
     // ============================================================================================
     // =============================== open for write =============================================
     // ============================================================================================
-
 
     public final GammaRefTranlocal openForWrite(final GammaTransaction tx, final int lockMode) {
         if (tx == null) {
@@ -1462,95 +1454,6 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tranlocal.addCommutingFunction(tx.pool, function);
     }
 
-    // ============================================================================================
-    // ================================= try acquire =========================================
-    // ============================================================================================
-
-    @Override
-    public final boolean tryAcquire(final LockMode desiredLockMode) {
-        final GammaTransaction tx = (GammaTransaction) getThreadLocalTransaction();
-
-        if (tx == null) {
-            throw new TransactionRequiredException();
-        }
-
-        return tryAcquire(tx, desiredLockMode);
-    }
-
-    public final boolean tryAcquire(final GammaTransaction tx, final LockMode desiredLockMode) {
-        if (tx == null) {
-            throw new NullPointerException();
-        }
-
-        if (tx instanceof FatMonoGammaTransaction) {
-            return tryAcquire((FatMonoGammaTransaction) tx, desiredLockMode);
-        } else if (tx instanceof FatFixedLengthGammaTransaction) {
-            return tryAcquire((FatFixedLengthGammaTransaction) tx, desiredLockMode);
-        } else {
-            return tryAcquire((FatVariableLengthGammaTransaction) tx, desiredLockMode);
-        }
-    }
-
-    @Override
-    public final boolean tryAcquire(final Transaction tx, final LockMode desiredLockMode) {
-        return tryAcquire((GammaTransaction) tx, desiredLockMode);
-    }
-
-    public final boolean tryAcquire(final FatMonoGammaTransaction tx, final LockMode desiredLockMode) {
-        if (tx == null) {
-            throw new NullPointerException();
-        }
-
-        if (tx.status != TX_ACTIVE) {
-            throw tx.abortTryAcquireOnBadStatus(this);
-        }
-
-        if (desiredLockMode == null) {
-            throw tx.abortTryAcquireOnNullLockMode(this);
-        }
-
-        throw new TodoException();
-    }
-
-    public final boolean tryAcquire(final FatFixedLengthGammaTransaction tx, final LockMode desiredLockMode) {
-        if (tx == null) {
-            throw new NullPointerException();
-        }
-
-        if (tx.status != TX_ACTIVE) {
-            throw tx.abortTryAcquireOnBadStatus(this);
-        }
-
-        if (desiredLockMode == null) {
-            throw tx.abortTryAcquireOnNullLockMode(this);
-        }
-
-        throw new TodoException();
-    }
-
-    public final boolean tryAcquire(final FatVariableLengthGammaTransaction tx, final LockMode desiredLockMode) {
-        if (tx == null) {
-            throw new NullPointerException();
-        }
-
-        if (tx.status != TX_ACTIVE) {
-            throw tx.abortTryAcquireOnBadStatus(this);
-        }
-
-        if (desiredLockMode == null) {
-            throw tx.abortTryAcquireOnNullLockMode(this);
-        }
-
-        final GammaTransactionConfiguration config = tx.config;
-
-        final GammaRefTranlocal tranlocal = tx.locate(this);
-        if (tranlocal != null) {
-            return tryLockAndCheckConflict(tx, tranlocal, config.spinCount, desiredLockMode.asInt());
-        }
-
-        throw new TodoException();
-    }
-
     public final void ensure() {
         ensure(getRequiredThreadLocalGammaTransaction());
     }
@@ -1969,8 +1872,11 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     }
 
     protected final int arriveAndExclusiveLockOrBackoff() {
-        for (int k = 0; k <= stm.defaultMaxRetries; k++) {
-            final int arriveStatus = arriveAndExclusiveLock(stm.spinCount);
+        final int maxRetries = stm.defaultMaxRetries;
+        final int spinCount = stm.spinCount;
+
+        for (int k = 0; k <= maxRetries; k++) {
+            final int arriveStatus = arriveAndExclusiveLock(spinCount);
 
             if (arriveStatus != FAILURE) {
                 return arriveStatus;
