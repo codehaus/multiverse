@@ -2,11 +2,7 @@
                         to do
 --------------------------------------------------------------------
 
-- conflict detection & fast conflict detection beginning if the richmans conflict scan is used.
-
 - commute: while commuting, no transaction accessed allowed.
-
-- readonly/readbiased
 
 - listeners
 
@@ -15,10 +11,6 @@
 - pre/post start listeners and fat gamma block
 
 - commute and locking
-
-- constructing objects and check for read consistency.
-
-- commuting objects and check for read consistency once loaded
 
 - optimize the tx-pool logic (instead of using an array, use a single linked list)..
 transactions can also act as node (no need to introduce additional datastructures).
@@ -32,9 +24,17 @@ needs more research.
 
 - testing: atomic change operations and globalconflictcounter increment
 
+- local conflict counter should be set if needed when the flatten commute is called.
+
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- conflict detection & fast conflict detection beginning if the richmans conflict scan is used.
+
+- constructing objects and check for read consistency.
+
+- commuting objects and check for read consistency once loaded
 
 - upgrade writelock test should be checked for callees, making sure that the conflict flag is set correct on the tx.
 

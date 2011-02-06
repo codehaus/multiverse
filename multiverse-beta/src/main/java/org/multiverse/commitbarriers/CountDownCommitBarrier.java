@@ -1,7 +1,9 @@
 package org.multiverse.commitbarriers;
 
 import org.multiverse.api.Transaction;
+import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.api.lifecycle.TransactionListener;
 
@@ -168,7 +170,8 @@ public final class CountDownCommitBarrier extends CommitBarrier {
      * Increases the number of parties that need to return before this CommitBarrier can open.
      * The parties are only increased after the transaction has committed.
      * <p/>
-     * If extra is 0, this call is ignored.
+     * If extra is 0, this call is ignored (unless the Transaction is not active, then a
+     * IllegalTransactionState will be thrown.
      * <p/>
      * This is the call you want to use when you are doing an atomicIncParties inside a transaction.
      * A transaction can be retried multiple times, and if number of parties is incremented more than
@@ -179,22 +182,31 @@ public final class CountDownCommitBarrier extends CommitBarrier {
      * @param extra the number of extra parties
      * @throws NullPointerException     if tx is null.
      * @throws IllegalArgumentException is extra smaller than zero.
-     * @throws DeadTransactionException if the transaction is dead
+     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+     *                                  if the transaction is not in the correct
+     *                                  state for this operation (so not active).
      */
     public void incParties(Transaction tx, int extra) {
         if (tx == null) {
             throw new NullPointerException();
         }
 
-        if (extra < 0) {
-            throw new IllegalArgumentException();
+        if (tx.getStatus() != TransactionStatus.Active) {
+            if(tx.getStatus() == TransactionStatus.Prepared){
+                tx.abort();
+                throw new PreparedTransactionException(format("[%s] Can't call incParties on non active transaction because it is %s",
+                        tx.getConfiguration().getFamilyName(),
+                        tx.getStatus()));
+            }else{
+                throw new DeadTransactionException(format("[%s] Can't call incParties on non active transaction because it is %s",
+                        tx.getConfiguration().getFamilyName(),
+                        tx.getStatus()));
+            }
+
         }
 
-        if (!tx.getStatus().isAlive()) {
-            String msg = format("[%s] Can't call incParties on dead transaction because it is %s",
-                    tx.getConfiguration().getFamilyName(),
-                    tx.getStatus());
-            throw new DeadTransactionException(msg);
+        if (extra < 0) {
+            throw new IllegalArgumentException();
         }
 
         lock.lock();

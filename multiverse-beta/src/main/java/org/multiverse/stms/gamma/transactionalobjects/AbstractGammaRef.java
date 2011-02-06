@@ -47,6 +47,9 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     public final boolean flattenCommute(final GammaTransaction tx, final GammaRefTranlocal tranlocal, final int lockMode) {
         final GammaTransactionConfiguration config = tx.config;
 
+
+        //todo: the local conflict counter should be set if available.
+
         if (!load(tx, tranlocal, lockMode, config.spinCount, tx.richmansMansConflictScan)) {
             return false;
         }

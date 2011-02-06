@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.stms.gamma.GammaStm;
 
 import static org.junit.Assert.*;
@@ -50,16 +51,20 @@ public class CountDownCommitBarrier_incPartiesWithTransactionTest {
     }
 
     @Test
-    public void whenTransactionPrepared() {
+    public void whenTransactionPrepared_thenPreparedTransactionFailure() {
         CountDownCommitBarrier barrier = new CountDownCommitBarrier(10);
         Transaction tx = stm.newDefaultTransaction();
         tx.prepare();
 
-        barrier.incParties(tx, 5);
+        try {
+            barrier.incParties(tx, 5);
+            fail();
+        } catch (PreparedTransactionException expected) {
+        }
 
-        assertIsPrepared(tx);
+        assertIsAborted(tx);
         assertEquals(0, barrier.getNumberWaiting());
-        assertEquals(15, barrier.getParties());
+        assertEquals(10, barrier.getParties());
         assertTrue(barrier.isClosed());
     }
 

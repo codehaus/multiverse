@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 
-public class CountDownCommitBarrier_incPartiesTest {
+public class CountDownCommitBarrier_atomicIncPartiesTest {
     private GammaStm stm;
 
     @Before

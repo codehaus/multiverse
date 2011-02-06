@@ -100,14 +100,10 @@ public class VetoCommitBarrier_vetoCommitWithTransactionTest implements GammaCon
         GammaTransaction tx = stm.newDefaultTransaction();
         ref.get(tx);
 
-        stm.getDefaultAtomicBlock().execute(new AtomicVoidClosure() {
-            @Override
-            public void execute(Transaction tx) throws Exception {
-                ref.incrementAndGet(tx, 1);
-            }
-        });
+        //conflicting write
+        ref.atomicIncrementAndGet(1);
 
-        ref.incrementAndGet(1);
+        ref.incrementAndGet(tx, 1);
 
         VetoCommitBarrier barrier = new VetoCommitBarrier();
         try {
