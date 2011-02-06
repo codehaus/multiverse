@@ -47,6 +47,6 @@ public abstract class LeanGammaTransaction_commuteTest<T extends GammaTransactio
         assertWriteBiased(ref);
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-        assertTrue(tx.getConfiguration().speculativeConfiguration.get().isCommuteDetected);
+        assertTrue(tx.getConfiguration().speculativeConfiguration.get().commuteDetected);
     }
 }

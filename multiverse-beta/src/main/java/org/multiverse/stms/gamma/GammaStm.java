@@ -405,7 +405,7 @@ public final class GammaStm implements Stm {
             final int length = speculativeConfiguration.minimalLength;
 
             if (length <= 1) {
-                if (speculativeConfiguration.isFat) {
+                if (speculativeConfiguration.fat) {
                     FatMonoGammaTransaction tx = pool.takeFatMono();
                     if (tx == null) {
                         return new FatMonoGammaTransaction(config);
@@ -424,7 +424,7 @@ public final class GammaStm implements Stm {
                 }
 
             } else if (length <= config.maxFixedLengthTransactionSize) {
-                if (speculativeConfiguration.isFat) {
+                if (speculativeConfiguration.fat) {
                     final FatFixedLengthGammaTransaction tx = pool.takeFatFixedLength();
                     if (tx == null) {
                         return new FatFixedLengthGammaTransaction(config);

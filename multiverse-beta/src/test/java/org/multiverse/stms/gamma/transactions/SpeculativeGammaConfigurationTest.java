@@ -9,118 +9,171 @@ public class SpeculativeGammaConfigurationTest {
     @Test
     public void whenLean() {
         SpeculativeGammaConfiguration config = new SpeculativeGammaConfiguration();
-        assertFalse(config.isNonRefTypeDetected);
-        assertFalse(config.isFat);
-        assertFalse(config.isCommuteDetected);
-        assertFalse(config.isOrelseDetected);
-        assertFalse(config.areListenersDetected);
-        assertFalse(config.areLocksDetected);
-        assertFalse(config.isAbortOnlyDetected);
+
+        assertFalse(config.fat);
+        assertFalse(config.nonRefTypeDetected);
+        assertFalse(config.commuteDetected);
+        assertFalse(config.orelseDetected);
+        assertFalse(config.listenersDetected);
+        assertFalse(config.locksDetected);
+        assertFalse(config.abortOnlyDetected);
+        assertFalse(config.ensureDetected);
+        assertFalse(config.constructedObjectsDetected);
         assertEquals(1, config.minimalLength);
     }
 
     @Test
-    public void createWithNonRefType() {
+    public void newWithNonRefType() {
         SpeculativeGammaConfiguration config = new SpeculativeGammaConfiguration()
                 .newWithNonRefType();
 
-        assertTrue(config.isNonRefTypeDetected);
-        assertTrue(config.isFat);
-        assertFalse(config.isCommuteDetected);
-        assertFalse(config.isOrelseDetected);
-        assertFalse(config.areListenersDetected);
-        assertFalse(config.areLocksDetected);
-        assertFalse(config.isAbortOnlyDetected);
+        assertTrue(config.fat);
+        assertTrue(config.nonRefTypeDetected);
+        assertFalse(config.commuteDetected);
+        assertFalse(config.orelseDetected);
+        assertFalse(config.listenersDetected);
+        assertFalse(config.locksDetected);
+        assertFalse(config.abortOnlyDetected);
+        assertFalse(config.ensureDetected);
+        assertFalse(config.constructedObjectsDetected);
         assertEquals(1, config.minimalLength);
     }
 
-      @Test
-    public void createWithAbortOnly() {
+    @Test
+    public void newWithEnsure() {
+        SpeculativeGammaConfiguration config = new SpeculativeGammaConfiguration()
+                .newWithEnsure();
+
+        assertTrue(config.fat);
+        assertFalse(config.nonRefTypeDetected);
+        assertFalse(config.commuteDetected);
+        assertFalse(config.orelseDetected);
+        assertFalse(config.listenersDetected);
+        assertFalse(config.locksDetected);
+        assertFalse(config.abortOnlyDetected);
+        assertTrue(config.ensureDetected);
+        assertFalse(config.constructedObjectsDetected);
+        assertEquals(1, config.minimalLength);
+    }
+
+    @Test
+    public void newWithAbortOnly() {
         SpeculativeGammaConfiguration config = new SpeculativeGammaConfiguration()
                 .newWithAbortOnly();
 
-        assertFalse(config.isNonRefTypeDetected);
-        assertTrue(config.isFat);
-        assertFalse(config.isCommuteDetected);
-        assertFalse(config.isOrelseDetected);
-        assertFalse(config.areListenersDetected);
-        assertFalse(config.areLocksDetected);
-        assertTrue(config.isAbortOnlyDetected);
+        assertTrue(config.fat);
+        assertFalse(config.nonRefTypeDetected);
+        assertFalse(config.commuteDetected);
+        assertFalse(config.orelseDetected);
+        assertFalse(config.listenersDetected);
+        assertFalse(config.locksDetected);
+        assertTrue(config.abortOnlyDetected);
+        assertFalse(config.ensureDetected);
+        assertFalse(config.constructedObjectsDetected);
         assertEquals(1, config.minimalLength);
     }
 
     @Test
-    public void createWithCommuteRequired() {
+    public void newWithCommute() {
         SpeculativeGammaConfiguration config = new SpeculativeGammaConfiguration()
-                .newWithCommuteRequired();
+                .newWithCommute();
 
-        assertFalse(config.isNonRefTypeDetected);
-        assertTrue(config.isFat);
-        assertTrue(config.isCommuteDetected);
-        assertFalse(config.isOrelseDetected);
-        assertFalse(config.areListenersDetected);
-        assertFalse(config.areLocksDetected);
-        assertFalse(config.isAbortOnlyDetected);
+        assertTrue(config.fat);
+        assertFalse(config.nonRefTypeDetected);
+        assertTrue(config.commuteDetected);
+        assertFalse(config.orelseDetected);
+        assertFalse(config.listenersDetected);
+        assertFalse(config.locksDetected);
+        assertFalse(config.abortOnlyDetected);
+        assertFalse(config.ensureDetected);
+        assertFalse(config.constructedObjectsDetected);
         assertEquals(1, config.minimalLength);
     }
 
     @Test
-    public void createWithListenersRequired() {
+    public void newListListeners() {
         SpeculativeGammaConfiguration config = new SpeculativeGammaConfiguration()
-                .newWithListenersRequired();
+                .newWithListeners();
 
-        assertFalse(config.isNonRefTypeDetected);
-        assertTrue(config.isFat);
-        assertFalse(config.isCommuteDetected);
-        assertFalse(config.isOrelseDetected);
-        assertTrue(config.areListenersDetected);
-        assertFalse(config.areLocksDetected);
-        assertFalse(config.isAbortOnlyDetected);
+        assertTrue(config.fat);
+        assertFalse(config.nonRefTypeDetected);
+        assertFalse(config.commuteDetected);
+        assertFalse(config.orelseDetected);
+        assertTrue(config.listenersDetected);
+        assertFalse(config.locksDetected);
+        assertFalse(config.abortOnlyDetected);
+        assertFalse(config.ensureDetected);
+        assertFalse(config.constructedObjectsDetected);
         assertEquals(1, config.minimalLength);
     }
 
     @Test
-    public void createWithOrElseRequired() {
+    public void newWithOrElse() {
         SpeculativeGammaConfiguration config = new SpeculativeGammaConfiguration()
-                .newWithOrElseRequired();
+                .newWithOrElse();
 
-        assertFalse(config.isNonRefTypeDetected);
-        assertTrue(config.isFat);
-        assertFalse(config.isCommuteDetected);
-        assertTrue(config.isOrelseDetected);
-        assertFalse(config.areListenersDetected);
-        assertFalse(config.areLocksDetected);
-        assertFalse(config.isAbortOnlyDetected);
+        assertTrue(config.fat);
+        assertFalse(config.nonRefTypeDetected);
+        assertFalse(config.commuteDetected);
+        assertTrue(config.orelseDetected);
+        assertFalse(config.listenersDetected);
+        assertFalse(config.locksDetected);
+        assertFalse(config.abortOnlyDetected);
+        assertFalse(config.ensureDetected);
+        assertFalse(config.constructedObjectsDetected);
         assertEquals(1, config.minimalLength);
     }
 
     @Test
-    public void createWithMinimalLength() {
+    public void newWithMinimalLength() {
         SpeculativeGammaConfiguration config = new SpeculativeGammaConfiguration()
                 .newWithMinimalLength(10);
 
-        assertFalse(config.isNonRefTypeDetected);
-        assertFalse(config.isFat);
-        assertFalse(config.isCommuteDetected);
-        assertFalse(config.isOrelseDetected);
-        assertFalse(config.areListenersDetected);
-        assertFalse(config.areLocksDetected);
-        assertFalse(config.isAbortOnlyDetected);
+        assertFalse(config.fat);
+        assertFalse(config.nonRefTypeDetected);
+        assertFalse(config.commuteDetected);
+        assertFalse(config.orelseDetected);
+        assertFalse(config.listenersDetected);
+        assertFalse(config.locksDetected);
+        assertFalse(config.abortOnlyDetected);
+        assertFalse(config.ensureDetected);
+        assertFalse(config.constructedObjectsDetected);
         assertEquals(10, config.minimalLength);
     }
 
     @Test
-    public void createWithLocksRequired() {
+    public void newWithLocks() {
         SpeculativeGammaConfiguration config = new SpeculativeGammaConfiguration()
-                .newWithLocksRequired();
+                .newWithLocks();
 
-        assertFalse(config.isNonRefTypeDetected);
-        assertTrue(config.isFat);
-        assertFalse(config.isCommuteDetected);
-        assertFalse(config.isOrelseDetected);
-        assertFalse(config.areListenersDetected);
-        assertTrue(config.areLocksDetected);
-        assertFalse(config.isAbortOnlyDetected);
+
+        assertTrue(config.fat);
+        assertFalse(config.nonRefTypeDetected);
+        assertFalse(config.commuteDetected);
+        assertFalse(config.orelseDetected);
+        assertFalse(config.listenersDetected);
+        assertTrue(config.locksDetected);
+        assertFalse(config.abortOnlyDetected);
+        assertFalse(config.ensureDetected);
+        assertFalse(config.constructedObjectsDetected);
+        assertEquals(1, config.minimalLength);
+    }
+
+    @Test
+    public void newWithConstructedObjects() {
+        SpeculativeGammaConfiguration config = new SpeculativeGammaConfiguration()
+                .newWithConstructedObjects();
+
+
+        assertTrue(config.fat);
+        assertFalse(config.nonRefTypeDetected);
+        assertFalse(config.commuteDetected);
+        assertFalse(config.orelseDetected);
+        assertFalse(config.listenersDetected);
+        assertFalse(config.locksDetected);
+        assertFalse(config.abortOnlyDetected);
+        assertFalse(config.ensureDetected);
+        assertTrue(config.constructedObjectsDetected);
         assertEquals(1, config.minimalLength);
     }
 }

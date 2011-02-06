@@ -257,7 +257,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public void updateSpeculativeConfigurationTouseOrElse() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
-            SpeculativeGammaConfiguration update = current.newWithOrElseRequired();
+            SpeculativeGammaConfiguration update = current.newWithOrElse();
             if (speculativeConfiguration.compareAndSet(current, update)) {
                 return;
             }
@@ -267,7 +267,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public void updateSpeculativeConfigurationToUseListeners() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
-            SpeculativeGammaConfiguration update = current.newWithListenersRequired();
+            SpeculativeGammaConfiguration update = current.newWithListeners();
             if (speculativeConfiguration.compareAndSet(current, update)) {
                 return;
             }
@@ -287,7 +287,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public void updateSpeculativeConfigurationToUseCommute() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
-            SpeculativeGammaConfiguration update = current.newWithCommuteRequired();
+            SpeculativeGammaConfiguration update = current.newWithCommute();
             if (speculativeConfiguration.compareAndSet(current, update)) {
                 return;
             }
@@ -297,7 +297,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public void updateSpeculativeConfigurationToUseExplicitLocking() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
-            SpeculativeGammaConfiguration update = current.newWithLocksRequired();
+            SpeculativeGammaConfiguration update = current.newWithLocks();
             if (speculativeConfiguration.compareAndSet(current, update)) {
                 return;
             }
@@ -307,7 +307,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public void updateSpeculativeConfigurationToUseConstructedObjects() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
-            SpeculativeGammaConfiguration next = current.newWithConstructedObjectsRequired();
+            SpeculativeGammaConfiguration next = current.newWithConstructedObjects();
 
             if (speculativeConfiguration.compareAndSet(current, next)) {
                 return;
@@ -330,6 +330,18 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
             SpeculativeGammaConfiguration next = current.newWithMinimalLength(newLength);
+
+            if (speculativeConfiguration.compareAndSet(current, next)) {
+                return;
+            }
+        }
+    }
+
+
+    public void updateSpeculativeConfigurationToUseEnsure() {
+         while (true) {
+            SpeculativeGammaConfiguration current = speculativeConfiguration.get();
+            SpeculativeGammaConfiguration next = current.newWithEnsure();
 
             if (speculativeConfiguration.compareAndSet(current, next)) {
                 return;
@@ -365,28 +377,10 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             if (speculative) {
 
                 newSpeculativeConfiguration = new SpeculativeGammaConfiguration(
-                        false,
-                        false,//is commute required
-                        isFat(),
-                        false,//isNonRefTypeRequired
-                        false,//isOrElseRequired
-                        false,//areLockRequired
-                        false,//areConstructedObjectRequired
-                        false,//isRichmansConflictRequired
-                        false,
-                        1);
+                        isFat(), false,false, false,false,false,false,false,false,false,1);
             } else {
                 newSpeculativeConfiguration = new SpeculativeGammaConfiguration(
-                        true,
-                        true,
-                        true,
-                        true,
-                        true,
-                        true,
-                        true,
-                        true,
-                        true,
-                        Integer.MAX_VALUE);
+                        true, true,true, true,true,true,true,true,true,true,Integer.MAX_VALUE);
             }
 
             if (maximumPoorMansConflictScanLength == 0) {
@@ -647,4 +641,5 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
                 ", permanentListeners=" + permanentListeners +
                 '}';
     }
+
 }

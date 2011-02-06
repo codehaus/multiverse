@@ -32,6 +32,6 @@ public abstract class LeanGammaTransaction_openForConstructionTest<T extends Gam
         }
 
         assertIsAborted(tx);
-        assertTrue(tx.getConfiguration().speculativeConfiguration.get().areConstructedObjectsDetected);
+        assertTrue(tx.getConfiguration().speculativeConfiguration.get().constructedObjectsDetected);
     }
 }

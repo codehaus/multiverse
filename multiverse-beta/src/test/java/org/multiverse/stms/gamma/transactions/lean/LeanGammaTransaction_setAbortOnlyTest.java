@@ -32,6 +32,6 @@ public abstract class LeanGammaTransaction_setAbortOnlyTest<T extends GammaTrans
         }
 
         assertIsAborted(tx);
-        assertTrue(tx.config.speculativeConfiguration.get().isAbortOnlyDetected);
+        assertTrue(tx.config.speculativeConfiguration.get().abortOnlyDetected);
     }
 }

@@ -37,7 +37,7 @@ public abstract class LeanGammaTransaction_registerTest<T extends GammaTransacti
         }
 
         assertIsAborted(tx);
-        assertFalse(tx.getConfiguration().getSpeculativeConfiguration().areListenersDetected);
+        assertFalse(tx.getConfiguration().getSpeculativeConfiguration().listenersDetected);
     }
 
     @Test
@@ -53,7 +53,7 @@ public abstract class LeanGammaTransaction_registerTest<T extends GammaTransacti
         }
 
         assertIsAborted(tx);
-        assertTrue(tx.getConfiguration().getSpeculativeConfiguration().areListenersDetected);
+        assertTrue(tx.getConfiguration().getSpeculativeConfiguration().listenersDetected);
         assertNull(tx.listeners);
         verifyZeroInteractions(listener);
     }
@@ -72,7 +72,7 @@ public abstract class LeanGammaTransaction_registerTest<T extends GammaTransacti
 
         assertIsAborted(tx);
         verifyZeroInteractions(listener);
-        assertFalse(tx.getConfiguration().getSpeculativeConfiguration().areListenersDetected);
+        assertFalse(tx.getConfiguration().getSpeculativeConfiguration().listenersDetected);
     }
 
     @Test
@@ -89,7 +89,7 @@ public abstract class LeanGammaTransaction_registerTest<T extends GammaTransacti
 
         assertIsAborted(tx);
         verifyZeroInteractions(listener);
-        assertFalse(tx.getConfiguration().getSpeculativeConfiguration().areListenersDetected);
+        assertFalse(tx.getConfiguration().getSpeculativeConfiguration().listenersDetected);
     }
 
     @Test
@@ -106,6 +106,6 @@ public abstract class LeanGammaTransaction_registerTest<T extends GammaTransacti
 
         assertIsCommitted(tx);
         verifyZeroInteractions(listener);
-        assertFalse(tx.getConfiguration().getSpeculativeConfiguration().areListenersDetected);
+        assertFalse(tx.getConfiguration().getSpeculativeConfiguration().listenersDetected);
     }
 }

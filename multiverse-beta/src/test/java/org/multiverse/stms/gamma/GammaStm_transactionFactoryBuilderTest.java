@@ -213,7 +213,7 @@ public class GammaStm_transactionFactoryBuilderTest {
                 .newTransactionFactory();
 
         GammaTransactionConfiguration configuration = txFactory.getConfiguration();
-        assertFalse(configuration.getSpeculativeConfiguration().isFat);
+        assertFalse(configuration.getSpeculativeConfiguration().fat);
         assertTrue(configuration.isSpeculative());
     }
 
@@ -226,7 +226,7 @@ public class GammaStm_transactionFactoryBuilderTest {
 
 
         GammaTransactionConfiguration configuration = txFactory.getConfiguration();
-        assertTrue(configuration.getSpeculativeConfiguration().isFat);
+        assertTrue(configuration.getSpeculativeConfiguration().fat);
         assertTrue(configuration.isSpeculative());
     }
 

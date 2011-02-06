@@ -24,7 +24,7 @@ import static org.multiverse.stms.gamma.GammaStmUtils.toDebugString;
  *
  * @author Peter Veentjer.
  */
-public abstract class GammaTransaction  implements GammaConstants, Transaction {
+public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public final GammaObjectPool pool = new GammaObjectPool();
     public int status = TX_ACTIVE;
@@ -70,7 +70,7 @@ public abstract class GammaTransaction  implements GammaConstants, Transaction {
         return config.controlFlowErrorsReused ? Retry.INSTANCE : new Retry(true);
     }
 
-    private boolean isLean() {
+    public final boolean isLean() {
         return transactionType == TRANSACTIONTYPE_LEAN_MONO || transactionType == TRANSACTIONTYPE_LEAN_FIXED_LENGTH;
     }
 
@@ -117,7 +117,7 @@ public abstract class GammaTransaction  implements GammaConstants, Transaction {
 
     // ================= open for read =============================
 
-    public SpeculativeConfigurationError abortOpenForReadOrWriteOnExplicitLocking(AbstractGammaRef ref) {
+    public SpeculativeConfigurationError abortOpenForReadOrWriteOnExplicitLockingDetected(AbstractGammaRef ref) {
         config.updateSpeculativeConfigurationToUseExplicitLocking();
         abortIfAlive();
 
@@ -525,6 +525,18 @@ public abstract class GammaTransaction  implements GammaConstants, Transaction {
                         config.familyName));
     }
 
+    public SpeculativeConfigurationError abortEnsureOnEnsureDetected(GammaObject o) {
+        config.updateSpeculativeConfigurationToUseEnsure();
+        abortIfAlive();
+        if (config.controlFlowErrorsReused) {
+            return SpeculativeConfigurationError.INSTANCE;
+        }
+
+        return new SpeculativeConfigurationError(
+                format("[%s] Failed to execute evaluate the Ref.ensure [%s], reason: the transaction lean and a fat one needs to be used",
+                        config.familyName,toDebugString(o)));
+    }
+
     public final NullPointerException abortAcquireOnNullLockMode(GammaObject o) {
         switch (status) {
             case TX_ACTIVE:
@@ -733,4 +745,6 @@ public abstract class GammaTransaction  implements GammaConstants, Transaction {
                 throw new IllegalStateException();
         }
     }
+
+
 }
