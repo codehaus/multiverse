@@ -1,13 +1,13 @@
 package org.multiverse.stms.gamma;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.functions.Function;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
@@ -18,6 +18,7 @@ import org.multiverse.stms.gamma.transactions.lean.LeanMonoGammaTransaction;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
@@ -77,33 +78,6 @@ public class GammaAtomicBlock_speculativeTest implements GammaConstants {
         assertInstanceof(FatVariableLengthGammaTransaction.class, transactions.get(2));
         assertInstanceof(FatVariableLengthGammaTransaction.class, transactions.get(3));
     }
-
-    /*
-    @Test
-    public void whenPermanentListenerAdded() {
-        final List<GammaTransaction> transactions = new LinkedList<GammaTransaction>();
-        final AtomicBoolean added = new AtomicBoolean();
-        final TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
-
-        AtomicBlock block = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigurationEnabled(true)
-                .buildAtomicBlock();
-
-        block.execute(new AtomicVoidClosure() {
-            @Override
-            public void execute(Transaction tx) throws Exception {
-                GammaTransaction btx = (GammaTransaction) tx;
-                transactions.add(btx);
-                if (!added.get()) {
-                    btx.registerPermanent( listener);
-                }
-            }
-        });
-
-        assertEquals(2, transactions.size());
-        assertTrue(transactions.get(0) instanceof LeanMonoGammaTransaction);
-        assertTrue(transactions.get(1) instanceof FatMonoGammaTransaction);
-    }           */
 
     @Test
     public void whenCommute() {
@@ -229,16 +203,15 @@ public class GammaAtomicBlock_speculativeTest implements GammaConstants {
     }
 
     @Test
-    @Ignore
     public void whenNormalListenerAdded() {
-        /*
         final List<GammaTransaction> transactions = new LinkedList<GammaTransaction>();
         final AtomicBoolean added = new AtomicBoolean();
-        final TransactionLifecycleListener listener = mock(TransactionLifecycleListener.class);
+        final TransactionListener listener = mock(TransactionListener.class);
 
         AtomicBlock block = stm.newTransactionFactoryBuilder()
-                .setSpeculativeConfigurationEnabled(true)
-                .buildAtomicBlock();
+                .setSpeculative(true)
+                .setDirtyCheckEnabled(false)
+                .newAtomicBlock();
 
         block.execute(new AtomicVoidClosure() {
             @Override
@@ -256,13 +229,7 @@ public class GammaAtomicBlock_speculativeTest implements GammaConstants {
 
         assertEquals(2, transactions.size());
         assertTrue(transactions.get(0) instanceof LeanMonoGammaTransaction);
-        assertTrue(transactions.get(1) instanceof FatMonoGammaTransaction);    */
-    }
-
-    @Test
-    @Ignore
-    public void whenNormalListenersAvailable_thenTheyAreNotCopied() {
-
+        assertTrue(transactions.get(1) instanceof FatMonoGammaTransaction);
     }
 
     @Test
