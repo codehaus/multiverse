@@ -69,7 +69,9 @@ public class GammaRef_consistentLoadStressTest implements GammaConstants {
                         inconsistencyCount.incrementAndGet();
                         System.out.println("Inconsistency detected");
                     }
-                    ref.departAfterReading();
+                    if (tranlocal.hasDepartObligation) {
+                        ref.departAfterReading();
+                    }
                 }
 
                 k++;
@@ -94,11 +96,6 @@ public class GammaRef_consistentLoadStressTest implements GammaConstants {
                 if (arriveStatus == FAILURE) {
                     continue;
                 }
-
-                if ((arriveStatus & MASK_UNREGISTERED) != 0) {
-                    throw new RuntimeException();
-                }
-
 
                 Long value = ref.version + 1;
                 ref.ref_value = value;

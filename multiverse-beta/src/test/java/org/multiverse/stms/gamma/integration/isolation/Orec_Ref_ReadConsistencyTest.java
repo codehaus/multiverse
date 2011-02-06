@@ -156,33 +156,6 @@ public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
             releaseChainAfterSuccess();
         }
 
-        private boolean fullWrite() {
-            for (int k = 0; k < refs.length; k++) {
-                GammaRef ref = refs[k];
-                GammaRefTranlocal tranlocal = tranlocals[k];
-
-                //if (!ref.tryLockAfterNormalArrive(64, LOCKMODE_EXCLUSIVE)) {
-                //    releaseChainAfterFailure();
-                //    return false;
-                //}
-
-                tranlocal.lockMode = LOCKMODE_EXCLUSIVE;
-
-                if (tranlocal.version != ref.version) {
-                    releaseChainAfterFailure();
-                    return false;
-                }
-            }
-
-            for (int k = 0; k < refs.length; k++) {
-                refs[k].version++;
-                refs[k].departAfterUpdateAndUnlock();
-                tranlocals[k].lockMode = LOCKMODE_NONE;
-                tranlocals[k].hasDepartObligation = false;
-            }
-            return true;
-        }
-
         private void fullRead() {
             for (; ;) {
                 lastConflictCount = stm.getGlobalConflictCounter().count();

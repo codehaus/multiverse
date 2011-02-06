@@ -53,6 +53,7 @@ public class GammaLongRef_consistentLoadStressTest implements GammaConstants {
 
     class ReadThread extends TestThread {
         private final GammaTransaction tx = stm.newDefaultTransaction();
+
         public ReadThread(int id) {
             super("ReadThread-" + id);
         }
@@ -62,16 +63,18 @@ public class GammaLongRef_consistentLoadStressTest implements GammaConstants {
             GammaRefTranlocal tranlocal = new GammaRefTranlocal();
             int k = 0;
             while (!stop) {
-                boolean success = ref.load(tx,tranlocal, LOCKMODE_NONE, 100, true);
+                boolean success = ref.load(tx, tranlocal, LOCKMODE_NONE, 100, true);
                 if (success) {
                     if (tranlocal.version != tranlocal.long_value) {
                         inconsistencyCount.incrementAndGet();
-                        System.out.printf("Inconsistency detected, version %s and value %s\n",tranlocal.version, tranlocal.long_value);
+                        System.out.printf("Inconsistency detected, version %s and value %s\n", tranlocal.version, tranlocal.long_value);
                     }
-                    ref.departAfterReading();
+                    if (tranlocal.hasDepartObligation) {
+                        ref.departAfterReading();
+                    }
                 }
                 k++;
-                if(k% 100000 == 0){
+                if (k % 100000 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
             }
@@ -86,24 +89,20 @@ public class GammaLongRef_consistentLoadStressTest implements GammaConstants {
 
         @Override
         public void doRun() throws Exception {
-            int k=0;
+            int k = 0;
             while (!stop) {
                 int arriveStatus = ref.arriveAndLock(1, LOCKMODE_EXCLUSIVE);
                 if (arriveStatus == FAILURE) {
                     continue;
                 }
 
-                if ((arriveStatus & MASK_UNREGISTERED)!=0) {
-                    throw new RuntimeException();
-                }
-
-                ref.long_value = ref.version+1;
-                ref.version = ref.version+1;
+                ref.long_value = ref.version + 1;
+                ref.version = ref.version + 1;
                 ref.departAfterUpdateAndUnlock();
 
                 k++;
-                if(k% 100000 == 0){
-                    System.out.printf("%s is at %s\n",getName(),k);
+                if (k % 100000 == 0) {
+                    System.out.printf("%s is at %s\n", getName(), k);
                 }
             }
         }
