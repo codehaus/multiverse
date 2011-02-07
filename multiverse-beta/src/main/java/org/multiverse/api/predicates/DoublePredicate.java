@@ -5,8 +5,16 @@ package org.multiverse.api.predicates;
  *
  * @author Peter Veentjer.
  */
-public abstract class DoublePredicate implements Predicate<Double>{
+public abstract class DoublePredicate implements Predicate<Double> {
 
+    public static DoublePredicate newEqualsPredicate(final double value) {
+        return new DoublePredicate() {
+            @Override
+            public boolean evaluate(double current) {
+                return current == value;
+            }
+        };
+    }
 
     /**
      * Evaluates the predicate

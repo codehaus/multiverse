@@ -15,6 +15,18 @@ public final class Functions {
 
     private static final LongFunction decOneLongFunction = new IncLongFunction(-1);
 
+    private static final DoubleFunction incOneDoubleFunction = new IncDoubleFunction();
+
+    private static final DoubleFunction identityDoubleFunction = new IdentityDoubleFunction();
+
+    public static DoubleFunction newIdentityDoubleFunction(){
+        return identityDoubleFunction;
+    }
+
+    public static DoubleFunction newIncDoubleFunction() {
+        return incOneDoubleFunction;
+    }
+
     /**
      * Returns an identity IntFunction (a function that returns its input value). The instance is cached.
      *
@@ -174,6 +186,30 @@ public final class Functions {
             return "IncLongFunction{" +
                     "value=" + value +
                     '}';
+        }
+    }
+
+     private static class IncDoubleFunction extends DoubleFunction {
+        @Override
+        public double call(double current) {
+            return current + 1;
+        }
+
+        @Override
+        public String toString() {
+            return "IncDoubleFunction{value=1}";
+        }
+    }
+
+       private static class IdentityDoubleFunction extends DoubleFunction {
+        @Override
+        public double call(double current) {
+            return current;
+        }
+
+        @Override
+        public String toString() {
+            return "IdentityDoubleFunction{}";
         }
     }
 
