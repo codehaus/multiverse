@@ -53,7 +53,7 @@ public class TestUtils implements MultiverseConstants {
     }
 
     public static void assertEqualsDouble(double expected, double found) {
-        assertEqualsDouble(null, expected, found);
+        assertEqualsDouble(format("expected %s found %s",expected, found), expected, found);
     }
 
     public static int processorCount() {

@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
-import org.multiverse.stms.gamma.GammaTestUtils;
 import org.multiverse.stms.gamma.transactionalobjects.GammaDoubleRef;
 import org.multiverse.stms.gamma.transactions.fat.FatFixedLengthGammaTransaction;
 import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
@@ -17,6 +16,7 @@ import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsActive;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
+@SuppressWarnings({"ResultOfObjectAllocationIgnored"})
 public class GammaDoubleRef_constructionTest {
 
     private GammaStm stm;
@@ -31,7 +31,7 @@ public class GammaDoubleRef_constructionTest {
         double initialValue = 10;
         GammaDoubleRef ref = new GammaDoubleRef(stm, initialValue);
 
-        GammaTestUtils.assertVersionAndValue(ref, GammaConstants.VERSION_UNCOMMITTED + 1, initialValue);
+        assertVersionAndValue(ref, GammaConstants.VERSION_UNCOMMITTED + 1, initialValue);
         assertRefHasNoLocks(ref);
         assertReadonlyCount(ref, 0);
         assertSurplus(ref, 0);
