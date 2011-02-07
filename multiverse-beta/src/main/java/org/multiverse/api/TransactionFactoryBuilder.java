@@ -19,7 +19,7 @@ public interface TransactionFactoryBuilder {
      *
      * @return the used TransactionConfiguration.
      */
-    TransactionConfiguration getTransactionConfiguration();
+    TransactionConfiguration getConfiguration();
 
     /**
      * Sets if ControlFlowErrors are reused. Normally you don't want to reuse them because they can be expensive

@@ -17,7 +17,7 @@ import org.multiverse.stms.gamma.GammaAtomicBlock;
 public interface GammaTransactionFactoryBuilder extends TransactionFactoryBuilder {
 
     @Override
-    GammaTransactionConfiguration getTransactionConfiguration();
+    GammaTransactionConfiguration getConfiguration();
 
     GammaTransactionFactoryBuilder setFat();
 

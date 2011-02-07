@@ -91,7 +91,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionConfiguration getTransactionConfiguration() {
+        public GammaTransactionConfiguration getConfiguration() {
             return config;
         }
 

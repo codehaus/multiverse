@@ -63,8 +63,8 @@ public class GammaStm_transactionFactoryBuilderTest {
         TransactionListener listener = mock(TransactionListener.class);
         GammaTransactionFactoryBuilder newBuilder = oldBuilder.addPermanentListener(listener);
 
-        assertEquals(asList(listener), newBuilder.getTransactionConfiguration().getPermanentListeners());
-        assertTrue(oldBuilder.getTransactionConfiguration().getPermanentListeners().isEmpty());
+        assertEquals(asList(listener), newBuilder.getConfiguration().getPermanentListeners());
+        assertTrue(oldBuilder.getConfiguration().getPermanentListeners().isEmpty());
     }
 
     @Test
@@ -74,13 +74,13 @@ public class GammaStm_transactionFactoryBuilderTest {
         GammaTransactionFactoryBuilder newBuilder = oldBuilder.addPermanentListener(listener)
                 .addPermanentListener(listener);
 
-        assertEquals(asList(listener, listener), newBuilder.getTransactionConfiguration().getPermanentListeners());
+        assertEquals(asList(listener, listener), newBuilder.getConfiguration().getPermanentListeners());
     }
 
     @Test
     public void whenNoPermanentListenersAdded_thenEmptyList() {
         GammaTransactionFactoryBuilder builder = stm.newTransactionFactoryBuilder();
-        assertTrue(builder.getTransactionConfiguration().getPermanentListeners().isEmpty());
+        assertTrue(builder.getConfiguration().getPermanentListeners().isEmpty());
     }
 
     @Test
@@ -91,7 +91,7 @@ public class GammaStm_transactionFactoryBuilderTest {
                 .addPermanentListener(listener1)
                 .addPermanentListener(listener2);
 
-        List<TransactionListener> listeners = builder.getTransactionConfiguration().getPermanentListeners();
+        List<TransactionListener> listeners = builder.getConfiguration().getPermanentListeners();
         assertEquals(asList(listener1, listener2), listeners);
     }
 
@@ -101,7 +101,7 @@ public class GammaStm_transactionFactoryBuilderTest {
                 .addPermanentListener(mock(TransactionListener.class))
                 .addPermanentListener(mock(TransactionListener.class));
 
-        List<TransactionListener> listeners = builder.getTransactionConfiguration().getPermanentListeners();
+        List<TransactionListener> listeners = builder.getConfiguration().getPermanentListeners();
 
         try {
             listeners.clear();
