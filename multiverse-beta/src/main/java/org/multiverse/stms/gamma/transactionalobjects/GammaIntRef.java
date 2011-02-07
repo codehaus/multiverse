@@ -386,7 +386,7 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
 
     public final void await(final GammaTransaction tx, final int value) {
         if (get(tx) != value) {
-            retry();
+            tx.retry();
         }
     }
 

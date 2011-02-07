@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.TestUtils.assertInstanceof;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 
 public class GammaAtomicBlock_speculativeTest implements GammaConstants {
@@ -33,6 +34,7 @@ public class GammaAtomicBlock_speculativeTest implements GammaConstants {
     @Before
     public void setUp() {
         stm = new GammaStm();
+        clearThreadLocalTransaction();
     }
 
     @Test

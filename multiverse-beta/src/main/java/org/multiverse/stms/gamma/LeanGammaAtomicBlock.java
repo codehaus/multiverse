@@ -597,7 +597,6 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
         Throwable cause = null;
         try{
             if(tx != null && tx.isAlive()){
-                System.out.println("Existing transaction found");
                 closure.execute(tx);
                 return;
             }
