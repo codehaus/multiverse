@@ -1,7 +1,6 @@
 package org.multiverse.stms.gamma.transactionalobjects.gammaintref;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.LockedException;
@@ -11,7 +10,7 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaIntRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.assertIsActive;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
@@ -115,12 +114,10 @@ public class GammaIntRef_atomicGetAndIncrementTest {
         assertVersionAndValue(ref, initialVersion, 10);
     }
 
-    @Ignore
     @Test
     public void whenListenersAvailable() {
-        /*
-        long initialValue = 10;
-        GammaIntRef ref = newLongRef(stm, initialValue);
+        int initialValue = 10;
+        GammaIntRef ref = new GammaIntRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         int amount = 1;
@@ -135,6 +132,5 @@ public class GammaIntRef_atomicGetAndIncrementTest {
         joinAll(thread);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + amount);
-        */
     }
 }

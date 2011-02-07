@@ -1,7 +1,6 @@
 package org.multiverse.stms.gamma.transactionalobjects.gammaintref;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.LockedException;
@@ -10,6 +9,7 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaIntRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.*;
+import static org.multiverse.TestUtils.assertOrecValue;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
@@ -99,7 +99,6 @@ public class GammaIntRef_atomicGetTest {
     }
 
     @Test
-    @Ignore
     public void whenReadBiasedAndPrivatizedByOther_thenLockedException() {
         GammaIntRef ref = makeReadBiased(new GammaIntRef(stm, 100));
         long version = ref.getVersion();
@@ -107,20 +106,19 @@ public class GammaIntRef_atomicGetTest {
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
+        long orecValue = ref.orec;
         try {
             ref.atomicGet();
             fail();
         } catch (LockedException ex) {
         }
 
-        assertSurplus(ref, 1);
-        assertReadBiased(ref);
+        assertOrecValue(ref, orecValue);
         assertRefHasExclusiveLock(ref, otherTx);
         assertVersionAndValue(ref, version, 100);
     }
 
     @Test
-    @Ignore
     public void whenReadBiasedAndEnsuredByOther_thenLockedException() {
         GammaIntRef ref = makeReadBiased(new GammaIntRef(stm, 100));
         long version = ref.getVersion();
@@ -128,12 +126,14 @@ public class GammaIntRef_atomicGetTest {
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
-        long result = ref.atomicGet();
+        long orecValue = ref.orec;
+        try {
+            ref.atomicGet();
+            fail();
+        } catch (LockedException expected) {
+        }
 
-        assertEquals(100, result);
-        assertSurplus(ref, 1);
-        assertRefHasWriteLock(ref, otherTx);
-        assertReadBiased(ref);
+        assertOrecValue(ref, orecValue);
         assertVersionAndValue(ref, version, 100);
     }
 }

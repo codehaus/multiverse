@@ -1,7 +1,6 @@
 package org.multiverse.stms.gamma.transactionalobjects.gammalongref;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.LockedException;
@@ -10,6 +9,7 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.*;
+import static org.multiverse.TestUtils.assertOrecValue;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
@@ -24,11 +24,10 @@ public class GammaLongRef_atomicGetTest {
     }
 
     @Test(expected = LockedException.class)
-    @Ignore
     public void whenUnconstructed() {
         GammaTransaction tx = stm.newDefaultTransaction();
-        //GammaLongRef ref = new GammaLongRef(tx);
-        //ref.atomicGet();
+        GammaLongRef ref = new GammaLongRef(tx);
+        ref.atomicGet();
     }
 
     @Test
@@ -100,7 +99,6 @@ public class GammaLongRef_atomicGetTest {
     }
 
     @Test
-    @Ignore
     public void whenReadBiasedAndPrivatizedByOther_thenLockedException() {
         GammaLongRef ref = makeReadBiased(new GammaLongRef(stm, 100));
         long version = ref.getVersion();
@@ -108,20 +106,19 @@ public class GammaLongRef_atomicGetTest {
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
+        long orecValue = ref.orec;
         try {
             ref.atomicGet();
             fail();
         } catch (LockedException ex) {
         }
 
-        assertSurplus(ref, 1);
-        assertReadBiased(ref);
+        assertOrecValue(ref, orecValue);
         assertRefHasExclusiveLock(ref, otherTx);
         assertVersionAndValue(ref, version, 100);
     }
 
     @Test
-    @Ignore
     public void whenReadBiasedAndEnsuredByOther_thenLockedException() {
         GammaLongRef ref = makeReadBiased(new GammaLongRef(stm, 100));
         long version = ref.getVersion();
@@ -129,12 +126,14 @@ public class GammaLongRef_atomicGetTest {
         GammaTransaction otherTx = stm.newDefaultTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
-        long result = ref.atomicGet();
+        long orecValue = ref.orec;
+        try {
+            ref.atomicGet();
+            fail();
+        } catch (LockedException expected) {
+        }
 
-        assertEquals(100, result);
-        assertSurplus(ref, 1);
-        assertRefHasWriteLock(ref, otherTx);
-        assertReadBiased(ref);
+        assertOrecValue(ref,orecValue);
         assertVersionAndValue(ref, version, 100);
     }
 }

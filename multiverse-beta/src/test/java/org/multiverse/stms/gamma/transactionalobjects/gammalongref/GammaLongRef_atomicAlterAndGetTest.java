@@ -1,7 +1,6 @@
 package org.multiverse.stms.gamma.transactionalobjects.gammalongref;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.LockedException;
@@ -15,7 +14,7 @@ import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
-import static org.multiverse.TestUtils.assertIsActive;
+import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.api.functions.Functions.newIdentityLongFunction;
 import static org.multiverse.api.functions.Functions.newIncLongFunction;
@@ -174,9 +173,7 @@ public class GammaLongRef_atomicAlterAndGetTest {
     }
 
     @Test
-    @Ignore
     public void whenListenersAvailable() {
-        /*
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -190,6 +187,6 @@ public class GammaLongRef_atomicAlterAndGetTest {
 
         joinAll(thread);
         assertRefHasNoLocks(ref);
-        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);     */
+        assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
     }
 }
