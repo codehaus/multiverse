@@ -10,6 +10,7 @@ import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import java.util.*;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.*;
@@ -137,7 +138,7 @@ public class GammaTestUtils implements GammaConstants {
 
     public static void assertVersionAndValue(GammaDoubleRef ref, long version, double value) {
         Assert.assertEquals("version doesn't match", version, ref.getVersion());
-        TestUtils.assertEqualsDouble("value doesn't match", value, ref.atomicWeakGet());
+        TestUtils.assertEqualsDouble(format("value doesn't match, expected %s found %s", value, ref.atomicWeakGet()),value, ref.atomicWeakGet());
     }
 
     public static <E> void assertVersionAndValue(GammaRef<E> ref, long version, E value) {

@@ -209,12 +209,12 @@ public class GammaDoubleRef_await2WithPredicateTest {
         thread1.assertNothingThrown();
         assertAlive(thread2);
 
-        ref.atomicSet(20);
+        ref.atomicSet(1);
 
         sleepMs(500);
         assertNotAlive(thread2);
         thread2.assertNothingThrown();
 
-        assertVersionAndValue(ref, initialVersion + 2, 20);
+        assertVersionAndValue(ref, initialVersion + 2, 1);
     }
 }
