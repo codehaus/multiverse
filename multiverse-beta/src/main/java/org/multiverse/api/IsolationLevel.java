@@ -33,7 +33,7 @@ public enum IsolationLevel {
      * <p/>
      * This is the 'serialized' isolation level provided by MVCC databases like Oracle/Postgresql
      * (although Postgresql 9 is going to provide a truly serialized isolation level) and MySQL with the InnoDb.
-     * All data read contains committed data and all data will be consistent.
+     * All data read. contains committed data and all data will be consistent.
      * <p/>
      * A transaction that is readonly, gets the same isolation behavior as the Serializable isolation level
      * since the writeskew problem can't occur (since nothing can be written).
@@ -42,7 +42,8 @@ public enum IsolationLevel {
 
     /**
      * Provides truly serialized transaction at the cost of reduced performance and concurrency. This is the highest
-     * isolation level where no isolation anomalies are allowed to happen.
+     * isolation level where no isolation anomalies are allowed to happen. So the writeSkew problem is not allowed to
+     * happen.
      */
     Serializable(false, false, false);
 

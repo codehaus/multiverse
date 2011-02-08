@@ -78,7 +78,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         int itemCount = 0;
         //first write everything without releasing
         for (int k = 0; k < array.length; k++) {
-            if(SHAKE_BUGS) shakeBugs();
+            if (SHAKE_BUGS) shakeBugs();
 
             final GammaRefTranlocal tranlocal = array[k];
 
@@ -109,7 +109,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
             final GammaRefTranlocal tranlocal = array[k];
 
             if (tranlocal != null) {
-                if(SHAKE_BUGS) shakeBugs();
+                if (SHAKE_BUGS) shakeBugs();
 
                 array[k] = null;
                 if (success) {
@@ -149,7 +149,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     private GammaObject doPrepare() {
         for (int k = 0; k < array.length; k++) {
-            if(SHAKE_BUGS) shakeBugs();
+            if (SHAKE_BUGS) shakeBugs();
 
             final GammaRefTranlocal tranlocal = array[k];
 
@@ -310,10 +310,12 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
             return true;
         }
 
-        //todo: isolation level check.
+        if (config.inconsistentReadAllowed) {
+            return true;
+        }
 
         if (richmansMansConflictScan) {
-            if(SHAKE_BUGS) shakeBugs();
+            if (SHAKE_BUGS) shakeBugs();
 
             final long conflictCount = config.globalConflictCounter.count();
 
@@ -329,12 +331,12 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
         //doing a full conflict scan
         for (int k = 0; k < array.length; k++) {
-            if(SHAKE_BUGS) shakeBugs();
+            if (SHAKE_BUGS) shakeBugs();
 
             final GammaRefTranlocal tranlocal = array[k];
 
             //noinspection ObjectEquality
-            final boolean skip = tranlocal == null|| (!richmansMansConflictScan && justAdded == tranlocal);
+            final boolean skip = tranlocal == null || (!richmansMansConflictScan && justAdded == tranlocal);
 
             if (!skip && tranlocal.owner.hasReadConflict(tranlocal)) {
                 return false;

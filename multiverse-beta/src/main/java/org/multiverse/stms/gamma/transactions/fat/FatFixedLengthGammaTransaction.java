@@ -329,6 +329,10 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
             return true;
         }
 
+        if(config.inconsistentReadAllowed){
+            return true;
+        }
+
         if (richmansMansConflictScan) {
             if(SHAKE_BUGS) shakeBugs();
 

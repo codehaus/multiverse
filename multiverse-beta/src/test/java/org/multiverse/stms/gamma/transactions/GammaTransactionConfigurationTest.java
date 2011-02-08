@@ -25,7 +25,7 @@ public class GammaTransactionConfigurationTest {
     }
 
     @Test
-    public void testIsRichMansConflictScanRequiredIfZeroMaximumPoorMans() {
+    public void testIsRichMansConflictScanRequiredIfMaximumPoorMansConflictScanLengthIsZero() {
         GammaStmConfiguration stmConfig = new GammaStmConfiguration();
         stmConfig.maximumPoorMansConflictScanLength = 10;
         stmConfig.speculativeConfigEnabled = true;
