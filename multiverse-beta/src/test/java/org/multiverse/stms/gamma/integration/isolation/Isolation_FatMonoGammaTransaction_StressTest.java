@@ -10,6 +10,7 @@ public class Isolation_FatMonoGammaTransaction_StressTest extends Isolation_Abst
     @Override
     protected AtomicBlock newBlock(LockMode lockMode, boolean dirtyCheckEnabled) {
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .setMaxRetries(10000)
                 .setReadLockMode(lockMode)
                 .setDirtyCheckEnabled(dirtyCheckEnabled);
         return new LeanGammaAtomicBlock(new FatMonoGammaTransactionFactory(config));

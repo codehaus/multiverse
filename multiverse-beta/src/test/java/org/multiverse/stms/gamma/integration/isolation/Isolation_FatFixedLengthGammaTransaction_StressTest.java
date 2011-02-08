@@ -11,6 +11,7 @@ public class Isolation_FatFixedLengthGammaTransaction_StressTest extends Isolati
     @Override
     protected AtomicBlock newBlock(LockMode lockMode, boolean dirtyCheckEnabled) {
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .setMaxRetries(10000)
                 .setReadLockMode(lockMode)
                 .setDirtyCheckEnabled(dirtyCheckEnabled);
         return new LeanGammaAtomicBlock(new FatFixedLengthGammaTransactionFactory(config));
