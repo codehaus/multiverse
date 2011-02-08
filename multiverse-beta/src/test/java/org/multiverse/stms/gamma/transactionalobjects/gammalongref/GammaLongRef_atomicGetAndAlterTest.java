@@ -14,6 +14,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.multiverse.TestUtils.joinAll;
+import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 import static org.multiverse.api.functions.Functions.newIdentityLongFunction;
@@ -158,7 +160,6 @@ public class GammaLongRef_atomicGetAndAlterTest {
 
     @Test
     public void whenListenersAvailable() {
-        /*
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -174,6 +175,5 @@ public class GammaLongRef_atomicGetAndAlterTest {
         joinAll(thread);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
-        */
     }
 }

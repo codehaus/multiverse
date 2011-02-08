@@ -51,6 +51,12 @@ needs more research.
 
 - GammaRef_getAndAlterTest
 
+- Lock.acquire0Test
+
+- Lock_getLockMode0Test
+
+
+
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
