@@ -44,4 +44,9 @@ public interface MultiverseConstants {
     final int LOCKMODE_READ = 1;
     final int LOCKMODE_WRITE = 2;
     final int LOCKMODE_EXCLUSIVE = 3;
+
+    final int ISOLATION_READ_COMMITTED = 0;
+    final int ISOLATION_REPEATABLE_READ = 1;
+    final int ISOLATION_SNAPSHOT = 2;
+    final int ISOLATION_SERIALIZED = 3;
 }

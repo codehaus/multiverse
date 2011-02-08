@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 
-public class Orec_Ref_ReadConsistencyTest implements GammaConstants {
+public class Orec_Ref_ReadConsistencyStressTest implements GammaConstants {
 
     private GammaStm stm;
     private GammaRef[] refs;

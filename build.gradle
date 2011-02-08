@@ -151,6 +151,7 @@ project(':multiverse-beta') {
     exclude("**/*LongTest*")
     exclude("**/*PerformanceTest*")
     exclude("**/*performanceTest*")
+    exclude("**/*Driver*")
   }
 
   task shortintegrationtest(type: Test) {

@@ -32,7 +32,7 @@ import static org.multiverse.TestUtils.*;
  * with refs it fails
  * with longs it succeeds.
  */
-public class Orec_LongRef_ReadConsistencyTest implements GammaConstants {
+public class Orec_LongRef_ReadConsistencyStressTest implements GammaConstants {
 
     private GammaStm stm;
     private GammaLongRef[] refs;
