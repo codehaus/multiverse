@@ -26,9 +26,17 @@ needs more research.
 
 - local conflict counter should be set if needed when the flatten commute is called.
 
+- improved testing for the repeatable read isolation level
+
+- adding read committed isolation level
+
+- lean transaction and readonly? no checking is done but what if configured as readonly
+
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+- remove duplication from the openForWrite (should do the loading part by the openForRead and add additional
+checks itself).
 
 - try locking was removed (moved to 0.8).
 

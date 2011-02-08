@@ -102,6 +102,14 @@ public final class Functions {
         }
     }
 
+    public static BooleanFunction newInverseBooleanFunction() {
+        return inverseBooleanFunction;
+    }
+
+    public static BooleanFunction newIdentityBooleanFunction() {
+        return identityBooleanFunction;
+    }
+
     /**
      * Returns a {@link LongFunction} that increments with the given amount. For the -1, 0 and 1
      * a cached instance is returned. In the other cases a new instance is created.
@@ -124,6 +132,25 @@ public final class Functions {
 
         return new IncLongFunction(amount);
     }
+
+    private static final BooleanFunction inverseBooleanFunction = new BooleanFunction() {
+        @Override
+        public boolean call(boolean current) {
+            return !current;
+        }
+    };
+
+    private static final BooleanFunction identityBooleanFunction = new BooleanFunction() {
+        @Override
+        public boolean call(boolean current) {
+            return current;
+        }
+
+        @Override
+        public String toString() {
+            return "IdentityBooleanFunction";
+        }
+    };
 
     private static final IntFunction identityIntFunction = new IntFunction() {
         @Override

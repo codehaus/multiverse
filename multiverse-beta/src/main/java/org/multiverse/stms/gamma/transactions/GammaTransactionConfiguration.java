@@ -1,6 +1,11 @@
 package org.multiverse.stms.gamma.transactions;
 
-import org.multiverse.api.*;
+import org.multiverse.api.BackoffPolicy;
+import org.multiverse.api.IsolationLevel;
+import org.multiverse.api.LockMode;
+import org.multiverse.api.PropagationLevel;
+import org.multiverse.api.TraceLevel;
+import org.multiverse.api.TransactionConfiguration;
 import org.multiverse.api.exceptions.IllegalTransactionFactoryException;
 import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.gamma.GammaConstants;
@@ -60,6 +65,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     public boolean isFat;
     public int maximumPoorMansConflictScanLength;
     public ArrayList<TransactionListener> permanentListeners;
+    public boolean unrepeatableReadAllowed;
 
     public GammaTransactionConfiguration(GammaStm stm) {
         this(stm, new GammaStmConfiguration());
@@ -88,6 +94,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         this.isolationLevel = config.isolationLevel;
         this.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
         this.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
+        this.unrepeatableReadAllowed = isolationLevel.isUnrepeatableReadAllowed();
         this.propagationLevel = config.propagationLevel;
         this.controlFlowErrorsReused = config.controlFlowErrorsReused;
         this.familyName = "anonymoustransaction-" + idGenerator.incrementAndGet();
@@ -339,7 +346,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
 
 
     public void updateSpeculativeConfigurationToUseEnsure() {
-         while (true) {
+        while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
             SpeculativeGammaConfiguration next = current.newWithEnsure();
 
@@ -377,10 +384,10 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             if (speculative) {
 
                 newSpeculativeConfiguration = new SpeculativeGammaConfiguration(
-                        isFat(), false,false, false,false,false,false,false,false,false,1);
+                        isFat(), false, false, false, false, false, false, false, false, false, 1);
             } else {
                 newSpeculativeConfiguration = new SpeculativeGammaConfiguration(
-                        true, true,true, true,true,true,true,true,true,true,Integer.MAX_VALUE);
+                        true, true, true, true, true, true, true, true, true, true, Integer.MAX_VALUE);
             }
 
             if (maximumPoorMansConflictScanLength == 0) {
@@ -415,6 +422,14 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         }
 
         if (dirtyCheck) {
+            return true;
+        }
+
+        if (readonly) {
+            return true;
+        }
+
+        if (readonly) {
             return true;
         }
 
@@ -554,6 +569,7 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         config.isolationLevel = isolationLevel;
         config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
         config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
+        config.unrepeatableReadAllowed = isolationLevel.isUnrepeatableReadAllowed();
         return config;
     }
 

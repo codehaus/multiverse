@@ -5,6 +5,7 @@ import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.LockedException;
+import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.api.functions.*;
 import org.multiverse.stms.gamma.GammaObjectPool;
@@ -19,6 +20,7 @@ import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransact
 import org.multiverse.stms.gamma.transactions.lean.LeanFixedLengthGammaTransaction;
 import org.multiverse.stms.gamma.transactions.lean.LeanMonoGammaTransaction;
 
+import static java.lang.Math.max;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
 import static org.multiverse.stms.gamma.GammaStmUtils.asGammaTransaction;
 import static org.multiverse.stms.gamma.GammaStmUtils.getRequiredThreadLocalGammaTransaction;
@@ -514,6 +516,50 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     // =============================== open for read ==============================================
     // ============================================================================================
 
+    protected final long readLong(final GammaTransaction tx) {
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        final int type = tx.transactionType;
+        if (type == TRANSACTIONTYPE_LEAN_MONO) {
+            return openForRead((LeanMonoGammaTransaction) tx, LOCKMODE_NONE).long_value;
+        } else if (type == TRANSACTIONTYPE_LEAN_FIXED_LENGTH) {
+            return openForRead((LeanFixedLengthGammaTransaction) tx, LOCKMODE_NONE).long_value;
+        }
+
+        final GammaTransactionConfiguration config = tx.config;
+        if (!config.unrepeatableReadAllowed) {
+            if (type == TRANSACTIONTYPE_FAT_MONO) {
+                return openForRead((FatMonoGammaTransaction) tx, LOCKMODE_NONE).long_value;
+            } else if (type == TRANSACTIONTYPE_FAT_FIXED_LENGTH) {
+                return openForRead((FatFixedLengthGammaTransaction) tx, LOCKMODE_NONE).long_value;
+            } else {
+                return openForRead((FatVariableLengthGammaTransaction) tx, LOCKMODE_NONE).long_value;
+            }
+        }
+
+        if (type == TRANSACTIONTYPE_FAT_MONO) {
+            return readLong((FatMonoGammaTransaction) tx);
+        } else if (type == TRANSACTIONTYPE_FAT_FIXED_LENGTH) {
+            return readLong((FatFixedLengthGammaTransaction) tx);
+        } else {
+            return readLong((FatVariableLengthGammaTransaction) tx);
+        }
+    }
+
+    private long readLong(FatMonoGammaTransaction tx) {
+        throw new TodoException();
+    }
+
+    private long readLong(FatFixedLengthGammaTransaction tx) {
+        throw new TodoException();
+    }
+
+    private long readLong(FatVariableLengthGammaTransaction tx) {
+        throw new TodoException();
+    }
+
     public final GammaRefTranlocal openForRead(final GammaTransaction tx, final int lockMode) {
         if (tx == null) {
             throw new NullPointerException();
@@ -740,9 +786,6 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tranlocal.isDirty = false;
         tranlocal.mode = TRANLOCAL_READ;
         tranlocal.writeSkewCheck = config.isolationLevel == IsolationLevel.Serializable;
-        //todo: can be removed, but are added to narrow down the inconsistency bug
-        tranlocal.ref_value = null;
-        tranlocal.ref_oldValue = null;
         tranlocal.version = -1;
     }
 
@@ -988,6 +1031,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
     public final GammaRefTranlocal openForWrite(final LeanFixedLengthGammaTransaction tx, int lockMode) {
         final GammaRefTranlocal tranlocal = openForRead(tx, lockMode);
+
         if (!tx.hasWrites) {
             tx.hasWrites = true;
         }
@@ -999,235 +1043,71 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         return tranlocal;
     }
 
-    private static void initTranlocalForWrite(final GammaTransactionConfiguration config, final GammaRefTranlocal tranlocal) {
-        tranlocal.isDirty = !config.dirtyCheck;
-        tranlocal.mode = TRANLOCAL_WRITE;
-        tranlocal.writeSkewCheck = config.isolationLevel == IsolationLevel.Serializable;
-    }
+    public final GammaRefTranlocal openForWrite(final FatMonoGammaTransaction tx, final int desiredLockMode) {
+        GammaTransactionConfiguration config = tx.config;
 
-    public final GammaRefTranlocal openForWrite(final FatMonoGammaTransaction tx, int desiredLockMode) {
-        if (tx.status != TX_ACTIVE) {
-            throw tx.abortOpenForWriteOnBadStatus(this);
-        }
-
-        final GammaTransactionConfiguration config = tx.config;
-
-        //noinspection ObjectEquality
-        if (config.stm != stm) {
-            throw tx.abortOpenForWriteOnBadStm(this);
-        }
+        GammaRefTranlocal tranlocal = openForRead(tx, max(desiredLockMode, config.writeLockModeAsInt));
 
         if (config.readonly) {
             throw tx.abortOpenForWriteOnReadonly(this);
         }
 
-        desiredLockMode = config.writeLockModeAsInt <= desiredLockMode ? desiredLockMode : config.writeLockModeAsInt;
-
-        final GammaRefTranlocal tranlocal = tx.tranlocal;
-
-        //noinspection ObjectEquality
-        if (tranlocal.owner == this) {
-            final int mode = tranlocal.mode;
-
-            if (mode == TRANLOCAL_CONSTRUCTING) {
-                return tranlocal;
-            }
-
-            if (mode == TRANLOCAL_COMMUTING) {
-                if (!flattenCommute(tx, tranlocal, desiredLockMode)) {
-                    throw tx.abortOnReadWriteConflict(this);
-                }
-                return tranlocal;
-            }
-
-            if (desiredLockMode > tranlocal.getLockMode()) {
-                if (!tryLockAndCheckConflict(tx, tranlocal, config.spinCount, desiredLockMode)) {
-                    throw tx.abortOnReadWriteConflict(this);
-                }
-            }
-
+        if (!tx.hasWrites) {
             tx.hasWrites = true;
-            tranlocal.setDirty(!config.dirtyCheck);
+        }
+
+        if (tranlocal.mode == TRANLOCAL_READ) {
             tranlocal.mode = TRANLOCAL_WRITE;
-            return tranlocal;
-        }
-
-        if (tranlocal.owner != null) {
-            throw tx.abortOnTransactionTooSmall(2);
-        }
-
-        initTranlocalForWrite(config, tranlocal);
-        if (!load(tx, tranlocal, desiredLockMode, config.spinCount, tx.richmansMansConflictScan)) {
-            throw tx.abortOnReadWriteConflict(this);
-        }
-
-        tx.hasWrites = true;
-        return tranlocal;
-    }
-
-
-    public final GammaRefTranlocal openForWrite(final FatFixedLengthGammaTransaction tx, int lockMode) {
-        if (tx.status != TX_ACTIVE) {
-            throw tx.abortOpenForWriteOnBadStatus(this);
-        }
-
-        final GammaTransactionConfiguration config = tx.config;
-
-        //noinspection ObjectEquality
-        if (config.stm != stm) {
-            throw tx.abortOpenForWriteOnBadStm(this);
-        }
-
-        if (config.readonly) {
-            throw tx.abortOpenForWriteOnReadonly(this);
-        }
-
-        GammaRefTranlocal found = null;
-        GammaRefTranlocal newNode = null;
-        GammaRefTranlocal node = tx.head;
-        while (true) {
-            if (node == null) {
-                break;
-            } else if (node.owner == this) {
-                found = node;
-                break;
-            } else if (node.owner == null) {
-                newNode = node;
-                break;
-            } else {
-                node = node.next;
-            }
-        }
-
-        lockMode = config.writeLockModeAsInt > lockMode ? config.writeLockModeAsInt : lockMode;
-
-        if (found != null) {
-            tx.shiftInFront(found);
-
-            final int mode = found.mode;
-
-            if (mode == TRANLOCAL_CONSTRUCTING) {
-                return found;
-            }
-
-            if (mode == TRANLOCAL_COMMUTING) {
-                if (!flattenCommute(tx, found, lockMode)) {
-                    throw tx.abortOnReadWriteConflict(this);
-                }
-                return found;
-            }
-
-            if (lockMode > found.getLockMode()) {
-                if (!tryLockAndCheckConflict(tx, found, config.spinCount, lockMode)) {
-                    throw tx.abortOnReadWriteConflict(this);
-                }
-            }
-
-            found.mode = TRANLOCAL_WRITE;
-            found.setDirty(!config.dirtyCheck);
-            tx.hasWrites = true;
-            return found;
-        }
-
-        if (newNode == null) {
-            throw tx.abortOnTransactionTooSmall(config.maxFixedLengthTransactionSize + 1);
-        }
-
-        initTranlocalForWrite(config, newNode);
-        tx.hasWrites = true;
-        tx.size++;
-
-        final boolean hasReadsBeforeLoading = tx.hasReads;
-        if (!hasReadsBeforeLoading) {
-            tx.hasReads = true;
-            tx.localConflictCount = config.globalConflictCounter.count();
-        }
-
-        if (!load(tx, newNode, lockMode, config.spinCount, tx.richmansMansConflictScan)) {
-            throw tx.abortOnReadWriteConflict(this);
-        }
-
-        //if (hasReadsBeforeLoading && !tx.isReadConsistent(newNode)) {
-        if (!tx.isReadConsistent(newNode)) {
-            throw tx.abortOnReadWriteConflict(this);
-        }
-
-        tx.shiftInFront(newNode);
-        return newNode;
-    }
-
-    public final GammaRefTranlocal openForWrite(final FatVariableLengthGammaTransaction tx, int desiredLockMode) {
-        if (tx.status != TX_ACTIVE) {
-            throw tx.abortOpenForWriteOnBadStatus(this);
-        }
-
-        final GammaTransactionConfiguration config = tx.config;
-
-        //noinspection ObjectEquality
-        if (config.stm != stm) {
-            throw tx.abortOpenForWriteOnBadStm(this);
-        }
-
-        if (config.readonly) {
-            throw tx.abortOpenForWriteOnReadonly(this);
-        }
-
-        desiredLockMode = config.writeLockModeAsInt <= desiredLockMode ? desiredLockMode : config.writeLockModeAsInt;
-
-        final int identityHash = identityHashCode();
-
-        final int indexOf = tx.indexOf(this, identityHash);
-        if (indexOf > -1) {
-            final GammaRefTranlocal tranlocal = tx.array[indexOf];
-            final int mode = tranlocal.mode;
-
-            if (mode == TRANLOCAL_CONSTRUCTING) {
-                return tranlocal;
-            }
-
-            if (mode == TRANLOCAL_COMMUTING) {
-                if (!flattenCommute(tx, tranlocal, desiredLockMode)) {
-                    throw tx.abortOnReadWriteConflict(this);
-                }
-                return tranlocal;
-            }
-
-            if (desiredLockMode > tranlocal.getLockMode()) {
-                if (!tryLockAndCheckConflict(tx, tranlocal, config.spinCount, desiredLockMode)) {
-                    throw tx.abortOnReadWriteConflict(this);
-                }
-            }
-
-            tx.hasWrites = true;
+            tranlocal.writeSkewCheck = config.isolationLevel == IsolationLevel.Serializable;
             tranlocal.setDirty(!config.dirtyCheck);
-            tranlocal.mode = TRANLOCAL_WRITE;
-            return tranlocal;
-        }
-
-        final GammaRefTranlocal tranlocal = tx.pool.take(this);
-        initTranlocalForWrite(config, tranlocal);
-        tx.attach(tranlocal, identityHash);
-        tx.size++;
-        tx.hasWrites = true;
-
-        final boolean hasReadsBeforeLoading = tx.hasReads;
-        if (!hasReadsBeforeLoading) {
-            tx.hasReads = true;
-            tx.localConflictCount = config.globalConflictCounter.count();
-        }
-
-        if (!load(tx, tranlocal, desiredLockMode, config.spinCount, tx.richmansMansConflictScan)) {
-            throw tx.abortOnReadWriteConflict(this);
-        }
-
-        //hasReadsBeforeLoading &&
-        if (!tx.isReadConsistent(tranlocal)) {
-            throw tx.abortOnReadWriteConflict(this);
         }
 
         return tranlocal;
     }
 
+    public final GammaRefTranlocal openForWrite(final FatFixedLengthGammaTransaction tx, final int lockMode) {
+        GammaTransactionConfiguration config = tx.config;
+
+        GammaRefTranlocal tranlocal = openForRead(tx, max(lockMode, config.writeLockModeAsInt));
+
+        if (config.readonly) {
+            throw tx.abortOpenForWriteOnReadonly(this);
+        }
+
+        if (!tx.hasWrites) {
+            tx.hasWrites = true;
+        }
+
+        if (tranlocal.mode == TRANLOCAL_READ) {
+            tranlocal.mode = TRANLOCAL_WRITE;
+            tranlocal.writeSkewCheck = config.isolationLevel == IsolationLevel.Serializable;
+            tranlocal.setDirty(!config.dirtyCheck);
+        }
+
+        return tranlocal;
+    }
+
+    public final GammaRefTranlocal openForWrite(final FatVariableLengthGammaTransaction tx, final int lockMode) {
+        GammaTransactionConfiguration config = tx.config;
+
+        GammaRefTranlocal tranlocal = openForRead(tx, max(lockMode, config.writeLockModeAsInt));
+
+        if (config.readonly) {
+            throw tx.abortOpenForWriteOnReadonly(this);
+        }
+
+        if (!tx.hasWrites) {
+            tx.hasWrites = true;
+        }
+
+        if (tranlocal.mode == TRANLOCAL_READ) {
+            tranlocal.mode = TRANLOCAL_WRITE;
+            tranlocal.writeSkewCheck = config.isolationLevel == IsolationLevel.Serializable;
+            tranlocal.setDirty(!config.dirtyCheck);
+        }
+
+        return tranlocal;
+    }
 
     // ============================================================================================
     // ================================= open for commute =========================================
