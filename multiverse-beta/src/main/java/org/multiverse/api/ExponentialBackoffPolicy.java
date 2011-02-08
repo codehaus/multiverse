@@ -14,6 +14,7 @@ import static java.util.concurrent.locks.LockSupport.parkNanos;
  *
  * @author Peter Veentjer.
  */
+@SuppressWarnings({"CallToThreadYield"})
 public final class ExponentialBackoffPolicy implements BackoffPolicy {
 
     public final static BackoffPolicy MAX_100_MS = new ExponentialBackoffPolicy();

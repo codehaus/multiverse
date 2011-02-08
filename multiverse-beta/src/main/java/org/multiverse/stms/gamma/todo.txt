@@ -23,6 +23,11 @@ needs more research.
 - stripe of conflict counters.
 
 - testing: atomic change operations and globalconflictcounter increment
+    - intref
+    - booleanref
+    - longref
+    - doubleref
+    - def
 
 - local conflict counter should be set if needed when the flatten commute is called.
 
@@ -31,6 +36,12 @@ needs more research.
 - adding read committed isolation level
 
 - lean transaction and readonly? no checking is done but what if configured as readonly
+
+- orelse
+
+- implement the read committed isolation level
+
+- Ref.GammaRef_atomicGetAndSetTest
 
 --------------------------------------------------------------------
                         done

@@ -37,7 +37,7 @@ public enum IsolationLevel {
      * All data read. contains committed data and all data will be consistent.
      * <p/>
      * A transaction that is readonly, gets the same isolation behavior as the Serializable isolation level
-     * since the writeskew problem can't occur (since nothing can be written).
+     * since the writeskew problem can't occur (nothing can be written).
      */
     Snapshot(false, false, true),
 
