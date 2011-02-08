@@ -7,7 +7,7 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.Retry;
 import org.multiverse.api.exceptions.TransactionRequiredException;
-import org.multiverse.api.predicates.LongPredicate;
+import org.multiverse.api.predicates.BooleanPredicate;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaBooleanRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
@@ -17,13 +17,12 @@ import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.api.predicates.LongPredicate.newEqualsPredicate;
+import static org.multiverse.api.predicates.BooleanPredicate.newEqualsPredicate;
 import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasNoLocks;
 import static org.multiverse.stms.gamma.GammaTestUtils.assertVersionAndValue;
 
 public class GammaBooleanRef_await1WithPredicateTest {
 
-    /*
     private GammaStm stm;
 
     @Before
@@ -45,7 +44,7 @@ public class GammaBooleanRef_await1WithPredicateTest {
         setThreadLocalTransaction(tx);
 
         try {
-            ref.await(newEqualsPredicate(initialValue + 1));
+            ref.await(newEqualsPredicate(!initialValue));
             fail();
         } catch (Retry expected) {
         }
@@ -81,7 +80,7 @@ public class GammaBooleanRef_await1WithPredicateTest {
         GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        LongPredicate predicate = mock(LongPredicate.class);
+        BooleanPredicate predicate = mock(BooleanPredicate.class);
 
         when(predicate.evaluate(initialValue)).thenThrow(new SomeUncheckedException());
 
@@ -125,7 +124,7 @@ public class GammaBooleanRef_await1WithPredicateTest {
         GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        LongPredicate predicate = mock(LongPredicate.class);
+        BooleanPredicate predicate = mock(BooleanPredicate.class);
         try {
             ref.await(predicate);
             fail();
@@ -148,7 +147,7 @@ public class GammaBooleanRef_await1WithPredicateTest {
         setThreadLocalTransaction(tx);
         tx.prepare();
 
-        LongPredicate predicate = mock(LongPredicate.class);
+        BooleanPredicate predicate = mock(BooleanPredicate.class);
         try {
             ref.await(predicate);
             fail();
@@ -171,7 +170,7 @@ public class GammaBooleanRef_await1WithPredicateTest {
         setThreadLocalTransaction(tx);
         tx.abort();
 
-        LongPredicate predicate = mock(LongPredicate.class);
+        BooleanPredicate predicate = mock(BooleanPredicate.class);
         try {
             ref.await(predicate);
             fail();
@@ -194,7 +193,7 @@ public class GammaBooleanRef_await1WithPredicateTest {
         setThreadLocalTransaction(tx);
         tx.commit();
 
-        LongPredicate predicate = mock(LongPredicate.class);
+        BooleanPredicate predicate = mock(BooleanPredicate.class);
         try {
             ref.await(predicate);
             fail();
@@ -207,6 +206,7 @@ public class GammaBooleanRef_await1WithPredicateTest {
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
+    /*
     @Test
     public void whenSomeWaitingNeeded() {
         int initialValue = 0;
@@ -237,5 +237,5 @@ public class GammaBooleanRef_await1WithPredicateTest {
 
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 2, 20);
-    } */
+    }   */
 }

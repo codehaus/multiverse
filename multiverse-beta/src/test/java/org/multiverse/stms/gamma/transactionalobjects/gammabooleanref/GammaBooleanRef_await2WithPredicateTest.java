@@ -2,14 +2,10 @@ package org.multiverse.stms.gamma.transactionalobjects.gammabooleanref;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.multiverse.TestThread;
-import org.multiverse.api.Transaction;
-import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.Retry;
-import org.multiverse.api.predicates.LongPredicate;
-import org.multiverse.api.references.LongRef;
+import org.multiverse.api.predicates.BooleanPredicate;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaBooleanRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
@@ -18,13 +14,11 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.api.predicates.LongPredicate.newEqualsPredicate;
-import static org.multiverse.api.predicates.LongPredicate.newLargerThanOrEqualsPredicate;
+import static org.multiverse.api.predicates.BooleanPredicate.newEqualsPredicate;
 import static org.multiverse.stms.gamma.GammaTestUtils.assertVersionAndValue;
 
 public class GammaBooleanRef_await2WithPredicateTest {
 
-    /*
     private GammaStm stm;
 
     @Before
@@ -45,7 +39,7 @@ public class GammaBooleanRef_await2WithPredicateTest {
                 .newTransaction();
 
         try {
-            ref.await(tx, newEqualsPredicate(initialValue + 1));
+            ref.await(tx, newEqualsPredicate(!initialValue));
             fail();
         } catch (Retry expected) {
 
@@ -75,7 +69,7 @@ public class GammaBooleanRef_await2WithPredicateTest {
         GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        LongPredicate predicate = mock(LongPredicate.class);
+        BooleanPredicate predicate = mock(BooleanPredicate.class);
 
         when(predicate.evaluate(initialValue)).thenThrow(new MyException());
 
@@ -118,7 +112,7 @@ public class GammaBooleanRef_await2WithPredicateTest {
         GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        LongPredicate predicate = mock(LongPredicate.class);
+        BooleanPredicate predicate = mock(BooleanPredicate.class);
         try {
             ref.await(null, predicate);
             fail();
@@ -139,7 +133,7 @@ public class GammaBooleanRef_await2WithPredicateTest {
         GammaTransaction tx = stm.newDefaultTransaction();
         tx.prepare();
 
-        LongPredicate predicate = mock(LongPredicate.class);
+        BooleanPredicate predicate = mock(BooleanPredicate.class);
         try {
             ref.await(tx, predicate);
             fail();
@@ -160,7 +154,7 @@ public class GammaBooleanRef_await2WithPredicateTest {
         GammaTransaction tx = stm.newDefaultTransaction();
         tx.abort();
 
-        LongPredicate predicate = mock(LongPredicate.class);
+        BooleanPredicate predicate = mock(BooleanPredicate.class);
         try {
             ref.await(tx, predicate);
             fail();
@@ -181,7 +175,7 @@ public class GammaBooleanRef_await2WithPredicateTest {
         GammaTransaction tx = stm.newDefaultTransaction();
         tx.commit();
 
-        LongPredicate predicate = mock(LongPredicate.class);
+        BooleanPredicate predicate = mock(BooleanPredicate.class);
         try {
             ref.await(tx, predicate);
             fail();
@@ -193,6 +187,7 @@ public class GammaBooleanRef_await2WithPredicateTest {
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
+    /*
     @Test
     public void whenSomeWaitingNeeded() {
         int initialValue = 0;

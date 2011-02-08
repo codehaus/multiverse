@@ -216,5 +216,4 @@ public class GammaDoubleRef_getAndIncrement1Test implements GammaConstants {
         assertSame(tx, getThreadLocalTransaction());
         assertIsAborted(tx);
     }
-
 }

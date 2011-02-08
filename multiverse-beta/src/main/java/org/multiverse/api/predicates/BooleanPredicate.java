@@ -7,6 +7,23 @@ package org.multiverse.api.predicates;
  */
 public abstract class BooleanPredicate implements Predicate<Boolean>{
 
+      public static BooleanPredicate newEqualsPredicate(final boolean value) {
+        return new BooleanPredicate() {
+            @Override
+            public boolean evaluate(final boolean current) {
+                return current == value;
+            }
+        };
+    }
+
+     public static BooleanPredicate newNotEqualsPredicate(final boolean value) {
+        return new BooleanPredicate() {
+            @Override
+            public boolean evaluate(final boolean current) {
+                return current != value;
+            }
+        };
+    }
 
     /**
      * Evaluates the predicate
