@@ -23,7 +23,8 @@ public enum IsolationLevel {
     ReadCommitted(true, true, true),
 
     /**
-     *
+     * With the RepeatableRead isolation level you will always see committed data and next to that once a read
+     * is done, this read is going to be repeatable (so you will see the same value every time).
      */
     RepeatableRead(false, true, true),
 
