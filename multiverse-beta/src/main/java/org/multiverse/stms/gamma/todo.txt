@@ -41,7 +41,15 @@ needs more research.
 
 - implement the read committed isolation level
 
-- Ref.GammaRef_atomicGetAndSetTest
+- GammaRef_atomicGetAndSetTest
+
+- GammaRef_atomicAlterAndGetTest
+
+- GammaRef_atomicGetAndAlterTest
+
+- GammaRef_commuteTest
+
+- GammaRef_getAndAlterTest
 
 --------------------------------------------------------------------
                         done
