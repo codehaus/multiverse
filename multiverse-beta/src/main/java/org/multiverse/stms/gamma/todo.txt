@@ -55,11 +55,14 @@ needs more research.
 
 - Lock_getLockMode0Test
 
-
-
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- GammaRef_alterAndGet1Test
+
+- GammaRef_alterAndGet2Test
+
 - remove duplication from the openForWrite (should do the loading part by the openForRead and add additional
 checks itself).
 

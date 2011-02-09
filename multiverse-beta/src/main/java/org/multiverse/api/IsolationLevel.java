@@ -93,10 +93,6 @@ public enum IsolationLevel {
 
     @Override
     public String toString() {
-        return "IsolationLevel." + name() + "{" +
-                "writeSkewAllowed=" + writeSkewAllowed +
-                ", unrepeatableReadAllowed=" + unrepeatableReadAllowed +
-                ", inconsistentReadAllowed=" + inconsistentReadAllowed +
-                '}';
+        return "IsolationLevel." + name();
     }
 }
