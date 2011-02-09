@@ -27,7 +27,9 @@ public interface TransactionalObject {
     Lock getLock();
 
     /**
-     * Returns the current version of the transactional object. Each time an update happens, the value is increased.
+     * Returns the current version of the transactional object. Each time an update happens, the value is increased. It depends
+     * on the stm implementation if the version over references has any meaning. With the MVCC there is a relation, but with the
+     * SkySTM isn't.
      * <p/>
      * This method doesn't look at a ThreadLocalTransaction.
      *
@@ -36,12 +38,11 @@ public interface TransactionalObject {
     long getVersion();
 
     /**
-     * Does a ensure. What is means is that at the end of the transaction (so deferred)
-     * checks if no other transaction has made an update and also guarantees that till the transaction
-     * completes no other transaction is able to do an update. Using the ensure you can
-     * coordinate writeskew problem on the reference level. This can safely be called on already
-     * ensured/privatized tranlocals (although it doesn't provide any value anymore since the ensure
-     * privatize already prevent conflicts).
+     * Does an ensure. What is means is that at the end of the transaction (so deferred) checks if no other transaction has
+     * made an update and also guarantees that till the transaction completes no other transaction is able to do an update.
+     * Using the ensure you can coordinate writeskew problem on the reference level. This can safely be called on already
+     * ensured/privatized tranlocals (although it doesn't provide any value anymore since the ensure privatize already prevent
+     * conflicts).
      * <p/>
      * Unlike the {@link Lock#acquire(LockMode)} which is pessimistic, this is optimistic.
      * <p/>
@@ -52,17 +53,16 @@ public interface TransactionalObject {
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
+     * @see #ensure(Transaction)
      */
     void ensure();
 
     /**
-     * Does a ensure. What is means is that at the end of the transaction (so deferred)
-     * checks if no other transaction has made an update and also guarantees that till the transaction
-     * completes no other transaction is able to do an update. Using the ensure you can
-     * coordinate writeskew problem on the reference level. This can safely be called on already
-     * ensured/privatized tranlocals (although it doesn't provide any value anymore since the ensure
-     * privatize already prevent conflicts).
+     * Does an ensure. What is means is that at the end of the transaction (so deferred) checks if no other transaction has
+     * made an update and also guarantees that till the transaction completes no other transaction is able to do an update.
+     * Using the ensure you can coordinate writeskew problem on the reference level. This can safely be called on already
+     * ensured/privatized tranlocals (although it doesn't provide any value anymore since the ensure privatize already prevent
+     * conflicts).
      * <p/>
      * Unlike the {@link Lock#acquire(LockMode)} which is pessimistic, this is optimistic.
      * <p/>
@@ -74,7 +74,7 @@ public interface TransactionalObject {
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
+     * @see #ensure()
      */
     void ensure(Transaction self);
 
