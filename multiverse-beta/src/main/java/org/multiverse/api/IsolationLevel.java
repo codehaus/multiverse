@@ -6,6 +6,12 @@ package org.multiverse.api;
  * <p/>
  * The dirty read isn't added since atm we already have an extremely cheap read using the atomicWeakGet on the
  * refs. Using the atomicWeakGet you have extremely cheap access to committed data.
+ * <p/>
+ * <h2>Unrepeatable Read</h2>
+ * <p/>
+ * <h2>Inconsistent Read</h2>
+ * <p/>
+ * * <h2>Writeskew</h2>
  *
  * @author Peter Veentjer.
  */
@@ -59,7 +65,7 @@ public enum IsolationLevel {
     }
 
     /**
-     * Checks if the writeskew is allowed to happen.
+     * Checks if the writeskew problem is allowed to happen.
      *
      * @return true if the writeSkew is allowed to happen.
      */
