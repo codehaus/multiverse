@@ -44,7 +44,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     public final boolean flattenCommute(final GammaTransaction tx, final GammaRefTranlocal tranlocal, final int lockMode) {
         final GammaTransactionConfiguration config = tx.config;
 
-        //todo: the local conflict counter should be set if available.
+        tx.initLocalConflictCounter();
 
         if (!load(tx, tranlocal, lockMode, config.spinCount, tx.richmansMansConflictScan)) {
             return false;
@@ -1195,6 +1195,11 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tx.hasWrites = true;
         initTranlocalForCommute(config, tranlocal);
         tranlocal.addCommutingFunction(tx.pool, function);
+
+        int writeLockMode = config.writeLockModeAsInt;
+        if (writeLockMode > LOCKMODE_NONE) {
+            flattenCommute(tx, tranlocal, writeLockMode);
+        }
     }
 
     public final void openForCommute(final FatFixedLengthGammaTransaction tx, final Function function) {
@@ -1272,6 +1277,11 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tx.hasWrites = true;
         initTranlocalForCommute(config, newNode);
         newNode.addCommutingFunction(tx.pool, function);
+
+        int writeLockMode = config.writeLockModeAsInt;
+        if (writeLockMode > LOCKMODE_NONE) {
+            flattenCommute(tx, newNode, writeLockMode);
+        }
     }
 
     public final void openForCommute(final FatVariableLengthGammaTransaction tx, final Function function) {
@@ -1332,6 +1342,11 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tx.attach(tranlocal, identityHash);
         tx.size++;
         tranlocal.addCommutingFunction(tx.pool, function);
+
+        int writeLockMode = config.writeLockModeAsInt;
+        if (writeLockMode > LOCKMODE_NONE) {
+            flattenCommute(tx, tranlocal, writeLockMode);
+        }
     }
 
     public final void ensure() {

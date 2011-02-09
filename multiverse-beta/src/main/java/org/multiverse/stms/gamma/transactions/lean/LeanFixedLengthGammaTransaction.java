@@ -351,4 +351,9 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
         newHead.previous = null;
         head = newHead;
     }
+
+    @Override
+    public void initLocalConflictCounter() {
+        //ignore
+    }
 }

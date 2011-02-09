@@ -200,4 +200,9 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
     public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
         return true;
     }
+
+    @Override
+    public void initLocalConflictCounter() {
+        //ignore
+    }
 }

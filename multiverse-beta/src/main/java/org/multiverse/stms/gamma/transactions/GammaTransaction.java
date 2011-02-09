@@ -746,5 +746,9 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
-
+    /**
+     * Initializes the local conflict counter if the transaction has a need for it.
+     * It should only be initialized if there are no reads.
+     */
+    public abstract void initLocalConflictCounter();
 }

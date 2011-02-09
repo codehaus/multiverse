@@ -10,7 +10,7 @@
 
 - pre/post start listeners and fat gamma block
 
-- commute and locking
+- testing: commute and locking
 
 - optimize the tx-pool logic (instead of using an array, use a single linked list)..
 transactions can also act as node (no need to introduce additional datastructures).
@@ -29,7 +29,7 @@ needs more research.
     - doubleref
     - def
 
-- local conflict counter should be set if needed when the flatten commute is called.
+- testing: local conflict counter should be set if needed when the flatten commute is called.
 
 - improved testing for the repeatable read isolation level
 
@@ -58,6 +58,10 @@ needs more research.
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- commute and locking
+
+- local conflict counter should be set if needed when the flatten commute is called.
 
 - GammaRef_alterAndGet1Test
 

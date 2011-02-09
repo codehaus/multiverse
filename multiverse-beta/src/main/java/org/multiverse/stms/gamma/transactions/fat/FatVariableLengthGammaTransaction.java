@@ -301,6 +301,13 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
     }
 
     @Override
+    public void initLocalConflictCounter() {
+        if (richmansMansConflictScan && !hasReads) {
+            localConflictCount = config.globalConflictCounter.count();
+        }
+    }
+
+    @Override
     public final boolean isReadConsistent(GammaRefTranlocal justAdded) {
         if (!hasReads) {
             return true;

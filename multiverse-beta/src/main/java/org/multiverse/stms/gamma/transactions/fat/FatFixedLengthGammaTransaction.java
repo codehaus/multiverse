@@ -368,4 +368,11 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
 
         return true;
     }
+
+    @Override
+    public void initLocalConflictCounter() {
+        if(richmansMansConflictScan && !hasReads){
+            localConflictCount = config.globalConflictCounter.count();
+        }
+    }
 }
