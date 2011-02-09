@@ -53,8 +53,10 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
         if (owner != null) {
             if (hasWrites) {
                 if (status == TX_ACTIVE) {
-                    if (!owner.prepare(this, tranlocal)) {
-                        throw abortOnReadWriteConflict(owner);
+                    if (!skipPrepare()) {
+                        if (!owner.prepare(this, tranlocal)) {
+                            throw abortOnReadWriteConflict(owner);
+                        }
                     }
                 }
 

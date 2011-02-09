@@ -534,7 +534,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
         return new SpeculativeConfigurationError(
                 format("[%s] Failed to execute evaluate the Ref.ensure [%s], reason: the transaction lean and a fat one needs to be used",
-                        config.familyName,toDebugString(o)));
+                        config.familyName, toDebugString(o)));
     }
 
     public final NullPointerException abortAcquireOnNullLockMode(GammaObject o) {
@@ -745,6 +745,19 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                 throw new IllegalStateException();
         }
     }
+
+    public final boolean skipPrepare() {
+        if (config.readLockModeAsInt == LOCKMODE_EXCLUSIVE){
+            return true;
+        }
+
+        if (config.writeLockModeAsInt == LOCKMODE_EXCLUSIVE && config.writeSkewAllowed){
+            return true;
+        }
+
+        return false;
+    }
+
 
     /**
      * Initializes the local conflict counter if the transaction has a need for it.

@@ -148,6 +148,10 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     private GammaObject doPrepare() {
+        if(skipPrepare()){
+            return null;
+        }
+
         for (int k = 0; k < array.length; k++) {
             if (SHAKE_BUGS) shakeBugs();
 

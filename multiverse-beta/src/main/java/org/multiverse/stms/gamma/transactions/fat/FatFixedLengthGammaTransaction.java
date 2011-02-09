@@ -134,6 +134,10 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     private AbstractGammaRef prepareChainForCommit() {
+        if(skipPrepare()){
+            return null;
+        }
+
         GammaRefTranlocal node = head;
 
         do {

@@ -1,3 +1,13 @@
+- fast 'write' on orec.depart when exclusive lock and no surplus
+
+- fast readset validation on committing transaction if the conflict counter has not changed
+needs more research.
+
+- stripe of conflict counters.
+
+- optimize the tx-pool logic (instead of using an array, use a single linked list)..
+transactions can also act as node (no need to introduce additional datastructures).
+
 --------------------------------------------------------------------
                         to do
 --------------------------------------------------------------------
@@ -11,16 +21,6 @@
 - pre/post start listeners and fat gamma block
 
 - testing: commute and locking
-
-- optimize the tx-pool logic (instead of using an array, use a single linked list)..
-transactions can also act as node (no need to introduce additional datastructures).
-
-- fast 'write' on orec.depart when exclusive lock and no surplus
-
-- fast readset validation on committing transaction if the conflict counter has not changed
-needs more research.
-
-- stripe of conflict counters.
 
 - testing: atomic change operations and globalconflictcounter increment
     - intref
