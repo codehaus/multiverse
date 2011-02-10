@@ -12,6 +12,8 @@ transactions can also act as node (no need to introduce additional datastructure
                         to do
 --------------------------------------------------------------------
 
+- testing: prepare of transactions and excusive lock isolation level
+
 - commute: while commuting, no transaction accessed allowed.
 
 - listeners

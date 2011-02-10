@@ -185,6 +185,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
         attempt++;
         abortOnly = false;
         commitConflict = false;
+        evaluatingCommute = false;
         return true;
     }
 
@@ -196,6 +197,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
         attempt = 1;
         abortOnly = false;
         commitConflict = false;
+        evaluatingCommute = false;
     }
 
     @Override

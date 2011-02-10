@@ -58,11 +58,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         boolean abort = true;
-        //evaluatingCommute = true;
         try {
             CallableNode node = tranlocal.headCallable;
             while (node != null) {
-                evaluate(tranlocal, node.function);
+                evaluate(tranlocal, tx, node.function);
                 CallableNode newNext = node.next;
                 tx.pool.putCallableNode(node);
                 node = newNext;
@@ -71,7 +70,6 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
             abort = false;
         } finally {
-            //evaluatingCommute = false;
             if (abort) {
                 tx.abort();
             }
@@ -80,31 +78,37 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         return true;
     }
 
-    private void evaluate(final GammaRefTranlocal tranlocal, final Function function) {
-        switch (type) {
-            case TYPE_REF:
-                tranlocal.ref_value = function.call(tranlocal.ref_value);
-                break;
-            case TYPE_INT:
-                IntFunction intFunction = (IntFunction) function;
-                tranlocal.long_value = intFunction.call((int) tranlocal.long_value);
-                break;
-            case TYPE_LONG:
-                LongFunction longFunction = (LongFunction) function;
-                tranlocal.long_value = longFunction.call(tranlocal.long_value);
-                break;
-            case TYPE_DOUBLE:
-                DoubleFunction doubleFunction = (DoubleFunction) function;
-                double doubleResult = doubleFunction.call(GammaStmUtils.longAsDouble(tranlocal.long_value));
-                tranlocal.long_value = GammaStmUtils.doubleAsLong(doubleResult);
-                break;
-            case TYPE_BOOLEAN:
-                BooleanFunction booleanFunction = (BooleanFunction) function;
-                boolean booleanResult = booleanFunction.call(GammaStmUtils.longAsBoolean(tranlocal.long_value));
-                tranlocal.long_value = GammaStmUtils.booleanAsLong(booleanResult);
-                break;
-            default:
-                throw new IllegalStateException();
+    private void evaluate(final GammaRefTranlocal tranlocal, GammaTransaction tx, final Function function) {
+        tx.evaluatingCommute = true;
+
+        try {
+            switch (type) {
+                case TYPE_REF:
+                    tranlocal.ref_value = function.call(tranlocal.ref_value);
+                    break;
+                case TYPE_INT:
+                    IntFunction intFunction = (IntFunction) function;
+                    tranlocal.long_value = intFunction.call((int) tranlocal.long_value);
+                    break;
+                case TYPE_LONG:
+                    LongFunction longFunction = (LongFunction) function;
+                    tranlocal.long_value = longFunction.call(tranlocal.long_value);
+                    break;
+                case TYPE_DOUBLE:
+                    DoubleFunction doubleFunction = (DoubleFunction) function;
+                    double doubleResult = doubleFunction.call(GammaStmUtils.longAsDouble(tranlocal.long_value));
+                    tranlocal.long_value = GammaStmUtils.doubleAsLong(doubleResult);
+                    break;
+                case TYPE_BOOLEAN:
+                    BooleanFunction booleanFunction = (BooleanFunction) function;
+                    boolean booleanResult = booleanFunction.call(GammaStmUtils.longAsBoolean(tranlocal.long_value));
+                    tranlocal.long_value = GammaStmUtils.booleanAsLong(booleanResult);
+                    break;
+                default:
+                    throw new IllegalStateException();
+            }
+        } finally {
+            tx.evaluatingCommute = false;
         }
     }
 
@@ -399,6 +403,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOpenForConstructionOnReadonly(this);
         }
 
+        if (tx.evaluatingCommute) {
+            throw tx.abortOnOpenForConstructionWhileEvaluatingCommute(this);
+        }
+
         final GammaRefTranlocal tranlocal = tx.tranlocal;
 
         //noinspection ObjectEquality
@@ -434,6 +442,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         if (config.readonly) {
             throw tx.abortOpenForConstructionOnReadonly(this);
+        }
+
+        if (tx.evaluatingCommute) {
+            throw tx.abortOnOpenForConstructionWhileEvaluatingCommute(this);
         }
 
         final int identityHash = identityHashCode();
@@ -473,6 +485,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         if (config.readonly) {
             throw tx.abortOpenForConstructionOnReadonly(this);
+        }
+
+        if (tx.evaluatingCommute) {
+            throw tx.abortOnOpenForConstructionWhileEvaluatingCommute(this);
         }
 
         GammaRefTranlocal found = null;
@@ -801,6 +817,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOpenForReadOnBadStm(this);
         }
 
+        if (tx.evaluatingCommute) {
+            throw tx.abortOnOpenForReadWhileEvaluatingCommute(this);
+        }
+
         lockMode = config.readLockModeAsInt <= lockMode ? lockMode : config.readLockModeAsInt;
 
         final GammaRefTranlocal tranlocal = tx.tranlocal;
@@ -854,6 +874,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         //noinspection ObjectEquality
         if (config.stm != stm) {
             throw tx.abortOpenForReadOnBadStm(this);
+        }
+
+        if (tx.evaluatingCommute) {
+            throw tx.abortOnOpenForReadWhileEvaluatingCommute(this);
         }
 
         GammaRefTranlocal found = null;
@@ -936,6 +960,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         //noinspection ObjectEquality
         if (config.stm != stm) {
             throw tx.abortOpenForReadOnBadStm(this);
+        }
+
+        if (tx.evaluatingCommute) {
+            throw tx.abortOnOpenForReadWhileEvaluatingCommute(this);
         }
 
         desiredLockMode = config.readLockModeAsInt <= desiredLockMode ? desiredLockMode : config.readLockModeAsInt;
@@ -1151,6 +1179,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortCommuteOnNullFunction(this);
         }
 
+        if (tx.evaluatingCommute) {
+            throw tx.abortOnOpenForCommuteWhileEvaluatingCommute(this);
+        }
+
         final GammaTransactionConfiguration config = tx.config;
 
         //noinspection ObjectEquality
@@ -1178,7 +1210,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
             boolean abort = true;
             try {
-                evaluate(tranlocal, function);
+                evaluate(tranlocal, tx, function);
                 abort = false;
             } finally {
                 if (abort) {
@@ -1213,6 +1245,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
         if (function == null) {
             throw tx.abortCommuteOnNullFunction(this);
+        }
+
+        if (tx.evaluatingCommute) {
+            throw tx.abortOnOpenForCommuteWhileEvaluatingCommute(this);
         }
 
         final GammaTransactionConfiguration config = tx.config;
@@ -1258,7 +1294,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
             boolean abort = true;
             try {
-                evaluate(found, function);
+                evaluate(found, tx, function);
                 abort = false;
             } finally {
                 if (abort) {
@@ -1297,6 +1333,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortCommuteOnNullFunction(this);
         }
 
+        if (tx.evaluatingCommute) {
+            throw tx.abortOnOpenForCommuteWhileEvaluatingCommute(this);
+        }
+
         final GammaTransactionConfiguration config = tx.config;
 
         //noinspection ObjectEquality
@@ -1326,7 +1366,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
             boolean abort = true;
             try {
-                evaluate(tranlocal, function);
+                evaluate(tranlocal, tx, function);
                 abort = false;
             } finally {
                 if (abort) {

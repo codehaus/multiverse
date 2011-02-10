@@ -289,6 +289,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         hasReads = false;
         abortOnly = false;
         commitConflict = false;
+        evaluatingCommute = false;
     }
 
     @Override
@@ -304,6 +305,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         hasReads = false;
         abortOnly = false;
         attempt++;
+        evaluatingCommute = false;
         return true;
     }
 

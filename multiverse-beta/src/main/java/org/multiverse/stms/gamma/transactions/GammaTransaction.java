@@ -38,6 +38,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     public final RetryLatch retryListener = new DefaultRetryLatch();
     public ArrayList<TransactionListener> listeners;
     public boolean commitConflict;
+    public boolean evaluatingCommute = false;
 
     public GammaTransaction(GammaTransactionConfiguration config, int transactionType) {
         config.init();
@@ -179,34 +180,6 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         return new ReadonlyException(
                 format("[%s] Failed to Ref.openForWrite '%s', reason: the transaction is readonly",
                         config.familyName, toDebugString(object)));
-    }
-
-    public final IllegalTransactionStateException abortOpenForWriteOnBadStatus(GammaObject o) {
-        switch (status) {
-            case TX_PREPARED:
-                abort();
-                return new PreparedTransactionException(
-                        format("[%s] Failed to execute Ref.openForWrite '%s', reason: the transaction is prepared",
-                                config.familyName, toDebugString(o)));
-            case TX_ABORTED:
-                return new DeadTransactionException(
-                        format("[%s] Failed to execute Ref.openForWrite '%s', reason: the transaction is aborted",
-                                config.familyName, toDebugString(o)));
-            case TX_COMMITTED:
-                return new DeadTransactionException(
-                        format("[%s] Failed to execute Ref.openForWrite '%s', reason: the transaction is committed",
-                                config.familyName, toDebugString(o)));
-            default:
-                throw new IllegalStateException();
-        }
-    }
-
-    public final StmMismatchException abortOpenForWriteOnBadStm(GammaObject o) {
-        abortIfAlive();
-        return new StmMismatchException(
-                format("[%s] Failed to execute Ref.openForWrite '%s', reason: the stm the ref was created with " +
-                        "is a different stm than the stm of the transaction",
-                        config.familyName, toDebugString(o)));
     }
 
     // ============================= retry ==============================
@@ -457,33 +430,30 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                         config.familyName));
     }
 
-    public IllegalTransactionStateException abortTryAcquireOnBadStatus(GammaObject object) {
-        switch (status) {
-            case TX_PREPARED:
-                abort();
-                return new PreparedTransactionException(
-                        format("[%s] Failed to execute Transaction.commute '%s', reason: the transaction is prepared",
-                                config.familyName, toDebugString(object)));
-            case TX_ABORTED:
-                return new DeadTransactionException(
-                        format("[%s] Failed to execute Transaction.commute '%s', reason: the transaction is aborted",
-                                config.familyName, toDebugString(object)));
-            case TX_COMMITTED:
-                return new DeadTransactionException(
-                        format("[%s] Failed to execute Transaction.commute '%s', reason: the transaction is prepared",
-                                config.familyName, toDebugString(object)));
-            default:
-                throw new IllegalStateException();
-        }
+    public TransactionExecutionException abortOnOpenForConstructionWhileEvaluatingCommute(GammaObject o) {
+        abort();
+        return new IllegalCommuteException(
+                format("[%s] Failed to execute Ref.openForConstruction '%s', " +
+                        "reason: the transaction is already evaluating a commuting function",
+                        config.familyName, toDebugString(o)));
     }
 
-    public NullPointerException abortTryAcquireOnNullLockMode(GammaObject object) {
+    public TransactionExecutionException abortOnOpenForReadWhileEvaluatingCommute(GammaObject o) {
         abortIfAlive();
-        return new NullPointerException(
-                format("[%s] Failed to execute Lock.tryAcquire '%s', reason: the lockMode is null",
-                        config.familyName, toDebugString(object)));
+        return new IllegalCommuteException(
+                format("[%s] Failed to execute Ref.openForRead '%s', " +
+                        "reason: the transaction is already evaluating a commuting function",
+                        config.familyName, toDebugString(o)));
+
     }
 
+    public TransactionExecutionException abortOnOpenForCommuteWhileEvaluatingCommute(GammaObject o) {
+        abortIfAlive();
+        return new IllegalCommuteException(
+                format("[%s] Failed to execute Ref.openForCommute '%s', " +
+                        "reason: the transaction is already evaluating a commuting function",
+                        config.familyName, toDebugString(o)));
+    }
 
     public IllegalTransactionStateException abortEnsureOnBadStatus(AbstractGammaRef o) {
         switch (status) {
@@ -747,21 +717,14 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public final boolean skipPrepare() {
-        if (config.readLockModeAsInt == LOCKMODE_EXCLUSIVE){
-            return true;
-        }
-
-        if (config.writeLockModeAsInt == LOCKMODE_EXCLUSIVE && config.writeSkewAllowed){
-            return true;
-        }
-
-        return false;
+        return config.readLockModeAsInt == LOCKMODE_EXCLUSIVE;
     }
-
 
     /**
      * Initializes the local conflict counter if the transaction has a need for it.
      * It should only be initialized if there are no reads.
      */
     public abstract void initLocalConflictCounter();
+
+
 }

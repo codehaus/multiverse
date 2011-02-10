@@ -281,6 +281,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         abortOnly = false;
         attempt++;
         commitConflict = false;
+        evaluatingCommute = false;
         return true;
     }
 
@@ -302,6 +303,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         final SpeculativeGammaConfiguration speculativeConfig = config.speculativeConfiguration.get();
         richmansMansConflictScan = speculativeConfig.isRichMansConflictScanRequired;
         commitConflict = false;
+        evaluatingCommute = false;
     }
 
     @Override
