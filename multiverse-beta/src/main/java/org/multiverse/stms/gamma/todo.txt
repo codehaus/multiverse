@@ -14,11 +14,13 @@ transactions can also act as node (no need to introduce additional datastructure
 
 - testing: prepare of transactions and excusive lock isolation level
 
-- commute: while commuting, no transaction accessed allowed.
+- testing: commute: while commuting, no transaction accessed allowed.
 
-- listeners
+- testing: post commit listener
 
-- permanent listeners
+- testing: post abort listener
+
+- listeners & exceptions
 
 - pre/post start listeners and fat gamma block
 
@@ -37,29 +39,31 @@ transactions can also act as node (no need to introduce additional datastructure
 
 - adding read committed isolation level
 
-- lean transaction and readonly? no checking is done but what if configured as readonly
+- testing: lean transaction and readonly? no checking is done but what if configured as readonly
 
 - orelse
 
 - implement the read committed isolation level
 
-- GammaRef_atomicGetAndSetTest
+- testing:GammaRef_atomicGetAndSetTest
 
-- GammaRef_atomicAlterAndGetTest
+- testing:GammaRef_atomicAlterAndGetTest
 
-- GammaRef_atomicGetAndAlterTest
+- testing:GammaRef_atomicGetAndAlterTest
 
-- GammaRef_commuteTest
+- testing:GammaRef_commuteTest
 
-- GammaRef_getAndAlterTest
+- testing:GammaRef_getAndAlterTest
 
-- Lock.acquire0Test
+- testing:Lock.acquire0Test
 
-- Lock_getLockMode0Test
+- testing:Lock_getLockMode0Test
 
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- commute: while commuting, no transaction accessed allowed.
 
 - commute and locking
 
