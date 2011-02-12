@@ -42,6 +42,8 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     public final boolean flattenCommute(final GammaTransaction tx, final GammaRefTranlocal tranlocal, final int lockMode) {
+        assert tranlocal.mode == TRANLOCAL_COMMUTING;
+
         final GammaTransactionConfiguration config = tx.config;
 
         tx.initLocalConflictCounter();
@@ -175,8 +177,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         if (mode == TRANLOCAL_READ) {
-            return !tranlocal.writeSkewCheck
-                    || tryLockAndCheckConflict(tx, tranlocal, tx.config.spinCount, LOCKMODE_READ);
+            if (!tranlocal.writeSkewCheck) {
+                return true;
+            }
+            return tryLockAndCheckConflict(tx, tranlocal, tx.config.spinCount, LOCKMODE_READ);
         }
 
         if (mode == TRANLOCAL_COMMUTING) {
@@ -185,17 +189,19 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             }
         }
 
-        if (!tranlocal.isDirty()) {
+        if (!tranlocal.isDirty) {
             final boolean isDirty = type == TYPE_REF
                     ? tranlocal.ref_value != tranlocal.ref_oldValue
                     : tranlocal.long_value != tranlocal.long_oldValue;
 
             if (!isDirty) {
-                return !tranlocal.writeSkewCheck
-                        || tryLockAndCheckConflict(tx, tranlocal, tx.config.spinCount, LOCKMODE_READ);
+                if (!tranlocal.writeSkewCheck) {
+                    return true;
+                }
+                return tryLockAndCheckConflict(tx, tranlocal, tx.config.spinCount, LOCKMODE_READ);
             }
 
-            tranlocal.setDirty(true);
+            tranlocal.isDirty = true;
         }
 
         return tryLockAndCheckConflict(tx, tranlocal, tx.config.spinCount, LOCKMODE_EXCLUSIVE);

@@ -15,7 +15,8 @@ import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.String.format;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -102,6 +103,35 @@ public class WriteSkewStressTest {
     }
 
     @Test
+    public void whenPessimisticWriteSanityTest() {
+        Customer customer1 = new Customer();
+        Customer customer2 = new Customer();
+
+        GammaTransaction tx1 = stm.newDefaultTransaction();
+        GammaTransaction tx2 = stm.newDefaultTransaction();
+
+        customer1.account1.get(tx1);
+        customer1.account2.get(tx1);
+        customer1.account2.get(tx1);
+        customer2.account2.get(tx1);
+
+        customer1.account1.get(tx2);
+        customer1.account2.get(tx2);
+        customer2.account1.get(tx2);
+        customer2.account2.get(tx2);
+
+        customer1.account1.openForWrite(tx1, LOCKMODE_READ).long_value++;
+        customer2.account1.openForWrite(tx1, LOCKMODE_READ).long_value++;
+
+        customer1.account2.openForWrite(tx2, LOCKMODE_READ).long_value++;
+        customer2.account2.openForWrite(tx2, LOCKMODE_READ).long_value++;
+
+        tx1.commit();
+        tx2.commit();
+    }
+
+
+    @Test
     public void whenPessimisticWriteLevel_thenWriteSkewPossible() {
         mode = Mode.pessimisticWriteLevel;
         startAll(threads);
@@ -114,6 +144,42 @@ public class WriteSkewStressTest {
         System.out.println("User2: " + customer2);
 
         assertTrue("no writeskew detected", writeSkewEncountered.get());
+    }
+
+    @Test
+    public void whenPessimisticWriteLevelSanityTest() {
+        Customer customer1 = new Customer();
+        Customer customer2 = new Customer();
+
+        GammaTransaction tx1 = stm.newTransactionFactoryBuilder()
+                .setSpeculative(false)
+                .setWriteLockMode(LockMode.Read)
+                .newTransactionFactory()
+                .newTransaction();
+        GammaTransaction tx2 = stm.newTransactionFactoryBuilder()
+                .setSpeculative(false)
+                .setWriteLockMode(LockMode.Read)
+                .newTransactionFactory()
+                .newTransaction();
+
+        customer1.account1.get(tx1);
+        customer1.account2.get(tx1);
+        customer1.account2.get(tx1);
+        customer2.account2.get(tx1);
+
+        customer1.account1.get(tx2);
+        customer1.account2.get(tx2);
+        customer2.account1.get(tx2);
+        customer2.account2.get(tx2);
+
+        customer1.account1.openForWrite(tx1, LOCKMODE_NONE).long_value++;
+        customer2.account1.openForWrite(tx1, LOCKMODE_NONE).long_value++;
+
+        customer1.account2.openForWrite(tx2, LOCKMODE_NONE).long_value++;
+        customer2.account2.openForWrite(tx2, LOCKMODE_NONE).long_value++;
+
+        tx1.commit();
+        tx2.commit();
     }
 
     @Test
@@ -130,6 +196,7 @@ public class WriteSkewStressTest {
 
         assertFalse("writeskew detected", writeSkewEncountered.get());
     }
+
 
     @Test
     public void whenSnapshotIsolation_thenWriteSkewPossible() {
@@ -169,17 +236,21 @@ public class WriteSkewStressTest {
     public class TransferThread extends TestThread {
 
         private final AtomicBlock snapshotBlock = stm.newTransactionFactoryBuilder()
+                .setSpeculative(false)
                 .setMaxRetries(10000)
                 .newAtomicBlock();
         private final AtomicBlock serializedBlock = stm.newTransactionFactoryBuilder()
+                .setSpeculative(false)
                 .setIsolationLevel(IsolationLevel.Serializable)
                 .setMaxRetries(10000)
                 .newAtomicBlock();
         private final AtomicBlock pessimisticReadsBlock = stm.newTransactionFactoryBuilder()
+                .setSpeculative(false)
                 .setReadLockMode(LockMode.Read)
                 .setMaxRetries(10000)
                 .newAtomicBlock();
         private final AtomicBlock pessimisticWritesBlock = stm.newTransactionFactoryBuilder()
+                .setSpeculative(false)
                 .setWriteLockMode(LockMode.Read)
                 .setMaxRetries(10000)
                 .newAtomicBlock();
@@ -193,7 +264,7 @@ public class WriteSkewStressTest {
         public void doRun() throws Exception {
             int k = 0;
             while (!stop) {
-                if (k % 10000 == 0) {
+                if (k % 100 == 0) {
                     System.out.printf("%s is at %s\n", getName(), k);
                 }
 
@@ -269,7 +340,7 @@ public class WriteSkewStressTest {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
-                    run(btx, LockMode.Read, LockMode.Read);
+                    run(btx, LockMode.Read, LockMode.None);
                 }
             });
         }
@@ -299,6 +370,8 @@ public class WriteSkewStressTest {
                 }
             }
 
+            sleepRandomMs(5);
+
             if (sum >= amount) {
                 GammaLongRef fromAccount = from.getRandomAccount();
                 fromAccount.openForWrite(tx, writeLockMode.asInt()).long_value -= amount;
@@ -307,7 +380,7 @@ public class WriteSkewStressTest {
                 toAccount.openForWrite(tx, writeLockMode.asInt()).long_value += amount;
             }
 
-            sleepRandomUs(20);
+            sleepRandomMs(5);
         }
     }
 
