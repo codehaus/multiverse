@@ -23,11 +23,11 @@ import static org.junit.Assert.*;
  */
 public class TestUtils implements MultiverseConstants {
 
-    public static void assertOrecValue(AbstractGammaObject object, long expected){
+    public static void assertOrecValue(AbstractGammaObject object, long expected) {
         assertEquals(expected, object.orec);
     }
 
-    public static void assertFailure(int value){
+    public static void assertFailure(int value) {
         assertEquals(GammaConstants.FAILURE, value);
     }
 
@@ -53,7 +53,7 @@ public class TestUtils implements MultiverseConstants {
     }
 
     public static void assertEqualsDouble(double expected, double found) {
-        assertEqualsDouble(format("expected %s found %s",expected, found), expected, found);
+        assertEqualsDouble(format("expected %s found %s", expected, found), expected, found);
     }
 
     public static int processorCount() {
@@ -242,8 +242,8 @@ public class TestUtils implements MultiverseConstants {
                 try {
                     if (System.currentTimeMillis() > maxTimeMs) {
                         fail(String.format(
-                                "Failed to join all threads in %s seconds, remaining threads %s",
-                                timeoutSec, uncompleted));
+                                "Failed to join all threads in %s seconds, remaining threads %s.\n%s",
+                                timeoutSec, uncompleted, getStacks(uncompleted)));
                     }
                     thread.join(100);
 
@@ -267,5 +267,18 @@ public class TestUtils implements MultiverseConstants {
         }
 
         return durationMs;
+    }
+
+    private static String getStacks(List<TestThread> uncompleted) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("Uncompleted threads:\n");
+        for (TestThread thread : uncompleted) {
+            sb.append("-------------------------------------------------------------------");
+            sb.append(thread.getName()+"\n");
+            for (StackTraceElement element : thread.getStackTrace()) {
+                    sb.append("\tat " + element+"\n");
+            }
+        }
+        return sb.toString();
     }
 }

@@ -16,6 +16,7 @@ import java.util.LinkedList;
 
 import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.joinAll;
+import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.TestUtils.startAll;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.StmUtils.retry;
@@ -45,6 +46,8 @@ public abstract class QueueWithCapacity_AbstractTest implements GammaConstants {
         ConsumeThread consumeThread = new ConsumeThread();
 
         startAll(produceThread, consumeThread);
+        sleepMs(45000);
+
         joinAll(produceThread, consumeThread);
 
         assertEquals(itemCount, produceThread.producedItems.size());

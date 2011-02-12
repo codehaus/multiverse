@@ -39,8 +39,52 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
     protected abstract void assertCleaned(T transaction);
 
+
     @Test
-    public void conflict_whenArriveByOther(){
+    public void listeners_whenDirtyWrite_thenListenersNotified() {
+        listeners_whenDirtyWrite_thenListenersNotified(LockMode.None, LockMode.None);
+        listeners_whenDirtyWrite_thenListenersNotified(LockMode.None, LockMode.Read);
+        listeners_whenDirtyWrite_thenListenersNotified(LockMode.None, LockMode.Write);
+        listeners_whenDirtyWrite_thenListenersNotified(LockMode.None, LockMode.Exclusive);
+
+        listeners_whenDirtyWrite_thenListenersNotified(LockMode.Read, LockMode.Read);
+        listeners_whenDirtyWrite_thenListenersNotified(LockMode.Read, LockMode.Write);
+        listeners_whenDirtyWrite_thenListenersNotified(LockMode.Read, LockMode.Exclusive);
+
+        listeners_whenDirtyWrite_thenListenersNotified(LockMode.Write, LockMode.Write);
+        listeners_whenDirtyWrite_thenListenersNotified(LockMode.Write, LockMode.Exclusive);
+
+        listeners_whenDirtyWrite_thenListenersNotified(LockMode.Exclusive, LockMode.Exclusive);
+    }
+
+    public void listeners_whenDirtyWrite_thenListenersNotified(LockMode readLockMode, LockMode writeLockMode) {
+        String oldValue = "oldvalue";
+        GammaRef<String> ref = new GammaRef<String>(stm, oldValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction waitingTx = newTransaction();
+        ref.get(waitingTx);
+        try {
+            waitingTx.retry();
+            fail();
+        } catch (Retry expected) {
+        }
+
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .setReadLockMode(readLockMode)
+                .setWriteLockMode(writeLockMode);
+
+        GammaTransaction tx = newTransaction(config);
+        String newValue = "newvalue";
+        ref.set(tx, newValue);
+        tx.commit();
+
+        assertTrue(waitingTx.retryListener.isOpen());
+        assertVersionAndValue(ref, initialVersion + 1, newValue);
+    }
+
+    @Test
+    public void conflict_whenArriveByOther() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -58,8 +102,8 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         long globalConflictCount = stm.globalConflictCounter.count();
         tx.commit();
 
-        assertGlobalConflictCount(stm, globalConflictCount+1);
-        assertVersionAndValue(ref, initialVersion+1, newValue);
+        assertGlobalConflictCount(stm, globalConflictCount + 1);
+        assertVersionAndValue(ref, initialVersion + 1, newValue);
     }
 
     @Test
@@ -451,6 +495,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         tx.commit();
 
         assertNull(tranlocal.owner);
+        assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
         assertEquals(TransactionStatus.Committed, tx.getStatus());
         assertEquals(initialValue + 1, ref.long_value);
         assertEquals(initialVersion + 1, ref.version);
@@ -540,6 +585,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
         assertNull(tranlocal.owner);
         assertEquals(TransactionStatus.Committed, tx.getStatus());
+        assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
         assertEquals(initialValue + 1, ref.long_value);
         assertEquals(initialVersion + 1, ref.version);
         assertCleaned(tx);
@@ -569,7 +615,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        ref.openForRead(tx, readLockMode.asInt());
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, readLockMode.asInt());
         if (prepareFirst) {
             tx.prepare();
         }
@@ -577,6 +623,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
         assertIsCommitted(tx);
         assertLockMode(ref, LockMode.None);
+        assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertCleaned(tx);
         assertGlobalConflictCount(stm, globalConflictCount);
@@ -644,6 +691,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertEquals(TransactionStatus.Committed, tx.getStatus());
         assertEquals(initialValue + 1, ref.long_value);
         assertEquals(initialVersion + 1, ref.version);
+        assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
         assertCleaned(tx);
         assertRefHasNoLocks(ref);
         assertGlobalConflictCount(stm, globalConflictCount);
@@ -672,6 +720,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         tx.commit();
 
         assertNull(tranlocal.owner);
+        assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
         assertEquals(TransactionStatus.Committed, tx.getStatus());
         assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.version);
@@ -704,6 +753,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         tx.commit();
 
         assertNull(tranlocal.owner);
+        assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
         assertEquals(TransactionStatus.Committed, tx.getStatus());
         assertEquals(initialValue + 1, ref.long_value);
         assertEquals(initialVersion + 1, ref.version);
@@ -740,7 +790,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasReadLock(ref, otherTx);
         assertReadLockCount(ref, 1);
-
+        assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
         assertGlobalConflictCount(stm, globalConflictCount);
     }
 
@@ -768,7 +818,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasWriteLock(ref, otherTx);
-
+        assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
         assertGlobalConflictCount(stm, globalConflictCount);
     }
 
@@ -793,6 +843,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         } catch (ReadWriteConflict expected) {
         }
 
+        assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasExclusiveLock(ref, otherTx);

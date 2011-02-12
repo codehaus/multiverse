@@ -717,7 +717,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public final boolean skipPrepare() {
-        return config.readLockModeAsInt == LOCKMODE_EXCLUSIVE;
+        return config.readLockModeAsInt == LOCKMODE_EXCLUSIVE && !config.dirtyCheck;
     }
 
     /**

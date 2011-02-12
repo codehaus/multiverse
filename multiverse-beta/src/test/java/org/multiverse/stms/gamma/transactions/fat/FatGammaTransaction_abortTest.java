@@ -1,7 +1,6 @@
 package org.multiverse.stms.gamma.transactions.fat;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.TransactionStatus;
@@ -92,7 +91,9 @@ public abstract class FatGammaTransaction_abortTest<T extends GammaTransaction> 
         GammaRefTranlocal tranlocal = ref.openForRead(tx, readLockMode.asInt());
         tx.abort();
 
-        assertEquals(TransactionStatus.Aborted, tx.getStatus());
+        assertIsAborted(tx);
+        assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
+        assertNull(tranlocal.owner);
         assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.getVersion());
         assertCleaned(tx);
@@ -116,6 +117,8 @@ public abstract class FatGammaTransaction_abortTest<T extends GammaTransaction> 
         tx.abort();
 
         assertEquals(TransactionStatus.Aborted, tx.getStatus());
+        assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
+        assertNull(tranlocal.owner);
         assertEquals(initialValue, ref.long_value);
         assertEquals(initialVersion, ref.getVersion());
         assertCleaned(tx);
