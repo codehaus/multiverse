@@ -46,7 +46,6 @@ public abstract class QueueWithCapacity_AbstractTest implements GammaConstants {
         ConsumeThread consumeThread = new ConsumeThread();
 
         startAll(produceThread, consumeThread);
-        sleepMs(45000);
 
         joinAll(produceThread, consumeThread);
 
