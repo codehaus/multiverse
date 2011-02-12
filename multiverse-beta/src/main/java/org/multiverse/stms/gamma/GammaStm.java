@@ -34,7 +34,7 @@ public final class GammaStm implements Stm {
     public final NaiveTransactionalCollectionFactory defaultTransactionalCollectionFactory
             = new NaiveTransactionalCollectionFactory(this);
     public final int readBiasedThreshold;
-
+    public final GammaOrElseBlock defaultOrElseBlock = new GammaOrElseBlock();
 
     public GammaStm() {
         this(new GammaStmConfiguration());
@@ -65,8 +65,8 @@ public final class GammaStm implements Stm {
     }
 
     @Override
-    public OrElseBlock newOrElseBlock() {
-        return null;
+    public GammaOrElseBlock newOrElseBlock() {
+        return defaultOrElseBlock;
     }
 
     public GlobalConflictCounter getGlobalConflictCounter() {

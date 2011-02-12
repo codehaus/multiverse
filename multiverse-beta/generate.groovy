@@ -51,7 +51,7 @@ for (def closure in atomicClosures) {
 
 generateAtomicBlock(engine, atomicClosures)
 //generateOrElseBlock(engine, atomicClosures)
-//generateBetaOrElseBlock(engine, atomicClosures)
+generateGammaOrElseBlock(engine, atomicClosures)
 //generateStmUtils(engine, atomicClosures)
 
 for (def atomicBlock in atomicBlocks) {
@@ -222,8 +222,8 @@ void generateOrElseBlock(VelocityEngine engine, List<AtomicClosure> closures) {
     file.text = writer.toString()
 }
 
-void generateBetaOrElseBlock(VelocityEngine engine, List<AtomicClosure> closures) {
-    Template t = engine.getTemplate('src/main/java/org/multiverse/stms/gamma/BetaOrElseBlock.vm')
+void generateGammaOrElseBlock(VelocityEngine engine, List<AtomicClosure> closures) {
+    Template t = engine.getTemplate('src/main/java/org/multiverse/stms/gamma/GammaOrElseBlock.vm')
 
     VelocityContext context = new VelocityContext()
     context.put('closures', closures)
@@ -231,7 +231,7 @@ void generateBetaOrElseBlock(VelocityEngine engine, List<AtomicClosure> closures
     StringWriter writer = new StringWriter()
     t.merge(context, writer)
 
-    File file = new File('src/main/java/org/multiverse/stms/gamma/BetaOrElseBlock.java')
+    File file = new File('src/main/java/org/multiverse/stms/gamma/GammaOrElseBlock.java')
     file.createNewFile()
     file.text = writer.toString()
 }

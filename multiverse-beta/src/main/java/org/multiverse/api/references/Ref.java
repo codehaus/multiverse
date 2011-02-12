@@ -1,9 +1,8 @@
 package org.multiverse.api.references;
 
-import org.multiverse.api.Transaction;
-import org.multiverse.api.TransactionalObject;
-import org.multiverse.api.functions.Function;
-import org.multiverse.api.predicates.Predicate;
+import org.multiverse.api.*;
+import org.multiverse.api.functions.*;
+import org.multiverse.api.predicates.*;
 
 /**
  * A Transactional Reference comparable to the <a href="http://clojure.org/refs">Clojure Ref</a>.
@@ -15,7 +14,7 @@ import org.multiverse.api.predicates.Predicate;
  * <h1>ControlFlowError</h1>
  * All non atomic methods are able to throw a (subclass) of the ControlFlowError. This error should
  * not be caught, it is task of the AtomicTemplate to do this.
- *
+ * 
  * <h1>TransactionalExecutionException</h1>
  * Most of the methods can throw a {@link org.multiverse.api.exceptions.TransactionExecutionException}.
  * This exception can be caught, but in most cases you want to figure out what the cause is (e.g. because

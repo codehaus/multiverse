@@ -41,8 +41,6 @@ transactions can also act as node (no need to introduce additional datastructure
 
 - testing: lean transaction and readonly? no checking is done but what if configured as readonly
 
-- orelse
-
 - implement the read committed isolation level
 
 - testing:GammaRef_atomicGetAndSetTest
@@ -64,6 +62,8 @@ transactions can also act as node (no need to introduce additional datastructure
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- orelse
 
 - commute: while commuting, no transaction accessed allowed.
 

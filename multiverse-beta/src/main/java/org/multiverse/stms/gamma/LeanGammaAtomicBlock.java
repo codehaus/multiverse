@@ -1,17 +1,13 @@
 package org.multiverse.stms.gamma;
 
-import org.multiverse.api.ThreadLocalTransaction;
-import org.multiverse.api.TraceLevel;
-import org.multiverse.api.closures.*;
+import org.multiverse.api.*;
 import org.multiverse.api.exceptions.*;
-import org.multiverse.stms.gamma.transactions.GammaTransaction;
-import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
-import org.multiverse.stms.gamma.transactions.GammaTransactionPool;
-
+import org.multiverse.api.closures.*;
+import org.multiverse.stms.gamma.transactions.*;
 import java.util.logging.Logger;
 
 import static java.lang.String.format;
-import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransactionContainer;
+import static org.multiverse.api.ThreadLocalTransaction.*;
 
 /**
 * An GammaAtomicBlock made for the GammaStm.
@@ -634,9 +630,6 @@ private static final Logger logger = Logger.getLogger(LeanGammaAtomicBlock.class
                         pool.put(old);
                         transactionContainer.tx = tx;
                     } catch (ReadWriteConflict e) {
-                        if(tx.status!=GammaConstants.TX_ABORTED){
-                            throw new RuntimeException();
-                        }
                         cause = e;
                         if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
