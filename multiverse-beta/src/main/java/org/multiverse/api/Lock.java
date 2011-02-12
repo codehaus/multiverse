@@ -36,7 +36,8 @@ public interface Lock {
 
     /**
      * Returns the current LockMode. This call doesn't look at any running transaction, it shows the actual
-     * state of the Lock. The value could be stale as soon as it is received.
+     * state of the Lock. The value could be stale as soon as it is received. To retrieve the LockMode of
+     * a Transaction has on a Lock, the {@link #getLockMode()} needs to be used.
      *
      * @return the current LockMode.
      */
@@ -44,24 +45,28 @@ public interface Lock {
 
     /**
      * Gets the LockMode the transaction stored in the the {@link ThreadLocalTransaction} has on this Lock.
+     * To retrieve the actual LockMode of the Lock, you need to use the {@link #atomicGetLockMode()}.
      *
      * @return the LockMode.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
+     * @see #atomicGetLockMode()
+     * @see #getLockMode(Transaction)
      */
     LockMode getLockMode();
 
     /**
-     * Gets the LockMode the transaction has on the Lock. This call makes use of the tx.
+     * Gets the LockMode the transaction has on the Lock. This call makes use of the tx. To retrieve the actual
+     * LockMode of the Lock, you need to use the {@link #atomicGetLockMode()}
      *
      * @param tx the Lock
      * @return the LockMode the transaction has on the Lock.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
+     * @see #atomicGetLockMode()
+     * @see #getLockMode(Transaction)
      */
     LockMode getLockMode(Transaction tx);
 

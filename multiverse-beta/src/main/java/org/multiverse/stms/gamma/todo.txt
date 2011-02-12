@@ -59,6 +59,8 @@ transactions can also act as node (no need to introduce additional datastructure
 
 - testing:Lock_getLockMode0Test
 
+- testing: PhantomReadTest
+
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------

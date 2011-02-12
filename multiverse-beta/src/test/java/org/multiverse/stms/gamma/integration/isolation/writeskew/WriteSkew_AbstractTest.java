@@ -32,6 +32,7 @@ public abstract class WriteSkew_AbstractTest<T extends GammaTransaction> {
         clearThreadLocalTransaction();
     }
 
+
     @Test
     public void whenWriteSkewAllowed_thenNotDetected() {
         GammaLongRef ref1 = new GammaLongRef(stm);

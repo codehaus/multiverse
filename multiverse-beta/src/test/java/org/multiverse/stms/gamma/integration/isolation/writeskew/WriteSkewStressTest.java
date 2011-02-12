@@ -7,8 +7,6 @@ import org.multiverse.api.AtomicBlock;
 import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.closures.AtomicClosure;
-import org.multiverse.api.closures.AtomicLongClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
@@ -17,8 +15,7 @@ import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.String.format;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
@@ -32,15 +29,15 @@ import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransact
  */
 public class WriteSkewStressTest {
     private volatile boolean stop;
-    private User user1;
-    private User user2;
+    private Customer customer1;
+    private Customer customer2;
 
     enum Mode {
         snapshot,
-        privatizedReadLevel,
-        privatizedWriteLevel,
-        privatizedRead,
-        privatizedWrite,
+        pessimisticReadLevel,
+        pessimisticWriteLevel,
+        pessimisticReads,
+        pessimisticWrites,
         serialized
     }
 
@@ -54,8 +51,8 @@ public class WriteSkewStressTest {
     public void setUp() {
         stm = (GammaStm) getGlobalStmInstance();
         clearThreadLocalTransaction();
-        user1 = new User();
-        user2 = new User();
+        customer1 = new Customer();
+        customer2 = new Customer();
         stop = false;
         writeSkewEncountered.set(false);
 
@@ -64,7 +61,7 @@ public class WriteSkewStressTest {
             threads[k] = new TransferThread(k);
         }
 
-        GammaLongRef account = user1.getRandomAccount();
+        GammaLongRef account = customer1.getRandomAccount();
         GammaTransaction tx = stm.newDefaultTransaction();
         account.openForWrite(tx, LOCKMODE_NONE).long_value = 1000;
         tx.commit();
@@ -72,15 +69,15 @@ public class WriteSkewStressTest {
 
     @Test
     public void whenPessimisticRead_thenNoWriteSkewPossible() {
-        mode = Mode.privatizedRead;
+        mode = Mode.pessimisticReads;
         startAll(threads);
         sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
 
         joinAll(threads);
 
-        System.out.println("User1: " + user1);
-        System.out.println("User2: " + user2);
+        System.out.println("User1: " + customer1);
+        System.out.println("User2: " + customer2);
 
         assertFalse("writeskew detected", writeSkewEncountered.get());
     }
@@ -91,71 +88,71 @@ public class WriteSkewStressTest {
      */
     @Test
     public void whenPessimisticWrite_thenWriteSkewPossible() {
-        mode = Mode.privatizedWrite;
+        mode = Mode.pessimisticWrites;
         startAll(threads);
         sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
 
         joinAll(threads);
 
-        System.out.println("User1: " + user1);
-        System.out.println("User2: " + user2);
+        System.out.println("User1: " + customer1);
+        System.out.println("User2: " + customer2);
 
         assertTrue("no writeskew detected", writeSkewEncountered.get());
     }
 
     @Test
-    public void whenLockLevelWrite_thenWriteSkewPossible() {
-        mode = Mode.privatizedWriteLevel;
+    public void whenPessimisticWriteLevel_thenWriteSkewPossible() {
+        mode = Mode.pessimisticWriteLevel;
         startAll(threads);
         sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
 
         joinAll(threads);
 
-        System.out.println("User1: " + user1);
-        System.out.println("User2: " + user2);
+        System.out.println("User1: " + customer1);
+        System.out.println("User2: " + customer2);
 
         assertTrue("no writeskew detected", writeSkewEncountered.get());
     }
 
     @Test
-    public void whenLockLevelRead_thenNoWriteSkewPossible() {
-        mode = Mode.privatizedReadLevel;
+    public void whenPessimisticReadLevel_thenNoWriteSkewPossible() {
+        mode = Mode.pessimisticReadLevel;
         startAll(threads);
         sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
 
         joinAll(threads);
 
-        System.out.println("User1: " + user1);
-        System.out.println("User2: " + user2);
+        System.out.println("User1: " + customer1);
+        System.out.println("User2: " + customer2);
 
         assertFalse("writeskew detected", writeSkewEncountered.get());
     }
 
     @Test
-    public void whenWriteSkewAllowed_thenWriteSkewPossible() {
+    public void whenSnapshotIsolation_thenWriteSkewPossible() {
         mode = Mode.snapshot;
         startAll(threads);
         sleepMs(getStressTestDurationMs(30 * 1000));
         stop = true;
         joinAll(threads);
 
-        System.out.println("User1: " + user1);
-        System.out.println("User2: " + user2);
+        System.out.println("User1: " + customer1);
+        System.out.println("User2: " + customer2);
 
-        System.out.println("User1.account1: " + user1.account1.toDebugString());
-        System.out.println("User1.account2: " + user1.account2.toDebugString());
+        System.out.println("User1.account1: " + customer1.account1.toDebugString());
+        System.out.println("User1.account2: " + customer1.account2.toDebugString());
 
-        System.out.println("User2.account1: " + user2.account1.toDebugString());
-        System.out.println("User2.account2: " + user2.account2.toDebugString());
+        System.out.println("User2.account1: " + customer2.account1.toDebugString());
+        System.out.println("User2.account2: " + customer2.account2.toDebugString());
 
         assertTrue(writeSkewEncountered.get());
     }
 
     @Test
-    public void whenWriteSkewNotAllowed_thenNoWriteSkewPossible() {
+    public void whenSerializedIsolationLevel_thenWriteSkewNotPossible() {
         mode = Mode.serialized;
         startAll(threads);
         sleepMs(getStressTestDurationMs(30 * 1000));
@@ -163,8 +160,8 @@ public class WriteSkewStressTest {
 
         joinAll(threads);
 
-        System.out.println("User1: " + user1);
-        System.out.println("User2: " + user2);
+        System.out.println("User1: " + customer1);
+        System.out.println("User2: " + customer2);
 
         assertFalse("writeskew detected", writeSkewEncountered.get());
     }
@@ -172,21 +169,18 @@ public class WriteSkewStressTest {
     public class TransferThread extends TestThread {
 
         private final AtomicBlock snapshotBlock = stm.newTransactionFactoryBuilder()
-                .setIsolationLevel(IsolationLevel.Snapshot)
                 .setMaxRetries(10000)
                 .newAtomicBlock();
         private final AtomicBlock serializedBlock = stm.newTransactionFactoryBuilder()
                 .setIsolationLevel(IsolationLevel.Serializable)
                 .setMaxRetries(10000)
                 .newAtomicBlock();
-        private final AtomicBlock privatizedReadLevelBlock = stm.newTransactionFactoryBuilder()
-                .setReadLockMode(LockMode.Exclusive)
-                .setIsolationLevel(IsolationLevel.Snapshot)
+        private final AtomicBlock pessimisticReadsBlock = stm.newTransactionFactoryBuilder()
+                .setReadLockMode(LockMode.Read)
                 .setMaxRetries(10000)
                 .newAtomicBlock();
-        private final AtomicBlock privatizedWriteLevelBlock = stm.newTransactionFactoryBuilder()
-                .setWriteLockMode(LockMode.Exclusive)
-                .setIsolationLevel(IsolationLevel.Snapshot)
+        private final AtomicBlock pessimisticWritesBlock = stm.newTransactionFactoryBuilder()
+                .setWriteLockMode(LockMode.Read)
                 .setMaxRetries(10000)
                 .newAtomicBlock();
 
@@ -205,22 +199,22 @@ public class WriteSkewStressTest {
 
                 switch (mode) {
                     case snapshot:
-                        doItWithSnapshot();
+                        runWithSnapshotIsolation();
                         break;
                     case serialized:
-                        doItWithSerializedBlock();
+                        runWithSerializedIsolation();
                         break;
-                    case privatizedReadLevel:
-                        doItWithPrivatizedReadLevel();
+                    case pessimisticReadLevel:
+                        runWithPessimisticReadLevel();
                         break;
-                    case privatizedWriteLevel:
-                        doItWithPrivatizedWriteLevel();
+                    case pessimisticWriteLevel:
+                        runWithPessimisticWriteLevel();
                         break;
-                    case privatizedRead:
-                        doItWithPrivatizedRead();
+                    case pessimisticReads:
+                        runWithPessimisticReads();
                         break;
-                    case privatizedWrite:
-                        doItWithPrivatizedWrite();
+                    case pessimisticWrites:
+                        runWithPessimisticWrites();
                         break;
                     default:
                         throw new IllegalStateException();
@@ -230,103 +224,98 @@ public class WriteSkewStressTest {
             }
         }
 
-        private void doItWithPrivatizedReadLevel() {
-            privatizedReadLevelBlock.execute(new AtomicVoidClosure() {
+        private void runWithPessimisticReadLevel() {
+            pessimisticReadsBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
-                    doIt(btx, false, false);
+                    run(btx, LockMode.None, LockMode.None);
                 }
             });
         }
 
-        private void doItWithPrivatizedWriteLevel() {
-            privatizedWriteLevelBlock.execute(new AtomicVoidClosure() {
+        private void runWithPessimisticWriteLevel() {
+            pessimisticWritesBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
-                    doIt(btx, false, false);
+                    run(btx, LockMode.None, LockMode.None);
                 }
             });
         }
 
-        private void doItWithSerializedBlock() {
+        private void runWithSerializedIsolation() {
             serializedBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
-                    doIt(btx, false, false);
+                    run(btx, LockMode.None, LockMode.None);
                 }
             });
         }
 
-        private void doItWithSnapshot() {
+        private void runWithSnapshotIsolation() {
             snapshotBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
-                    doIt(btx, false, false);
+                    run(btx, LockMode.None, LockMode.None);
                 }
             });
         }
 
-        private void doItWithPrivatizedRead() {
+        private void runWithPessimisticReads() {
             snapshotBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
-                    doIt(btx, true, true);
+                    run(btx, LockMode.Read, LockMode.Read);
                 }
             });
         }
 
-        private void doItWithPrivatizedWrite() {
+        private void runWithPessimisticWrites() {
             snapshotBlock.execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
-                    doIt(btx, false, true);
+                    run(btx, LockMode.None, LockMode.Read);
                 }
             });
         }
 
-        public void doIt(GammaTransaction tx, boolean pessimisticRead, boolean pessimisticWrite) {
+        public void run(GammaTransaction tx, LockMode readLockMode, LockMode writeLockMode) {
             int amount = randomInt(100);
 
-            User from = random(user1, user2);
-            User to = random(user1, user2);
+            Customer from = random(customer1, customer2);
+            Customer to = random(customer1, customer2);
 
-            long sum = from.account1.openForRead(tx, pessimisticRead ? LOCKMODE_EXCLUSIVE : LOCKMODE_NONE).long_value
-                    + from.account2.openForRead(tx, pessimisticRead ? LOCKMODE_EXCLUSIVE : LOCKMODE_NONE).long_value;
+            long sum = from.account1.openForRead(tx, readLockMode.asInt()).long_value
+                    + from.account2.openForRead(tx, readLockMode.asInt()).long_value;
 
             if (sum < 0) {
-                if (!writeSkewEncountered.get()) {
-                    writeSkewEncountered.set(true);
+                if (writeSkewEncountered.compareAndSet(false, true)) {
                     System.out.println("writeskew detected");
                 }
             }
 
             if (sum >= amount) {
                 GammaLongRef fromAccount = from.getRandomAccount();
-                fromAccount.openForWrite(tx, pessimisticWrite ? LOCKMODE_EXCLUSIVE : LOCKMODE_NONE).long_value -= amount;
+                fromAccount.openForWrite(tx, writeLockMode.asInt()).long_value -= amount;
 
                 GammaLongRef toAccount = to.getRandomAccount();
-                toAccount.openForWrite(tx, pessimisticWrite ? LOCKMODE_EXCLUSIVE : LOCKMODE_NONE).long_value += amount;
+                toAccount.openForWrite(tx, writeLockMode.asInt()).long_value += amount;
             }
 
             sleepRandomUs(20);
         }
     }
 
-    public User random(User user1, User user2) {
-        return randomBoolean() ? user1 : user2;
+    public Customer random(Customer customer1, Customer customer2) {
+        return randomBoolean() ? customer1 : customer2;
     }
 
-    public class User {
-        private AtomicBlock getTotalBlock = stm.newTransactionFactoryBuilder()
-                .setReadonly(true)
-                .newAtomicBlock();
-
+    public class Customer {
         private GammaLongRef account1 = new GammaLongRef(stm);
         private GammaLongRef account2 = new GammaLongRef(stm);
 
@@ -334,26 +323,9 @@ public class WriteSkewStressTest {
             return randomBoolean() ? account1 : account2;
         }
 
-        public long getTotal() {
-            return getTotalBlock.execute(new AtomicLongClosure() {
-                @Override
-                public long execute(Transaction tx) throws Exception {
-                    GammaTransaction btx = (GammaTransaction) tx;
-                    return account1.get(btx) + account2.get(btx);
-                }
-            });
-        }
-
         public String toString() {
-            return stm.newTransactionFactoryBuilder().newAtomicBlock().execute(new AtomicClosure<String>() {
-                @Override
-                public String execute(Transaction tx) throws Exception {
-                    GammaTransaction btx = (GammaTransaction) tx;
-
-                    return format("User(account1 = %s, account2 = %s)",
-                            account1.get(btx), account2.get(btx));
-                }
-            });
+            return format("User(account1 = %s, account2 = %s, sum=%s)",
+                    account1.atomicToString(), account2.atomicToString(), account1.atomicGet() + account2.atomicGet());
         }
     }
 }
