@@ -28,38 +28,6 @@ import org.multiverse.api.predicates.*;
 public interface IntRef extends TransactionalObject {
 
     /**
-     * Sets the value and returns the previous value using the Transaction on the ThreadLocalTransaction.
-     *
-     * @param value the new value.
-     * @return the old value.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     */
-    int getAndSet(int value);
-
-    /**
-     * Sets the new value using the Transaction on the ThreadLocalTransaction.
-     *
-     * @param value the new value.
-     * @return the new value.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     */
-    int set(int value);
-
-    /**
-     * Sets the new value using the provided transaction.
-     *
-     * @param tx    the transaction used to do the set.
-     * @param value the new value
-     * @return the old value
-     * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     */
-    int set(Transaction tx, int value);
-
-    /**
      * Gets the value using the provided transaction.
      *
      * @return the current value.
@@ -68,6 +36,18 @@ public interface IntRef extends TransactionalObject {
      * @see #atomicGet()
      */
     int get();
+
+     /**
+     * Gets the value and applies the lock. If the current lockMode already is higher than the provided lockMode
+     * the Lock is not upgraded to a higher value.
+     *
+     * @param lockMode the LockMode applied.
+     * @return the current value.
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     * @see #atomicGet()
+     */
+    int getAndLock(LockMode lockMode);
 
     /**
      * Gets the value using the provided transaction.
@@ -79,6 +59,81 @@ public interface IntRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     int get(Transaction tx);
+
+    int getAndLock(Transaction tx, LockMode lockMode);
+
+    /**
+    * Sets the new value using the Transaction on the ThreadLocalTransaction.
+    *
+    * @param value the new value.
+    * @return the new value.
+    * @throws org.multiverse.api.exceptions.ControlFlowError
+    * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    */
+    int set(int value);
+
+    /**
+    * Sets the new value using the Transaction on the ThreadLocalTransaction and applies the lock.
+    *
+    * @param value the new value.
+    * @param lockMode
+    * @return the new value.
+    * @throws NullPointerException if lockMode is null (if the transaction is alive, it will also be aborted.
+    * @throws org.multiverse.api.exceptions.ControlFlowError
+    * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    */
+    int setAndLock(int value, LockMode lockMode);
+
+   /**
+    * Sets the new value using the provided transaction.
+    *
+    * @param tx    the transaction used to do the set.
+    * @param value the new value
+    * @return the old value
+    * @throws NullPointerException if tx is null.
+    * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    * @throws org.multiverse.api.exceptions.ControlFlowError
+    */
+    int set(Transaction tx, int value);
+
+    /**
+    * Sets the new value using the provided transaction.
+    *
+    * @param tx    the transaction used to do the set.
+    * @param value the new value
+    * @return the old value
+    * @throws NullPointerException if tx is null or lockMode is null. If the lockMode is null and the transaction
+    *                              is alive, it will be aborted.
+    * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    * @throws org.multiverse.api.exceptions.ControlFlowError
+    */
+    int setAndLock(Transaction tx, int value, LockMode lockMode);
+
+    /**
+     * Sets the value and returns the previous value using the Transaction on the ThreadLocalTransaction.
+     *
+     * @param value the new value.
+     * @return the old value.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     */
+    int getAndSet(int value);
+
+    int getAndSetAndLock(int value, LockMode lockMode);
+
+    /**
+    * Sets the value using the provided transaction.
+    *
+    * @param value the new value.
+    * @param tx    the transaction used to do the getAndSet.
+    * @return the old value.
+    * @throws NullPointerException if tx is null.
+    * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    * @throws org.multiverse.api.exceptions.ControlFlowError
+    */
+    int getAndSet(Transaction tx, int value);
+
+    int getAndSetAndLock(Transaction tx, int value, LockMode lockMode);
 
     /**
      * Atomically gets the value. The value could be stale as soon as it is returned. This
@@ -121,19 +176,7 @@ public interface IntRef extends TransactionalObject {
      */
     int atomicGetAndSet(int newValue);
 
-    /**
-     * Sets the value using the provided transaction.
-     *
-     * @param value the new value.
-     * @param tx    the transaction used to do the getAndSet.
-     * @return the old value.
-     * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     */
-    int getAndSet(Transaction tx, int value);
-
-    /**
+     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
      * will commute. If somehow there already is a dependency or a dependency is formed on the result of
      * the commuting function, the function will not commute and will be exactly the same as an alter.

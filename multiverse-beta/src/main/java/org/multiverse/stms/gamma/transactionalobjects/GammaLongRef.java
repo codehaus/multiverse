@@ -1,5 +1,6 @@
 package org.multiverse.stms.gamma.transactionalobjects;
 
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.functions.Functions;
@@ -45,19 +46,31 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
     }
 
     @Override
-    public final long getAndSet(final long value) {
-        return getAndSet(getRequiredThreadLocalGammaTransaction(), value);
+    public final long get() {
+        return get(getRequiredThreadLocalGammaTransaction());
     }
 
-    public final long getAndSet(final Transaction tx, final long value) {
-        return getAndSet(asGammaTransaction(tx), value);
+    @Override
+    public final long get(final Transaction tx) {
+        return get(asGammaTransaction(tx));
     }
 
-    public final long getAndSet(final GammaTransaction tx, final long value) {
-        final GammaRefTranlocal tranlocal = openForWrite(tx, LOCKMODE_NONE);
-        final long oldValue = tranlocal.long_value;
-        tranlocal.long_value = value;
-        return oldValue;
+    public final long get(final GammaTransaction tx) {
+        return readLong(tx);
+    }
+
+    @Override
+    public long getAndLock(LockMode lockMode) {
+        return getAndLock(getRequiredThreadLocalGammaTransaction(), lockMode);
+    }
+
+    @Override
+    public long getAndLock(Transaction tx, LockMode lockMode) {
+        return getAndLock(asGammaTransaction(tx), lockMode);
+    }
+
+    public long getAndLock(GammaTransaction tx, LockMode lockMode) {
+        return getLong(tx, lockMode);
     }
 
     @Override
@@ -76,17 +89,47 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
     }
 
     @Override
-    public final long get() {
-        return get(getRequiredThreadLocalGammaTransaction());
+    public long setAndLock(long value, LockMode lockMode) {
+        return setAndLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
     }
 
     @Override
-    public final long get(final Transaction tx) {
-        return get(asGammaTransaction(tx));
+    public long setAndLock(Transaction tx, long value, LockMode lockMode) {
+        return setAndLock(asGammaTransaction(tx), value, lockMode);
     }
 
-    public final long get(final GammaTransaction tx) {
-        return readLong(tx);
+    public long setAndLock(GammaTransaction tx, long value, LockMode lockMode) {
+        return setLong(tx, lockMode, value, false);
+    }
+
+    @Override
+    public final long getAndSet(final long value) {
+        return getAndSet(getRequiredThreadLocalGammaTransaction(), value);
+    }
+
+    public final long getAndSet(final Transaction tx, final long value) {
+        return getAndSet(asGammaTransaction(tx), value);
+    }
+
+    public final long getAndSet(final GammaTransaction tx, final long value) {
+        final GammaRefTranlocal tranlocal = openForWrite(tx, LOCKMODE_NONE);
+        final long oldValue = tranlocal.long_value;
+        tranlocal.long_value = value;
+        return oldValue;
+    }
+
+    @Override
+    public long getAndSetAndLock(long value, LockMode lockMode) {
+        return getAndSetAndLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
+    }
+
+    @Override
+    public long getAndSetAndLock(Transaction tx, long value, LockMode lockMode) {
+        return getAndSetLock(asGammaTransaction(tx), value, lockMode);
+    }
+
+    public long getAndSetLock(GammaTransaction tx, long value, LockMode lockMode) {
+        return setLong(tx, lockMode, value, true);
     }
 
     @Override

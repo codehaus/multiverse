@@ -5,16 +5,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.multiverse.api.LockMode;
+import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.api.references.LongRef;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.GammaStmUtils;
 import org.multiverse.stms.gamma.transactionalobjects.GammaBooleanRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
 import org.multiverse.stms.gamma.transactions.fat.FatFixedLengthGammaTransactionFactory;
@@ -198,7 +196,7 @@ public class GammaBooleanRef_get1Test {
         long initialVersion = ref.getVersion();
 
         try {
-            ref.get(null);
+            ref.get((Transaction)null);
             fail();
         } catch (NullPointerException expected) {
 

@@ -1,7 +1,9 @@
 package org.multiverse.stms.gamma.transactionalobjects;
 
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LockedException;
+import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.Function;
 import org.multiverse.api.predicates.Predicate;
 import org.multiverse.api.references.Ref;
@@ -47,6 +49,34 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     @Override
+    public final E get() {
+        return get(getRequiredThreadLocalGammaTransaction());
+    }
+
+    @Override
+    public final E get(final Transaction tx) {
+        return get(asGammaTransaction(tx));
+    }
+
+    public final E get(final GammaTransaction tx) {
+        return (E) openForRead(tx, LOCKMODE_NONE).ref_value;
+    }
+
+    @Override
+    public E getAndLock(LockMode lockMode) {
+        return getAndLock(getRequiredThreadLocalGammaTransaction(), lockMode);
+    }
+
+    @Override
+    public E getAndLock(Transaction tx, LockMode lockMode) {
+        return getAndLock(asGammaTransaction(tx), lockMode);
+    }
+
+    public E getAndLock(GammaTransaction tx, LockMode lockMode) {
+        throw new TodoException();
+    }
+
+    @Override
     public final E set(final E value) {
         return set(getRequiredThreadLocalTransaction(), value);
     }
@@ -63,17 +93,48 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     @Override
-    public final E get() {
-        return get(getRequiredThreadLocalGammaTransaction());
+    public E setAndLock(E value, LockMode lockMode) {
+        return setAndLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
     }
 
     @Override
-    public final E get(final Transaction tx) {
-        return get(asGammaTransaction(tx));
+    public E setAndLock(Transaction tx, E value, LockMode lockMode) {
+        return setAndLock(asGammaTransaction(tx), value, lockMode);
     }
 
-    public final E get(final GammaTransaction tx) {
-        return (E) openForRead(tx, LOCKMODE_NONE).ref_value;
+    public E setAndLock(GammaTransaction tx, E value, LockMode lockMode) {
+        throw new TodoException();
+    }
+
+    @Override
+    public final E getAndSet(final E value) {
+        return getAndSet(getRequiredThreadLocalTransaction(), value);
+    }
+
+    @Override
+    public final E getAndSet(final Transaction tx, final E value) {
+        return getAndSet(asGammaTransaction(tx), value);
+    }
+
+    public final E getAndSet(final GammaTransaction tx, final E value) {
+        GammaRefTranlocal tranlocal = openForWrite(tx, LOCKMODE_NONE);
+        E oldValue = (E) tranlocal.ref_value;
+        tranlocal.ref_value = value;
+        return oldValue;
+    }
+
+    @Override
+    public E getAndSetAndLock(E value, LockMode lockMode) {
+        return getAndSetAndLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
+    }
+
+    @Override
+    public E getAndSetAndLock(Transaction tx, E value, LockMode lockMode) {
+        return getAndSetAndLock(asGammaTransaction(tx), value, lockMode);
+    }
+
+    public E getAndSetAndLock(GammaTransaction tx, E value, LockMode lockMode) {
+        throw new TodoException();
     }
 
     @Override
@@ -96,22 +157,6 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
         return (E) atomicSetObject(newValue, true);
     }
 
-    @Override
-    public final E getAndSet(final E value) {
-        return getAndSet(getRequiredThreadLocalTransaction(), value);
-    }
-
-    @Override
-    public final E getAndSet(final Transaction tx, final E value) {
-        return getAndSet(asGammaTransaction(tx), value);
-    }
-
-    public final E getAndSet(final GammaTransaction tx, final E value) {
-        GammaRefTranlocal tranlocal = openForWrite(tx, LOCKMODE_NONE);
-        E oldValue = (E) tranlocal.ref_value;
-        tranlocal.ref_value = value;
-        return oldValue;
-    }
 
     @Override
     public final void commute(final Function<E> function) {

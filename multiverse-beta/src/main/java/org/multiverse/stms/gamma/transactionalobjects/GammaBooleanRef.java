@@ -1,5 +1,6 @@
 package org.multiverse.stms.gamma.transactionalobjects;
 
+import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.functions.BooleanFunction;
@@ -43,6 +44,34 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     }
 
     @Override
+    public boolean getAndLock(LockMode lockMode) {
+        return getAndLock(getRequiredThreadLocalGammaTransaction(), lockMode);
+    }
+
+    @Override
+    public boolean getAndLock(Transaction tx, LockMode lockMode) {
+        return getAndLock(asGammaTransaction(tx), lockMode);
+    }
+
+    public boolean getAndLock(GammaTransaction tx, LockMode lockMode) {
+        return longAsBoolean(getLong(asGammaTransaction(tx), lockMode));
+    }
+
+    @Override
+    public final boolean get() {
+        return get(getRequiredThreadLocalGammaTransaction());
+    }
+
+    @Override
+    public final boolean get(final Transaction tx) {
+        return get(asGammaTransaction(tx));
+    }
+
+    public final boolean get(final GammaTransaction tx) {
+        return longAsBoolean(openForRead(tx, LOCKMODE_NONE).long_value);
+    }
+
+    @Override
     public final boolean set(final boolean value) {
         return set(getRequiredThreadLocalGammaTransaction(), value);
     }
@@ -58,17 +87,48 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     }
 
     @Override
-    public final boolean get() {
-        return get(getRequiredThreadLocalGammaTransaction());
+    public boolean setAndLock(boolean value, LockMode lockMode) {
+        return setAndLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
     }
 
     @Override
-    public final boolean get(final Transaction tx) {
-        return get(asGammaTransaction(tx));
+    public boolean setAndLock(Transaction tx, boolean value, LockMode lockMode) {
+        return setAndLock(asGammaTransaction(tx), value, lockMode);
     }
 
-    public final boolean get(final GammaTransaction tx) {
-        return longAsBoolean(openForRead(tx, LOCKMODE_NONE).long_value);
+    public boolean setAndLock(GammaTransaction tx, boolean value, LockMode lockMode) {
+        return longAsBoolean(setLong(tx, lockMode, booleanAsLong(value), false));
+    }
+
+    @Override
+    public final boolean getAndSet(final boolean value) {
+        return getAndSet(getRequiredThreadLocalGammaTransaction(), value);
+    }
+
+    @Override
+    public final boolean getAndSet(final Transaction tx, final boolean value) {
+        return getAndSet(asGammaTransaction(tx), value);
+    }
+
+    @Override
+    public boolean getAndSetAndLock(boolean value, LockMode lockMode) {
+        return getAndSetAndLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
+    }
+
+    @Override
+    public boolean getAndSetAndLock(Transaction tx, boolean value, LockMode lockMode) {
+        return getAndSetAndLock(asGammaTransaction(tx), value, lockMode);
+    }
+
+    public boolean getAndSetAndLock(GammaTransaction tx, boolean value, LockMode lockMode) {
+        return longAsBoolean(setLong(tx, lockMode, booleanAsLong(value), true));
+    }
+
+    public final boolean getAndSet(final GammaTransaction tx, final boolean value) {
+        GammaRefTranlocal tranlocal = openForWrite(tx, LOCKMODE_NONE);
+        boolean oldValue = longAsBoolean(tranlocal.long_value);
+        tranlocal.long_value = booleanAsLong(value);
+        return oldValue;
     }
 
     @Override
@@ -89,23 +149,6 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     @Override
     public final boolean atomicGetAndSet(final boolean newValue) {
         return longAsBoolean(atomicSetLong(booleanAsLong(newValue), true));
-    }
-
-    @Override
-    public final boolean getAndSet(final boolean value) {
-        return getAndSet(getRequiredThreadLocalGammaTransaction(), value);
-    }
-
-    @Override
-    public final boolean getAndSet(final Transaction tx, final boolean value) {
-        return getAndSet(asGammaTransaction(tx), value);
-    }
-
-    public final boolean getAndSet(final GammaTransaction tx, final boolean value) {
-        GammaRefTranlocal tranlocal = openForWrite(tx, LOCKMODE_NONE);
-        boolean oldValue = longAsBoolean(tranlocal.long_value);
-        tranlocal.long_value = booleanAsLong(value);
-        return oldValue;
     }
 
     @Override

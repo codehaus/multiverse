@@ -28,38 +28,6 @@ import org.multiverse.api.predicates.*;
 public interface DoubleRef extends TransactionalObject {
 
     /**
-     * Sets the value and returns the previous value using the Transaction on the ThreadLocalTransaction.
-     *
-     * @param value the new value.
-     * @return the old value.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     */
-    double getAndSet(double value);
-
-    /**
-     * Sets the new value using the Transaction on the ThreadLocalTransaction.
-     *
-     * @param value the new value.
-     * @return the new value.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     */
-    double set(double value);
-
-    /**
-     * Sets the new value using the provided transaction.
-     *
-     * @param tx    the transaction used to do the set.
-     * @param value the new value
-     * @return the old value
-     * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     */
-    double set(Transaction tx, double value);
-
-    /**
      * Gets the value using the provided transaction.
      *
      * @return the current value.
@@ -68,6 +36,18 @@ public interface DoubleRef extends TransactionalObject {
      * @see #atomicGet()
      */
     double get();
+
+     /**
+     * Gets the value and applies the lock. If the current lockMode already is higher than the provided lockMode
+     * the Lock is not upgraded to a higher value.
+     *
+     * @param lockMode the LockMode applied.
+     * @return the current value.
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     * @see #atomicGet()
+     */
+    double getAndLock(LockMode lockMode);
 
     /**
      * Gets the value using the provided transaction.
@@ -79,6 +59,81 @@ public interface DoubleRef extends TransactionalObject {
      * @throws org.multiverse.api.exceptions.ControlFlowError
      */
     double get(Transaction tx);
+
+    double getAndLock(Transaction tx, LockMode lockMode);
+
+    /**
+    * Sets the new value using the Transaction on the ThreadLocalTransaction.
+    *
+    * @param value the new value.
+    * @return the new value.
+    * @throws org.multiverse.api.exceptions.ControlFlowError
+    * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    */
+    double set(double value);
+
+    /**
+    * Sets the new value using the Transaction on the ThreadLocalTransaction and applies the lock.
+    *
+    * @param value the new value.
+    * @param lockMode
+    * @return the new value.
+    * @throws NullPointerException if lockMode is null (if the transaction is alive, it will also be aborted.
+    * @throws org.multiverse.api.exceptions.ControlFlowError
+    * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    */
+    double setAndLock(double value, LockMode lockMode);
+
+   /**
+    * Sets the new value using the provided transaction.
+    *
+    * @param tx    the transaction used to do the set.
+    * @param value the new value
+    * @return the old value
+    * @throws NullPointerException if tx is null.
+    * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    * @throws org.multiverse.api.exceptions.ControlFlowError
+    */
+    double set(Transaction tx, double value);
+
+    /**
+    * Sets the new value using the provided transaction.
+    *
+    * @param tx    the transaction used to do the set.
+    * @param value the new value
+    * @return the old value
+    * @throws NullPointerException if tx is null or lockMode is null. If the lockMode is null and the transaction
+    *                              is alive, it will be aborted.
+    * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    * @throws org.multiverse.api.exceptions.ControlFlowError
+    */
+    double setAndLock(Transaction tx, double value, LockMode lockMode);
+
+    /**
+     * Sets the value and returns the previous value using the Transaction on the ThreadLocalTransaction.
+     *
+     * @param value the new value.
+     * @return the old value.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     */
+    double getAndSet(double value);
+
+    double getAndSetAndLock(double value, LockMode lockMode);
+
+    /**
+    * Sets the value using the provided transaction.
+    *
+    * @param value the new value.
+    * @param tx    the transaction used to do the getAndSet.
+    * @return the old value.
+    * @throws NullPointerException if tx is null.
+    * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    * @throws org.multiverse.api.exceptions.ControlFlowError
+    */
+    double getAndSet(Transaction tx, double value);
+
+    double getAndSetAndLock(Transaction tx, double value, LockMode lockMode);
 
     /**
      * Atomically gets the value. The value could be stale as soon as it is returned. This
@@ -121,19 +176,7 @@ public interface DoubleRef extends TransactionalObject {
      */
     double atomicGetAndSet(double newValue);
 
-    /**
-     * Sets the value using the provided transaction.
-     *
-     * @param value the new value.
-     * @param tx    the transaction used to do the getAndSet.
-     * @return the old value.
-     * @throws NullPointerException if tx is null.
-     * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     */
-    double getAndSet(Transaction tx, double value);
-
-    /**
+     /**
      * Applies the function on the re in a commuting manner. So if there are no dependencies, the function
      * will commute. If somehow there already is a dependency or a dependency is formed on the result of
      * the commuting function, the function will not commute and will be exactly the same as an alter.

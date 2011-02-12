@@ -59,6 +59,8 @@ transactions can also act as node (no need to introduce additional datastructure
 
 - testing: PhantomReadTest
 
+- ordering of get/set/getandset in ref
+
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------

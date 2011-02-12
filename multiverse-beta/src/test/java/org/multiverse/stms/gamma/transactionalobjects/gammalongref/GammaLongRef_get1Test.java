@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.multiverse.api.LockMode;
+import org.multiverse.api.Transaction;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
@@ -188,7 +189,7 @@ public class GammaLongRef_get1Test {
         long initialVersion = ref.getVersion();
 
         try {
-            ref.get(null);
+            ref.get((Transaction)null);
             fail();
         } catch (NullPointerException expected) {
 

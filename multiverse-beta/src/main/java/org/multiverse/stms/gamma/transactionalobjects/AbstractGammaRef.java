@@ -1424,6 +1424,15 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tranlocal.writeSkewCheck = true;
     }
 
+    protected final long getLong(GammaTransaction tx, LockMode lockMode){
+        throw new TodoException();
+    }
+
+    protected final long setLong(GammaTransaction tx, LockMode lockMode, long newValue, boolean returnOld){
+        throw new TodoException();
+    }
+
+
     public final long atomicGetLong() {
         assert type != TYPE_REF;
 
