@@ -1,11 +1,7 @@
 package org.multiverse.stms.gamma;
 
-import org.multiverse.api.BackoffPolicy;
-import org.multiverse.api.ExponentialBackoffPolicy;
-import org.multiverse.api.IsolationLevel;
-import org.multiverse.api.LockMode;
-import org.multiverse.api.PropagationLevel;
-import org.multiverse.api.TraceLevel;
+import org.multiverse.api.*;
+import org.multiverse.api.DefaultBackoffPolicy;
 
 import static java.lang.String.format;
 
@@ -122,7 +118,7 @@ public final class GammaStmConfiguration {
      * If a transaction fails for a read/write conflict it should not hammer the system by trying again and running in the same conflict
      * The default backoff policy helps to back threads of by sleeping/yielding.
      */
-    public BackoffPolicy backoffPolicy = ExponentialBackoffPolicy.MAX_100_MS;
+    public BackoffPolicy backoffPolicy = DefaultBackoffPolicy.MAX_100_MS;
 
     /**
      * With the trace level you have control if you get output of transactions executing. It helps with debugging. If the

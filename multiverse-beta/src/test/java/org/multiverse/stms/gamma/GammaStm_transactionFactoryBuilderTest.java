@@ -44,7 +44,7 @@ public class GammaStm_transactionFactoryBuilderTest {
         assertEquals(1000, config.maxRetries);
         assertTrue(config.isSpeculative());
         assertTrue(config.isAnonymous);
-        assertSame(ExponentialBackoffPolicy.MAX_100_MS, config.getBackoffPolicy());
+        assertSame(DefaultBackoffPolicy.MAX_100_MS, config.getBackoffPolicy());
         assertEquals(Long.MAX_VALUE, config.getTimeoutNs());
         assertSame(TraceLevel.None, config.getTraceLevel());
         assertTrue(config.writeSkewAllowed);

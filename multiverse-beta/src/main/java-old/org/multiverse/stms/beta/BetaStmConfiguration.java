@@ -26,7 +26,7 @@ public class BetaStmConfiguration {
     public int maxRetries = 1000;
     public boolean speculativeConfigEnabled = true;
     public int maxArrayTransactionSize = 20;
-    public BackoffPolicy backoffPolicy = ExponentialBackoffPolicy.MAX_100_MS;
+    public BackoffPolicy backoffPolicy = DefaultBackoffPolicy.MAX_100_MS;
     public TraceLevel traceLevel = TraceLevel.None;
 
     /**

@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 import static java.util.concurrent.locks.LockSupport.parkNanos;
 
 /**
- * A {@link ExponentialBackoffPolicy} that does an exponential backoff. So each next attempt, the delay is doubled until a
+ * A {@link DefaultBackoffPolicy} that does an exponential backoff. So each next attempt, the delay is doubled until a
  * configurable maximum delay has been reached.
  * <p/>
  * The exponential growth of delay can be truncated by providing a maxDelay. If no max delay is provided, the maximum
@@ -15,11 +15,10 @@ import static java.util.concurrent.locks.LockSupport.parkNanos;
  * @author Peter Veentjer.
  */
 @SuppressWarnings({"CallToThreadYield"})
-public final class ExponentialBackoffPolicy implements BackoffPolicy {
+public final class DefaultBackoffPolicy implements BackoffPolicy {
 
-    public final static BackoffPolicy MAX_100_MS = new ExponentialBackoffPolicy();
+    public final static BackoffPolicy MAX_100_MS = new DefaultBackoffPolicy();
 
-    private final long maxDelayNs;
     private final long minDelayNs;
     private final long[] slotTimes;
 
@@ -27,8 +26,8 @@ public final class ExponentialBackoffPolicy implements BackoffPolicy {
      * Creates an ExponentialBackoffPolicy with 100 nanoseconds as minimal delay and 100 milliseconds as maximum
      * delay.
      */
-    public ExponentialBackoffPolicy() {
-        this(1000, TimeUnit.MILLISECONDS.toNanos(100), TimeUnit.NANOSECONDS);
+    public DefaultBackoffPolicy() {
+        this(1000);
     }
 
     /**
@@ -40,15 +39,10 @@ public final class ExponentialBackoffPolicy implements BackoffPolicy {
      * @param unit       the unit of maxDelay.
      * @throws NullPointerException if unit is null.
      */
-    public ExponentialBackoffPolicy(long minDelayNs, long maxDelay, TimeUnit unit) {
-        this.maxDelayNs = unit.toNanos(maxDelay);
-        this.minDelayNs = minDelayNs;
-        if (minDelayNs > maxDelayNs) {
-            throw new IllegalArgumentException("minimum delay can't be larger than maximum delay");
-        }
-
+    public DefaultBackoffPolicy(long minDelayNs) {
         Random random = new Random();
         slotTimes = new long[1000];
+        this.minDelayNs = minDelayNs;
 
         double a = 100;
         double b = -4963;
