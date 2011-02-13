@@ -38,20 +38,6 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
         this.version = VERSION_UNCOMMITTED + 1;
     }
 
-    @Override
-    public final double set(final double value) {
-        return set(getRequiredThreadLocalGammaTransaction(), value);
-    }
-
-    @Override
-    public final double set(final Transaction tx, final double value) {
-        return set(asGammaTransaction(tx), value);
-    }
-
-    public final double set(final GammaTransaction tx, final double value) {
-        openForWrite(tx, LOCKMODE_NONE).long_value = doubleAsLong(value);
-        return value;
-    }
 
     @Override
     public final double get() {
@@ -68,30 +54,45 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
     }
 
     @Override
-    public double getAndLock(LockMode lockMode) {
+    public final double getAndLock(LockMode lockMode) {
         return getAndLock(getRequiredThreadLocalGammaTransaction(), lockMode);
     }
 
     @Override
-    public double getAndLock(Transaction tx, LockMode lockMode) {
+    public final double getAndLock(Transaction tx, LockMode lockMode) {
         return getAndLock(asGammaTransaction(tx), lockMode);
     }
 
-    public double getAndLock(GammaTransaction tx, LockMode lockMode) {
+    public final double getAndLock(GammaTransaction tx, LockMode lockMode) {
         return longAsDouble(getLong(tx, lockMode));
     }
 
     @Override
-    public double setAndLock(double value, LockMode lockMode) {
+    public final double set(final double value) {
+        return set(getRequiredThreadLocalGammaTransaction(), value);
+    }
+
+    @Override
+    public final double set(final Transaction tx, final double value) {
+        return set(asGammaTransaction(tx), value);
+    }
+
+    public final double set(final GammaTransaction tx, final double value) {
+        openForWrite(tx, LOCKMODE_NONE).long_value = doubleAsLong(value);
+        return value;
+    }
+
+    @Override
+    public final double setAndLock(double value, LockMode lockMode) {
         return setAndLock(getRequiredThreadLocalGammaTransaction(), doubleAsLong(value), lockMode);
     }
 
     @Override
-    public double setAndLock(Transaction tx, double value, LockMode lockMode) {
+    public final double setAndLock(Transaction tx, double value, LockMode lockMode) {
         return setAndLock(asGammaTransaction(tx), value, lockMode);
     }
 
-    public double setAndLock(GammaTransaction tx, double value, LockMode lockMode) {
+    public final double setAndLock(GammaTransaction tx, double value, LockMode lockMode) {
         return longAsDouble(setLong(tx, lockMode, doubleAsLong(value), false));
     }
 
@@ -113,16 +114,16 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
     }
 
     @Override
-    public double getAndSetAndLock(double value, LockMode lockMode) {
+    public final double getAndSetAndLock(double value, LockMode lockMode) {
         return getAndSetAndLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
     }
 
     @Override
-    public double getAndSetAndLock(Transaction tx, double value, LockMode lockMode) {
+    public final double getAndSetAndLock(Transaction tx, double value, LockMode lockMode) {
         return getAndSetAndLock(asGammaTransaction(tx), value, lockMode);
     }
 
-    public double getAndSetAndLock(GammaTransaction tx, double value, LockMode lockMode) {
+    public final double getAndSetAndLock(GammaTransaction tx, double value, LockMode lockMode) {
         return longAsDouble(setLong(tx, lockMode, doubleAsLong(value), true));
     }
 
@@ -145,7 +146,6 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
     public final double atomicGetAndSet(final double newValue) {
         return longAsDouble(atomicSetLong(doubleAsLong(newValue), true));
     }
-
 
     @Override
     public final void commute(final DoubleFunction function) {

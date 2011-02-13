@@ -44,20 +44,6 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     }
 
     @Override
-    public boolean getAndLock(LockMode lockMode) {
-        return getAndLock(getRequiredThreadLocalGammaTransaction(), lockMode);
-    }
-
-    @Override
-    public boolean getAndLock(Transaction tx, LockMode lockMode) {
-        return getAndLock(asGammaTransaction(tx), lockMode);
-    }
-
-    public boolean getAndLock(GammaTransaction tx, LockMode lockMode) {
-        return longAsBoolean(getLong(asGammaTransaction(tx), lockMode));
-    }
-
-    @Override
     public final boolean get() {
         return get(getRequiredThreadLocalGammaTransaction());
     }
@@ -69,6 +55,20 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
 
     public final boolean get(final GammaTransaction tx) {
         return longAsBoolean(openForRead(tx, LOCKMODE_NONE).long_value);
+    }
+
+    @Override
+    public final boolean getAndLock(LockMode lockMode) {
+        return getAndLock(getRequiredThreadLocalGammaTransaction(), lockMode);
+    }
+
+    @Override
+    public final boolean getAndLock(Transaction tx, LockMode lockMode) {
+        return getAndLock(asGammaTransaction(tx), lockMode);
+    }
+
+    public final boolean getAndLock(GammaTransaction tx, LockMode lockMode) {
+        return longAsBoolean(getLong(asGammaTransaction(tx), lockMode));
     }
 
     @Override
@@ -87,16 +87,16 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     }
 
     @Override
-    public boolean setAndLock(boolean value, LockMode lockMode) {
+    public final boolean setAndLock(boolean value, LockMode lockMode) {
         return setAndLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
     }
 
     @Override
-    public boolean setAndLock(Transaction tx, boolean value, LockMode lockMode) {
+    public final boolean setAndLock(Transaction tx, boolean value, LockMode lockMode) {
         return setAndLock(asGammaTransaction(tx), value, lockMode);
     }
 
-    public boolean setAndLock(GammaTransaction tx, boolean value, LockMode lockMode) {
+    public final boolean setAndLock(GammaTransaction tx, boolean value, LockMode lockMode) {
         return longAsBoolean(setLong(tx, lockMode, booleanAsLong(value), false));
     }
 
@@ -111,16 +111,16 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     }
 
     @Override
-    public boolean getAndSetAndLock(boolean value, LockMode lockMode) {
+    public final boolean getAndSetAndLock(boolean value, LockMode lockMode) {
         return getAndSetAndLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
     }
 
     @Override
-    public boolean getAndSetAndLock(Transaction tx, boolean value, LockMode lockMode) {
+    public final boolean getAndSetAndLock(Transaction tx, boolean value, LockMode lockMode) {
         return getAndSetAndLock(asGammaTransaction(tx), value, lockMode);
     }
 
-    public boolean getAndSetAndLock(GammaTransaction tx, boolean value, LockMode lockMode) {
+    public final boolean getAndSetAndLock(GammaTransaction tx, boolean value, LockMode lockMode) {
         return longAsBoolean(setLong(tx, lockMode, booleanAsLong(value), true));
     }
 

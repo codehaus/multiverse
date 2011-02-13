@@ -57,15 +57,15 @@ transactions can also act as node (no need to introduce additional datastructure
 
 - testing:PhantomReadTest
 
+--------------------------------------------------------------------
+                        done
+--------------------------------------------------------------------
+
 - testing: getAndLock
 
 - testing: getAndSetAndLock
 
 - testing: setAndLock.
-
---------------------------------------------------------------------
-                        done
---------------------------------------------------------------------
 
 - implement the getAndLock, setAndLock and the getAndSetAndLock
 

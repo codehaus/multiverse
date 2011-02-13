@@ -60,16 +60,16 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
     }
 
     @Override
-    public long getAndLock(LockMode lockMode) {
+    public final long getAndLock(LockMode lockMode) {
         return getAndLock(getRequiredThreadLocalGammaTransaction(), lockMode);
     }
 
     @Override
-    public long getAndLock(Transaction tx, LockMode lockMode) {
+    public final long getAndLock(Transaction tx, LockMode lockMode) {
         return getAndLock(asGammaTransaction(tx), lockMode);
     }
 
-    public long getAndLock(GammaTransaction tx, LockMode lockMode) {
+    public final long getAndLock(GammaTransaction tx, LockMode lockMode) {
         return getLong(tx, lockMode);
     }
 
@@ -89,16 +89,16 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
     }
 
     @Override
-    public long setAndLock(long value, LockMode lockMode) {
+    public final long setAndLock(long value, LockMode lockMode) {
         return setAndLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
     }
 
     @Override
-    public long setAndLock(Transaction tx, long value, LockMode lockMode) {
+    public final long setAndLock(Transaction tx, long value, LockMode lockMode) {
         return setAndLock(asGammaTransaction(tx), value, lockMode);
     }
 
-    public long setAndLock(GammaTransaction tx, long value, LockMode lockMode) {
+    public final long setAndLock(GammaTransaction tx, long value, LockMode lockMode) {
         return setLong(tx, lockMode, value, false);
     }
 
@@ -119,16 +119,16 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
     }
 
     @Override
-    public long getAndSetAndLock(long value, LockMode lockMode) {
+    public final long getAndSetAndLock(long value, LockMode lockMode) {
         return getAndSetAndLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
     }
 
     @Override
-    public long getAndSetAndLock(Transaction tx, long value, LockMode lockMode) {
+    public final long getAndSetAndLock(Transaction tx, long value, LockMode lockMode) {
         return getAndSetLock(asGammaTransaction(tx), value, lockMode);
     }
 
-    public long getAndSetLock(GammaTransaction tx, long value, LockMode lockMode) {
+    public final long getAndSetLock(GammaTransaction tx, long value, LockMode lockMode) {
         return setLong(tx, lockMode, value, true);
     }
 

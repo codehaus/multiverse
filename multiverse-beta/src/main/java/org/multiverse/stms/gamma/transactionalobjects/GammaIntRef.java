@@ -63,11 +63,11 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     }
 
     @Override
-    public int getAndLock(Transaction tx, LockMode lockMode) {
+    public final int getAndLock(Transaction tx, LockMode lockMode) {
         return getAndLock(asGammaTransaction(tx), lockMode);
     }
 
-    public int getAndLock(GammaTransaction tx, LockMode lockMode) {
+    public final int getAndLock(GammaTransaction tx, LockMode lockMode) {
         return (int) getLong(tx, lockMode);
     }
 
@@ -88,16 +88,16 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     }
 
     @Override
-    public int setAndLock(int value, LockMode lockMode) {
+    public final int setAndLock(int value, LockMode lockMode) {
         return setAndLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
     }
 
     @Override
-    public int setAndLock(Transaction tx, int value, LockMode lockMode) {
+    public final int setAndLock(Transaction tx, int value, LockMode lockMode) {
         return setAndLock(asGammaTransaction(tx), value, lockMode);
     }
 
-    public int setAndLock(GammaTransaction tx, int value, LockMode lockMode) {
+    public final int setAndLock(GammaTransaction tx, int value, LockMode lockMode) {
         return (int) longAsDouble(setLong(tx, lockMode, value, false));
     }
 
@@ -119,16 +119,16 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     }
 
     @Override
-    public int getAndSetAndLock(int value, LockMode lockMode) {
+    public final int getAndSetAndLock(int value, LockMode lockMode) {
         return getAndSetLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
     }
 
     @Override
-    public int getAndSetAndLock(Transaction tx, int value, LockMode lockMode) {
+    public final int getAndSetAndLock(Transaction tx, int value, LockMode lockMode) {
         return getAndSetLock(asGammaTransaction(tx), value, lockMode);
     }
 
-    public int getAndSetLock(GammaTransaction tx, int value, LockMode lockMode) {
+    public final int getAndSetLock(GammaTransaction tx, int value, LockMode lockMode) {
         return (int) setLong(tx, lockMode, value, true);
     }
 

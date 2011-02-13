@@ -62,16 +62,16 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     @Override
-    public E getAndLock(LockMode lockMode) {
+    public final E getAndLock(LockMode lockMode) {
         return getAndLock(getRequiredThreadLocalGammaTransaction(), lockMode);
     }
 
     @Override
-    public E getAndLock(Transaction tx, LockMode lockMode) {
+    public final E getAndLock(Transaction tx, LockMode lockMode) {
         return getAndLock(asGammaTransaction(tx), lockMode);
     }
 
-    public E getAndLock(GammaTransaction tx, LockMode lockMode) {
+    public final E getAndLock(GammaTransaction tx, LockMode lockMode) {
         return (E) getObject(tx, lockMode);
     }
 
@@ -92,16 +92,16 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     @Override
-    public E setAndLock(E value, LockMode lockMode) {
+    public final E setAndLock(E value, LockMode lockMode) {
         return setAndLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
     }
 
     @Override
-    public E setAndLock(Transaction tx, E value, LockMode lockMode) {
+    public final E setAndLock(Transaction tx, E value, LockMode lockMode) {
         return setAndLock(asGammaTransaction(tx), value, lockMode);
     }
 
-    public E setAndLock(GammaTransaction tx, E value, LockMode lockMode) {
+    public final E setAndLock(GammaTransaction tx, E value, LockMode lockMode) {
         return (E)setObject(tx, lockMode, value, false);
     }
 
@@ -123,16 +123,16 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     @Override
-    public E getAndSetAndLock(E value, LockMode lockMode) {
+    public final E getAndSetAndLock(E value, LockMode lockMode) {
         return getAndSetAndLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
     }
 
     @Override
-    public E getAndSetAndLock(Transaction tx, E value, LockMode lockMode) {
+    public final E getAndSetAndLock(Transaction tx, E value, LockMode lockMode) {
         return getAndSetAndLock(asGammaTransaction(tx), value, lockMode);
     }
 
-    public E getAndSetAndLock(GammaTransaction tx, E value, LockMode lockMode) {
+    public final E getAndSetAndLock(GammaTransaction tx, E value, LockMode lockMode) {
         return (E)setObject(tx, lockMode, value, true);
     }
 
