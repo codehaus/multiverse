@@ -1,7 +1,6 @@
 package org.multiverse.stms.gamma.transactions.fat;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.TransactionStatus;
@@ -163,9 +162,31 @@ public abstract class FatGammaTransaction_openForReadTest<T extends GammaTransac
     }
 
     @Test
-    @Ignore
     public void whenAlreadyOpenedForCommuteAndLockingConflicts() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
+        T tx = newTransaction();
+        ref.commute(tx, Functions.newIncLongFunction());
+        GammaRefTranlocal tranlocal = tx.locate(ref);
+
+        T otherTx = newTransaction();
+        ref.getLock().acquire(otherTx, LockMode.Exclusive);
+
+        try{
+            ref.openForRead(tx, LOCKMODE_NONE);
+            fail();
+        }catch(ReadWriteConflict expected){
+
+        }
+
+        assertNotNull(tranlocal);
+        assertNull(tranlocal.owner);
+        assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
+        assertIsAborted(tx);
+        assertRefHasExclusiveLock(ref, otherTx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
