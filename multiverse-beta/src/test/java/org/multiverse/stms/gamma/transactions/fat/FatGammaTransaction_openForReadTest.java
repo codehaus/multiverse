@@ -89,7 +89,7 @@ public abstract class FatGammaTransaction_openForReadTest<T extends GammaTransac
     public void whenTransactionAbortOnly_thenRereadStillPossible() {
         GammaLongRef ref = new GammaLongRef(stm, 0);
 
-        GammaTransaction tx = stm.newDefaultTransaction();
+        GammaTransaction tx = newTransaction();
         GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
         tx.setAbortOnly();
         GammaRefTranlocal reread = ref.openForRead(tx, LOCKMODE_NONE);
@@ -100,15 +100,30 @@ public abstract class FatGammaTransaction_openForReadTest<T extends GammaTransac
     }
 
     @Test
-    @Ignore
-    public void whenReadFirstAndThenLockedByOtherAndThenReread() {
-
+    public void whenReadFirstAndExclusivelyLockedByOtherAndThenReread_thenNoProblem() {
+        whenReadFirstAndExclusivelyLockedByOtherAndThenReread_thenNoProblem(LockMode.None);
+        whenReadFirstAndExclusivelyLockedByOtherAndThenReread_thenNoProblem(LockMode.Read);
+        whenReadFirstAndExclusivelyLockedByOtherAndThenReread_thenNoProblem(LockMode.Write);
+        whenReadFirstAndExclusivelyLockedByOtherAndThenReread_thenNoProblem(LockMode.Exclusive);
     }
 
-    @Test
-    @Ignore
-    public void whenReadFirstAndThenLockedByOtherAndThenLockUpgrade() {
+    public void whenReadFirstAndExclusivelyLockedByOtherAndThenReread_thenNoProblem(LockMode lockMode) {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
+        GammaTransaction tx = newTransaction();
+        GammaRefTranlocal read = ref.openForRead(tx, LOCKMODE_NONE);
+
+        GammaTransaction otherTx = newTransaction();
+        ref.getLock().acquire(otherTx, lockMode);
+
+        GammaRefTranlocal read2 = ref.openForRead(tx, LOCKMODE_NONE);
+
+        assertIsActive(tx);
+        assertSame(read, read2);
+        assertRefHasLockMode(ref, otherTx, lockMode.asInt());
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
@@ -716,10 +731,10 @@ public abstract class FatGammaTransaction_openForReadTest<T extends GammaTransac
         T tx = newTransaction();
         tx.evaluatingCommute = true;
 
-        try{
+        try {
             ref.openForRead(tx, LOCKMODE_NONE);
             fail();
-        }catch(IllegalCommuteException expected){
+        } catch (IllegalCommuteException expected) {
         }
 
         assertIsAborted(tx);
