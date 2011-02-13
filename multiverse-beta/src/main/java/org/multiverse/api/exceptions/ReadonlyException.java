@@ -1,8 +1,8 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link IllegalTransactionStateException} that indicates that an action is executed on a
- * readonly transaction that requires an update.
+ * A {@link IllegalTransactionStateException} that indicates that a write action is executed using
+ * a readonly transaction.
  *
  * @author Peter Veentjer.
  */

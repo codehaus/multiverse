@@ -4,7 +4,7 @@ import org.multiverse.api.OrElseBlock;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.*;
 import org.multiverse.api.exceptions.InvisibleCheckedException;
-import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.exceptions.RetryError;
 import org.multiverse.api.exceptions.TransactionRequiredException;
 
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
@@ -41,7 +41,7 @@ public class BetaOrElseBlock implements OrElseBlock {
 
         try {
             return either.execute(tx);
-        } catch (Retry retry) {
+        } catch (RetryError retry) {
             return orelse.execute(tx);
         }
     }
@@ -75,7 +75,7 @@ public class BetaOrElseBlock implements OrElseBlock {
 
         try {
             return either.execute(tx);
-        } catch (Retry retry) {
+        } catch (RetryError retry) {
             return orelse.execute(tx);
         }
     }
@@ -109,7 +109,7 @@ public class BetaOrElseBlock implements OrElseBlock {
 
         try {
             return either.execute(tx);
-        } catch (Retry retry) {
+        } catch (RetryError retry) {
             return orelse.execute(tx);
         }
     }
@@ -143,7 +143,7 @@ public class BetaOrElseBlock implements OrElseBlock {
 
         try {
             return either.execute(tx);
-        } catch (Retry retry) {
+        } catch (RetryError retry) {
             return orelse.execute(tx);
         }
     }
@@ -177,7 +177,7 @@ public class BetaOrElseBlock implements OrElseBlock {
 
         try {
             return either.execute(tx);
-        } catch (Retry retry) {
+        } catch (RetryError retry) {
             return orelse.execute(tx);
         }
     }
@@ -213,7 +213,7 @@ public class BetaOrElseBlock implements OrElseBlock {
         try {
             either.execute(tx);
             return;
-        } catch (Retry retry) {
+        } catch (RetryError retry) {
             orelse.execute(tx);
             return;
         }

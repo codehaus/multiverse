@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.exceptions.RetryError;
 import org.multiverse.api.predicates.DoublePredicate;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaDoubleRef;
@@ -41,7 +41,7 @@ public class GammaDoubleRef_await2WithPredicateTest {
         try {
             ref.await(tx, newEqualsPredicate(initialValue + 1));
             fail();
-        } catch (Retry expected) {
+        } catch (RetryError expected) {
 
         }
 

@@ -1,7 +1,7 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link TransactionExecutionException} that is thrown when the retry fails. The {@link Retry} is thrown
+ * A {@link TransactionExecutionException} that is thrown when the retry fails. The {@link RetryError} is thrown
  * when a retry happens, but when a transaction is not allowed to block, or too many retries have happened,
  * subclasses of this exception are thrown.
  *

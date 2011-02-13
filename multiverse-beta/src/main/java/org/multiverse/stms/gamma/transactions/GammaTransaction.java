@@ -24,6 +24,7 @@ import static org.multiverse.stms.gamma.GammaStmUtils.toDebugString;
  *
  * @author Peter Veentjer.
  */
+@SuppressWarnings({"OverlyComplexClass", "ClassWithTooManyFields", "OverlyCoupledClass"})
 public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public final GammaObjectPool pool = new GammaObjectPool();
@@ -67,8 +68,8 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
         }
     }
 
-    protected Retry newRetryError() {
-        return config.controlFlowErrorsReused ? Retry.INSTANCE : new Retry(true);
+    protected RetryError newRetryError() {
+        return config.controlFlowErrorsReused ? RetryError.INSTANCE : new RetryError(true);
     }
 
     public final boolean isLean() {
@@ -605,11 +606,6 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
             default:
                 throw new IllegalStateException();
         }
-    }
-
-    @Override
-    public void ensureWrites() {
-        throw new TodoException();
     }
 
     @Override

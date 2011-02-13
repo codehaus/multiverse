@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.multiverse.SomeUncheckedException;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.exceptions.RetryError;
 import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.api.predicates.BooleanPredicate;
 import org.multiverse.stms.gamma.GammaStm;
@@ -46,7 +46,7 @@ public class GammaBooleanRef_await1WithPredicateTest {
         try {
             ref.await(newEqualsPredicate(!initialValue));
             fail();
-        } catch (Retry expected) {
+        } catch (RetryError expected) {
         }
 
         assertIsAborted(tx);

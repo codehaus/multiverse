@@ -4,7 +4,6 @@ import org.multiverse.api.Lock;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.PanicError;
-import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
@@ -58,7 +57,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     private final int readBiasedThreshold;
 
     public AbstractGammaObject(GammaStm stm) {
-        assert stm!=null;
+        assert stm != null;
         this.stm = stm;
         this.readBiasedThreshold = stm.readBiasedThreshold;
     }

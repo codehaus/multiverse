@@ -1,8 +1,10 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link TransactionExecutionException} thrown when a transaction
- * encounters a transactional object that belongs to a different STM than the STM is belongs to.
+ * A {@link TransactionExecutionException} thrown when a transaction encounters encounters a transactional object
+ * that belongs to a different Stm instance.
+ *
+ * Normally this won't be an issue since only a GlobalStmInstance is used.
  *
  * @author Peter Veentjer.
  */

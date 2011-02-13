@@ -7,7 +7,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.exceptions.RetryError;
 import org.multiverse.api.predicates.LongPredicate;
 import org.multiverse.api.references.LongRef;
 import org.multiverse.stms.gamma.GammaStm;
@@ -46,7 +46,7 @@ public class GammaLongRef_await2WithPredicateTest {
         try {
             ref.await(tx, newEqualsPredicate(initialValue + 1));
             fail();
-        } catch (Retry expected) {
+        } catch (RetryError expected) {
 
         }
 

@@ -207,7 +207,7 @@ private static final Logger logger = Logger.getLogger(FatGammaAtomicBlock.class.
                         tx.commit();
                         abort = false;
                         return result;
-                    } catch (Retry e) {
+                    } catch (RetryError e) {
                         if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
@@ -441,7 +441,7 @@ private static final Logger logger = Logger.getLogger(FatGammaAtomicBlock.class.
                         tx.commit();
                         abort = false;
                         return result;
-                    } catch (Retry e) {
+                    } catch (RetryError e) {
                         if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
@@ -675,7 +675,7 @@ private static final Logger logger = Logger.getLogger(FatGammaAtomicBlock.class.
                         tx.commit();
                         abort = false;
                         return result;
-                    } catch (Retry e) {
+                    } catch (RetryError e) {
                         if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
@@ -909,7 +909,7 @@ private static final Logger logger = Logger.getLogger(FatGammaAtomicBlock.class.
                         tx.commit();
                         abort = false;
                         return result;
-                    } catch (Retry e) {
+                    } catch (RetryError e) {
                         if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
@@ -1143,7 +1143,7 @@ private static final Logger logger = Logger.getLogger(FatGammaAtomicBlock.class.
                         tx.commit();
                         abort = false;
                         return result;
-                    } catch (Retry e) {
+                    } catch (RetryError e) {
                         if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",
@@ -1384,7 +1384,7 @@ private static final Logger logger = Logger.getLogger(FatGammaAtomicBlock.class.
                         tx.commit();
                         abort = false;
                         return;
-                    } catch (Retry e) {
+                    } catch (RetryError e) {
                         if(TRACING_ENABLED){
                             if (transactionConfiguration.getTraceLevel().isLogableFrom(TraceLevel.Course)) {
                                 logger.info(format("[%s] Encountered a retry",

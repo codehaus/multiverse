@@ -3,23 +3,17 @@ package org.multiverse.api.exceptions;
 /**
  * A {@link RetryException} thrown when the blocking operation on a transaction using the retry has
  * been interrupted.
- *
+ * <p/>
  * Unlike the {@link InterruptedException} this exception is not checked. A checked interrupted
  * exception is quite nasty to have since either you need to deal with it, or you need to propagate it.
- *
+ * <p/>
  * When this exception is thrown, the interrupted status on the Thread always is restored.
  *
  * @author Peter Veentjer.
  */
-public class RetryInterruptedException extends RetryException{
+public class RetryInterruptedException extends RetryException {
 
     private static final long serialVersionUID = 0;
-
-    /**
-     * Creates a new RetryInterruptedException
-     */
-    public RetryInterruptedException() {
-    }
 
     /**
      * Creates a new RetryInterruptedException with the provided message.
@@ -34,18 +28,10 @@ public class RetryInterruptedException extends RetryException{
      * Creates a new RetryInterruptedException with the provided message and cause.
      *
      * @param message the message
-     * @param cause the cause of this exception
+     * @param cause   the cause of this exception
      */
     public RetryInterruptedException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    /**
-     * Creates a new RetryInterruptedException with the provided cause.
-     *
-     * @param cause the cause of this exception.
-     */
-    public RetryInterruptedException(Throwable cause) {
-        super(cause);
-    }
 }

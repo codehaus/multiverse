@@ -10,7 +10,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.exceptions.RetryError;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.api.lifecycle.TransactionListener;
@@ -504,7 +504,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         try {
             tx.retry();
             fail();
-        } catch (Retry retry) {
+        } catch (RetryError retry) {
         }
 
         ref.atomicIncrementAndGet(1);
@@ -527,7 +527,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
         try {
             listeningTx.retry();
             fail();
-        } catch (Retry retry) {
+        } catch (RetryError retry) {
 
         }
 
@@ -554,7 +554,7 @@ public abstract class BetaTransaction_commitTest implements BetaStmConstants {
             try {
                 tx.retry();
                 fail();
-            } catch (Retry retry) {
+            } catch (RetryError retry) {
 
             }
         }

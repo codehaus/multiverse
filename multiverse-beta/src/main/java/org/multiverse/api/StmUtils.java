@@ -19,50 +19,101 @@ import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTr
  *
  * @author Peter Veentjer.
  */
-public class StmUtils {
+public final class StmUtils {
 
     private final static RefFactory refFactory
-            = getGlobalStmInstance().getDefaultRefFactory();
+        = getGlobalStmInstance().getDefaultRefFactory();
     private final static AtomicBlock defaultAtomicBlock
-            = getGlobalStmInstance().getDefaultAtomicBlock();
+        = getGlobalStmInstance().getDefaultAtomicBlock();
     private final static OrElseBlock orelseBlock
-            = getGlobalStmInstance().newOrElseBlock();
+        = getGlobalStmInstance().newOrElseBlock();
     private final static TransactionalCollectionsFactory transactionalCollectionsFactory
-            = getGlobalStmInstance().getDefaultTransactionalCollectionFactory();
+        = getGlobalStmInstance().getDefaultTransactionalCollectionFactory();
 
-    public static <E> TransactionalList<E> newLinkedList() {
+    /**
+     * Creates a new committed TransactionList based on linked nodes.
+     *
+     * @return the created TransactionalList.
+     */
+    public static <E> TransactionalList<E> newLinkedList(){
         return transactionalCollectionsFactory.newLinkedList();
     }
 
-    public static <E> TransactionalStack<E> newStack() {
+    /**
+     * Creates a new committed unbound TransactionalStack.
+     *
+     * @return the created TransactionalStack.
+     */
+    public static <E> TransactionalStack<E> newStack(){
         return transactionalCollectionsFactory.newStack();
     }
 
-    public static <E> TransactionalStack<E> newStack(int capacity) {
+    /**
+     * Creates a new committed bound TransactionalStack.
+     *
+     * @param capacity the maximum capacity of the stack. Integer.MAX_VALUE indicates that there is no bound.
+     * @return the create TransactionalStack
+     * @throws IllegalArgumentException if capacity smaller than 0.
+     */
+    public static <E> TransactionalStack<E> newStack(int capacity){
         return transactionalCollectionsFactory.newStack(capacity);
     }
 
-    public static <E> TransactionalQueue<E> newQueue() {
+    /**
+     * Creates a new committed unbound TransactionalQueue.
+     *
+     * @return the created TransactionalQueue.
+     */
+    public static <E> TransactionalQueue<E> newQueue(){
         return transactionalCollectionsFactory.newQueue();
     }
 
-    public static <E> TransactionalQueue<E> newQueue(int capacity) {
+    /**
+     * Creates a new committed bound TransactionalQueue.
+     *
+     * @param capacity the maximum capacity of the queue. Integer.MAX_VALUE indicates that there is no bound.
+     * @return the created TransactionalQueue
+     * @throws IllegalArgumentException if capacity smaller than 0.
+     */
+    public static <E> TransactionalQueue<E> newQueue(int capacity){
         return transactionalCollectionsFactory.newQueue(capacity);
     }
 
-    public static <E> TransactionalDeque<E> newDeque() {
+    /**
+     * Creates a new committed unbound TransactionalDeque.
+     *
+     * @return the created TransactionalDeque
+     */
+    public static <E> TransactionalDeque<E> newDeque(){
         return transactionalCollectionsFactory.newDeque();
     }
 
-    public static <E> TransactionalDeque<E> newDeque(int capacity) {
+    /**
+     * Creates a new committed bound TransactionalDeque.
+     *
+     * @param capacity the maximum capacity of the deque. Integer.MAX_VALUE indicates that there is no bound.
+     * @return the created TransactionalDeque.
+     * @throws IllegalArgumentException if capacity is smaller than 0.
+     */
+    public static <E> TransactionalDeque<E> newDeque(int capacity){
         return transactionalCollectionsFactory.newDeque(capacity);
     }
 
-    public static <E> TransactionalSet<E> newHashSet() {
+    /**
+     * Creates a new committed TransactionalSet that is based on a 'hashtable'.
+     *
+     * @return the created TransactionalSet.
+     */
+    public static <E> TransactionalSet<E> newHashSet(){
         return transactionalCollectionsFactory.newHashSet();
     }
 
-    public static <K, V> TransactionalMap<K, V> newHashMap() {
+    /**
+     * Creates a new committed TransactionalMap.
+     *
+     * @return the created TransactionalMap
+     */
+    public static <K, V> TransactionalMap<K, V> newHashMap(){
         return transactionalCollectionsFactory.newHashMap();
     }
 
@@ -70,7 +121,7 @@ public class StmUtils {
      * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
      * transaction (so the propagation level is Requires) and will not commit this transaction.
-     * <p/>
+     *
      * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
      *
@@ -78,62 +129,61 @@ public class StmUtils {
      * @return the result of the execution
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if the closure throws a checked exception.
+     *                                  if the closure throws a checked exception.
      */
-    public static <E> E execute(AtomicClosure<E> closure) {
+    public static <E> E execute(AtomicClosure<E> closure){
         return defaultAtomicBlock.execute(closure);
     }
 
+   /**
+    * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
+    * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
+    * transaction (so the propagation level is Requires) and will not commit this transaction.
+    *
+    * @param closure The {AtomicClosure} to execute.
+    * @return the result of the execution
+    * @throws NullPointerException if closure is null.
+    * @throws Exception is the closure throws an Exception
+    */
+   public static <E> E executeChecked(AtomicClosure<E> closure) throws Exception{
+       return defaultAtomicBlock.executeChecked(closure);
+   }
+
+   /**
+    * * Executes the either block, or in case of a retry, the orelse block is executed.
+    *
+    * If in the execution of the closure a checked exception is thrown, the exception
+    * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
+    * getCause method.
+    *
+    * @param either
+    * @param orelse
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
+    */
+    public static <E> E execute(AtomicClosure<E> either, AtomicClosure<E> orelse){
+        return orelseBlock.execute(either,orelse);
+    }
+
+    /**
+    * Executes the either block, or in case of a retry, the orelse block is executed.
+    *
+    * @param either
+    * @param orelse
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws Exception if the execute call fails.
+    */
+    public static <E> E executeChecked(AtomicClosure<E> either, AtomicClosure<E> orelse)throws Exception{
+        return orelseBlock.executeChecked(either,orelse);
+    }
+
     /**
      * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
      * transaction (so the propagation level is Requires) and will not commit this transaction.
      *
-     * @param closure The {AtomicClosure} to execute.
-     * @return the result of the execution
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            is the closure throws an Exception
-     */
-    public static <E> E executeChecked(AtomicClosure<E> closure) throws Exception {
-        return defaultAtomicBlock.executeChecked(closure);
-    }
-
-    /**
-     * * Executes the either block, or in case of a retry, the orelse block is executed.
-     * <p/>
-     * If in the execution of the closure a checked exception is thrown, the exception
-     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
-     * getCause method.
-     *
-     * @param either
-     * @param orelse
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if a checked exception is thrown by the closure.
-     */
-    public static <E> E execute(AtomicClosure<E> either, AtomicClosure<E> orelse) {
-        return orelseBlock.execute(either, orelse);
-    }
-
-    /**
-     * Executes the either block, or in case of a retry, the orelse block is executed.
-     *
-     * @param either
-     * @param orelse
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            if the execute call fails.
-     */
-    public static <E> E executeChecked(AtomicClosure<E> either, AtomicClosure<E> orelse) throws Exception {
-        return orelseBlock.executeChecked(either, orelse);
-    }
-
-    /**
-     * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-     * transaction (so the propagation level is Requires) and will not commit this transaction.
-     * <p/>
      * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
      *
@@ -141,62 +191,61 @@ public class StmUtils {
      * @return the result of the execution
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if the closure throws a checked exception.
+     *                                  if the closure throws a checked exception.
      */
-    public static int execute(AtomicIntClosure closure) {
+    public static  int execute(AtomicIntClosure closure){
         return defaultAtomicBlock.execute(closure);
     }
 
+   /**
+    * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
+    * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
+    * transaction (so the propagation level is Requires) and will not commit this transaction.
+    *
+    * @param closure The {AtomicIntClosure} to execute.
+    * @return the result of the execution
+    * @throws NullPointerException if closure is null.
+    * @throws Exception is the closure throws an Exception
+    */
+   public static  int executeChecked(AtomicIntClosure closure) throws Exception{
+       return defaultAtomicBlock.executeChecked(closure);
+   }
+
+   /**
+    * * Executes the either block, or in case of a retry, the orelse block is executed.
+    *
+    * If in the execution of the closure a checked exception is thrown, the exception
+    * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
+    * getCause method.
+    *
+    * @param either
+    * @param orelse
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
+    */
+    public static  int execute(AtomicIntClosure either, AtomicIntClosure orelse){
+        return orelseBlock.execute(either,orelse);
+    }
+
+    /**
+    * Executes the either block, or in case of a retry, the orelse block is executed.
+    *
+    * @param either
+    * @param orelse
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws Exception if the execute call fails.
+    */
+    public static  int executeChecked(AtomicIntClosure either, AtomicIntClosure orelse)throws Exception{
+        return orelseBlock.executeChecked(either,orelse);
+    }
+
     /**
      * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
      * transaction (so the propagation level is Requires) and will not commit this transaction.
      *
-     * @param closure The {AtomicIntClosure} to execute.
-     * @return the result of the execution
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            is the closure throws an Exception
-     */
-    public static int executeChecked(AtomicIntClosure closure) throws Exception {
-        return defaultAtomicBlock.executeChecked(closure);
-    }
-
-    /**
-     * * Executes the either block, or in case of a retry, the orelse block is executed.
-     * <p/>
-     * If in the execution of the closure a checked exception is thrown, the exception
-     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
-     * getCause method.
-     *
-     * @param either
-     * @param orelse
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if a checked exception is thrown by the closure.
-     */
-    public static int execute(AtomicIntClosure either, AtomicIntClosure orelse) {
-        return orelseBlock.execute(either, orelse);
-    }
-
-    /**
-     * Executes the either block, or in case of a retry, the orelse block is executed.
-     *
-     * @param either
-     * @param orelse
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            if the execute call fails.
-     */
-    public static int executeChecked(AtomicIntClosure either, AtomicIntClosure orelse) throws Exception {
-        return orelseBlock.executeChecked(either, orelse);
-    }
-
-    /**
-     * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-     * transaction (so the propagation level is Requires) and will not commit this transaction.
-     * <p/>
      * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
      *
@@ -204,62 +253,61 @@ public class StmUtils {
      * @return the result of the execution
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if the closure throws a checked exception.
+     *                                  if the closure throws a checked exception.
      */
-    public static long execute(AtomicLongClosure closure) {
+    public static  long execute(AtomicLongClosure closure){
         return defaultAtomicBlock.execute(closure);
     }
 
+   /**
+    * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
+    * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
+    * transaction (so the propagation level is Requires) and will not commit this transaction.
+    *
+    * @param closure The {AtomicLongClosure} to execute.
+    * @return the result of the execution
+    * @throws NullPointerException if closure is null.
+    * @throws Exception is the closure throws an Exception
+    */
+   public static  long executeChecked(AtomicLongClosure closure) throws Exception{
+       return defaultAtomicBlock.executeChecked(closure);
+   }
+
+   /**
+    * * Executes the either block, or in case of a retry, the orelse block is executed.
+    *
+    * If in the execution of the closure a checked exception is thrown, the exception
+    * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
+    * getCause method.
+    *
+    * @param either
+    * @param orelse
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
+    */
+    public static  long execute(AtomicLongClosure either, AtomicLongClosure orelse){
+        return orelseBlock.execute(either,orelse);
+    }
+
+    /**
+    * Executes the either block, or in case of a retry, the orelse block is executed.
+    *
+    * @param either
+    * @param orelse
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws Exception if the execute call fails.
+    */
+    public static  long executeChecked(AtomicLongClosure either, AtomicLongClosure orelse)throws Exception{
+        return orelseBlock.executeChecked(either,orelse);
+    }
+
     /**
      * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
      * transaction (so the propagation level is Requires) and will not commit this transaction.
      *
-     * @param closure The {AtomicLongClosure} to execute.
-     * @return the result of the execution
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            is the closure throws an Exception
-     */
-    public static long executeChecked(AtomicLongClosure closure) throws Exception {
-        return defaultAtomicBlock.executeChecked(closure);
-    }
-
-    /**
-     * * Executes the either block, or in case of a retry, the orelse block is executed.
-     * <p/>
-     * If in the execution of the closure a checked exception is thrown, the exception
-     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
-     * getCause method.
-     *
-     * @param either
-     * @param orelse
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if a checked exception is thrown by the closure.
-     */
-    public static long execute(AtomicLongClosure either, AtomicLongClosure orelse) {
-        return orelseBlock.execute(either, orelse);
-    }
-
-    /**
-     * Executes the either block, or in case of a retry, the orelse block is executed.
-     *
-     * @param either
-     * @param orelse
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            if the execute call fails.
-     */
-    public static long executeChecked(AtomicLongClosure either, AtomicLongClosure orelse) throws Exception {
-        return orelseBlock.executeChecked(either, orelse);
-    }
-
-    /**
-     * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-     * transaction (so the propagation level is Requires) and will not commit this transaction.
-     * <p/>
      * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
      *
@@ -267,62 +315,61 @@ public class StmUtils {
      * @return the result of the execution
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if the closure throws a checked exception.
+     *                                  if the closure throws a checked exception.
      */
-    public static double execute(AtomicDoubleClosure closure) {
+    public static  double execute(AtomicDoubleClosure closure){
         return defaultAtomicBlock.execute(closure);
     }
 
+   /**
+    * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
+    * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
+    * transaction (so the propagation level is Requires) and will not commit this transaction.
+    *
+    * @param closure The {AtomicDoubleClosure} to execute.
+    * @return the result of the execution
+    * @throws NullPointerException if closure is null.
+    * @throws Exception is the closure throws an Exception
+    */
+   public static  double executeChecked(AtomicDoubleClosure closure) throws Exception{
+       return defaultAtomicBlock.executeChecked(closure);
+   }
+
+   /**
+    * * Executes the either block, or in case of a retry, the orelse block is executed.
+    *
+    * If in the execution of the closure a checked exception is thrown, the exception
+    * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
+    * getCause method.
+    *
+    * @param either
+    * @param orelse
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
+    */
+    public static  double execute(AtomicDoubleClosure either, AtomicDoubleClosure orelse){
+        return orelseBlock.execute(either,orelse);
+    }
+
+    /**
+    * Executes the either block, or in case of a retry, the orelse block is executed.
+    *
+    * @param either
+    * @param orelse
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws Exception if the execute call fails.
+    */
+    public static  double executeChecked(AtomicDoubleClosure either, AtomicDoubleClosure orelse)throws Exception{
+        return orelseBlock.executeChecked(either,orelse);
+    }
+
     /**
      * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
      * transaction (so the propagation level is Requires) and will not commit this transaction.
      *
-     * @param closure The {AtomicDoubleClosure} to execute.
-     * @return the result of the execution
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            is the closure throws an Exception
-     */
-    public static double executeChecked(AtomicDoubleClosure closure) throws Exception {
-        return defaultAtomicBlock.executeChecked(closure);
-    }
-
-    /**
-     * * Executes the either block, or in case of a retry, the orelse block is executed.
-     * <p/>
-     * If in the execution of the closure a checked exception is thrown, the exception
-     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
-     * getCause method.
-     *
-     * @param either
-     * @param orelse
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if a checked exception is thrown by the closure.
-     */
-    public static double execute(AtomicDoubleClosure either, AtomicDoubleClosure orelse) {
-        return orelseBlock.execute(either, orelse);
-    }
-
-    /**
-     * Executes the either block, or in case of a retry, the orelse block is executed.
-     *
-     * @param either
-     * @param orelse
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            if the execute call fails.
-     */
-    public static double executeChecked(AtomicDoubleClosure either, AtomicDoubleClosure orelse) throws Exception {
-        return orelseBlock.executeChecked(either, orelse);
-    }
-
-    /**
-     * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-     * transaction (so the propagation level is Requires) and will not commit this transaction.
-     * <p/>
      * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
      *
@@ -330,114 +377,112 @@ public class StmUtils {
      * @return the result of the execution
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if the closure throws a checked exception.
+     *                                  if the closure throws a checked exception.
      */
-    public static boolean execute(AtomicBooleanClosure closure) {
+    public static  boolean execute(AtomicBooleanClosure closure){
         return defaultAtomicBlock.execute(closure);
     }
 
+   /**
+    * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
+    * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
+    * transaction (so the propagation level is Requires) and will not commit this transaction.
+    *
+    * @param closure The {AtomicBooleanClosure} to execute.
+    * @return the result of the execution
+    * @throws NullPointerException if closure is null.
+    * @throws Exception is the closure throws an Exception
+    */
+   public static  boolean executeChecked(AtomicBooleanClosure closure) throws Exception{
+       return defaultAtomicBlock.executeChecked(closure);
+   }
+
+   /**
+    * * Executes the either block, or in case of a retry, the orelse block is executed.
+    *
+    * If in the execution of the closure a checked exception is thrown, the exception
+    * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
+    * getCause method.
+    *
+    * @param either
+    * @param orelse
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
+    */
+    public static  boolean execute(AtomicBooleanClosure either, AtomicBooleanClosure orelse){
+        return orelseBlock.execute(either,orelse);
+    }
+
+    /**
+    * Executes the either block, or in case of a retry, the orelse block is executed.
+    *
+    * @param either
+    * @param orelse
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws Exception if the execute call fails.
+    */
+    public static  boolean executeChecked(AtomicBooleanClosure either, AtomicBooleanClosure orelse)throws Exception{
+        return orelseBlock.executeChecked(either,orelse);
+    }
+
     /**
      * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
      * transaction (so the propagation level is Requires) and will not commit this transaction.
      *
-     * @param closure The {AtomicBooleanClosure} to execute.
-     * @return the result of the execution
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            is the closure throws an Exception
-     */
-    public static boolean executeChecked(AtomicBooleanClosure closure) throws Exception {
-        return defaultAtomicBlock.executeChecked(closure);
-    }
-
-    /**
-     * * Executes the either block, or in case of a retry, the orelse block is executed.
-     * <p/>
-     * If in the execution of the closure a checked exception is thrown, the exception
-     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
-     * getCause method.
-     *
-     * @param either
-     * @param orelse
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if a checked exception is thrown by the closure.
-     */
-    public static boolean execute(AtomicBooleanClosure either, AtomicBooleanClosure orelse) {
-        return orelseBlock.execute(either, orelse);
-    }
-
-    /**
-     * Executes the either block, or in case of a retry, the orelse block is executed.
-     *
-     * @param either
-     * @param orelse
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            if the execute call fails.
-     */
-    public static boolean executeChecked(AtomicBooleanClosure either, AtomicBooleanClosure orelse) throws Exception {
-        return orelseBlock.executeChecked(either, orelse);
-    }
-
-    /**
-     * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-     * transaction (so the propagation level is Requires) and will not commit this transaction.
-     * <p/>
      * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
      *
      * @param closure The {AtomicVoidClosure} to execute.
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if the closure throws a checked exception.
+     *                                  if the closure throws a checked exception.
      */
-    public static void execute(AtomicVoidClosure closure) {
+    public static  void execute(AtomicVoidClosure closure){
         defaultAtomicBlock.execute(closure);
     }
 
-    /**
-     * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
-     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
-     * transaction (so the propagation level is Requires) and will not commit this transaction.
-     *
-     * @param closure The {AtomicVoidClosure} to execute.
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            is the closure throws an Exception
-     */
-    public static void executeChecked(AtomicVoidClosure closure) throws Exception {
-        defaultAtomicBlock.executeChecked(closure);
+   /**
+    * Executes the closure transactionally on the GlobalStmInstance using the default AtomicBlock. If a
+    * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
+    * transaction (so the propagation level is Requires) and will not commit this transaction.
+    *
+    * @param closure The {AtomicVoidClosure} to execute.
+    * @throws NullPointerException if closure is null.
+    * @throws Exception is the closure throws an Exception
+    */
+   public static  void executeChecked(AtomicVoidClosure closure) throws Exception{
+       defaultAtomicBlock.executeChecked(closure);
+   }
+
+   /**
+    * * Executes the either block, or in case of a retry, the orelse block is executed.
+    *
+    * If in the execution of the closure a checked exception is thrown, the exception
+    * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
+    * getCause method.
+    *
+    * @param either
+    * @param orelse
+    * @throws NullPointerException if closure is null.
+    * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
+    */
+    public static  void execute(AtomicVoidClosure either, AtomicVoidClosure orelse){
+        orelseBlock.execute(either,orelse);
     }
 
     /**
-     * * Executes the either block, or in case of a retry, the orelse block is executed.
-     * <p/>
-     * If in the execution of the closure a checked exception is thrown, the exception
-     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
-     * getCause method.
-     *
-     * @param either
-     * @param orelse
-     * @throws NullPointerException if closure is null.
-     * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if a checked exception is thrown by the closure.
-     */
-    public static void execute(AtomicVoidClosure either, AtomicVoidClosure orelse) {
-        orelseBlock.execute(either, orelse);
-    }
-
-    /**
-     * Executes the either block, or in case of a retry, the orelse block is executed.
-     *
-     * @param either
-     * @param orelse
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            if the execute call fails.
-     */
-    public static void executeChecked(AtomicVoidClosure either, AtomicVoidClosure orelse) throws Exception {
-        orelseBlock.executeChecked(either, orelse);
+    * Executes the either block, or in case of a retry, the orelse block is executed.
+    *
+    * @param either
+    * @param orelse
+    * @throws NullPointerException if closure is null.
+    * @throws Exception if the execute call fails.
+    */
+    public static  void executeChecked(AtomicVoidClosure either, AtomicVoidClosure orelse)throws Exception{
+        orelseBlock.executeChecked(either,orelse);
     }
 
     /**
@@ -555,9 +600,8 @@ public class StmUtils {
      * For more information see {@link Transaction#prepare()}.
      *
      * @throws TransactionRequiredException if no active transaction is found.
-     * @throws IllegalTransactionStateException
-     *                                      if the active transaction is not in the correct
-     *                                      state for this operation.
+     * @throws IllegalTransactionStateException if the active transaction is not in the correct
+     *                                           state for this operation.
      * @throws ControlFlowError
      */
     public static void prepare() {
@@ -571,9 +615,8 @@ public class StmUtils {
      * For more information see {@link Transaction#abort()}.
      *
      * @throws TransactionRequiredException if no active transaction is found.
-     * @throws IllegalTransactionStateException
-     *                                      if the active transaction is not in the correct
-     *                                      state for this operation.
+     * @throws IllegalTransactionStateException if the active transaction is not in the correct
+     *                                           state for this operation.
      * @throws ControlFlowError
      */
     public static void abort() {
@@ -582,30 +625,13 @@ public class StmUtils {
     }
 
     /**
-     * Ensures all writes (so you get the guarantee that all writes are able to commit).
-     * <p/>
-     * For more information see {@link Transaction#ensureWrites()}
-     *
-     * @throws TransactionRequiredException if no active transaction is found.
-     * @throws IllegalTransactionStateException
-     *                                      if the active transaction is not in the correct
-     *                                      state for this operation.
-     * @throws ControlFlowError
-     */
-    public static void ensureWrites() {
-        Transaction tx = getRequiredThreadLocalTransaction();
-        tx.ensureWrites();
-    }
-
-    /**
      * Commits the Transaction in the ThreadLocalTransaction transaction.
      * <p/>
      * For more information see {@link Transaction#commit()}.
      *
      * @throws TransactionRequiredException if no active transaction is found.
-     * @throws IllegalTransactionStateException
-     *                                      if the active transaction is not in the correct
-     *                                      state for this operation.
+     * @throws IllegalTransactionStateException if the active transaction is not in the correct
+     *                                           state for this operation.
      * @throws ControlFlowError
      */
     public static void commit() {
@@ -617,7 +643,6 @@ public class StmUtils {
      * Scheduled an deferred or compensating task on the Transaction in the ThreadLocalTransaction. This task is
      * executed after the transaction commits or aborts.
      * <p/>
-     *
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
      * @throws org.multiverse.api.exceptions.TransactionRequiredException
@@ -636,8 +661,7 @@ public class StmUtils {
         tx.register(new TransactionListener() {
             @Override
             public void notify(Transaction tx, TransactionEvent event) {
-                if (event == TransactionEvent.PostCommit
-                        || event == TransactionEvent.PostAbort) {
+                if (event == TransactionEvent.PostCommit || event == TransactionEvent.PostAbort) {
                     task.run();
                 }
             }
@@ -648,7 +672,6 @@ public class StmUtils {
      * Scheduled an deferred task on the Transaction in the ThreadLocalTransaction. This task is executed after
      * the transaction commits and one of the use cases is starting transactions.
      * <p/>
-     *
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
      * @throws org.multiverse.api.exceptions.TransactionRequiredException
@@ -675,10 +698,9 @@ public class StmUtils {
     }
 
     /**
-     * Scheduled an compensating task on the Transaction in the ThreadLocalTransaction. This task is executed after
+     * Scheduled a compensating task on the Transaction in the ThreadLocalTransaction. This task is executed after
      * the transaction aborts and one of the use cases is cleaning up non transaction resources like the file system.
      * <p/>
-     *
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
      * @throws org.multiverse.api.exceptions.TransactionRequiredException

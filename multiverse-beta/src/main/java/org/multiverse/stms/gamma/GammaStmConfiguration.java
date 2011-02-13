@@ -137,7 +137,7 @@ public final class GammaStmConfiguration {
      * expensive part is building the StackTrace.
      * <p/>
      * For more info about the control flow errors see the subclasses of the {@link org.multiverse.api.exceptions.ControlFlowError} like
-     * the {@link org.multiverse.api.exceptions.ReadWriteConflict}, {@link org.multiverse.api.exceptions.Retry} and the
+     * the {@link org.multiverse.api.exceptions.ReadWriteConflict}, {@link org.multiverse.api.exceptions.RetryError} and the
      * {@link org.multiverse.api.exceptions.SpeculativeConfigurationError}.
      */
     public boolean controlFlowErrorsReused = true;

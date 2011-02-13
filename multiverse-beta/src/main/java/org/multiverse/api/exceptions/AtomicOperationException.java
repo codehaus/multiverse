@@ -1,7 +1,8 @@
 package org.multiverse.api.exceptions;
 
 /**
- * An {@link TransactionExecutionException} that indicates that an atomic operation so one with
+ * An {@link TransactionExecutionException} that indicates that an atomic operation has failed (e.g. because the ref
+ * was locked).
  *
  * @author Peter Veentjer.
  */

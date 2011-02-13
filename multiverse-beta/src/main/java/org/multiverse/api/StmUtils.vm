@@ -17,19 +17,19 @@ import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTr
  *
  * @author Peter Veentjer.
  */
-public class StmUtils {
+public final class StmUtils {
 
     private final static RefFactory refFactory
         = getGlobalStmInstance().getDefaultRefFactory();
     private final static AtomicBlock defaultAtomicBlock
         = getGlobalStmInstance().getDefaultAtomicBlock();
     private final static OrElseBlock orelseBlock
-        = getGlobalStmInstance().createOrElseBlock();
+        = getGlobalStmInstance().newOrElseBlock();
     private final static TransactionalCollectionsFactory transactionalCollectionsFactory
         = getGlobalStmInstance().getDefaultTransactionalCollectionFactory();
 
     /**
-     * Creates a new TransactionList based on linked nodes.
+     * Creates a new committed TransactionList based on linked nodes.
      *
      * @return the created TransactionalList.
      */
@@ -38,7 +38,7 @@ public class StmUtils {
     }
 
     /**
-     * Creates a new unbound TransactionalStack.
+     * Creates a new committed unbound TransactionalStack.
      *
      * @return the created TransactionalStack.
      */
@@ -47,9 +47,9 @@ public class StmUtils {
     }
 
     /**
-     * Creates a bound TransactionalStack.
+     * Creates a new committed bound TransactionalStack.
      *
-     * @param the maximum capacity of the stack. Integer.MAX_VALUE indicates that there is no bound.
+     * @param capacity the maximum capacity of the stack. Integer.MAX_VALUE indicates that there is no bound.
      * @return the create TransactionalStack
      * @throws IllegalArgumentException if capacity smaller than 0.
      */
@@ -58,7 +58,7 @@ public class StmUtils {
     }
 
     /**
-     * Creates a unbound TransactionalQueue.
+     * Creates a new committed unbound TransactionalQueue.
      *
      * @return the created TransactionalQueue.
      */
@@ -67,9 +67,9 @@ public class StmUtils {
     }
 
     /**
-     * Creates a bound TransactionalQueue.
+     * Creates a new committed bound TransactionalQueue.
      *
-     * @param capactiy the maximum capacity of the queue. Integer.MAX_VALUE indicates that there is no bound.
+     * @param capacity the maximum capacity of the queue. Integer.MAX_VALUE indicates that there is no bound.
      * @return the created TransactionalQueue
      * @throws IllegalArgumentException if capacity smaller than 0.
      */
@@ -78,7 +78,7 @@ public class StmUtils {
     }
 
     /**
-     * Creates an unbound TransactionalDeque.
+     * Creates a new committed unbound TransactionalDeque.
      *
      * @return the created TransactionalDeque
      */
@@ -87,7 +87,7 @@ public class StmUtils {
     }
 
     /**
-     * Creates a bound TransactionalDeque.
+     * Creates a new committed bound TransactionalDeque.
      *
      * @param capacity the maximum capacity of the deque. Integer.MAX_VALUE indicates that there is no bound.
      * @return the created TransactionalDeque.
@@ -98,7 +98,7 @@ public class StmUtils {
     }
 
     /**
-     * Creates a TransactionalSet that is based on a hashing.
+     * Creates a new committed TransactionalSet that is based on a 'hashtable'.
      *
      * @return the created TransactionalSet.
      */
@@ -107,7 +107,7 @@ public class StmUtils {
     }
 
     /**
-     * Creates a TransactionalMap.
+     * Creates a new committed TransactionalMap.
      *
      * @return the created TransactionalMap
      */
@@ -343,21 +343,6 @@ public class StmUtils {
     }
 
     /**
-     * Ensures all writes (so you get the guarantee that all writes are able to commit).
-     *
-     * For more information see {@link Transaction#ensureWrites()}
-     *
-     * @throws TransactionRequiredException if no active transaction is found.
-     * @throws IllegalTransactionStateException if the active transaction is not in the correct
-     *                                           state for this operation.
-     * @throws ControlFlowError
-     */
-    public static void ensureWrites(){
-        Transaction tx = getRequiredThreadLocalTransaction();
-        tx.ensureWrites();
-    }
-
-    /**
      * Commits the Transaction in the ThreadLocalTransaction transaction.
      * <p/>
      * For more information see {@link Transaction#commit()}.
@@ -391,11 +376,10 @@ public class StmUtils {
         }
 
         Transaction tx = getRequiredThreadLocalTransaction();
-        tx.register(new TransactionLifecycleListener() {
+        tx.register(new TransactionListener() {
             @Override
-            public void notify(Transaction tx, TransactionLifecycleEvent event) {
-                if (event == TransactionLifecycleEvent.PostCommit
-                        || event == TransactionLifecycleEvent.PostAbort) {
+            public void notify(Transaction tx, TransactionEvent event) {
+                if (event == TransactionEvent.PostCommit || event == TransactionEvent.PostAbort) {
                     task.run();
                 }
             }
@@ -421,10 +405,10 @@ public class StmUtils {
         }
 
         Transaction tx = getRequiredThreadLocalTransaction();
-        tx.register(new TransactionLifecycleListener() {
+        tx.register(new TransactionListener() {
             @Override
-            public void notify(Transaction tx, TransactionLifecycleEvent event) {
-                if (event == TransactionLifecycleEvent.PostCommit) {
+            public void notify(Transaction tx, TransactionEvent event) {
+                if (event == TransactionEvent.PostCommit) {
                     task.run();
                 }
             }
@@ -450,10 +434,10 @@ public class StmUtils {
         }
 
         Transaction tx = getRequiredThreadLocalTransaction();
-        tx.register(new TransactionLifecycleListener() {
+        tx.register(new TransactionListener() {
             @Override
-            public void notify(Transaction tx, TransactionLifecycleEvent event) {
-                if (event == TransactionLifecycleEvent.PostAbort) {
+            public void notify(Transaction tx, TransactionEvent event) {
+                if (event == TransactionEvent.PostAbort) {
                     task.run();
                 }
             }

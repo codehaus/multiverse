@@ -60,7 +60,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         try {
             tx.retry();
             fail();
-        } catch (Retry retry) {
+        } catch (RetryError retry) {
         }
 
         assertIsAborted(tx);
@@ -151,7 +151,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         try {
             tx.retry();
             fail();
-        } catch (Retry retry) {
+        } catch (RetryError retry) {
 
         }
         RetryLatch latch = getFirstListener(ref);
@@ -172,7 +172,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         try {
             tx.retry();
             fail();
-        } catch (Retry retry) {
+        } catch (RetryError retry) {
         }
 
         RetryLatch latch = getFirstListener(ref);
@@ -193,7 +193,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         try {
             tx.retry();
             fail();
-        } catch (Retry retry) {
+        } catch (RetryError retry) {
 
         }
 
@@ -215,7 +215,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         try {
             tx.retry();
             fail();
-        } catch (Retry retry) {
+        } catch (RetryError retry) {
 
         }
 
@@ -263,7 +263,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         try {
             tx.retry();
             fail();
-        } catch (Retry retry) {
+        } catch (RetryError retry) {
 
         }
 
@@ -291,7 +291,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         try {
             tx.retry();
             fail();
-        } catch (Retry retry) {
+        } catch (RetryError retry) {
         }
 
         RetryLatch latch = getFirstListener(ref);
@@ -315,7 +315,7 @@ public abstract class BetaTransaction_retryTest implements BetaStmConstants {
         try {
             tx.retry();
             fail();
-        } catch (Retry retry) {
+        } catch (RetryError retry) {
         }
 
         assertEquals(1, listenerMock.events.size());

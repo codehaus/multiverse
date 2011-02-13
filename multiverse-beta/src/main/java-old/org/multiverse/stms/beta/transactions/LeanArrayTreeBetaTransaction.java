@@ -2,7 +2,7 @@ package org.multiverse.stms.beta.transactions;
 
 import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.exceptions.RetryError;
 import org.multiverse.api.exceptions.SpeculativeConfigurationError;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.*;
@@ -1687,7 +1687,7 @@ public final class LeanArrayTreeBetaTransaction extends AbstractLeanBetaTransact
         status = ABORTED;
         if (!atLeastOneRegistration) throw abortOnNoRetryPossible();
 
-        throw Retry.INSTANCE;
+        throw RetryError.INSTANCE;
     }
 
     // ============================== reset ========================================

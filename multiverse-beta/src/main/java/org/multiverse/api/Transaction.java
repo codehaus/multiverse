@@ -166,19 +166,6 @@ public interface Transaction {
     boolean isAbortOnly();
 
     /**
-     * Ensures all writes that have been made. If one or more of the ref have been privatized, this call will also
-     * complete successfully. After this call completes successfully, the transaction still can be used (unlike the
-     * {@link #prepare()}.
-     *
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *          if the transaction is not in the correct
-     *          state for this operation.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
-     */
-    void ensureWrites();
-
-    /**
      * Registers a TransactionListener. Every time a transaction is retried, the listener needs to
      * be registered again if you want the task to be executed again. If you want a permanent listener, have
      * a look at the {@link TransactionFactoryBuilder#addPermanentListener(org.multiverse.api.lifecycle.TransactionListener)}.

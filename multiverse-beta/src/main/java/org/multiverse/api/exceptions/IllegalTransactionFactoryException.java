@@ -28,13 +28,4 @@ public class IllegalTransactionFactoryException extends IllegalStateException {
     public IllegalTransactionFactoryException(String message, Throwable cause) {
         super(message, cause);
     }
-
-    /**
-     * Creates a new IllegalTransactionFactoryException.
-     *
-     * @param cause the cause of the exception.
-     */
-    public IllegalTransactionFactoryException(Throwable cause) {
-        super(cause);
-    }
 }

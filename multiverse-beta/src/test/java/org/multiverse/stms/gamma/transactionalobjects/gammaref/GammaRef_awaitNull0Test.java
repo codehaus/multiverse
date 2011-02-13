@@ -109,7 +109,7 @@ public class GammaRef_awaitNull0Test {
         try {
             ref.awaitNull();
             fail();
-        } catch (Retry expected) {
+        } catch (RetryError expected) {
         }
 
         assertIsAborted(tx);

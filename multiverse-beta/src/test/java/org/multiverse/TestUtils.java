@@ -43,7 +43,6 @@ public class TestUtils implements MultiverseConstants {
         }
     }
 
-
     public static void clearCurrentThreadInterruptedStatus() {
         Thread.interrupted();
     }

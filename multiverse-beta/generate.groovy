@@ -52,7 +52,7 @@ for (def closure in atomicClosures) {
 generateAtomicBlock(engine, atomicClosures)
 //generateOrElseBlock(engine, atomicClosures)
 generateGammaOrElseBlock(engine, atomicClosures)
-//generateStmUtils(engine, atomicClosures)
+generateStmUtils(engine, atomicClosures)
 
 for (def atomicBlock in atomicBlocks) {
     generateBetaAtomicBlock(engine, atomicBlock, atomicClosures)

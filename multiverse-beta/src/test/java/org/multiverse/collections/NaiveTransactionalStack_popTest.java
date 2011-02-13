@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.multiverse.api.Stm;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.exceptions.RetryError;
 
 import static org.junit.Assert.*;
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
@@ -68,7 +68,7 @@ public class NaiveTransactionalStack_popTest {
                 try {
                     stack.pop();
                     fail();
-                } catch (Retry retry) {
+                } catch (RetryError retry) {
                 }
             }
         });

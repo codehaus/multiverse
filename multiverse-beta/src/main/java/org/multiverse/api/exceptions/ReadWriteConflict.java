@@ -1,10 +1,11 @@
 package org.multiverse.api.exceptions;
 
 /**
- * An {@link ControlFlowError} that indicates that a load a transactional object using a transaction failed.
- * See the ControlFlowError of this error for more details about these situations.
+ * An {@link ControlFlowError} that indicates that reading or writing a transactional object failed, e.g.
+ * because it was locked or because a read or write conflict was detected.
  * <p/>
- * A ReadWriteConflict can in most cases be solved by retrying the transaction.
+ * A ReadWriteConflict can in most cases be solved by retrying the transaction (this will automatically be
+ * done by the AtomicBlock).
  *
  * @author Peter Veentjer.
  */
@@ -14,13 +15,13 @@ public class ReadWriteConflict extends ControlFlowError {
 
     public final static ReadWriteConflict INSTANCE = new ReadWriteConflict(false);
 
-    private final boolean fillStackTrace;
-
     /**
      * Creates a new ReadWriteConflict.
+     *
+     * @param fillStackTrace if the StackTrace should be filled.
      */
     public ReadWriteConflict(boolean fillStackTrace) {
-        this.fillStackTrace = fillStackTrace;
+        super(fillStackTrace);
     }
 
     /**
@@ -29,8 +30,7 @@ public class ReadWriteConflict extends ControlFlowError {
      * @param message the message of the ReadWriteConflict.
      */
     public ReadWriteConflict(String message) {
-        super(message);
-        fillStackTrace = true;
+        super(true, message);
     }
 
     /**
@@ -40,16 +40,6 @@ public class ReadWriteConflict extends ControlFlowError {
      * @param cause   the cause of the ReadWriteConflict.
      */
     public ReadWriteConflict(String message, Throwable cause) {
-        super(message, cause);
-        fillStackTrace = true;
-    }
-
-    @Override
-    public StackTraceElement[] getStackTrace() {
-        if (fillStackTrace) {
-            return super.getStackTrace();
-        } else {
-            return new StackTraceElement[0];
-        }
+        super(true, message, cause);
     }
 }

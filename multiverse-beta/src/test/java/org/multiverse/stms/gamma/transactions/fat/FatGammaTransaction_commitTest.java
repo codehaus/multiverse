@@ -9,7 +9,7 @@ import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.AbortOnlyException;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.exceptions.RetryError;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaConstants;
@@ -67,7 +67,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         try {
             waitingTx.retry();
             fail();
-        } catch (Retry expected) {
+        } catch (RetryError expected) {
         }
 
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
@@ -420,7 +420,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         try {
             listeningTx.retry();
             fail();
-        } catch (Retry retry) {
+        } catch (RetryError retry) {
         }
 
         GammaTransaction tx = newTransaction();

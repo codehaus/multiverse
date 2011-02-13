@@ -6,7 +6,7 @@ import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.api.exceptions.Retry;
+import org.multiverse.api.exceptions.RetryError;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
@@ -109,7 +109,7 @@ public class GammaRef_awaitNotNullAndGet1Test implements GammaConstants {
         try {
             ref.awaitNotNullAndGet(tx);
             fail();
-        } catch (Retry expected) {
+        } catch (RetryError expected) {
         }
 
         assertIsAborted(tx);

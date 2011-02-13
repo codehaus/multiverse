@@ -1,11 +1,20 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link ControlFlowError} that indicates that current transaction implementation can't deal
- * with more transactional objects than it can handle. This Error is useful for the STM
- * to speculative selection of a better performing implementation. So it can start with a very
- * fast transaction that only is able to deal with one or a few transactional objects and it
- * able to grow to more advanced but slower transaction implementations
+ * Multiverse uses a speculative configuration
+ * mechanism if enabled (see {@link org.multiverse.api.TransactionFactoryBuilder#setSpeculative(boolean)} for more information)
+ * which makes certain optimizations possible. E.g. one of the optimizations is to use different transaction implementations
+ * that are optimized for certain transaction lengths. As long as the speculation is not violated, you will get better
+ * performance than when a more heavy weight transaction/configuration.
+ * <p/>
+ * So ControlFlowErrors are not something bad, but just a way for the STM to figure out what the cheapest settings are for
+ * performance/scalability.
+ * <h2>Unexpected retries</h2>
+ * Because a transaction can fail on a speculative failure more than once, it could be that the transaction is retried. Normally
+ * this is not an issue, since the transaction will be retried, so is invisible. And once the AtomicBlock has learned, it will
+ * not make the same mistakes again, but if you do io (e.g. print to the System.out or do logging) you can expect to see aborts,
+ * even though there is no other reason to. Speculative behavior can be turned of (either on the Transaction or STM level) but
+ * you will not get the best out of performance.*
  *
  * @author Peter Veentjer.
  */
@@ -15,13 +24,13 @@ public class SpeculativeConfigurationError extends ControlFlowError {
 
     public final static SpeculativeConfigurationError INSTANCE = new SpeculativeConfigurationError(false);
 
-    private final boolean fillStackTrace;
-
     /**
      * Creates a SpeculativeConfigurationError.
+     *
+     * @param fillStackTrace if the StackTrace should be filled.
      */
     public SpeculativeConfigurationError(boolean fillStackTrace) {
-        this.fillStackTrace = fillStackTrace;
+        super(fillStackTrace);
     }
 
     /**
@@ -30,8 +39,7 @@ public class SpeculativeConfigurationError extends ControlFlowError {
      * @param message the message of the exception.
      */
     public SpeculativeConfigurationError(String message) {
-        super(message);
-        this.fillStackTrace = true;
+        super(true, message);
     }
 
     /**
@@ -41,16 +49,6 @@ public class SpeculativeConfigurationError extends ControlFlowError {
      * @param cause   the cause of the exception.
      */
     public SpeculativeConfigurationError(String message, Throwable cause) {
-        super(message, cause);
-        this.fillStackTrace = true;
-    }
-
-    @Override
-    public StackTraceElement[] getStackTrace() {
-        if (fillStackTrace) {
-            return super.getStackTrace();
-        } else {
-            return new StackTraceElement[0];
-        }
+        super(true, message, cause);
     }
 }
