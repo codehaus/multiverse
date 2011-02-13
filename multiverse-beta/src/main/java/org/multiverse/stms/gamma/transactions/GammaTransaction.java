@@ -154,6 +154,27 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                         config.familyName, toDebugString(o)));
     }
 
+
+    public IllegalTransactionStateException abortOpenForReadOnNullLockMode(AbstractGammaRef object) {
+         switch (status) {
+            case TX_PREPARED:
+                abort();
+                return new PreparedTransactionException(
+                        format("[%s] Failed to execute Ref.openForRead '%s', reason: the LockMode is null",
+                                config.familyName, toDebugString(object)));
+            case TX_ABORTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Ref.openForRead '%s', reason: the Lockmode is null",
+                                config.familyName, toDebugString(object)));
+            case TX_COMMITTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Ref.openForRead '%s', reason: the LockMode is null",
+                                config.familyName, toDebugString(object)));
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
     public final IllegalTransactionStateException abortOpenForReadOnBadStatus(GammaObject object) {
         switch (status) {
             case TX_PREPARED:

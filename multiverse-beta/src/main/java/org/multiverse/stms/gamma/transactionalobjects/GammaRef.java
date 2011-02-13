@@ -3,7 +3,6 @@ package org.multiverse.stms.gamma.transactionalobjects;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.exceptions.LockedException;
-import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.functions.Function;
 import org.multiverse.api.predicates.Predicate;
 import org.multiverse.api.references.Ref;
@@ -73,7 +72,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     public E getAndLock(GammaTransaction tx, LockMode lockMode) {
-        throw new TodoException();
+        return (E) getObject(tx, lockMode);
     }
 
     @Override
@@ -103,7 +102,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     public E setAndLock(GammaTransaction tx, E value, LockMode lockMode) {
-        throw new TodoException();
+        return (E)setObject(tx, lockMode, value, false);
     }
 
     @Override
@@ -134,7 +133,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     public E getAndSetAndLock(GammaTransaction tx, E value, LockMode lockMode) {
-        throw new TodoException();
+        return (E)setObject(tx, lockMode, value, true);
     }
 
     @Override

@@ -1424,14 +1424,83 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         tranlocal.writeSkewCheck = true;
     }
 
-    protected final long getLong(GammaTransaction tx, LockMode lockMode){
-        throw new TodoException();
+    protected final long getLong(GammaTransaction tx, LockMode lockMode) {
+        assert type != TYPE_REF;
+
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortOpenForReadOnBadStatus(this);
+        }
+
+        if (lockMode == null) {
+            throw tx.abortOpenForReadOnNullLockMode(this);
+        }
+
+        return openForRead(tx, lockMode.asInt()).long_value;
     }
 
-    protected final long setLong(GammaTransaction tx, LockMode lockMode, long newValue, boolean returnOld){
-        throw new TodoException();
+     protected final Object getObject(GammaTransaction tx, LockMode lockMode) {
+        assert type == TYPE_REF;
+
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortOpenForReadOnBadStatus(this);
+        }
+
+        if (lockMode == null) {
+            throw tx.abortOpenForReadOnNullLockMode(this);
+        }
+
+        return openForRead(tx, lockMode.asInt()).ref_value;
     }
 
+    protected final long setLong(GammaTransaction tx, LockMode lockMode, long newValue, boolean returnOld) {
+        assert type != TYPE_REF;
+
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortOpenForReadOnBadStatus(this);
+        }
+
+        if (lockMode == null) {
+            throw tx.abortOpenForReadOnNullLockMode(this);
+        }
+
+        GammaRefTranlocal tranlocal = openForWrite(tx, lockMode.asInt());
+        long oldValue = tranlocal.long_value;
+        tranlocal.long_value = newValue;
+        return returnOld ? oldValue : newValue;
+    }
+
+     protected final Object setObject(GammaTransaction tx, LockMode lockMode, Object newValue, boolean returnOld) {
+        assert type == TYPE_REF;
+
+        if (tx == null) {
+            throw new NullPointerException();
+        }
+
+        if (tx.status != TX_ACTIVE) {
+            throw tx.abortOpenForReadOnBadStatus(this);
+        }
+
+        if (lockMode == null) {
+            throw tx.abortOpenForReadOnNullLockMode(this);
+        }
+
+        GammaRefTranlocal tranlocal = openForWrite(tx, lockMode.asInt());
+        Object oldValue = tranlocal.ref_value;
+        tranlocal.ref_value = newValue;
+        return returnOld ? oldValue : newValue;
+    }
 
     public final long atomicGetLong() {
         assert type != TYPE_REF;
