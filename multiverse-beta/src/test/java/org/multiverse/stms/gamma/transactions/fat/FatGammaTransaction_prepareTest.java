@@ -3,10 +3,12 @@ package org.multiverse.stms.gamma.transactions.fat;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.SomeUncheckedException;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.AbortOnlyException;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
@@ -15,7 +17,11 @@ import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.multiverse.TestUtils.*;
+import static org.multiverse.api.functions.Functions.newIncLongFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public abstract class FatGammaTransaction_prepareTest<T extends GammaTransaction> implements GammaConstants {
@@ -53,7 +59,7 @@ public abstract class FatGammaTransaction_prepareTest<T extends GammaTransaction
         assertIsPrepared(tx);
         assertTrue(tx.commitConflict);
         assertGlobalConflictCount(stm, globalConflictCount);
-        assertVersionAndValue(ref, initialVersion , initialValue);
+        assertVersionAndValue(ref, initialVersion, initialValue);
         assertLockMode(ref, LOCKMODE_EXCLUSIVE);
         assertSurplus(ref, 2);
     }
@@ -108,16 +114,120 @@ public abstract class FatGammaTransaction_prepareTest<T extends GammaTransaction
     }
 
     @Test
-    @Ignore
     public void whenContainsCommute() {
+        int initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
+        long globalConflictCount = stm.globalConflictCounter.count();
+        LongFunction function = newIncLongFunction();
+        GammaTransaction tx = newTransaction();
+        ref.commute(tx, function);
+        GammaRefTranlocal tranlocal = tx.locate(ref);
+
+        tx.prepare();
+
+        assertIsPrepared(tx);
+        assertRefHasExclusiveLock(ref, tx);
+        assertTrue(tranlocal.isDirty);
+        assertEquals(LOCKMODE_EXCLUSIVE, tranlocal.lockMode);
+        assertEquals(initialValue + 1, tranlocal.long_value);
+        assertTrue(tranlocal.hasDepartObligation);
+        assertGlobalConflictCount(stm, globalConflictCount);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
-    @Ignore
-    public void whenContainsCommuteThatConflicts() {
+    public void whenContainsMultipleCommutes() {
+        int initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
 
+        long globalConflictCount = stm.globalConflictCounter.count();
+        LongFunction function1 = newIncLongFunction();
+        LongFunction function2 = newIncLongFunction();
+        LongFunction function3 = newIncLongFunction();
+        GammaTransaction tx = newTransaction();
+        ref.commute(tx, function1);
+        ref.commute(tx, function2);
+        ref.commute(tx, function3);
+        GammaRefTranlocal tranlocal = tx.locate(ref);
+
+        tx.prepare();
+
+        assertIsPrepared(tx);
+        assertRefHasExclusiveLock(ref, tx);
+        assertTrue(tranlocal.isDirty);
+        assertEquals(LOCKMODE_EXCLUSIVE, tranlocal.lockMode);
+        assertEquals(initialValue + 3, tranlocal.long_value);
+        assertTrue(tranlocal.hasDepartObligation);
+        assertGlobalConflictCount(stm, globalConflictCount);
+        assertVersionAndValue(ref, initialVersion, initialValue);
     }
+
+    @Test
+    public void whenContainsCommuteThatCausesProblems() {
+        int initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        long globalConflictCount = stm.globalConflictCounter.count();
+        LongFunction function = mock(LongFunction.class);
+        when(function.call(anyLong())).thenThrow(new SomeUncheckedException());
+        GammaTransaction tx = newTransaction();
+        ref.commute(tx, function);
+        GammaRefTranlocal tranlocal = tx.locate(ref);
+
+        try {
+            tx.prepare();
+            fail();
+        } catch (SomeUncheckedException expected) {
+
+        }
+
+        assertIsAborted(tx);
+        assertRefHasNoLocks(ref);
+        assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
+        assertGlobalConflictCount(stm, globalConflictCount);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
+
+    @Test
+    public void whenContainsCommuteThatIsLocked() {
+        whenContainsCommuteThatIsLocked(LockMode.Read);
+        whenContainsCommuteThatIsLocked(LockMode.Write);
+        whenContainsCommuteThatIsLocked(LockMode.Exclusive);
+    }
+
+    public void whenContainsCommuteThatIsLocked(LockMode lockMode) {
+        int initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        long globalConflictCount = stm.globalConflictCounter.count();
+        LongFunction function = mock(LongFunction.class);
+        when(function.call(anyLong())).thenThrow(new SomeUncheckedException());
+        GammaTransaction tx = newTransaction();
+        ref.commute(tx, function);
+        GammaRefTranlocal tranlocal = tx.locate(ref);
+
+        GammaTransaction otherTx = newTransaction();
+        ref.getLock().acquire(otherTx, lockMode);
+
+        try {
+            tx.prepare();
+            fail();
+        } catch (ReadWriteConflict expected) {
+
+        }
+
+        assertIsAborted(tx);
+        assertRefHasLockMode(ref, otherTx, lockMode.asInt());
+        assertEquals(LOCKMODE_NONE, tranlocal.lockMode);
+        assertGlobalConflictCount(stm, globalConflictCount);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
+
 
     @Test
     public void whenContainsConstructed() {
