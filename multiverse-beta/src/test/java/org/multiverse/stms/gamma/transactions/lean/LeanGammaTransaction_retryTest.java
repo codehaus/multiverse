@@ -3,6 +3,7 @@ package org.multiverse.stms.gamma.transactions.lean;
 import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.RetryNotAllowedException;
 import org.multiverse.api.exceptions.RetryNotPossibleException;
 import org.multiverse.stms.gamma.GammaStm;
@@ -49,6 +50,20 @@ public abstract class LeanGammaTransaction_retryTest<T extends GammaTransaction>
             tx.retry();
             fail();
         } catch (RetryNotAllowedException expected) {
+        }
+
+        assertIsAborted(tx);
+    }
+
+      @Test
+    public void whenAlreadyPrepared() {
+        T tx = newTransaction();
+        tx.prepare();
+
+        try {
+            tx.retry();
+            fail();
+        } catch (PreparedTransactionException expected) {
         }
 
         assertIsAborted(tx);

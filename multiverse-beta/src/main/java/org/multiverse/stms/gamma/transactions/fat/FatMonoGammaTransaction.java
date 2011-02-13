@@ -129,7 +129,7 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
 
     @Override
     public final void retry() {
-        if (status != TX_ACTIVE && status != TX_PREPARED) {
+        if (status != TX_ACTIVE) {
             throw abortRetryOnBadStatus();
         }
 

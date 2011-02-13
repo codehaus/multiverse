@@ -5,6 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.RetryNotAllowedException;
 import org.multiverse.api.exceptions.RetryNotPossibleException;
 import org.multiverse.api.functions.Function;
@@ -47,7 +48,7 @@ public abstract class FatGammaTransaction_retryTest<T extends GammaTransaction> 
     }
 
     @Test
-    public void whenContainsConstructed() {
+    public void whenOnlyContainsConstructed() {
         GammaTransaction tx = newTransaction();
         GammaRef<String> ref = new GammaRef<String>(tx, "foo");
 
@@ -62,7 +63,7 @@ public abstract class FatGammaTransaction_retryTest<T extends GammaTransaction> 
     }
 
     @Test
-    public void whenContainsCommute() {
+    public void whenOnlyContainsCommute() {
         String intialValue = "initialValue";
         GammaRef<String> ref = new GammaRef<String>(stm, intialValue);
 
@@ -104,6 +105,20 @@ public abstract class FatGammaTransaction_retryTest<T extends GammaTransaction> 
             tx.retry();
             fail();
         } catch (RetryNotAllowedException expected) {
+        }
+
+        assertIsAborted(tx);
+    }
+
+    @Test
+    public void whenAlreadyPrepared() {
+        T tx = newTransaction();
+        tx.prepare();
+
+        try {
+            tx.retry();
+            fail();
+        } catch (PreparedTransactionException expected) {
         }
 
         assertIsAborted(tx);
