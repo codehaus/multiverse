@@ -458,21 +458,21 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
     }
 
     @Override
-    public String toString() {
+    public  final String toString() {
         return toString(getRequiredThreadLocalGammaTransaction());
     }
 
     @Override
-    public String toString(Transaction tx) {
+    public  final String toString(Transaction tx) {
         return toString(asGammaTransaction(tx));
     }
 
-    public String toString(GammaTransaction tx) {
+    public  final String toString(GammaTransaction tx) {
         return Long.toString(get(tx));
     }
 
     @Override
-    public String atomicToString() {
+    public  final String atomicToString() {
         return Long.toString(atomicGet());
     }
 }

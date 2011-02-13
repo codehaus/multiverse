@@ -329,27 +329,27 @@ public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRe
     }
 
     @Override
-    public String toDebugString() {
+    public final String toDebugString() {
         return String.format("GammaBooleanRef{orec=%s, version=%s, value=%s, hasListeners=%s)",
                 ___toOrecString(), version, longAsBoolean(long_value), listeners != null);
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return toString(getRequiredThreadLocalGammaTransaction());
     }
 
     @Override
-    public String toString(Transaction tx) {
+    public final String toString(Transaction tx) {
         return toString(asGammaTransaction(tx));
     }
 
-    public String toString(GammaTransaction tx) {
+    public final String toString(GammaTransaction tx) {
         return Boolean.toString(get(tx));
     }
 
     @Override
-    public String atomicToString() {
+    public final String atomicToString() {
         return Boolean.toString(atomicGet());
     }
 }

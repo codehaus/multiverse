@@ -409,27 +409,27 @@ public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef 
     }
 
     @Override
-    public String toDebugString() {
+    public  final String toDebugString() {
         return String.format("GammaDoubleRef{orec=%s, version=%s, value=%s, hasListeners=%s)",
                 ___toOrecString(), version, longAsDouble(long_value), listeners != null);
     }
 
     @Override
-    public String toString() {
+    public  final String toString() {
         return toString(getRequiredThreadLocalGammaTransaction());
     }
 
     @Override
-    public String toString(Transaction tx) {
+    public  final String toString(Transaction tx) {
         return toString(asGammaTransaction(tx));
     }
 
-    public String toString(GammaTransaction tx) {
+    public  final String toString(GammaTransaction tx) {
         return Double.toString(get(tx));
     }
 
     @Override
-    public String atomicToString() {
+    public  final String atomicToString() {
         return Double.toString(atomicGet());
     }
 }

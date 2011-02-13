@@ -102,7 +102,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     public final E setAndLock(GammaTransaction tx, E value, LockMode lockMode) {
-        return (E)setObject(tx, lockMode, value, false);
+        return (E) setObject(tx, lockMode, value, false);
     }
 
     @Override
@@ -133,7 +133,7 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     public final E getAndSetAndLock(GammaTransaction tx, E value, LockMode lockMode) {
-        return (E)setObject(tx, lockMode, value, true);
+        return (E) setObject(tx, lockMode, value, true);
     }
 
     @Override
@@ -427,28 +427,28 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     @Override
-    public String toDebugString() {
+    public final String toDebugString() {
         return String.format("GammaRef{orec=%s, version=%s, value=%s, hasListeners=%s)",
                 ___toOrecString(), version, ref_value, listeners != null);
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return toString(getRequiredThreadLocalGammaTransaction());
     }
 
     @Override
-    public String toString(Transaction tx) {
+    public final String toString(Transaction tx) {
         return toString(asGammaTransaction(tx));
     }
 
-    public String toString(GammaTransaction tx) {
+    public final String toString(GammaTransaction tx) {
         E value = get(tx);
         return value == null ? "null" : value.toString();
     }
 
     @Override
-    public String atomicToString() {
+    public final String atomicToString() {
         E value = atomicGet();
         return value == null ? "null" : value.toString();
     }
