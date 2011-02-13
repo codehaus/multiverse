@@ -1,12 +1,8 @@
 package org.multiverse.stms.gamma.transactions.fat;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.IllegalCommuteException;
-import org.multiverse.api.exceptions.ReadonlyException;
-import org.multiverse.api.exceptions.StmMismatchException;
+import org.multiverse.api.exceptions.*;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
@@ -82,24 +78,6 @@ public abstract class FatGammaTransaction_openForConstructionTest<T extends Gamm
     }
 
     @Test
-    @Ignore
-    public void whenOpenedForRead() {
-
-    }
-
-    @Test
-    @Ignore
-    public void whenOpenedForWrite() {
-
-    }
-
-    @Test
-    @Ignore
-    public void whenOpenedForCommute() {
-
-    }
-
-    @Test
     public void whenStmMismatch() {
         GammaStm otherStm = new GammaStm();
         GammaLongRef ref = new GammaLongRef(otherStm);
@@ -133,17 +111,14 @@ public abstract class FatGammaTransaction_openForConstructionTest<T extends Gamm
     }
 
     @Test
-    @Ignore
     public void whenTransactionAlreadyPrepared() {
         GammaTransaction tx = newTransaction();
         tx.prepare();
 
-        GammaLongRef ref = new GammaLongRef(stm);
-
         try {
-            ref.openForConstruction(tx);
+            new GammaLongRef(tx);
             fail();
-        } catch (DeadTransactionException expected) {
+        } catch (PreparedTransactionException expected) {
         }
 
         assertIsAborted(tx);
