@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
+import org.multiverse.api.exceptions.IllegalCommuteException;
 import org.multiverse.api.exceptions.ReadonlyException;
 import org.multiverse.api.exceptions.StmMismatchException;
 import org.multiverse.stms.gamma.GammaStm;
@@ -108,6 +109,24 @@ public abstract class FatGammaTransaction_openForConstructionTest<T extends Gamm
             ref.openForConstruction(tx);
             fail();
         } catch (StmMismatchException expected) {
+        }
+
+        assertIsAborted(tx);
+    }
+
+     // ==========================================
+
+     @Test
+    public void commuting_whenCommuting_thenFailure() {
+        long initialValue = 10;
+
+        T tx = newTransaction();
+        tx.evaluatingCommute = true;
+
+        try{
+            new GammaLongRef(tx, initialValue);
+            fail();
+        }catch(IllegalCommuteException expected){
         }
 
         assertIsAborted(tx);

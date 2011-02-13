@@ -712,6 +712,28 @@ public abstract class FatGammaTransaction_openForWriteTest<T extends GammaTransa
         assertRefHasExclusiveLock(ref, otherTx);
     }
 
+    // ==========================================
+
+     @Test
+    public void commuting_whenCommuting_thenFailure() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        T tx = newTransaction();
+        tx.evaluatingCommute = true;
+
+        try{
+            ref.openForWrite(tx, LOCKMODE_NONE);
+            fail();
+        }catch(IllegalCommuteException expected){
+        }
+
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertRefHasNoLocks(ref);
+    }
+
     // ================================================================
 
 

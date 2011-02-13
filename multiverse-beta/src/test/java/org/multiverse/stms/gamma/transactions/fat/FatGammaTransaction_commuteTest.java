@@ -336,6 +336,32 @@ public abstract class FatGammaTransaction_commuteTest<T extends GammaTransaction
         verifyZeroInteractions(function);
     }
 
+    // =========================== commuting =========================
+
+    @Test
+    public void commuting_whenCommuting_thenFailure() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        T tx = newTransaction();
+        tx.evaluatingCommute = true;
+
+        LongFunction function = mock(LongFunction.class);
+        try {
+            ref.commute(tx, function);
+            fail();
+        } catch (IllegalCommuteException expected) {
+        }
+
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertRefHasNoLocks(ref);
+        verifyZeroInteractions(function);
+    }
+
+    // ========================== state ==============================
+
     @Test
     public void whenTransactionPrepared_thenPreparedTransactionException() {
         long initialValue = 10;

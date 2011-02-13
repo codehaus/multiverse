@@ -14,8 +14,6 @@ transactions can also act as node (no need to introduce additional datastructure
 
 - testing: prepare of transactions and excusive lock isolation level
 
-- testing: commute: while commuting, no transaction accessed allowed.
-
 - testing: post commit listener
 
 - testing: post abort listener
@@ -57,13 +55,15 @@ transactions can also act as node (no need to introduce additional datastructure
 
 - testing:Lock_getLockMode0Test
 
-- testing: PhantomReadTest
-
-- ordering of get/set/getandset in ref
+- testing:PhantomReadTest
 
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- testing: commute: while commuting, no transaction accessed allowed.
+
+- ordering of get/set/getandset in ref
 
 - orelse
 

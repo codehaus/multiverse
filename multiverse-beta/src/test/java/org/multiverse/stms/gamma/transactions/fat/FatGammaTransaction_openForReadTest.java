@@ -37,9 +37,9 @@ public abstract class FatGammaTransaction_openForReadTest<T extends GammaTransac
 
 
     @Test
-    public void whenArrive(){
+    public void whenArrive() {
         //the mono transaction doesn't support (or need) the richmans conflict
-        assumeTrue(getMaxCapacity()>1);
+        assumeTrue(getMaxCapacity() > 1);
 
         GammaLongRef ref = new GammaLongRef(stm);
 
@@ -703,6 +703,28 @@ public abstract class FatGammaTransaction_openForReadTest<T extends GammaTransac
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, intitialValue);
         assertRefHasExclusiveLock(ref, otherTx);
+    }
+
+    // =================== while commuting ============================
+
+    @Test
+    public void commuting_whenCommuting_thenFailure() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        T tx = newTransaction();
+        tx.evaluatingCommute = true;
+
+        try{
+            ref.openForRead(tx, LOCKMODE_NONE);
+            fail();
+        }catch(IllegalCommuteException expected){
+        }
+
+        assertIsAborted(tx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+        assertRefHasNoLocks(ref);
     }
 
     // ================================================================
