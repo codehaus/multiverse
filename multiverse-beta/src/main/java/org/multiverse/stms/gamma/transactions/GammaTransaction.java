@@ -49,21 +49,31 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     protected void notifyListeners(TransactionEvent event) {
         if (listeners != null) {
+            boolean abort = true;
             try {
                 for (int k = 0; k < listeners.size(); k++) {
                     listeners.get(k).notify(this, event);
                 }
+                abort = false;
             } finally {
-                listeners.clear();
-                pool.putArrayList(listeners);
-                listeners = null;
+                 if (abort) {
+                    abortIfAlive();
+                }
             }
         }
 
         final ArrayList<TransactionListener> permanentListeners = config.permanentListeners;
         if (permanentListeners != null) {
-            for (int k = 0; k < permanentListeners.size(); k++) {
-                permanentListeners.get(k).notify(this, event);
+            boolean abort = true;
+            try {
+                for (int k = 0; k < permanentListeners.size(); k++) {
+                    permanentListeners.get(k).notify(this, event);
+                }
+                abort = false;
+            } finally {
+                if (abort) {
+                    abortIfAlive();
+                }
             }
         }
     }
@@ -156,7 +166,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
 
     public IllegalTransactionStateException abortOpenForReadOnNullLockMode(AbstractGammaRef object) {
-         switch (status) {
+        switch (status) {
             case TX_PREPARED:
                 abort();
                 return new PreparedTransactionException(

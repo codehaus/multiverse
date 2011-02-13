@@ -49,7 +49,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         tx.commit();
 
         assertIsCommitted(tx);
-        //verify(listener).notify(tx, TransactionEvent.PrePrepare);
+        verify(listener).notify(tx, TransactionEvent.PrePrepare);
         verify(listener).notify(tx, TransactionEvent.PostCommit);
     }
 
@@ -65,7 +65,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         tx.commit();
 
         assertIsCommitted(tx);
-        //verify(listener).notify(tx, TransactionEvent.PrePrepare);
+        verify(listener).notify(tx, TransactionEvent.PrePrepare);
         verify(listener).notify(tx, TransactionEvent.PostCommit);
     }
 

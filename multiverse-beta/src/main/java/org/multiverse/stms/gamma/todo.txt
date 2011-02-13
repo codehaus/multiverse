@@ -14,10 +14,6 @@ transactions can also act as node (no need to introduce additional datastructure
 
 - testing: prepare of transactions and excusive lock isolation level
 
-- testing: post commit listener
-
-- testing: post abort listener
-
 - listeners & exceptions
 
 - pre/post start listeners and fat gamma block
@@ -60,6 +56,12 @@ transactions can also act as node (no need to introduce additional datastructure
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------
+
+- testing: post commit listener
+
+- testing: post abort listener
+
+- testing: pre-prepare listener
 
 - testing: getAndLock
 

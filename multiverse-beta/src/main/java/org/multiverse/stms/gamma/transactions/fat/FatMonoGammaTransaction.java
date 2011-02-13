@@ -48,6 +48,10 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
             throw abortCommitOnAbortOnly();
         }
 
+        if (status == TX_ACTIVE) {
+            notifyListeners(TransactionEvent.PrePrepare);
+        }
+
         final AbstractGammaRef owner = tranlocal.owner;
 
         if (owner != null) {
@@ -110,6 +114,8 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
         if (abortOnly) {
             throw abortPrepareOnAbortOnly();
         }
+
+        notifyListeners(TransactionEvent.PrePrepare);
 
         final AbstractGammaRef owner = tranlocal.owner;
         if (owner != null) {
@@ -180,6 +186,12 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
             return false;
         }
 
+        if (listeners != null) {
+            listeners.clear();
+            pool.putArrayList(listeners);
+            listeners = null;
+        }
+
         status = TX_ACTIVE;
         hasWrites = false;
         attempt++;
@@ -191,6 +203,12 @@ public final class FatMonoGammaTransaction extends GammaTransaction {
 
     @Override
     public final void hardReset() {
+        if (listeners != null) {
+            listeners.clear();
+            pool.putArrayList(listeners);
+            listeners = null;
+        }
+
         status = TX_ACTIVE;
         hasWrites = false;
         remainingTimeoutNs = config.timeoutNs;

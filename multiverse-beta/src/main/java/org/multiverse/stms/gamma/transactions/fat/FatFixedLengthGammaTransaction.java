@@ -61,6 +61,10 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
             throw abortCommitOnAbortOnly();
         }
 
+        if (status == TX_ACTIVE) {
+            notifyListeners(TransactionEvent.PrePrepare);
+        }
+
         if (size > 0) {
             if (hasWrites) {
                 if (status == TX_ACTIVE) {
@@ -91,7 +95,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         int listenersIndex = 0;
         GammaRefTranlocal node = head;
         do {
-            if(SHAKE_BUGS) shakeBugs();
+            if (SHAKE_BUGS) shakeBugs();
 
             final AbstractGammaRef owner = node.owner;
             //if we are at the end, we can return the listenersArray.
@@ -124,6 +128,8 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
             throw abortPrepareOnAbortOnly();
         }
 
+        notifyListeners(TransactionEvent.PrePrepare);
+
         GammaObject o = prepareChainForCommit();
         if (o != null) {
             throw abortOnReadWriteConflict(o);
@@ -134,7 +140,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     private AbstractGammaRef prepareChainForCommit() {
-        if(skipPrepare()){
+        if (skipPrepare()) {
             return null;
         }
 
@@ -147,7 +153,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
                 return null;
             }
 
-            if(SHAKE_BUGS) shakeBugs();
+            if (SHAKE_BUGS) shakeBugs();
             if (!owner.prepare(this, node)) {
                 return owner;
             }
@@ -182,7 +188,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
                 return;
             }
 
-            if(SHAKE_BUGS) shakeBugs();
+            if (SHAKE_BUGS) shakeBugs();
             if (success) {
                 owner.releaseAfterReading(node, pool);
             } else {
@@ -280,6 +286,12 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
 
     @Override
     public final void hardReset() {
+        if (listeners != null) {
+            listeners.clear();
+            pool.putArrayList(listeners);
+            listeners = null;
+        }
+
         status = TX_ACTIVE;
         hasWrites = false;
         size = 0;
@@ -298,6 +310,12 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
             return false;
         }
 
+        if (listeners != null) {
+            listeners.clear();
+            pool.putArrayList(listeners);
+            listeners = null;
+        }
+
         commitConflict = false;
         status = TX_ACTIVE;
         hasWrites = false;
@@ -314,6 +332,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         if (newHead == head) {
             return;
         }
+
 
         head.previous = newHead;
         if (newHead.next != null) {
@@ -335,12 +354,12 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
             return true;
         }
 
-        if(config.inconsistentReadAllowed){
+        if (config.inconsistentReadAllowed) {
             return true;
         }
 
         if (richmansMansConflictScan) {
-            if(SHAKE_BUGS) shakeBugs();
+            if (SHAKE_BUGS) shakeBugs();
 
             final long currentConflictCount = config.globalConflictCounter.count();
 
@@ -357,7 +376,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         //doing a full conflict scan
         GammaRefTranlocal node = head;
         while (node != null) {
-            if(SHAKE_BUGS) shakeBugs();
+            if (SHAKE_BUGS) shakeBugs();
 
             //if we are at the end, we are done.
             if (node.owner == null) {
@@ -377,7 +396,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
 
     @Override
     public void initLocalConflictCounter() {
-        if(richmansMansConflictScan && !hasReads){
+        if (richmansMansConflictScan && !hasReads) {
             localConflictCount = config.globalConflictCounter.count();
         }
     }

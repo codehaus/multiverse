@@ -43,6 +43,10 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
             throw abortCommitOnAbortOnly();
         }
 
+        if (status == TX_ACTIVE) {
+            notifyListeners(TransactionEvent.PrePrepare);
+        }
+
         if (size > 0) {
             if (hasWrites) {
                 if (status == TX_ACTIVE) {
@@ -136,6 +140,8 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
             throw abortPrepareOnAbortOnly();
         }
 
+        notifyListeners(TransactionEvent.PrePrepare);
+
         if (hasWrites) {
             final GammaObject conflictingObject = doPrepare();
             if (conflictingObject != null) {
@@ -148,7 +154,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     private GammaObject doPrepare() {
-        if(skipPrepare()){
+        if (skipPrepare()) {
             return null;
         }
 
@@ -282,6 +288,12 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         attempt++;
         commitConflict = false;
         evaluatingCommute = false;
+        if (listeners != null) {
+            listeners.clear();
+            pool.putArrayList(listeners);
+            listeners = null;
+        }
+
         return true;
     }
 
@@ -304,6 +316,12 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         richmansMansConflictScan = speculativeConfig.isRichMansConflictScanRequired;
         commitConflict = false;
         evaluatingCommute = false;
+        if (listeners != null) {
+            listeners.clear();
+            pool.putArrayList(listeners);
+            listeners = null;
+        }
+
     }
 
     @Override
