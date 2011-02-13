@@ -29,7 +29,7 @@ import static org.multiverse.stms.gamma.benchmarks.BenchmarkUtils.transactionsPe
  */
 public abstract class Isolation_AbstractTest implements GammaConstants {
 
-    public long transactionsPerThread = 100 * 1000 * 1000;
+    public long transactionsPerThread = 50 * 1000 * 1000;
     public final int threadCount = 2;
 
     protected GammaStm stm;

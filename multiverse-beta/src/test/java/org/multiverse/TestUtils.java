@@ -273,12 +273,13 @@ public class TestUtils implements MultiverseConstants {
         StringBuffer sb = new StringBuffer();
         sb.append("Uncompleted threads:\n");
         for (TestThread thread : uncompleted) {
-            sb.append("-------------------------------------------------------------------");
+            sb.append("-------------------------------------------------------------------\n");
             sb.append(thread.getName()+"\n");
             for (StackTraceElement element : thread.getStackTrace()) {
                     sb.append("\tat " + element+"\n");
             }
         }
+        sb.append("-------------------------------------------------------------------\n");
         return sb.toString();
     }
 }

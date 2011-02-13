@@ -1,6 +1,7 @@
 package org.multiverse.stms.gamma.integration.isolation.levels;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.Transaction;
@@ -15,6 +16,7 @@ import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.gamma.GammaTestUtils.makeReadBiased;
 
+@Ignore
 public class IsolationLevelReadCommittedTest {
     private GammaStm stm;
     private GammaTransactionFactory transactionFactory;

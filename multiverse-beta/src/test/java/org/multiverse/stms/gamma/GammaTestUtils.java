@@ -7,6 +7,8 @@ import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.functions.Function;
 import org.multiverse.stms.gamma.transactionalobjects.*;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
+import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransaction;
 
 import java.util.*;
 
@@ -17,6 +19,13 @@ import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.getField;
 
 public class GammaTestUtils implements GammaConstants {
+
+    public static GammaTransaction newArrivingTransaction(GammaStm stm){
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .setMaximumPoorMansConflictScanLength(0)
+                .setSpeculative(false);
+        return new FatVariableLengthGammaTransaction(config);
+    }
 
     public static void assertGlobalConflictCount(GammaStm stm, long expected){
         assertEquals(expected, stm.globalConflictCounter.count());
