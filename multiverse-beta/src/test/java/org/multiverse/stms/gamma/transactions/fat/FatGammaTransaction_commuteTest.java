@@ -1,13 +1,14 @@
 package org.multiverse.stms.gamma.transactions.fat;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.SomeUncheckedException;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.*;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
+import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.GammaTestUtils;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
@@ -17,8 +18,8 @@ import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.LOCKMODE_NONE;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
@@ -68,7 +69,6 @@ public abstract class FatGammaTransaction_commuteTest<T extends GammaTransaction
 
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 3);
-
     }
 
     @Test
@@ -99,9 +99,26 @@ public abstract class FatGammaTransaction_commuteTest<T extends GammaTransaction
     }
 
     @Test
-    @Ignore
     public void whenAlreadyOpenedForReadAndFunctionCausesProblem() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initalVersion = ref.getVersion();
 
+        GammaTransaction tx = newTransaction();
+        GammaRefTranlocal tranlocal = ref.openForRead(tx, LOCKMODE_NONE);
+        LongFunction function = mock(LongFunction.class);
+        when(function.call(anyLong())).thenThrow(new SomeUncheckedException());
+
+        try {
+            ref.commute(tx, function);
+            fail();
+        } catch (SomeUncheckedException expected) {
+        }
+
+        assertIsAborted(tx);
+        assertNull(tranlocal.owner);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initalVersion, initialValue);
     }
 
     @Test
@@ -132,9 +149,26 @@ public abstract class FatGammaTransaction_commuteTest<T extends GammaTransaction
     }
 
     @Test
-    @Ignore
-    public void whenAlreadyOpenedForWriteAndFunctionsCausesProblem() {
+    public void whenAlreadyOpenedForWriteAndFunctionCausesProblem() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initalVersion = ref.getVersion();
 
+        GammaTransaction tx = newTransaction();
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+        LongFunction function = mock(LongFunction.class);
+        when(function.call(anyLong())).thenThrow(new SomeUncheckedException());
+
+        try {
+            ref.commute(tx, function);
+            fail();
+        } catch (SomeUncheckedException expected) {
+        }
+
+        assertIsAborted(tx);
+        assertNull(tranlocal.owner);
+        assertRefHasNoLocks(ref);
+        assertVersionAndValue(ref, initalVersion, initialValue);
     }
 
     @Test
@@ -215,15 +249,44 @@ public abstract class FatGammaTransaction_commuteTest<T extends GammaTransaction
     }
 
     @Test
-    @Ignore
     public void whenAlreadyOpenedForConstruction() {
+        GammaTransaction tx = newTransaction();
 
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(tx, initialValue);
+        GammaRefTranlocal tranlocal = tx.locate(ref);
+        LongFunction incFunction = Functions.newIncLongFunction();
+        ref.commute(tx, incFunction);
+
+        assertEquals(initialValue + 1, tranlocal.long_value);
+        assertTrue(tx.hasWrites);
+        assertIsActive(tx);
+        assertVersionAndValue(ref, GammaConstants.VERSION_UNCOMMITTED, 0);
+        assertLockMode(ref, LockMode.Exclusive);
+        assertTrue(tranlocal.isConstructing());
+        assertNull(tranlocal.headCallable);
     }
 
     @Test
-    @Ignore
     public void whenAlreadyOpenedForConstructionAndFunctionCausesProblem() {
+        GammaTransaction tx = newTransaction();
+        LongFunction function = mock(LongFunction.class);
+        when(function.call(anyLong())).thenThrow(new SomeUncheckedException());
 
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(tx, initialValue);
+        GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
+
+        try {
+            ref.commute(tx, function);
+            fail();
+        } catch (SomeUncheckedException expected) {
+        }
+
+        assertIsAborted(tx);
+        assertNull(tranlocal.owner);
+        assertLockMode(ref, LockMode.Exclusive);
+        assertVersionAndValue(ref, GammaConstants.VERSION_UNCOMMITTED, 0);
     }
 
     @Test

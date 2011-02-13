@@ -120,8 +120,23 @@ public abstract class FatGammaTransaction_prepareTest<T extends GammaTransaction
     }
 
     @Test
-    @Ignore
     public void whenContainsConstructed() {
+        long globalConflictCount = stm.globalConflictCounter.count();
+
+        GammaTransaction tx = newTransaction();
+        int initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(tx, initialValue);
+        GammaRefTranlocal tranlocal = tx.locate(ref);
+
+        tx.prepare();
+
+        assertIsPrepared(tx);
+        assertRefHasExclusiveLock(ref, tx);
+        assertTrue(tranlocal.isDirty);
+        assertEquals(LOCKMODE_EXCLUSIVE, tranlocal.lockMode);
+        assertTrue(tranlocal.hasDepartObligation);
+        assertGlobalConflictCount(stm, globalConflictCount);
+        assertVersionAndValue(ref, GammaConstants.VERSION_UNCOMMITTED, 0);
     }
 
     // =============================== dirty check =================================
