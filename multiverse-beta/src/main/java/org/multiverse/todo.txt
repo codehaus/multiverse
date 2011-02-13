@@ -56,10 +56,6 @@ transaction has caused any conflicting writes. So you know that there is no writ
 
 - make distinction between arriveForRead/arriveForWrite and upgradeArriveForReadToArriveForWrite
 
-- it is important that once a transaction has read a read biased orec, that it doesn't do a depart.
-Because the orec could have been changed to write biased. This will be not possible because:
-a tranlocal can't be
-
 - generate different classes: for conflict counter directly and for conflict counter with an array.
 
 - when a transaction needs to wait for a lock, can it help another transaction?
@@ -72,9 +68,6 @@ a tranlocal can't be
 - expose lock for read.
 
 - expose lock for write.
-
-- read transaction still can be expensive because some read tracking is needed when it hits
-non permanent.
 
 - the class index makes it easy to create some kind of arrays that store all kind of information
   on the transactional class level. The question is how to to do it for transactions. You don't want to
@@ -144,8 +137,6 @@ performance.
 
 - tryPrivatizeWhen
 
-- transaction completely optimized for ref.
-
 - reading and backoff? Atm only spinning is used.
 
 - acquire commit lock. atm only some spinning is used
@@ -157,8 +148,6 @@ performance.
 
 - blocking and speculative readtracking?
 
-- readonly transactions are getting slow, they were 100M and dropped to 40M. So need to be put back to 100M.
-
 - lean mono should not upgrade to array when untracked read is done, but should just attach it to the transaction.
 
 - when all reads/writes are pessimistic, cheap conflict detection and cheap prepare.
@@ -166,8 +155,6 @@ performance.
 - rollbackfor/rollnotbackfor exception configuration
 
 - automatic publication of javadoc on codehaus
-
-- introduce a debug setting that enabled exceptions
 
 - profiler
 
@@ -190,8 +177,6 @@ performance.
 - orelse:
 
     - testing
-
-    - problem with the registration in the retry itself.
 
 - lifecyclelistener
 

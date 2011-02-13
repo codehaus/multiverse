@@ -290,16 +290,6 @@ public class Orec_LongRef_ReadConsistencyStressTest implements GammaConstants {
                     owner.releaseAfterReading(tranlocal, pool);
                 }
                 tranlocal.owner = owner;
-
-                //if (tranlocal.hasDepartObligation) {
-                //    tranlocal.hasDepartObligation = false;
-                //    if (tranlocal.lockMode == LOCKMODE_NONE) {
-                //        tranlocal.owner.departAfterReading();
-                //    } else {
-                //        tranlocal.lockMode = LOCKMODE_NONE;
-                //        tranlocal.owner.departAfterUpdateAndUnlock();
-                //    }
-                //}
             }
         }
     }
