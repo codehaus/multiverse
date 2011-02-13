@@ -1,16 +1,12 @@
 package org.multiverse.api;
 
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.locks.LockSupport.parkNanos;
 
 /**
- * A {@link DefaultBackoffPolicy} that does an exponential backoff. So each next attempt, the delay is doubled until a
- * configurable maximum delay has been reached.
- * <p/>
- * The exponential growth of delay can be truncated by providing a maxDelay. If no max delay is provided, the maximum
- * delay would be 10.000.000.000 seconds (292 years). So be careful with not using an acceptable maximum delay.
+ * A {@link DefaultBackoffPolicy} that does an 'exponential' backoff. So each next attempt, the calculated delay is increased and randomized
+ * (so the next value can be smaller than the previous) until a configurable maximum delay has been reached.
  *
  * @author Peter Veentjer.
  */
@@ -35,8 +31,6 @@ public final class DefaultBackoffPolicy implements BackoffPolicy {
      *
      * @param minDelayNs the minimum delay in nanoseconds to wait. If a negative or zero value provided, it will be
      *                   interpreted that no external minimal value is needed.
-     * @param maxDelay   the maximum delay.
-     * @param unit       the unit of maxDelay.
      * @throws NullPointerException if unit is null.
      */
     public DefaultBackoffPolicy(long minDelayNs) {
