@@ -6,14 +6,18 @@ import org.multiverse.api.LockMode;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.functions.LongFunction;
+import org.multiverse.api.lifecycle.TransactionEvent;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
+import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
@@ -28,7 +32,38 @@ public abstract class FatGammaTransaction_abortTest<T extends GammaTransaction> 
 
     protected abstract T newTransaction();
 
+    protected abstract T newTransaction(GammaTransactionConfiguration config);
+
     protected abstract void assertCleaned(T tx);
+
+    @Test
+    public void listener_whenNormalListenerAvailable() {
+        T tx = newTransaction();
+        TransactionListener listener = mock(TransactionListener.class);
+        tx.register(listener);
+
+        tx.abort();
+
+        assertIsAborted(tx);
+        //verify(listener).notify(tx, TransactionEvent.PrePrepare);
+        verify(listener).notify(tx, TransactionEvent.PostAbort);
+    }
+
+    @Test
+    public void listener_whenPermanentListenerAvailable() {
+        TransactionListener listener = mock(TransactionListener.class);
+
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .addPermanentListener(listener);
+
+        T tx = newTransaction(config);
+
+        tx.abort();
+
+        assertIsAborted(tx);
+        //verify(listener).notify(tx, TransactionEvent.PrePrepare);
+        verify(listener).notify(tx, TransactionEvent.PostAbort);
+    }
 
     @Test
     public void whenUnused() {

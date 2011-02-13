@@ -14,4 +14,9 @@ public class FatMonoGammaTransaction_abortTest extends FatGammaTransaction_abort
     protected FatMonoGammaTransaction newTransaction() {
         return new FatMonoGammaTransaction(new GammaTransactionConfiguration(stm));
     }
+
+    @Override
+    protected FatMonoGammaTransaction newTransaction(GammaTransactionConfiguration config) {
+        return new FatMonoGammaTransaction(config);
+    }
 }

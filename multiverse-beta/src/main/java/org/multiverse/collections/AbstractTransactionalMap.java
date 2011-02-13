@@ -25,7 +25,7 @@ public abstract class AbstractTransactionalMap<K, V> implements TransactionalMap
     }
 
     @Override
-    public Stm getStm() {
+    public final Stm getStm() {
         return stm;
     }
 

@@ -12,6 +12,8 @@ import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.exceptions.RetryError;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
+import org.multiverse.api.lifecycle.TransactionEvent;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.*;
@@ -19,8 +21,7 @@ import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
@@ -39,25 +40,54 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
 
     protected abstract void assertCleaned(T transaction);
 
-
     @Test
-    public void listeners_whenDirtyWrite_thenListenersNotified() {
-        listeners_whenDirtyWrite_thenListenersNotified(LockMode.None, LockMode.None);
-        listeners_whenDirtyWrite_thenListenersNotified(LockMode.None, LockMode.Read);
-        listeners_whenDirtyWrite_thenListenersNotified(LockMode.None, LockMode.Write);
-        listeners_whenDirtyWrite_thenListenersNotified(LockMode.None, LockMode.Exclusive);
+    public void listener_whenNormalListenerAvailable() {
+        T tx = newTransaction();
+        TransactionListener listener = mock(TransactionListener.class);
+        tx.register(listener);
 
-        listeners_whenDirtyWrite_thenListenersNotified(LockMode.Read, LockMode.Read);
-        listeners_whenDirtyWrite_thenListenersNotified(LockMode.Read, LockMode.Write);
-        listeners_whenDirtyWrite_thenListenersNotified(LockMode.Read, LockMode.Exclusive);
+        tx.commit();
 
-        listeners_whenDirtyWrite_thenListenersNotified(LockMode.Write, LockMode.Write);
-        listeners_whenDirtyWrite_thenListenersNotified(LockMode.Write, LockMode.Exclusive);
-
-        listeners_whenDirtyWrite_thenListenersNotified(LockMode.Exclusive, LockMode.Exclusive);
+        assertIsCommitted(tx);
+        //verify(listener).notify(tx, TransactionEvent.PrePrepare);
+        verify(listener).notify(tx, TransactionEvent.PostCommit);
     }
 
-    public void listeners_whenDirtyWrite_thenListenersNotified(LockMode readLockMode, LockMode writeLockMode) {
+    @Test
+    public void listener_whenPermanentListenerAvailable() {
+        TransactionListener listener = mock(TransactionListener.class);
+
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .addPermanentListener(listener);
+
+        T tx = newTransaction(config);
+
+        tx.commit();
+
+        assertIsCommitted(tx);
+        //verify(listener).notify(tx, TransactionEvent.PrePrepare);
+        verify(listener).notify(tx, TransactionEvent.PostCommit);
+    }
+
+
+    @Test
+    public void retryListeners_whenDirtyWrite_thenListenersNotified() {
+        retryListeners_whenDirtyWrite_thenListenersNotified(LockMode.None, LockMode.None);
+        retryListeners_whenDirtyWrite_thenListenersNotified(LockMode.None, LockMode.Read);
+        retryListeners_whenDirtyWrite_thenListenersNotified(LockMode.None, LockMode.Write);
+        retryListeners_whenDirtyWrite_thenListenersNotified(LockMode.None, LockMode.Exclusive);
+
+        retryListeners_whenDirtyWrite_thenListenersNotified(LockMode.Read, LockMode.Read);
+        retryListeners_whenDirtyWrite_thenListenersNotified(LockMode.Read, LockMode.Write);
+        retryListeners_whenDirtyWrite_thenListenersNotified(LockMode.Read, LockMode.Exclusive);
+
+        retryListeners_whenDirtyWrite_thenListenersNotified(LockMode.Write, LockMode.Write);
+        retryListeners_whenDirtyWrite_thenListenersNotified(LockMode.Write, LockMode.Exclusive);
+
+        retryListeners_whenDirtyWrite_thenListenersNotified(LockMode.Exclusive, LockMode.Exclusive);
+    }
+
+    public void retryListeners_whenDirtyWrite_thenListenersNotified(LockMode readLockMode, LockMode writeLockMode) {
         String oldValue = "oldvalue";
         GammaRef<String> ref = new GammaRef<String>(stm, oldValue);
         long initialVersion = ref.getVersion();
