@@ -27,8 +27,6 @@ public abstract class LeanGammaTransaction_openForWriteTest<T extends GammaTrans
         stm = new GammaStm();
     }
 
-
-
     public abstract T newTransaction();
 
     public abstract int getMaximumLength();
