@@ -5,6 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.RetryNotAllowedException;
+import org.multiverse.api.exceptions.RetryNotPossibleException;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
@@ -51,9 +52,16 @@ public abstract class FatGammaTransaction_retryTest<T extends GammaTransaction> 
     }
 
     @Test
-    @Ignore
     public void whenUnused() {
+        GammaTransaction tx = newTransaction();
 
+        try {
+            tx.retry();
+            fail();
+        } catch (RetryNotPossibleException expected) {
+        }
+
+        assertIsAborted(tx);
     }
 
     @Test

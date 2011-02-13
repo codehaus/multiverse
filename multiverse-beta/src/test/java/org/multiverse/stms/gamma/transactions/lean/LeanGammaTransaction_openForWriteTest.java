@@ -1,9 +1,9 @@
 package org.multiverse.stms.gamma.transactions.lean;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
+import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
@@ -26,6 +26,8 @@ public abstract class LeanGammaTransaction_openForWriteTest<T extends GammaTrans
     public void setUp() {
         stm = new GammaStm();
     }
+
+
 
     public abstract T newTransaction();
 
@@ -292,9 +294,26 @@ public abstract class LeanGammaTransaction_openForWriteTest<T extends GammaTrans
     }
 
     @Test
-    @Ignore
     public void whenOverflowing() {
+         int maxCapacity = getMaximumLength();
+        assumeTrue(maxCapacity < Integer.MAX_VALUE);
 
+        T tx = newTransaction();
+
+        for (int k = 0; k < maxCapacity; k++) {
+            GammaRef ref = new GammaRef(stm, 0);
+            ref.openForWrite(tx, LOCKMODE_NONE);
+        }
+
+        GammaRef ref = new GammaRef(stm, 0);
+        try {
+            ref.openForWrite(tx, LOCKMODE_NONE);
+            fail();
+        } catch (SpeculativeConfigurationError expected) {
+        }
+
+        assertEquals(TransactionStatus.Aborted, tx.getStatus());
+        assertEquals(maxCapacity + 1, tx.getConfiguration().getSpeculativeConfiguration().minimalLength);
     }
 
     @Test
