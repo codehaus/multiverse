@@ -3,16 +3,23 @@ package org.multiverse.stms.gamma.transactions.fat;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.RetryNotAllowedException;
 import org.multiverse.api.exceptions.RetryNotPossibleException;
+import org.multiverse.api.functions.Function;
 import org.multiverse.stms.gamma.GammaStm;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.assertIsAborted;
 import static org.multiverse.TestUtils.assertIsCommitted;
+import static org.multiverse.stms.gamma.GammaTestUtils.assertLockMode;
+import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasNoLocks;
 
 public abstract class FatGammaTransaction_retryTest<T extends GammaTransaction> {
 
@@ -40,15 +47,38 @@ public abstract class FatGammaTransaction_retryTest<T extends GammaTransaction> 
     }
 
     @Test
-    @Ignore
     public void whenContainsConstructed() {
+        GammaTransaction tx = newTransaction();
+        GammaRef<String> ref = new GammaRef<String>(tx, "foo");
 
+        try {
+            tx.retry();
+            fail();
+        } catch (RetryNotPossibleException expected) {
+        }
+
+        assertIsAborted(tx);
+        assertLockMode(ref, LockMode.Exclusive);
     }
 
     @Test
-    @Ignore
     public void whenContainsCommute() {
+        String intialValue = "initialValue";
+        GammaRef<String> ref = new GammaRef<String>(stm, intialValue);
 
+        GammaTransaction tx = newTransaction();
+        Function<String> function = mock(Function.class);
+        ref.commute(tx, function);
+
+        try {
+            tx.retry();
+            fail();
+        } catch (RetryNotPossibleException expected) {
+        }
+
+        assertIsAborted(tx);
+        assertRefHasNoLocks(ref);
+        verifyZeroInteractions(function);
     }
 
     @Test
