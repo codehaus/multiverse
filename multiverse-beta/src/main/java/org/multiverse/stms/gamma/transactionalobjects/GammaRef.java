@@ -444,13 +444,13 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     public final String toString(GammaTransaction tx) {
-        E value = get(tx);
+        final E value = get(tx);
         return value == null ? "null" : value.toString();
     }
 
     @Override
     public final String atomicToString() {
-        E value = atomicGet();
+        final E value = atomicGet();
         return value == null ? "null" : value.toString();
     }
 }

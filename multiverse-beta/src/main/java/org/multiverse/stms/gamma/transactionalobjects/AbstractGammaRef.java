@@ -1440,7 +1440,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         return openForRead(tx, lockMode.asInt()).long_value;
     }
 
-     protected final Object getObject(GammaTransaction tx, LockMode lockMode) {
+    protected final Object getObject(GammaTransaction tx, LockMode lockMode) {
         assert type == TYPE_REF;
 
         if (tx == null) {
@@ -1479,7 +1479,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         return returnOld ? oldValue : newValue;
     }
 
-     protected final Object setObject(GammaTransaction tx, LockMode lockMode, Object newValue, boolean returnOld) {
+    protected final Object setObject(GammaTransaction tx, LockMode lockMode, Object newValue, boolean returnOld) {
         assert type == TYPE_REF;
 
         if (tx == null) {
