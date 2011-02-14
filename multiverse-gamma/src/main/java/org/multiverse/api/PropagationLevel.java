@@ -4,6 +4,8 @@ package org.multiverse.api;
  * With the PropagationLevel you have control on how nesting of transaction happens.
  *
  * @author Peter Veentjer.
+ * @see TransactionFactoryBuilder#setPropagationLevel(PropagationLevel)
+ * @see TransactionConfiguration#getPropagationLevel()
  */
 public enum PropagationLevel {
 

@@ -11,9 +11,10 @@ package org.multiverse.api;
  * <p/>
  * <h2>Inconsistent Read</h2>
  * <p/>
- * * <h2>Writeskew</h2>
+ * <h2>Writeskew</h2>
  *
  * @author Peter Veentjer.
+ * @see TransactionFactoryBuilder#setIsolationLevel(IsolationLevel)
  */
 public enum IsolationLevel {
 

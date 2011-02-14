@@ -155,7 +155,7 @@ public interface Transaction {
     void setAbortOnly();
 
     /**
-     * Checks if this Transaction is abortonly.
+     * Checks if this Transaction is abortonly (so will always fail when committing or preparing).
      * <p/>
      * This method is not threadsafe, so can only be called by the thread that used the transaction.
      *

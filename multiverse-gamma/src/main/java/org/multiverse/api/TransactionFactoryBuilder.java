@@ -11,6 +11,8 @@ import org.multiverse.api.lifecycle.TransactionListener;
  * instance is returned. In this case this isn't true because a new instance is returned every time.
  *
  * @author Peter Veentjer
+ * @see TransactionFactory
+ * @see TransactionConfiguration
  */
 public interface TransactionFactoryBuilder {
 
@@ -249,7 +251,7 @@ public interface TransactionFactoryBuilder {
     TransactionFactory newTransactionFactory();
 
     /**
-     * Builds an AtomicBlock optimized for executing transactions created by this TransactionFactoryBuilder.
+     * Builds an {@link AtomicBlock} optimized for executing transactions created by this TransactionFactoryBuilder.
      *
      * @return the created AtomicBlock.
      * @throws org.multiverse.api.exceptions.IllegalTransactionFactoryException
