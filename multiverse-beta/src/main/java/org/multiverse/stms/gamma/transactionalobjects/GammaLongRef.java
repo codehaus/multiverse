@@ -20,6 +20,7 @@ import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLoca
  *
  * @author Peter Veentjer.
  */
+@SuppressWarnings({"OverlyComplexClass"})
 public final class GammaLongRef extends AbstractGammaRef implements LongRef {
 
     public GammaLongRef(final GammaStm stm) {
@@ -60,16 +61,16 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
     }
 
     @Override
-    public final long getAndLock(LockMode lockMode) {
+    public final long getAndLock(final LockMode lockMode) {
         return getAndLock(getRequiredThreadLocalGammaTransaction(), lockMode);
     }
 
     @Override
-    public final long getAndLock(Transaction tx, LockMode lockMode) {
+    public final long getAndLock(final Transaction tx, final LockMode lockMode) {
         return getAndLock(asGammaTransaction(tx), lockMode);
     }
 
-    public final long getAndLock(GammaTransaction tx, LockMode lockMode) {
+    public final long getAndLock(final GammaTransaction tx, final LockMode lockMode) {
         return getLong(tx, lockMode);
     }
 
@@ -89,16 +90,16 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
     }
 
     @Override
-    public final long setAndLock(long value, LockMode lockMode) {
+    public final long setAndLock(final long value, final LockMode lockMode) {
         return setAndLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
     }
 
     @Override
-    public final long setAndLock(Transaction tx, long value, LockMode lockMode) {
+    public final long setAndLock(final Transaction tx, final long value, final LockMode lockMode) {
         return setAndLock(asGammaTransaction(tx), value, lockMode);
     }
 
-    public final long setAndLock(GammaTransaction tx, long value, LockMode lockMode) {
+    public final long setAndLock(final GammaTransaction tx, final long value, final LockMode lockMode) {
         return setLong(tx, lockMode, value, false);
     }
 
@@ -119,16 +120,16 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
     }
 
     @Override
-    public final long getAndSetAndLock(long value, LockMode lockMode) {
+    public final long getAndSetAndLock(final long value, final LockMode lockMode) {
         return getAndSetAndLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
     }
 
     @Override
-    public final long getAndSetAndLock(Transaction tx, long value, LockMode lockMode) {
+    public final long getAndSetAndLock(final Transaction tx, final long value, final LockMode lockMode) {
         return getAndSetLock(asGammaTransaction(tx), value, lockMode);
     }
 
-    public final long getAndSetLock(GammaTransaction tx, long value, LockMode lockMode) {
+    public final long getAndSetLock(final GammaTransaction tx, final long value, final LockMode lockMode) {
         return setLong(tx, lockMode, value, true);
     }
 

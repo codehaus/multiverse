@@ -271,7 +271,6 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
         return FAILURE;
     }
 
-    //todo: here the conflict count should be returned,
     public final int upgradeReadLock(int spinCount, final boolean exclusiveLock) {
         do {
             final long current = orec;
@@ -458,7 +457,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
      *
      * @param spinCount the maximum number of times to spin if a lock is acquired.
      * @param lockMode  the desired lockMode. This is not allowed to be LOCKMODE_NONE.
-     * @return
+     * @return the status of the operation.
      */
     public final int lockAfterArrive(int spinCount, final int lockMode) {
         assert lockMode != LOCKMODE_NONE;
@@ -592,8 +591,6 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 readonlyCount = 0;
             }
 
-            //todo: if exclusive lock is acquired and no readers/then cheap write
-
             long next = current;
             if (readLockCount > 0) {
                 next = setReadLockCount(next, readLockCount - 1);
@@ -694,9 +691,6 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
                 next = setReadLockCount(next, lockMode - 1);
             }
 
-            //todo: if a there is no surplus and exclusive lock is held, the same trick as with the releaseAfterUpdate
-            //can be applied that prevent a cas.
-
             if (___unsafe.compareAndSwapLong(this, valueOffset, current, next)) {
                 return;
             }
@@ -760,8 +754,6 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
             if (getSurplus(current) > 1) {
                 throw new PanicError("Surplus for readbiased orec larger than 1 " + toOrecString(current));
             }
-
-            //todo: cheap write
 
             long next = current;
             if (lockMode > 0) {

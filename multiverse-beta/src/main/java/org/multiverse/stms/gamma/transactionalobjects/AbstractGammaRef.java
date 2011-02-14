@@ -137,7 +137,6 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             listenerAfterWrite = ___removeListenersAfterWrite();
         }
 
-        //todo: content of this method can be inlined here.
         releaseAfterUpdate(tranlocal, pool);
         return listenerAfterWrite;
     }
@@ -1292,7 +1291,6 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 return;
             }
 
-            //todo: write lock should be applied?
             if (found.isRead()) {
                 found.mode = TRANLOCAL_WRITE;
                 tx.hasWrites = true;

@@ -21,6 +21,7 @@ import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLoca
  * @param <E>
  * @author Peter Veentjer.
  */
+@SuppressWarnings({"OverlyComplexClass"})
 public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
 
     public GammaRef(final GammaTransaction tx) {
@@ -62,16 +63,16 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     @Override
-    public final E getAndLock(LockMode lockMode) {
+    public final E getAndLock(final LockMode lockMode) {
         return getAndLock(getRequiredThreadLocalGammaTransaction(), lockMode);
     }
 
     @Override
-    public final E getAndLock(Transaction tx, LockMode lockMode) {
+    public final E getAndLock(final Transaction tx, final LockMode lockMode) {
         return getAndLock(asGammaTransaction(tx), lockMode);
     }
 
-    public final E getAndLock(GammaTransaction tx, LockMode lockMode) {
+    public final E getAndLock(final GammaTransaction tx, final LockMode lockMode) {
         return (E) getObject(tx, lockMode);
     }
 
@@ -92,16 +93,16 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     @Override
-    public final E setAndLock(E value, LockMode lockMode) {
+    public final E setAndLock(final E value, final LockMode lockMode) {
         return setAndLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
     }
 
     @Override
-    public final E setAndLock(Transaction tx, E value, LockMode lockMode) {
+    public final E setAndLock(final Transaction tx, final E value, final LockMode lockMode) {
         return setAndLock(asGammaTransaction(tx), value, lockMode);
     }
 
-    public final E setAndLock(GammaTransaction tx, E value, LockMode lockMode) {
+    public final E setAndLock(final GammaTransaction tx, final E value, final LockMode lockMode) {
         return (E) setObject(tx, lockMode, value, false);
     }
 
@@ -123,16 +124,16 @@ public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
     }
 
     @Override
-    public final E getAndSetAndLock(E value, LockMode lockMode) {
+    public final E getAndSetAndLock(final E value, final LockMode lockMode) {
         return getAndSetAndLock(getRequiredThreadLocalGammaTransaction(), value, lockMode);
     }
 
     @Override
-    public final E getAndSetAndLock(Transaction tx, E value, LockMode lockMode) {
+    public final E getAndSetAndLock(final Transaction tx, final E value, final LockMode lockMode) {
         return getAndSetAndLock(asGammaTransaction(tx), value, lockMode);
     }
 
-    public final E getAndSetAndLock(GammaTransaction tx, E value, LockMode lockMode) {
+    public final E getAndSetAndLock(final GammaTransaction tx, final E value, final LockMode lockMode) {
         return (E) setObject(tx, lockMode, value, true);
     }
 

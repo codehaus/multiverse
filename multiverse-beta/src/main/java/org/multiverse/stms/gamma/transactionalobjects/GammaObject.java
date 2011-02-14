@@ -6,7 +6,7 @@ import org.multiverse.stms.gamma.GammaStm;
 
 public interface GammaObject extends GammaConstants {
 
-     long getVersion();
+    long getVersion();
 
     GammaStm getStm();
 
