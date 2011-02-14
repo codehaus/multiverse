@@ -12,7 +12,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * is only increased on conflict and not on every update.
  * <p/>
  * Small transactions don't make use of this mechanism and do a full conflict scan every time. The advantage is that the pressure
- * on the GlobalConflictCounter is reduced and that expensive arrives/departs (require a cas) are reduced as well.
+ * on the GlobalConflictCounter is reduced and that expensive arrives/departs (requiring in most cases 1 or 2 cas operations)
+ * are reduced as well.
  *
  * @author Peter Veentjer.
  */
@@ -20,11 +21,19 @@ public final class GlobalConflictCounter {
 
     private final AtomicLong counter = new AtomicLong();
 
+    /**
+     * Signals that a conflict occurred.
+     */
     public void signalConflict() {
         final long oldCount = counter.get();
         counter.compareAndSet(oldCount, oldCount + 1);
     }
 
+    /**
+     * Gets the current conflict count. The actual value is not interesting, only the change is important.
+     *
+     * @return the current conflict count.
+     */
     public long count() {
         return counter.get();
     }

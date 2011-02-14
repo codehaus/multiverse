@@ -15,8 +15,15 @@ import org.multiverse.stms.gamma.transactions.lean.LeanMonoGammaTransaction;
 import static org.multiverse.stms.gamma.transactions.ThreadLocalGammaTransactionPool.getThreadLocalGammaTransactionPool;
 
 
+@SuppressWarnings({"ClassWithTooManyFields"})
 public final class GammaStm implements Stm {
 
+    /**
+     * Creates a GammaStm implementation optimized for speed. This method probably will be invoked
+     * by the {@link GlobalStmInstance}.
+     *
+     * @return the created GammaStm.
+     */
     @SuppressWarnings({"UnusedDeclaration"})
     public static GammaStm createFast() {
         return new GammaStm();
@@ -25,10 +32,9 @@ public final class GammaStm implements Stm {
     public final int defaultMaxRetries;
     public final int spinCount;
     public final BackoffPolicy defaultBackoffPolicy;
-
     public final GlobalConflictCounter globalConflictCounter = new GlobalConflictCounter();
     public final GammaRefFactoryImpl defaultRefFactory = new GammaRefFactoryImpl();
-    public final GammaRefFactoryBuilder refFactoryBuilder = new RefFactoryBuilderImpl();
+    public final GammaRefFactoryBuilder refFactoryBuilder = new GammaRefFactoryBuilderImpl();
     public final GammaAtomicBlock defaultAtomicBlock;
     public final GammaTransactionConfiguration defaultConfig;
     public final NaiveTransactionalCollectionFactory defaultTransactionalCollectionFactory
@@ -73,7 +79,7 @@ public final class GammaStm implements Stm {
         return globalConflictCounter;
     }
 
-    public class GammaTransactionFactoryBuilderImpl implements GammaTransactionFactoryBuilder {
+    private final class GammaTransactionFactoryBuilderImpl implements GammaTransactionFactoryBuilder {
 
         private final GammaTransactionConfiguration config;
 
@@ -287,7 +293,7 @@ public final class GammaStm implements Stm {
         return defaultRefFactory;
     }
 
-    class GammaRefFactoryImpl implements GammaRefFactory {
+    private final class GammaRefFactoryImpl implements GammaRefFactory {
         @Override
         public <E> GammaRef<E> newRef(E value) {
             return new GammaRef<E>(GammaStm.this, value);
@@ -330,14 +336,14 @@ public final class GammaStm implements Stm {
         return refFactoryBuilder;
     }
 
-    public final class RefFactoryBuilderImpl implements GammaRefFactoryBuilder {
+    private final class GammaRefFactoryBuilderImpl implements GammaRefFactoryBuilder {
         @Override
         public GammaRefFactory build() {
             return new GammaRefFactoryImpl();
         }
     }
 
-    public static final class NonSpeculativeGammaTransactionFactory implements GammaTransactionFactory {
+    private static final class NonSpeculativeGammaTransactionFactory implements GammaTransactionFactory {
 
         private final GammaTransactionConfiguration config;
 
@@ -374,7 +380,7 @@ public final class GammaStm implements Stm {
         }
     }
 
-    public static final class SpeculativeGammaTransactionFactory implements GammaTransactionFactory {
+    private static final class SpeculativeGammaTransactionFactory implements GammaTransactionFactory {
 
         private final GammaTransactionConfiguration config;
 

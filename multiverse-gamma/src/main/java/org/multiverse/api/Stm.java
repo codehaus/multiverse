@@ -56,8 +56,8 @@ public interface Stm {
     OrElseBlock newOrElseBlock();
 
     /**
-     * Returns the default reference factory that can be used for easy and cheap access to a reference factory
-     * instead of setting one up through the RefFactoryBuilder.
+     * Returns the default {@link RefFactory} that can be used for easy and cheap access to a reference factory
+     * instead of setting one up through the {@link RefFactoryBuilder}.
      *
      * @return the default RefFactory.
      */

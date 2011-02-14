@@ -4,6 +4,7 @@ package org.multiverse.api.lifecycle;
  * An enumeration for all possible events for the transaction lifecycle.
  *
  * @author Peter Veentjer.
+ * @see TransactionListener
  */
 public enum TransactionEvent {
 
