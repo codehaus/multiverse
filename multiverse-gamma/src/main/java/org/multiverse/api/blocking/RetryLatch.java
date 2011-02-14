@@ -3,11 +3,14 @@ package org.multiverse.api.blocking;
 /**
  * A blockingAllowed structure that can be used to create blocking transactions. When a transaction blocks, a
  * 'listener' is added to each read transactional object. This listener is the Latch. Each transactional object
- * can have a set of listeners, see the {@link org.multiverse.stms.beta.Listeners} for more information.
+ * can have a set of listeners.
  * <p/>
- * The Latch can safely be garbage collected because it works based on an listenerEra. When a transaction
- * wants to block it gets a Latch from the pool and reset it so it can be used. By resetting it, the listenerEra-counter
- * is incremented, so that call to open or await are ignored.
+ * The Latch can safely be created once by a Transaction and reused by the same Transaction because it works based on
+ * an listenerEra. So of opens happen with an older listener-era, the open is ignored. So even though the Latch could
+ * be attached to an older ref that didn't get updated, but is updated eventually even though the latch is notified
+ * by another ref, there is no problem.
+ * <p/>
+ * By resetting it, the listenerEra-counter is incremented, so that call to open or await are ignored.
  *
  * @author Peter Veentjer.
  */
@@ -77,8 +80,8 @@ public interface RetryLatch {
      * When the calling thread is interrupted, the Thread.interrupt status will not be eaten by
      * this method and safely be restored.
      *
-     * @param expectedEra  the expected era
-     * @param nanosTimeout the timeout in nanoseconds. Can safely be called with a zero or negative timeout
+     * @param expectedEra           the expected era
+     * @param nanosTimeout          the timeout in nanoseconds. Can safely be called with a zero or negative timeout
      * @param transactionFamilyName the name of the transaction (only needed for creating
      *                              a usable message in the RetryInterruptedException).
      * @return the remaining timeout. A 0 or negative value indicates that the latch is not opened in time.

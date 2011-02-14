@@ -9,12 +9,13 @@ import static java.lang.String.format;
  *
  * @author Peter Veentjer
  */
+@SuppressWarnings({"SynchronizeOnThis", "WaitOrAwaitWithoutTimeout"})
 public final class DefaultRetryLatch implements RetryLatch {
 
     private volatile long era = Long.MIN_VALUE;
     private volatile boolean isOpen = false;
 
-    @Override
+     @Override
     public void open(final long expectedEra) {
         if (isOpen || expectedEra != era) {
             return;

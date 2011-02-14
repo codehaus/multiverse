@@ -12,10 +12,11 @@ import static java.lang.Thread.yield;
  * <pre>
  * if(MultiverseConstants.SHAKE_BUGS){shakeBugs();}
  * </pre>
- * Since the ___BugshakerEnabled field is final, it can be removed by the JIT is the bugshaking is disabled so
+ * Since the SHAKE_BUGS field is final, it can be removed by the JIT is the bugshaking is disabled so
  * there is no overhead.
  * <p/>
- * At the moment the Bugshaker is not configurable, but will
+ * At the moment the inside of the Bugshaker is not configurable (so no control on how much delay and how often
+ * it happens).
  *
  * @author Peter Veentjer
  */

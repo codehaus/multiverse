@@ -12,12 +12,6 @@ public class TransactionNotAllowedException extends PropagationException {
     private static final long serialVersionUID = 0;
         
     /**
-     * Creates a new NoTransactionAllowedException.
-     */
-    public TransactionNotAllowedException() {
-    }
-
-    /**
      * Creates a new NoTransactionAllowedException with the provided message.
      *
      * @param message the message for the exception.

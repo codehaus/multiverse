@@ -13,6 +13,8 @@ package org.multiverse.api.exceptions;
  */
 public class IllegalCommuteException extends TransactionExecutionException {
 
+    private static final long serialVersionUID = 0;
+
     /**
      * Creates a new IllegalCommuteException with the provided message.
      *

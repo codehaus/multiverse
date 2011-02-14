@@ -8,6 +8,8 @@ package org.multiverse.api.exceptions;
  */
 public class AbortOnlyException extends IllegalTransactionStateException {
 
+    private static final long serialVersionUID = 0;
+
     /**
      * Creates a new AbortOnlyException with the provided message.
      *
