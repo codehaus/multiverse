@@ -296,7 +296,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         hasWrites = false;
         size = 0;
         remainingTimeoutNs = config.timeoutNs;
-        richmansMansConflictScan = config.speculativeConfiguration.get().isRichMansConflictScanRequired;
+        richmansMansConflictScan = config.speculativeConfiguration.get().richMansConflictScanRequired;
         attempt = 1;
         hasReads = false;
         abortOnly = false;

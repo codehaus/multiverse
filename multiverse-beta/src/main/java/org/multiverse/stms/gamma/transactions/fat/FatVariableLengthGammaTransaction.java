@@ -313,7 +313,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         }
         array = pool.takeTranlocalArray(config.minimalArrayTreeSize);
         final SpeculativeGammaConfiguration speculativeConfig = config.speculativeConfiguration.get();
-        richmansMansConflictScan = speculativeConfig.isRichMansConflictScanRequired;
+        richmansMansConflictScan = speculativeConfig.richMansConflictScanRequired;
         commitConflict = false;
         evaluatingCommute = false;
         if (listeners != null) {

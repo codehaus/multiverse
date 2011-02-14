@@ -19,7 +19,7 @@ public final class SpeculativeGammaConfiguration {
     public final boolean fat;
     public final boolean locksDetected;
     public final boolean constructedObjectsDetected;
-    public final boolean isRichMansConflictScanRequired;
+    public final boolean richMansConflictScanRequired;
     public final boolean abortOnlyDetected;
     public final boolean ensureDetected;
     public final int minimalLength;
@@ -53,7 +53,7 @@ public final class SpeculativeGammaConfiguration {
         this.listenersDetected = listenersDetected;
         this.locksDetected = locksDetected;
         this.commuteDetected = isCommuteDetected;
-        this.isRichMansConflictScanRequired = isRichMansConflictScanRequired;
+        this.richMansConflictScanRequired = isRichMansConflictScanRequired;
         this.nonRefTypeDetected = isNonRefTypeDetected;
         this.orelseDetected = isOrelseDetected;
         this.minimalLength = minimalLength;
@@ -72,7 +72,7 @@ public final class SpeculativeGammaConfiguration {
 
         return new SpeculativeGammaConfiguration(
                 fat, listenersDetected, commuteDetected, nonRefTypeDetected, orelseDetected,
-                locksDetected, constructedObjectsDetected, isRichMansConflictScanRequired,
+                locksDetected, constructedObjectsDetected, richMansConflictScanRequired,
                 abortOnlyDetected, ensureDetected, newMinimalLength);
     }
 
@@ -83,7 +83,7 @@ public final class SpeculativeGammaConfiguration {
 
         return new SpeculativeGammaConfiguration(
                 true, listenersDetected, commuteDetected, nonRefTypeDetected, orelseDetected, true,
-                constructedObjectsDetected, isRichMansConflictScanRequired, abortOnlyDetected, ensureDetected, minimalLength);
+                constructedObjectsDetected, richMansConflictScanRequired, abortOnlyDetected, ensureDetected, minimalLength);
     }
 
     public SpeculativeGammaConfiguration newWithAbortOnly() {
@@ -93,7 +93,7 @@ public final class SpeculativeGammaConfiguration {
 
         return new SpeculativeGammaConfiguration(
                 true, listenersDetected, commuteDetected, nonRefTypeDetected, orelseDetected, locksDetected,
-                constructedObjectsDetected, isRichMansConflictScanRequired, true, ensureDetected, minimalLength);
+                constructedObjectsDetected, richMansConflictScanRequired, true, ensureDetected, minimalLength);
     }
 
     public SpeculativeGammaConfiguration newWithConstructedObjects() {
@@ -103,7 +103,7 @@ public final class SpeculativeGammaConfiguration {
 
         return new SpeculativeGammaConfiguration(
                 true, listenersDetected, commuteDetected, nonRefTypeDetected, orelseDetected, locksDetected,
-                true, isRichMansConflictScanRequired, abortOnlyDetected, ensureDetected, minimalLength);
+                true, richMansConflictScanRequired, abortOnlyDetected, ensureDetected, minimalLength);
     }
 
     public SpeculativeGammaConfiguration newWithListeners() {
@@ -113,7 +113,7 @@ public final class SpeculativeGammaConfiguration {
 
         return new SpeculativeGammaConfiguration(
                 true, true, commuteDetected, nonRefTypeDetected, orelseDetected, locksDetected,
-                constructedObjectsDetected, isRichMansConflictScanRequired, abortOnlyDetected, ensureDetected, minimalLength);
+                constructedObjectsDetected, richMansConflictScanRequired, abortOnlyDetected, ensureDetected, minimalLength);
     }
 
     public SpeculativeGammaConfiguration newWithOrElse() {
@@ -123,7 +123,7 @@ public final class SpeculativeGammaConfiguration {
 
         return new SpeculativeGammaConfiguration(
                 true, listenersDetected, commuteDetected, nonRefTypeDetected, true, locksDetected,
-                constructedObjectsDetected, isRichMansConflictScanRequired, abortOnlyDetected, ensureDetected, minimalLength);
+                constructedObjectsDetected, richMansConflictScanRequired, abortOnlyDetected, ensureDetected, minimalLength);
     }
 
     public SpeculativeGammaConfiguration newWithNonRefType() {
@@ -133,7 +133,7 @@ public final class SpeculativeGammaConfiguration {
 
         return new SpeculativeGammaConfiguration(
                 true, listenersDetected, commuteDetected, true, orelseDetected, locksDetected,
-                constructedObjectsDetected, isRichMansConflictScanRequired, abortOnlyDetected, ensureDetected, minimalLength);
+                constructedObjectsDetected, richMansConflictScanRequired, abortOnlyDetected, ensureDetected, minimalLength);
     }
 
     public SpeculativeGammaConfiguration newWithCommute() {
@@ -143,11 +143,11 @@ public final class SpeculativeGammaConfiguration {
 
         return new SpeculativeGammaConfiguration(
                 true, listenersDetected, true, nonRefTypeDetected, orelseDetected, locksDetected,
-                constructedObjectsDetected, isRichMansConflictScanRequired, abortOnlyDetected, ensureDetected, minimalLength);
+                constructedObjectsDetected, richMansConflictScanRequired, abortOnlyDetected, ensureDetected, minimalLength);
     }
 
     public SpeculativeGammaConfiguration newWithRichMansConflictScan() {
-        if (isRichMansConflictScanRequired) {
+        if (richMansConflictScanRequired) {
             return this;
         }
 
@@ -170,17 +170,17 @@ public final class SpeculativeGammaConfiguration {
     @Override
     public String toString() {
         return "SpeculativeGammaConfiguration{" +
-                "areListenersRequired=" + listenersDetected +
-                ", isCommuteDetected=" + commuteDetected +
-                ", isNonRefTypeDetected=" + nonRefTypeDetected +
-                ", isOrelseDetected=" + orelseDetected +
-                ", isOrelseDetected=" + orelseDetected +
+                " isFat=" + fat +
+                ", listenersDetected=" + listenersDetected +
+                ", commuteDetected=" + commuteDetected +
+                ", nonRefTypeDetected=" + nonRefTypeDetected +
+                ", locksDetected=" + locksDetected +
+                ", orelseDetected=" + orelseDetected +
                 ", minimalLength=" + minimalLength +
-                ", isRichMansConflictScanDetected=" + isRichMansConflictScanRequired +
-                ", areConstructedObjectsDetected=" + constructedObjectsDetected +
+                ", richMansConflictScanDetected=" + richMansConflictScanRequired +
+                ", constructedObjectsDetected=" + constructedObjectsDetected +
                 ", abortOnlyDetected=" + abortOnlyDetected +
                 ", ensureDetected=" + ensureDetected +
-                ", isFat=" + fat +
                 '}';
     }
 
