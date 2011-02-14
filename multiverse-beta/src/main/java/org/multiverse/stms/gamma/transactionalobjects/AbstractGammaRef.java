@@ -1418,11 +1418,11 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             return;
         }
 
-        GammaRefTranlocal tranlocal = openForRead(tx, LOCKMODE_NONE);
+        final GammaRefTranlocal tranlocal = openForRead(tx, LOCKMODE_NONE);
         tranlocal.writeSkewCheck = true;
     }
 
-    protected final long getLong(GammaTransaction tx, LockMode lockMode) {
+    protected final long getLong(final GammaTransaction tx, final LockMode lockMode) {
         assert type != TYPE_REF;
 
         if (tx == null) {
@@ -1440,7 +1440,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         return openForRead(tx, lockMode.asInt()).long_value;
     }
 
-    protected final Object getObject(GammaTransaction tx, LockMode lockMode) {
+    protected final Object getObject(final GammaTransaction tx, final LockMode lockMode) {
         assert type == TYPE_REF;
 
         if (tx == null) {
@@ -1458,7 +1458,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         return openForRead(tx, lockMode.asInt()).ref_value;
     }
 
-    protected final long setLong(GammaTransaction tx, LockMode lockMode, long newValue, boolean returnOld) {
+    protected final long setLong(final GammaTransaction tx, final LockMode lockMode, final long newValue, final boolean returnOld) {
         assert type != TYPE_REF;
 
         if (tx == null) {
@@ -1473,13 +1473,13 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOpenForReadOnNullLockMode(this);
         }
 
-        GammaRefTranlocal tranlocal = openForWrite(tx, lockMode.asInt());
-        long oldValue = tranlocal.long_value;
+        final GammaRefTranlocal tranlocal = openForWrite(tx, lockMode.asInt());
+        final long oldValue = tranlocal.long_value;
         tranlocal.long_value = newValue;
         return returnOld ? oldValue : newValue;
     }
 
-    protected final Object setObject(GammaTransaction tx, LockMode lockMode, Object newValue, boolean returnOld) {
+    protected final Object setObject(final GammaTransaction tx, final LockMode lockMode, final Object newValue, final boolean returnOld) {
         assert type == TYPE_REF;
 
         if (tx == null) {
@@ -1494,8 +1494,8 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortOpenForReadOnNullLockMode(this);
         }
 
-        GammaRefTranlocal tranlocal = openForWrite(tx, lockMode.asInt());
-        Object oldValue = tranlocal.ref_value;
+        final GammaRefTranlocal tranlocal = openForWrite(tx, lockMode.asInt());
+        final Object oldValue = tranlocal.ref_value;
         tranlocal.ref_value = newValue;
         return returnOld ? oldValue : newValue;
     }
