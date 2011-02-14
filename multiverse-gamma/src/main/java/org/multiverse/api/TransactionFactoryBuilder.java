@@ -28,6 +28,7 @@ public interface TransactionFactoryBuilder {
      *
      * @param reused true if ControlFlowErrors should be reused.
      * @return the updated TransactionFactoryBuilder.
+     * @see TransactionConfiguration#isControlFlowErrorsReused()
      */
     TransactionFactoryBuilder setControlFlowErrorsReused(boolean reused);
 
@@ -40,6 +41,7 @@ public interface TransactionFactoryBuilder {
      * @param familyName the familyName of the transaction.
      * @return the updated TransactionFactoryBuilder
      * @throws NullPointerException if familyName is null.
+     * @see TransactionConfiguration#getFamilyName()
      */
     TransactionFactoryBuilder setFamilyName(String familyName);
 
@@ -50,6 +52,8 @@ public interface TransactionFactoryBuilder {
      * @param propagationLevel the new PropagationLevel
      * @return the updated TransactionFactoryBuilder
      * @throws NullPointerException if propagationLevel is null.
+     * @see TransactionConfiguration#getPropagationLevel()
+     * @see PropagationLevel
      */
     TransactionFactoryBuilder setPropagationLevel(PropagationLevel propagationLevel);
 
@@ -59,6 +63,8 @@ public interface TransactionFactoryBuilder {
      * @param lockMode the LockMode to set.
      * @return the updated TransactionFactoryBuilder.
      * @throws NullPointerException if lockMode is null.
+     * @see TransactionConfiguration#getReadLockMode()
+     * @see LockMode
      */
     TransactionFactoryBuilder setReadLockMode(LockMode lockMode);
 
@@ -77,6 +83,8 @@ public interface TransactionFactoryBuilder {
      * @param lockMode the LockMode to set.
      * @return the updated TransactionFactoryBuilder.
      * @throws NullPointerException if lockMode is null.
+     * @see TransactionConfiguration#getWriteLockMode()
+     * @see LockMode
      */
     TransactionFactoryBuilder setWriteLockMode(LockMode lockMode);
 
@@ -91,6 +99,7 @@ public interface TransactionFactoryBuilder {
      * @param listener the permanent listener to add.
      * @return the updated TransactionFactoryBuilder.
      * @throws NullPointerException if listener is null.
+     * @see TransactionConfiguration#getPermanentListeners()
      */
     TransactionFactoryBuilder addPermanentListener(TransactionListener listener);
 
@@ -101,6 +110,7 @@ public interface TransactionFactoryBuilder {
      * @return the updated TransactionFactoryBuilder.
      * @throws NullPointerException if traceLevel is null.
      * @see TransactionConfiguration#getTraceLevel()
+     * @see TraceLevel
      */
     TransactionFactoryBuilder setTraceLevel(TraceLevel traceLevel);
 
@@ -110,6 +120,8 @@ public interface TransactionFactoryBuilder {
      *
      * @param timeoutNs the timeout specified in nano seconds
      * @return the updated TransactionFactoryBuilder
+     * @see TransactionConfiguration#getTimeoutNs()
+     * @see Transaction#getRemainingTimeoutNs()
      */
     TransactionFactoryBuilder setTimeoutNs(long timeoutNs);
 
@@ -118,6 +130,7 @@ public interface TransactionFactoryBuilder {
      *
      * @param interruptible if the transaction can be interrupted while doing blocking operations.
      * @return the updated TransactionFactoryBuilder
+     * @see TransactionConfiguration#isInterruptible()
      */
     TransactionFactoryBuilder setInterruptible(boolean interruptible);
 
@@ -128,6 +141,7 @@ public interface TransactionFactoryBuilder {
      * @param backoffPolicy the backoff policy to use.
      * @return the updated TransactionFactoryBuilder
      * @throws NullPointerException if backoffPolicy is null.
+     * @see TransactionConfiguration#getBackoffPolicy()
      */
     TransactionFactoryBuilder setBackoffPolicy(BackoffPolicy backoffPolicy);
 
@@ -138,6 +152,7 @@ public interface TransactionFactoryBuilder {
      *
      * @param dirtyCheckEnabled true if dirty check should be executed, false otherwise.
      * @return the updated TransactionFactoryBuilder.
+     * @see TransactionConfiguration#isDirtyCheckEnabled()
      */
     TransactionFactoryBuilder setDirtyCheckEnabled(boolean dirtyCheckEnabled);
 
@@ -145,19 +160,21 @@ public interface TransactionFactoryBuilder {
      * Returns the maximum number of spins that should be executed when a transactional object can't be read
      * because it is locked.
      *
-     * @param spinCount the maximum number of spinds
+     * @param spinCount the maximum number of spins
      * @return the updated TransactionFactoryBuilder.
      * @throws IllegalArgumentException if spinCount smaller than 0.
+     * @see TransactionConfiguration#getSpinCount()
      */
     TransactionFactoryBuilder setSpinCount(int spinCount);
 
     /**
      * Sets the readonly property on a transaction. Readonly transactions are always cheaper than update transactions.
      * <p/>
-     * If this property is getAndSet, the stm will not speculate on this property anymore.
+     * If this property is set, the stm will not speculate on this property anymore.
      *
      * @param readonly true if the transaction should be readonly, false otherwise.
      * @return the updated TransactionFactoryBuilder
+     * @see TransactionConfiguration#isReadonly()
      */
     TransactionFactoryBuilder setReadonly(boolean readonly);
 
@@ -165,10 +182,13 @@ public interface TransactionFactoryBuilder {
      * Sets if the transaction should automatically track all reads that have been done. This is needed for blocking
      * operations, but also for other features like writeskew detection.
      * <p/>
-     * If this property is getAndSet, the stm will not speculate on this property anymore.
+     * If this property is set, the stm will not speculate on this property anymore.
+     * <p/>
+     * The transaction is free to track reads even though this property is disabled.
      *
      * @param enabled true if read tracking enabled, false otherwise.
      * @return the updated TransactionFactoryBuilder
+     * @see TransactionConfiguration#isReadTrackingEnabled()
      */
     TransactionFactoryBuilder setReadTrackingEnabled(boolean enabled);
 
@@ -180,25 +200,31 @@ public interface TransactionFactoryBuilder {
      *
      * @param speculative indicates if speculative configuration should be enabled.
      * @return the updated TransactionFactoryBuilder
+     * @see TransactionConfiguration#isSpeculative()
      */
     TransactionFactoryBuilder setSpeculative(boolean speculative);
 
     /**
      * Sets the the maximum count a transaction can be retried. The default is 1000. Setting it to a very low value
-     * could mean that a transaction can't complete. Setting it to a very high value could lead to livelocking.
+     * could mean that a transaction can't complete. Setting it to a very high value could lead to live-locking.
      *
      * @param maxRetries the maximum number of times a transaction can be tried.
      * @return the updated TransactionFactoryBuilder
      * @throws IllegalArgumentException if maxRetries smaller than 0.
+     * @see TransactionConfiguration#getMaxRetries()
      */
     TransactionFactoryBuilder setMaxRetries(int maxRetries);
 
     /**
      * Sets the isolation level.
+     * <p/>
+     * The transaction is free to upgraded to a higher isolation level.
      *
      * @param isolationLevel the new IsolationLevel
      * @return the updated TransactionFactoryBuilder
      * @throws NullPointerException if isolationLevel is null.
+     * @see TransactionConfiguration#getIsolationLevel()
+     * @see IsolationLevel
      */
     TransactionFactoryBuilder setIsolationLevel(IsolationLevel isolationLevel);
 
@@ -210,7 +236,6 @@ public interface TransactionFactoryBuilder {
      * @param blockingAllowed true if explicit retry is allowed, false otherwise.
      * @return the updated TransactionFactoryBuilder
      */
-
     TransactionFactoryBuilder setBlockingAllowed(boolean blockingAllowed);
 
     /**
@@ -224,7 +249,7 @@ public interface TransactionFactoryBuilder {
     TransactionFactory newTransactionFactory();
 
     /**
-     * Builds an AtomicBlock optimized for a transactions created by this TransactionFactoryBuilder.
+     * Builds an AtomicBlock optimized for executing transactions created by this TransactionFactoryBuilder.
      *
      * @return the created AtomicBlock.
      * @throws org.multiverse.api.exceptions.IllegalTransactionFactoryException

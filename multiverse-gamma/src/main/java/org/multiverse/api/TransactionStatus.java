@@ -14,7 +14,7 @@ public enum TransactionStatus {
 
     /**
      * When a Transaction is prepared for commit. Once it reaches this state, a commit will always
-     * happen.
+     * succeed (if called).
      */
     Prepared(true),
 
@@ -24,7 +24,7 @@ public enum TransactionStatus {
     Aborted(false),
 
     /**
-     * When a Transaction committed.
+     * When a Transaction successfully committed.
      */
     Committed(false);
 
