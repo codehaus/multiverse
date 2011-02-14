@@ -167,8 +167,8 @@ public final class StmUtils {
     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
     * getCause method.
     *
-    * @param either
-    * @param orelse
+    * @param either the either block
+    * @param orelse the orelse block.
 #if(${closure.type} ne 'void')
     * @return the result of the execution.
 #end

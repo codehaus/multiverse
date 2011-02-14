@@ -33,7 +33,7 @@ public interface Stm {
      * <p/>
      * Transactions returned by this method are not speculative.
      *
-     * @return the started default Transaction.
+     * @return the new default Transaction.
      */
     Transaction newDefaultTransaction();
 

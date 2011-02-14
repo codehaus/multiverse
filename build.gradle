@@ -1,7 +1,7 @@
 import org.codehaus.groovy.ant.Groovy
 
 def executeBenchmark(String filepath) {
-  execute("benchy-execute -p ${processorCount} -cp multiverse-beta/build/classes/main:multiverse-beta/build/classes/test ${filepath}")
+  execute("benchy-execute -p ${processorCount} -cp multiverse-gamma/build/classes/main:multiverse-gamma/build/classes/test ${filepath}")
 }
 
 def executeDisplay(String filepath) {
@@ -22,7 +22,7 @@ allprojects {
   defaultTasks 'clean', 'install'
 }
 
-project(':multiverse-beta') {
+project(':multiverse-gamma') {
   apply plugin: 'java'
   apply plugin: 'maven'
   apply plugin: 'project-reports'
