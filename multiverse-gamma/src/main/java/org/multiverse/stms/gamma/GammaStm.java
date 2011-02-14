@@ -61,21 +61,21 @@ public final class GammaStm implements Stm {
     }
 
     @Override
-    public GammaTransaction newDefaultTransaction() {
+    public final GammaTransaction newDefaultTransaction() {
         return new FatVariableLengthGammaTransaction(this);
     }
 
     @Override
-    public GammaAtomicBlock getDefaultAtomicBlock() {
+    public final GammaAtomicBlock getDefaultAtomicBlock() {
         return defaultAtomicBlock;
     }
 
     @Override
-    public GammaOrElseBlock newOrElseBlock() {
+    public final GammaOrElseBlock newOrElseBlock() {
         return defaultOrElseBlock;
     }
 
-    public GlobalConflictCounter getGlobalConflictCounter() {
+    public final GlobalConflictCounter getGlobalConflictCounter() {
         return globalConflictCounter;
     }
 
@@ -88,7 +88,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setFat() {
+        public final GammaTransactionFactoryBuilder setFat() {
             if (config.isFat) {
                 return this;
             }
@@ -97,17 +97,17 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionConfiguration getConfiguration() {
+        public final GammaTransactionConfiguration getConfiguration() {
             return config;
         }
 
         @Override
-        public GammaTransactionFactoryBuilder addPermanentListener(TransactionListener listener) {
+        public GammaTransactionFactoryBuilder addPermanentListener(final TransactionListener listener) {
             return new GammaTransactionFactoryBuilderImpl(config.addPermanentListener(listener));
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setControlFlowErrorsReused(boolean reused) {
+        public final GammaTransactionFactoryBuilder setControlFlowErrorsReused(final boolean reused) {
             if (config.controlFlowErrorsReused = reused) {
                 return this;
             }
@@ -116,7 +116,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setReadLockMode(LockMode lockMode) {
+        public final GammaTransactionFactoryBuilder setReadLockMode(final LockMode lockMode) {
             if (config.readLockMode == lockMode) {
                 return this;
             }
@@ -125,7 +125,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setWriteLockMode(LockMode lockMode) {
+        public final GammaTransactionFactoryBuilder setWriteLockMode(final LockMode lockMode) {
             if (config.writeLockMode == lockMode) {
                 return this;
             }
@@ -134,7 +134,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setFamilyName(String familyName) {
+        public final GammaTransactionFactoryBuilder setFamilyName(final String familyName) {
             if (config.familyName.equals(familyName)) {
                 return this;
             }
@@ -143,7 +143,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setPropagationLevel(final PropagationLevel level) {
+        public final GammaTransactionFactoryBuilder setPropagationLevel(final PropagationLevel level) {
             if (level == config.propagationLevel) {
                 return this;
             }
@@ -152,7 +152,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setBlockingAllowed(final boolean blockingAllowed) {
+        public final GammaTransactionFactoryBuilder setBlockingAllowed(final boolean blockingAllowed) {
             if (blockingAllowed == config.blockingAllowed) {
                 return this;
             }
@@ -161,7 +161,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setIsolationLevel(final IsolationLevel isolationLevel) {
+        public final GammaTransactionFactoryBuilder setIsolationLevel(final IsolationLevel isolationLevel) {
             if (isolationLevel == config.isolationLevel) {
                 return this;
             }
@@ -170,7 +170,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setTraceLevel(final TraceLevel traceLevel) {
+        public final GammaTransactionFactoryBuilder setTraceLevel(final TraceLevel traceLevel) {
             if (traceLevel == config.traceLevel) {
                 return this;
             }
@@ -179,7 +179,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setTimeoutNs(final long timeoutNs) {
+        public final GammaTransactionFactoryBuilder setTimeoutNs(final long timeoutNs) {
             if (timeoutNs == config.timeoutNs) {
                 return this;
             }
@@ -188,7 +188,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setInterruptible(final boolean interruptible) {
+        public final GammaTransactionFactoryBuilder setInterruptible(final boolean interruptible) {
             if (interruptible == config.interruptible) {
                 return this;
             }
@@ -197,7 +197,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setBackoffPolicy(final BackoffPolicy backoffPolicy) {
+        public final GammaTransactionFactoryBuilder setBackoffPolicy(final BackoffPolicy backoffPolicy) {
             //noinspection ObjectEquality
             if (backoffPolicy == config.backoffPolicy) {
                 return this;
@@ -207,7 +207,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setDirtyCheckEnabled(final boolean dirtyCheckEnabled) {
+        public final GammaTransactionFactoryBuilder setDirtyCheckEnabled(final boolean dirtyCheckEnabled) {
             if (dirtyCheckEnabled == config.dirtyCheck) {
                 return this;
             }
@@ -216,7 +216,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setSpinCount(final int spinCount) {
+        public final GammaTransactionFactoryBuilder setSpinCount(final int spinCount) {
             if (spinCount == config.spinCount) {
                 return this;
             }
@@ -225,7 +225,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setSpeculative(final boolean enabled) {
+        public final GammaTransactionFactoryBuilder setSpeculative(final boolean enabled) {
             if (enabled == config.speculative) {
                 return this;
             }
@@ -235,7 +235,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setReadonly(final boolean readonly) {
+        public final GammaTransactionFactoryBuilder setReadonly(final boolean readonly) {
             if (readonly == config.readonly) {
                 return this;
             }
@@ -244,7 +244,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setReadTrackingEnabled(final boolean enabled) {
+        public final GammaTransactionFactoryBuilder setReadTrackingEnabled(final boolean enabled) {
             if (enabled == config.trackReads) {
                 return this;
             }
@@ -253,7 +253,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionFactoryBuilder setMaxRetries(final int maxRetries) {
+        public final GammaTransactionFactoryBuilder setMaxRetries(final int maxRetries) {
             if (maxRetries == config.maxRetries) {
                 return this;
             }
@@ -262,7 +262,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaAtomicBlock newAtomicBlock() {
+        public final GammaAtomicBlock newAtomicBlock() {
             config.init();
 
             if (leanAtomicBlock()) {
@@ -289,50 +289,50 @@ public final class GammaStm implements Stm {
     }
 
     @Override
-    public GammaRefFactory getDefaultRefFactory() {
+    public final GammaRefFactory getDefaultRefFactory() {
         return defaultRefFactory;
     }
 
     private final class GammaRefFactoryImpl implements GammaRefFactory {
         @Override
-        public <E> GammaRef<E> newRef(E value) {
+        public final <E> GammaRef<E> newRef(E value) {
             return new GammaRef<E>(GammaStm.this, value);
         }
 
         @Override
-        public GammaIntRef newIntRef(int value) {
+        public final GammaIntRef newIntRef(int value) {
             return new GammaIntRef(GammaStm.this, value);
         }
 
         @Override
-        public GammaBooleanRef newBooleanRef(boolean value) {
+        public final GammaBooleanRef newBooleanRef(boolean value) {
             return new GammaBooleanRef(GammaStm.this, value);
         }
 
         @Override
-        public GammaDoubleRef newDoubleRef(double value) {
+        public final GammaDoubleRef newDoubleRef(double value) {
             return new GammaDoubleRef(GammaStm.this, value);
         }
 
         @Override
-        public GammaLongRef newLongRef(long value) {
+        public final GammaLongRef newLongRef(long value) {
             return new GammaLongRef(GammaStm.this, value);
         }
     }
 
     @Override
-    public GammaTransactionFactoryBuilder newTransactionFactoryBuilder() {
-        GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
+    public final GammaTransactionFactoryBuilder newTransactionFactoryBuilder() {
+        final GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         return new GammaTransactionFactoryBuilderImpl(config);
     }
 
     @Override
-    public TransactionalCollectionsFactory getDefaultTransactionalCollectionFactory() {
+    public final TransactionalCollectionsFactory getDefaultTransactionalCollectionFactory() {
         return defaultTransactionalCollectionFactory;
     }
 
     @Override
-    public GammaRefFactoryBuilder getRefFactoryBuilder() {
+    public final GammaRefFactoryBuilder getRefFactoryBuilder() {
         return refFactoryBuilder;
     }
 
@@ -352,17 +352,17 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionConfiguration getConfiguration() {
+        public final GammaTransactionConfiguration getConfiguration() {
             return config;
         }
 
         @Override
-        public GammaTransaction newTransaction() {
+        public final GammaTransaction newTransaction() {
             return newTransaction(getThreadLocalGammaTransactionPool());
         }
 
         @Override
-        public GammaTransaction newTransaction(final GammaTransactionPool pool) {
+        public final GammaTransaction newTransaction(final GammaTransactionPool pool) {
             FatVariableLengthGammaTransaction tx = pool.takeMap();
 
             if (tx == null) {
@@ -375,7 +375,7 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransaction upgradeAfterSpeculativeFailure(final GammaTransaction tailingTx, final GammaTransactionPool pool) {
+        public final GammaTransaction upgradeAfterSpeculativeFailure(final GammaTransaction tailingTx, final GammaTransactionPool pool) {
             throw new UnsupportedOperationException();
         }
     }
@@ -389,24 +389,24 @@ public final class GammaStm implements Stm {
         }
 
         @Override
-        public GammaTransactionConfiguration getConfiguration() {
+        public final GammaTransactionConfiguration getConfiguration() {
             return config;
         }
 
         @Override
-        public GammaTransaction newTransaction() {
+        public final GammaTransaction newTransaction() {
             return newTransaction(getThreadLocalGammaTransactionPool());
         }
 
         @Override
-        public GammaTransaction upgradeAfterSpeculativeFailure(final GammaTransaction failingTx, final GammaTransactionPool pool) {
+        public final GammaTransaction upgradeAfterSpeculativeFailure(final GammaTransaction failingTx, final GammaTransactionPool pool) {
             final GammaTransaction tx = newTransaction(pool);
             tx.copyForSpeculativeFailure(failingTx);
             return tx;
         }
 
         @Override
-        public GammaTransaction newTransaction(final GammaTransactionPool pool) {
+        public final GammaTransaction newTransaction(final GammaTransactionPool pool) {
             final SpeculativeGammaConfiguration speculativeConfiguration = config.speculativeConfiguration.get();
             final int length = speculativeConfiguration.minimalLength;
 
