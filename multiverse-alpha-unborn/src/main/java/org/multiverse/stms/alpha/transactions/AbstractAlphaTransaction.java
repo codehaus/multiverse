@@ -139,7 +139,7 @@ public abstract class AbstractAlphaTransaction<C extends AbstractAlphaTransactio
                 throw new DeadTransactionException(committedMsg);
             case Aborted:
                 String abortedMsg = format(
-                        "Can't open for commuting write transactional object '%s' "
+                        "Can't open for write transactional object '%s' "
                                 + "because transaction '%s' already is aborted.",
                         toTxObjectString(transactionalObject), config.getFamilyName());
                 throw new DeadTransactionException(abortedMsg);

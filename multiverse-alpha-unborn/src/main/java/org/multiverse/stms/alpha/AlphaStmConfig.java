@@ -46,7 +46,7 @@ public final class AlphaStmConfig {
 
     public int maxReadSpinCount = 50;
 
-    public PrimitiveClock clock = new StrictPrimitiveClock();
+    public PrimitiveClock clock = new RelaxedPrimitiveClock();
 
     public CommitLockPolicy commitLockPolicy =
             GenericCommitLockPolicy.FAIL_FAST_BUT_RETRY;
