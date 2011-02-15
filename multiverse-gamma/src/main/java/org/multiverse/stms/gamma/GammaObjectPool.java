@@ -22,6 +22,7 @@ import java.util.ArrayList;
  *
  * @author Peter Veentjer
  */
+@SuppressWarnings({"ClassWithTooManyFields"})
 public final class GammaObjectPool {
 
     private final static boolean ENABLED = Boolean.parseBoolean(
@@ -55,13 +56,13 @@ public final class GammaObjectPool {
     private final GammaRefTranlocal[] tranlocalsGammaRef = new GammaRefTranlocal[100];
     private int lastUsedGammaRef = -1;
 
-    private Listeners[] listenersPool = new Listeners[100];
+    private final Listeners[] listenersPool = new Listeners[100];
     private int listenersPoolIndex = -1;
 
-    private ArrayList[] arrayListPool = new ArrayList[10];
+    private final ArrayList[] arrayListPool = new ArrayList[10];
     private int arrayListPoolIndex = -1;
 
-    private CallableNode[] callableNodePool = new CallableNode[10];
+    private final CallableNode[] callableNodePool = new CallableNode[100];
     private int callableNodePoolIndex = -1;
 
     public GammaObjectPool() {
@@ -227,7 +228,7 @@ public final class GammaObjectPool {
      */
     public ArrayList takeArrayList() {
         if (!arrayListPoolingEnabled || arrayListPoolIndex == -1) {
-            return new ArrayList();
+            return new ArrayList(10);
         }
 
         ArrayList list = arrayListPool[arrayListPoolIndex];

@@ -17,8 +17,7 @@ import static org.multiverse.api.ThreadLocalTransaction.*;
 * @author Peter Veentjer
 */
 public final class ${atomicBlock.name} extends AbstractGammaAtomicBlock{
-private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.getName());
-
+    private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.getName());
 
 #if(!${atomicBlock.lean})
     private final PropagationLevel propagationLevel;
@@ -38,7 +37,7 @@ private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.
 
 #foreach($closure in $closures)
     @Override
-    public ${closure.typeParameter} ${closure.type} executeChecked(
+    public final ${closure.typeParameter} ${closure.type} executeChecked(
         final ${closure.name}${closure.typeParameter} closure)throws Exception{
 
         try{
@@ -54,7 +53,7 @@ private static final Logger logger = Logger.getLogger(${atomicBlock.name}.class.
 
 #if(${atomicBlock.lean})
     @Override
-    public ${closure.typeParameter} ${closure.type} execute(final ${closure.name}${closure.typeParameter} closure){
+    public final ${closure.typeParameter} ${closure.type} execute(final ${closure.name}${closure.typeParameter} closure){
 
         if(closure == null){
             throw new NullPointerException();

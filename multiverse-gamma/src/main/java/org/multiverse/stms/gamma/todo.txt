@@ -12,30 +12,25 @@ transactions can also act as node (no need to introduce additional datastructure
                         to do
 --------------------------------------------------------------------
 
+- adding read committed isolation level
+
+
+
 - testing: prepare of transactions and excusive lock isolation level
 
-- listeners & exceptions
+- testing: listeners & exceptions
 
 - pre/post start listeners and fat gamma block
 
 - testing: commute and locking
 
 - testing: atomic change operations and globalconflictcounter increment
-    - intref
-    - booleanref
-    - longref
-    - doubleref
-    - def
 
 - testing: local conflict counter should be set if needed when the flatten commute is called.
 
-- improved testing for the repeatable read isolation level
-
-- adding read committed isolation level
+- testing improved for the repeatable read isolation level
 
 - testing: lean transaction and readonly? no checking is done but what if configured as readonly
-
-- implement the read committed isolation level
 
 - testing:GammaRef_atomicGetAndSetTest
 
