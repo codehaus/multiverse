@@ -225,7 +225,6 @@
             <artifactId>args4j</artifactId>
             <version>${args4j.version}</version>
             <scope>provided</scope>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
