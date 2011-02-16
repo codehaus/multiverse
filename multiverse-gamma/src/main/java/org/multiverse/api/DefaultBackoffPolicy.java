@@ -5,8 +5,8 @@ import java.util.Random;
 import static java.util.concurrent.locks.LockSupport.parkNanos;
 
 /**
- * A {@link DefaultBackoffPolicy} that does an 'exponential' backoff. So each next attempt, the calculated delay is increased and randomized
- * (so the next value can be smaller than the previous) until a configurable maximum delay has been reached.
+ * A {@link DefaultBackoffPolicy} that does an 'exponential' backoff. So each next attempt, the calculated delay is increased
+ * and randomized (so the next value can be smaller than the previous, but overal they will increase).
  *
  * @author Peter Veentjer.
  */
@@ -52,11 +52,11 @@ public final class DefaultBackoffPolicy implements BackoffPolicy {
 
     @Override
     public void delay(int attempt) throws InterruptedException {
-        delayedUninterruptible(attempt);
+        delayUninterruptible(attempt);
     }
 
     @Override
-    public void delayedUninterruptible(int attempt) {
+    public void delayUninterruptible(int attempt) {
         long delayNs = calcDelayNs(attempt);
 
         if (delayNs >= minDelayNs) {

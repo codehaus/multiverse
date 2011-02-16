@@ -7,11 +7,15 @@ package org.multiverse.api;
  * The dirty read isn't added since atm we already have an extremely cheap read using the atomicWeakGet on the
  * refs. Using the atomicWeakGet you have extremely cheap access to committed data.
  * <p/>
- * <h2>Unrepeatable Read</h2>
- * <p/>
- * <h2>Inconsistent Read</h2>
- * <p/>
- * <h2>Writeskew</h2>
+ *
+ * <h3>Unrepeatable Read</h3>
+ * <p>
+ *
+ * <h3>Inconsistent Read</h3>
+ *
+ * <p>
+ *
+ * <h3>Writeskew</h3>
  *
  * @author Peter Veentjer.
  * @see TransactionFactoryBuilder#setIsolationLevel(IsolationLevel)
@@ -55,14 +59,14 @@ public enum IsolationLevel {
      */
     Serializable(false, false, false);
 
-    private final boolean writeSkewAllowed;
-    private final boolean unrepeatableReadAllowed;
-    private final boolean inconsistentReadAllowed;
+    private final boolean allowWriteSkew;
+    private final boolean allowUnrepeatableRead;
+    private final boolean allowInconsistentRead;
 
-    IsolationLevel(boolean unrepeatableReadAllowed, boolean inconsistentReadAllowed, boolean writeSkewAllowed) {
-        this.unrepeatableReadAllowed = unrepeatableReadAllowed;
-        this.inconsistentReadAllowed = inconsistentReadAllowed;
-        this.writeSkewAllowed = writeSkewAllowed;
+    IsolationLevel(boolean allowUnrepeatableRead, boolean allowInconsistentRead, boolean allowWriteSkew) {
+        this.allowUnrepeatableRead = allowUnrepeatableRead;
+        this.allowInconsistentRead = allowInconsistentRead;
+        this.allowWriteSkew = allowWriteSkew;
     }
 
     /**
@@ -70,8 +74,8 @@ public enum IsolationLevel {
      *
      * @return true if the writeSkew is allowed to happen.
      */
-    public final boolean isWriteSkewAllowed() {
-        return writeSkewAllowed;
+    public final boolean doesAllowWriteSkew() {
+        return allowWriteSkew;
     }
 
     /**
@@ -79,8 +83,8 @@ public enum IsolationLevel {
      *
      * @return true if the dirty read is allowed to happen.
      */
-    public boolean isUnrepeatableReadAllowed() {
-        return unrepeatableReadAllowed;
+    public boolean doesAllowUnrepeatableRead() {
+        return allowUnrepeatableRead;
     }
 
     /**
@@ -88,8 +92,8 @@ public enum IsolationLevel {
      *
      * @return true if the inconsistent read is allowed to happen.
      */
-    public boolean isInconsistentReadAllowed() {
-        return inconsistentReadAllowed;
+    public boolean doesAllowInconsistentRead() {
+        return allowInconsistentRead;
     }
 
     @Override

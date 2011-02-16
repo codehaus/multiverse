@@ -8,7 +8,7 @@ public class SpinningBackoffPolicy implements BackoffPolicy{
     }
 
     @Override
-    public void delayedUninterruptible(int attempt) {
+    public void delayUninterruptible(int attempt) {
 
     }
 }

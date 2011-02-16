@@ -10,8 +10,10 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.multiverse.TestUtils.assertOrecValue;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
@@ -98,18 +100,16 @@ public class AbstractGammaRef_hasReadConflictTest implements GammaConstants {
     }
 
     @Test
-    @Ignore
     public void whenFresh() {
-        /*
-        GammaTransaction tx = stm.startDefaultTransaction();
+        GammaTransaction tx = stm.newDefaultTransaction();
         GammaLongRef ref = new GammaLongRef(tx);
-        GammaLongRefTranlocal tranlocal = tx.openForConstruction(ref);
+        GammaRefTranlocal tranlocal = tx.locate(ref);
 
-        boolean conflict = ref.___hasReadConflict(tranlocal);
+        long orecValue = ref.orec;
+        boolean conflict = ref.hasReadConflict(tranlocal);
 
         assertFalse(conflict);
-        assertSurplus(1, ref);
-        assertRefHasCommitLock(ref, tx);*/
+        assertOrecValue(ref, orecValue);
     }
 
     @Test

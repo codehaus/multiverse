@@ -7,7 +7,11 @@ import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.exceptions.TransactionRequiredException;
-import org.multiverse.api.functions.*;
+import org.multiverse.api.functions.BooleanFunction;
+import org.multiverse.api.functions.DoubleFunction;
+import org.multiverse.api.functions.Function;
+import org.multiverse.api.functions.IntFunction;
+import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.GammaStmUtils;
@@ -1199,6 +1203,10 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             throw tx.abortCommuteOnReadonly(this);
         }
 
+        if (config.writeLockModeAsInt > LOCKMODE_NONE) {
+
+        }
+
         final GammaRefTranlocal tranlocal = tx.tranlocal;
 
         //noinspection ObjectEquality
@@ -1266,23 +1274,27 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         if (config.isReadonly()) {
             throw tx.abortCommuteOnReadonly(this);
         }
-
         GammaRefTranlocal found = null;
         GammaRefTranlocal newNode = null;
         GammaRefTranlocal node = tx.head;
-        while (true) {
-            if (node == null) {
-                break;
-            } else //noinspection ObjectEquality
-                if (node.owner == this) {
-                    found = node;
+
+        if (config.writeLockModeAsInt > LOCKMODE_NONE) {
+            found = openForWrite(tx, config.writeLockModeAsInt);
+        } else {
+            while (true) {
+                if (node == null) {
                     break;
-                } else if (node.owner == null) {
-                    newNode = node;
-                    break;
-                } else {
-                    node = node.next;
-                }
+                } else //noinspection ObjectEquality
+                    if (node.owner == this) {
+                        found = node;
+                        break;
+                    } else if (node.owner == null) {
+                        newNode = node;
+                        break;
+                    } else {
+                        node = node.next;
+                    }
+            }
         }
 
         if (found != null) {
@@ -1512,7 +1524,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                     return read;
                 }
             }
-            stm.defaultBackoffPolicy.delayedUninterruptible(attempt);
+            stm.defaultBackoffPolicy.delayUninterruptible(attempt);
             attempt++;
         } while (attempt <= stm.spinCount);
 
@@ -1530,7 +1542,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                     return read;
                 }
             }
-            stm.defaultBackoffPolicy.delayedUninterruptible(attempt);
+            stm.defaultBackoffPolicy.delayUninterruptible(attempt);
             attempt++;
         } while (attempt <= stm.spinCount);
 
@@ -1899,7 +1911,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
                 return arriveStatus;
             }
 
-            stm.defaultBackoffPolicy.delayedUninterruptible(k + 1);
+            stm.defaultBackoffPolicy.delayUninterruptible(k + 1);
         }
 
         return FAILURE;

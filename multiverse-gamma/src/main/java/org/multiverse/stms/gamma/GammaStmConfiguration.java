@@ -1,7 +1,15 @@
 package org.multiverse.stms.gamma;
 
-import org.multiverse.api.*;
+import org.multiverse.api.BackoffPolicy;
 import org.multiverse.api.DefaultBackoffPolicy;
+import org.multiverse.api.IsolationLevel;
+import org.multiverse.api.LockMode;
+import org.multiverse.api.PropagationLevel;
+import org.multiverse.api.TraceLevel;
+import org.multiverse.api.lifecycle.TransactionListener;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import static java.lang.String.format;
 
@@ -16,6 +24,11 @@ import static java.lang.String.format;
  */
 @SuppressWarnings({"ClassWithTooManyFields"})
 public final class GammaStmConfiguration {
+
+    /**
+     * Contains the permanent TransactionListeners that should always be executed. Null references are not allowed.
+     */
+    public List<TransactionListener> permanentListeners = new LinkedList<TransactionListener>();
 
     /**
      * The default propagation level for all transactions executed by the Stm.
@@ -164,19 +177,19 @@ public final class GammaStmConfiguration {
      * @throws IllegalStateException if the configuration isn't valid.
      */
     public void validate() {
-        if(timeoutNs<0){
+        if (timeoutNs < 0) {
             throw new IllegalStateException(
                     "[GammaStmConfiguration] timeoutNs can't be smaller than 0, " +
                             "timeoutNs was " + timeoutNs);
         }
 
-        if(readBiasedThreshold<0){
+        if (readBiasedThreshold < 0) {
             throw new IllegalStateException(
                     "[GammaStmConfiguration] readBiasedThreshold can't be smaller than 0, " +
                             "readBiasedThreshold was " + readBiasedThreshold);
         }
 
-        if(readBiasedThreshold>1023){
+        if (readBiasedThreshold > 1023) {
             throw new IllegalStateException(
                     "[GammaStmConfiguration] readBiasedThreshold can't be larger than 1023, " +
                             "readBiasedThreshold was " + readBiasedThreshold);
@@ -208,9 +221,9 @@ public final class GammaStmConfiguration {
             throw new IllegalStateException("[GammaStmConfiguration] isolationLevel can't be null");
         }
 
-        if (isolationLevel.isWriteSkewAllowed() && !trackReads) {
+        if (isolationLevel.doesAllowWriteSkew() && !trackReads) {
             throw new IllegalStateException(
-                    format("[GammaStmConfiguration] isolation level '%s' can't be combined with readtracking"+
+                    format("[GammaStmConfiguration] isolation level '%s' can't be combined with readtracking" +
                             "is false since it is needed to prevent the writeskew problem", isolationLevel));
         }
 
@@ -227,7 +240,7 @@ public final class GammaStmConfiguration {
         if (minimalVariableLengthTransactionSize < 1) {
             throw new IllegalStateException(
                     "[GammaStmConfiguration] minimalVariableLengthTransactionSize can't be smaller than 1, but was "
-                    + minimalVariableLengthTransactionSize);
+                            + minimalVariableLengthTransactionSize);
         }
 
         if (maxRetries < 0) {
@@ -238,7 +251,7 @@ public final class GammaStmConfiguration {
         if (maxFixedLengthTransactionSize < 2) {
             throw new IllegalStateException(
                     "[GammaStmConfiguration] maxFixedLengthTransactionSize can't be smaller than 2, but was "
-                    + maxFixedLengthTransactionSize);
+                            + maxFixedLengthTransactionSize);
         }
 
         if (backoffPolicy == null) {
@@ -251,6 +264,18 @@ public final class GammaStmConfiguration {
 
         if (propagationLevel == null) {
             throw new IllegalStateException("[GammaStmConfiguration] propagationLevel can't be null");
+        }
+
+        if (permanentListeners == null) {
+            throw new IllegalStateException("[GammaStmConfiguration] permanentListeners can't be null");
+        }
+
+        for (int k = 0; k < permanentListeners.size(); k++) {
+            TransactionListener listener = permanentListeners.get(k);
+            if (listener == null) {
+                throw new IllegalStateException(
+                        format("[GammaStmConfiguration] permanentListener at index %s can't be null", k));
+            }
         }
     }
 }

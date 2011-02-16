@@ -14,12 +14,13 @@ import org.multiverse.stms.gamma.GammaStmConfiguration;
 import org.multiverse.stms.gamma.GlobalConflictCounter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.String.format;
+import static java.util.Collections.EMPTY_LIST;
+import static java.util.Collections.unmodifiableList;
 
 /**
  * A configuration object that contains the configuration for a GammaTransaction.
@@ -92,15 +93,20 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
         this.timeoutNs = config.timeoutNs;
         this.traceLevel = config.traceLevel;
         this.isolationLevel = config.isolationLevel;
-        this.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        this.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        this.unrepeatableReadAllowed = isolationLevel.isUnrepeatableReadAllowed();
+        this.writeSkewAllowed = isolationLevel.doesAllowWriteSkew();
+        this.inconsistentReadAllowed = isolationLevel.doesAllowInconsistentRead();
+        this.unrepeatableReadAllowed = isolationLevel.doesAllowUnrepeatableRead();
         this.propagationLevel = config.propagationLevel;
         this.controlFlowErrorsReused = config.controlFlowErrorsReused;
         this.familyName = "anonymoustransaction-" + idGenerator.incrementAndGet();
         this.isAnonymous = true;
         this.maximumPoorMansConflictScanLength = config.maximumPoorMansConflictScanLength;
         this.isFat = config.isFat;
+        if (config.permanentListeners.isEmpty()) {
+            this.permanentListeners = null;
+        } else {
+            this.permanentListeners = new ArrayList<TransactionListener>(config.permanentListeners);
+        }
     }
 
     /**
@@ -246,25 +252,15 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
     @Override
     public List<TransactionListener> getPermanentListeners() {
         if (permanentListeners == null) {
-            return Collections.EMPTY_LIST;
+            return EMPTY_LIST;
         }
-        return Collections.unmodifiableList(permanentListeners);
+        return unmodifiableList(permanentListeners);
     }
 
     public void updateSpeculativeConfigurationToUseNonRefType() {
         while (true) {
             SpeculativeGammaConfiguration current = speculativeConfiguration.get();
             SpeculativeGammaConfiguration update = current.newWithNonRefType();
-            if (speculativeConfiguration.compareAndSet(current, update)) {
-                return;
-            }
-        }
-    }
-
-    public void updateSpeculativeConfigurationTouseOrElse() {
-        while (true) {
-            SpeculativeGammaConfiguration current = speculativeConfiguration.get();
-            SpeculativeGammaConfiguration update = current.newWithOrElse();
             if (speculativeConfiguration.compareAndSet(current, update)) {
                 return;
             }
@@ -429,10 +425,6 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             return true;
         }
 
-        if (readonly) {
-            return true;
-        }
-
         return false;
     }
 
@@ -567,9 +559,9 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
 
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(this);
         config.isolationLevel = isolationLevel;
-        config.writeSkewAllowed = isolationLevel.isWriteSkewAllowed();
-        config.inconsistentReadAllowed = isolationLevel.isInconsistentReadAllowed();
-        config.unrepeatableReadAllowed = isolationLevel.isUnrepeatableReadAllowed();
+        config.writeSkewAllowed = isolationLevel.doesAllowWriteSkew();
+        config.inconsistentReadAllowed = isolationLevel.doesAllowInconsistentRead();
+        config.unrepeatableReadAllowed = isolationLevel.doesAllowUnrepeatableRead();
         return config;
     }
 
@@ -611,8 +603,8 @@ public final class GammaTransactionConfiguration implements TransactionConfigura
             throw new NullPointerException();
         }
 
-        ArrayList<TransactionListener> newPermanentListeners
-                = new ArrayList<TransactionListener>();
+        //we need to clone the list since the GammaTransactionConfiguration is considered to be immutable
+        ArrayList<TransactionListener> newPermanentListeners = new ArrayList<TransactionListener>();
         if (permanentListeners != null) {
             newPermanentListeners.addAll(permanentListeners);
         }

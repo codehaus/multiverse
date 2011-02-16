@@ -6,13 +6,15 @@ import org.multiverse.MultiverseConstants;
  * Using the LockMode one can control the pessimistic nature of a transaction.
  * <p/>
  * Normally STM transactions are very optimistic (e.g. fail during execution or at the end because some read or
- * write conflict was detected), but in some cases a more pessimistic approach is better.
+ * write conflict was detected), but in some cases a more pessimistic approach is better.  For more information
+ * see {@link Lock}.
  *
  * @author Peter Veentjer.
  * @see TransactionFactoryBuilder#setReadLockMode(LockMode)
  * @see TransactionFactoryBuilder#setWriteLockMode(LockMode)
  * @see TransactionConfiguration#getReadLockMode()
  * @see TransactionConfiguration#getWriteLockMode()
+ * @see Lock
  */
 public enum LockMode implements MultiverseConstants {
 

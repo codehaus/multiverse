@@ -48,6 +48,12 @@ transactions can also act as node (no need to introduce additional datastructure
 
 - testing:PhantomReadTest
 
+- CountDownCommitBarrier: RestorePartiesCompensatingTask
+
+- iterators and transactional collections
+
+- transactional collections and check on isolation level of transaction
+
 --------------------------------------------------------------------
                         done
 --------------------------------------------------------------------

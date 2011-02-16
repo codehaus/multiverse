@@ -237,7 +237,7 @@ private static final Logger logger = Logger.getLogger(FatGammaAtomicBlock.class.
                             }
                         }
 
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
+                        backoffPolicy.delayUninterruptible(tx.getAttempt());
                     }
                 } while (tx.softReset());
             } finally {
@@ -471,7 +471,7 @@ private static final Logger logger = Logger.getLogger(FatGammaAtomicBlock.class.
                             }
                         }
 
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
+                        backoffPolicy.delayUninterruptible(tx.getAttempt());
                     }
                 } while (tx.softReset());
             } finally {
@@ -705,7 +705,7 @@ private static final Logger logger = Logger.getLogger(FatGammaAtomicBlock.class.
                             }
                         }
 
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
+                        backoffPolicy.delayUninterruptible(tx.getAttempt());
                     }
                 } while (tx.softReset());
             } finally {
@@ -939,7 +939,7 @@ private static final Logger logger = Logger.getLogger(FatGammaAtomicBlock.class.
                             }
                         }
 
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
+                        backoffPolicy.delayUninterruptible(tx.getAttempt());
                     }
                 } while (tx.softReset());
             } finally {
@@ -1173,7 +1173,7 @@ private static final Logger logger = Logger.getLogger(FatGammaAtomicBlock.class.
                             }
                         }
 
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
+                        backoffPolicy.delayUninterruptible(tx.getAttempt());
                     }
                 } while (tx.softReset());
             } finally {
@@ -1414,7 +1414,7 @@ private static final Logger logger = Logger.getLogger(FatGammaAtomicBlock.class.
                             }
                         }
 
-                        backoffPolicy.delayedUninterruptible(tx.getAttempt());
+                        backoffPolicy.delayUninterruptible(tx.getAttempt());
                     }
                 } while (tx.softReset());
             } finally {

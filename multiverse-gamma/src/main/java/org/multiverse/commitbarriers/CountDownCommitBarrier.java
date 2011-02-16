@@ -192,15 +192,15 @@ public final class CountDownCommitBarrier extends CommitBarrier {
         }
 
         if (tx.getStatus() != TransactionStatus.Active) {
-            if(tx.getStatus() == TransactionStatus.Prepared){
+            if (tx.getStatus() == TransactionStatus.Prepared) {
                 tx.abort();
-                throw new PreparedTransactionException(format("[%s] Can't call incParties on non active transaction because it is %s",
-                        tx.getConfiguration().getFamilyName(),
-                        tx.getStatus()));
-            }else{
-                throw new DeadTransactionException(format("[%s] Can't call incParties on non active transaction because it is %s",
-                        tx.getConfiguration().getFamilyName(),
-                        tx.getStatus()));
+                throw new PreparedTransactionException(
+                        format("[%s] Can't call incParties on non active transaction because it is %s",
+                                tx.getConfiguration().getFamilyName(), tx.getStatus()));
+            } else {
+                throw new DeadTransactionException(
+                        format("[%s] Can't call incParties on non active transaction because it is %s",
+                                tx.getConfiguration().getFamilyName(), tx.getStatus()));
             }
 
         }

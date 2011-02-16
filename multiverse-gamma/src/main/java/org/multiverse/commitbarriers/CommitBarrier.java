@@ -5,7 +5,6 @@ import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.utils.StandardThreadFactory;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
@@ -24,6 +23,7 @@ import static java.lang.String.format;
  *
  * @author Peter Veentjer.
  */
+@SuppressWarnings({"OverlyComplexClass"})
 public abstract class CommitBarrier {
 
     private static int corePoolSize = 5;
@@ -39,8 +39,8 @@ public abstract class CommitBarrier {
     private volatile int numberWaiting = 0;
 
     //for all non final non volatile variables; they only should be accessed while the lock is acquired.
-    private List<Runnable> onAbortTasks = new ArrayList<Runnable>();
-    private List<Runnable> onCommitTasks = new ArrayList<Runnable>();
+    private List<Runnable> onAbortTasks = new LinkedList<Runnable>();
+    private List<Runnable> onCommitTasks = new LinkedList<Runnable>();
 
     /**
      * Creates a new CommitBarrier.
@@ -110,7 +110,7 @@ public abstract class CommitBarrier {
         statusCondition.signalAll();
         onAbortTasks = null;
         List<Runnable> result = onCommitTasks;
-        onCommitTasks = new ArrayList<Runnable>();
+        onCommitTasks = new LinkedList<Runnable>();
         return result;
     }
 
@@ -123,9 +123,9 @@ public abstract class CommitBarrier {
         numberWaiting = 0;
         status = Status.Aborted;
         statusCondition.signalAll();
-        onCommitTasks = new ArrayList<Runnable>();
+        onCommitTasks = new LinkedList<Runnable>();
         List<Runnable> result = onAbortTasks;
-        onAbortTasks = new ArrayList<Runnable>();
+        onAbortTasks = new LinkedList<Runnable>();
         return result;
     }
 
@@ -166,7 +166,7 @@ public abstract class CommitBarrier {
      *
      * @param tasks the tasks to execute.
      */
-    protected static void executeTasks(List<Runnable> tasks) {
+    protected static void executeTasks(final List<Runnable> tasks) {
         if (tasks == null) {
             return;
         }
@@ -227,7 +227,7 @@ public abstract class CommitBarrier {
      * @throws InterruptedException if the thread is interrupted while waiting.
      * @throws NullPointerException if unit is null.
      */
-    public final boolean tryAwaitOpen(long timeout, TimeUnit unit) throws InterruptedException {
+    public final boolean tryAwaitOpen(final long timeout, final TimeUnit unit) throws InterruptedException {
         if (unit == null) {
             throw new NullPointerException();
         }
@@ -261,7 +261,7 @@ public abstract class CommitBarrier {
      * @param unit    the timeunit for the timeout argument.
      * @return true if the wait was a success, false otherwise.
      */
-    public final boolean tryAwaitOpenUninterruptibly(long timeout, TimeUnit unit) {
+    public final boolean tryAwaitOpenUninterruptibly(final long timeout, final TimeUnit unit) {
         if (unit == null) {
             throw new NullPointerException();
         }
@@ -330,7 +330,7 @@ public abstract class CommitBarrier {
      * @throws NullPointerException       if unit is null.
      * @throws CommitBarrierOpenException if the CommitBarrier already is aborted or committed.
      */
-    public final void setTimeout(long timeout, TimeUnit unit) {
+    public final void setTimeout(final long timeout, final TimeUnit unit) {
         lock.lock();
         try {
             switch (status) {
@@ -372,7 +372,7 @@ public abstract class CommitBarrier {
      * @throws NullPointerException       if task is null.
      * @throws CommitBarrierOpenException if this CommitBarrier already is aborted or committed.
      */
-    public final void registerOnAbortTask(Runnable task) {
+    public final void registerOnAbortTask(final Runnable task) {
         lock.lock();
         try {
             switch (status) {
@@ -413,7 +413,7 @@ public abstract class CommitBarrier {
      * @throws NullPointerException       if task is null.
      * @throws CommitBarrierOpenException if this CommitBarrier already is aborted or committed.
      */
-    public final void registerOnCommitTask(Runnable task) {
+    public final void registerOnCommitTask(final Runnable task) {
         lock.lock();
         try {
             switch (status) {
@@ -464,7 +464,7 @@ public abstract class CommitBarrier {
      *
      * @param tx the transaction to finish
      */
-    protected final void finish(Transaction tx) {
+    protected final void finish(final Transaction tx) {
         if (tx == null) {
             return;
         }
@@ -484,11 +484,13 @@ public abstract class CommitBarrier {
      * <p/>
      * Can be called without the mainlock is acquired.
      *
-     * @param tx the transaction to check.
+     * @param tx        the transaction to check.
+     * @param operation the name of the operation to checks if this transaction is not dead. Needed to provide
+     *                  a useful message.
      * @throws DeadTransactionException if tx is dead.
      * @throws NullPointerException     if tx is null.
      */
-    protected final void ensureNotDead(Transaction tx, String operation) {
+    protected static void ensureNotDead(final Transaction tx, final String operation) {
         if (tx == null) {
             throw new NullPointerException();
         }
@@ -518,7 +520,7 @@ public abstract class CommitBarrier {
      *                                    state for this operation.
      * @throws CommitBarrierOpenException if this VetoCommitBarrier is committed or aborted.
      */
-    public void joinCommit(Transaction tx) throws InterruptedException {
+    public void joinCommit(final Transaction tx) throws InterruptedException {
         ensureNotDead(tx, "joinCommit");
 
         List<Runnable> tasks = null;
@@ -577,10 +579,10 @@ public abstract class CommitBarrier {
      *                                    state for the operation.
      * @throws CommitBarrierOpenException if this VetoCommitBarrier is committed or aborted.
      */
-    public void joinCommitUninterruptibly(Transaction tx) {
+    public void joinCommitUninterruptibly(final Transaction tx) {
         ensureNotDead(tx, "joinCommitUninterruptibly");
 
-        List<Runnable> postCommitTasks = new ArrayList<Runnable>();
+        List<Runnable> postCommitTasks = null;
         lock.lock();
         try {
             switch (status) {
@@ -630,7 +632,7 @@ public abstract class CommitBarrier {
      * @throws CommitBarrierOpenException if tx or this CountDownCommitBarrier is aborted or committed.
      * @throws NullPointerException       if tx is null.
      */
-    public boolean tryJoinCommit(Transaction tx) {
+    public boolean tryJoinCommit(final Transaction tx) {
         ensureNotDead(tx, "tryJoinCommit");
 
         List<Runnable> postCommitTasks = null;
@@ -697,7 +699,7 @@ public abstract class CommitBarrier {
      * @throws NullPointerException       if tx or unit is null is null.
      * @throws InterruptedException       if the calling thread is interrupted while waiting.
      */
-    public boolean tryJoinCommit(Transaction tx, long timeout, TimeUnit unit) throws InterruptedException {
+    public boolean tryJoinCommit(final Transaction tx, final long timeout, final TimeUnit unit) throws InterruptedException {
         ensureNotDead(tx, "tryJoinCommit");
 
         long timeoutNs = unit.toNanos(timeout);
@@ -768,7 +770,7 @@ public abstract class CommitBarrier {
      * @throws CommitBarrierOpenException if tx or this CountDownCommitBarrier is aborted or committed.
      * @throws NullPointerException       if tx or unit is null is null.
      */
-    public boolean tryJoinCommitUninterruptibly(Transaction tx, long timeout, TimeUnit unit) {
+    public boolean tryJoinCommitUninterruptibly(final Transaction tx, final long timeout, final TimeUnit unit) {
         ensureNotDead(tx, "tryJoinCommitUninterruptibly");
 
         long timeoutNs = unit.toNanos(timeout);

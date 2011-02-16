@@ -1,7 +1,7 @@
 package org.multiverse.api;
 
 /**
- * An enumeration of all possible states a {@link Transaction} can be in.
+ * An enumeration of all possible states a {@link Transaction} can have.
  *
  * @author Peter Veentjer
  */

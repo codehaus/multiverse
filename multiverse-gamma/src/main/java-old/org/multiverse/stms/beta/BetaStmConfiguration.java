@@ -39,7 +39,7 @@ public class BetaStmConfiguration {
             throw new IllegalStateException("isolationLevel can't be null");
         }
 
-        if (isolationLevel.isWriteSkewAllowed() && !trackReads) {
+        if (isolationLevel.doesAllowWriteSkew() && !trackReads) {
             throw new IllegalStateException(format("isolation level '%s' can't be combined with readtracking is false" +
                     "since it is needed to prevent the writeskew problem", isolationLevel));
         }

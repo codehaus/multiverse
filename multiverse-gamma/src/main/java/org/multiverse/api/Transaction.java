@@ -3,37 +3,51 @@ package org.multiverse.api;
 import org.multiverse.api.lifecycle.TransactionListener;
 
 /**
- * All changes on transaction objects must be done through a Transaction. The transaction make sure that changes
- * on java objects are:
- * <ul>
+ * The unit of work for {@link Stm}. The transaction make sure that changes on {@link TransactionalObject} instances are:
+ * <ol>
  * <li>Atomic: all or nothing gets committed (Failure atomicity)</li>
  * <li>Consistent : </li>
  * <li>Isolated: a transaction is executed isolated from other transactions. Meaning that a transaction won't see changed made by
- * transactions executed concurrently, but it will see changes made by transaction completed before.</li>
- * </ul>
- * <p/>
- * <dl>
- * <p/>
- * <dt>Thread-safety</dt>
- * <dd>
- * A Transaction is not thread-safe to use (just like a Hibernate Session is not thread-safe to use). It can be
- * handed over from thread to thread, but one needs to be really careful with threadlocals. Although the
- * Stm/Transaction implementation don't care about threadlocals, the stuff in front (templates, instrumented code etc)
- * could depend on threadlocals.
- * </dd>
- * <p/>
- * <dt>TransactionListener</dt>
- * <dd>
- * It is possible to listen to a Transaction when it aborts, or commits. This can be done with the
+ * transactions executed concurrently, but it will see changes made by transaction completed before. It depends on the
+ * {@link IsolationLevel} or {@link LockMode} used how strict the isolation is.</li>
+ * </ol>
+ *
+ * <h3>Thread-safety</h3>
+ *
+ * <p>A Transaction is not thread-safe (just like a Hibernate Session is not thread-safe to use). It can be
+ * handed over from thread to thread, but one needs to be really careful with the {@link ThreadLocalTransaction} or other
+ * thread specific state like the stackframe of a method (this is an issue when instrumentation is used since the stackframe
+ * is likely to be enhanced to include the Transaction as a local variable.
+ *
+ * <h3>TransactionListener</h3>
+ *
+ * <p>It is possible to listen to a Transaction when it aborts/prepares/commits/starts. There are 2 different flavors of
+ * listeners:
+ * <ol>
+ * <li>normal listeners: are registered during the execution of a transaction using the
+ * {@link Transaction#register(org.multiverse.api.lifecycle.TransactionListener)} method. If the transactions aborts/commits
+ * these listeners are removed. So if the transaction is retried, the listeners need to be registered (this is easy since
+ * the logic inside the atomic block that did the register, is executed again.
+ * </li>
+ * <li>permanent listeners: are registered once and will always remain. It can be done on the
+ * AtomicBlock level using the {@link TransactionFactoryBuilder#addPermanentListener(org.multiverse.api.lifecycle.TransactionListener)}
+ * or it can be done on the Stm level.
+ * </li>
+ * </ol>
+ *
+ * This can be done with the
  * {@link #register(org.multiverse.api.lifecycle.TransactionListener)}. You can also register permanent TransactionListener;
- * useful for a product that uses Multiverse as lower level stm, look for the
+ * useful for a product that uses Multiverse as lower level stm and always want to execute certain functionality, look for the
  * {@link TransactionFactoryBuilder#addPermanentListener(org.multiverse.api.lifecycle.TransactionListener).
- * <p/>
- * When the Transaction is reset, the normal TransactionListeners are dropped and the permanent are not. So the TransactionListener
- * need to be registered again (this is easy because the transaction is executed again, so the logic that registered
- * the TransactionListener as well.
- * </dd>
- * </dl>
+ * <p>
+ * When the Transaction is reset, the normal TransactionListeners are dropped and the permanent are not. So the normal
+ * TransactionListener need to be registered again (this is easy because the transaction is executed again.
+ *
+ * <h3>Storing transaction references</h3>
+ *
+ * <p>Transaction instances should not be stored since they are likely to be pooled by the STM. So it could be that the same
+ * transaction instance is re-used to execute a completely unrelated piece of logic, and it can also be that different instances
+ * are used to execute the same logic.
  *
  * @author Peter Veentjer.
  */

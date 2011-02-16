@@ -10,5 +10,5 @@ public interface BackoffPolicy {
 
     void delay(int attempt) throws InterruptedException;
 
-    void delayedUninterruptible(int attempt);
+    void delayUninterruptible(int attempt);
 }
