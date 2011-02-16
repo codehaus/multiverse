@@ -8,6 +8,11 @@ import org.multiverse.api.predicates.Predicate;
 
 import java.util.Collection;
 
+/**
+ *
+ * @param <E>
+ * @author Peter Veentjer.
+ */
 public interface TransactionalCollection<E> extends TransactionalIterable<E>, Collection<E> {
 
     /**

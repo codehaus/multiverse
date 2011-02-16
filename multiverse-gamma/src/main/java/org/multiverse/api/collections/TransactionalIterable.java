@@ -2,6 +2,11 @@ package org.multiverse.api.collections;
 
 import org.multiverse.api.Transaction;
 
+/**
+ *
+ * @param <E>
+ * @author Peter Veentjer.
+ */
 public interface TransactionalIterable<E> extends Iterable<E> {
 
     /**

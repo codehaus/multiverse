@@ -1,11 +1,11 @@
 package org.multiverse.api.exceptions;
 
 /**
- * An {@link ControlFlowError} that indicates that reading or writing a transactional object failed, e.g.
- * because it was locked or because a read or write conflict was detected.
+ * An {@link ControlFlowError} that indicates that reading or writing a {@link org.multiverse.api.TransactionalObject}
+ * failed, e.g. because it was locked or because a read or write conflict was detected.
  * <p/>
- * A ReadWriteConflict can in most cases be solved by retrying the transaction (this will automatically be
- * done by the AtomicBlock).
+ * A ReadWriteConflict can in most cases be solved by retrying the {@link org.multiverse.api.Transaction} (this will
+ * automatically be done by the {@link org.multiverse.api.AtomicBlock}).
  *
  * @author Peter Veentjer.
  */

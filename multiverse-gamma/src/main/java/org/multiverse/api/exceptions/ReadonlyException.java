@@ -2,19 +2,14 @@ package org.multiverse.api.exceptions;
 
 /**
  * A {@link IllegalTransactionStateException} that indicates that a write action is executed using
- * a readonly transaction.
+ * a readonly {@link org.multiverse.api.Transaction}.
  *
  * @author Peter Veentjer.
+ * @see org.multiverse.api.TransactionFactoryBuilder#setReadonly(boolean)
  */
 public class ReadonlyException extends IllegalTransactionStateException {
 
     private static final long serialVersionUID = 0;
-
-    /**
-     * Creates a new ReadonlyException.
-     */
-    public ReadonlyException() {
-    }
 
     /**
      * Creates a new ReadonlyException.

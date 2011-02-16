@@ -2,6 +2,12 @@ package org.multiverse.api.collections;
 
 import org.multiverse.api.Transaction;
 
+/**
+ *
+ *
+ * @param <E>
+ * @author Peter Veentjer.
+ */
 public interface TransactionalStack<E> extends TransactionalCollection<E> {
 
     int getCapacity();

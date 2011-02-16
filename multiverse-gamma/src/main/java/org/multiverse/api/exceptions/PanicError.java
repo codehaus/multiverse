@@ -2,7 +2,7 @@ package org.multiverse.api.exceptions;
 
 
 /**
- * An {@link Error} thrown when the state of the STM has been compromised. Normally this exception should
+ * An {@link Error} thrown when the state of the {@link org.multiverse.api.Stm} has been compromised. Normally this exception should
  * never happen.
  *
  * @author Peter Veentjer.
@@ -10,12 +10,6 @@ package org.multiverse.api.exceptions;
 public class PanicError extends Error {
 
     private static final long serialVersionUID = 0;
-
-    /**
-     * Creates a new PanicError.
-     */
-    public PanicError() {
-    }
 
     /**
      * Creates a new PanicError with the provided message.
@@ -34,14 +28,5 @@ public class PanicError extends Error {
      */
     public PanicError(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    /**
-     * Creates a new PanicError with the provided cause.
-     *
-     * @param cause the cause of the PanicError.
-     */
-    public PanicError(Throwable cause) {
-        super(cause);
     }
 }

@@ -2,8 +2,8 @@ package org.multiverse.api.exceptions;
 
 /**
  * A {@link TransactionExecutionException} that is thrown when the retry fails. The {@link RetryError} is thrown
- * when a retry happens, but when a transaction is not allowed to block, or too many retries have happened,
- * subclasses of this exception are thrown.
+ * when a retry happens, but when a {@link org.multiverse.api.Transaction} is not allowed to block, or too many
+ * retries have happened, subclasses of this exception are thrown.
  *
  * @author Peter Veentjer.
  */
@@ -34,14 +34,5 @@ public abstract class RetryException extends TransactionExecutionException {
      */
     public RetryException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    /**
-     * Creates a new RetryException with the provided cause.
-     *
-     * @param cause the cause of the RetryException.
-     */
-    public RetryException(Throwable cause) {
-        super(cause);
     }
 }

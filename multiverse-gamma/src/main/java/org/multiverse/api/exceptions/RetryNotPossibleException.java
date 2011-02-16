@@ -1,8 +1,8 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link RetryException} that indicates that a retry is done, without the possibility of progress, for
- * example when the readset of a transaction is empty.
+ * A {@link RetryException} that indicates that a retry is done on a {@link org.multiverse.api.Transaction} without
+ * the possibility of progress, for example when the readset of a transaction is empty.
  *
  * @author Peter Veentjer.
  */

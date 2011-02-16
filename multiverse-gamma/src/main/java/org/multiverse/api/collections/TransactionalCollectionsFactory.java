@@ -2,6 +2,11 @@ package org.multiverse.api.collections;
 
 import org.multiverse.api.Stm;
 
+/**
+ * A factory responsible for creating Transactional collections.
+ *
+ * @author Peter Veentjer.
+ */
 public interface TransactionalCollectionsFactory {
 
     Stm getStm();

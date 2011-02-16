@@ -4,6 +4,11 @@ import org.multiverse.api.Transaction;
 
 import java.util.Queue;
 
+/**
+ *
+ * @param <E>
+ * @author Peter Veentjer.
+ */
 public interface TransactionalQueue<E> extends TransactionalCollection<E>, Queue<E> {
 
     int getCapacity();

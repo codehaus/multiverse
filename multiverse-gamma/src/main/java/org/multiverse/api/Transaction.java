@@ -31,17 +31,11 @@ import org.multiverse.api.lifecycle.TransactionListener;
  * </li>
  * <li>permanent listeners: are registered once and will always remain. It can be done on the
  * AtomicBlock level using the {@link TransactionFactoryBuilder#addPermanentListener(org.multiverse.api.lifecycle.TransactionListener)}
- * or it can be done on the Stm level.
+ * or it can be done on the Stm level. Permanent listeners are suited for products that want to integrate with Multiverse and always
+ * execute some logic at important transaction events. Registration of permanent can also be done on the {@link Stm} level. See
+ * the implementations for more details. Permanent listeners are always executed after the normal listeners.
  * </li>
  * </ol>
- *
- * This can be done with the
- * {@link #register(org.multiverse.api.lifecycle.TransactionListener)}. You can also register permanent TransactionListener;
- * useful for a product that uses Multiverse as lower level stm and always want to execute certain functionality, look for the
- * {@link TransactionFactoryBuilder#addPermanentListener(org.multiverse.api.lifecycle.TransactionListener).
- * <p>
- * When the Transaction is reset, the normal TransactionListeners are dropped and the permanent are not. So the normal
- * TransactionListener need to be registered again (this is easy because the transaction is executed again.
  *
  * <h3>Storing transaction references</h3>
  *
@@ -55,8 +49,8 @@ public interface Transaction {
 
     /**
      * Returns the TransactionConfiguration used by this Transaction.
-     * <p/>
-     * Because the Transaction can be reused, the TransactionConfiguration used by this Transaction doesn't need to be constant.
+     *
+     * <p>Because the Transaction can be reused, the TransactionConfiguration used by this Transaction doesn't need to be constant.
      *
      * @return the TransactionConfiguration.
      */
@@ -80,8 +74,9 @@ public interface Transaction {
 
     /**
      * Gets the remaining timeout in nanoseconds. Long.MAX_VALUE indicates that no timeout is used.
-     * <p/>
-     * The remaining timeout only is decreased if a transaction blocks.
+     *
+     * <p>The remaining timeout only is decreased if a transaction blocks on a retry or when doing
+     * a backoff.
      *
      * @return the remaining timeout.
      */
@@ -91,19 +86,20 @@ public interface Transaction {
      * Commits this Transaction. If the Transaction is:
      * <ol>
      * <li>active: it is prepared for commit and then committed</li>
-     * <li>prepared: it is committed (so changes persisted). Once it is prepared, the commit is guaranteed to
+     * <li>prepared: it is committed. Once it is prepared, the commit is guaranteed to
      * succeed.</li>
      * <li>aborted: a DeadTransactionException is thrown</li>
-     * <li>committed: a DeadTransactionException is thrown</li>
+     * <li>committed: the call is ignored</li>
      * </ol>
-     * So it is safe to call while active or prepared.
-     * <p/>
-     * Transaction will always be aborted if the commit does not succeed.
-     * <p/>
-     * Commit will not throw any validation exceptions after the transaction is prepared.
-     * <p/>
-     * If there are TransactionListeners (either normal ones or permanent ones) and they thrown a RuntimeException
-     * or Error, this will be rethrown.
+     *
+     * <p>Transaction will always be aborted if the commit does not succeed.
+     *
+     * <p>Commit will not throw a {@link org.multiverse.api.exceptions.ReadWriteConflict} after the transaction is prepared.
+     * So if prepared successfully, a commit will always succeed.
+     *
+     * <p>If there are TransactionListeners (either normal ones or permanent ones) and they thrown a {@link RuntimeException}
+     * or {@link Error}, this will be re-thrown. If a listener fails after the prepare/commit  the transaction still is
+     * committed.
      *
      * @throws org.multiverse.api.exceptions.ReadWriteConflict
      *          if the commit failed. Check the class hierarchy of the ReadWriteConflict for more information.
@@ -118,8 +114,8 @@ public interface Transaction {
      * made after the transaction has been prepared. If the transaction already is prepared, the call is ignored.  If
      * the prepare fails, the transaction automatically is aborted. Once a transaction is prepared, the commit will
      * always succeed.
-     * <p/>
-     * It is very important that the transaction eventually commits or aborts, if it doesn't no other transaction
+     *
+     * <p>It is very important that the transaction eventually commits or aborts, if it doesn't no other transaction
      * reading/writing the committed resources, can't commit.
      *
      * @throws org.multiverse.api.exceptions.ReadWriteConflict
@@ -134,8 +130,8 @@ public interface Transaction {
      * the implementation if this operation is simple (ditching objects for example), or if changes need to be rolled
      * back. If an exception is thrown while executing the abort, the transaction is still aborted. And example of
      * such a situation is a pre-abort task that fails. So the transaction always is aborted (unless it is committed).
-     * <p/>
-     * If the Transaction already is aborted, the call is ignored.
+     *
+     * <p>If the Transaction already is aborted, the call is ignored.
      *
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if the Transaction is not in the correct state for this operation.
@@ -143,8 +139,8 @@ public interface Transaction {
     void abort();
 
     /**
-     * Retries the transaction. This call doesn't block, but if all goes well a RetryError is thrown which is caught by
-     * the AtomicBlock.
+     * Retries the transaction. This call doesn't block, but if all goes well a {@link org.multiverse.api.exceptions.RetryError}
+     * is thrown which is caught by the {@link AtomicBlock}.
      *
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
      *          if the transaction is not in a legal state for
@@ -156,10 +152,10 @@ public interface Transaction {
 
     /**
      * Signals that the only possible outcome of the Transaction is one that aborts. When the transaction prepares or
-     * commits it checks if the transaction is marked for abort. If so, it will automatically aborted and an
+     * commits it checks if the transaction is marked as abort only. If so, it will automatically aborted and an
      * {@link org.multiverse.api.exceptions.AbortOnlyException} is thrown.
-     * <p/>
-     * This method is not threadsafe, so can only be called by the thread that used the transaction.
+     *
+     * <p>This method is not threadsafe, so can only be called by the thread that used the transaction.
      *
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
      *          if the transaction is not active.
@@ -169,11 +165,11 @@ public interface Transaction {
     void setAbortOnly();
 
     /**
-     * Checks if this Transaction is abortonly (so will always fail when committing or preparing).
-     * <p/>
-     * This method is not threadsafe, so can only be called by the thread that used the transaction.
+     * Checks if this Transaction is abort only (so will always fail when committing or preparing).
      *
-     * @return true if abortonly, false otherwise.
+     * <p>This method is not threadsafe, so can only be called by the thread that used the transaction.
+     *
+     * @return true if abort only, false otherwise.
      * @throws org.multiverse.api.exceptions.DeadTransactionException
      *          if the transaction is committed/aborted.
      */
@@ -183,11 +179,11 @@ public interface Transaction {
      * Registers a TransactionListener. Every time a transaction is retried, the listener needs to
      * be registered again if you want the task to be executed again. If you want a permanent listener, have
      * a look at the {@link TransactionFactoryBuilder#addPermanentListener(org.multiverse.api.lifecycle.TransactionListener)}.
-     * <p/>
-     * If a TransactionListener is added more than once, it is executed more than once. No checks
+     *
+     * <p>If a TransactionListener is added more than once, it is executed more than once. No checks
      * are made. The permanent listeners are executed in the order they are added.
-     * <p/>
-     * If a TransactionListener throws an Error/RuntimeException and the transaction still is alive,
+     *
+     * <p>If a TransactionListener throws an Error/RuntimeException and the transaction still is alive,
      * it is aborted. For compensating and deferred actions this is not an issue, but for the PrePrepare state
      * or the state it could since the transaction is aborted.
      *

@@ -1,9 +1,10 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link RuntimeException} thrown by the STM when something fails while executing transactions.
+ * A {@link RuntimeException} thrown by the {@link org.multiverse.api.Stm} when something fails while executing a
+ * {@link org.multiverse.api.Transaction}.
  *
- * This exception is not caught by the {@link org.multiverse.api.AtomicBlock}.
+ * <p>This exception is not caught by the {@link org.multiverse.api.AtomicBlock}.
  *
  * @author Peter Veentjer.
  */

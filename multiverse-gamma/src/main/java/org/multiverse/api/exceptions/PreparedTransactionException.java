@@ -2,19 +2,13 @@ package org.multiverse.api.exceptions;
 
 /**
  * A {@link IllegalTransactionStateException} that is thrown when an operation is executed on a
- * transaction while the transaction is prepared.
+ * {@link org.multiverse.api.Transaction} while the transaction is prepared.
  *
  * @author Peter Veentjer.
  */
 public class PreparedTransactionException extends IllegalTransactionStateException {
 
     private static final long serialVersionUID = 0;
-
-    /**
-     * Creates a new PreparedTransactionException.
-     */
-    public PreparedTransactionException() {
-    }
 
     /**
      * Creates a new PreparedTransactionException with the provided message.

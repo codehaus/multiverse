@@ -1,22 +1,25 @@
 package org.multiverse.api.exceptions;
 
 /**
- * Multiverse uses a speculative configuration
- * mechanism if enabled (see {@link org.multiverse.api.TransactionFactoryBuilder#setSpeculative(boolean)} for more information)
- * which makes certain optimizations possible. E.g. one of the optimizations is to use different transaction implementations
- * that are optimized for certain transaction lengths. As long as the speculation is not violated, you will get better
- * performance than when a more heavy weight transaction/configuration.
- * <p/>
- * So ControlFlowErrors are not something bad, but just a way for the STM to figure out what the cheapest settings are for
+ * Multiverse uses a speculative configuration mechanism if enabled makes certain optimizations possible. E.g. one of the optimizations
+ * is to use different {@link org.multiverse.api.Transaction} implementations that are optimized for certain transaction lengths. As
+ * long as the speculation is not violated, you will get better performance than when a more heavy weight transaction/configuration.
+ *
+ * <p>So ControlFlowErrors are not something bad, but just a way for the STM to figure out what the cheapest settings are for
  * performance/scalability.
- * <h2>Unexpected retries</h2>
- * Because a transaction can fail on a speculative failure more than once, it could be that the transaction is retried. Normally
- * this is not an issue, since the transaction will be retried, so is invisible. And once the AtomicBlock has learned, it will
- * not make the same mistakes again, but if you do io (e.g. print to the System.out or do logging) you can expect to see aborts,
- * even though there is no other reason to. Speculative behavior can be turned of (either on the Transaction or STM level) but
- * you will not get the best out of performance.*
+ *
+ * <h3>Unexpected retries</h3>
+ *
+ * <p>Because a transaction can fail on a speculative failure more than once, it could be that the transaction is retried. Normally
+ * this is not an issue, since the transaction will be retried, so is invisible. And once the {@link org.multiverse.api.AtomicBlock}
+ * has learned, it will not make the same mistakes again, but if you do io (e.g. print to the System.out or do logging) you can expect
+ * to see aborts, even though there is no other reason to.
+ *
+ * Speculative behavior can be turned of (either on the Transaction or STM level) but you will not get the best out of performance. For
+ * the speculative behavior to learn, it is important that the {@link org.multiverse.api.AtomicBlock} is reused.
  *
  * @author Peter Veentjer.
+ * @see org.multiverse.api.TransactionFactoryBuilder#setSpeculative(boolean)
  */
 public class SpeculativeConfigurationError extends ControlFlowError {
 

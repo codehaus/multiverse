@@ -3,10 +3,11 @@ package org.multiverse.api.exceptions;
 import static java.lang.String.format;
 
 /**
- * An {@link PropagationException} that can be thrown when no transaction but if it was expected. A typical
- * cause of this exception is that the PropagationLevel.Mandatory is used.
+ * An {@link PropagationException} that can be thrown when no {@link org.multiverse.api.Transaction} but if it was expected. A typical
+ * cause of this exception is that the {@link org.multiverse.api.PropagationLevel#Mandatory} is used.
  *
  * @author Peter Veentjer
+ * @see org.multiverse.api.TransactionFactoryBuilder#setPropagationLevel(org.multiverse.api.PropagationLevel)
  */
 public class TransactionRequiredException extends PropagationException {
 

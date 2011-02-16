@@ -1,13 +1,14 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link RetryException} that indicates that a retry is done while it isn't allowed
- * (because the transaction doesn't allow blocking transactions).
+ * A {@link RetryException} that indicates that a retry is done while the {@link org.multiverse.api.Transaction} doesn't
+ * allow blocking operations.
  * <p/>
  * For more information see {@link org.multiverse.api.TransactionFactoryBuilder#setBlockingAllowed(boolean)}
  * and {@link org.multiverse.api.TransactionConfiguration#isBlockingAllowed()}.
  *
  * @author Peter Veentjer.
+ * @see org.multiverse.api.TransactionFactoryBuilder#setBlockingAllowed(boolean)
  */
 public class RetryNotAllowedException extends RetryException {
 

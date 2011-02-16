@@ -13,8 +13,8 @@ public enum TransactionStatus {
     Active(true),
 
     /**
-     * When a Transaction is prepared for commit. Once it reaches this state, a commit will always
-     * succeed (if called).
+     * When the Transaction has been checked for conflicts and all resources have been claimed to make sure
+     * that a commit is going to succeed.
      */
     Prepared(true),
 

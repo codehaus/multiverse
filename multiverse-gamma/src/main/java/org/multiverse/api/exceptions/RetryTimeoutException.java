@@ -2,12 +2,12 @@ package org.multiverse.api.exceptions;
 
 /**
  * A {@link RetryException} thrown when a transaction times out while it blocks on a retry (so waits for an update).
- * <p/>
- * On a transaction the maximum timeout can be set. When it is set to a bound value (so smaller than Long.MAX_VALUE)
+ *
+ * <p>On a transaction the maximum timeout can be set. When it is set to a bound value (so smaller than Long.MAX_VALUE)
  * all retries that need to block the transaction (so wait till some write happened) will decrement the
  * remaining timeout. When the transaction eventually times out, this Exception is thrown.
- * <p/>
- * For more information see:
+ *
+ * <p>For more information see:
  * <ol>
  * <li>the remaining timeout: {@link org.multiverse.api.Transaction#getRemainingTimeoutNs()}</li>
  * <li>reading the configured timeout: {@link org.multiverse.api.TransactionConfiguration#getTimeoutNs()}.</li>

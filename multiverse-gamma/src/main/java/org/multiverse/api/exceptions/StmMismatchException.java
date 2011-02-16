@@ -4,9 +4,11 @@ package org.multiverse.api.exceptions;
  * A {@link TransactionExecutionException} thrown when a transaction encounters encounters a transactional object
  * that belongs to a different Stm instance.
  *
- * Normally this won't be an issue since only a GlobalStmInstance is used.
+ * <p>Normally this exception is not thrown because only a single Stm instance, stored in the {@link org.multiverse.api.GlobalStmInstance}
+ * is used.
  *
  * @author Peter Veentjer.
+ * @see org.multiverse.api.GlobalStmInstance
  */
 public class StmMismatchException extends TransactionExecutionException {
 
