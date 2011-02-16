@@ -12,30 +12,12 @@ transactions can also act as node (no need to introduce additional datastructure
 
 - Collections
 
-    - transactional linked list
-
     - 'size' structure to help with an approximate size for collections
-
-    - Collection: map
-
-    - Collection: filter
-
-    - Collection: flatMap
-
-    - Collection: foldLeft
-
-    - Collection: foldRight
-
-    - Collection: foreach
 
 - instead of going through the transaction to deal with tranlocals, one you have a reference to one,
 all operations like openForWrite/checkConflict/ensure etc.
 
-- the skipreadconflict logic can be made cheaper by merging the config.readlocklevel and config.inconsistentread.
-
 - ensure on the transaction? To make all changes 'committable'.
-
-- http://iamchrislewis.tumblr.com/post/239967776/a-look-at-how-scala-compiles-to-java
 
 - selective notifies in transaction, instead of always waking up.. one could provide a function that only wakes
  up under certain conditions.
@@ -93,11 +75,6 @@ to become free... so can when a lock unlease is done, see if there are listeners
 done before, the transaction knows it can remove the current listeners with the a cas, and add them to the set
 of listeners that to be notified. If a transaction wants to block ...
 when a normal transaction... when a lock is acquired, a retry error should also be thrown.
-
-- support for listener: can be done by providing the previous tranlocal. If that is not the same as the
-current tranlocal.. can you retry immediately? Watch out with updates because you need to use the
-origin. The problem with the old approach, is that an additional volatile read is needed and this kills
-performance.
 
 - use the function's for the atomic change functions
 
@@ -185,14 +162,6 @@ performance.
                         to do
 --------------------------------------------------------------------
 
-- Improve Javadoc on Ref
-
-- Improve Javadoc on AtomicBlock
-
-- Improve Javadoc on Isolation Level
-
-- Improve Javadoc on AtomicBlock
-
 - adding read committed isolation level
 
 - testing: prepare of transactions and excusive lock isolation level
@@ -255,11 +224,17 @@ performance.
 
 - Javadoc: BinaryFunction
 
-- Javadoc: Stm
+- Javadoc: Ref
+
+- Javadoc: Improve Javadoc on Isolation Level
+
+- Javadoc: Improve Javadoc on AtomicBlock
 
 ----------------------------------------------------------------------
                                 done
 ----------------------------------------------------------------------
+
+- Javadoc: Stm
 
 - Improved Javadoc on the Transaction life-cycle functionality.
 

@@ -5,13 +5,42 @@ import org.multiverse.api.references.RefFactory;
 import org.multiverse.api.references.RefFactoryBuilder;
 
 /**
- * The main interface for software transactional memory. Updates/reads in the stm should only be done through the
- * {@link Transaction}. So see that for more details.
+ * The main interface for software transactional memory. The main tasks are done by the following structures:
+ * <ol>
+ * <li>{@link TransactionalObject}: the structure where state and identity are separated and where state change
+ * is coordinated through a transaction. An example of the TransactionalObject is the {@link org.multiverse.api.references.Ref},
+ * but it could just as easily by a more complex transactional datastructure.
+ * </li>
+ * <li>{@link Transaction}: responsible for making sure that all changes on transactionalobjects are atomic, isolated and consistent.
+ * </li>
+ * <li>{@link AtomicBlock}: responsible for starting/committing/aborting/retrying transactions. The AtomicBlock executes an
+ * {@link org.multiverse.api.closures.AtomicClosure} (there are different tasted for return values). The AtomicClosure contains
+ * the logic that needs to be executed atomic, isolated and consistent.
+ * </li>
+ * </ol>
+ *
+ * <h3>Pluggability</h3>
+ *
+ * <p>The Stm interface provides a mechanism to separate the contract from the implementation. So it is possible to change the
+ * Stm implementation without changing the code that uses it. The idea is that for example a TL2 (MVCC) based implementation can
+ * be replaced by a SkySTM or a lock based STM. Of course every Stm implementation will have its strong and weak
+ * spots.
+ *
+ * <p>All functionality like AtomicBlocks, Refs, Transaction etc can be customized by providing a custom implementation of the
+ * factory/builder interfaces:
+ * <ol>
+ *     <li>{@link RefFactoryBuilder} a builder for creating {@link RefFactory}</li>
+ *     <li>{@link TransactionFactoryBuilder} a builder for creating an {@link AtomicBlock}/{@link Transaction}.
+ *     <li>{@link TransactionalCollectionsFactory} a factory for creating transactional collections</li>
+ * </ol>
+ *
+ * <h3>Multiple Stm instances</h3>
  *
  * <p>It is important that an TransactionalObject only is used within a single stm. If it is 'shared' between different
  * stm instances, isolation problems could happen. This can be caused by the fact that different stm instances
  * probably use different clocks or completely different mechanisms for preventing isolation problems.
- * <p/>
+ *
+ * <h3>Thread safe</h3>
  * All methods on the Stm are of course thread safe.
  *
  * @author Peter Veentjer.
