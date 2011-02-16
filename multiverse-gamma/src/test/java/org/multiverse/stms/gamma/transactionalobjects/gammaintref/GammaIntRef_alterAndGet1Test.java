@@ -25,8 +25,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.api.functions.Functions.newIdentityIntFunction;
-import static org.multiverse.api.functions.Functions.newIncIntFunction;
+import static org.multiverse.api.functions.Functions.identityIntFunction;
+import static org.multiverse.api.functions.Functions.incIntFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 @RunWith(Parameterized.class)
@@ -101,7 +101,7 @@ public class GammaIntRef_alterAndGet1Test {
         GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
 
-        IntFunction function = newIncIntFunction();
+        IntFunction function = Functions.incIntFunction();
         ref.alterAndGet(function);
         assertEquals(initialValue + 1, ref.get());
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -119,7 +119,7 @@ public class GammaIntRef_alterAndGet1Test {
         GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
 
-        IntFunction function = newIdentityIntFunction();
+        IntFunction function = identityIntFunction();
         ref.alterAndGet(function);
         assertEquals(initialValue, ref.get());
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -156,7 +156,7 @@ public class GammaIntRef_alterAndGet1Test {
         int initialValue = 10;
         GammaIntRef ref = new GammaIntRef(stm, initialValue);
         long initialVersion = ref.getVersion();
-        IntFunction function = Functions.newIncIntFunction(1);
+        IntFunction function = Functions.incIntFunction(1);
 
         try {
             ref.alterAndGet(function);
@@ -180,7 +180,7 @@ public class GammaIntRef_alterAndGet1Test {
         int initialValue = 10;
         GammaIntRef ref = new GammaIntRef(stm, initialValue);
         long initialVersion = ref.getVersion();
-        IntFunction function = Functions.newIncIntFunction(1);
+        IntFunction function = Functions.incIntFunction(1);
 
         try {
             ref.alterAndGet(function);
@@ -205,7 +205,7 @@ public class GammaIntRef_alterAndGet1Test {
         int initialValue = 10;
         GammaIntRef ref = new GammaIntRef(stm, initialValue);
         long initialVersion = ref.getVersion();
-        IntFunction function = newIncIntFunction(1);
+        IntFunction function = incIntFunction(1);
 
         try {
             ref.alterAndGet(function);
@@ -233,7 +233,7 @@ public class GammaIntRef_alterAndGet1Test {
 
         GammaTransaction tx = stm.newDefaultTransaction();
         setThreadLocalTransaction(tx);
-        ref.alterAndGet(newIncIntFunction());
+        ref.alterAndGet(Functions.incIntFunction());
         tx.commit();
 
         joinAll(thread);

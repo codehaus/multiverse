@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.LockedException;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.IntFunction;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.GammaStmConfiguration;
@@ -18,8 +19,7 @@ import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.api.functions.Functions.newIdentityIntFunction;
-import static org.multiverse.api.functions.Functions.newIncIntFunction;
+import static org.multiverse.api.functions.Functions.identityIntFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class GammaIntRef_atomicGetAndAlterTest {
@@ -40,7 +40,7 @@ public class GammaIntRef_atomicGetAndAlterTest {
         GammaIntRef ref = new GammaIntRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        IntFunction function = newIncIntFunction();
+        IntFunction function = Functions.incIntFunction();
         long result = ref.atomicGetAndAlter(function);
 
         assertEquals(2, result);
@@ -78,7 +78,7 @@ public class GammaIntRef_atomicGetAndAlterTest {
         setThreadLocalTransaction(tx);
         ref.set(10);
 
-        IntFunction function = newIncIntFunction();
+        IntFunction function = Functions.incIntFunction();
         long result = ref.atomicGetAndAlter(function);
 
         tx.abort();
@@ -123,7 +123,7 @@ public class GammaIntRef_atomicGetAndAlterTest {
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         try {
-            ref.atomicGetAndAlter(newIdentityIntFunction());
+            ref.atomicGetAndAlter(identityIntFunction());
             fail();
         } catch (LockedException expected) {
         }
@@ -169,7 +169,7 @@ public class GammaIntRef_atomicGetAndAlterTest {
 
         sleepMs(500);
 
-        long result = ref.atomicGetAndAlter(newIncIntFunction());
+        long result = ref.atomicGetAndAlter(Functions.incIntFunction());
 
         assertEquals(result, initialValue);
         joinAll(thread);

@@ -15,8 +15,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.api.functions.Functions.newIdentityIntFunction;
-import static org.multiverse.api.functions.Functions.newIncIntFunction;
+import static org.multiverse.api.functions.Functions.identityIntFunction;
+import static org.multiverse.api.functions.Functions.incIntFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class GammaIntRef_atomicAlterAndGetTest {
@@ -77,7 +77,7 @@ public class GammaIntRef_atomicAlterAndGetTest {
         GammaIntRef ref = new GammaIntRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        IntFunction function = Functions.newIncIntFunction(1);
+        IntFunction function = Functions.incIntFunction(1);
 
         long result = ref.atomicAlterAndGet(function);
 
@@ -93,7 +93,7 @@ public class GammaIntRef_atomicAlterAndGetTest {
         GammaIntRef ref = new GammaIntRef(stm, initialValue);
         long version = ref.getVersion();
 
-        IntFunction function = newIdentityIntFunction();
+        IntFunction function = identityIntFunction();
 
         long result = ref.atomicAlterAndGet(function);
 
@@ -113,7 +113,7 @@ public class GammaIntRef_atomicAlterAndGetTest {
         setThreadLocalTransaction(tx);
         ref.set(tx, 100);
 
-        IntFunction function = newIncIntFunction(1);
+        IntFunction function = incIntFunction(1);
 
         long result = ref.atomicAlterAndGet(function);
 
@@ -182,7 +182,7 @@ public class GammaIntRef_atomicAlterAndGetTest {
 
         sleepMs(500);
 
-        ref.atomicAlterAndGet(newIncIntFunction());
+        ref.atomicAlterAndGet(Functions.incIntFunction());
 
         joinAll(thread);
         assertRefHasNoLocks(ref);

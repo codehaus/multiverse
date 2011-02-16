@@ -29,11 +29,10 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.*;
-import static org.multiverse.TestUtils.LOCKMODE_NONE;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.api.functions.Functions.newInverseBooleanFunction;
+import static org.multiverse.api.functions.Functions.inverseBooleanFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 @RunWith(Parameterized.class)
@@ -90,7 +89,7 @@ public class GammaBooleanRef_commute2Test {
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        ref.commute(tx, Functions.newInverseBooleanFunction());
+        ref.commute(tx, Functions.inverseBooleanFunction());
 
         try {
             tx.commit();
@@ -114,7 +113,7 @@ public class GammaBooleanRef_commute2Test {
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        ref.commute(tx, newInverseBooleanFunction());
+        ref.commute(tx, inverseBooleanFunction());
 
         try {
             tx.commit();
@@ -138,7 +137,7 @@ public class GammaBooleanRef_commute2Test {
         ref.getLock().acquire(otherTx, LockMode.Read);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        ref.commute(tx, newInverseBooleanFunction());
+        ref.commute(tx, inverseBooleanFunction());
 
         try {
             tx.commit();
@@ -158,7 +157,7 @@ public class GammaBooleanRef_commute2Test {
         GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BooleanFunction function = newInverseBooleanFunction();
+        BooleanFunction function = inverseBooleanFunction();
         GammaTransaction tx = transactionFactory.newTransaction();
         ref.commute(tx, function);
 
@@ -176,7 +175,7 @@ public class GammaBooleanRef_commute2Test {
         GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BooleanFunction function = Functions.newIdentityBooleanFunction();
+        BooleanFunction function = Functions.identityBooleanFunction();
         GammaTransaction tx = transactionFactory.newTransaction();
         ref.commute(tx, function);
 
@@ -195,7 +194,7 @@ public class GammaBooleanRef_commute2Test {
         long initialVersion = ref.getVersion();
 
          Transaction tx = transactionFactory.newTransaction();
-        ref.commute(tx, newInverseBooleanFunction());
+        ref.commute(tx, inverseBooleanFunction());
         tx.commit();
 
         assertVersionAndValue(ref, initialVersion + 1, !initialValue);
@@ -207,7 +206,7 @@ public class GammaBooleanRef_commute2Test {
         GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BooleanFunction function = Functions.newInverseBooleanFunction();
+        BooleanFunction function = Functions.inverseBooleanFunction();
         GammaTransaction tx = transactionFactory.newTransaction();
         ref.get(tx);
         ref.commute(tx, function);
@@ -222,7 +221,7 @@ public class GammaBooleanRef_commute2Test {
 
     @Test
     public void whenAlreadyOpenedForConstruction() {
-        BooleanFunction function = Functions.newInverseBooleanFunction();
+        BooleanFunction function = Functions.inverseBooleanFunction();
         GammaTransaction tx = transactionFactory.newTransaction();
         GammaBooleanRef ref = new GammaBooleanRef(tx);
         ref.openForConstruction(tx);
@@ -240,7 +239,7 @@ public class GammaBooleanRef_commute2Test {
     public void whenAlreadyOpenedForWrite() {
         GammaBooleanRef ref = new GammaBooleanRef(stm, true);
 
-        BooleanFunction function = newInverseBooleanFunction();
+        BooleanFunction function = inverseBooleanFunction();
         GammaTransaction tx = transactionFactory.newTransaction();
         ref.set(tx, false);
         ref.commute(tx, function);
@@ -259,9 +258,9 @@ public class GammaBooleanRef_commute2Test {
         GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BooleanFunction function1 = newInverseBooleanFunction();
-        BooleanFunction function2 = newInverseBooleanFunction();
-        BooleanFunction function3 = newInverseBooleanFunction();
+        BooleanFunction function1 = inverseBooleanFunction();
+        BooleanFunction function2 = inverseBooleanFunction();
+        BooleanFunction function3 = inverseBooleanFunction();
         GammaTransaction tx = transactionFactory.newTransaction();
         ref.commute(tx, function1);
         ref.commute(tx, function2);
@@ -384,7 +383,7 @@ public class GammaBooleanRef_commute2Test {
 
         GammaTransaction tx1 = transactionFactory.newTransaction();
         ref1.set(tx1, false);
-        ref2.commute(tx1, Functions.newInverseBooleanFunction());
+        ref2.commute(tx1, Functions.inverseBooleanFunction());
 
         GammaTransaction tx2 = transactionFactory.newTransaction();
         ref2.set(tx2, false);
@@ -409,7 +408,7 @@ public class GammaBooleanRef_commute2Test {
         sleepMs(500);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        ref.commute(tx, newInverseBooleanFunction());
+        ref.commute(tx, inverseBooleanFunction());
         tx.commit();
 
         joinAll(thread);

@@ -23,12 +23,11 @@ import java.util.Collection;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.api.functions.Functions.newInverseBooleanFunction;
+import static org.multiverse.api.functions.Functions.inverseBooleanFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 
@@ -219,7 +218,7 @@ public class GammaBooleanRef_alterAndGet2Test {
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        BooleanFunction function = Functions.newInverseBooleanFunction();
+        BooleanFunction function = Functions.inverseBooleanFunction();
         ref.alterAndGet(tx, function);
 
         try {
@@ -247,7 +246,7 @@ public class GammaBooleanRef_alterAndGet2Test {
         sleepMs(500);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        ref.alterAndGet(tx, newInverseBooleanFunction());
+        ref.alterAndGet(tx, inverseBooleanFunction());
         tx.commit();
 
         joinAll(thread);
@@ -260,7 +259,7 @@ public class GammaBooleanRef_alterAndGet2Test {
         boolean initialValue = true;
         GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
         GammaTransaction tx = transactionFactory.newTransaction();
-        boolean result = ref.alterAndGet(tx, Functions.newInverseBooleanFunction());
+        boolean result = ref.alterAndGet(tx, Functions.inverseBooleanFunction());
         tx.commit();
 
         assertEquals(!initialValue, ref.atomicGet());

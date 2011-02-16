@@ -19,29 +19,39 @@ public final class Functions {
 
     private static final DoubleFunction identityDoubleFunction = new IdentityDoubleFunction();
 
-    public static DoubleFunction newIdentityDoubleFunction(){
+    /**
+     * Returns an {@link DoubleFunction} that returns its input.
+     *
+     * @return the identity function.
+     */
+    public static DoubleFunction identityDoubleFunction() {
         return identityDoubleFunction;
     }
 
-    public static DoubleFunction newIncDoubleFunction() {
+    /**
+     * Returns a {@link DoubleFunction} that increments the input with one.
+     *
+     * @return the increment function.
+     */
+    public static DoubleFunction incDoubleFunction() {
         return incOneDoubleFunction;
     }
 
     /**
-     * Returns an identity IntFunction (a function that returns its input value). The instance is cached.
+     * Returns an identity {@link IntFunction} (a function that returns its input value). The instance is cached.
      *
      * @return the identity IntFunction.
      */
-    public static IntFunction newIdentityIntFunction() {
+    public static IntFunction identityIntFunction() {
         return identityIntFunction;
     }
 
     /**
-     * Returns an identity LongFunction (a function that returns its input value). The instance is cached.
+     * Returns an identity {@link LongFunction} (a function that returns its input value). The instance is cached.
      *
      * @return the identity LongFunction.
      */
-    public static LongFunction newIdentityLongFunction() {
+    public static LongFunction identityLongFunction() {
         return identityLongFunction;
     }
 
@@ -50,7 +60,7 @@ public final class Functions {
      *
      * @return the increment IntFunction.
      */
-    public static IntFunction newIncIntFunction() {
+    public static IntFunction incIntFunction() {
         return incOneIntFunction;
     }
 
@@ -59,7 +69,7 @@ public final class Functions {
      *
      * @return the decrease IntFunction.
      */
-    public static IntFunction newDecIntFunction() {
+    public static IntFunction decIntFunction() {
         return decOneIntFunction;
     }
 
@@ -68,7 +78,7 @@ public final class Functions {
      *
      * @return the increment LongFunction.
      */
-    public static LongFunction newIncLongFunction() {
+    public static LongFunction incLongFunction() {
         return incOneLongFunction;
     }
 
@@ -77,10 +87,9 @@ public final class Functions {
      *
      * @return the decrement LongFunction.
      */
-    public static LongFunction newDecLongFunction() {
+    public static LongFunction decLongFunction() {
         return decOneLongFunction;
     }
-
 
     /**
      * Returns a {@link IntFunction} that increments with the given amount. For the -1, 0 and 1
@@ -89,7 +98,7 @@ public final class Functions {
      * @param amount the value to increment with. A negative value does a decrement.
      * @return the increment IntFunction.
      */
-    public static IntFunction newIncIntFunction(int amount) {
+    public static IntFunction incIntFunction(int amount) {
         switch (amount) {
             case 0:
                 return identityIntFunction;
@@ -102,11 +111,21 @@ public final class Functions {
         }
     }
 
-    public static BooleanFunction newInverseBooleanFunction() {
+    /**
+     * Returns a {@link BooleanFunction} that inverts the argument.
+     *
+     * @return the function
+     */
+    public static BooleanFunction inverseBooleanFunction() {
         return inverseBooleanFunction;
     }
 
-    public static BooleanFunction newIdentityBooleanFunction() {
+    /**
+     * Returns a {@link BooleanFunction} that returns the argument.
+     *
+     * @return the function.
+     */
+    public static BooleanFunction identityBooleanFunction() {
         return identityBooleanFunction;
     }
 
@@ -117,7 +136,7 @@ public final class Functions {
      * @param amount the value to increment with. A negative value does a decrement.
      * @return the increment LongFunction.
      */
-    public static LongFunction newIncLongFunction(long amount) {
+    public static LongFunction incLongFunction(long amount) {
         if (amount == 0) {
             return identityLongFunction;
         }
@@ -216,7 +235,7 @@ public final class Functions {
         }
     }
 
-     private static class IncDoubleFunction extends DoubleFunction {
+    private static class IncDoubleFunction extends DoubleFunction {
         @Override
         public double call(double current) {
             return current + 1;
@@ -228,7 +247,7 @@ public final class Functions {
         }
     }
 
-       private static class IdentityDoubleFunction extends DoubleFunction {
+    private static class IdentityDoubleFunction extends DoubleFunction {
         @Override
         public double call(double current) {
             return current;

@@ -61,7 +61,7 @@ public class GammaDoubleRef_commute1Test {
 
         GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
-        DoubleFunction function = Functions.newIncDoubleFunction();
+        DoubleFunction function = Functions.incDoubleFunction();
         ref.commute(function);
 
         GammaRefTranlocal commuting = tx.getRefTranlocal(ref);
@@ -88,7 +88,7 @@ public class GammaDoubleRef_commute1Test {
         long version = ref.getVersion();
         GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
-        DoubleFunction function = Functions.newIdentityDoubleFunction();
+        DoubleFunction function = Functions.identityDoubleFunction();
         ref.commute(function);
 
         GammaRefTranlocal commuting = tx.getRefTranlocal(ref);
@@ -137,7 +137,7 @@ public class GammaDoubleRef_commute1Test {
         GammaDoubleRef ref = new GammaDoubleRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        DoubleFunction function = Functions.newIncDoubleFunction();
+        DoubleFunction function = Functions.incDoubleFunction();
         try {
             ref.commute(function);
             fail();
@@ -161,7 +161,7 @@ public class GammaDoubleRef_commute1Test {
         setThreadLocalTransaction(tx);
         tx.commit();
 
-        DoubleFunction function = Functions.newIncDoubleFunction();
+        DoubleFunction function = Functions.incDoubleFunction();
         try {
             ref.commute(function);
             fail();
@@ -187,7 +187,7 @@ public class GammaDoubleRef_commute1Test {
         setThreadLocalTransaction(tx);
         tx.abort();
 
-        DoubleFunction function = Functions.newIncDoubleFunction();
+        DoubleFunction function = Functions.incDoubleFunction();
         try {
             ref.commute(function);
             fail();
@@ -212,7 +212,7 @@ public class GammaDoubleRef_commute1Test {
         setThreadLocalTransaction(tx);
         tx.prepare();
 
-        DoubleFunction function = Functions.newIncDoubleFunction();
+        DoubleFunction function = Functions.incDoubleFunction();
         try {
             ref.commute(function);
             fail();
@@ -237,7 +237,7 @@ public class GammaDoubleRef_commute1Test {
         setThreadLocalTransaction(tx);
 
         ref.getLock().acquire(LockMode.Write);
-        DoubleFunction function = Functions.newIncDoubleFunction();
+        DoubleFunction function = Functions.incDoubleFunction();
         ref.commute(function);
 
         GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
@@ -266,7 +266,7 @@ public class GammaDoubleRef_commute1Test {
         setThreadLocalTransaction(tx);
 
         ref.getLock().acquire(LockMode.Exclusive);
-        DoubleFunction function = Functions.newIncDoubleFunction();
+        DoubleFunction function = Functions.incDoubleFunction();
         ref.commute(function);
 
         GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
@@ -304,7 +304,7 @@ public class GammaDoubleRef_commute1Test {
         GammaTransaction otherTx = transactionFactory.newTransaction();
         ref.getLock().acquire(otherTx, LockMode.Write);
 
-        DoubleFunction function = Functions.newIncDoubleFunction();
+        DoubleFunction function = Functions.incDoubleFunction();
         ref.commute(function);
 
         GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
@@ -339,7 +339,7 @@ public class GammaDoubleRef_commute1Test {
         GammaTransaction otherTx = transactionFactory.newTransaction();
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
-        DoubleFunction function = Functions.newIncDoubleFunction();
+        DoubleFunction function = Functions.incDoubleFunction();
         ref.commute(function);
 
         GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);

@@ -18,8 +18,8 @@ import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.api.functions.Functions.newIdentityBooleanFunction;
-import static org.multiverse.api.functions.Functions.newInverseBooleanFunction;
+import static org.multiverse.api.functions.Functions.identityBooleanFunction;
+import static org.multiverse.api.functions.Functions.inverseBooleanFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class GammaBooleanRef_atomicGetAndAlterTest {
@@ -40,7 +40,7 @@ public class GammaBooleanRef_atomicGetAndAlterTest {
         GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BooleanFunction function = newInverseBooleanFunction();
+        BooleanFunction function = inverseBooleanFunction();
         boolean result = ref.atomicGetAndAlter(function);
 
         assertEquals(initialValue, result);
@@ -78,7 +78,7 @@ public class GammaBooleanRef_atomicGetAndAlterTest {
         setThreadLocalTransaction(tx);
         ref.set(!initialValue);
 
-        BooleanFunction function = newInverseBooleanFunction();
+        BooleanFunction function = inverseBooleanFunction();
         boolean result = ref.atomicGetAndAlter(function);
 
         tx.abort();
@@ -123,7 +123,7 @@ public class GammaBooleanRef_atomicGetAndAlterTest {
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         try {
-            ref.atomicGetAndAlter(newIdentityBooleanFunction());
+            ref.atomicGetAndAlter(identityBooleanFunction());
             fail();
         } catch (LockedException expected) {
         }
@@ -169,7 +169,7 @@ public class GammaBooleanRef_atomicGetAndAlterTest {
 
         sleepMs(500);
 
-        boolean result = ref.atomicGetAndAlter(newInverseBooleanFunction());
+        boolean result = ref.atomicGetAndAlter(inverseBooleanFunction());
 
         assertEquals(result, initialValue);
         joinAll(thread);

@@ -3,9 +3,9 @@ package org.multiverse.api;
 import org.multiverse.MultiverseConstants;
 
 /**
- * Using the LockMode one can control the pessimistic nature of a transaction.
- * <p/>
- * Normally STM transactions are very optimistic (e.g. fail during execution or at the end because some read or
+ * Using the LockMode one can control the pessimistic nature of a {@link Transaction}.
+ *
+ * <p>Normally transactions are very optimistic (e.g. fail during execution or at the end because some read or
  * write conflict was detected), but in some cases a more pessimistic approach is better.  For more information
  * see {@link Lock}.
  *
@@ -41,8 +41,8 @@ public enum LockMode implements MultiverseConstants {
      * The ExclusiveLock can be compared with the writelock of a traditional read/write lock. once the Exclusive lock is acquired
      * no other transaction can acquire any lock or can do any reading/writing (unless the transaction previously has read the
      * transactional object).
-     * <p/>
-     * The ExclusiveLock is the Lock acquired by the STM once a Transaction writes changes to a TransactionalObject.
+     *
+     * <p>The ExclusiveLock is the Lock acquired by the STM once a Transaction is prepared for writing changes to a TransactionalObject.
      */
     Exclusive(LOCKMODE_EXCLUSIVE);
 

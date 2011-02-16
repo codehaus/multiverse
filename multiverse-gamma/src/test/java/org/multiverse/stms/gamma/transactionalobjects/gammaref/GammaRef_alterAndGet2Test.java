@@ -218,7 +218,7 @@ public class GammaRef_alterAndGet2Test {
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        LongFunction function = Functions.newIncLongFunction(1);
+        LongFunction function = Functions.incLongFunction(1);
         ref.alterAndGet(tx, function);
 
         try {

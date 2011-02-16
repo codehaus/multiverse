@@ -45,7 +45,7 @@ public abstract class FatGammaTransaction_commuteTest<T extends GammaTransaction
 
         GammaTransaction tx = stm.newDefaultTransaction();
         tx.setAbortOnly();
-        ref.commute(tx, Functions.newIncLongFunction());
+        ref.commute(tx, Functions.incLongFunction());
 
         GammaRefTranlocal tranlocal = tx.locate(ref);
         assertNotNull(tranlocal);
@@ -62,9 +62,9 @@ public abstract class FatGammaTransaction_commuteTest<T extends GammaTransaction
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.newDefaultTransaction();
-        ref.commute(tx, Functions.newIncLongFunction());
-        ref.commute(tx, Functions.newIncLongFunction());
-        ref.commute(tx, Functions.newIncLongFunction());
+        ref.commute(tx, Functions.incLongFunction());
+        ref.commute(tx, Functions.incLongFunction());
+        ref.commute(tx, Functions.incLongFunction());
         tx.commit();
 
         assertRefHasNoLocks(ref);
@@ -86,7 +86,7 @@ public abstract class FatGammaTransaction_commuteTest<T extends GammaTransaction
 
         GammaTransaction tx = newTransaction();
         GammaRefTranlocal tranlocal = ref.openForRead(tx, lockMode.asInt());
-        LongFunction incFunction = Functions.newIncLongFunction();
+        LongFunction incFunction = Functions.incLongFunction();
         ref.commute(tx, incFunction);
 
         assertEquals(initialValue + 1, tranlocal.long_value);
@@ -136,7 +136,7 @@ public abstract class FatGammaTransaction_commuteTest<T extends GammaTransaction
 
         GammaTransaction tx = newTransaction();
         GammaRefTranlocal tranlocal = ref.openForWrite(tx, lockMode.asInt());
-        LongFunction incFunction = Functions.newIncLongFunction();
+        LongFunction incFunction = Functions.incLongFunction();
         ref.commute(tx, incFunction);
 
         assertEquals(initialValue + 1, tranlocal.long_value);
@@ -255,7 +255,7 @@ public abstract class FatGammaTransaction_commuteTest<T extends GammaTransaction
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(tx, initialValue);
         GammaRefTranlocal tranlocal = tx.locate(ref);
-        LongFunction incFunction = Functions.newIncLongFunction();
+        LongFunction incFunction = Functions.incLongFunction();
         ref.commute(tx, incFunction);
 
         assertEquals(initialValue + 1, tranlocal.long_value);
@@ -302,7 +302,7 @@ public abstract class FatGammaTransaction_commuteTest<T extends GammaTransaction
 
         GammaLongRef ref = new GammaLongRef(stm, 0);
         try {
-            ref.commute(tx, Functions.newIncLongFunction());
+            ref.commute(tx, Functions.incLongFunction());
             fail();
         } catch (SpeculativeConfigurationError expected) {
         }

@@ -180,7 +180,7 @@ public class GammaDoubleRef_getAndAlter2Test {
         sleepMs(500);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        double result = ref.getAndAlter(tx, Functions.newIncDoubleFunction());
+        double result = ref.getAndAlter(tx, Functions.incDoubleFunction());
         tx.commit();
 
         joinAll(thread);

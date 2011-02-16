@@ -10,15 +10,25 @@ import org.multiverse.api.closures.*;
  * mechanism. In the Multiverse 0.6 design and before, a single TransactionTemplate implementation was used that should
  * be used by all Stm's, but that design is limiting.
  *
- * Another useful features of this design is that for certain primitives it doesn't require any form of boxing.
+ * <p>Another useful features of this design is that for certain primitives it doesn't require any form of boxing.
  * It also provides an execute for a AtomicVoidClosure which doesn't force a developer to return something when
  * nothing needs to be returned.
  *
- * <h2>Reuse</h2>
- * AtomicBlocks are designed to be reused. E.g. some parts of the system like speculative configuration to work
- * properly and learn based on executed transactions, it is essential that the same AtomicBlock is reused.
+ * <h2>Threadsafe</h2>
  *
- * Another reason to reuse the AtomicBlock is that they can be expensive to create (a lot of object waste).
+ * <p>AtomicBlocks are threadsafe because once they are constructed, they are considered to be almost completely immutable.
+ *
+ * <h2>Reuse</h2>
+ *
+ * <p>AtomicBlocks can be expensive to create and should be reused. Creating an AtomicBlock can lead to a lot of objects being
+ * created and not reusing them leads to a lot of object waste (so put a lot of pressure on the garbage collector).
+ *
+ * <p>It is best to create the AtomicBlocks in the beginning and store them in a (static) field and reuse them. It is very
+ * unlikely that an AtomicBlock is going to be a contention point itself since in almost all cases only volatile reads are
+ * required.
+ *
+ * <p>This is even more important when speculative transactions are used because speculative transactions learn on the
+ * AtomicBlock level. So if the AtomicBlock is not reused, the speculative mechanism will not have full effect.
  *
  * @author Peter Veentjer.
  */

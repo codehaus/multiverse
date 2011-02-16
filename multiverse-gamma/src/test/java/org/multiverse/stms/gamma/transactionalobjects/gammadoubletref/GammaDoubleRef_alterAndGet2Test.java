@@ -28,7 +28,7 @@ import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.api.functions.Functions.newIncDoubleFunction;
+import static org.multiverse.api.functions.Functions.incDoubleFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 
@@ -218,7 +218,7 @@ public class GammaDoubleRef_alterAndGet2Test {
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        DoubleFunction function = Functions.newIncDoubleFunction();
+        DoubleFunction function = Functions.incDoubleFunction();
         ref.alterAndGet(tx, function);
 
         try {
@@ -246,7 +246,7 @@ public class GammaDoubleRef_alterAndGet2Test {
         sleepMs(500);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        ref.alterAndGet(tx, newIncDoubleFunction());
+        ref.alterAndGet(tx, incDoubleFunction());
         tx.commit();
 
         joinAll(thread);

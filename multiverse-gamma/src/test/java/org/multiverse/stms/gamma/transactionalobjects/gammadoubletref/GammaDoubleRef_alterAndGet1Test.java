@@ -26,8 +26,8 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.api.functions.Functions.newIdentityDoubleFunction;
-import static org.multiverse.api.functions.Functions.newIncDoubleFunction;
+import static org.multiverse.api.functions.Functions.identityDoubleFunction;
+import static org.multiverse.api.functions.Functions.incDoubleFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 @RunWith(Parameterized.class)
@@ -102,7 +102,7 @@ public class GammaDoubleRef_alterAndGet1Test {
         GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
 
-        DoubleFunction function = newIncDoubleFunction();
+        DoubleFunction function = incDoubleFunction();
         ref.alterAndGet(function);
         assertEqualsDouble(initialValue + 1, ref.get());
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -120,7 +120,7 @@ public class GammaDoubleRef_alterAndGet1Test {
         GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
 
-        DoubleFunction function = newIdentityDoubleFunction();
+        DoubleFunction function = identityDoubleFunction();
         ref.alterAndGet(function);
         assertEqualsDouble(initialValue, ref.get());
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -157,7 +157,7 @@ public class GammaDoubleRef_alterAndGet1Test {
         double initialValue = 10;
         GammaDoubleRef ref = new GammaDoubleRef(stm, initialValue);
         long initialVersion = ref.getVersion();
-        DoubleFunction function = Functions.newIncDoubleFunction();
+        DoubleFunction function = Functions.incDoubleFunction();
 
         try {
             ref.alterAndGet(function);
@@ -181,7 +181,7 @@ public class GammaDoubleRef_alterAndGet1Test {
         double initialValue = 10;
         GammaDoubleRef ref = new GammaDoubleRef(stm, initialValue);
         long initialVersion = ref.getVersion();
-        DoubleFunction function = Functions.newIncDoubleFunction();
+        DoubleFunction function = Functions.incDoubleFunction();
 
         try {
             ref.alterAndGet(function);
@@ -206,7 +206,7 @@ public class GammaDoubleRef_alterAndGet1Test {
         double initialValue = 10;
         GammaDoubleRef ref = new GammaDoubleRef(stm, initialValue);
         long initialVersion = ref.getVersion();
-        DoubleFunction function = newIncDoubleFunction();
+        DoubleFunction function = incDoubleFunction();
 
         try {
             ref.alterAndGet(function);
@@ -234,7 +234,7 @@ public class GammaDoubleRef_alterAndGet1Test {
 
         GammaTransaction tx = stm.newDefaultTransaction();
         setThreadLocalTransaction(tx);
-        ref.alterAndGet(newIncDoubleFunction());
+        ref.alterAndGet(incDoubleFunction());
         tx.commit();
 
         joinAll(thread);

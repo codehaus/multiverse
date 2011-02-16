@@ -10,12 +10,13 @@ import static java.lang.reflect.Modifier.isStatic;
 /**
  * A singleton that can be used for easy access to the {@link Stm} that is used globally. Once it has
  * been set, it should not be changed while running the system.
- * <p/>
- * Using the GlobalStmInstance imposes some limitations (like 1 global Stm instance that is used by everything) but makes the
+ *
+ * <p>Using the GlobalStmInstance imposes some limitations (like 1 global Stm instance that is used by everything) but makes the
  * system a lot easier to use. But if the GlobalStmInstance should not be used, but a 'private' Stm, you need to carry around
  * the Stm reference yourself and just ignore this GlobalStmInstance.
- * <p/>
- * The default implementation is the GammaStm for now. It can be configured through setting the System property:
+ *
+ * <h3>Initialization</h3>
+ * <p>The default implementation is the GammaStm for now. It can be configured through setting the System property:
  * org.multiverse api GlobalStmInstance.factoryMethod. This method should be a no arg static method that returns a
  * {@link Stm} instance.
  *
@@ -116,7 +117,7 @@ public final class GlobalStmInstance {
     /**
      * Gets the global {@link Stm} instance. The returned value will never be null.
      *
-     * @return the global STM instance.
+     * @return the global Stm instance.
      */
     public static Stm getGlobalStmInstance() {
         return instance;

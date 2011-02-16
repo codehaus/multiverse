@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.LockedException;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.GammaStmConfiguration;
@@ -18,8 +19,7 @@ import static org.multiverse.TestUtils.joinAll;
 import static org.multiverse.TestUtils.sleepMs;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.api.functions.Functions.newIdentityLongFunction;
-import static org.multiverse.api.functions.Functions.newIncLongFunction;
+import static org.multiverse.api.functions.Functions.identityLongFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class GammaLongRef_atomicGetAndAlterTest {
@@ -40,7 +40,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        LongFunction function = newIncLongFunction();
+        LongFunction function = Functions.incLongFunction();
         long result = ref.atomicGetAndAlter(function);
 
         assertEquals(2, result);
@@ -78,7 +78,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
         setThreadLocalTransaction(tx);
         ref.set(10);
 
-        LongFunction function = newIncLongFunction();
+        LongFunction function = Functions.incLongFunction();
         long result = ref.atomicGetAndAlter(function);
 
         tx.abort();
@@ -123,7 +123,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         try {
-            ref.atomicGetAndAlter(newIdentityLongFunction());
+            ref.atomicGetAndAlter(identityLongFunction());
             fail();
         } catch (LockedException expected) {
         }
@@ -169,7 +169,7 @@ public class GammaLongRef_atomicGetAndAlterTest {
 
         sleepMs(500);
 
-        long result = ref.atomicGetAndAlter(newIncLongFunction());
+        long result = ref.atomicGetAndAlter(Functions.incLongFunction());
 
         assertEquals(result, initialValue);
         joinAll(thread);

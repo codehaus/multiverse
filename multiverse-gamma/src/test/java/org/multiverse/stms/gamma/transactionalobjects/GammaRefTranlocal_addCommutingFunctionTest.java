@@ -27,12 +27,12 @@ public class GammaRefTranlocal_addCommutingFunctionTest implements GammaConstant
     public void whenFirstAddition() {
         GammaRefTranlocal tranlocal = new GammaRefTranlocal();
         tranlocal.mode = TRANLOCAL_COMMUTING;
-        tranlocal.addCommutingFunction(pool, Functions.newIncLongFunction(1));
+        tranlocal.addCommutingFunction(pool, Functions.incLongFunction(1));
 
         assertFalse(tranlocal.isRead());
         assertTrue(tranlocal.isCommuting());
         assertEquals(0, tranlocal.long_value);
-        assertHasCommutingFunctions(tranlocal, Functions.newIncLongFunction(1));
+        assertHasCommutingFunctions(tranlocal, Functions.incLongFunction(1));
     }
 
     @Test

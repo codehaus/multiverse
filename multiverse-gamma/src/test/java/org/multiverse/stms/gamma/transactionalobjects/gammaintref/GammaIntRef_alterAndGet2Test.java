@@ -27,7 +27,6 @@ import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.api.functions.Functions.newIncIntFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 
@@ -217,7 +216,7 @@ public class GammaIntRef_alterAndGet2Test {
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        IntFunction function = Functions.newIncIntFunction(1);
+        IntFunction function = Functions.incIntFunction(1);
         ref.alterAndGet(tx, function);
 
         try {
@@ -245,7 +244,7 @@ public class GammaIntRef_alterAndGet2Test {
         sleepMs(500);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        ref.alterAndGet(tx, newIncIntFunction());
+        ref.alterAndGet(tx, Functions.incIntFunction());
         tx.commit();
 
         joinAll(thread);

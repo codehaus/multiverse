@@ -85,7 +85,7 @@ public abstract class Commute_AbstractTest {
                 public long execute(Transaction tx) throws Exception {
                     GammaTransaction btx = (GammaTransaction) tx;
                     for (int k = 0; k < refs.length; k++) {
-                        refs[k].commute(btx, Functions.newIncLongFunction(1));
+                        refs[k].commute(btx, Functions.incLongFunction(1));
                     }
                     return refs.length;
                 }

@@ -93,7 +93,7 @@ public abstract class FatGammaTransaction_openForWriteTest<T extends GammaTransa
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        ref.commute(tx, Functions.newIncLongFunction());
+        ref.commute(tx, Functions.incLongFunction());
         GammaRefTranlocal tranlocal = ref.openForWrite(tx, LOCKMODE_NONE);
 
         assertNotNull(tranlocal);
@@ -114,7 +114,7 @@ public abstract class FatGammaTransaction_openForWriteTest<T extends GammaTransa
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        ref.commute(tx, Functions.newIncLongFunction());
+        ref.commute(tx, Functions.incLongFunction());
         GammaRefTranlocal tranlocal = tx.locate(ref);
 
         T otherTx = newTransaction();

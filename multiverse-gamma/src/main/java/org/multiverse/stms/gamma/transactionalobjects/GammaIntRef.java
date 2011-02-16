@@ -392,7 +392,7 @@ public final class GammaIntRef extends AbstractGammaRef implements IntRef {
     }
 
     public final void increment(final GammaTransaction tx, final int amount) {
-        commute(tx, Functions.newIncIntFunction(amount));
+        commute(tx, Functions.incIntFunction(amount));
     }
 
     @Override

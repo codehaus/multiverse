@@ -16,8 +16,8 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.api.functions.Functions.newIdentityDoubleFunction;
-import static org.multiverse.api.functions.Functions.newIncDoubleFunction;
+import static org.multiverse.api.functions.Functions.identityDoubleFunction;
+import static org.multiverse.api.functions.Functions.incDoubleFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class GammaDoubleRef_atomicAlterAndGetTest {
@@ -78,7 +78,7 @@ public class GammaDoubleRef_atomicAlterAndGetTest {
         GammaDoubleRef ref = new GammaDoubleRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        DoubleFunction function = Functions.newIncDoubleFunction();
+        DoubleFunction function = Functions.incDoubleFunction();
 
         double result = ref.atomicAlterAndGet(function);
 
@@ -94,7 +94,7 @@ public class GammaDoubleRef_atomicAlterAndGetTest {
         GammaDoubleRef ref = new GammaDoubleRef(stm, initialValue);
         long version = ref.getVersion();
 
-        DoubleFunction function = newIdentityDoubleFunction();
+        DoubleFunction function = identityDoubleFunction();
 
         double result = ref.atomicAlterAndGet(function);
 
@@ -114,7 +114,7 @@ public class GammaDoubleRef_atomicAlterAndGetTest {
         setThreadLocalTransaction(tx);
         ref.set(tx, 100);
 
-        DoubleFunction function = newIncDoubleFunction();
+        DoubleFunction function = incDoubleFunction();
 
         double result = ref.atomicAlterAndGet(function);
 
@@ -183,7 +183,7 @@ public class GammaDoubleRef_atomicAlterAndGetTest {
 
         sleepMs(500);
 
-        ref.atomicAlterAndGet(newIncDoubleFunction());
+        ref.atomicAlterAndGet(incDoubleFunction());
 
         joinAll(thread);
         assertRefHasNoLocks(ref);

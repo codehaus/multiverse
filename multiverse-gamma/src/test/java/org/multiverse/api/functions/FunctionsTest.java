@@ -3,14 +3,14 @@ package org.multiverse.api.functions;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.multiverse.api.functions.Functions.newIdentityIntFunction;
-import static org.multiverse.api.functions.Functions.newIdentityLongFunction;
+import static org.multiverse.api.functions.Functions.identityIntFunction;
+import static org.multiverse.api.functions.Functions.identityLongFunction;
 
 public class FunctionsTest {
 
     @Test
     public void testIntIdentityFunction() {
-        IntFunction function = newIdentityIntFunction();
+        IntFunction function = identityIntFunction();
 
         assertEquals(0, function.call(0));
         assertEquals(10, function.call(10));
@@ -19,7 +19,7 @@ public class FunctionsTest {
 
     @Test
     public void testLongIdentityFunction() {
-        LongFunction function = newIdentityLongFunction();
+        LongFunction function = identityLongFunction();
 
         assertEquals(0, function.call(0));
         assertEquals(10, function.call(10));

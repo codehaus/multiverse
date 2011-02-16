@@ -47,7 +47,7 @@ public class NoBlockingTest {
             execute(new AtomicVoidClosure() {
                 @Override
                 public void execute(Transaction tx) throws Exception {
-                    ref.commute(Functions.newIncLongFunction());
+                    ref.commute(Functions.incLongFunction());
                     retry();
                 }
             });

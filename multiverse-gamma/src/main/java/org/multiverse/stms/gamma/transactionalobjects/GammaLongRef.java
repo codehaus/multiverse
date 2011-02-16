@@ -374,41 +374,41 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
 
     @Override
     public final void increment(final Transaction tx) {
-        commute(asGammaTransaction(tx), Functions.newIncLongFunction());
+        commute(asGammaTransaction(tx), Functions.incLongFunction());
     }
 
     public final void increment(final GammaTransaction tx) {
-        commute(tx, Functions.newIncLongFunction());
+        commute(tx, Functions.incLongFunction());
     }
 
     @Override
     public final void increment(final long amount) {
-        commute(getRequiredThreadLocalGammaTransaction(), Functions.newIncLongFunction(amount));
+        commute(getRequiredThreadLocalGammaTransaction(), Functions.incLongFunction(amount));
     }
 
     @Override
     public final void increment(final Transaction tx, final long amount) {
-        commute(asGammaTransaction(tx), Functions.newIncLongFunction(amount));
+        commute(asGammaTransaction(tx), Functions.incLongFunction(amount));
     }
 
     @Override
     public final void decrement() {
-        commute(getRequiredThreadLocalGammaTransaction(), Functions.newDecLongFunction());
+        commute(getRequiredThreadLocalGammaTransaction(), Functions.decLongFunction());
     }
 
     @Override
     public final void decrement(final Transaction tx) {
-        commute(asGammaTransaction(tx), Functions.newDecLongFunction());
+        commute(asGammaTransaction(tx), Functions.decLongFunction());
     }
 
     @Override
     public final void decrement(final long amount) {
-        commute(getRequiredThreadLocalGammaTransaction(), Functions.newIncLongFunction(-amount));
+        commute(getRequiredThreadLocalGammaTransaction(), Functions.incLongFunction(-amount));
     }
 
     @Override
     public final void decrement(final Transaction tx, final long amount) {
-        commute(asGammaTransaction(tx), Functions.newIncLongFunction(-amount));
+        commute(asGammaTransaction(tx), Functions.incLongFunction(-amount));
     }
 
     @Override

@@ -16,8 +16,8 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.api.functions.Functions.newIdentityLongFunction;
-import static org.multiverse.api.functions.Functions.newIncLongFunction;
+import static org.multiverse.api.functions.Functions.identityLongFunction;
+import static org.multiverse.api.functions.Functions.incLongFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class GammaLongRef_atomicAlterAndGetTest {
@@ -78,7 +78,7 @@ public class GammaLongRef_atomicAlterAndGetTest {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        LongFunction function = Functions.newIncLongFunction(1);
+        LongFunction function = Functions.incLongFunction(1);
 
         long result = ref.atomicAlterAndGet(function);
 
@@ -94,7 +94,7 @@ public class GammaLongRef_atomicAlterAndGetTest {
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long version = ref.getVersion();
 
-        LongFunction function = newIdentityLongFunction();
+        LongFunction function = identityLongFunction();
 
         long result = ref.atomicAlterAndGet(function);
 
@@ -114,7 +114,7 @@ public class GammaLongRef_atomicAlterAndGetTest {
         setThreadLocalTransaction(tx);
         ref.set(tx, 100);
 
-        LongFunction function = newIncLongFunction(1);
+        LongFunction function = incLongFunction(1);
 
         long result = ref.atomicAlterAndGet(function);
 
@@ -183,7 +183,7 @@ public class GammaLongRef_atomicAlterAndGetTest {
 
         sleepMs(500);
 
-        ref.atomicAlterAndGet(newIncLongFunction());
+        ref.atomicAlterAndGet(Functions.incLongFunction());
 
         joinAll(thread);
         assertRefHasNoLocks(ref);

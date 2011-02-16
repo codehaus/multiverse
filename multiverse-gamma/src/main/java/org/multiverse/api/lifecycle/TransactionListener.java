@@ -3,7 +3,7 @@ package org.multiverse.api.lifecycle;
 import org.multiverse.api.Transaction;
 
 /**
- * A listener tailored for listening to events in the transaction lifecycle.
+ * A listener tailored for listening to events in the {@link Transaction} life-cycle.
  *
  * @author Peter Veentjer
  * @see TransactionEvent
@@ -13,9 +13,9 @@ import org.multiverse.api.Transaction;
 public interface TransactionListener {
 
     /**
-     * Notifies that a certain event happened inside a transaction.
+     * Notifies that a certain {@link TransactionEvent} happened inside a {@link Transaction}.
      *
-     * @param transaction the transaction where the event happened
+     * @param transaction the {@link Transaction} where the event happened
      * @param e the event
      */
     void notify(Transaction transaction, TransactionEvent e);

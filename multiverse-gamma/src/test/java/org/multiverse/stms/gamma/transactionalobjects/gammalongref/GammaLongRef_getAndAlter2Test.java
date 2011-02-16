@@ -8,6 +8,7 @@ import org.multiverse.SomeUncheckedException;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
@@ -25,7 +26,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.api.functions.Functions.newIncLongFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasNoLocks;
 import static org.multiverse.stms.gamma.GammaTestUtils.assertVersionAndValue;
 
@@ -180,7 +180,7 @@ public class GammaLongRef_getAndAlter2Test {
         sleepMs(500);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        long result = ref.getAndAlter(tx, newIncLongFunction());
+        long result = ref.getAndAlter(tx, Functions.incLongFunction());
         tx.commit();
 
         joinAll(thread);

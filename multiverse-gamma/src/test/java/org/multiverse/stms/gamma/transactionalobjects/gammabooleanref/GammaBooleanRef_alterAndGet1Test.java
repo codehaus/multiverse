@@ -22,12 +22,11 @@ import java.util.Collection;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.api.functions.Functions.newIdentityBooleanFunction;
-import static org.multiverse.api.functions.Functions.newInverseBooleanFunction;
+import static org.multiverse.api.functions.Functions.identityBooleanFunction;
+import static org.multiverse.api.functions.Functions.inverseBooleanFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 @RunWith(Parameterized.class)
@@ -102,7 +101,7 @@ public class GammaBooleanRef_alterAndGet1Test {
         GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
 
-        BooleanFunction function = Functions.newInverseBooleanFunction();
+        BooleanFunction function = Functions.inverseBooleanFunction();
         ref.alterAndGet(function);
         assertEquals(!initialValue, ref.get());
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -120,7 +119,7 @@ public class GammaBooleanRef_alterAndGet1Test {
         GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
 
-        BooleanFunction function = newIdentityBooleanFunction();
+        BooleanFunction function = identityBooleanFunction();
         ref.alterAndGet(function);
         assertEquals(initialValue, ref.get());
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -157,7 +156,7 @@ public class GammaBooleanRef_alterAndGet1Test {
         boolean initialValue = true;
         GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
         long initialVersion = ref.getVersion();
-        BooleanFunction function = Functions.newInverseBooleanFunction();
+        BooleanFunction function = Functions.inverseBooleanFunction();
 
         try {
             ref.alterAndGet(function);
@@ -181,7 +180,7 @@ public class GammaBooleanRef_alterAndGet1Test {
         boolean initialValue = true;
         GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
         long initialVersion = ref.getVersion();
-        BooleanFunction function = Functions.newInverseBooleanFunction();
+        BooleanFunction function = Functions.inverseBooleanFunction();
 
         try {
             ref.alterAndGet(function);
@@ -206,7 +205,7 @@ public class GammaBooleanRef_alterAndGet1Test {
         boolean initialValue = true;
         GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
         long initialVersion = ref.getVersion();
-        BooleanFunction function = newInverseBooleanFunction();
+        BooleanFunction function = inverseBooleanFunction();
 
         try {
             ref.alterAndGet(function);
@@ -234,7 +233,7 @@ public class GammaBooleanRef_alterAndGet1Test {
 
         GammaTransaction tx = stm.newDefaultTransaction();
         setThreadLocalTransaction(tx);
-        ref.alterAndGet(newInverseBooleanFunction());
+        ref.alterAndGet(inverseBooleanFunction());
         tx.commit();
 
         joinAll(thread);

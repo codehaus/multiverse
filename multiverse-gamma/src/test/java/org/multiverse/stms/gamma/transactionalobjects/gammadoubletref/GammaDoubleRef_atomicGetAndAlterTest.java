@@ -16,8 +16,8 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
-import static org.multiverse.api.functions.Functions.newIdentityDoubleFunction;
-import static org.multiverse.api.functions.Functions.newIncDoubleFunction;
+import static org.multiverse.api.functions.Functions.identityDoubleFunction;
+import static org.multiverse.api.functions.Functions.incDoubleFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class GammaDoubleRef_atomicGetAndAlterTest {
@@ -38,7 +38,7 @@ public class GammaDoubleRef_atomicGetAndAlterTest {
         GammaDoubleRef ref = new GammaDoubleRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        DoubleFunction function = newIncDoubleFunction();
+        DoubleFunction function = incDoubleFunction();
         double result = ref.atomicGetAndAlter(function);
 
         assertEqualsDouble(2, result);
@@ -76,7 +76,7 @@ public class GammaDoubleRef_atomicGetAndAlterTest {
         setThreadLocalTransaction(tx);
         ref.set(10);
 
-        DoubleFunction function = newIncDoubleFunction();
+        DoubleFunction function = incDoubleFunction();
         double result = ref.atomicGetAndAlter(function);
 
         tx.abort();
@@ -121,7 +121,7 @@ public class GammaDoubleRef_atomicGetAndAlterTest {
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         try {
-            ref.atomicGetAndAlter(newIdentityDoubleFunction());
+            ref.atomicGetAndAlter(identityDoubleFunction());
             fail();
         } catch (LockedException expected) {
         }
@@ -167,7 +167,7 @@ public class GammaDoubleRef_atomicGetAndAlterTest {
 
         sleepMs(500);
 
-        double result = ref.atomicGetAndAlter(newIncDoubleFunction());
+        double result = ref.atomicGetAndAlter(incDoubleFunction());
 
         assertEqualsDouble(result, initialValue);
         joinAll(thread);

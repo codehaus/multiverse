@@ -293,7 +293,7 @@ public abstract class FatGammaTransaction_commitTest<T extends GammaTransaction>
         long initialVersion = ref.getVersion();
 
         T tx = newTransaction();
-        ref.commute(tx, Functions.newIncLongFunction());
+        ref.commute(tx, Functions.incLongFunction());
         tx.commit();
 
         assertIsCommitted(tx);

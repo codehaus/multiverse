@@ -8,6 +8,7 @@ import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.AbortOnlyException;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
+import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.api.lifecycle.TransactionListener;
@@ -22,7 +23,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.functions.Functions.newIncLongFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public abstract class FatGammaTransaction_prepareTest<T extends GammaTransaction> implements GammaConstants {
@@ -150,7 +150,7 @@ public abstract class FatGammaTransaction_prepareTest<T extends GammaTransaction
         long initialVersion = ref.getVersion();
 
         long globalConflictCount = stm.globalConflictCounter.count();
-        LongFunction function = newIncLongFunction();
+        LongFunction function = Functions.incLongFunction();
         GammaTransaction tx = newTransaction();
         ref.commute(tx, function);
         GammaRefTranlocal tranlocal = tx.locate(ref);
@@ -174,9 +174,9 @@ public abstract class FatGammaTransaction_prepareTest<T extends GammaTransaction
         long initialVersion = ref.getVersion();
 
         long globalConflictCount = stm.globalConflictCounter.count();
-        LongFunction function1 = newIncLongFunction();
-        LongFunction function2 = newIncLongFunction();
-        LongFunction function3 = newIncLongFunction();
+        LongFunction function1 = Functions.incLongFunction();
+        LongFunction function2 = Functions.incLongFunction();
+        LongFunction function3 = Functions.incLongFunction();
         GammaTransaction tx = newTransaction();
         ref.commute(tx, function1);
         ref.commute(tx, function2);

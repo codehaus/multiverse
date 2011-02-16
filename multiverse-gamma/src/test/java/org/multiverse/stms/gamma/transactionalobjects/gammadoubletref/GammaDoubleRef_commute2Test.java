@@ -32,7 +32,7 @@ import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
-import static org.multiverse.api.functions.Functions.newIncDoubleFunction;
+import static org.multiverse.api.functions.Functions.incDoubleFunction;
 import static org.multiverse.stms.gamma.GammaStmUtils.longAsDouble;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
@@ -92,7 +92,7 @@ public class GammaDoubleRef_commute2Test {
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        ref.commute(tx, newIncDoubleFunction());
+        ref.commute(tx, incDoubleFunction());
 
         try {
             tx.commit();
@@ -116,7 +116,7 @@ public class GammaDoubleRef_commute2Test {
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        ref.commute(tx, newIncDoubleFunction());
+        ref.commute(tx, incDoubleFunction());
 
         try {
             tx.commit();
@@ -140,7 +140,7 @@ public class GammaDoubleRef_commute2Test {
         ref.getLock().acquire(otherTx, LockMode.Read);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        ref.commute(tx, newIncDoubleFunction());
+        ref.commute(tx, incDoubleFunction());
 
         try {
             tx.commit();
@@ -160,7 +160,7 @@ public class GammaDoubleRef_commute2Test {
         GammaDoubleRef ref = new GammaDoubleRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        DoubleFunction function = newIncDoubleFunction();
+        DoubleFunction function = incDoubleFunction();
         GammaTransaction tx = transactionFactory.newTransaction();
         ref.commute(tx, function);
 
@@ -178,7 +178,7 @@ public class GammaDoubleRef_commute2Test {
         GammaDoubleRef ref = new GammaDoubleRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        DoubleFunction function = Functions.newIdentityDoubleFunction();
+        DoubleFunction function = Functions.identityDoubleFunction();
         GammaTransaction tx = transactionFactory.newTransaction();
         ref.commute(tx, function);
 
@@ -196,7 +196,7 @@ public class GammaDoubleRef_commute2Test {
         GammaDoubleRef ref = new GammaDoubleRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        DoubleFunction function = Functions.newIncDoubleFunction();
+        DoubleFunction function = Functions.incDoubleFunction();
         Transaction tx = transactionFactory.newTransaction();
         ref.commute(tx, function);
         tx.commit();
@@ -210,7 +210,7 @@ public class GammaDoubleRef_commute2Test {
         GammaDoubleRef ref = new GammaDoubleRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        DoubleFunction function = Functions.newIncDoubleFunction();
+        DoubleFunction function = Functions.incDoubleFunction();
         GammaTransaction tx = transactionFactory.newTransaction();
         ref.get(tx);
         ref.commute(tx, function);
@@ -225,7 +225,7 @@ public class GammaDoubleRef_commute2Test {
 
     @Test
     public void whenAlreadyOpenedForConstruction() {
-        DoubleFunction function = Functions.newIncDoubleFunction();
+        DoubleFunction function = Functions.incDoubleFunction();
         GammaTransaction tx = transactionFactory.newTransaction();
         GammaDoubleRef ref = new GammaDoubleRef(tx);
         ref.openForConstruction(tx);
@@ -243,7 +243,7 @@ public class GammaDoubleRef_commute2Test {
     public void whenAlreadyOpenedForWrite() {
         GammaDoubleRef ref = new GammaDoubleRef(stm, 10);
 
-        DoubleFunction function = newIncDoubleFunction();
+        DoubleFunction function = incDoubleFunction();
         GammaTransaction tx = transactionFactory.newTransaction();
         ref.set(tx, 11);
         ref.commute(tx, function);
@@ -262,8 +262,8 @@ public class GammaDoubleRef_commute2Test {
         GammaDoubleRef ref = new GammaDoubleRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        DoubleFunction function1 = newIncDoubleFunction();
-        DoubleFunction function2 = newIncDoubleFunction();
+        DoubleFunction function1 = incDoubleFunction();
+        DoubleFunction function2 = incDoubleFunction();
         GammaTransaction tx = transactionFactory.newTransaction();
         ref.commute(tx, function1);
         ref.commute(tx, function2);
@@ -385,7 +385,7 @@ public class GammaDoubleRef_commute2Test {
 
         GammaTransaction tx1 = transactionFactory.newTransaction();
         ref1.incrementAndGet(tx1,1);
-        ref2.commute(tx1, Functions.newIncDoubleFunction());
+        ref2.commute(tx1, Functions.incDoubleFunction());
 
         GammaTransaction tx2 = transactionFactory.newTransaction();
         ref2.incrementAndGet(tx2, 1);
@@ -410,7 +410,7 @@ public class GammaDoubleRef_commute2Test {
         sleepMs(500);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        ref.commute(tx, newIncDoubleFunction());
+        ref.commute(tx, incDoubleFunction());
         tx.commit();
 
         joinAll(thread);

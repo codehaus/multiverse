@@ -26,8 +26,8 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.api.functions.Functions.newIdentityLongFunction;
-import static org.multiverse.api.functions.Functions.newIncLongFunction;
+import static org.multiverse.api.functions.Functions.identityLongFunction;
+import static org.multiverse.api.functions.Functions.incLongFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 @RunWith(Parameterized.class)
@@ -102,7 +102,7 @@ public class GammaLongRef_alterAndGet1Test {
         GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
 
-        LongFunction function = newIncLongFunction();
+        LongFunction function = Functions.incLongFunction();
         ref.alterAndGet(function);
         assertEquals(initialValue + 1, ref.get());
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -120,7 +120,7 @@ public class GammaLongRef_alterAndGet1Test {
         GammaTransaction tx = transactionFactory.newTransaction();
         setThreadLocalTransaction(tx);
 
-        LongFunction function = newIdentityLongFunction();
+        LongFunction function = identityLongFunction();
         ref.alterAndGet(function);
         assertEquals(initialValue, ref.get());
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -157,7 +157,7 @@ public class GammaLongRef_alterAndGet1Test {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
-        LongFunction function = Functions.newIncLongFunction(1);
+        LongFunction function = Functions.incLongFunction(1);
 
         try {
             ref.alterAndGet(function);
@@ -181,7 +181,7 @@ public class GammaLongRef_alterAndGet1Test {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
-        LongFunction function = Functions.newIncLongFunction(1);
+        LongFunction function = Functions.incLongFunction(1);
 
         try {
             ref.alterAndGet(function);
@@ -206,7 +206,7 @@ public class GammaLongRef_alterAndGet1Test {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
-        LongFunction function = newIncLongFunction(1);
+        LongFunction function = incLongFunction(1);
 
         try {
             ref.alterAndGet(function);
@@ -234,7 +234,7 @@ public class GammaLongRef_alterAndGet1Test {
 
         GammaTransaction tx = stm.newDefaultTransaction();
         setThreadLocalTransaction(tx);
-        ref.alterAndGet(newIncLongFunction());
+        ref.alterAndGet(Functions.incLongFunction());
         tx.commit();
 
         joinAll(thread);

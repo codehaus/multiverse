@@ -5,8 +5,8 @@ import org.multiverse.api.lifecycle.TransactionListener;
 /**
  * A Builder for creating a {@link TransactionFactory}. This builder provides full control on transaction
  * settings.
- * <p/>
- * Instances of this class are considered immutable, so when you call one of the modifying methods, make sure
+ *
+ * <p>Instances of this class are considered immutable, so when you call one of the modifying methods, make sure
  * that you use the resulting TransactionFactoryBuilder. Normally with the builder implementation the same
  * instance is returned. In this case this isn't true because a new instance is returned every time.
  *

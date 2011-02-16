@@ -235,9 +235,37 @@ performance.
 
 - Improved message on the abortOnEnsureOnBadStatus
 
+- Javadoc: TransactionalCollection
+
+- Javadoc: TransactionalCollectionFactory
+
+- Javadoc: TransactionalDeque
+
+- Javadoc: TransactionalIterable
+
+- Javadoc: TransactionalList
+
+- Javadoc: TransactionalMap
+
+- Javadoc: TransactionalQueue
+
+- Javadoc: TransactionalSet
+
+- Javadoc: TransactionalStack
+
+- Javadoc: BinaryFunction
+
+- Javadoc: Stm
+
 ----------------------------------------------------------------------
                                 done
 ----------------------------------------------------------------------
+
+- Improved Javadoc on the Transaction life-cycle functionality.
+
+- Improved Documentation for Functions
+
+- Improved Documentation for all exceptions
 
 - Improved Documentation on ControlFlowError
 

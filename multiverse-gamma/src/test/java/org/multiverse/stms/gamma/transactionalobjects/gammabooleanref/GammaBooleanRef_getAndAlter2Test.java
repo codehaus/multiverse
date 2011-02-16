@@ -26,7 +26,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
-import static org.multiverse.api.functions.Functions.newInverseBooleanFunction;
+import static org.multiverse.api.functions.Functions.inverseBooleanFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasNoLocks;
 import static org.multiverse.stms.gamma.GammaTestUtils.assertVersionAndValue;
 
@@ -187,7 +187,7 @@ public class GammaBooleanRef_getAndAlter2Test {
         sleepMs(500);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        boolean result = ref.getAndAlter(tx, newInverseBooleanFunction());
+        boolean result = ref.getAndAlter(tx, inverseBooleanFunction());
         tx.commit();
 
         joinAll(thread);
@@ -202,7 +202,7 @@ public class GammaBooleanRef_getAndAlter2Test {
         boolean initialValue = true;
         GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
         GammaTransaction tx = transactionFactory.newTransaction();
-        boolean result = ref.getAndAlter(tx, Functions.newInverseBooleanFunction());
+        boolean result = ref.getAndAlter(tx, Functions.inverseBooleanFunction());
         tx.commit();
 
         assertEquals(false, ref.atomicGet());

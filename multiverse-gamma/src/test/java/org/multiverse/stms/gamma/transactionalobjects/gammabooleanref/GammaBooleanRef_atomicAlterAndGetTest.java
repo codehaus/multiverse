@@ -15,8 +15,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.api.functions.Functions.newIdentityBooleanFunction;
-import static org.multiverse.api.functions.Functions.newInverseBooleanFunction;
+import static org.multiverse.api.functions.Functions.identityBooleanFunction;
+import static org.multiverse.api.functions.Functions.inverseBooleanFunction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 public class GammaBooleanRef_atomicAlterAndGetTest {
@@ -77,7 +77,7 @@ public class GammaBooleanRef_atomicAlterAndGetTest {
         GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        BooleanFunction function = Functions.newInverseBooleanFunction();
+        BooleanFunction function = Functions.inverseBooleanFunction();
 
         boolean result = ref.atomicAlterAndGet(function);
 
@@ -93,7 +93,7 @@ public class GammaBooleanRef_atomicAlterAndGetTest {
         GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
         long version = ref.getVersion();
 
-        BooleanFunction function = newIdentityBooleanFunction();
+        BooleanFunction function = identityBooleanFunction();
 
         boolean result = ref.atomicAlterAndGet(function);
 
@@ -113,7 +113,7 @@ public class GammaBooleanRef_atomicAlterAndGetTest {
         setThreadLocalTransaction(tx);
         ref.set(tx, !initialValue);
 
-        BooleanFunction function = newInverseBooleanFunction();
+        BooleanFunction function = inverseBooleanFunction();
 
         boolean result = ref.atomicAlterAndGet(function);
 
@@ -182,7 +182,7 @@ public class GammaBooleanRef_atomicAlterAndGetTest {
 
         sleepMs(500);
 
-        ref.atomicAlterAndGet(newInverseBooleanFunction());
+        ref.atomicAlterAndGet(inverseBooleanFunction());
 
         joinAll(thread);
         assertRefHasNoLocks(ref);
