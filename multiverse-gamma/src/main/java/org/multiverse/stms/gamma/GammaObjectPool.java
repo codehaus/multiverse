@@ -26,25 +26,25 @@ import java.util.ArrayList;
 public final class GammaObjectPool {
 
     private final static boolean ENABLED = Boolean.parseBoolean(
-            System.getProperty("org.multiverse.stm,beta.BetaObjectPool.enabled", "true"));
+            System.getProperty("org.multiverse.stm,gamma.GammaObjectPool.enabled", "true"));
 
     private final static boolean TRANLOCAL_POOLING_ENABLED = Boolean.parseBoolean(
-            System.getProperty("org.multiverse.stm.beta.BetaObjectPool.tranlocalPooling", String.valueOf(ENABLED)));
+            System.getProperty("org.multiverse.stm.gamma.GammaObjectPool.tranlocalPooling", String.valueOf(ENABLED)));
 
     private final static boolean TRANLOCALARRAY_POOLING_ENABLED = Boolean.parseBoolean(
-            System.getProperty("org.multiverse.stm.beta.BetaObjectPool.tranlocalArrayPooling", String.valueOf(ENABLED)));
+            System.getProperty("org.multiverse.stm.gamma.GammaObjectPool.tranlocalArrayPooling", String.valueOf(ENABLED)));
 
     private final static boolean LISTENER_POOLING_ENABLED = Boolean.parseBoolean(
-            System.getProperty("org.multiverse.stm.beta.BetaObjectPool.listenersPooling", String.valueOf(ENABLED)));
+            System.getProperty("org.multiverse.stm.gamma.GammaObjectPool.listenersPooling", String.valueOf(ENABLED)));
 
     private final static boolean LISTENERSARRAY_POOLING_ENABLED = Boolean.parseBoolean(
-            System.getProperty("org.multiverse.stm.beta.BetaObjectPool.listenersArrayPooling", String.valueOf(ENABLED)));
+            System.getProperty("org.multiverse.stm.gamma.GammaObjectPool.listenersArrayPooling", String.valueOf(ENABLED)));
 
     private final static boolean ARRAYLIST_POOLING_ENABLED = Boolean.parseBoolean(
-            System.getProperty("org.multiverse.stm.beta.GammaObjectPool.arrayListPooling", String.valueOf(ENABLED)));
+            System.getProperty("org.multiverse.stm.gamma.GammaObjectPool.arrayListPooling", String.valueOf(ENABLED)));
 
     private final static boolean CALLABLENODE_POOLING_ENABLED = Boolean.parseBoolean(
-            System.getProperty("org.multiverse.stm.beta.GammaObjectPool.callableNodePooling", String.valueOf(ENABLED)));
+            System.getProperty("org.multiverse.stm.gamma.GammaObjectPool.callableNodePooling", String.valueOf(ENABLED)));
 
     private final boolean tranlocalPoolingEnabled;
     private final boolean tranlocalArrayPoolingEnabled;

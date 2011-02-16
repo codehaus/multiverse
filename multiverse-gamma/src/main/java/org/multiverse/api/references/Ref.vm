@@ -23,7 +23,7 @@ import org.multiverse.api.predicates.*;
  * <h1>Threadsafe</h1>
  * All methods are threadsafe.
  *
-#if(${transactionalObject.name} eq "BetaRef")
+#if(${transactionalObject.name} eq "GammaRef")
  * @param <E>
 #end
  * @author Peter Veentjer.

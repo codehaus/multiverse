@@ -16,10 +16,10 @@ public final class ThreadLocalGammaTransactionPool {
 
 
     /**
-     * Returns the BetaObjectPool stored in the ThreadLocalBetaTransactionPool. If no instance exists,
+     * Returns the GammaTransactionalPool stored in the ThreadLocalGammaTransactionPool. If no instance exists,
      * a new instance is created.
      *
-     * @return the BetaObjectPool.
+     * @return the GammaTransactionPool.
      */
     public static GammaTransactionPool getThreadLocalGammaTransactionPool() {
         return threadlocal.get();

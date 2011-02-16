@@ -55,7 +55,7 @@ generateGammaOrElseBlock(engine, atomicClosures)
 generateStmUtils(engine, atomicClosures)
 
 for (def atomicBlock in atomicBlocks) {
-    generateBetaAtomicBlock(engine, atomicBlock, atomicClosures)
+    generateGammaAtomicBlock(engine, atomicBlock, atomicClosures)
 }
 
 
@@ -179,7 +179,7 @@ void generateAtomicClosure(VelocityEngine engine, AtomicClosure closure) {
     file.text = writer.toString()
 }
 
-void generateBetaAtomicBlock(VelocityEngine engine, AtomicBlock atomicBlock, List<AtomicClosure> closures) {
+void generateGammaAtomicBlock(VelocityEngine engine, AtomicBlock atomicBlock, List<AtomicClosure> closures) {
     Template t = engine.getTemplate('src/main/java/org/multiverse/stms/gamma/GammaAtomicBlock.vm')
 
     VelocityContext context = new VelocityContext()

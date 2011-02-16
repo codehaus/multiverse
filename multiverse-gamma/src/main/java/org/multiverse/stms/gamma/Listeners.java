@@ -47,7 +47,7 @@ public final class Listeners {
      * This call should only be done by the transaction that removed the listeners from
      * the transactional object. So it is not threadsafe,
      *
-     * @param pool the BetaObjectPool to store the discarded Listeners in.
+     * @param pool the GammaObjectPool to store the discarded Listeners in.
      */
     public void openAll(final GammaObjectPool pool) {
         Listeners current = this;
@@ -67,7 +67,7 @@ public final class Listeners {
      * The call safely can be made with a null listenersArray. In that case the call is ignored.
      *
      * @param listenersArray the array of Listeners to notify.
-     * @param pool           the BetaObjectPool to pool the Listeners and the array containing the listeners.
+     * @param pool           the GammaObjectPool to pool the Listeners and the array containing the listeners.
      */
     public static void openAll(final Listeners[] listenersArray, final GammaObjectPool pool) {
         if (listenersArray == null) {
