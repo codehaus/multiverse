@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.multiverse.SomeUncheckedException;
 import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
@@ -159,22 +160,19 @@ public class GammaBooleanRef_getAndAlter2Test {
         long initialVersion = ref.getVersion();
 
         BooleanFunction function = mock(BooleanFunction.class);
-        when(function.call(initialValue)).thenThrow(new MyException());
+        when(function.call(initialValue)).thenThrow(new SomeUncheckedException());
 
         GammaTransaction tx = transactionFactory.newTransaction();
         try {
             ref.getAndAlter(tx, function);
             fail();
-        } catch (MyException expected) {
+        } catch (SomeUncheckedException expected) {
 
         }
 
         assertIsAborted(tx);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
-    }
-
-    class MyException extends RuntimeException {
     }
 
     @Test

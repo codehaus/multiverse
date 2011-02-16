@@ -2,6 +2,7 @@ package org.multiverse.stms.gamma.transactionalobjects.gammabooleanref;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.SomeUncheckedException;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.RetryError;
@@ -71,21 +72,18 @@ public class GammaBooleanRef_await2WithPredicateTest {
 
         BooleanPredicate predicate = mock(BooleanPredicate.class);
 
-        when(predicate.evaluate(initialValue)).thenThrow(new MyException());
+        when(predicate.evaluate(initialValue)).thenThrow(new SomeUncheckedException());
 
         GammaTransaction tx = stm.newDefaultTransaction();
 
         try {
             ref.await(tx, predicate);
             fail();
-        } catch (MyException expected) {
+        } catch (SomeUncheckedException expected) {
         }
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-    }
-
-    class MyException extends RuntimeException {
     }
 
     @Test

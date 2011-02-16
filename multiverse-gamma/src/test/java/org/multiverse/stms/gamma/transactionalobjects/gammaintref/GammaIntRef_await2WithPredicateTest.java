@@ -2,6 +2,7 @@ package org.multiverse.stms.gamma.transactionalobjects.gammaintref;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.SomeUncheckedException;
 import org.multiverse.TestThread;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
@@ -76,21 +77,18 @@ public class GammaIntRef_await2WithPredicateTest {
 
         IntPredicate predicate = mock(IntPredicate.class);
 
-        when(predicate.evaluate(initialValue)).thenThrow(new MyException());
+        when(predicate.evaluate(initialValue)).thenThrow(new SomeUncheckedException());
 
         GammaTransaction tx = stm.newDefaultTransaction();
 
         try {
             ref.await(tx, predicate);
             fail();
-        } catch (MyException expected) {
+        } catch (SomeUncheckedException expected) {
         }
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
-    }
-
-    class MyException extends RuntimeException {
     }
 
     @Test
