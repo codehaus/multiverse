@@ -27,7 +27,9 @@ package org.multiverse.api;
  *
  * <p>Locks atm are acquired for the remaining duration of the transaction and only will always be automatically
  * released once the transaction commits/aborts. This is essentially the same behavior you get with Oracle once
- * a update/delete/insert is done, or when the record is locked manually by executing the 'select for update'.
+ * a update/delete/insert is done, or when the record is locked manually by executing the 'select for update'. For
+ * this to work it is very important that the {@link org.multiverse.api.exceptions.ControlFlowError} is not caught
+ * by the logic executed in an atomic block, but is caught by the AtomicBlock itself.
  *
  * <h3>Blocking</h3>
  *
@@ -60,7 +62,7 @@ package org.multiverse.api;
  *
  * <p>Downgrading locks currently is not possible and downgrade calls are ignored.
  *
- * <h3>Locking granularity</h3>
+ * <h3>Locking scope</h3>
  *
  * <p>Locking can be done on the Transaction level (see the {@link TransactionFactoryBuilder#setReadLockMode(LockMode)} and
  * {@link TransactionFactoryBuilder#setWriteLockMode(LockMode)} where all reads or all writes (to do a write also a read
@@ -81,12 +83,12 @@ package org.multiverse.api;
  *
  * <p>2 Ingredients are needed for a deadlock:
  * <ol>
- * <li>applying locks in different orders</li>
- * <li>unbound waiting for a lock to come available</li>
+ * <li>Transactions acquiring locks in a different order</li>
+ * <li>Transactions that do an unbound waiting for a lock to come available</li>
  * </ol>
- * The problem with applying locks in the correct order is that it places an extra borden on the developer. That is why atm the second
+ * The problem with applying locks in the same order is that it places an extra borden on the developer. That is why atm the second
  * ingredient is always missing if the GammaStm (the default STM implementation) is used. Therefor a developer doesn't need to worry about
- * deadlocks (although it shifts the problem to a higher chance of starvation and livelocks).
+ * deadlocks (although it shifts the problem to an increased chance of starvation and livelocks).
  *
  * @author Peter Veentjer.
  * @see TransactionFactoryBuilder#setReadLockMode(LockMode)

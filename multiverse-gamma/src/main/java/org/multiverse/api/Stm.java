@@ -9,12 +9,12 @@ import org.multiverse.api.references.RefFactoryBuilder;
  * <ol>
  * <li>{@link TransactionalObject}: the structure where state and identity are separated and where state change
  * is coordinated through a transaction. An example of the TransactionalObject is the {@link org.multiverse.api.references.Ref},
- * but it could just as easily by a more complex transactional datastructure.
+ * but it could just as easily by a more complex transactional datastructure that is enhanced by instrumentation.
  * </li>
  * <li>{@link Transaction}: responsible for making sure that all changes on transactionalobjects are atomic, isolated and consistent.
  * </li>
  * <li>{@link AtomicBlock}: responsible for starting/committing/aborting/retrying transactions. The AtomicBlock executes an
- * {@link org.multiverse.api.closures.AtomicClosure} (there are different tasted for return values). The AtomicClosure contains
+ * {@link org.multiverse.api.closures.AtomicClosure} (there are different tastes for return values). The AtomicClosure contains
  * the logic that needs to be executed atomic, isolated and consistent.
  * </li>
  * </ol>

@@ -1,7 +1,8 @@
 package org.multiverse.api;
 
 /**
- * With the PropagationLevel you have control on how nesting of transaction happens.
+ * With the PropagationLevel you have control on how the {@link AtomicBlock} reacts on the existence or the non existence
+ * of a {@link Transaction}.
  *
  * @author Peter Veentjer.
  * @see TransactionFactoryBuilder#setPropagationLevel(PropagationLevel)

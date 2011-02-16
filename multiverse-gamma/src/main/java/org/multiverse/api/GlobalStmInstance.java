@@ -41,20 +41,20 @@ public final class GlobalStmInstance {
             instance = (Stm) method.invoke(null);
             logger.info(format("Successfully initialized GlobalStmInstance using factoryMethod '%s'.", factoryMethod));
         } catch (IllegalAccessException e) {
-            String msg = format("Failed to initialize GlobalStmInstance through System property '%s' with value '%s'." +
-                    "'%s' is not accessible (it should be public)').",
+            String msg = format("Failed to initialize the GlobalStmInstance through System property '%s' with value '%s'." +
+                    "Reason: factory method '%s' is not accessible (it should be public)').",
                     KEY, factoryMethod, factoryMethod);
             logger.severe(msg);
             throw new IllegalArgumentException(msg, e);
         } catch (ClassCastException e) {
             String msg = format("Failed to initialize GlobalStmInstance through System property '%s' with value '%s'." +
-                    "'%s' is not accessible (it should be public)').",
+                    "Reason: factory method '%s' is not accessible (it should be public)').",
                     KEY, factoryMethod, factoryMethod);
             logger.severe(msg);
             throw new IllegalArgumentException(msg, e);
         } catch (InvocationTargetException e) {
-            String msg = format("Failed to initialize GlobalStmInstance through System property '%s' with value '%s'." +
-                    "'%s' failed to be invoked.",
+            String msg = format("Failed to initialize the GlobalStmInstance through System property '%s' with value '%s'." +
+                    "Reason: factory method '%s' failed to be invoked.",
                     KEY, factoryMethod, factoryMethod);
             logger.severe(msg);
             throw new IllegalArgumentException(msg, e);
@@ -65,8 +65,8 @@ public final class GlobalStmInstance {
         int indexOf = factoryMethod.lastIndexOf('.');
         if (indexOf == -1) {
             String msg = format(
-                    "Failed to initialize GlobalStmInstance through System property '%s' with value '%s'. " +
-                            "It is not a valid factory method, it should be something like 'com.SomeStm.createSomeStm').",
+                    "Failed to initialize the GlobalStmInstance through System property '%s' with value '%s'. " +
+                            "Reason: It is not a valid factory method, it should be something like 'com.SomeStm.createSomeStm()').",
                     KEY, factoryMethod);
             logger.info(msg);
             throw new IllegalArgumentException();
@@ -77,8 +77,8 @@ public final class GlobalStmInstance {
         try {
             clazz = Thread.currentThread().getContextClassLoader().loadClass(className);
         } catch (ClassNotFoundException e) {
-            String msg = format("Failed to initialize GlobalStmInstance through System property '%s' with value '%s'." +
-                    "'%s' is not an existing class (it can't be found using the Thread.currentThread.getContextClassLoader).",
+            String msg = format("Failed to initialize the GlobalStmInstance through System property '%s' with value '%s'." +
+                    "Reason: '%s' is not an existing class (it can't be found using the Thread.currentThread.getContextClassLoader).",
                     KEY, className, factoryMethod);
             logger.info(msg);
             throw new IllegalArgumentException(msg, e);
@@ -86,8 +86,8 @@ public final class GlobalStmInstance {
 
         String methodName = factoryMethod.substring(indexOf + 1);
         if (methodName.length() == 0) {
-            String msg = format("Failed to initialize GlobalStmInstance through System property '%s' with value '%s'." +
-                    "The factory method is completely missing, it should be something like %s.createSomeStm.",
+            String msg = format("Failed to initialize the GlobalStmInstance through System property '%s' with value '%s'." +
+                    "Reason: the factory method is does not exist, it should be something like %s.createSomeStm.",
                     KEY, className, factoryMethod);
             logger.info(msg);
             throw new IllegalArgumentException(msg);
@@ -97,16 +97,16 @@ public final class GlobalStmInstance {
         try {
             method = clazz.getMethod(methodName);
         } catch (NoSuchMethodException e) {
-            String msg = format("Failed to initialize GlobalStmInstance through System property '%s' with value '%s'." +
-                    "The factory method is not found. Remember that it should not have any arguments.",
+            String msg = format("Failed to initialize the GlobalStmInstance through System property '%s' with value '%s'." +
+                    "Reason: the factory method does not exist. Remember that it should not have any arguments.",
                     KEY, factoryMethod);
             logger.info(msg);
             throw new IllegalArgumentException(msg, e);
         }
 
         if (!isStatic(method.getModifiers())) {
-            String msg = format("Failed to initialize GlobalStmInstance through System property '%s' with value '%s'." +
-                    "The factory method is not static.",
+            String msg = format("Failed to initialize the GlobalStmInstance through System property '%s' with value '%s'." +
+                    "Reason: the factory method is not static.",
                     KEY, factoryMethod);
             logger.info(msg);
             throw new IllegalArgumentException(msg);
