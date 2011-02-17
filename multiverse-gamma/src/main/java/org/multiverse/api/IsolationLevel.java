@@ -6,16 +6,51 @@ package org.multiverse.api;
  * <p/>
  * The dirty read isn't added since atm we already have an extremely cheap read using the atomicWeakGet on the
  * refs. Using the atomicWeakGet you have extremely cheap access to committed data.
- * <p/>
+ *
+ * <p>The following isolation anomalies have been identified:
+ * <ol>
+ *     <li>Dirty Read</li>
+ *     <li>Unrepeatable Read</li>
+ *     <li>Inconsistent Read</li>
+ *     <li>Write Skew</li>
+ * </ol>
+ *
+ * <h3>Dirty Read</h3>
+ *
+ * <p>The DirtyRead isolation anomaly is that one transaction could observe uncommitted changes made by another transaction.
+ * The biggest problem with this anomaly is that eventually the updating transaction could abort and the reading transaction
+ * sees changes that never made it into the system.
+ *
+ * <p>Currently the Dirty Read anomaly is not possible in Multiverse since writes to main memory are deferred until commit
+ * and once the first write to main memory is executed, the following writes are guaranteed to succeed.
  *
  * <h3>Unrepeatable Read</h3>
- * <p>
+ *
+ * <p>The Unrepeatable Read isolation anomaly is that a transaction could see changes made by other transactions. So at one
+ * moment it could see value X and a moment later it could see Y. This could lead to all kinds of erratic behavior like
+ * transaction that can get stuck in an infinitive loop.
+ *
+ * <p>Such a transaction is called a zombie transaction and can cause serious damage since they are consuming resources
+ * (like cpu) and are holding on to various resources (like Locks).
  *
  * <h3>Inconsistent Read</h3>
  *
- * <p>
+ * <p>With the inconsistent read isolation level
  *
  * <h3>Writeskew</h3>
+ *
+ * <h3>Isolation Levels</h3>
+ *
+ * <table>
+ *
+ * </table>
+ *
+ *
+ * <h3>Implementation and isolation level upgrade</h3>
+ *
+ * <p>An implementation of the {@link Transaction} is free to upgrade the isolation level to a higher one if it doesn't support that specific isolation
+ * level. This is the same as Oracle is doing with the ReadUncommitted, which automatically is upgraded to a ReadCommitted or the RepeatableRead which is
+ * automatically upgraded to Snapshot (Oracle calls this the Serialized isolation level).
  *
  * @author Peter Veentjer.
  * @see TransactionFactoryBuilder#setIsolationLevel(IsolationLevel)

@@ -35,7 +35,8 @@ import org.multiverse.api.closures.*;
  * {@link Transaction#retry}. The latter is really a blocking operation that only retries when there is a reason to retry.
  *
  * <h3>Configuration</h3>
- * The {@link AtomicBlock} can be configured through the {@link TransactionFactoryBuilder}. So that for more detail since
+ *
+ * <p>The {@link AtomicBlock} can be configured through the {@link TransactionFactoryBuilder}. So that for more detail since
  * there are tons of settings to choose from.
  *
  * <h3>Thread-safety</h3>
