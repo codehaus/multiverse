@@ -14,6 +14,7 @@ import org.multiverse.MultiverseConstants;
  * @see TransactionFactoryBuilder#setWriteLockMode(LockMode)
  * @see TransactionConfiguration#getReadLockMode()
  * @see TransactionConfiguration#getWriteLockMode()
+ * @see org.multiverse.api.TransactionalObject#getLock()
  * @see Lock
  */
 public enum LockMode implements MultiverseConstants {

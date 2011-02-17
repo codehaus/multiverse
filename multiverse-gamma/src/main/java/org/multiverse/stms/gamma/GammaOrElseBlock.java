@@ -36,7 +36,7 @@ public class GammaOrElseBlock implements OrElseBlock{
 
         try{
             return either.execute(tx);
-        }catch(RetryError retry){
+        }catch(Retry retry){
             return orelse.execute(tx);
         }
     }
@@ -69,7 +69,7 @@ public class GammaOrElseBlock implements OrElseBlock{
 
         try{
             return either.execute(tx);
-        }catch(RetryError retry){
+        }catch(Retry retry){
             return orelse.execute(tx);
         }
     }
@@ -102,7 +102,7 @@ public class GammaOrElseBlock implements OrElseBlock{
 
         try{
             return either.execute(tx);
-        }catch(RetryError retry){
+        }catch(Retry retry){
             return orelse.execute(tx);
         }
     }
@@ -135,7 +135,7 @@ public class GammaOrElseBlock implements OrElseBlock{
 
         try{
             return either.execute(tx);
-        }catch(RetryError retry){
+        }catch(Retry retry){
             return orelse.execute(tx);
         }
     }
@@ -168,7 +168,7 @@ public class GammaOrElseBlock implements OrElseBlock{
 
         try{
             return either.execute(tx);
-        }catch(RetryError retry){
+        }catch(Retry retry){
             return orelse.execute(tx);
         }
     }
@@ -203,7 +203,7 @@ public class GammaOrElseBlock implements OrElseBlock{
         try{
             either.execute(tx);
             return;
-        }catch(RetryError retry){
+        }catch(Retry retry){
             orelse.execute(tx);
             return;
         }

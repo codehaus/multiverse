@@ -2,12 +2,10 @@ package org.multiverse.api;
 
 import org.multiverse.api.closures.*;
 import org.multiverse.api.collections.*;
-import org.multiverse.api.exceptions.ControlFlowError;
-import org.multiverse.api.exceptions.IllegalTransactionStateException;
-import org.multiverse.api.exceptions.TransactionRequiredException;
-import org.multiverse.api.lifecycle.TransactionEvent;
-import org.multiverse.api.lifecycle.TransactionListener;
+import org.multiverse.api.exceptions.*;
+import org.multiverse.api.lifecycle.*;
 import org.multiverse.api.references.*;
+import java.util.*;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTransaction;
@@ -122,8 +120,11 @@ public final class StmUtils {
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
      * transaction (so the propagation level is Requires) and will not commit this transaction.
      *
-     * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
+     * <p>This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
+     *
+     * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
+     * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
      *
      * @param closure The {AtomicClosure} to execute.
      * @return the result of the execution
@@ -140,6 +141,9 @@ public final class StmUtils {
     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
     * transaction (so the propagation level is Requires) and will not commit this transaction.
     *
+    * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
+    * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
+    *
     * @param closure The {AtomicClosure} to execute.
     * @return the result of the execution
     * @throws NullPointerException if closure is null.
@@ -150,14 +154,14 @@ public final class StmUtils {
    }
 
    /**
-    * * Executes the either block, or in case of a retry, the orelse block is executed.
+    * Executes the either block, or in case of a retry, the orelse block is executed.
     *
     * If in the execution of the closure a checked exception is thrown, the exception
     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
     * getCause method.
     *
-    * @param either
-    * @param orelse
+    * @param either the either block
+    * @param orelse the orelse block.
     * @return the result of the execution.
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
@@ -184,8 +188,11 @@ public final class StmUtils {
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
      * transaction (so the propagation level is Requires) and will not commit this transaction.
      *
-     * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
+     * <p>This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
+     *
+     * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
+     * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
      *
      * @param closure The {AtomicIntClosure} to execute.
      * @return the result of the execution
@@ -202,6 +209,9 @@ public final class StmUtils {
     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
     * transaction (so the propagation level is Requires) and will not commit this transaction.
     *
+    * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
+    * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
+    *
     * @param closure The {AtomicIntClosure} to execute.
     * @return the result of the execution
     * @throws NullPointerException if closure is null.
@@ -212,14 +222,14 @@ public final class StmUtils {
    }
 
    /**
-    * * Executes the either block, or in case of a retry, the orelse block is executed.
+    * Executes the either block, or in case of a retry, the orelse block is executed.
     *
     * If in the execution of the closure a checked exception is thrown, the exception
     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
     * getCause method.
     *
-    * @param either
-    * @param orelse
+    * @param either the either block
+    * @param orelse the orelse block.
     * @return the result of the execution.
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
@@ -246,8 +256,11 @@ public final class StmUtils {
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
      * transaction (so the propagation level is Requires) and will not commit this transaction.
      *
-     * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
+     * <p>This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
+     *
+     * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
+     * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
      *
      * @param closure The {AtomicLongClosure} to execute.
      * @return the result of the execution
@@ -264,6 +277,9 @@ public final class StmUtils {
     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
     * transaction (so the propagation level is Requires) and will not commit this transaction.
     *
+    * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
+    * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
+    *
     * @param closure The {AtomicLongClosure} to execute.
     * @return the result of the execution
     * @throws NullPointerException if closure is null.
@@ -274,14 +290,14 @@ public final class StmUtils {
    }
 
    /**
-    * * Executes the either block, or in case of a retry, the orelse block is executed.
+    * Executes the either block, or in case of a retry, the orelse block is executed.
     *
     * If in the execution of the closure a checked exception is thrown, the exception
     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
     * getCause method.
     *
-    * @param either
-    * @param orelse
+    * @param either the either block
+    * @param orelse the orelse block.
     * @return the result of the execution.
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
@@ -308,8 +324,11 @@ public final class StmUtils {
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
      * transaction (so the propagation level is Requires) and will not commit this transaction.
      *
-     * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
+     * <p>This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
+     *
+     * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
+     * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
      *
      * @param closure The {AtomicDoubleClosure} to execute.
      * @return the result of the execution
@@ -326,6 +345,9 @@ public final class StmUtils {
     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
     * transaction (so the propagation level is Requires) and will not commit this transaction.
     *
+    * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
+    * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
+    *
     * @param closure The {AtomicDoubleClosure} to execute.
     * @return the result of the execution
     * @throws NullPointerException if closure is null.
@@ -336,14 +358,14 @@ public final class StmUtils {
    }
 
    /**
-    * * Executes the either block, or in case of a retry, the orelse block is executed.
+    * Executes the either block, or in case of a retry, the orelse block is executed.
     *
     * If in the execution of the closure a checked exception is thrown, the exception
     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
     * getCause method.
     *
-    * @param either
-    * @param orelse
+    * @param either the either block
+    * @param orelse the orelse block.
     * @return the result of the execution.
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
@@ -370,8 +392,11 @@ public final class StmUtils {
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
      * transaction (so the propagation level is Requires) and will not commit this transaction.
      *
-     * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
+     * <p>This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
+     *
+     * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
+     * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
      *
      * @param closure The {AtomicBooleanClosure} to execute.
      * @return the result of the execution
@@ -388,6 +413,9 @@ public final class StmUtils {
     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
     * transaction (so the propagation level is Requires) and will not commit this transaction.
     *
+    * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
+    * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
+    *
     * @param closure The {AtomicBooleanClosure} to execute.
     * @return the result of the execution
     * @throws NullPointerException if closure is null.
@@ -398,14 +426,14 @@ public final class StmUtils {
    }
 
    /**
-    * * Executes the either block, or in case of a retry, the orelse block is executed.
+    * Executes the either block, or in case of a retry, the orelse block is executed.
     *
     * If in the execution of the closure a checked exception is thrown, the exception
     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
     * getCause method.
     *
-    * @param either
-    * @param orelse
+    * @param either the either block
+    * @param orelse the orelse block.
     * @return the result of the execution.
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
@@ -432,8 +460,11 @@ public final class StmUtils {
      * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
      * transaction (so the propagation level is Requires) and will not commit this transaction.
      *
-     * This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
+     * <p>This method doesn't throw a checked exception, but if the closure does, it is wrapped inside an
      * InvisibleCheckedException.
+     *
+     * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
+     * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
      *
      * @param closure The {AtomicVoidClosure} to execute.
      * @throws NullPointerException if closure is null.
@@ -449,6 +480,9 @@ public final class StmUtils {
     * Transaction already is active on the ThreadLocalTransaction, this transaction will lift on that
     * transaction (so the propagation level is Requires) and will not commit this transaction.
     *
+    * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
+    * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
+    *
     * @param closure The {AtomicVoidClosure} to execute.
     * @throws NullPointerException if closure is null.
     * @throws Exception is the closure throws an Exception
@@ -458,14 +492,14 @@ public final class StmUtils {
    }
 
    /**
-    * * Executes the either block, or in case of a retry, the orelse block is executed.
+    * Executes the either block, or in case of a retry, the orelse block is executed.
     *
     * If in the execution of the closure a checked exception is thrown, the exception
     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
     * getCause method.
     *
-    * @param either
-    * @param orelse
+    * @param either the either block
+    * @param orelse the orelse block.
     * @throws NullPointerException if closure is null.
     * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
     */
@@ -486,7 +520,7 @@ public final class StmUtils {
     }
 
     /**
-     * Creates a committed IntRef with the provided value using the GlobalStmInstance.
+     * Creates a committed {@link IntRef} with the provided value using the {@link GlobalStmInstance}.
      *
      * @param value the initial value of the IntRef
      * @return the created IntRef.
@@ -496,7 +530,7 @@ public final class StmUtils {
     }
 
     /**
-     * Creates a committed IntRef with 0 as initial value using the GlobalStmInstance.
+     * Creates a committed {@link IntRef} with 0 as initial value using the {@link GlobalStmInstance}.
      *
      * @return the created IntRef.
      */
@@ -505,7 +539,7 @@ public final class StmUtils {
     }
 
     /**
-     * Creates a committed LongRef with 0 as initial value using the GlobalStmInstance.
+     * Creates a committed {@link LongRef} with 0 as initial value using the {@link GlobalStmInstance}.
      *
      * @return the created LongRef.
      */
@@ -514,7 +548,7 @@ public final class StmUtils {
     }
 
     /**
-     * Creates a committed LongRef with the provided value using the GlobalStmInstance.
+     * Creates a committed {@link LongRef} with the provided value using the {@link GlobalStmInstance}.
      *
      * @param value the initial value of the LongRef.
      * @return the created LongRef.
@@ -524,7 +558,7 @@ public final class StmUtils {
     }
 
     /**
-     * Creates a committed DoubleRef with 0 as initial value using the GlobalStmInstance.
+     * Creates a committed {@link DoubleRef} with 0 as initial value using the {@link GlobalStmInstance}.
      *
      * @return the created DoubleRef.
      */
@@ -533,7 +567,7 @@ public final class StmUtils {
     }
 
     /**
-     * Creates a committed DoubleRef with the provided value using the GlobalStmInstance.
+     * Creates a committed {@link DoubleRef} with the provided value using the {@link GlobalStmInstance}.
      *
      * @param value the initial value.
      * @return the created DoubleRef.
@@ -543,7 +577,7 @@ public final class StmUtils {
     }
 
     /**
-     * Creates a committed BooleanRef with false as initial value using the GlobalStmInstance.
+     * Creates a committed {@link BooleanRef} with false as initial value using the {@link GlobalStmInstance}.
      *
      * @return the created BooleanRef.
      */
@@ -552,7 +586,7 @@ public final class StmUtils {
     }
 
     /**
-     * Creates a committed BooleanRef with the provided value using the GlobalStmInstance.
+     * Creates a committed {@link BooleanRef} with the provided value using the {@link GlobalStmInstance}.
      *
      * @param value the initial value
      * @return the created BooleanRef.
@@ -562,7 +596,7 @@ public final class StmUtils {
     }
 
     /**
-     * Creates a committed Ref with null as initial value using the GlobalStmInstance.
+     * Creates a committed {@link Ref} with null as initial value using the {@link GlobalStmInstance}.
      *
      * @param <E> the type of the Ref.
      * @return the created Ref.
@@ -572,7 +606,7 @@ public final class StmUtils {
     }
 
     /**
-     * Creates a committed Ref with the provided value using the GlobalStmInstance.
+     * Creates a committed {@link Ref} with the provided value using the {@link GlobalStmInstance}.
      *
      * @param value the initial value of the Ref.
      * @param <E>   the type of the Ref.
@@ -585,8 +619,8 @@ public final class StmUtils {
     /**
      * Does a retry. This behavior is needed for blocking transactions; transaction that wait for a state change
      * to happen on certain datastructures, e.g. an item to come available on a transactional blocking queue.
-     * <p/>
-     * Under the hood the retry throws an Retry that will be caught up the callstack
+     *
+     * <p>Under the hood the retry throws an Retry that will be caught up the callstack
      * (by the {@link AtomicBlock} for example). The Retry should not be caught by user code in almost all cases.
      */
     public static void retry() {
@@ -596,8 +630,8 @@ public final class StmUtils {
 
     /**
      * Prepares the Transaction in the ThreadLocalTransaction transaction.
-     * <p/>
-     * For more information see {@link Transaction#prepare()}.
+     *
+     * <p>For more information see {@link Transaction#prepare()}.
      *
      * @throws TransactionRequiredException if no active transaction is found.
      * @throws IllegalTransactionStateException if the active transaction is not in the correct
@@ -611,8 +645,8 @@ public final class StmUtils {
 
     /**
      * Aborts the Transaction in the ThreadLocalTransaction transaction.
-     * <p/>
-     * For more information see {@link Transaction#abort()}.
+     *
+     * <p>For more information see {@link Transaction#abort()}.
      *
      * @throws TransactionRequiredException if no active transaction is found.
      * @throws IllegalTransactionStateException if the active transaction is not in the correct
@@ -626,8 +660,8 @@ public final class StmUtils {
 
     /**
      * Commits the Transaction in the ThreadLocalTransaction transaction.
-     * <p/>
-     * For more information see {@link Transaction#commit()}.
+     *
+     * <p>For more information see {@link Transaction#commit()}.
      *
      * @throws TransactionRequiredException if no active transaction is found.
      * @throws IllegalTransactionStateException if the active transaction is not in the correct
@@ -642,7 +676,7 @@ public final class StmUtils {
     /**
      * Scheduled an deferred or compensating task on the Transaction in the ThreadLocalTransaction. This task is
      * executed after the transaction commits or aborts.
-     * <p/>
+     *
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
      * @throws org.multiverse.api.exceptions.TransactionRequiredException
@@ -669,9 +703,9 @@ public final class StmUtils {
     }
 
     /**
-     * Scheduled an deferred task on the Transaction in the ThreadLocalTransaction. This task is executed after
+     * Scheduled an deferred task on the {@link Transaction} in the {@link ThreadLocalTransaction}. This task is executed after
      * the transaction commits and one of the use cases is starting transactions.
-     * <p/>
+     *
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
      * @throws org.multiverse.api.exceptions.TransactionRequiredException
@@ -698,9 +732,9 @@ public final class StmUtils {
     }
 
     /**
-     * Scheduled a compensating task on the Transaction in the ThreadLocalTransaction. This task is executed after
+     * Scheduled a compensating task on the {@link Transaction} in the {@link ThreadLocalTransaction}. This task is executed after
      * the transaction aborts and one of the use cases is cleaning up non transaction resources like the file system.
-     * <p/>
+     *
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
      * @throws org.multiverse.api.exceptions.TransactionRequiredException

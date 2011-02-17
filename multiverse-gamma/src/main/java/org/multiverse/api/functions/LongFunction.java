@@ -3,12 +3,12 @@ package org.multiverse.api.functions;
 /**
  * A {@link Function} for primitives that accepts an argument of type long and returns a new
  * value of the same type.
- * <p/>
- * The reason why {@link LongFunction} is an abstract class instead of an ordinary interface, is that
+ *
+ * <p>The reason why {@link LongFunction} is an abstract class instead of an ordinary interface, is that
  * this class doesn't cause any unwanted boxing of primitives version of the call method is used instead of the one that
  * accepts and returns a/an Long).
- * <p/>
- * This class is generated.
+ *
+ * <p>This class is generated.
  *
  * @author Peter Veentjer.
  */

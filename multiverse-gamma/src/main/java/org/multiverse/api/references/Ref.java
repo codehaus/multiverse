@@ -23,6 +23,7 @@ import org.multiverse.api.predicates.*;
  * <h1>Threadsafe</h1>
  * All methods are threadsafe.
  *
+ * @param <E>
  * @author Peter Veentjer.
  */
 public interface Ref<E> extends TransactionalObject {

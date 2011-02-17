@@ -1,6 +1,6 @@
 package org.multiverse.api;
 
-import org.multiverse.MultiverseConstants;
+import org.multiverse.*;
 import org.multiverse.api.closures.*;
 
 /**
@@ -14,9 +14,28 @@ import org.multiverse.api.closures.*;
  * It also provides an execute for a AtomicVoidClosure which doesn't force a developer to return something when
  * nothing needs to be returned.
  *
- * <h3>Threadsafe</h3>
+ * <h3>AtomicClosure</h3>
  *
- * <p>AtomicBlocks are threadsafe.
+ * <p>The AtomicClosure is the functionality that needs to be executed isolated, consistent and atomically. There
+ * are different tasted of Closures but essentially the only difference is the return type. There are primitive closures
+ * that prevent unwanted autoboxing and there also is a {@link org.multiverse.api.closures.AtomicVoidClosureVoidClosure} that prevents
+ * returning a value if none is needed.
+ *
+ * <h3>Automatic retries</h3>
+ *
+ * <p>If a transaction encounters a {@link org.multiverse.api.exceptions.ReadWriteConflict} or a
+ * { @link org.multiverse.api.exceptions.SpeculativeConfigurationError} it will automatically retry the
+ * the AtomicClosure until either the next execution completes or the maximum number of retries has been reached.
+ * To prevent contention, also a {@link BackoffPolicy} is used, to prevent transactions from causing more contention
+ * if there already is contention. For configuring the maximum number of retries, see the {@link TransactionFactoryBuilder#setMaxRetries}
+ * and for configuring the BackoffPolicy, see {@link TransactionFactoryBuilder#setBackoffPolicy}.
+ *
+ * <p>It is very important to realize that automatically retrying a transaction on a conflict is something else than the
+ * {@link Transaction#retry}. The latter is really a blocking operation that only retries when there is a reason to retry.
+ *
+ * <h3>Thread-safety</h3>
+ *
+ * <p>AtomicBlocks are threadsafe. The AtomicBlock is designed to be shared between threads.
  *
  * <h3>Reuse</h3>
  *
@@ -48,151 +67,152 @@ import org.multiverse.api.closures.*;
  * of exceptions have occurred. This is similar with the Spring framework where this can be configured through the
  * <a href="http://static.springsource.org/spring/docs/2.0.x/reference/transaction.html#transaction-declarative-rolling-back}">9.5.3: Rolling back</a>
  *
+ * <h3>Atomic operation composition</h3>
+ *
+ * <p>Using traditional concurrency control, composing locking operations is extremely hard because it is very likely that
+ * it is impossible without knowing implementation details of the structure, or because of deadlocks. With Stm transactional
+ * operations can be composed and controlling how the system should react on existing or missing transactions can be controlled
+ * through the {@link TransactionFactoryBuilder#setPropagationLevel} where the {@link PropagationLevel#Requires} is the default.
+ *
  * @author Peter Veentjer.
  */
-public interface AtomicBlock extends MultiverseConstants {
+public interface AtomicBlock extends MultiverseConstants{
 
-    /**
-     * Returns the TransactionFactory that is used by this AtomicBlock to create Transactions used inside.
-     *
-     * @return the TransactionFactory used by this AtomicBlock.
-     */
+   /**
+    * Returns the TransactionFactory that is used by this AtomicBlock to create Transactions used inside.
+    *
+    * @return the TransactionFactory used by this AtomicBlock.
+    */
     TransactionFactory getTransactionFactory();
 
-    /**
-     * Executes the closure. If in the execution of the closure a checked exception is thrown, the exception
-     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
-     * getCause method.
-     *
-     * @param closure the closure to execute.
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if a checked exception is thrown by the closure.
-     */
+   /**
+    * Executes the closure. If in the execution of the closure a checked exception is thrown, the exception
+    * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
+    * getCause method.
+    *
+    * @param closure the closure to execute.
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
+    */
     <E> E execute(AtomicClosure<E> closure);
 
     /**
-     * Executes the closure.
-     *
-     * @param closure the closure to execute.
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            if the execute call fails.
-     */
-    <E> E executeChecked(AtomicClosure<E> closure) throws Exception;
+    * Executes the closure.
+    *
+    * @param closure the closure to execute.
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws Exception if the execute call fails.
+    */
+    <E> E executeChecked(AtomicClosure<E> closure)throws Exception;
+
+   /**
+    * Executes the closure. If in the execution of the closure a checked exception is thrown, the exception
+    * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
+    * getCause method.
+    *
+    * @param closure the closure to execute.
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
+    */
+     int execute(AtomicIntClosure closure);
 
     /**
-     * Executes the closure. If in the execution of the closure a checked exception is thrown, the exception
-     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
-     * getCause method.
-     *
-     * @param closure the closure to execute.
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if a checked exception is thrown by the closure.
-     */
-    int execute(AtomicIntClosure closure);
+    * Executes the closure.
+    *
+    * @param closure the closure to execute.
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws Exception if the execute call fails.
+    */
+     int executeChecked(AtomicIntClosure closure)throws Exception;
+
+   /**
+    * Executes the closure. If in the execution of the closure a checked exception is thrown, the exception
+    * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
+    * getCause method.
+    *
+    * @param closure the closure to execute.
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
+    */
+     long execute(AtomicLongClosure closure);
 
     /**
-     * Executes the closure.
-     *
-     * @param closure the closure to execute.
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            if the execute call fails.
-     */
-    int executeChecked(AtomicIntClosure closure) throws Exception;
+    * Executes the closure.
+    *
+    * @param closure the closure to execute.
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws Exception if the execute call fails.
+    */
+     long executeChecked(AtomicLongClosure closure)throws Exception;
+
+   /**
+    * Executes the closure. If in the execution of the closure a checked exception is thrown, the exception
+    * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
+    * getCause method.
+    *
+    * @param closure the closure to execute.
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
+    */
+     double execute(AtomicDoubleClosure closure);
 
     /**
-     * Executes the closure. If in the execution of the closure a checked exception is thrown, the exception
-     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
-     * getCause method.
-     *
-     * @param closure the closure to execute.
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if a checked exception is thrown by the closure.
-     */
-    long execute(AtomicLongClosure closure);
+    * Executes the closure.
+    *
+    * @param closure the closure to execute.
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws Exception if the execute call fails.
+    */
+     double executeChecked(AtomicDoubleClosure closure)throws Exception;
+
+   /**
+    * Executes the closure. If in the execution of the closure a checked exception is thrown, the exception
+    * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
+    * getCause method.
+    *
+    * @param closure the closure to execute.
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
+    */
+     boolean execute(AtomicBooleanClosure closure);
 
     /**
-     * Executes the closure.
-     *
-     * @param closure the closure to execute.
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            if the execute call fails.
-     */
-    long executeChecked(AtomicLongClosure closure) throws Exception;
+    * Executes the closure.
+    *
+    * @param closure the closure to execute.
+    * @return the result of the execution.
+    * @throws NullPointerException if closure is null.
+    * @throws Exception if the execute call fails.
+    */
+     boolean executeChecked(AtomicBooleanClosure closure)throws Exception;
+
+   /**
+    * Executes the closure. If in the execution of the closure a checked exception is thrown, the exception
+    * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
+    * getCause method.
+    *
+    * @param closure the closure to execute.
+    * @throws NullPointerException if closure is null.
+    * @throws org.multiverse.api.exceptions.InvisibleCheckedException if a checked exception is thrown by the closure.
+    */
+     void execute(AtomicVoidClosure closure);
 
     /**
-     * Executes the closure. If in the execution of the closure a checked exception is thrown, the exception
-     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
-     * getCause method.
-     *
-     * @param closure the closure to execute.
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if a checked exception is thrown by the closure.
-     */
-    double execute(AtomicDoubleClosure closure);
-
-    /**
-     * Executes the closure.
-     *
-     * @param closure the closure to execute.
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            if the execute call fails.
-     */
-    double executeChecked(AtomicDoubleClosure closure) throws Exception;
-
-    /**
-     * Executes the closure. If in the execution of the closure a checked exception is thrown, the exception
-     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
-     * getCause method.
-     *
-     * @param closure the closure to execute.
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if a checked exception is thrown by the closure.
-     */
-    boolean execute(AtomicBooleanClosure closure);
-
-    /**
-     * Executes the closure.
-     *
-     * @param closure the closure to execute.
-     * @return the result of the execution.
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            if the execute call fails.
-     */
-    boolean executeChecked(AtomicBooleanClosure closure) throws Exception;
-
-    /**
-     * Executes the closure. If in the execution of the closure a checked exception is thrown, the exception
-     * is wrapped in a InvisibleCheckedException. The original exception can be retrieved by calling the
-     * getCause method.
-     *
-     * @param closure the closure to execute.
-     * @throws NullPointerException if closure is null.
-     * @throws org.multiverse.api.exceptions.InvisibleCheckedException
-     *                              if a checked exception is thrown by the closure.
-     */
-    void execute(AtomicVoidClosure closure);
-
-    /**
-     * Executes the closure.
-     *
-     * @param closure the closure to execute.
-     * @throws NullPointerException if closure is null.
-     * @throws Exception            if the execute call fails.
-     */
-    void executeChecked(AtomicVoidClosure closure) throws Exception;
+    * Executes the closure.
+    *
+    * @param closure the closure to execute.
+    * @throws NullPointerException if closure is null.
+    * @throws Exception if the execute call fails.
+    */
+     void executeChecked(AtomicVoidClosure closure)throws Exception;
 
 }

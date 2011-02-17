@@ -2,10 +2,10 @@ package org.multiverse.api.functions;
 
 /**
  * A Function that accepts an argument of a certain type and returns a new value of the same type.
- * <p/>
- * Can be used for commuting functions or for the Ref.alter methods.
- * <p/>
- * This class is generated.
+ *
+ * <p>Can be used for commuting functions or for the Ref.alter methods.
+ *
+ * <p>This class is generated.
  *
  * @author Peter Veentjer.
  */
