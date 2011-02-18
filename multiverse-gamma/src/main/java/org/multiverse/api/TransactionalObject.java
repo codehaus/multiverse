@@ -40,14 +40,15 @@ public interface TransactionalObject {
     long getVersion();
 
     /**
-     * Does an ensure. What is means is that at the end of the transaction (so deferred) checks if no other transaction has
-     * made an update, if this TransactionalObject only is read. The ensure is a way to prevent to writeskew problem on the
-     * ref level (see {@link IsolationLevel} for more detail about the writeskew problem}
+     * Does an ensure. What is means is that at the end of the transaction (so deferred), the transaction checks if no other
+     * transaction has made an update, if this TransactionalObject only is read. The ensure is a way to prevent to writeskew
+     * problem on the ref level (see {@link IsolationLevel} for more detail about the writeskew problem}
      *
      * <p>This can safely be called on an TransactionalObject that already is locked, although it doesn't provide much value
      * since with a locked TransactionalObject, since the writeskew problem can't occur anymore because it can't be changed.
      *
-     * <p>Unlike the {@link Lock#acquire(LockMode)} which is pessimistic, this is optimistic.
+     * <p>Unlike the {@link Lock#acquire(LockMode)} which is pessimistic, ensure is optimistic. This means that a conflict
+     * can be detected once the transaction commits.
      *
      * <p>This method has no effect if the {@link Transaction} is readonly, because a writeskew is not possible with a
      * readonly transaction.
@@ -63,14 +64,15 @@ public interface TransactionalObject {
     void ensure();
 
     /**
-     * Does an ensure. What is means is that at the end of the transaction (so deferred) checks if no other transaction has
-     * made an update, if this TransactionalObject only is read. The ensure is a way to prevent to writeskew problem on the
-     * ref level (see {@link IsolationLevel} for more detail about the writeskew problem}
+     * Does an ensure. What is means is that at the end of the transaction (so deferred), the transaction checks if no other
+     * transaction has made an update, if this TransactionalObject only is read. The ensure is a way to prevent to writeskew
+     * problem on the ref level (see {@link IsolationLevel} for more detail about the writeskew problem}
      *
      * <p>This can safely be called on an TransactionalObject that already is locked, although it doesn't provide much value
      * since with a locked TransactionalObject, since the writeskew problem can't occur anymore because it can't be changed.
      *
-     * <p>Unlike the {@link Lock#acquire(LockMode)} which is pessimistic, this is optimistic.
+     * <p>Unlike the {@link Lock#acquire(LockMode)} which is pessimistic, ensure is optimistic. This means that a conflict
+     * can be detected once the transaction commits.
      *
      * <p>This method has no effect if the {@link Transaction} is readonly, because a writeskew is not possible with a
      * readonly transaction.

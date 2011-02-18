@@ -202,8 +202,6 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - transactional collections and check on isolation level of transaction
 
-- Improved message on the abortOnEnsureOnBadStatus
-
 - Javadoc: TransactionalCollection
 
 - Javadoc: TransactionalCollectionFactory
@@ -226,15 +224,19 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - Javadoc: Ref
 
-- Javadoc: Improve Javadoc on Isolation Level
+- Javadoc: Isolation Level
 
 ----------------------------------------------------------------------
                                 done
 ----------------------------------------------------------------------
 
-- Javadoc: Improve Javadoc on AtomicBlock
+- Improved message on the abortOnEnsureOnBadStatus
 
-- Javadoc: Stm
+- Improved JavaDoc: TransactionalObject
+
+- Improved Javadoc: Improve Javadoc on AtomicBlock
+
+- Improved Javadoc: Stm
 
 - Improved Javadoc on the Transaction life-cycle functionality.
 

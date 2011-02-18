@@ -488,17 +488,22 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
     public IllegalTransactionStateException abortEnsureOnBadStatus(AbstractGammaRef o) {
-        switch (status) {
-            case TX_ABORTED:
-                return new DeadTransactionException("");
+            switch (status) {
             case TX_PREPARED:
                 abort();
-                return new PreparedTransactionException("");
+                return new PreparedTransactionException(
+                        format("[%s] Failed to execute Ref.ensure with reference '%s', reason: the transaction is prepared",
+                                config.familyName, toDebugString(o)));
+            case TX_ABORTED:
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Ref.ensure with reference '%s', reason: the transaction is aborted",
+                                config.familyName, toDebugString(o)));
             case TX_COMMITTED:
-                return new DeadTransactionException("");
+                return new DeadTransactionException(
+                        format("[%s] Failed to execute Ref.ensure with reference '%s', reason: the transaction is committed",
+                                config.familyName, toDebugString(o)));
             default:
                 throw new IllegalStateException();
-
         }
     }
 
