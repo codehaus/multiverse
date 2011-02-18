@@ -2,6 +2,7 @@ package org.multiverse.stms.gamma.transactions.fat;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.multiverse.api.IsolationLevel;
 import org.multiverse.api.LockMode;
 import org.multiverse.api.TransactionStatus;
 import org.multiverse.api.exceptions.*;
@@ -745,6 +746,26 @@ public abstract class FatGammaTransaction_openForWriteTest<T extends GammaTransa
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasExclusiveLock(ref, otherTx);
+    }
+
+    //====================================================
+     @Test
+    public void whenRepeatableReadIsolationLevel(){
+         assumeTrue(getMaxCapacity()>1);
+
+        long initialValue = 1;
+        GammaLongRef ref1 = new GammaLongRef(stm, initialValue);
+        GammaLongRef ref2 = new GammaLongRef(stm, initialValue);
+
+        GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
+                .setIsolationLevel(IsolationLevel.ReadCommitted);
+        T tx = newTransaction(config);
+
+        ref1.openForWrite(tx, LOCKMODE_NONE);
+        ref1.atomicIncrementAndGet(1);
+        ref2.openForWrite(tx, LOCKMODE_NONE);
+
+        assertIsActive(tx);
     }
 
     // ==========================================

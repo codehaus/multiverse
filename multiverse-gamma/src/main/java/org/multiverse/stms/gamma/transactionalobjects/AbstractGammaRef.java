@@ -554,7 +554,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         }
 
         final GammaTransactionConfiguration config = tx.config;
-        if (!config.unrepeatableReadAllowed) {
+        //if (!config.unrepeatableReadAllowed) {
             if (type == TRANSACTIONTYPE_FAT_MONO) {
                 return openForRead((FatMonoGammaTransaction) tx, LOCKMODE_NONE).long_value;
             } else if (type == TRANSACTIONTYPE_FAT_FIXED_LENGTH) {
@@ -562,15 +562,15 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
             } else {
                 return openForRead((FatVariableLengthGammaTransaction) tx, LOCKMODE_NONE).long_value;
             }
-        }
+        //}
 
-        if (type == TRANSACTIONTYPE_FAT_MONO) {
-            return readLong((FatMonoGammaTransaction) tx);
-        } else if (type == TRANSACTIONTYPE_FAT_FIXED_LENGTH) {
-            return readLong((FatFixedLengthGammaTransaction) tx);
-        } else {
-            return readLong((FatVariableLengthGammaTransaction) tx);
-        }
+        //if (type == TRANSACTIONTYPE_FAT_MONO) {
+        //    return readLong((FatMonoGammaTransaction) tx);
+        //} else if (type == TRANSACTIONTYPE_FAT_FIXED_LENGTH) {
+        //    return readLong((FatFixedLengthGammaTransaction) tx);
+        //} else {
+        //    return readLong((FatVariableLengthGammaTransaction) tx);
+        //}
     }
 
     private long readLong(FatMonoGammaTransaction tx) {
