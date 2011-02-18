@@ -1,7 +1,7 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link ControlFlowError} that indicates that an explicit retry should be done on a {@link org.multiverse.api.Transaction}.
+ * A {@link ControlFlowError} thrown when an explicit retry is done on a {@link org.multiverse.api.Transaction}.
  * With the {RetryError} it is possible to create blocking transactions.
  *
  * <p>An example is a transaction wants to pop an item from an empty queue. The Retry is caught by the transaction

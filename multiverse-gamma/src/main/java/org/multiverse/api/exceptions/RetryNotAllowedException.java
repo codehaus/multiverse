@@ -1,8 +1,8 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link RetryException} that indicates that a retry is done while the {@link org.multiverse.api.Transaction} doesn't
- * allow blocking operations.
+ * A {@link RetryException} thrown when a {@link org.multiverse.api.StmUtils#retry()} or {@link org.multiverse.api.Transaction#retry()}
+ * is done while the {@link org.multiverse.api.Transaction} doesn't allow blocking transactions.
  * <p/>
  * For more information see {@link org.multiverse.api.TransactionFactoryBuilder#setBlockingAllowed(boolean)}
  * and {@link org.multiverse.api.TransactionConfiguration#isBlockingAllowed()}.

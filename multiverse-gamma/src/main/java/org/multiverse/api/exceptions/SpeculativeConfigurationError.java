@@ -1,7 +1,7 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link ControlFlowError} responsible for dealing with the speculative configuration mechanism.
+ * A {@link ControlFlowError} thrown for dealing with the speculative configuration mechanism.
  *
  * <p>Multiverse uses a speculative configuration mechanism if enabled makes certain optimizations possible. E.g. one of the optimizations
  * is to use different {@link org.multiverse.api.Transaction} implementations that are optimized for certain transaction lengths. As

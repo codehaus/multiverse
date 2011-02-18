@@ -1,8 +1,7 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link RuntimeException} thrown by the {@link org.multiverse.api.Stm} when something fails while executing a
- * {@link org.multiverse.api.Transaction}.
+ * A {@link RuntimeException} thrown when something fails while executing a {@link org.multiverse.api.Transaction}.
  *
  * <p>This exception is not caught by the {@link org.multiverse.api.AtomicBlock}.
  *

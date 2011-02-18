@@ -1,7 +1,7 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link RuntimeException} that indicates that some part of the implementation is missing. Normally they should never be
+ * A {@link RuntimeException} thrown when some part of the implementation is missing. Normally they should never be
  * thrown in releases.
  *
  * @author Peter Veentjer

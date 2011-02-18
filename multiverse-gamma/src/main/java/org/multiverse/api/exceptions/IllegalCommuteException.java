@@ -1,7 +1,7 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link TransactionExecutionException} that is thrown when {@link org.multiverse.api.Transaction} access is done while
+ * A {@link TransactionExecutionException} thrown when {@link org.multiverse.api.Transaction} access is done while
  * a commuting function is being evaluated.
  *
  * <p>The reason why Transaction access is not allowed,  is that once other reads/writes are done while executing the commuting
