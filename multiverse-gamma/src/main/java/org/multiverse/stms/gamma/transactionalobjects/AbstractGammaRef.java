@@ -6,7 +6,7 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.api.exceptions.TodoException;
-import org.multiverse.api.exceptions.TransactionManditoryException;
+import org.multiverse.api.exceptions.TransactionMandatoryException;
 import org.multiverse.api.functions.BooleanFunction;
 import org.multiverse.api.functions.DoubleFunction;
 import org.multiverse.api.functions.Function;
@@ -1678,7 +1678,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         final GammaTransaction tx = (GammaTransaction) getThreadLocalTransaction();
 
         if (tx == null) {
-            throw new TransactionManditoryException();
+            throw new TransactionMandatoryException();
         }
 
         acquire(tx, desiredLockMode);

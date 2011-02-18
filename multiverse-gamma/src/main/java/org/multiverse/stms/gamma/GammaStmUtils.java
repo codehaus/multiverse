@@ -1,7 +1,7 @@
 package org.multiverse.stms.gamma;
 
 import org.multiverse.api.Transaction;
-import org.multiverse.api.exceptions.TransactionManditoryException;
+import org.multiverse.api.exceptions.TransactionMandatoryException;
 import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
@@ -22,7 +22,7 @@ public final class GammaStmUtils {
         final Transaction tx = getThreadLocalTransaction();
 
         if (tx == null) {
-            throw new TransactionManditoryException();
+            throw new TransactionMandatoryException();
         }
 
         return asGammaTransaction(tx);

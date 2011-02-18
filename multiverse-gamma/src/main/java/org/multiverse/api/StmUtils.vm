@@ -370,7 +370,7 @@ public final class StmUtils {
                     *
                     * @param task the deferred task to execute.
                     * @throws NullPointerException if task is null.
-                    * @throws org.multiverse.api.exceptions.TransactionManditoryException
+                    * @throws org.multiverse.api.exceptions.TransactionMandatoryException
                     * if no Transaction is getAndSet at the
                     * {@link org.multiverse.api.ThreadLocalTransaction}.
                     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
@@ -454,7 +454,7 @@ public final class StmUtils {
                     });
                     }
 
-                    //we don&amp;amp;apos;t want instances
+                    //we don&amp;amp;amp;apos;t want instances
 
                     private StmUtils() {
                     }

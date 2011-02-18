@@ -25,7 +25,7 @@ public enum PropagationLevel {
 
     /**
      * Indicates that a transaction should always be available. If not, a
-     * {@link org.multiverse.api.exceptions.TransactionManditoryException} is thrown.
+     * {@link org.multiverse.api.exceptions.TransactionMandatoryException} is thrown.
      */
     Mandatory,
 

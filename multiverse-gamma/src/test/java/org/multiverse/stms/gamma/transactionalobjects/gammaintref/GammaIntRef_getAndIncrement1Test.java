@@ -9,7 +9,7 @@ import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.api.exceptions.TransactionManditoryException;
+import org.multiverse.api.exceptions.TransactionMandatoryException;
 import org.multiverse.api.references.IntRef;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
@@ -161,7 +161,7 @@ public class GammaIntRef_getAndIncrement1Test implements GammaConstants {
         try {
             ref.getAndIncrement(1);
             fail();
-        } catch (TransactionManditoryException expected) {
+        } catch (TransactionMandatoryException expected) {
 
         }
 

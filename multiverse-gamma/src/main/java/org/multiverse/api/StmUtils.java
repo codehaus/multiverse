@@ -632,7 +632,7 @@ public final class StmUtils {
      *
      * <p>For more information see {@link Transaction#prepare()}.
      *
-     * @throws org.multiverse.api.exceptions.TransactionManditoryException if no active transaction is found.
+     * @throws org.multiverse.api.exceptions.TransactionMandatoryException if no active transaction is found.
      * @throws IllegalTransactionStateException if the active transaction is not in the correct
      *                                           state for this operation.
      * @throws ControlFlowError
@@ -647,7 +647,7 @@ public final class StmUtils {
      *
      * <p>For more information see {@link Transaction#abort()}.
      *
-     * @throws org.multiverse.api.exceptions.TransactionManditoryException if no active transaction is found.
+     * @throws org.multiverse.api.exceptions.TransactionMandatoryException if no active transaction is found.
      * @throws IllegalTransactionStateException if the active transaction is not in the correct
      *                                           state for this operation.
      * @throws ControlFlowError
@@ -662,7 +662,7 @@ public final class StmUtils {
      *
      * <p>For more information see {@link Transaction#commit()}.
      *
-     * @throws org.multiverse.api.exceptions.TransactionManditoryException if no active transaction is found.
+     * @throws org.multiverse.api.exceptions.TransactionMandatoryException if no active transaction is found.
      * @throws IllegalTransactionStateException if the active transaction is not in the correct
      *                                           state for this operation.
      * @throws ControlFlowError
@@ -678,7 +678,7 @@ public final class StmUtils {
      *
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
-     * @throws org.multiverse.api.exceptions.TransactionManditoryException
+     * @throws org.multiverse.api.exceptions.TransactionMandatoryException
      *                              if no Transaction is getAndSet at the
      *                              {@link org.multiverse.api.ThreadLocalTransaction}.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
@@ -707,7 +707,7 @@ public final class StmUtils {
      *
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
-     * @throws org.multiverse.api.exceptions.TransactionManditoryException
+     * @throws org.multiverse.api.exceptions.TransactionMandatoryException
      *                              if no Transaction is getAndSet at the
      *                              {@link org.multiverse.api.ThreadLocalTransaction}.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
@@ -736,7 +736,7 @@ public final class StmUtils {
      *
      * @param task the deferred task to execute.
      * @throws NullPointerException if task is null.
-     * @throws org.multiverse.api.exceptions.TransactionManditoryException
+     * @throws org.multiverse.api.exceptions.TransactionMandatoryException
      *                              if no Transaction is getAndSet at the
      *                              {@link org.multiverse.api.ThreadLocalTransaction}.
      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException

@@ -9,7 +9,7 @@ import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.api.exceptions.TransactionManditoryException;
+import org.multiverse.api.exceptions.TransactionMandatoryException;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaBooleanRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
@@ -224,7 +224,7 @@ public class GammaBooleanRef_getAndSet1Test {
         try {
             ref.getAndSet(newValue);
             fail();
-        } catch (TransactionManditoryException expected) {
+        } catch (TransactionMandatoryException expected) {
         }
 
         assertSurplus(ref, 0);

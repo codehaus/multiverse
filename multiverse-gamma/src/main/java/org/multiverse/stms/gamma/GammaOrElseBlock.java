@@ -31,7 +31,7 @@ public class GammaOrElseBlock implements OrElseBlock{
 
         Transaction tx = getThreadLocalTransaction();
         if(tx == null){
-            throw new TransactionManditoryException("No transaction is found, but one is required for the orelse");
+            throw new TransactionMandatoryException("No transaction is found, but one is required for the orelse");
         }
 
         try{
@@ -64,7 +64,7 @@ public class GammaOrElseBlock implements OrElseBlock{
 
         Transaction tx = getThreadLocalTransaction();
         if(tx == null){
-            throw new TransactionManditoryException("No transaction is found, but one is required for the orelse");
+            throw new TransactionMandatoryException("No transaction is found, but one is required for the orelse");
         }
 
         try{
@@ -97,7 +97,7 @@ public class GammaOrElseBlock implements OrElseBlock{
 
         Transaction tx = getThreadLocalTransaction();
         if(tx == null){
-            throw new TransactionManditoryException("No transaction is found, but one is required for the orelse");
+            throw new TransactionMandatoryException("No transaction is found, but one is required for the orelse");
         }
 
         try{
@@ -130,7 +130,7 @@ public class GammaOrElseBlock implements OrElseBlock{
 
         Transaction tx = getThreadLocalTransaction();
         if(tx == null){
-            throw new TransactionManditoryException("No transaction is found, but one is required for the orelse");
+            throw new TransactionMandatoryException("No transaction is found, but one is required for the orelse");
         }
 
         try{
@@ -163,7 +163,7 @@ public class GammaOrElseBlock implements OrElseBlock{
 
         Transaction tx = getThreadLocalTransaction();
         if(tx == null){
-            throw new TransactionManditoryException("No transaction is found, but one is required for the orelse");
+            throw new TransactionMandatoryException("No transaction is found, but one is required for the orelse");
         }
 
         try{
@@ -197,7 +197,7 @@ public class GammaOrElseBlock implements OrElseBlock{
 
         Transaction tx = getThreadLocalTransaction();
         if(tx == null){
-            throw new TransactionManditoryException("No transaction is found, but one is required for the orelse");
+            throw new TransactionMandatoryException("No transaction is found, but one is required for the orelse");
         }
 
         try{

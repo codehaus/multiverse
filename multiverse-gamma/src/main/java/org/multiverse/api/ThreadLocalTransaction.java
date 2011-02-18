@@ -1,6 +1,6 @@
 package org.multiverse.api;
 
-import org.multiverse.api.exceptions.TransactionManditoryException;
+import org.multiverse.api.exceptions.TransactionMandatoryException;
 
 /**
  * A {@link ThreadLocal} that contains the current {@link Transaction}. The {@link Stm} and the {@link Transaction}
@@ -47,20 +47,20 @@ public final class ThreadLocalTransaction {
     }
 
     /**
-     * Gets the threadlocal {@link Transaction} or throws a {@link org.multiverse.api.exceptions.TransactionManditoryException} if no transaction is found.
+     * Gets the threadlocal {@link Transaction} or throws a {@link org.multiverse.api.exceptions.TransactionMandatoryException} if no transaction is found.
      *
      * <p>No checks are done on the state of the transaction (so it could be that an aborted or committed transaction is
      * returned).
      *
      * @return the threadlocal transaction.
-     * @throws org.multiverse.api.exceptions.TransactionManditoryException
+     * @throws org.multiverse.api.exceptions.TransactionMandatoryException
      *          if no thread local transaction is found.
      */
     public static Transaction getRequiredThreadLocalTransaction() {
         Transaction tx = threadlocal.get().tx;
 
         if (tx == null) {
-            throw new TransactionManditoryException("No transaction is found on the ThreadLocalTransaction");
+            throw new TransactionMandatoryException("No transaction is found on the ThreadLocalTransaction");
         }
 
         return tx;

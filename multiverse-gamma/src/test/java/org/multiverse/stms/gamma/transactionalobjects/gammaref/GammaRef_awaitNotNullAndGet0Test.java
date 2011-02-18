@@ -129,7 +129,7 @@ public class GammaRef_awaitNotNullAndGet0Test implements GammaConstants {
         try {
             ref.awaitNotNullAndGet();
             fail();
-        } catch (TransactionManditoryException expected) {
+        } catch (TransactionMandatoryException expected) {
         }
 
         assertVersionAndValue(ref, initialVersion, null);

@@ -125,7 +125,7 @@ public class GammaRef_awaitNull0Test {
         try {
             ref.awaitNull();
             fail();
-        } catch (TransactionManditoryException expected) {
+        } catch (TransactionMandatoryException expected) {
         }
 
         assertVersionAndValue(ref, initialVersion, null);

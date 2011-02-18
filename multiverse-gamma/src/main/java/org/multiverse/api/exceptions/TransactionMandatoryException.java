@@ -9,14 +9,14 @@ import static java.lang.String.format;
  * @author Peter Veentjer
  * @see org.multiverse.api.TransactionFactoryBuilder#setPropagationLevel(org.multiverse.api.PropagationLevel)
  */
-public class TransactionManditoryException extends PropagationException {
+public class TransactionMandatoryException extends PropagationException {
 
     private static final long serialVersionUID = 0;
 
     /**
      * Creates a new TransactionRequiredException.
      */
-    public TransactionManditoryException() {
+    public TransactionMandatoryException() {
     }
 
     /**
@@ -24,7 +24,7 @@ public class TransactionManditoryException extends PropagationException {
      *
      * @param message the message of the exception.
      */
-    public TransactionManditoryException(String message) {
+    public TransactionMandatoryException(String message) {
         super(message);
     }
 
@@ -34,7 +34,7 @@ public class TransactionManditoryException extends PropagationException {
      * @param clazz the class of the method where the transaction was required
      * @param method the name of the method where the transaction was required.
      */
-    public TransactionManditoryException(Class clazz, String method){
+    public TransactionMandatoryException(Class clazz, String method){
         super(format("%s.%s is missing a required transaction", clazz.getName(),method));
     }
 
@@ -44,7 +44,7 @@ public class TransactionManditoryException extends PropagationException {
      * @param message the message of the exception.
      * @param cause   the cause of the exception.
      */
-    public TransactionManditoryException(String message, Throwable cause) {
+    public TransactionMandatoryException(String message, Throwable cause) {
         super(message, cause);
     }
 }

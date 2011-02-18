@@ -9,7 +9,7 @@ import org.multiverse.api.predicates.*;
  * If a method is prefixed with atomic, the call will always run under its own transaction, no
  * matter if there already is a transaction available (so the propagation level is Requires New).
  * For the other methods, always an transaction needs to be available, else you will get the
- * {@link org.multiverse.api.exceptions.TransactionManditoryException}.
+ * {@link org.multiverse.api.exceptions.TransactionMandatoryException}.
  *
  * <h1>ControlFlowError</h1>
  * All non atomic methods are able to throw a (subclass) of the ControlFlowError. This error should

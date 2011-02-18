@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicVoidClosure;
-import org.multiverse.api.exceptions.TransactionManditoryException;
+import org.multiverse.api.exceptions.TransactionMandatoryException;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
@@ -27,7 +27,7 @@ public class StmUtilsTest {
         try {
             scheduleDeferredTask(task);
             fail();
-        } catch (TransactionManditoryException expected) {
+        } catch (TransactionMandatoryException expected) {
         }
 
         verifyZeroInteractions(task);
@@ -82,7 +82,7 @@ public class StmUtilsTest {
         try {
             scheduleCompensatingTask(task);
             fail();
-        } catch (TransactionManditoryException expected) {
+        } catch (TransactionMandatoryException expected) {
         }
 
         verifyZeroInteractions(task);
@@ -134,7 +134,7 @@ public class StmUtilsTest {
         try {
             scheduleCompensatingOrDeferredTask(task);
             fail();
-        } catch (TransactionManditoryException expected) {
+        } catch (TransactionMandatoryException expected) {
         }
 
         verifyZeroInteractions(task);
