@@ -127,7 +127,7 @@ public final class StmUtils {
      * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
      * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
      *
-     * @param closure The {$closure.name} to execute.
+     * @param closure The closure {@link ${closure.name}} to execute.
 #if(${closure.type} ne 'void')
      * @return the result of the execution
 #end
@@ -151,7 +151,7 @@ public final class StmUtils {
     * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
     * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
     *
-    * @param closure The {$closure.name} to execute.
+    * @param closure The {@link ${closure.name}} to execute.
 #if(${closure.type} ne 'void')
     * @return the result of the execution
 #end

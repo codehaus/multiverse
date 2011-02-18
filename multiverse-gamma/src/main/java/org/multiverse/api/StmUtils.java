@@ -126,7 +126,7 @@ public final class StmUtils {
      * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
      * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
      *
-     * @param closure The {AtomicClosure} to execute.
+     * @param closure The closure {@link AtomicClosure} to execute.
      * @return the result of the execution
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
@@ -144,7 +144,7 @@ public final class StmUtils {
     * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
     * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
     *
-    * @param closure The {AtomicClosure} to execute.
+    * @param closure The {@link AtomicClosure} to execute.
     * @return the result of the execution
     * @throws NullPointerException if closure is null.
     * @throws Exception is the closure throws an Exception
@@ -194,7 +194,7 @@ public final class StmUtils {
      * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
      * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
      *
-     * @param closure The {AtomicIntClosure} to execute.
+     * @param closure The closure {@link AtomicIntClosure} to execute.
      * @return the result of the execution
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
@@ -212,7 +212,7 @@ public final class StmUtils {
     * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
     * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
     *
-    * @param closure The {AtomicIntClosure} to execute.
+    * @param closure The {@link AtomicIntClosure} to execute.
     * @return the result of the execution
     * @throws NullPointerException if closure is null.
     * @throws Exception is the closure throws an Exception
@@ -262,7 +262,7 @@ public final class StmUtils {
      * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
      * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
      *
-     * @param closure The {AtomicLongClosure} to execute.
+     * @param closure The closure {@link AtomicLongClosure} to execute.
      * @return the result of the execution
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
@@ -280,7 +280,7 @@ public final class StmUtils {
     * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
     * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
     *
-    * @param closure The {AtomicLongClosure} to execute.
+    * @param closure The {@link AtomicLongClosure} to execute.
     * @return the result of the execution
     * @throws NullPointerException if closure is null.
     * @throws Exception is the closure throws an Exception
@@ -330,7 +330,7 @@ public final class StmUtils {
      * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
      * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
      *
-     * @param closure The {AtomicDoubleClosure} to execute.
+     * @param closure The closure {@link AtomicDoubleClosure} to execute.
      * @return the result of the execution
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
@@ -348,7 +348,7 @@ public final class StmUtils {
     * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
     * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
     *
-    * @param closure The {AtomicDoubleClosure} to execute.
+    * @param closure The {@link AtomicDoubleClosure} to execute.
     * @return the result of the execution
     * @throws NullPointerException if closure is null.
     * @throws Exception is the closure throws an Exception
@@ -398,7 +398,7 @@ public final class StmUtils {
      * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
      * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
      *
-     * @param closure The {AtomicBooleanClosure} to execute.
+     * @param closure The closure {@link AtomicBooleanClosure} to execute.
      * @return the result of the execution
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
@@ -416,7 +416,7 @@ public final class StmUtils {
     * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
     * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
     *
-    * @param closure The {AtomicBooleanClosure} to execute.
+    * @param closure The {@link AtomicBooleanClosure} to execute.
     * @return the result of the execution
     * @throws NullPointerException if closure is null.
     * @throws Exception is the closure throws an Exception
@@ -466,7 +466,7 @@ public final class StmUtils {
      * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
      * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
      *
-     * @param closure The {AtomicVoidClosure} to execute.
+     * @param closure The closure {@link AtomicVoidClosure} to execute.
      * @throws NullPointerException if closure is null.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
      *                                  if the closure throws a checked exception.
@@ -483,7 +483,7 @@ public final class StmUtils {
     * <p>If you want to get most out of performance, it is best to make use of a customized {@link AtomicBlock} instead
     * of relying on the default AtomicBlock that will always provide the most expensive transaction available.
     *
-    * @param closure The {AtomicVoidClosure} to execute.
+    * @param closure The {@link AtomicVoidClosure} to execute.
     * @throws NullPointerException if closure is null.
     * @throws Exception is the closure throws an Exception
     */

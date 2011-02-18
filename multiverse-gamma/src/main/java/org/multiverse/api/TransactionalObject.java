@@ -3,6 +3,11 @@ package org.multiverse.api;
 /**
  * The interface each transactional object needs to implement.
  *
+ * <p>A TransactionalObject is an object where all reads/writes are managed through a {@link Transaction} (unless an atomic
+ * method is used).
+ *
+ * <p>Each TransactionalObject belongs to 1 {@link Stm} instance.
+ *
  * <p>All methods are threadsafe.
  *
  * @author Peter Veentjer.

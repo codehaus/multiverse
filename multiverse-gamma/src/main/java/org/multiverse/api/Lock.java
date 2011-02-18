@@ -4,8 +4,9 @@ package org.multiverse.api;
  * The Lock provides access to pessimistic behavior of a {@link TransactionalObject}. STM normally is very optimistic, but
  * in some cases a more pessimistic approach (one with less retries) could be a better fitting solution.
  * <p/>
- * There are different types of locks:
+ * There are 4 different types of lockmodes:
  * <ul>
+ * <li><b>LockMode.None:</b> it doesn't do any locking</li>
  * <li><b>LockMode.Read:</b> it allows multiple transactions to acquire the read lock, but transaction acquiring the write-lock
  * or exclusive lock (needed when a transaction wants to commit) is prohibited. If the read lock is acquired by a different
  * transaction, a transaction still is able to read/write, but it isn't allowed to commit the changes (since and exclusive
@@ -20,7 +21,7 @@ package org.multiverse.api;
  * <li><b>LockMode.Exclusive:</b> it allows only one transaction to acquire the commit lock, and readers are not
  * allowed to read anymore. From an isolation perspective, the exclusive lock looks a lot like the synchronized
  * statement (or a {@link java.util.concurrent.locks.ReentrantLock}} where only mutually exclusive access is
- * possible. The exclusive lock normally is used by the STM when it commits.<li>
+ * possible. The exclusive lock normally is used by the STM when it commits.</li>
  * </ul>
  *
  * <h3>Lock duration and release</h3>
@@ -53,10 +54,10 @@ package org.multiverse.api;
  * <ol>
  * <li>LockMode.Read->LockMode.Write: as long as no other transaction has acquired the Lock in LockMode.Read</li>
  * <li>LockMode.Read->LockMode.Exclusive: as long as no other transaction has acquired the Lock in LockMode.Read</li>
- * <li>LockMode.Write->LockMode.Exclusive</li>
+ * <li>LockMode.Write->LockMode.Exclusive: will always succeed</li>
  * </ol>
  * <p>
- * The transaction is allowed to apply a more strict LockMode than the one specified.
+ * The Transaction is allowed to apply a more strict LockMode than the one specified.
  *
  * <h3>Lock downgrade</h3>
  *

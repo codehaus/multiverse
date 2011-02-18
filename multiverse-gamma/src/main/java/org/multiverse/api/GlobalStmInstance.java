@@ -18,7 +18,7 @@ import static java.lang.reflect.Modifier.isStatic;
  * <h3>Initialization</h3>
  *
  * <p>The default implementation is the GammaStm for now. It can be configured through setting the System property:
- * org.multiverse api GlobalStmInstance.factoryMethod. This method should be a no arg static method that returns a
+ * 'org.multiverse.api.GlobalStmInstance.factoryMethod'. This method should be a no arg static method that returns a
  * {@link Stm} instance.
  *
  * @author Peter Veentjer
