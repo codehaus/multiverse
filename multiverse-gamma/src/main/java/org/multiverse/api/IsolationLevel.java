@@ -35,11 +35,35 @@ package org.multiverse.api;
  *
  * <h3>Inconsistent Read</h3>
  *
- * <p>With the inconsistent read isolation level
+ * <p>With the inconsistent read it is possible that a value is read depending on a previous read value that has been updated
+ * by another transaction. E.g. there are 100 refs all initialized with the same value and there is an updating transaction
+ * that increments all value's by one, and there is a reading transaction that reads all refs, then it should see the same
+ * values for all values.
  *
  * <h3>Writeskew</h3>
  *
+ * <p>With the writeskew problem it is possible that 2 transactions commit....
+ *
+ * <p>Example 1: there are 1 person that has 2 bank accounts and the invariant is that the sum of both bank accounts is
+ * always equal or larger than zero. If user has has 50 euro on both accounts (so the sum is 100) and there are 2 transactions
+ * that both subtract 100 euro from the bank accounts, and the first sees account1=50 and account2=50, the subtraction is allowed
+ * and subtracts it 100 from the first account, and the second transaction sees exactly the same and subtracts 100 from the second
+ * account, it could be possible that the person ends up with -50 on both accounts (so a sum of -100), clearly violating the
+ * contract that the the sum should never be smaller than 0.
+ *
+ * <p>Example 2:
+ *
  * <h3>Isolation Levels</h3>
+ *
+ * <p>The following isolation levels are currently defined in Multiverse:
+ * <ol>
+ *     <li>Read Committed</li>
+ *     <li>Repeatable Read</li>
+ *     <li>Snapshot</li>
+ *     <li>Serialized</li>
+ * </ol>
+ * The read uncommitted is currently not defined since currently there is no need to do a dirty read, there will always be committed
+ * data available for reading (the write is deferred till commit, so you won't have to see transactions in progress).
  *
  * <table>
  *
