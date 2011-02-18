@@ -185,17 +185,17 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - publication of benchy
 
-- removal of the ReadCommitted isolation level
-
 ----------------------------------------------------------------------
                                 done
 ----------------------------------------------------------------------
+
+- removal of the ReadCommitted isolation level
 
 - Javadoc: Ref
 
 - upload of sources in jar form
 
-- upload of javadoc in jar form
+- upload of Javadoc in jar form
 
 - testing: repeatable read isolation level
 
@@ -203,7 +203,7 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - testing: GammaRef_atomicGetAndAlterTest
 
-- testing:GammaRef_commuteTest
+- testing: GammaRef_commuteTest
 
 - testing: GammaRef_commute1Test
 
@@ -221,16 +221,16 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - Improved Javadoc on the Transaction life-cycle functionality.
 
-- Improved Documentation for Functions
+- Improved Javadoc for Functions
 
-- Improved Documentation for all exceptions
+- Improved Javadoc for all exceptions
 
-- Improved Documentation on ControlFlowError
+- Improved Javadoc on ControlFlowError
 
-- Improved Documentation on TransactionStatus
+- Improved Javadoc on TransactionStatus
 
-- Improved Documentation on Lock
+- Improved Javadoc on Lock
 
-- Improved Documentation on LockMode
+- Improved Javadoc on LockMode
 
 - Improved Javadoc on Transaction
