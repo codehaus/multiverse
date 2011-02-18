@@ -20,6 +20,15 @@ public final class Functions {
     private static final DoubleFunction identityDoubleFunction = new IdentityDoubleFunction();
 
     /**
+     * Returns an {@link Function} that returns its input.
+     *
+     * @return the identity function.
+     */
+    public static Function identityFunction(){
+        return identityFunction;
+    }
+
+    /**
      * Returns an {@link DoubleFunction} that returns its input.
      *
      * @return the identity function.
@@ -194,6 +203,19 @@ public final class Functions {
             return "IdentityLongFunction";
         }
     };
+
+    private static final Function identityFunction = new Function() {
+        @Override
+        public Object call(Object value) {
+            return value;
+        }
+
+        @Override
+            public String toString() {
+                return "IdentityFunction";
+            }
+        };
+
 
     private static class IncIntFunction extends IntFunction {
         private final int value;

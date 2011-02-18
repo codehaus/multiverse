@@ -58,10 +58,6 @@ transaction has caused any conflicting writes. So you know that there is no writ
 - safe way to use multiple stm's (refs need to store the stm they belong to and transaction
  needs to detect if there is a conflict. Problem is with non fresh refs
 
-- expose lock for read.
-
-- expose lock for write.
-
 - the class index makes it easy to create some kind of arrays that store all kind of information
   on the transactional class level. The question is how to to do it for transactions. You don't want to
   publish it every time.
@@ -90,10 +86,6 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - transactional treeset
 
-- transactional hashset
-
-- transactional treeset
-
 - a reference that always causes a privatization.
 
 - transactional array
@@ -108,12 +100,6 @@ when a normal transaction... when a lock is acquired, a retry error should also 
     - state not used for now
 
 - use a retry policy for re-acquiring lock. atm only spinning is used.
-
-- openForConstruction on generic transactional object should return current type of tranlocal
-
-- openForRead on generic transactional object should return current type of tranlocal
-
-- openForWrite on generic transactional object should return current type of tranlocal
 
 - cram all logic of the tranlocal in a long
 
@@ -154,9 +140,6 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - jmm issue with commit and listeners, it could happen that a write is done after a check is done if a listeners
   is available. This could lead to a deadlock since the listener that is set after the write
-
-- mono transaction can do a cheap read of the current tranlocal already is permanent:
-  this is because no consistency guaranteed need to be provided.
 
 --------------------------------------------------------------------
                         to do
@@ -228,7 +211,9 @@ when a normal transaction... when a lock is acquired, a retry error should also 
                                 done
 ----------------------------------------------------------------------
 
-- testing:GammaRef_atomicGetAndSetTest
+- testing: GammaRef_commute1Test
+
+- testing: GammaRef_atomicGetAndSetTest
 
 - testing: GammaLongRef_atomicGetAndSetTest
 
