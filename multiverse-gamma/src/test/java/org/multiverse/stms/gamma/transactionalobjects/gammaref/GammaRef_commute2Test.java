@@ -13,9 +13,8 @@ import org.multiverse.api.exceptions.ReadWriteConflict;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
 import org.multiverse.stms.gamma.GammaStm;
-import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
-import org.multiverse.stms.gamma.transactionalobjects.gammalongref.LongRefAwaitThread;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
 import org.multiverse.stms.gamma.transactions.fat.FatFixedLengthGammaTransactionFactory;
@@ -63,7 +62,8 @@ public class GammaRef_commute2Test {
 
     @Test
     public void whenCommuteFunctionCausesProblems_thenNoProblemsSinceCommuteFunctionNotEvaluatedImmediately() {
-        GammaLongRef ref = new GammaLongRef(stm);
+        Long initialValue = 10L;
+        GammaRef<Long> ref = new GammaRef<Long>(stm, initialValue);
 
         LongFunction function = mock(LongFunction.class);
         RuntimeException ex = new RuntimeException();
@@ -75,44 +75,26 @@ public class GammaRef_commute2Test {
         assertHasCommutingFunctions(tx.getRefTranlocal(ref), function);
 
         assertIsActive(tx);
-        assertEquals(0, ref.atomicGet());
+        assertEquals(initialValue, ref.atomicGet());
         assertRefHasNoLocks(ref);
         assertSurplus(ref, 0);
         assertNull(getThreadLocalTransaction());
     }
 
     @Test
-    public void whenExclusiveLockAcquiredByOther_thenCommuteSucceedsButCommitFails() {
-        long initialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, initialValue);
-        long initialVersion = ref.getVersion();
-
-        GammaTransaction otherTx = transactionFactory.newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Exclusive);
-
-        GammaTransaction tx = transactionFactory.newTransaction();
-        ref.commute(tx, Functions.incLongFunction());
-
-        try {
-            tx.commit();
-            fail();
-        } catch (ReadWriteConflict expected) {
-        }
-
-        assertSurplus(ref, 1);
-        assertIsAborted(tx);
-        assertRefHasExclusiveLock(ref, otherTx);
-        assertVersionAndValue(ref, initialVersion, initialValue);
+    public void whenLockedByOther(){
+        whenLockedByOther(LockMode.Read);
+        whenLockedByOther(LockMode.Write);
+        whenLockedByOther(LockMode.Exclusive);
     }
 
-    @Test
-    public void whenWriteLockAcquiredByOther_thenCommuteSucceedsButCommitFails() {
-        long initialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+   public void whenLockedByOther(LockMode lockMode) {
+        Long initialValue = 10L;
+        GammaRef<Long> ref = new GammaRef<Long>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         GammaTransaction otherTx = transactionFactory.newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Write);
+        ref.getLock().acquire(otherTx, lockMode);
 
         GammaTransaction tx = transactionFactory.newTransaction();
         ref.commute(tx, Functions.incLongFunction());
@@ -123,40 +105,16 @@ public class GammaRef_commute2Test {
         } catch (ReadWriteConflict expected) {
         }
 
-        assertIsAborted(tx);
         assertSurplus(ref, 1);
-        assertRefHasWriteLock(ref, otherTx);
-        assertVersionAndValue(ref, initialVersion, initialValue);
-    }
-
-    @Test
-    public void whenReadLockAcquiredByOther_thenCommuteSucceedsButCommitFails() {
-        long initialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, initialValue);
-        long initialVersion = ref.getVersion();
-
-        GammaTransaction otherTx = transactionFactory.newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Read);
-
-        GammaTransaction tx = transactionFactory.newTransaction();
-        ref.commute(tx, Functions.incLongFunction());
-
-        try {
-            tx.commit();
-            fail();
-        } catch (ReadWriteConflict expected) {
-        }
-
         assertIsAborted(tx);
-        assertSurplus(ref, 1);
-        assertRefHasReadLock(ref, otherTx);
+        assertRefHasLockMode(ref, otherTx, lockMode.asInt());
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
     @Test
     public void whenSuccess() {
-        long initialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        Long initialValue = 10L;
+        GammaRef<Long> ref = new GammaRef<Long>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         LongFunction function = Functions.incLongFunction();
@@ -173,8 +131,8 @@ public class GammaRef_commute2Test {
 
     @Test
     public void whenNoChange() {
-        long initialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        Long initialValue = 10L;
+        GammaRef<Long> ref = new GammaRef<Long>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         LongFunction function = Functions.identityLongFunction();
@@ -191,8 +149,8 @@ public class GammaRef_commute2Test {
 
     @Test
     public void whenNormalTransactionUsed() {
-        long initialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        Long initialValue = 10L;
+        GammaRef<Long> ref = new GammaRef<Long>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         LongFunction function = Functions.incLongFunction(1);
@@ -205,8 +163,8 @@ public class GammaRef_commute2Test {
 
     @Test
     public void whenAlreadyOpenedForRead() {
-        long initialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        Long initialValue = 10L;
+        GammaRef<Long> ref = new GammaRef<Long>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         LongFunction function = Functions.incLongFunction(1);
@@ -216,7 +174,7 @@ public class GammaRef_commute2Test {
 
         GammaRefTranlocal commute = tx.getRefTranlocal(ref);
         assertFalse(commute.isCommuting());
-        assertEquals(11, commute.long_value);
+        assertEquals(new Long(11), commute.ref_value);
         tx.commit();
 
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
@@ -224,41 +182,42 @@ public class GammaRef_commute2Test {
 
     @Test
     public void whenAlreadyOpenedForConstruction() {
-        LongFunction function = Functions.incLongFunction(1);
         GammaTransaction tx = transactionFactory.newTransaction();
-        GammaLongRef ref = new GammaLongRef(tx);
+        Long initialValue = 10L;
+        GammaRef<Long> ref = new GammaRef<Long>(tx, initialValue);
         ref.openForConstruction(tx);
-        ref.commute(tx, function);
+        ref.commute(tx, Functions.incLongFunction());
 
         GammaRefTranlocal commute = tx.getRefTranlocal(ref);
         assertFalse(commute.isCommuting());
-        assertEquals(1, commute.long_value);
+        assertEquals(new Long(11), commute.ref_value);
         tx.commit();
 
-        assertEquals(1, ref.atomicGet());
+        assertEquals(new Long(11), ref.atomicGet());
     }
 
     @Test
     public void whenAlreadyOpenedForWrite() {
-        GammaLongRef ref = new GammaLongRef(stm, 10);
+        Long initialValue = 10L;
+        GammaRef<Long> ref = new GammaRef<Long>(stm, initialValue);
 
         LongFunction function = Functions.incLongFunction();
         GammaTransaction tx = transactionFactory.newTransaction();
-        ref.set(tx, 11);
+        ref.set(tx, new Long(11));
         ref.commute(tx, function);
 
         GammaRefTranlocal commute = tx.getRefTranlocal(ref);
         assertFalse(commute.isCommuting());
-        assertEquals(12, commute.long_value);
+        assertEquals(new Long(12), commute.ref_value);
         tx.commit();
 
-        assertEquals(12, ref.atomicGet());
+        assertEquals(new Long(12), ref.atomicGet());
     }
 
     @Test
     public void whenAlreadyCommuting() {
-        long initialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        Long initialValue = 10L;
+        GammaRef<Long> ref = new GammaRef<Long>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         LongFunction function1 = Functions.incLongFunction();
@@ -277,12 +236,13 @@ public class GammaRef_commute2Test {
 
     @Test
     public void whenNullFunction_thenNullPointerException() {
-        long initialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        Long initialValue = 10L;
+        GammaRef<Long> ref = new GammaRef<Long>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = transactionFactory.newTransaction();
 
+        long orecValue = ref.orec;
         try {
             ref.commute(tx, null);
             fail();
@@ -292,16 +252,18 @@ public class GammaRef_commute2Test {
 
         assertIsAborted(tx);
         assertVersionAndValue(ref, initialVersion, initialValue);
+        assertOrecValue(ref, orecValue);
     }
 
     @Test
     public void whenNullTransaction_thenNullPointerException() {
-        long initialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        Long initialValue = 10L;
+        GammaRef<Long> ref = new GammaRef<Long>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         LongFunction function = mock(LongFunction.class);
 
+        long orecValue = ref.orec;
         try {
             ref.commute((Transaction) null, function);
             fail();
@@ -310,18 +272,20 @@ public class GammaRef_commute2Test {
 
         verifyZeroInteractions(function);
         assertVersionAndValue(ref, initialVersion, initialValue);
+        assertOrecValue(ref, orecValue);
     }
 
     @Test
     public void whenTransactionAborted_thenDeadTransactionException() {
-        long initialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        Long initialValue = 10L;
+        GammaRef<Long> ref = new GammaRef<Long>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         LongFunction function = mock(LongFunction.class);
         GammaTransaction tx = transactionFactory.newTransaction();
         tx.abort();
 
+        long orecValue = ref.orec;
         try {
             ref.commute(tx, function);
             fail();
@@ -331,18 +295,20 @@ public class GammaRef_commute2Test {
         assertIsAborted(tx);
         verifyZeroInteractions(function);
         assertVersionAndValue(ref, initialVersion, initialValue);
+        assertOrecValue(ref,orecValue);
     }
 
     @Test
     public void whenTransactionCommitted_thenDeadTransactionException() {
-        long initialValue = 20;
-        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        Long initialValue = 20L;
+        GammaRef<Long> ref = new GammaRef<Long>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         LongFunction function = mock(LongFunction.class);
         GammaTransaction tx = transactionFactory.newTransaction();
         tx.commit();
 
+        long orecValue = ref.orec;
         try {
             ref.commute(tx, function);
             fail();
@@ -352,18 +318,20 @@ public class GammaRef_commute2Test {
         assertIsCommitted(tx);
         verifyZeroInteractions(function);
         assertVersionAndValue(ref, initialVersion, initialValue);
+        assertOrecValue(ref, orecValue);
     }
 
     @Test
     public void whenTransactionPrepared_thenPreparedTransactionException() {
-        long initialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        Long initialValue = 10L;
+        GammaRef<Long> ref = new GammaRef<Long>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         LongFunction function = mock(LongFunction.class);
         GammaTransaction tx = transactionFactory.newTransaction();
         tx.prepare();
 
+        long orecValue = ref.orec;
         try {
             ref.commute(tx, function);
             fail();
@@ -373,37 +341,39 @@ public class GammaRef_commute2Test {
         assertIsAborted(tx);
         verifyZeroInteractions(function);
         assertVersionAndValue(ref, initialVersion, initialValue);
+        assertOrecValue(ref, orecValue);
     }
 
     @Test
     public void fullExample() {
         assumeTrue(!(transactionFactory.newTransaction() instanceof FatMonoGammaTransaction));
 
-        GammaLongRef ref1 = new GammaLongRef(stm, 10);
-        GammaLongRef ref2 = new GammaLongRef(stm, 10);
+        Long initialValue = 10L;
+        GammaRef<Long> ref1 = new GammaRef<Long>(stm, initialValue);
+        GammaRef<Long> ref2 = new GammaRef<Long>(stm, initialValue);
 
         GammaTransaction tx1 = transactionFactory.newTransaction();
-        ref1.openForWrite(tx1, LOCKMODE_NONE).long_value++;
+        ref1.openForWrite(tx1, LOCKMODE_NONE).ref_value = new Long(11);
         ref2.commute(tx1, Functions.incLongFunction(1));
 
         GammaTransaction tx2 = transactionFactory.newTransaction();
-        ref2.openForWrite(tx2, LOCKMODE_NONE).long_value++;
+        ref2.openForWrite(tx2, LOCKMODE_NONE).ref_value = new Long(11);
         tx2.commit();
 
         tx1.commit();
 
         assertIsCommitted(tx1);
-        assertEquals(11, ref1.atomicGet());
-        assertEquals(12, ref2.atomicGet());
+        assertEquals(new Long(11), ref1.atomicGet());
+        assertEquals(new Long(12), ref2.atomicGet());
     }
 
     @Test
     public void whenListenersAvailable() {
-        long initialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        Long initialValue = 10L;
+        GammaRef<Long> ref = new GammaRef<Long>(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        LongRefAwaitThread thread = new LongRefAwaitThread(ref, initialValue + 1);
+        RefAwaitThread thread = new RefAwaitThread(ref, initialValue + 1);
         thread.start();
 
         sleepMs(500);

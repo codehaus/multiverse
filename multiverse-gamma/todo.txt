@@ -167,8 +167,6 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - testing:GammaRef_atomicGetAndAlterTest
 
-- testing:GammaRef_commuteTest
-
 - testing:GammaRef_getAndAlterTest
 
 - testing:Lock.acquire0Test
@@ -207,9 +205,25 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - Javadoc: Isolation Level
 
+- AbstractTransactionalCollection:flatMap
+
+- AbstractTransactionalCollection:foldRight
+
+- NaiveTransactionalHashMap & todo's
+
+- NaiveTransactionalhashSet & todo's
+
+ - NaiveTransactionalLinkedList & todo's
+
+- CommitBarrier & todo's
+
+
+
 ----------------------------------------------------------------------
                                 done
 ----------------------------------------------------------------------
+
+- testing:GammaRef_commuteTest
 
 - testing: GammaRef_commute1Test
 
