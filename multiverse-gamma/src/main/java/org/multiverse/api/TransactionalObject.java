@@ -21,6 +21,8 @@ public interface TransactionalObject {
      * Gets the {@link Lock} that belongs to this TransactionalObject. This call doesn't cause any locking, it
      * only provides access to the object that is able to lock. The returned value will never be null.
      *
+     * <p>This call also doesn't rely on a {@link Transaction}.
+     *
      * @return the Lock
      * @throws UnsupportedOperationException if this operation is not supported.
      */
@@ -39,10 +41,11 @@ public interface TransactionalObject {
 
     /**
      * Does an ensure. What is means is that at the end of the transaction (so deferred) checks if no other transaction has
-     * made an update and also guarantees that till the transaction completes no other transaction is able to do an update.
-     * Using the ensure you can coordinate writeskew problem on the reference level. This can safely be called on already
-     * ensured/privatized tranlocals (although it doesn't provide any value anymore since the ensure privatize already prevent
-     * conflicts).
+     * made an update, if this TransactionalObject only is read. The ensure is a way to prevent to writeskew problem on the
+     * ref level (see {@link IsolationLevel} for more detail about the writeskew problem}
+     *
+     * <p>This can safely be called on an TransactionalObject that already is locked, although it doesn't provide much value
+     * since with a locked TransactionalObject, since the writeskew problem can't occur anymore because it can't be changed.
      *
      * <p>Unlike the {@link Lock#acquire(LockMode)} which is pessimistic, this is optimistic.
      *
@@ -60,11 +63,12 @@ public interface TransactionalObject {
     void ensure();
 
     /**
-     * Does an ensure. What is means is that at the end of the {@link Transaction} (so deferred) checks if no other transaction has
-     * made an update and also guarantees that till the transaction completes no other transaction is able to do an update.
-     * Using the ensure you can coordinate writeskew problem on the reference level. This can safely be called on already
-     * ensured/privatized tranlocals (although it doesn't provide any value anymore since the ensure privatize already prevent
-     * conflicts).
+     * Does an ensure. What is means is that at the end of the transaction (so deferred) checks if no other transaction has
+     * made an update, if this TransactionalObject only is read. The ensure is a way to prevent to writeskew problem on the
+     * ref level (see {@link IsolationLevel} for more detail about the writeskew problem}
+     *
+     * <p>This can safely be called on an TransactionalObject that already is locked, although it doesn't provide much value
+     * since with a locked TransactionalObject, since the writeskew problem can't occur anymore because it can't be changed.
      *
      * <p>Unlike the {@link Lock#acquire(LockMode)} which is pessimistic, this is optimistic.
      *

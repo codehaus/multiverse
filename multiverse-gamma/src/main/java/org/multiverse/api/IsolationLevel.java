@@ -76,6 +76,13 @@ package org.multiverse.api;
  * level. This is the same as Oracle is doing with the ReadUncommitted, which automatically is upgraded to a ReadCommitted or the RepeatableRead which is
  * automatically upgraded to Snapshot (Oracle calls this the Serialized isolation level).
  *
+ * <h3>Isolation: pessimistic or optimistic</h3>
+ *
+ * <h3>Isolation through locking</h3>
+ *
+ *
+ *
+ *
  * @author Peter Veentjer.
  * @see TransactionFactoryBuilder#setIsolationLevel(IsolationLevel)
  */
