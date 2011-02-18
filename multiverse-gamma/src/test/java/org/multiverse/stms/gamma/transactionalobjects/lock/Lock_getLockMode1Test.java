@@ -22,6 +22,8 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
+import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasLockMode;
 
 @RunWith(Parameterized.class)
 public class Lock_getLockMode1Test {
@@ -55,104 +57,43 @@ public class Lock_getLockMode1Test {
         ref.getLock().getLockMode(null);
     }
 
-    @Test
-    public void other_whenLockedForReadByOther() {
-        GammaLongRef ref = new GammaLongRef(stm);
-        GammaTransaction otherTx = transactionFactory.newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Read);
-
-        GammaTransaction tx = transactionFactory.newTransaction();
-        LockMode result = ref.getLock().getLockMode(tx);
-
-        assertEquals(LockMode.None, result);
-    }
-
-    @Test
+     @Test
     public void other_whenLockedForWriteByOther() {
+        whenLockedByOther(LockMode.Read);
+        whenLockedByOther(LockMode.Write);
+        whenLockedByOther(LockMode.Exclusive);
+    }
+
+    public void whenLockedByOther(LockMode lockMode) {
         GammaLongRef ref = new GammaLongRef(stm);
         GammaTransaction otherTx = transactionFactory.newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Write);
+        ref.getLock().acquire(otherTx, lockMode);
 
         GammaTransaction tx = transactionFactory.newTransaction();
         LockMode result = ref.getLock().getLockMode(tx);
 
         assertEquals(LockMode.None, result);
+        assertRefHasLockMode(ref, otherTx, lockMode.asInt());
     }
 
     @Test
-    public void other_whenLockForCommitByOther() {
+    public void whenLockedBySelf(){
+        self_whenLocked(LockMode.None);
+        self_whenLocked(LockMode.Read);
+        self_whenLocked(LockMode.Write);
+        self_whenLocked(LockMode.Exclusive);
+    }
+
+    public void self_whenLocked(LockMode lockMode){
         GammaLongRef ref = new GammaLongRef(stm);
-        GammaTransaction otherTx = transactionFactory.newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaTransaction tx = transactionFactory.newTransaction();
+        ref.getLock().acquire(tx, lockMode);
         LockMode result = ref.getLock().getLockMode(tx);
 
-        assertEquals(LockMode.None, result);
-    }
-
-    @Test
-    public void self_whenNotReadBySelf() {
-        GammaLongRef ref = new GammaLongRef(stm);
-
-        GammaTransaction tx = transactionFactory.newTransaction();
-        LockMode lockMode = ref.getLock().getLockMode(tx);
-
-        assertEquals(LockMode.None, lockMode);
-        assertIsActive(tx);
-        assertNull(tx.locate(ref));
-    }
-
-    @Test
-    public void self_whenNotLockedBySelf() {
-        GammaLongRef ref = new GammaLongRef(stm);
-
-        GammaTransaction tx = transactionFactory.newTransaction();
-        ref.get(tx);
-        LockMode lockMode = ref.getLock().getLockMode(tx);
-
-        assertEquals(LockMode.None, lockMode);
+        assertEquals(lockMode, result);
         assertIsActive(tx);
     }
-
-    @Test
-    public void self_whenReadLockedByself() {
-        GammaLongRef ref = new GammaLongRef(stm);
-
-        GammaTransaction tx = transactionFactory.newTransaction();
-        ref.getLock().acquire(tx, LockMode.Read);
-        LockMode lockMode = ref.getLock().getLockMode(tx);
-
-        assertEquals(LockMode.Read, lockMode);
-        assertIsActive(tx);
-    }
-
-    @Test
-    public void self_whenWriteLockedBySelf() {
-        GammaLongRef ref = new GammaLongRef(stm);
-
-        GammaTransaction tx = transactionFactory.newTransaction();
-        ref.getLock().acquire(tx, LockMode.Write);
-        LockMode lockMode = ref.getLock().getLockMode(tx);
-
-        assertEquals(LockMode.Write, lockMode);
-        assertIsActive(tx);
-    }
-
-    @Test
-    public void self_whenExclusiveLockedBySelf() {
-        GammaLongRef ref = new GammaLongRef(stm);
-
-        GammaTransaction tx = transactionFactory.newTransaction();
-        ref.getLock().acquire(tx, LockMode.Exclusive);
-        LockMode lockMode = ref.getLock().getLockMode(tx);
-
-        assertEquals(LockMode.Exclusive, lockMode);
-        assertIsActive(tx);
-    }
-
-    // ====================== states ==================================
-
     @Test
     public void whenTransactionPrepared_thenPreparedTransactionException() {
         GammaLongRef ref = new GammaLongRef(stm);

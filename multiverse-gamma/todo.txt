@@ -105,11 +105,11 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 - jmm issue with commit and listeners, it could happen that a write is done after a check is done if a listeners
   is available. This could lead to a deadlock since the listener that is set after the write
 
+- adding read committed isolation level
+
 --------------------------------------------------------------------
                         to do
 --------------------------------------------------------------------
-
-- adding read committed isolation level
 
 - testing: prepare of transactions and excusive lock isolation level
 
@@ -126,10 +126,6 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 - testing: lean transaction and readonly? no checking is done but what if configured as readonly
 
 - testing: GammaRef_getAndAlterTest
-
-- testing: Lock.acquire0Test
-
-- testing: Lock_getLockMode0Test
 
 - testing: PhantomReadTest
 
@@ -234,3 +230,8 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 - Improved Javadoc on LockMode
 
 - Improved Javadoc on Transaction
+
+- testing: Lock.acquire0Test
+
+- testing: Lock_getLockMode0Test
+
