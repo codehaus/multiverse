@@ -33,48 +33,25 @@ all operations like openForWrite/checkConflict/ensure etc.
     is this desirable? If it is locked, chances are high that and update already is done or is going
     to be done.
 
-- it possible to work with a stripe of conflict counters?
-
-- is it possible to do something with biased locking? So could an object be biased towards a
-transaction? This saves times if the object is read/updated by one thread repeatedly... privatization
-
-- is it possible to replace the snzi on the fly? So start with a cheap one (the uncontended snzi)
-and upgrade to a more complex one if needed.
-
 - cheap writeskew detection; first lock all writes.. if conflict counter hasn't changed, you know that
 there are no read conflicts..
 
 - write validation: can it be optimized? If the conflict counter has not changed, you know that no other
 transaction has caused any conflicting writes. So you know that there is no write conflict.
 
-- make distinction between arriveForRead/arriveForWrite and upgradeArriveForReadToArriveForWrite
-
-- generate different classes: for conflict counter directly and for conflict counter with an array.
-
 - when a transaction needs to wait for a lock, can it help another transaction?
 
 - contention management.
 
-- safe way to use multiple stm's (refs need to store the stm they belong to and transaction
- needs to detect if there is a conflict. Problem is with non fresh refs
-
 - the class index makes it easy to create some kind of arrays that store all kind of information
   on the transactional class level. The question is how to to do it for transactions. You don't want to
   publish it every time.
-
-- and what about 'snapshots'? so only doing it 1 of the n calls.
-
-- ref: the registerRetrylatch should also do the abort.
 
 - is it possible to combine pessimistic locking with blocking? What if a transaction wants to wait for a lock
 to become free... so can when a lock unlease is done, see if there are listeners before releasing the lock? If
 done before, the transaction knows it can remove the current listeners with the a cas, and add them to the set
 of listeners that to be notified. If a transaction wants to block ...
 when a normal transaction... when a lock is acquired, a retry error should also be thrown.
-
-- use the function's for the atomic change functions
-
-- improved backoff policy
 
 - durability:
     only when committing, a dirty transactional object needs to be checked if it is durable. If it isn't
@@ -89,15 +66,6 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 - a reference that always causes a privatization.
 
 - transactional array
-
-- mono transaction and undefined state
-    - state not used for now
-
-- array transaction and undefined state
-    - state not used for now
-
-- map transaction and undefined state
-    - state not used for now
 
 - use a retry policy for re-acquiring lock. atm only spinning is used.
 
@@ -123,8 +91,6 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 - blocking and speculative readtracking?
 
 - lean mono should not upgrade to array when untracked read is done, but should just attach it to the transaction.
-
-- when all reads/writes are pessimistic, cheap conflict detection and cheap prepare.
 
 - rollbackfor/rollnotbackfor exception configuration
 
@@ -159,17 +125,17 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - testing: local conflict counter should be set if needed when the flatten commute is called.
 
-- testing improved for the repeatable read isolation level
+- testing: repeatable read isolation level
 
 - testing: lean transaction and readonly? no checking is done but what if configured as readonly
 
-- testing:GammaRef_getAndAlterTest
+- testing: GammaRef_getAndAlterTest
 
-- testing:Lock.acquire0Test
+- testing: Lock.acquire0Test
 
-- testing:Lock_getLockMode0Test
+- testing: Lock_getLockMode0Test
 
-- testing:PhantomReadTest
+- testing: PhantomReadTest
 
 - CountDownCommitBarrier: RestorePartiesCompensatingTask
 
