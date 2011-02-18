@@ -19,40 +19,19 @@ public class Lock_atomicGetLockModeTest {
     }
 
     @Test
-    public void whenFree() {
-        GammaLongRef ref = new GammaLongRef(stm, 0);
-
-        LockMode lockMode = ref.atomicGetLockMode();
-        assertEquals(LockMode.None, lockMode);
+    public void test() {
+        test(LockMode.None);
+        test(LockMode.Read);
+        test(LockMode.Write);
+        test(LockMode.Exclusive);
     }
 
-    @Test
-    public void whenReadLocked() {
-        GammaLongRef ref = new GammaLongRef(stm);
+    public void test(LockMode lockMode){
+         GammaLongRef ref = new GammaLongRef(stm);
         GammaTransaction tx = stm.newDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Read);
+        ref.getLock().acquire(tx, lockMode);
 
-        LockMode lockMode = ref.atomicGetLockMode();
-        assertEquals(LockMode.Read, lockMode);
-    }
-
-    @Test
-    public void whenWriteLocked() {
-        GammaLongRef ref = new GammaLongRef(stm, 0);
-        GammaTransaction tx = stm.newDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Write);
-
-        LockMode lockMode = ref.atomicGetLockMode();
-        assertEquals(LockMode.Write, lockMode);
-    }
-
-    @Test
-    public void whenExclusiveLocked() {
-        GammaLongRef ref = new GammaLongRef(stm, 0);
-        GammaTransaction tx = stm.newDefaultTransaction();
-        ref.getLock().acquire(tx, LockMode.Exclusive);
-
-        LockMode lockMode = ref.atomicGetLockMode();
-        assertEquals(LockMode.Exclusive, lockMode);
+        LockMode result = ref.atomicGetLockMode();
+        assertEquals(lockMode, result);
     }
 }
