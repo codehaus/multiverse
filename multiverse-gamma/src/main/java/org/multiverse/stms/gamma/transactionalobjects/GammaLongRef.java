@@ -57,7 +57,7 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
     }
 
     public final long get(final GammaTransaction tx) {
-        return readLong(tx);
+        return openForRead(tx,LOCKMODE_NONE).long_value;
     }
 
     @Override

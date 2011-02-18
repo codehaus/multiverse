@@ -5,13 +5,8 @@ import org.multiverse.api.LockMode;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.blocking.RetryLatch;
 import org.multiverse.api.exceptions.LockedException;
-import org.multiverse.api.exceptions.TodoException;
 import org.multiverse.api.exceptions.TransactionMandatoryException;
-import org.multiverse.api.functions.BooleanFunction;
-import org.multiverse.api.functions.DoubleFunction;
-import org.multiverse.api.functions.Function;
-import org.multiverse.api.functions.IntFunction;
-import org.multiverse.api.functions.LongFunction;
+import org.multiverse.api.functions.*;
 import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.GammaStmUtils;
@@ -540,50 +535,6 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
     // ============================================================================================
     // =============================== open for read ==============================================
     // ============================================================================================
-
-    protected final long readLong(final GammaTransaction tx) {
-        if (tx == null) {
-            throw new NullPointerException();
-        }
-
-        final int type = tx.transactionType;
-        if (type == TRANSACTIONTYPE_LEAN_MONO) {
-            return openForRead((LeanMonoGammaTransaction) tx, LOCKMODE_NONE).long_value;
-        } else if (type == TRANSACTIONTYPE_LEAN_FIXED_LENGTH) {
-            return openForRead((LeanFixedLengthGammaTransaction) tx, LOCKMODE_NONE).long_value;
-        }
-
-        final GammaTransactionConfiguration config = tx.config;
-        //if (!config.unrepeatableReadAllowed) {
-            if (type == TRANSACTIONTYPE_FAT_MONO) {
-                return openForRead((FatMonoGammaTransaction) tx, LOCKMODE_NONE).long_value;
-            } else if (type == TRANSACTIONTYPE_FAT_FIXED_LENGTH) {
-                return openForRead((FatFixedLengthGammaTransaction) tx, LOCKMODE_NONE).long_value;
-            } else {
-                return openForRead((FatVariableLengthGammaTransaction) tx, LOCKMODE_NONE).long_value;
-            }
-        //}
-
-        //if (type == TRANSACTIONTYPE_FAT_MONO) {
-        //    return readLong((FatMonoGammaTransaction) tx);
-        //} else if (type == TRANSACTIONTYPE_FAT_FIXED_LENGTH) {
-        //    return readLong((FatFixedLengthGammaTransaction) tx);
-        //} else {
-        //    return readLong((FatVariableLengthGammaTransaction) tx);
-        //}
-    }
-
-    private long readLong(FatMonoGammaTransaction tx) {
-        throw new TodoException();
-    }
-
-    private long readLong(FatFixedLengthGammaTransaction tx) {
-        throw new TodoException();
-    }
-
-    private long readLong(FatVariableLengthGammaTransaction tx) {
-        throw new TodoException();
-    }
 
     public final GammaRefTranlocal openForRead(final GammaTransaction tx, final int lockMode) {
         if (tx == null) {
