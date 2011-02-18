@@ -1,4 +1,4 @@
-package org.multiverse.stms.gamma.transactionalobjects.gammaref;
+package org.multiverse.stms.gamma.transactionalobjects.gammalongref;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -6,15 +6,18 @@ import org.multiverse.api.LockMode;
 import org.multiverse.api.exceptions.LockedException;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.GammaStmConfiguration;
-import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
+import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.ThreadLocalTransaction.*;
+import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.getThreadLocalTransaction;
+import static org.multiverse.api.ThreadLocalTransaction.setThreadLocalTransaction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
-public class GammaRef_atomicGetAndSetTest {
+public class GammaLongRef_atomicGetAndSetTest {
 
     private GammaStm stm;
 
@@ -28,12 +31,12 @@ public class GammaRef_atomicGetAndSetTest {
 
     @Test
     public void whenSuccess() {
-        String initialValue = "initialValue";
-        GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
+        long initialValue = 2;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        String newValue = "newValue";
-        String result = ref.atomicGetAndSet(newValue);
+        int newValue = 10;
+        long result = ref.atomicGetAndSet(newValue);
 
         assertEquals(initialValue, result);
         assertNull(getThreadLocalTransaction());
@@ -45,15 +48,15 @@ public class GammaRef_atomicGetAndSetTest {
 
     @Test
     public void whenActiveTransactionAvailable_thenIgnored() {
-        String initialValue = "initialValue";
-        GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
+        long initialValue = 2;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = stm.newDefaultTransaction();
         setThreadLocalTransaction(tx);
 
-        String newValue = "newValue";
-        String result = ref.atomicGetAndSet(newValue);
+        long newValue = 10;
+        long result = ref.atomicGetAndSet(newValue);
 
         assertIsActive(tx);
         assert (tx.getRefTranlocal(ref) == null);
@@ -73,8 +76,8 @@ public class GammaRef_atomicGetAndSetTest {
     }
 
     public void whenLockedByOther_thenLockedException(LockMode lockMode) {
-        String initialValue = "initialValue";
-        GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
         GammaTransaction otherTx = stm.newDefaultTransaction();
@@ -82,7 +85,7 @@ public class GammaRef_atomicGetAndSetTest {
 
         long orecValue = ref.orec;
         try {
-            ref.atomicGetAndSet("newValue");
+            ref.atomicGetAndSet(1);
             fail();
         } catch (LockedException expected) {
         }
@@ -93,11 +96,11 @@ public class GammaRef_atomicGetAndSetTest {
 
     @Test
     public void whenNoChange_thenNoCommit() {
-        String initialValue = "initialValue";
-        GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
+        long initialValue = 2;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        String result = ref.atomicGetAndSet(initialValue);
+        long result = ref.atomicGetAndSet(initialValue);
 
         assertEquals(initialValue, result);
         assertVersionAndValue(ref, initialVersion, initialValue);
@@ -109,22 +112,21 @@ public class GammaRef_atomicGetAndSetTest {
 
     @Test
     public void whenListenersAvailable() {
-        String initialValue = "initialValue";
-        GammaRef<String> ref = new GammaRef<String>(stm, initialValue);
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
 
-        String newValue = "newValue";
-        RefAwaitThread thread = new RefAwaitThread(ref, newValue);
+        long newValue = initialValue + 1;
+        LongRefAwaitThread thread = new LongRefAwaitThread(ref, newValue);
         thread.start();
 
         sleepMs(500);
 
-        String result = ref.atomicGetAndSet(newValue);
+        long result = ref.atomicGetAndSet(newValue);
 
         assertEquals(initialValue, result);
         joinAll(thread);
         assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion + 1, newValue);
     }
-
 }

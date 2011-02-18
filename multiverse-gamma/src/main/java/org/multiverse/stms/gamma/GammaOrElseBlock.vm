@@ -47,7 +47,7 @@ public class GammaOrElseBlock implements OrElseBlock{
 #else
             return either.execute(tx);
 #end
-        }catch(Retry retry){
+        }catch(RetryError retry){
 #if(${closure.type} eq 'void')
             orelse.execute(tx);
             return;

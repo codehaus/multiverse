@@ -180,8 +180,6 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - testing: lean transaction and readonly? no checking is done but what if configured as readonly
 
-- testing:GammaRef_atomicGetAndSetTest
-
 - testing:GammaRef_atomicAlterAndGetTest
 
 - testing:GammaRef_atomicGetAndAlterTest
@@ -229,6 +227,10 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 ----------------------------------------------------------------------
                                 done
 ----------------------------------------------------------------------
+
+- testing:GammaRef_atomicGetAndSetTest
+
+- testing: GammaLongRef_atomicGetAndSetTest
 
 - Improved message on the abortOnEnsureOnBadStatus
 
