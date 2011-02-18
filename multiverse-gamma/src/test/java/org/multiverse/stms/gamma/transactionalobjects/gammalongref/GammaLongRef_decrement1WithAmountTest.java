@@ -239,7 +239,7 @@ public class GammaLongRef_decrement1WithAmountTest {
         try {
             ref.decrement(5);
             fail();
-        } catch (TransactionRequiredException expected) {
+        } catch (TransactionManditoryException expected) {
         }
 
         assertRefHasNoLocks(ref);

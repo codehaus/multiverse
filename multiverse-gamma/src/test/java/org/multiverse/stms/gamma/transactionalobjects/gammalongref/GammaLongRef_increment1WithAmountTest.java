@@ -234,7 +234,7 @@ public class GammaLongRef_increment1WithAmountTest {
         try {
             ref.increment(5);
             fail();
-        } catch (TransactionRequiredException expected) {
+        } catch (TransactionManditoryException expected) {
         }
 
         assertVersionAndValue(ref, initialVersion, initialValue);

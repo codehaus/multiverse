@@ -3,20 +3,20 @@ package org.multiverse.api.exceptions;
 import static java.lang.String.format;
 
 /**
- * A {@link PropagationException} thrown when no {@link org.multiverse.api.Transaction} is available, but if it was required. A typical
+ * A {@link PropagationException} thrown when no {@link org.multiverse.api.Transaction} is available while it is mandatory. A typical
  * cause of this exception is that the {@link org.multiverse.api.PropagationLevel#Mandatory} is used.
  *
  * @author Peter Veentjer
  * @see org.multiverse.api.TransactionFactoryBuilder#setPropagationLevel(org.multiverse.api.PropagationLevel)
  */
-public class TransactionRequiredException extends PropagationException {
+public class TransactionManditoryException extends PropagationException {
 
     private static final long serialVersionUID = 0;
 
     /**
      * Creates a new TransactionRequiredException.
      */
-    public TransactionRequiredException() {
+    public TransactionManditoryException() {
     }
 
     /**
@@ -24,7 +24,7 @@ public class TransactionRequiredException extends PropagationException {
      *
      * @param message the message of the exception.
      */
-    public TransactionRequiredException(String message) {
+    public TransactionManditoryException(String message) {
         super(message);
     }
 
@@ -34,7 +34,7 @@ public class TransactionRequiredException extends PropagationException {
      * @param clazz the class of the method where the transaction was required
      * @param method the name of the method where the transaction was required.
      */
-    public TransactionRequiredException(Class clazz, String method){
+    public TransactionManditoryException(Class clazz, String method){
         super(format("%s.%s is missing a required transaction", clazz.getName(),method));
     }
 
@@ -44,7 +44,7 @@ public class TransactionRequiredException extends PropagationException {
      * @param message the message of the exception.
      * @param cause   the cause of the exception.
      */
-    public TransactionRequiredException(String message, Throwable cause) {
+    public TransactionManditoryException(String message, Throwable cause) {
         super(message, cause);
     }
 }

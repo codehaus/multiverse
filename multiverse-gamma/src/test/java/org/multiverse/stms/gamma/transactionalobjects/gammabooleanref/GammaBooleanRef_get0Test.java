@@ -9,8 +9,7 @@ import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.api.exceptions.TransactionRequiredException;
-import org.multiverse.api.references.LongRef;
+import org.multiverse.api.exceptions.TransactionManditoryException;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.GammaStmUtils;
 import org.multiverse.stms.gamma.transactionalobjects.GammaBooleanRef;
@@ -189,7 +188,7 @@ public class GammaBooleanRef_get0Test {
         try {
             ref.get();
             fail();
-        } catch (TransactionRequiredException expected) {
+        } catch (TransactionManditoryException expected) {
 
         }
 

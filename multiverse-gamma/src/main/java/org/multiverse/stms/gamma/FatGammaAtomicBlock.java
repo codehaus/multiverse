@@ -95,7 +95,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock{
                                         transactionConfiguration.familyName));
                                 }
                             }
-                            throw new TransactionRequiredException(
+                            throw new TransactionManditoryException(
                                 format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                     transactionConfiguration.familyName));
                         }
@@ -329,7 +329,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock{
                                         transactionConfiguration.familyName));
                                 }
                             }
-                            throw new TransactionRequiredException(
+                            throw new TransactionManditoryException(
                                 format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                     transactionConfiguration.familyName));
                         }
@@ -563,7 +563,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock{
                                         transactionConfiguration.familyName));
                                 }
                             }
-                            throw new TransactionRequiredException(
+                            throw new TransactionManditoryException(
                                 format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                     transactionConfiguration.familyName));
                         }
@@ -797,7 +797,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock{
                                         transactionConfiguration.familyName));
                                 }
                             }
-                            throw new TransactionRequiredException(
+                            throw new TransactionManditoryException(
                                 format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                     transactionConfiguration.familyName));
                         }
@@ -1031,7 +1031,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock{
                                         transactionConfiguration.familyName));
                                 }
                             }
-                            throw new TransactionRequiredException(
+                            throw new TransactionManditoryException(
                                 format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                     transactionConfiguration.familyName));
                         }
@@ -1267,7 +1267,7 @@ public final class FatGammaAtomicBlock extends AbstractGammaAtomicBlock{
                                         transactionConfiguration.familyName));
                                 }
                             }
-                            throw new TransactionRequiredException(
+                            throw new TransactionManditoryException(
                                 format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                     transactionConfiguration.familyName));
                         }

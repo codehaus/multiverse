@@ -26,7 +26,7 @@ public interface OrElseBlock extends MultiverseConstants {
      * @param orelse
      * @return the result of the execution.
      * @throws NullPointerException if either or orelse is null.
-     * @throws org.multiverse.api.exceptions.TransactionRequiredException
+     * @throws org.multiverse.api.exceptions.TransactionManditoryException
      *                              if no transaction is found on the ThreadLocalTransaction.
      * @throws org.multiverse.api.exceptions.InvisibleCheckedException
      *                              if a checked exception is thrown by the closure.

@@ -6,7 +6,7 @@ import org.multiverse.api.StmUtils;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 import org.multiverse.api.closures.AtomicLongClosure;
-import org.multiverse.api.exceptions.TransactionRequiredException;
+import org.multiverse.api.exceptions.TransactionManditoryException;
 import org.multiverse.api.references.LongRef;
 
 import static org.junit.Assert.assertEquals;
@@ -19,7 +19,7 @@ import static org.multiverse.api.StmUtils.retry;
  */
 public class OrElseTest {
 
-    @Test(expected = TransactionRequiredException.class)
+    @Test(expected = TransactionManditoryException.class)
     public void whenCalledWithoutTransaction_thenTransactionRequiredException() {
         AtomicClosure closure = mock(AtomicClosure.class);
 

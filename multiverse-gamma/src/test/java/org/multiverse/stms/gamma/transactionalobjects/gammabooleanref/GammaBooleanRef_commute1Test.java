@@ -1,34 +1,8 @@
 package org.multiverse.stms.gamma.transactionalobjects.gammabooleanref;
 
-import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.multiverse.api.LockMode;
-import org.multiverse.api.TransactionFactory;
-import org.multiverse.api.exceptions.DeadTransactionException;
-import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.api.exceptions.TransactionRequiredException;
-import org.multiverse.api.functions.BooleanFunction;
-import org.multiverse.api.functions.Functions;
-import org.multiverse.stms.gamma.GammaStm;
-import org.multiverse.stms.gamma.transactionalobjects.GammaBooleanRef;
-import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
-import org.multiverse.stms.gamma.transactions.GammaTransaction;
-import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
-import org.multiverse.stms.gamma.transactions.fat.FatFixedLengthGammaTransactionFactory;
-import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransactionFactory;
-import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransactionFactory;
-
-import java.util.Collection;
-
-import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
-import static org.multiverse.TestUtils.*;
-import static org.multiverse.api.ThreadLocalTransaction.*;
-import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 @Ignore
 @RunWith(Parameterized.class)

@@ -9,7 +9,7 @@ import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
-import org.multiverse.api.exceptions.TransactionRequiredException;
+import org.multiverse.api.exceptions.TransactionManditoryException;
 import org.multiverse.api.functions.Function;
 import org.multiverse.api.functions.Functions;
 import org.multiverse.api.functions.LongFunction;
@@ -144,7 +144,7 @@ public class GammaRef_commute1Test {
         try {
             ref.commute(function);
             fail();
-        } catch (TransactionRequiredException expected) {
+        } catch (TransactionManditoryException expected) {
 
         }
 

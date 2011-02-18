@@ -212,7 +212,7 @@ public class GammaIntRef_decrement0Test {
         try {
             ref.decrement();
             fail();
-        } catch (TransactionRequiredException expected) {
+        } catch (TransactionManditoryException expected) {
         }
 
         assertRefHasNoLocks(ref);

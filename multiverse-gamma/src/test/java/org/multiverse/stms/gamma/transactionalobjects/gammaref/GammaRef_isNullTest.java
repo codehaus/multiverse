@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
-import org.multiverse.api.exceptions.TransactionRequiredException;
+import org.multiverse.api.exceptions.TransactionManditoryException;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
@@ -32,7 +32,7 @@ public class GammaRef_isNullTest {
         try {
             ref.isNull();
             fail();
-        } catch (TransactionRequiredException expected) {
+        } catch (TransactionManditoryException expected) {
         }
 
         assertVersionAndValue(ref, initialVersion, null);
@@ -47,7 +47,7 @@ public class GammaRef_isNullTest {
         try {
             ref.isNull();
             fail();
-        } catch (TransactionRequiredException expected) {
+        } catch (TransactionManditoryException expected) {
 
         }
 

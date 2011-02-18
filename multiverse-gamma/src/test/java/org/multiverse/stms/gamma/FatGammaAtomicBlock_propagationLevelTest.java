@@ -7,8 +7,8 @@ import org.multiverse.api.PropagationLevel;
 import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicIntClosure;
 import org.multiverse.api.closures.AtomicVoidClosure;
+import org.multiverse.api.exceptions.TransactionManditoryException;
 import org.multiverse.api.exceptions.TransactionNotAllowedException;
-import org.multiverse.api.exceptions.TransactionRequiredException;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
@@ -82,7 +82,7 @@ public class FatGammaAtomicBlock_propagationLevelTest implements GammaConstants 
         try {
             block.execute(closure);
             fail();
-        } catch (TransactionRequiredException expected) {
+        } catch (TransactionManditoryException expected) {
         }
 
         verifyZeroInteractions(closure);
