@@ -159,8 +159,6 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - Javadoc: BinaryFunction
 
-- Javadoc: Ref
-
 - Javadoc: Isolation Level
 
 - AbstractTransactionalCollection:flatMap
@@ -190,6 +188,8 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 ----------------------------------------------------------------------
                                 done
 ----------------------------------------------------------------------
+
+- Javadoc: Ref
 
 - upload of sources in jar form
 
