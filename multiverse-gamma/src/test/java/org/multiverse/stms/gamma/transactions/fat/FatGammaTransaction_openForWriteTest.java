@@ -758,7 +758,7 @@ public abstract class FatGammaTransaction_openForWriteTest<T extends GammaTransa
         GammaLongRef ref2 = new GammaLongRef(stm, initialValue);
 
         GammaTransactionConfiguration config = new GammaTransactionConfiguration(stm)
-                .setIsolationLevel(IsolationLevel.ReadCommitted);
+                .setIsolationLevel(IsolationLevel.RepeatableRead);
         T tx = newTransaction(config);
 
         ref1.openForWrite(tx, LOCKMODE_NONE);

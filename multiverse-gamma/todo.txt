@@ -185,6 +185,8 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - publication of benchy
 
+- removal of the ReadCommitted isolation level
+
 ----------------------------------------------------------------------
                                 done
 ----------------------------------------------------------------------
@@ -197,9 +199,9 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - testing: repeatable read isolation level
 
-- testing:GammaRef_atomicAlterAndGetTest
+- testing: GammaRef_atomicAlterAndGetTest
 
-- testing:GammaRef_atomicGetAndAlterTest
+- testing: GammaRef_atomicGetAndAlterTest
 
 - testing:GammaRef_commuteTest
 

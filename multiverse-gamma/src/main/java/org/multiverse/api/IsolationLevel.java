@@ -89,17 +89,6 @@ package org.multiverse.api;
 public enum IsolationLevel {
 
     /**
-     * This isolation level doesn't allow for uncommitted data to be read, but you don't get any consistency
-     * guarantees. It could be that the value read changes over time (although when readtracking is used this
-     * problem won't happen that often). And no guarantees are made that the data you read is consistent.
-     * <p/>
-     * Using the ReadCommitted isolation level can be dangerous since the consistency of the data is not guaranteed.
-     * This is even more true for and updating transaction since it could leave objects in an inconsistent state. So
-     * use it very carefully.
-     */
-    ReadCommitted(true, true, true),
-
-    /**
      * With the RepeatableRead isolation level you will always see committed data and next to that once a read
      * is done, this read is going to be repeatable (so you will see the same value every time).
      */
