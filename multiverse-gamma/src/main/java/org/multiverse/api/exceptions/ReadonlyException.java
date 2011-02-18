@@ -1,7 +1,7 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link IllegalTransactionStateException} that indicates that a write action is executed using
+ * An {@link IllegalTransactionStateException} that indicates that a write action is executed using
  * a readonly {@link org.multiverse.api.Transaction}.
  *
  * @author Peter Veentjer.

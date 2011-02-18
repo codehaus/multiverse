@@ -1,7 +1,7 @@
 package org.multiverse.api.exceptions;
 
 /**
- * An {@link RuntimeException} that wraps a checked exception. It is useful if a checked exception
+ * A {@link RuntimeException} that wraps a checked exception. It is useful if a checked exception
  * is thrown, but can't be rethrown. The original checked exception can be retrieved by calling the
  * {@link #getCause()}.
  *

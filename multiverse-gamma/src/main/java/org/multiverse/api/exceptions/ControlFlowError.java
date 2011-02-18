@@ -1,7 +1,7 @@
 package org.multiverse.api.exceptions;
 
 /**
- * A {@link Error} that is used to regulate control flow inside multiverse {@link org.multiverse.api.AtomicBlock}. Normally
+ * An {@link Error} that is used to regulate control flow inside multiverse {@link org.multiverse.api.AtomicBlock}. Normally
  * it would be a very bad thing to regulate control flow using an exception/error, but to make seamless integration in the Java
  * language possible, there is no better alternative. So these exceptions should not catch unless you really know know what you
  * are doing. So catching all Throwable instances (including Error) is a bad practice.
