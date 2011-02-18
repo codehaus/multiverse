@@ -118,7 +118,7 @@ public class GammaRef_awaitNull0Test {
     }
 
     @Test
-    public void whenNoTransactionAvailable_thenTransactionRequiredException() {
+    public void whenNoTransactionAvailable_thenTransactionMandatoryException() {
         GammaRef<String> ref = new GammaRef<String>(stm);
         long initialVersion = ref.getVersion();
 

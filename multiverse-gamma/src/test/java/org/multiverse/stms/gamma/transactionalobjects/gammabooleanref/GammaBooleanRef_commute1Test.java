@@ -119,7 +119,7 @@ public class GammaBooleanRef_commute1Test {
         try {
             ref.commute(function);
             fail();
-        } catch (TransactionRequiredException expected) {
+        } catch (TransactionMandatoryException expected) {
 
         }
 

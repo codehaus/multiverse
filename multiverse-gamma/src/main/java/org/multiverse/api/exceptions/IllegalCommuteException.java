@@ -6,8 +6,9 @@ package org.multiverse.api.exceptions;
  *
  * <p>The reason why Transaction access is not allowed,  is that once other reads/writes are done while executing the commuting
  * behavior, you can have read/write inconsistencies. E.g. in Clojure the same commuting function can be executed more than
- * once on a reference, leading to different values every time executed (e.g. the value it already had inside the transaction,
- * and the most recent committed value when the commuting operation is calculated during transaction commit.
+ * during the execution of a transaction once on a reference, leading to different values every time executed (e.g. the value it
+ * already had inside the transaction, and the most recent committed value when the commuting operation is calculated during
+ * transaction commit.
  *
  * @author Peter Veentjer.
  */

@@ -119,7 +119,7 @@ public class GammaDoubleRef_await1WithPredicateTest {
     }
 
     @Test
-    public void whenNoTransaction_thenTransactionRequiredException() {
+    public void whenNoTransaction_thenTransactionMandatoryException() {
         double initialValue = 10;
         GammaDoubleRef ref = new GammaDoubleRef(stm, initialValue);
         long initialVersion = ref.getVersion();

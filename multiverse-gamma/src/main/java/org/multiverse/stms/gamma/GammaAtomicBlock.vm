@@ -151,7 +151,7 @@ public final class ${atomicBlock.name} extends AbstractGammaAtomicBlock{
                                         transactionConfiguration.familyName));
                                 }
                             }
-                            throw new TransactionRequiredException(
+                            throw new TransactionMandatoryException(
                                 format("No transaction is found for atomicblock '%s' with 'Mandatory' propagation level",
                                     transactionConfiguration.familyName));
                         }

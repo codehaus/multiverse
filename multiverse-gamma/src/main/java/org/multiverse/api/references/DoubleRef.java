@@ -12,8 +12,8 @@ import org.multiverse.api.predicates.*;
  * {@link org.multiverse.api.exceptions.TransactionMandatoryException}.
  *
  * <h1>ControlFlowError</h1>
- * All non atomic methods are able to throw a (subclass) of the ControlFlowError. This error should
- * not be caught, it is task of the AtomicTemplate to do this.
+ * All non atomic methods are able to throw a (subclass) of the {@link org.multiverse.api.exceptions.ControlFlowError}. This error should
+ * not be caught, it is task of the {@link AtomicBlock} to deal with.
  * 
  * <h1>TransactionalExecutionException</h1>
  * Most of the methods can throw a {@link org.multiverse.api.exceptions.TransactionExecutionException}.
@@ -32,7 +32,10 @@ public interface DoubleRef extends TransactionalObject {
      *
      * @return the current value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      * @see #atomicGet()
      */
     double get();
@@ -44,7 +47,10 @@ public interface DoubleRef extends TransactionalObject {
      * @param lockMode the LockMode applied.
      * @return the current value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      * @see #atomicGet()
      */
     double getAndLock(LockMode lockMode);
@@ -56,7 +62,10 @@ public interface DoubleRef extends TransactionalObject {
      * @return the value stored in the ref.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     double get(Transaction tx);
 
@@ -67,8 +76,11 @@ public interface DoubleRef extends TransactionalObject {
     *
     * @param value the new value.
     * @return the new value.
-    * @throws org.multiverse.api.exceptions.ControlFlowError
     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
+    * @throws org.multiverse.api.exceptions.ControlFlowError
+    *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+    *                  is guaranteed to have been aborted.
     */
     double set(double value);
 
@@ -79,8 +91,11 @@ public interface DoubleRef extends TransactionalObject {
     * @param lockMode
     * @return the new value.
     * @throws NullPointerException if lockMode is null (if the transaction is alive, it will also be aborted.
-    * @throws org.multiverse.api.exceptions.ControlFlowError
     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
+    * @throws org.multiverse.api.exceptions.ControlFlowError
+    *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+    *                  is guaranteed to have been aborted.
     */
     double setAndLock(double value, LockMode lockMode);
 
@@ -92,7 +107,10 @@ public interface DoubleRef extends TransactionalObject {
     * @return the old value
     * @throws NullPointerException if tx is null.
     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
     * @throws org.multiverse.api.exceptions.ControlFlowError
+    *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+    *                  is guaranteed to have been aborted.
     */
     double set(Transaction tx, double value);
 
@@ -105,7 +123,10 @@ public interface DoubleRef extends TransactionalObject {
     * @throws NullPointerException if tx is null or lockMode is null. If the lockMode is null and the transaction
     *                              is alive, it will be aborted.
     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
     * @throws org.multiverse.api.exceptions.ControlFlowError
+    *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+    *                  is guaranteed to have been aborted.
     */
     double setAndLock(Transaction tx, double value, LockMode lockMode);
 
@@ -114,8 +135,11 @@ public interface DoubleRef extends TransactionalObject {
      *
      * @param value the new value.
      * @return the old value.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     double getAndSet(double value);
 
@@ -129,7 +153,10 @@ public interface DoubleRef extends TransactionalObject {
     * @return the old value.
     * @throws NullPointerException if tx is null.
     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
     * @throws org.multiverse.api.exceptions.ControlFlowError
+    *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+    *                  is guaranteed to have been aborted.
     */
     double getAndSet(Transaction tx, double value);
 
@@ -189,8 +216,11 @@ public interface DoubleRef extends TransactionalObject {
      *
      * @param function the function to apply to this reference.
      * @throws NullPointerException if function is null.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     void commute(DoubleFunction function);
 
@@ -209,7 +239,10 @@ public interface DoubleRef extends TransactionalObject {
      * @param function the function to apply to this reference.
      * @throws NullPointerException  if function is null. If there is an active transaction, it will be aborted.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     void commute(Transaction tx,DoubleFunction function);
 
@@ -231,7 +264,10 @@ public interface DoubleRef extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if function is null. The Transaction will also be aborted.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     double alterAndGet(DoubleFunction function);
 
@@ -243,7 +279,10 @@ public interface DoubleRef extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if function or transaction is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     double alterAndGet(Transaction tx,DoubleFunction function);
 
@@ -266,7 +305,10 @@ public interface DoubleRef extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if function is null. The transaction will be aborted as well.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     double getAndAlter(DoubleFunction function);
 
@@ -278,7 +320,10 @@ public interface DoubleRef extends TransactionalObject {
      * @return the old value
      * @throws NullPointerException if function or transaction is null. The transaction will be aborted as well.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     double getAndAlter(Transaction tx, DoubleFunction function);
 
@@ -308,7 +353,10 @@ public interface DoubleRef extends TransactionalObject {
      * @param amount the amount to increment with.
      * @return the old value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     double getAndIncrement(double amount);
 
@@ -320,7 +368,10 @@ public interface DoubleRef extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     double getAndIncrement(Transaction tx, double amount);
 
@@ -340,7 +391,10 @@ public interface DoubleRef extends TransactionalObject {
      * @param amount the amount to increment with.
      * @return the new value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     double incrementAndGet(double amount);
 
@@ -352,7 +406,10 @@ public interface DoubleRef extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     double incrementAndGet(Transaction tx, double amount);
 
@@ -364,7 +421,10 @@ public interface DoubleRef extends TransactionalObject {
      *
      * @param value the value to wait for.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     void await(double value);
 
@@ -376,7 +436,10 @@ public interface DoubleRef extends TransactionalObject {
      * @param value the value to wait for.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     void await(Transaction tx,double value);
 
@@ -389,7 +452,10 @@ public interface DoubleRef extends TransactionalObject {
      * @throws NullPointerException if predicate is null. When there is a non dead transaction,
      *                              it will be aborted.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     void await(DoublePredicate predicate);
 
@@ -403,7 +469,10 @@ public interface DoubleRef extends TransactionalObject {
      * @throws NullPointerException if predicate is null or tx is null. When there is a non dead transaction,
      *                              it will be aborted.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     void await(Transaction tx, DoublePredicate predicate);
 }

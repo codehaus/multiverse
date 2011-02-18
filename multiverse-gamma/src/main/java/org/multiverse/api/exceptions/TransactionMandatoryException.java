@@ -14,13 +14,13 @@ public class TransactionMandatoryException extends PropagationException {
     private static final long serialVersionUID = 0;
 
     /**
-     * Creates a new TransactionRequiredException.
+     * Creates a new TransactionMandatoryException.
      */
     public TransactionMandatoryException() {
     }
 
     /**
-     * Creates a new TransactionRequiredException with the provided message.
+     * Creates a new TransactionMandatoryException with the provided message.
      *
      * @param message the message of the exception.
      */
@@ -29,7 +29,7 @@ public class TransactionMandatoryException extends PropagationException {
     }
 
     /**
-     * Creates a new TransactionRequiredException
+     * Creates a new TransactionMandatoryException
      *
      * @param clazz the class of the method where the transaction was required
      * @param method the name of the method where the transaction was required.
@@ -39,7 +39,7 @@ public class TransactionMandatoryException extends PropagationException {
     }
 
     /**
-     * Creates a new TransactionRequiredException with the provided message.
+     * Creates a new TransactionMandatoryException with the provided message.
      *
      * @param message the message of the exception.
      * @param cause   the cause of the exception.

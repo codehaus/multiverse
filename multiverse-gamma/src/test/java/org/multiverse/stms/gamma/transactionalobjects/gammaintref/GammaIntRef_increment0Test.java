@@ -226,7 +226,7 @@ public class GammaIntRef_increment0Test {
     }
 
     @Test
-    public void whenNoTransaction_thenTransactionRequiredException() {
+    public void whenNoTransaction_thenTransactionMandatoryException() {
         int initialValue = 10;
         GammaIntRef ref = new GammaIntRef(stm, initialValue);
         long initialVersion = ref.getVersion();

@@ -122,7 +122,7 @@ public class GammaRef_awaitNotNullAndGet0Test implements GammaConstants {
     }
 
     @Test
-    public void whenNoTransactionAvailable_thenTransactionRequiredException() {
+    public void whenNoTransactionAvailable_thenTransactionMandatoryException() {
         GammaRef<String> ref = new GammaRef<String>(stm);
         long initialVersion = ref.getVersion();
 

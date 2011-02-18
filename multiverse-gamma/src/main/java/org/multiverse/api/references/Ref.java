@@ -12,8 +12,8 @@ import org.multiverse.api.predicates.*;
  * {@link org.multiverse.api.exceptions.TransactionMandatoryException}.
  *
  * <h1>ControlFlowError</h1>
- * All non atomic methods are able to throw a (subclass) of the ControlFlowError. This error should
- * not be caught, it is task of the AtomicTemplate to do this.
+ * All non atomic methods are able to throw a (subclass) of the {@link org.multiverse.api.exceptions.ControlFlowError}. This error should
+ * not be caught, it is task of the {@link AtomicBlock} to deal with.
  * 
  * <h1>TransactionalExecutionException</h1>
  * Most of the methods can throw a {@link org.multiverse.api.exceptions.TransactionExecutionException}.
@@ -33,7 +33,10 @@ public interface Ref<E> extends TransactionalObject {
      *
      * @return the current value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      * @see #atomicGet()
      */
     E get();
@@ -45,7 +48,10 @@ public interface Ref<E> extends TransactionalObject {
      * @param lockMode the LockMode applied.
      * @return the current value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      * @see #atomicGet()
      */
     E getAndLock(LockMode lockMode);
@@ -57,7 +63,10 @@ public interface Ref<E> extends TransactionalObject {
      * @return the value stored in the ref.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     E get(Transaction tx);
 
@@ -68,8 +77,11 @@ public interface Ref<E> extends TransactionalObject {
     *
     * @param value the new value.
     * @return the new value.
-    * @throws org.multiverse.api.exceptions.ControlFlowError
     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
+    * @throws org.multiverse.api.exceptions.ControlFlowError
+    *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+    *                  is guaranteed to have been aborted.
     */
     E set(E value);
 
@@ -80,8 +92,11 @@ public interface Ref<E> extends TransactionalObject {
     * @param lockMode
     * @return the new value.
     * @throws NullPointerException if lockMode is null (if the transaction is alive, it will also be aborted.
-    * @throws org.multiverse.api.exceptions.ControlFlowError
     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
+    * @throws org.multiverse.api.exceptions.ControlFlowError
+    *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+    *                  is guaranteed to have been aborted.
     */
     E setAndLock(E value, LockMode lockMode);
 
@@ -93,7 +108,10 @@ public interface Ref<E> extends TransactionalObject {
     * @return the old value
     * @throws NullPointerException if tx is null.
     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
     * @throws org.multiverse.api.exceptions.ControlFlowError
+    *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+    *                  is guaranteed to have been aborted.
     */
     E set(Transaction tx, E value);
 
@@ -106,7 +124,10 @@ public interface Ref<E> extends TransactionalObject {
     * @throws NullPointerException if tx is null or lockMode is null. If the lockMode is null and the transaction
     *                              is alive, it will be aborted.
     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
     * @throws org.multiverse.api.exceptions.ControlFlowError
+    *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+    *                  is guaranteed to have been aborted.
     */
     E setAndLock(Transaction tx, E value, LockMode lockMode);
 
@@ -115,8 +136,11 @@ public interface Ref<E> extends TransactionalObject {
      *
      * @param value the new value.
      * @return the old value.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     E getAndSet(E value);
 
@@ -130,7 +154,10 @@ public interface Ref<E> extends TransactionalObject {
     * @return the old value.
     * @throws NullPointerException if tx is null.
     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+    *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
     * @throws org.multiverse.api.exceptions.ControlFlowError
+    *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+    *                  is guaranteed to have been aborted.
     */
     E getAndSet(Transaction tx, E value);
 
@@ -190,8 +217,11 @@ public interface Ref<E> extends TransactionalObject {
      *
      * @param function the function to apply to this reference.
      * @throws NullPointerException if function is null.
-     * @throws org.multiverse.api.exceptions.ControlFlowError
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     void commute(Function<E> function);
 
@@ -210,7 +240,10 @@ public interface Ref<E> extends TransactionalObject {
      * @param function the function to apply to this reference.
      * @throws NullPointerException  if function is null. If there is an active transaction, it will be aborted.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     void commute(Transaction tx,Function<E> function);
 
@@ -232,7 +265,10 @@ public interface Ref<E> extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if function is null. The Transaction will also be aborted.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     E alterAndGet(Function<E> function);
 
@@ -244,7 +280,10 @@ public interface Ref<E> extends TransactionalObject {
      * @return the new value.
      * @throws NullPointerException if function or transaction is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     E alterAndGet(Transaction tx,Function<E> function);
 
@@ -267,7 +306,10 @@ public interface Ref<E> extends TransactionalObject {
      * @return the old value.
      * @throws NullPointerException if function is null. The transaction will be aborted as well.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     E getAndAlter(Function<E> function);
 
@@ -279,7 +321,10 @@ public interface Ref<E> extends TransactionalObject {
      * @return the old value
      * @throws NullPointerException if function or transaction is null. The transaction will be aborted as well.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     E getAndAlter(Transaction tx, Function<E> function);
 
@@ -298,7 +343,10 @@ public interface Ref<E> extends TransactionalObject {
      *
      * @return true if null, false otherwise.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     boolean isNull();
 
@@ -309,7 +357,10 @@ public interface Ref<E> extends TransactionalObject {
      * @return true if the value is null, false otherwise.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     boolean isNull(Transaction tx);
 
@@ -329,7 +380,10 @@ public interface Ref<E> extends TransactionalObject {
      *
      * @return the stored value.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     E awaitNotNullAndGet();
 
@@ -341,7 +395,10 @@ public interface Ref<E> extends TransactionalObject {
      * @return the stored value.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     E awaitNotNullAndGet(Transaction tx);
 
@@ -352,7 +409,10 @@ public interface Ref<E> extends TransactionalObject {
      * This call lifts on the Transaction in the ThreadLocalTransaction.
      *
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     void awaitNull();
 
@@ -363,7 +423,10 @@ public interface Ref<E> extends TransactionalObject {
     * @param tx the transaction this method lifts on.
     * @throws NullPointerException if tx is null.
     * @throws org.multiverse.api.exceptions.TransactionExecutionException
-    * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
+     * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
     */
     void awaitNull(Transaction tx);
 
@@ -375,7 +438,10 @@ public interface Ref<E> extends TransactionalObject {
      *
      * @param value the value to wait for.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     void await(E value);
 
@@ -387,7 +453,10 @@ public interface Ref<E> extends TransactionalObject {
      * @param value the value to wait for.
      * @throws NullPointerException if tx is null.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     void await(Transaction tx,E value);
 
@@ -400,7 +469,10 @@ public interface Ref<E> extends TransactionalObject {
      * @throws NullPointerException if predicate is null. When there is a non dead transaction,
      *                              it will be aborted.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     void await(Predicate<E> predicate);
 
@@ -414,7 +486,10 @@ public interface Ref<E> extends TransactionalObject {
      * @throws NullPointerException if predicate is null or tx is null. When there is a non dead transaction,
      *                              it will be aborted.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *                  if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
+     *                  if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                  is guaranteed to have been aborted.
      */
     void await(Transaction tx, Predicate<E> predicate);
 }

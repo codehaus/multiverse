@@ -323,7 +323,7 @@ public final class StmUtils {
      *
      * <p>For more information see {@link Transaction#prepare()}.
      *
-     * @throws TransactionRequiredException if no active transaction is found.
+     * @throws TransactionMandatoryException if no active transaction is found.
      * @throws IllegalTransactionStateException if the active transaction is not in the correct
      *                                           state for this operation.
      * @throws ControlFlowError
@@ -338,7 +338,7 @@ public final class StmUtils {
      *
      * <p>For more information see {@link Transaction#abort()}.
      *
-     * @throws TransactionRequiredException if no active transaction is found.
+     * @throws TransactionMandatoryException if no active transaction is found.
      * @throws IllegalTransactionStateException if the active transaction is not in the correct
      *                                           state for this operation.
      * @throws ControlFlowError
@@ -353,7 +353,7 @@ public final class StmUtils {
      *
      * <p>For more information see {@link Transaction#commit()}.
                     *
-                    * @throws TransactionRequiredException if no active transaction is found.
+                    * @throws TransactionMandatoryException if no active transaction is found.
                     * @throws IllegalTransactionStateException if the active transaction is not in the correct
                     * state for this operation.
                     * @throws ControlFlowError

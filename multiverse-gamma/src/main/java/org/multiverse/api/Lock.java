@@ -112,10 +112,11 @@ public interface Lock {
      * To retrieve the actual LockMode of the Lock, you need to use the {@link #atomicGetLockMode()}.
      *
      * @return the LockMode.
-     * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-     *
+     * @throws org.multiverse.api.exceptions.TransactionExecutionException
+     *          if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
+     *          if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *          is guaranteed to have been aborted.
      * @see #atomicGetLockMode()
      * @see #getLockMode(Transaction)
      */
@@ -128,9 +129,10 @@ public interface Lock {
      * @param tx the Lock
      * @return the LockMode the transaction has on the Lock.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
+     *          if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
+     *          if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *          is guaranteed to have been aborted.
      * @see #atomicGetLockMode()
      * @see #getLockMode(Transaction)
      */
@@ -148,9 +150,10 @@ public interface Lock {
      *
      * @param desiredLockMode the desired lockMode.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
+     *                              if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
+     *                              if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                              is guaranteed to have been aborted.
      * @throws NullPointerException if desiredLockMode is null. If an alive transaction is available, it will
      *                              be aborted.
      */
@@ -167,9 +170,10 @@ public interface Lock {
      * @param tx              the Transaction used for this operation.
      * @param desiredLockMode the desired lockMode.
      * @throws org.multiverse.api.exceptions.TransactionExecutionException
-     *
+     *                              if something failed while using the transaction. The transaction is guaranteed to have been aborted.
      * @throws org.multiverse.api.exceptions.ControlFlowError
-     *
+     *                              if the Stm needs to control the flow in a different way than normal returns of exceptions. The transaction
+     *                              is guaranteed to have been aborted.
      * @throws NullPointerException if tx or desiredLockMode is null. If an alive transaction is available, it will
      *                              be aborted.
      */

@@ -119,7 +119,7 @@ public class GammaBooleanRef_await1WithPredicateTest {
     }
 
     @Test
-    public void whenNoTransaction_thenTransactionRequiredException() {
+    public void whenNoTransaction_thenTransactionMandatoryException() {
         boolean initialValue = true;
         GammaBooleanRef ref = new GammaBooleanRef(stm, initialValue);
         long initialVersion = ref.getVersion();

@@ -176,7 +176,7 @@ public class GammaLongRef_decrement2Test {
     }
 
     @Test
-    public void whenNoTransaction_thenTransactionRequiredException() {
+    public void whenNoTransaction_thenTransactionMandatoryException() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();

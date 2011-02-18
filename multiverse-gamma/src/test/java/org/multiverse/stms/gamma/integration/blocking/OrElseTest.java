@@ -20,7 +20,7 @@ import static org.multiverse.api.StmUtils.retry;
 public class OrElseTest {
 
     @Test(expected = TransactionMandatoryException.class)
-    public void whenCalledWithoutTransaction_thenTransactionRequiredException() {
+    public void whenCalledWithoutTransaction_thenTransactionMandatoryException() {
         AtomicClosure closure = mock(AtomicClosure.class);
 
         StmUtils.execute(closure, closure);
