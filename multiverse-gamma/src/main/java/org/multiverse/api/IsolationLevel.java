@@ -31,7 +31,7 @@ package org.multiverse.api;
  * transaction that can get stuck in an infinitive loop.
  *
  * <p>Such a transaction is called a zombie transaction and can cause serious damage since they are consuming resources
- * (like cpu) and are holding on to various resources (like Locks).
+ * (like cpu) and are holding on to various resources (like Locks). So the unrepeatable read should be used with care.
  *
  * <h3>Inconsistent Read</h3>
  *
