@@ -2,10 +2,12 @@ package org.multiverse.api;
 
 import org.multiverse.api.closures.*;
 import org.multiverse.api.collections.*;
-import org.multiverse.api.exceptions.*;
-import org.multiverse.api.lifecycle.*;
+import org.multiverse.api.exceptions.ControlFlowError;
+import org.multiverse.api.exceptions.IllegalTransactionStateException;
+import org.multiverse.api.exceptions.TransactionMandatoryException;
+import org.multiverse.api.lifecycle.TransactionEvent;
+import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.api.references.*;
-import java.util.*;
 
 import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTransaction;
@@ -662,110 +664,99 @@ public final class StmUtils {
      * Commits the Transaction in the ThreadLocalTransaction transaction.
      *
      * <p>For more information see {@link Transaction#commit()}.
-                    *
-                    * @throws TransactionMandatoryException if no active transaction is found.
-                    * @throws IllegalTransactionStateException if the active transaction is not in the correct
-                    * state for this operation.
-                    * @throws ControlFlowError
-                    */
-                    public static void commit() {
-                    Transaction tx = getRequiredThreadLocalTransaction();
-                    tx.commit();
-                    }
+     *
+     * @throws TransactionMandatoryException if no active transaction is found.
+     * @throws IllegalTransactionStateException if the active transaction is not in the correct
+     * state for this operation.
+     * @throws ControlFlowError
+     */
+     public static void commit() {
+         Transaction tx = getRequiredThreadLocalTransaction();
+         tx.commit();
+     }
 
-                    /**
-                    * Scheduled an deferred or compensating task on the Transaction in the ThreadLocalTransaction. This
-                    task is
-                    * executed after the transaction commits or aborts.
-                    *
-                    * @param task the deferred task to execute.
-                    * @throws NullPointerException if task is null.
-                    * @throws org.multiverse.api.exceptions.TransactionMandatoryException
-                    * if no Transaction is getAndSet at the
-                    * {@link org.multiverse.api.ThreadLocalTransaction}.
-                    * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-                    * if the transaction is not in the
-                    * correct state to accept a compensating or deferred task.
-                    */
-                    public static void scheduleCompensatingOrDeferredTask(final Runnable task) {
-                    if (task == null) {
-                    throw new NullPointerException();
-                    }
+     /**
+      * Scheduled an deferred or compensating task on the Transaction in the ThreadLocalTransaction. Thistask is
+      * executed after the transaction commits or aborts.
+      *
+      * @param task the deferred task to execute.
+      * @throws NullPointerException if task is null.
+      * @throws org.multiverse.api.exceptions.TransactionMandatoryException
+                        if no Transaction is set on the {@link org.multiverse.api.ThreadLocalTransaction}.
+      * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+      *                 if the transaction is not in the correct state to accept a compensating or deferred task.
+      */
+      public static void scheduleCompensatingOrDeferredTask(final Runnable task) {
+            if (task == null) {
+                throw new NullPointerException();
+            }
 
-                    Transaction tx = getRequiredThreadLocalTransaction();
-                    tx.register(new TransactionListener() {
-                    @Override
-                    public void notify(Transaction tx, TransactionEvent event) {
+            Transaction tx = getRequiredThreadLocalTransaction();
+            tx.register(new TransactionListener() {
+                @Override
+                public void notify(Transaction tx, TransactionEvent event) {
                     if (event == TransactionEvent.PostCommit || event == TransactionEvent.PostAbort) {
-                    task.run();
+                        task.run();
                     }
-                    }
-                    });
-                    }
+                }
+            });
+       }
 
-                    /**
-                    * Scheduled an deferred task on the {@link Transaction} in the {@link ThreadLocalTransaction}. This
-                    task is executed after
-                    * the transaction commits and one of the use cases is starting transactions.
-                    *
-                    * @param task the deferred task to execute.
-                    * @throws NullPointerException if task is null.
-                    * @throwsorg.multiverse.api.exceptions.TransactionManditoryExceptionn
-                    * if no Transaction is getAndSet at the
-                    * {@link org.multiverse.api.ThreadLocalTransaction}.
-                    * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-                    * if the transaction is not in the
-                    * correct state to accept a deferred task.
-                    */
-                    public static void scheduleDeferredTask(final Runnable task) {
-                    if (task == null) {
-                    throw new NullPointerException();
-                    }
+       /**
+        * Scheduled an deferred task on the {@link Transaction} in the {@link ThreadLocalTransaction}. This task is executed after
+        * the transaction commits and one of the use cases is starting transactions.
+        *
+        * @param task the deferred task to execute.
+        * @throws NullPointerException if task is null.
+        * @throws org.multiverse.api.exceptions.TransactionMandatoryException
+        *                   if no Transaction is set on the {@link org.multiverse.api.ThreadLocalTransaction}.
+        * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+        *                   if the transaction is not in the correct state to accept a deferred task.
+        */
+       public static void scheduleDeferredTask(final Runnable task) {
+            if (task == null) {
+                throw new NullPointerException();
+            }
 
-                    Transaction tx = getRequiredThreadLocalTransaction();
-                    tx.register(new TransactionListener() {
-                    @Override
-                    public void notify(Transaction tx, TransactionEvent event) {
+            Transaction tx = getRequiredThreadLocalTransaction();
+            tx.register(new TransactionListener() {
+                @Override
+                public void notify(Transaction tx, TransactionEvent event) {
                     if (event == TransactionEvent.PostCommit) {
-                    task.run();
+                        task.run();
                     }
-                    }
-                    });
-                    }
+                }
+            });
+       }
 
-                    /**
-                    * Scheduled a compensating task on the {@link Transaction} in the {@link ThreadLocalTransaction}.
-                    This task is executed after
-                    * the transaction aborts and one of the use cases is cleaning up non transaction resources like the
-                    file system.
-                    *
-                    * @param task the deferred task to execute.
-                    * @throws NullPointerException if task is null.
-                    * @throworg.multiverse.api.exceptions.TransactionManditoryExceptionon
-                    * if no Transaction is getAndSet at the
-                    * {@link org.multiverse.api.ThreadLocalTransaction}.
-                    * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
-                    * if the transaction is not in the
-                    * correct state to accept a compensating task.
-                    */
-                    public static void scheduleCompensatingTask(final Runnable task) {
-                    if (task == null) {
-                    throw new NullPointerException();
-                    }
+       /**
+        * Scheduled a compensating task on the {@link Transaction} in the {@link ThreadLocalTransaction}. This task is executed after
+        * the transaction aborts and one of the use cases is cleaning up non transaction resources like the file system.
+        *
+        * @param task the deferred task to execute.
+        * @throws NullPointerException if task is null.
+        * @throw org.multiverse.api.exceptions.TransactionMandatoryException
+        *                       if no Transaction is set on the {@link org.multiverse.api.ThreadLocalTransaction}.
+        * @throws org.multiverse.api.exceptions.IllegalTransactionStateException
+        *                       if the transaction is not in the correct state to accept a compensating task.
+        */
+       public static void scheduleCompensatingTask(final Runnable task) {
+            if (task == null) {
+                throw new NullPointerException();
+            }
 
-                    Transaction tx = getRequiredThreadLocalTransaction();
-                    tx.register(new TransactionListener() {
-                    @Override
-                    public void notify(Transaction tx, TransactionEvent event) {
+            Transaction tx = getRequiredThreadLocalTransaction();
+            tx.register(new TransactionListener() {
+                @Override
+                public void notify(Transaction tx, TransactionEvent event) {
                     if (event == TransactionEvent.PostAbort) {
-                    task.run();
+                        task.run();
                     }
-                    }
-                    });
-                    }
+                }
+            });
+       }
 
-                    //we don&amp;amp;amp;apos;t want instances
-
-                    private StmUtils() {
-                    }
-                    }
+       //we don want instances
+       private StmUtils() {
+       }
+}
