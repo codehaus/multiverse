@@ -96,10 +96,6 @@ public class GammaAtomicBlock_integrationTest implements GammaConstants {
                     long l = ref.get();
                     ref.set(l + 1);
                 }
-
-
-                int a = 10;
-
             }
         });
 

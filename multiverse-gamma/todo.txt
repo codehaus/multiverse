@@ -123,8 +123,6 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - testing: local conflict counter should be set if needed when the flatten commute is called.
 
-- testing: lean transaction and readonly? no checking is done but what if configured as readonly
-
 - testing: GammaRef_getAndAlterTest
 
 - testing: PhantomReadTest
@@ -239,3 +237,4 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - testing: Lock_getLockMode0Test
 
+- testing: lean transaction and readonly? no checking is done but what if configured as readonly

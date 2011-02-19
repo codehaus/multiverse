@@ -1,7 +1,6 @@
 package org.multiverse.stms.gamma;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.multiverse.api.*;
 import org.multiverse.api.exceptions.IllegalTransactionFactoryException;
@@ -10,7 +9,7 @@ import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
 import org.multiverse.stms.gamma.transactions.GammaTransactionFactory;
 import org.multiverse.stms.gamma.transactions.GammaTransactionFactoryBuilder;
-import org.multiverse.stms.gamma.transactions.fat.FatVariableLengthGammaTransaction;
+import org.multiverse.stms.gamma.transactions.fat.FatMonoGammaTransaction;
 
 import java.util.List;
 
@@ -18,7 +17,7 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
-public class GammaStm_transactionFactoryBuilderTest {
+public class GammaStm_transactionFactoryBuilderTest implements GammaConstants{
     private GammaStm stm;
 
     @Before
@@ -231,27 +230,38 @@ public class GammaStm_transactionFactoryBuilderTest {
     }
 
     @Test
-    @Ignore
-    public void whenWriteSkewNotAllowedThenFatTransaction() {
+    public void whenSerializedThenFatTransaction() {
         GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
                 .setSpeculative(true)
+                .setDirtyCheckEnabled(false)
                 .setIsolationLevel(IsolationLevel.Serializable)
                 .newTransactionFactory();
 
         GammaTransaction tx = txFactory.newTransaction();
-        assertTrue(tx instanceof FatVariableLengthGammaTransaction);
+        assertTrue(tx instanceof FatMonoGammaTransaction);
     }
 
     @Test
-    @Ignore
-    public void whenWriteSkewAllowedThenFatTransaction() {
-        /*
-        GammaTransactionFactory txFactory = stm.createTransactionFactoryBuilder()
-                .setSpeculativeConfigurationEnabled(true)
+    public void whenSnapshotIsolationLevelThenLeanTransaction() {
+        GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
+                .setSpeculative(true)
+                .setDirtyCheckEnabled(false)
                 .setIsolationLevel(IsolationLevel.Snapshot)
-                .build();
+                .newTransactionFactory();
 
         GammaTransaction tx = txFactory.newTransaction();
-        assertTrue(tx instanceof AbstractLeanGammaTransaction);*/
+        assertEquals(TRANSACTIONTYPE_LEAN_MONO, tx.transactionType);
+    }
+
+     @Test
+    public void whenReadonlyThenFatTransaction() {
+        GammaTransactionFactory txFactory = stm.newTransactionFactoryBuilder()
+                .setSpeculative(true)
+                .setReadonly(true)
+                .setDirtyCheckEnabled(false)
+                .newTransactionFactory();
+
+        GammaTransaction tx = txFactory.newTransaction();
+        assertEquals(TRANSACTIONTYPE_FAT_MONO,tx.transactionType);
     }
 }
