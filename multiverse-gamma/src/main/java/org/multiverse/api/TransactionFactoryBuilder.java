@@ -20,16 +20,16 @@ import org.multiverse.api.lifecycle.TransactionListener;
 public interface TransactionFactoryBuilder {
 
     /**
-     * Returns the TransactionConfiguration used by this TransactionFactoryBuilder.
+     * Returns the {@link }TransactionConfiguration} used by this TransactionFactoryBuilder.
      *
      * @return the used TransactionConfiguration.
      */
     TransactionConfiguration getConfiguration();
 
     /**
-     * Sets if ControlFlowErrors are reused. Normally you don't want to reuse them because they can be expensive
-     * to create (especially the stacktrace) and they could be created very often. But for debugging purposes it
-     * can be quite annoying because you want to see the stacktrace.
+     * Sets if the {@link org.multiverse.api.exceptions.ControlFlowError} is reused. Normally you don't want to reuse them
+     * because they can be expensive to create (especially the stacktrace) and they could be created very often. But for
+     * debugging purposes it can be quite annoying because you want to see the stacktrace.
      *
      * @param reused true if ControlFlowErrors should be reused.
      * @return the updated TransactionFactoryBuilder.
@@ -38,7 +38,7 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setControlFlowErrorsReused(boolean reused);
 
     /**
-     * Sets the transaction familyname. If one AtomicBlock is used inside a method, a useful familyname could
+     * Sets the {@link Transaction} familyname. If an {@link AtomicBlock} is used inside a method, a useful familyname could
      * be the full name of the class and the method.
      * <p/>
      * The transaction familyName is useful debugging purposes, but has not other meaning.
@@ -64,7 +64,7 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setPropagationLevel(PropagationLevel propagationLevel);
 
     /**
-     * Sets the LockMode for all reads. If a LockMode is set higher than {@link LockMode#None}, this transaction
+     * Sets the {@link Transaction} {@link LockMode} for all reads. If a LockMode is set higher than {@link LockMode#None}, this transaction
      * will locks all reads (and writes since a read is needed for a write) and the transaction automatically becomes
      * serialized.
      *
@@ -77,7 +77,7 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setReadLockMode(LockMode lockMode);
 
     /**
-     * Sets the {@link LockMode} for all writes. For a write, always a read needs to be done, so if the read LockMode is
+     * Sets the {@link Transaction{} {@link LockMode} for all writes. For a write, always a read needs to be done, so if the read LockMode is
      *
      * <p>Freshly constructed objects that are not committed, automatically are locked with {@link LockMode#Exclusive}.
      *
@@ -97,9 +97,8 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setWriteLockMode(LockMode lockMode);
 
     /**
-     * Adds a permanent {@link TransactionListener} to this {@link TransactionFactoryBuilder}. All permanent listeners
-     * are always executed after all normal listeners are executed. If the same listener is added multiple times, it will
-     * be executed multiple times.
+     * Adds a permanent {@link Transaction} {@link TransactionListener}. All permanent listeners are always executed after all normal
+     * listeners are executed. If the same listener is added multiple times, it will be executed multiple times.
      *
      * <p>This method is very useful for integrating Multiverse in other JVM based environments because with this
      * approach you have a callback when transaction aborts/commit and can add your own logic. See the
@@ -113,7 +112,7 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder addPermanentListener(TransactionListener listener);
 
     /**
-     * Sets the TraceLevel. With tracing it is possible to see what is happening inside a transaction.
+     * Sets the {@link Transaction} {@link TraceLevel}. With tracing it is possible to see what is happening inside a transaction.
      *
      * @param traceLevel the new traceLevel.
      * @return the updated TransactionFactoryBuilder.
@@ -144,7 +143,7 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setInterruptible(boolean interruptible);
 
     /**
-     * Sets the new {@link BackoffPolicy}. Policy is used to backoff when a transaction conflicts with another {@link Transaction}.
+     * Sets the {@link Transaction} {@link BackoffPolicy}. Policy is used to backoff when a transaction conflicts with another {@link Transaction}.
      * See the {@link BackoffPolicy} for more information.
      *
      * @param backoffPolicy the backoff policy to use.
@@ -155,9 +154,10 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setBackoffPolicy(BackoffPolicy backoffPolicy);
 
     /**
-     * Sets if the dirty check is enabled. Dirty check is that something only needs to be written, if there really
-     * is a change. If it is disabled, it will always write, and this could prevent the aba isolation anomaly, but
-     * causes more conflicts so more contention. In most cases enabling it is the best option.
+     * Sets if the {@link Transaction} dirty check is enabled. Dirty check is that something only needs to be written,
+     * if there really is a change (else it will be interpreted as a read). If it is disabled, it will always write, and
+     * this could prevent the aba isolation anomaly, but causes more conflicts so more contention. In most cases enabling
+     * it is the best option.
      *
      * @param dirtyCheckEnabled true if dirty check should be executed, false otherwise.
      * @return the updated TransactionFactoryBuilder.
@@ -222,7 +222,7 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setSpeculative(boolean speculative);
 
     /**
-     * Sets the the maximum count a transaction can be retried. The default is 1000. Setting it to a very low value
+     * Sets the the maximum count a {@link Transaction} can be retried. The default is 1000. Setting it to a very low value
      * could mean that a transaction can't complete. Setting it to a very high value could lead to live-locking.
      *
      * <p>If the speculative configuration mechanism is enabled ({@link #setSpeculative(boolean)}), a few retries
