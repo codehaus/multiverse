@@ -10,6 +10,7 @@ import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.stms.gamma.GammaStmUtils.*;
 import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLocalGammaObjectPool;
 
@@ -18,7 +19,11 @@ import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLoca
  *
  * @author Peter Veentjer.
  */
-public final class GammaBooleanRef extends AbstractGammaRef implements BooleanRef {
+public class GammaBooleanRef extends AbstractGammaRef implements BooleanRef {
+
+    public GammaBooleanRef(boolean value){
+        this((GammaStm) getGlobalStmInstance(),value);
+    }
 
     public GammaBooleanRef(final GammaTransaction tx) {
         this(tx, false);

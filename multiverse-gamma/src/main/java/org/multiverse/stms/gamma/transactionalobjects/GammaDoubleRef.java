@@ -10,11 +10,17 @@ import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.stms.gamma.GammaStmUtils.*;
 import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLocalGammaObjectPool;
 
 @SuppressWarnings({"OverlyComplexClass"})
-public final class GammaDoubleRef extends AbstractGammaRef implements DoubleRef {
+public class GammaDoubleRef extends AbstractGammaRef implements DoubleRef {
+
+    public GammaDoubleRef(double value) {
+        this((GammaStm) getGlobalStmInstance(), value);
+    }
+
 
     public GammaDoubleRef(final GammaTransaction tx) {
         this(tx, 0);

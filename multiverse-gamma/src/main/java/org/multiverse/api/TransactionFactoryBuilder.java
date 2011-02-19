@@ -3,8 +3,11 @@ package org.multiverse.api;
 import org.multiverse.api.lifecycle.TransactionListener;
 
 /**
- * A Builder for creating a {@link TransactionFactory}. This builder provides full control on transaction
- * settings.
+ * A Builder for creating a {@link TransactionFactory} and {@link AtomicBlock}. This builder provides full control
+ * on transaction settings.
+ *
+ * <p>Since the {@link Transaction} and {@link AtomicBlock} are very closely integrated, both of them are created
+ * by this TransactionFactoryBuilder.
  *
  * <p>Instances of this class are considered immutable, so when you call one of the modifying methods, make sure
  * that you use the resulting TransactionFactoryBuilder. Normally with the builder implementation the same
@@ -35,10 +38,10 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setControlFlowErrorsReused(boolean reused);
 
     /**
-     * Sets the transaction familyname.
+     * Sets the transaction familyname. If one AtomicBlock is used inside a method, a useful familyname could
+     * be the full name of the class and the method.
      * <p/>
-     * The transaction familyName is useful debugging purposes. With Multiverse 0.4 it was
-     * also needed for speculative configuration, but that requirement is dropped.
+     * The transaction familyName is useful debugging purposes, but has not other meaning.
      *
      * @param familyName the familyName of the transaction.
      * @return the updated TransactionFactoryBuilder
@@ -49,7 +52,8 @@ public interface TransactionFactoryBuilder {
 
     /**
      * Sets the {@link org.multiverse.api.PropagationLevel} used. With the PropagationLevel you have control
-     * on how the transaction deals with transaction nesting.
+     * on how the transaction deals with transaction nesting. The default is {@link PropagationLevel#Requires}
+     * which automatically starts a transaction is one is missing, or lifts on a transaction if available.
      *
      * @param propagationLevel the new PropagationLevel
      * @return the updated TransactionFactoryBuilder
@@ -60,7 +64,9 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setPropagationLevel(PropagationLevel propagationLevel);
 
     /**
-     * Sets the LockMode for all reads.
+     * Sets the LockMode for all reads. If a LockMode is set higher than {@link LockMode#None}, this transaction
+     * will locks all reads (and writes since a read is needed for a write) and the transaction automatically becomes
+     * serialized.
      *
      * @param lockMode the LockMode to set.
      * @return the updated TransactionFactoryBuilder.
@@ -71,14 +77,14 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setReadLockMode(LockMode lockMode);
 
     /**
-     * Sets the LockMode for all writes. For a write, always a read needs to be done, so if the ReadLockMode is
-     * <p/>
-     * Freshly constructed objects that are not committed, automatically are locked with an Exclusive lock.
-     * <p/>
-     * If the write LockMode is set after the read LockMode and the write LockMode is lower than the read LockMode,
-     * a IllegalTransactionFactoryException will be thrown when a TransactionFactory is created.
-     * <p/>
-     * If the write LockMode is set before the read LockMode and the write LockMode is lower than the read LockMode,
+     * Sets the {@link LockMode} for all writes. For a write, always a read needs to be done, so if the read LockMode is
+     *
+     * <p>Freshly constructed objects that are not committed, automatically are locked with {@link LockMode#Exclusive}.
+     *
+     * <p>If the write LockMode is set after the read LockMode and the write LockMode is lower than the read LockMode,
+     * an {@code IllegalTransactionFactoryException} will be thrown when a {@link TransactionFactory} is created.
+     *
+     * <p>If the write LockMode is set before the read LockMode and the write LockMode is lower than the read LockMode,
      * the write LockMode automatically is upgraded to that of the read LockMode. This makes setting the readLock
      * mode less of a nuisance.
      *
@@ -91,12 +97,13 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setWriteLockMode(LockMode lockMode);
 
     /**
-     * Adds a permanent Listener to this TransactionFactoryBuilder. All permanent listeners are always executed
-     * after all normal listeners are executed. If the same listener is added multiple times, it will be executed
-     * multiple times.
-     * <p/>
-     * This method is very useful for integrating Multiverse in other JVM based environments because with this
-     * approach you have a callback when transaction aborts/commit and can add your own logic.
+     * Adds a permanent {@link TransactionListener} to this {@link TransactionFactoryBuilder}. All permanent listeners
+     * are always executed after all normal listeners are executed. If the same listener is added multiple times, it will
+     * be executed multiple times.
+     *
+     * <p>This method is very useful for integrating Multiverse in other JVM based environments because with this
+     * approach you have a callback when transaction aborts/commit and can add your own logic. See the
+     * {@link TransactionListener} for more information about normal vs permanent listeners.
      *
      * @param listener the permanent listener to add.
      * @return the updated TransactionFactoryBuilder.
@@ -117,7 +124,7 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setTraceLevel(TraceLevel traceLevel);
 
     /**
-     * Sets the timeout (the maximum time a transaction is allowed to block. Long.MAX_VALUE indicates that an
+     * Sets the timeout (the maximum time a {@link Transaction} is allowed to block. Long.MAX_VALUE indicates that an
      * unbound timeout should be used.
      *
      * @param timeoutNs the timeout specified in nano seconds
@@ -128,7 +135,7 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setTimeoutNs(long timeoutNs);
 
     /**
-     * Sets if the transaction can be interrupted while doing blocking operations.
+     * Sets if the {@link Transaction} can be interrupted while doing blocking operations.
      *
      * @param interruptible if the transaction can be interrupted while doing blocking operations.
      * @return the updated TransactionFactoryBuilder
@@ -137,7 +144,7 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setInterruptible(boolean interruptible);
 
     /**
-     * Sets the new backoff policy. Policy is used to backoff when a transaction conflicts with another transaction.
+     * Sets the new {@link BackoffPolicy}. Policy is used to backoff when a transaction conflicts with another {@link Transaction}.
      * See the {@link BackoffPolicy} for more information.
      *
      * @param backoffPolicy the backoff policy to use.
@@ -159,8 +166,10 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setDirtyCheckEnabled(boolean dirtyCheckEnabled);
 
     /**
-     * Returns the maximum number of spins that should be executed when a transactional object can't be read
-     * because it is locked.
+     * Sets the maximum number of spins that are allowed when a {@link Transaction} can't be read/written/locked
+     * because it is locked by another transaction.
+     *
+     * <p>Setting the value to a very high value, could lead to more an increased chance of a live locking.
      *
      * @param spinCount the maximum number of spins
      * @return the updated TransactionFactoryBuilder.
@@ -170,9 +179,8 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setSpinCount(int spinCount);
 
     /**
-     * Sets the readonly property on a transaction. Readonly transactions are always cheaper than update transactions.
-     * <p/>
-     * If this property is set, the stm will not speculate on this property anymore.
+     * Sets the readonly property on a {@link Transaction}. If a transaction is configured as readonly, no write operations
+     * (also no construction of new transactional objects making use of that transaction) is allowed
      *
      * @param readonly true if the transaction should be readonly, false otherwise.
      * @return the updated TransactionFactoryBuilder
@@ -181,11 +189,12 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setReadonly(boolean readonly);
 
     /**
-     * Sets if the transaction should automatically track all reads that have been done. This is needed for blocking
+     * Sets if the {@link Transaction} should automatically track all reads that have been done. This is needed for blocking
      * operations, but also for other features like writeskew detection.
-     * <p/>
-     * If this property is set, the stm will not speculate on this property anymore.
-     * <p/>
+     *
+     * <p>Tracking reads puts more pressure on the transaction since it needs to store all reads, but it reduces the chance
+     * of read conflicts, since once read from main memory, it can be retrieved from the transaction.
+     *
      * The transaction is free to track reads even though this property is disabled.
      *
      * @param enabled true if read tracking enabled, false otherwise.
@@ -195,10 +204,16 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setReadTrackingEnabled(boolean enabled);
 
     /**
-     * With the speculative configuration enabled, the stm is allowed to determine optimal settings for transactions.
-     * Some behavior like readonly or the need for tracking reads can be determined runtime. The system can newTransaction with
+     * With the speculative configuration enabled, the {@link Stm} is allowed to determine optimal settings for
+     * a {@link Transaction}.
+     *
+     * <p>Some behavior like readonly or the need for tracking reads can be determined runtime. The system can start with
      * a readonly non readtracking transaction and upgrade to an update or a read tracking once a write or retry
      * happens.
+     *
+     * <p>It depends on the {@link Stm} implementation on which properties it is going to speculate.
+     *
+     * <p>Enabling it can cause a few unexpected 'retries' of transactions, but it can seriously improve performance.
      *
      * @param speculative indicates if speculative configuration should be enabled.
      * @return the updated TransactionFactoryBuilder
@@ -210,6 +225,9 @@ public interface TransactionFactoryBuilder {
      * Sets the the maximum count a transaction can be retried. The default is 1000. Setting it to a very low value
      * could mean that a transaction can't complete. Setting it to a very high value could lead to live-locking.
      *
+     * <p>If the speculative configuration mechanism is enabled ({@link #setSpeculative(boolean)}), a few retries
+     * are done in the beginning to figure out the best settings.
+     *
      * @param maxRetries the maximum number of times a transaction can be tried.
      * @return the updated TransactionFactoryBuilder
      * @throws IllegalArgumentException if maxRetries smaller than 0.
@@ -218,9 +236,11 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setMaxRetries(int maxRetries);
 
     /**
-     * Sets the isolation level.
-     * <p/>
-     * The transaction is free to upgraded to a higher isolation level.
+     * Sets the {@link IsolationLevel} on the {@link Transaction}.
+     *
+     * <p>The {@link Transaction} is free to upgraded to a higher {@link IsolationLevel}. This is essentially the same
+     * behavior you get when Oracle is used, where a read uncommitted is upgraded to a read committed and a repeatable
+     * read is upgraded to the Oracle version of serialized (so with the writeskew problem still there).
      *
      * @param isolationLevel the new IsolationLevel
      * @return the updated TransactionFactoryBuilder
@@ -231,7 +251,7 @@ public interface TransactionFactoryBuilder {
     TransactionFactoryBuilder setIsolationLevel(IsolationLevel isolationLevel);
 
     /**
-     * Sets if the Transaction is allowed to do an explicit retry (needed for a blocking operation). One use case
+     * Sets if the {@link Transaction} is allowed to do an explicit retry (needed for a blocking operation). One use case
      * for disallowing it, it when the transaction is used inside an actor, and you don't want that inside the logic
      * executed by the agent a blocking operations is done (e.g. taking an item of a blocking queue).
      *
@@ -251,7 +271,7 @@ public interface TransactionFactoryBuilder {
     TransactionFactory newTransactionFactory();
 
     /**
-     * Builds an {@link AtomicBlock} optimized for executing transactions created by this TransactionFactoryBuilder.
+     * Builds a new {@link AtomicBlock} optimized for executing transactions created by this TransactionFactoryBuilder.
      *
      * @return the created AtomicBlock.
      * @throws org.multiverse.api.exceptions.IllegalTransactionFactoryException

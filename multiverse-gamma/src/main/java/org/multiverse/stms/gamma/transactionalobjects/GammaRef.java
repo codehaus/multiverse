@@ -10,6 +10,7 @@ import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.api.ThreadLocalTransaction.getRequiredThreadLocalTransaction;
 import static org.multiverse.stms.gamma.GammaStmUtils.asGammaTransaction;
 import static org.multiverse.stms.gamma.GammaStmUtils.getRequiredThreadLocalGammaTransaction;
@@ -22,7 +23,11 @@ import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLoca
  * @author Peter Veentjer.
  */
 @SuppressWarnings({"OverlyComplexClass"})
-public final class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
+public class GammaRef<E> extends AbstractGammaRef implements Ref<E> {
+
+    public GammaRef(E value) {
+        this((GammaStm) getGlobalStmInstance(), value);
+    }
 
     public GammaRef(final GammaTransaction tx) {
         this(tx, null);

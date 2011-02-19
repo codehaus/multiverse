@@ -12,7 +12,7 @@ package org.multiverse.api;
  */
 public enum TraceLevel {
 
-    None, Course;
+    None, Coarse;
 
     /**
      * Checks if the provided level is higher than this TraceLevel.

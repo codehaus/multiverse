@@ -48,7 +48,7 @@ transaction has caused any conflicting writes. So you know that there is no writ
   publish it every time.
 
 - is it possible to combine pessimistic locking with blocking? What if a transaction wants to wait for a lock
-to become free... so can when a lock unlease is done, see if there are listeners before releasing the lock? If
+to become free... so can when a lock release is done, see if there are listeners before releasing the lock? If
 done before, the transaction knows it can remove the current listeners with the a cas, and add them to the set
 of listeners that to be notified. If a transaction wants to block ...
 when a normal transaction... when a lock is acquired, a retry error should also be thrown.

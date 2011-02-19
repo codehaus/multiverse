@@ -11,6 +11,7 @@ import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
+import static org.multiverse.api.GlobalStmInstance.getGlobalStmInstance;
 import static org.multiverse.stms.gamma.GammaStmUtils.asGammaTransaction;
 import static org.multiverse.stms.gamma.GammaStmUtils.getRequiredThreadLocalGammaTransaction;
 import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLocalGammaObjectPool;
@@ -21,7 +22,11 @@ import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLoca
  * @author Peter Veentjer.
  */
 @SuppressWarnings({"OverlyComplexClass"})
-public final class GammaLongRef extends AbstractGammaRef implements LongRef {
+public class GammaLongRef extends AbstractGammaRef implements LongRef {
+
+    public GammaLongRef(long value) {
+        this((GammaStm) getGlobalStmInstance(), value);
+    }
 
     public GammaLongRef(final GammaStm stm) {
         this(stm, 0);
@@ -57,7 +62,7 @@ public final class GammaLongRef extends AbstractGammaRef implements LongRef {
     }
 
     public final long get(final GammaTransaction tx) {
-        return openForRead(tx,LOCKMODE_NONE).long_value;
+        return openForRead(tx, LOCKMODE_NONE).long_value;
     }
 
     @Override
