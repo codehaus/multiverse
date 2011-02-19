@@ -185,6 +185,10 @@ when a normal transaction... when a lock is acquired, a retry error should also 
                                 done
 ----------------------------------------------------------------------
 
+- Improved Javadoc: StmUtils
+
+- Improved Javadoc: TransactionFactoryBuilder
+
 - removal of the ReadCommitted isolation level
 
 - Javadoc: Ref
