@@ -22,7 +22,7 @@ import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLoca
  * @author Peter Veentjer.
  */
 @SuppressWarnings({"OverlyComplexClass"})
-public class GammaLongRef extends AbstractGammaRef implements LongRef {
+public class GammaLongRef extends BaseGammaRef implements LongRef {
 
     public GammaLongRef(long value) {
         this((GammaStm) getGlobalStmInstance(), value);

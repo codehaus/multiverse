@@ -10,7 +10,7 @@ public final class GammaRefTranlocal<E> implements GammaConstants {
     public E ref_value;
     public long version;
     public int lockMode;
-    public AbstractGammaRef owner;
+    public BaseGammaRef owner;
     public int mode;
     public boolean hasDepartObligation;
     public boolean isDirty;

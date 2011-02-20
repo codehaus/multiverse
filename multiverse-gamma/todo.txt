@@ -111,11 +111,29 @@ when a normal transaction... when a lock is acquired, a retry error should also 
                         to do
 --------------------------------------------------------------------
 
+- CountDownCommitBarrier: RestorePartiesCompensatingTask
+
+- iterators and transactional collections
+
+- transactional collections and check on isolation level of transaction
+
+- pre/post start listeners and fat gamma block
+
+- AbstractTransactionalCollection:flatMap
+
+- AbstractTransactionalCollection:foldRight
+
+- NaiveTransactionalHashMap & todo's
+
+- NaiveTransactionalhashSet & todo's
+
+- NaiveTransactionalLinkedList & todo's
+
+- CommitBarrier & todo's
+
 - testing: prepare of transactions and excusive lock isolation level
 
 - testing: listeners & exceptions
-
-- pre/post start listeners and fat gamma block
 
 - testing: commute and locking
 
@@ -126,12 +144,6 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 - testing: GammaRef_getAndAlterTest
 
 - testing: PhantomReadTest
-
-- CountDownCommitBarrier: RestorePartiesCompensatingTask
-
-- iterators and transactional collections
-
-- transactional collections and check on isolation level of transaction
 
 - Javadoc: TransactionalCollection
 
@@ -155,18 +167,6 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - Javadoc: Isolation Level
 
-- AbstractTransactionalCollection:flatMap
-
-- AbstractTransactionalCollection:foldRight
-
-- NaiveTransactionalHashMap & todo's
-
-- NaiveTransactionalhashSet & todo's
-
-- NaiveTransactionalLinkedList & todo's
-
-- CommitBarrier & todo's
-
 - cleanup git repo: needs to be published to trunk instead of multiverse-beta
 
 - cleanup codehaus uploads
@@ -183,17 +183,19 @@ when a normal transaction... when a lock is acquired, a retry error should also 
                                 done
 ----------------------------------------------------------------------
 
-- Improved Javadoc: StmUtils
-
-- Improved Javadoc: TransactionFactoryBuilder
-
 - removal of the ReadCommitted isolation level
-
-- Javadoc: Ref
 
 - upload of sources in jar form
 
 - upload of Javadoc in jar form
+
+- Improved message on the abortOnEnsureOnBadStatus
+
+- testing: Lock.acquire0Test
+
+- testing: Lock_getLockMode0Test
+
+- testing: lean transaction and readonly? no checking is done but what if configured as readonly
 
 - testing: repeatable read isolation level
 
@@ -209,7 +211,9 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - testing: GammaLongRef_atomicGetAndSetTest
 
-- Improved message on the abortOnEnsureOnBadStatus
+- Improved Javadoc: StmUtils
+
+- Improved Javadoc: TransactionFactoryBuilder
 
 - Improved JavaDoc: TransactionalObject
 
@@ -233,8 +237,4 @@ when a normal transaction... when a lock is acquired, a retry error should also 
 
 - Improved Javadoc on Transaction
 
-- testing: Lock.acquire0Test
-
-- testing: Lock_getLockMode0Test
-
-- testing: lean transaction and readonly? no checking is done but what if configured as readonly
+- Improved Javadoc on Ref

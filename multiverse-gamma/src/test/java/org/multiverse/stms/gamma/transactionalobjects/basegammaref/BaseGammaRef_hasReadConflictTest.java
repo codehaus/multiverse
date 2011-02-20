@@ -1,4 +1,4 @@
-package org.multiverse.stms.gamma.transactionalobjects.abstractgammaref;
+package org.multiverse.stms.gamma.transactionalobjects.basegammaref;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -10,14 +10,13 @@ import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.multiverse.TestUtils.assertOrecValue;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
-public class AbstractGammaRef_hasReadConflictTest implements GammaConstants {
+public class BaseGammaRef_hasReadConflictTest implements GammaConstants {
     private GammaStm stm;
 
     @Before

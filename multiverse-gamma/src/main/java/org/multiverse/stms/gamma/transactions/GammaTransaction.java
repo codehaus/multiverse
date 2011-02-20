@@ -10,7 +10,7 @@ import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.api.lifecycle.TransactionListener;
 import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaObjectPool;
-import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
+import org.multiverse.stms.gamma.transactionalobjects.BaseGammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
@@ -129,7 +129,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     // ================= open for read =============================
 
-    public SpeculativeConfigurationError abortOpenForReadOrWriteOnExplicitLockingDetected(AbstractGammaRef ref) {
+    public SpeculativeConfigurationError abortOpenForReadOrWriteOnExplicitLockingDetected(BaseGammaRef ref) {
         config.updateSpeculativeConfigurationToUseExplicitLocking();
         abortIfAlive();
 
@@ -142,7 +142,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                         config.familyName, toDebugString(ref)));
     }
 
-    public SpeculativeConfigurationError abortOpenForReadOnNonRefTypeDetected(AbstractGammaRef ref) {
+    public SpeculativeConfigurationError abortOpenForReadOnNonRefTypeDetected(BaseGammaRef ref) {
         config.updateSpeculativeConfigurationToUseNonRefType();
         abortIfAlive();
 
@@ -165,7 +165,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
     }
 
 
-    public IllegalTransactionStateException abortOpenForReadOnNullLockMode(AbstractGammaRef object) {
+    public IllegalTransactionStateException abortOpenForReadOnNullLockMode(BaseGammaRef object) {
         switch (status) {
             case TX_PREPARED:
                 abort();
@@ -302,7 +302,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     }
 
-    public SpeculativeConfigurationError abortOpenForConstructionRequired(AbstractGammaRef ref) {
+    public SpeculativeConfigurationError abortOpenForConstructionRequired(BaseGammaRef ref) {
         config.updateSpeculativeConfigurationToUseConstructedObjects();
         abortIfAlive();
         if (config.controlFlowErrorsReused) {
@@ -316,7 +316,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     // ============================== open for commute ======================
 
-    public SpeculativeConfigurationError abortCommuteOnCommuteDetected(AbstractGammaRef ref) {
+    public SpeculativeConfigurationError abortCommuteOnCommuteDetected(BaseGammaRef ref) {
         config.updateSpeculativeConfigurationToUseCommute();
         abortIfAlive();
         if (config.controlFlowErrorsReused) {
@@ -487,7 +487,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
                         config.familyName, toDebugString(o)));
     }
 
-    public IllegalTransactionStateException abortEnsureOnBadStatus(AbstractGammaRef o) {
+    public IllegalTransactionStateException abortEnsureOnBadStatus(BaseGammaRef o) {
             switch (status) {
             case TX_PREPARED:
                 abort();
@@ -569,7 +569,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
 
     public abstract void abort();
 
-    public abstract GammaRefTranlocal locate(AbstractGammaRef o);
+    public abstract GammaRefTranlocal locate(BaseGammaRef o);
 
     @Override
     public final GammaTransactionConfiguration getConfiguration() {
@@ -686,7 +686,7 @@ public abstract class GammaTransaction implements GammaConstants, Transaction {
      * @param ref the AbstractGammaRef
      * @return the found GammaRefTranlocal or null if not found.
      */
-    public abstract GammaRefTranlocal getRefTranlocal(AbstractGammaRef ref);
+    public abstract GammaRefTranlocal getRefTranlocal(BaseGammaRef ref);
 
     public final boolean isAlive() {
         return status == TX_ACTIVE || status == TX_PREPARED;

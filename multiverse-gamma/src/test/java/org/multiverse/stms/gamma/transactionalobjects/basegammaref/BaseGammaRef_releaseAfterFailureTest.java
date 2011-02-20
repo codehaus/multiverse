@@ -1,4 +1,4 @@
-package org.multiverse.stms.gamma.transactionalobjects.abstractgammaref;
+package org.multiverse.stms.gamma.transactionalobjects.basegammaref;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
-public class AbstractGammaRef_releaseAfterFailureTest implements GammaConstants {
+public class BaseGammaRef_releaseAfterFailureTest implements GammaConstants {
 
     private GammaStm stm;
 

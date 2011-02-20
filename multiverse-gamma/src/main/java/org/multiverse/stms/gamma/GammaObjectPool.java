@@ -1,6 +1,6 @@
 package org.multiverse.stms.gamma;
 
-import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
+import org.multiverse.stms.gamma.transactionalobjects.BaseGammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.CallableNode;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 
@@ -81,7 +81,7 @@ public final class GammaObjectPool {
      * @return the pooled tranlocal, or null if none is found.
      * @throws NullPointerException if owner is null.
      */
-    public GammaRefTranlocal take(final AbstractGammaRef owner) {
+    public GammaRefTranlocal take(final BaseGammaRef owner) {
         if (owner == null) {
             throw new NullPointerException();
         }

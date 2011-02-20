@@ -156,7 +156,7 @@ public abstract class AbstractGammaObject implements GammaObject, Lock {
     }
 
     public final LockMode getLockMode(final GammaTransaction tx) {
-        final GammaRefTranlocal tranlocal = tx.locate((AbstractGammaRef) this);
+        final GammaRefTranlocal tranlocal = tx.locate((BaseGammaRef) this);
 
         if (tranlocal == null) {
             return LockMode.None;

@@ -1,4 +1,4 @@
-package org.multiverse.stms.gamma.transactionalobjects.abstractgammaref;
+package org.multiverse.stms.gamma.transactionalobjects.basegammaref;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +21,7 @@ import static org.multiverse.TestUtils.getField;
 import static org.multiverse.api.ThreadLocalTransaction.clearThreadLocalTransaction;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
-public class AbstractGammaRef_registerChangeListenerTest implements GammaConstants {
+public class BaseGammaRef_registerChangeListenerTest implements GammaConstants {
     private GammaStm stm;
     private GammaObjectPool pool;
 

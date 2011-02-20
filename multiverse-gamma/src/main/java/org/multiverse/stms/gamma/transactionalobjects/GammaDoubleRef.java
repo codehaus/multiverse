@@ -15,7 +15,7 @@ import static org.multiverse.stms.gamma.GammaStmUtils.*;
 import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLocalGammaObjectPool;
 
 @SuppressWarnings({"OverlyComplexClass"})
-public class GammaDoubleRef extends AbstractGammaRef implements DoubleRef {
+public class GammaDoubleRef extends BaseGammaRef implements DoubleRef {
 
     public GammaDoubleRef(double value) {
         this((GammaStm) getGlobalStmInstance(), value);

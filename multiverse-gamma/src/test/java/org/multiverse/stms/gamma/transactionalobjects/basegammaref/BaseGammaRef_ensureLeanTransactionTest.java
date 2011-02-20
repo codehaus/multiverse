@@ -1,4 +1,4 @@
-package org.multiverse.stms.gamma.transactionalobjects.abstractgammaref;
+package org.multiverse.stms.gamma.transactionalobjects.basegammaref;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.multiverse.TestUtils.assertIsAborted;
 
-public class AbstractGammaRef_ensureLeanTransactionTest {
+public class BaseGammaRef_ensureLeanTransactionTest {
 
     private GammaStm stm;
 

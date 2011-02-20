@@ -19,7 +19,7 @@ import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLoca
  *
  * @author Peter Veentjer.
  */
-public class GammaBooleanRef extends AbstractGammaRef implements BooleanRef {
+public class GammaBooleanRef extends BaseGammaRef implements BooleanRef {
 
     public GammaBooleanRef(boolean value){
         this((GammaStm) getGlobalStmInstance(),value);

@@ -2,7 +2,7 @@ package org.multiverse.stms.gamma.transactions.lean;
 
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
-import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
+import org.multiverse.stms.gamma.transactionalobjects.BaseGammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
@@ -27,7 +27,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public final GammaRefTranlocal locate(AbstractGammaRef o) {
+    public final GammaRefTranlocal locate(BaseGammaRef o) {
         if (status != TX_ACTIVE) {
             throw abortLocateOnBadStatus(o);
         }
@@ -49,7 +49,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
             throw abortCommitOnBadStatus();
         }
 
-        final AbstractGammaRef owner = tranlocal.owner;
+        final BaseGammaRef owner = tranlocal.owner;
 
         if (owner == null) {
             status = TX_COMMITTED;
@@ -130,7 +130,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
         }
 
         status = TX_ABORTED;
-        AbstractGammaRef owner = tranlocal.owner;
+        BaseGammaRef owner = tranlocal.owner;
         if (owner != null) {
             owner.releaseAfterFailure(tranlocal, pool);
         }
@@ -146,7 +146,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
             throw abortPrepareOnBadStatus();
         }
 
-        final AbstractGammaRef owner = tranlocal.owner;
+        final BaseGammaRef owner = tranlocal.owner;
         if (owner != null) {
             if (!owner.prepare(this, tranlocal)) {
                 throw abortOnReadWriteConflict(owner);
@@ -157,7 +157,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public final GammaRefTranlocal getRefTranlocal(AbstractGammaRef ref) {
+    public final GammaRefTranlocal getRefTranlocal(BaseGammaRef ref) {
         //noinspection ObjectEquality
         return tranlocal.owner == ref ? tranlocal : null;
     }
@@ -176,7 +176,7 @@ public final class LeanMonoGammaTransaction extends GammaTransaction {
             throw abortRetryOnNoRetryPossible();
         }
 
-        final AbstractGammaRef owner = tranlocal.owner;
+        final BaseGammaRef owner = tranlocal.owner;
         if (owner == null) {
             throw abortRetryOnNoRetryPossible();
         }

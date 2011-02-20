@@ -3,7 +3,7 @@ package org.multiverse.stms.gamma.transactions.fat;
 import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
-import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
+import org.multiverse.stms.gamma.transactionalobjects.BaseGammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
@@ -97,7 +97,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         do {
             if (SHAKE_BUGS) shakeBugs();
 
-            final AbstractGammaRef owner = node.owner;
+            final BaseGammaRef owner = node.owner;
             //if we are at the end, we can return the listenersArray.
             if (owner == null) {
                 return listenersArray;
@@ -139,7 +139,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
     }
 
     @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
-    private AbstractGammaRef prepareChainForCommit() {
+    private BaseGammaRef prepareChainForCommit() {
         if (skipPrepare()) {
             return null;
         }
@@ -147,7 +147,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
         GammaRefTranlocal node = head;
 
         do {
-            final AbstractGammaRef owner = node.owner;
+            final BaseGammaRef owner = node.owner;
 
             if (owner == null) {
                 return null;
@@ -182,7 +182,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
     private void releaseChain(final boolean success) {
         GammaRefTranlocal node = head;
         while (node != null) {
-            final AbstractGammaRef owner = node.owner;
+            final BaseGammaRef owner = node.owner;
 
             if (owner == null) {
                 return;
@@ -200,7 +200,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public final GammaRefTranlocal getRefTranlocal(final AbstractGammaRef ref) {
+    public final GammaRefTranlocal getRefTranlocal(final BaseGammaRef ref) {
         GammaRefTranlocal node = head;
         while (node != null) {
             //noinspection ObjectEquality
@@ -239,7 +239,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
 
         GammaRefTranlocal tranlocal = head;
         do {
-            final AbstractGammaRef owner = tranlocal.owner;
+            final BaseGammaRef owner = tranlocal.owner;
 
             if (furtherRegistrationNeeded) {
                 switch (owner.registerChangeListener(retryListener, tranlocal, pool, listenerEra)) {
@@ -272,7 +272,7 @@ public final class FatFixedLengthGammaTransaction extends GammaTransaction {
 
 
     @Override
-    public final GammaRefTranlocal locate(AbstractGammaRef o) {
+    public final GammaRefTranlocal locate(BaseGammaRef o) {
         if (status != TX_ACTIVE) {
             throw abortLocateOnBadStatus(o);
         }

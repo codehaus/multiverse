@@ -572,7 +572,6 @@ public final class LeanGammaAtomicBlock extends AbstractGammaAtomicBlock{
 
     @Override
     public final  void execute(final AtomicVoidClosure closure){
-
         if(closure == null){
             throw new NullPointerException();
         }

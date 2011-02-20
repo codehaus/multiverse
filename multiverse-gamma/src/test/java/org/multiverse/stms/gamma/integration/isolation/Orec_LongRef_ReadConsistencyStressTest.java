@@ -12,7 +12,7 @@ import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaObjectPool;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.LeanGammaAtomicBlock;
-import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
+import org.multiverse.stms.gamma.transactionalobjects.BaseGammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
@@ -239,7 +239,7 @@ public class Orec_LongRef_ReadConsistencyStressTest implements GammaConstants {
             lastConflictCount = globalConflictCount;
 
             for (GammaRefTranlocal tranlocal : tranlocals) {
-                AbstractGammaRef owner = tranlocal.owner;
+                BaseGammaRef owner = tranlocal.owner;
 
                 if (!tranlocal.hasDepartObligation) {
                     continue;
@@ -266,7 +266,7 @@ public class Orec_LongRef_ReadConsistencyStressTest implements GammaConstants {
 
         private void releaseChainAfterFailure() {
             for (GammaRefTranlocal tranlocal : tranlocals) {
-                AbstractGammaRef owner = tranlocal.owner;
+                BaseGammaRef owner = tranlocal.owner;
                 tranlocal.owner.releaseAfterFailure(tranlocal, pool);
                 tranlocal.owner = owner;
                 //if (tranlocal.hasDepartObligation) {
@@ -283,7 +283,7 @@ public class Orec_LongRef_ReadConsistencyStressTest implements GammaConstants {
 
         private void releaseChainAfterSuccess(boolean write) {
             for (GammaRefTranlocal tranlocal : tranlocals) {
-                AbstractGammaRef owner = tranlocal.owner;
+                BaseGammaRef owner = tranlocal.owner;
                 if (write) {
                     owner.releaseAfterUpdate(tranlocal, pool);
                 } else {

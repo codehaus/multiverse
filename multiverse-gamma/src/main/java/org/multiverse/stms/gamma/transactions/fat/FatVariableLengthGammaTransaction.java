@@ -3,7 +3,7 @@ package org.multiverse.stms.gamma.transactions.fat;
 import org.multiverse.api.lifecycle.TransactionEvent;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
-import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
+import org.multiverse.stms.gamma.transactionalobjects.BaseGammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
@@ -90,7 +90,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
                 continue;
             }
 
-            final AbstractGammaRef owner = tranlocal.owner;
+            final BaseGammaRef owner = tranlocal.owner;
             final Listeners listeners = owner.commit(tranlocal, pool);
 
             if (listeners != null) {
@@ -167,7 +167,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
                 continue;
             }
 
-            final AbstractGammaRef owner = tranlocal.owner;
+            final BaseGammaRef owner = tranlocal.owner;
 
             if (!owner.prepare(this, tranlocal)) {
                 return owner;
@@ -197,7 +197,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public final GammaRefTranlocal locate(AbstractGammaRef o) {
+    public final GammaRefTranlocal locate(BaseGammaRef o) {
         if (status != TX_ACTIVE) {
             throw abortLocateOnBadStatus(o);
         }
@@ -210,7 +210,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public final GammaRefTranlocal getRefTranlocal(AbstractGammaRef ref) {
+    public final GammaRefTranlocal getRefTranlocal(BaseGammaRef ref) {
         int indexOf = indexOf(ref, ref.identityHashCode());
         return indexOf == -1 ? null : array[indexOf];
     }
@@ -243,7 +243,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
 
             array[k] = null;
 
-            final AbstractGammaRef owner = tranlocal.owner;
+            final BaseGammaRef owner = tranlocal.owner;
 
             if (furtherRegistrationNeeded) {
                 switch (owner.registerChangeListener(retryListener, tranlocal, pool, listenerEra)) {
@@ -385,7 +385,7 @@ public final class FatVariableLengthGammaTransaction extends GammaTransaction {
         return size;
     }
 
-    public final int indexOf(final AbstractGammaRef ref, final int hash) {
+    public final int indexOf(final BaseGammaRef ref, final int hash) {
         int jump = 0;
         boolean goLeft = true;
 

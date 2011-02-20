@@ -1,4 +1,4 @@
-package org.multiverse.stms.gamma.transactionalobjects.abstractgammaref;
+package org.multiverse.stms.gamma.transactionalobjects.basegammaref;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -9,6 +9,7 @@ import org.multiverse.api.TransactionFactory;
 import org.multiverse.api.exceptions.DeadTransactionException;
 import org.multiverse.api.exceptions.PreparedTransactionException;
 import org.multiverse.api.exceptions.ReadWriteConflict;
+import org.multiverse.stms.gamma.GammaConstants;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactionalobjects.GammaLongRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
@@ -24,21 +25,16 @@ import java.util.Collection;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
-import static org.multiverse.TestUtils.LOCKMODE_EXCLUSIVE;
-import static org.multiverse.TestUtils.LOCKMODE_NONE;
-import static org.multiverse.TestUtils.LOCKMODE_READ;
-import static org.multiverse.TestUtils.LOCKMODE_WRITE;
 import static org.multiverse.TestUtils.*;
 import static org.multiverse.api.ThreadLocalTransaction.*;
 import static org.multiverse.stms.gamma.GammaTestUtils.*;
 
 @RunWith(Parameterized.class)
-public class AbstractGammaRef_ensure1Test {
-
+public class BaseGammaRef_ensure0Test implements GammaConstants {
     private final GammaTransactionFactory transactionFactory;
     private final GammaStm stm;
 
-    public AbstractGammaRef_ensure1Test(GammaTransactionFactory transactionFactory) {
+    public BaseGammaRef_ensure0Test(GammaTransactionFactory transactionFactory) {
         this.transactionFactory = transactionFactory;
         this.stm = transactionFactory.getConfiguration().getStm();
     }
@@ -64,11 +60,9 @@ public class AbstractGammaRef_ensure1Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = transactionFactory.newTransaction();
-
-
         setThreadLocalTransaction(tx);
-        ref.get(tx);
-        ref.ensure(tx);
+        ref.get();
+        ref.ensure();
 
         ref.atomicIncrementAndGet(1);
 
@@ -87,19 +81,21 @@ public class AbstractGammaRef_ensure1Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        ref.set(tx, initialValue + 1);
-        ref.getLock().acquire(tx, LockMode.Read);
-        ref.ensure(tx);
+        setThreadLocalTransaction(tx);
+        ref.set(initialValue + 1);
+        ref.getLock().acquire(LockMode.Read);
+        ref.ensure();
 
         GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         assertIsActive(tx);
         assertTrue(tranlocal.isConflictCheckNeeded());
+        assertRefHasReadLock(ref, tx);
         assertEquals(LOCKMODE_READ, tranlocal.getLockMode());
 
         tx.commit();
 
-        assertIsCommitted(tx);
         assertRefHasNoLocks(ref);
+        assertIsCommitted(tx);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
         assertSurplus(ref, 0);
     }
@@ -111,19 +107,21 @@ public class AbstractGammaRef_ensure1Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        ref.set(tx, initialValue + 1);
-        ref.getLock().acquire(tx, LockMode.Write);
-        ref.ensure(tx);
+        setThreadLocalTransaction(tx);
+        ref.set(initialValue + 1);
+        ref.getLock().acquire(LockMode.Write);
+        ref.ensure();
 
         GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         assertIsActive(tx);
         assertTrue(tranlocal.isConflictCheckNeeded());
+        assertRefHasWriteLock(ref, tx);
         assertEquals(LOCKMODE_WRITE, tranlocal.getLockMode());
 
         tx.commit();
 
-        assertIsCommitted(tx);
         assertRefHasNoLocks(ref);
+        assertIsCommitted(tx);
         assertVersionAndValue(ref, initialVersion + 1, initialValue + 1);
         assertSurplus(ref, 0);
     }
@@ -135,9 +133,10 @@ public class AbstractGammaRef_ensure1Test {
         long initialVersion = ref.getVersion();
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        ref.set(tx, initialValue + 1);
-        ref.getLock().acquire(tx, LockMode.Exclusive);
-        ref.ensure(tx);
+        setThreadLocalTransaction(tx);
+        ref.set(initialValue + 1);
+        ref.getLock().acquire(LockMode.Exclusive);
+        ref.ensure();
 
         GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         assertIsActive(tx);
@@ -153,29 +152,9 @@ public class AbstractGammaRef_ensure1Test {
         assertSurplus(ref, 0);
     }
 
-    @Test
-    public void whenReadLockAcquiredByOther() {
-        long initialValue = 10;
-        GammaLongRef ref = new GammaLongRef(stm, initialValue);
-        long initialVersion = ref.getVersion();
-
-        GammaTransaction otherTx = transactionFactory.newTransaction();
-        ref.getLock().acquire(otherTx, LockMode.Read);
-
-        GammaTransaction tx = transactionFactory.newTransaction();
-        ref.set(tx, initialValue + 1);
-        ref.ensure(tx);
-
-        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
-        assertIsActive(tx);
-        assertTrue(tranlocal.isConflictCheckNeeded());
-        assertRefHasReadLock(ref, otherTx);
-        assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
-        assertVersionAndValue(ref, initialVersion, initialValue);
-    }
 
     @Test
-    public void whenWriteLockAcquiredByOther() {
+    public void whenEnsuredByOther() {
         long initialValue = 10;
         GammaLongRef ref = new GammaLongRef(stm, initialValue);
         long initialVersion = ref.getVersion();
@@ -184,8 +163,9 @@ public class AbstractGammaRef_ensure1Test {
         ref.getLock().acquire(otherTx, LockMode.Write);
 
         GammaTransaction tx = transactionFactory.newTransaction();
-        ref.set(tx, initialValue + 1);
-        ref.ensure(tx);
+        setThreadLocalTransaction(tx);
+        ref.set(initialValue + 1);
+        ref.ensure();
 
         GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         assertIsActive(tx);
@@ -205,14 +185,34 @@ public class AbstractGammaRef_ensure1Test {
         ref.getLock().acquire(otherTx, LockMode.Exclusive);
 
         GammaTransaction tx = transactionFactory.newTransaction();
+        setThreadLocalTransaction(tx);
         try {
-            ref.ensure(tx);
+            ref.ensure();
             fail();
         } catch (ReadWriteConflict expected) {
+
         }
 
         assertIsAborted(tx);
         assertRefHasExclusiveLock(ref, otherTx);
+        assertVersionAndValue(ref, initialVersion, initialValue);
+    }
+
+    @Test
+    public void whenCalled_thenNoLockingDuringTransaction() {
+        long initialValue = 10;
+        GammaLongRef ref = new GammaLongRef(stm, initialValue);
+        long initialVersion = ref.getVersion();
+
+        GammaTransaction tx = transactionFactory.newTransaction();
+        setThreadLocalTransaction(tx);
+
+        ref.ensure();
+
+        GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
+
+        assertTrue(tranlocal.isConflictCheckNeeded());
+        assertRefHasNoLocks(ref);
         assertVersionAndValue(ref, initialVersion, initialValue);
     }
 
@@ -228,7 +228,7 @@ public class AbstractGammaRef_ensure1Test {
         } catch (NullPointerException expected) {
         }
 
-        assertNull(getThreadLocalTransaction());
+        assertSame(null, getThreadLocalTransaction());
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasNoLocks(ref);
     }
@@ -236,6 +236,7 @@ public class AbstractGammaRef_ensure1Test {
     @Test
     public void state_whenAlreadyPrepared_thenPreparedTransactionException() {
         GammaTransaction tx = transactionFactory.newTransaction();
+        setThreadLocalTransaction(tx);
         tx.prepare();
 
         long initialValue = 10;
@@ -243,13 +244,13 @@ public class AbstractGammaRef_ensure1Test {
         long initialVersion = ref.getVersion();
 
         try {
-            ref.ensure(tx);
+            ref.ensure();
             fail();
         } catch (PreparedTransactionException expected) {
         }
 
         assertIsAborted(tx);
-        assertNull(getThreadLocalTransaction());
+        assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasNoLocks(ref);
     }
@@ -257,6 +258,7 @@ public class AbstractGammaRef_ensure1Test {
     @Test
     public void state_whenAlreadyAborted_thenDeadTransactionException() {
         GammaTransaction tx = transactionFactory.newTransaction();
+        setThreadLocalTransaction(tx);
         tx.abort();
 
         long initialValue = 10;
@@ -264,13 +266,13 @@ public class AbstractGammaRef_ensure1Test {
         long initialVersion = ref.getVersion();
 
         try {
-            ref.ensure(tx);
+            ref.ensure();
             fail();
         } catch (DeadTransactionException expected) {
         }
 
         assertIsAborted(tx);
-        assertNull(getThreadLocalTransaction());
+        assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasNoLocks(ref);
     }
@@ -278,6 +280,7 @@ public class AbstractGammaRef_ensure1Test {
     @Test
     public void state_whenAlreadyCommitted_thenDeadTransactionException() {
         GammaTransaction tx = transactionFactory.newTransaction();
+        setThreadLocalTransaction(tx);
         tx.commit();
 
         long initialValue = 10;
@@ -285,19 +288,19 @@ public class AbstractGammaRef_ensure1Test {
         long initialVersion = ref.getVersion();
 
         try {
-            ref.ensure(tx);
+            ref.ensure();
             fail();
         } catch (DeadTransactionException expected) {
         }
 
         assertIsCommitted(tx);
-        assertNull(getThreadLocalTransaction());
+        assertSame(tx, getThreadLocalTransaction());
         assertVersionAndValue(ref, initialVersion, initialValue);
         assertRefHasNoLocks(ref);
     }
 
     @Test
-    public void whenPossibleWriteSkew_thenCanBeDetectedWithDeferredEnsure() {
+    public void whenPossibleWriteSkew_thenCanBeDetectedWithEnsure() {
         assumeTrue(!(transactionFactory.newTransaction() instanceof FatMonoGammaTransaction));
 
         GammaLongRef ref1 = new GammaLongRef(stm);
@@ -323,5 +326,4 @@ public class AbstractGammaRef_ensure1Test {
 
         assertIsAborted(tx2);
     }
-
 }

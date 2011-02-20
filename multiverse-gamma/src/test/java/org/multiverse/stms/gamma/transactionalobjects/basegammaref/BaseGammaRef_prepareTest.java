@@ -1,4 +1,4 @@
-package org.multiverse.stms.gamma.transactionalobjects.abstractgammaref;
+package org.multiverse.stms.gamma.transactionalobjects.basegammaref;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -12,7 +12,7 @@ import org.multiverse.stms.gamma.transactions.GammaTransaction;
 
 import static org.junit.Assert.*;
 
-public class AbstractGammaRef_prepareTest implements GammaConstants {
+public class BaseGammaRef_prepareTest implements GammaConstants {
 
     private GammaStm stm;
 

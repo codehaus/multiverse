@@ -27,14 +27,14 @@ import static org.multiverse.stms.gamma.ThreadLocalGammaObjectPool.getThreadLoca
 import static org.multiverse.utils.Bugshaker.shakeBugs;
 
 @SuppressWarnings({"OverlyComplexClass", "OverlyCoupledClass"})
-public abstract class AbstractGammaRef extends AbstractGammaObject {
+public abstract class BaseGammaRef extends AbstractGammaObject {
 
     public final int type;
     @SuppressWarnings({"VolatileLongOrDoubleField"})
     public volatile long long_value;
     public volatile Object ref_value;
 
-    protected AbstractGammaRef(GammaStm stm, int type) {
+    protected BaseGammaRef(GammaStm stm, int type) {
         super(stm);
         this.type = type;
     }
@@ -735,7 +735,7 @@ public abstract class AbstractGammaRef extends AbstractGammaObject {
         if (tx.hasReads) {
             node = tx.head;
             do {
-                final AbstractGammaRef owner = node.owner;
+                final BaseGammaRef owner = node.owner;
 
                 //if we are at the end, we are done.
                 if (owner == null) {

@@ -73,7 +73,7 @@ public class GammaTestUtils implements GammaConstants {
         assertReadLockCount(ref, 0);
     }
 
-    public static void assertRefHasReadLock(AbstractGammaRef ref, GammaTransaction tx) {
+    public static void assertRefHasReadLock(BaseGammaRef ref, GammaTransaction tx) {
         GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         if (tranlocal == null) {
             fail("A Tranlocal should have been available for a ref that has the read lock");
@@ -82,7 +82,7 @@ public class GammaTestUtils implements GammaConstants {
         assertLockMode(ref, LOCKMODE_READ);
     }
 
-    public static void assertRefHasNoLocks(AbstractGammaRef ref, GammaTransaction tx) {
+    public static void assertRefHasNoLocks(BaseGammaRef ref, GammaTransaction tx) {
         GammaRefTranlocal tranlocal = tx.getRefTranlocal(ref);
         if (tranlocal != null) {
             Assert.assertEquals(LOCKMODE_NONE, tranlocal.getLockMode());
@@ -91,7 +91,7 @@ public class GammaTestUtils implements GammaConstants {
         assertReadLockCount(ref, 0);
     }
 
-    public static void assertRefHasWriteLock(AbstractGammaRef ref, GammaTransaction lockOwner) {
+    public static void assertRefHasWriteLock(BaseGammaRef ref, GammaTransaction lockOwner) {
         GammaRefTranlocal tranlocal = lockOwner.getRefTranlocal(ref);
         if (tranlocal == null) {
             fail("A Tranlocal should have been available for a ref that has the write lock");
@@ -101,7 +101,7 @@ public class GammaTestUtils implements GammaConstants {
         assertReadLockCount(ref, 0);
     }
 
-    public static void assertRefHasExclusiveLock(AbstractGammaRef ref, GammaTransaction lockOwner) {
+    public static void assertRefHasExclusiveLock(BaseGammaRef ref, GammaTransaction lockOwner) {
         GammaRefTranlocal tranlocal = lockOwner.getRefTranlocal(ref);
         if (tranlocal == null) {
             fail("A tranlocal should have been stored in the transaction for the ref");
@@ -111,7 +111,7 @@ public class GammaTestUtils implements GammaConstants {
         assertReadLockCount(ref, 0);
     }
 
-    public static void assertRefHasLockMode(AbstractGammaRef ref, GammaTransaction lockOwner, int lockMode) {
+    public static void assertRefHasLockMode(BaseGammaRef ref, GammaTransaction lockOwner, int lockMode) {
         switch (lockMode) {
             case LOCKMODE_NONE:
                 assertRefHasNoLocks(ref, lockOwner);

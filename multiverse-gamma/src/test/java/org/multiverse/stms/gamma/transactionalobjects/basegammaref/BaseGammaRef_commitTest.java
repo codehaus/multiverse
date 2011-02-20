@@ -1,4 +1,4 @@
-package org.multiverse.stms.gamma.transactionalobjects.abstractgammaref;
+package org.multiverse.stms.gamma.transactionalobjects.basegammaref;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +11,7 @@ import static org.multiverse.stms.gamma.GammaStmUtils.doubleAsLong;
 import static org.multiverse.stms.gamma.GammaTestUtils.assertRefHasNoLocks;
 import static org.multiverse.stms.gamma.GammaTestUtils.assertVersionAndValue;
 
-public class AbstractGammaRef_saveTest implements GammaConstants {
+public class BaseGammaRef_commitTest implements GammaConstants {
 
     private GammaStm stm;
     private GammaObjectPool pool;

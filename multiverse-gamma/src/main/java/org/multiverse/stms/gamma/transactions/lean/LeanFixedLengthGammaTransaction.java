@@ -2,7 +2,7 @@ package org.multiverse.stms.gamma.transactions.lean;
 
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.Listeners;
-import org.multiverse.stms.gamma.transactionalobjects.AbstractGammaRef;
+import org.multiverse.stms.gamma.transactionalobjects.BaseGammaRef;
 import org.multiverse.stms.gamma.transactionalobjects.GammaObject;
 import org.multiverse.stms.gamma.transactionalobjects.GammaRefTranlocal;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
@@ -76,7 +76,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
             int listenersIndex = 0;
             GammaRefTranlocal node = head;
             do {
-                final AbstractGammaRef owner = node.owner;
+                final BaseGammaRef owner = node.owner;
 
                 if (owner == null) {
                     break;
@@ -123,7 +123,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
     private GammaObject prepareChainForCommit() {
         GammaRefTranlocal node = head;
         do {
-            final AbstractGammaRef owner = node.owner;
+            final BaseGammaRef owner = node.owner;
 
             if (owner == null) {
                 return null;
@@ -180,7 +180,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
     private void releaseChainForAbort() {
         GammaRefTranlocal node = head;
         do {
-            final AbstractGammaRef owner = node.owner;
+            final BaseGammaRef owner = node.owner;
 
             if (owner == null) {
                 return;
@@ -210,7 +210,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
     private void releaseReadonlyChain() {
         GammaRefTranlocal node = head;
         do {
-            final AbstractGammaRef owner = node.owner;
+            final BaseGammaRef owner = node.owner;
 
             if (owner == null) {
                 return;
@@ -226,7 +226,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
     }
 
     @Override
-    public final GammaRefTranlocal getRefTranlocal(final AbstractGammaRef ref) {
+    public final GammaRefTranlocal getRefTranlocal(final BaseGammaRef ref) {
         GammaRefTranlocal node = head;
         do {
             //noinspection ObjectEquality
@@ -265,7 +265,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
 
         GammaRefTranlocal tranlocal = head;
         do {
-            final AbstractGammaRef owner = tranlocal.owner;
+            final BaseGammaRef owner = tranlocal.owner;
 
             if (furtherRegistrationNeeded) {
                 switch (owner.registerChangeListener(retryListener, tranlocal, pool, listenerEra)) {
@@ -298,7 +298,7 @@ public final class LeanFixedLengthGammaTransaction extends GammaTransaction {
 
 
     @Override
-    public final GammaRefTranlocal locate(AbstractGammaRef o) {
+    public final GammaRefTranlocal locate(BaseGammaRef o) {
         if (status != TX_ACTIVE) {
             throw abortLocateOnBadStatus(o);
         }
