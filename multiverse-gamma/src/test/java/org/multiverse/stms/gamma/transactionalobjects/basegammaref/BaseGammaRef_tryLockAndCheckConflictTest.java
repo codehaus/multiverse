@@ -22,8 +22,7 @@ public class BaseGammaRef_tryLockAndCheckConflictTest implements GammaConstants 
         stm = new GammaStm();
     }
 
-    //different locks by other
-    //conflicts
+   //conflicts
 
     @Test
     public void writeBiased_whenOtherHasLocked() {
