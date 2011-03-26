@@ -1,0 +1,162 @@
+<chapter xml:id="chapter-performance-tuning">
+
+<title>Performance tuning</title>
+
+<sect1>
+    <title>Introduction</title>
+    <para>
+        Check out the following set of guidelines to improve performance/scalability of STM datastructures.
+    </para>
+</sect1>
+
+<sect1>
+    <title>Primitive refs</title>
+    <para>
+        Multiverse provides support for various primitives refs: IntRef, LongRef, BooleanRef and DoubleRef. Using a primitive instead of a
+        normal ref in combination with wrapper types, has the advantage that no autoboxing is needed. Doing millions of wrapper creations per
+        second, can seriously limit performance and scalability.
+    </para>
+</sect1>
+
+<sect1>
+    <title>Don't throw away the AtomicBlock</title>
+    <para>
+        It is best to create an AtomicBlock once and stored it in a final static field. For more information see
+        'Customize the AtomicBlock'.
+    </para>
+</sect1>
+
+<sect1>
+    <title>Customize the AtomicBlock</title>
+    <para>
+        Use a customized AtomicBlock, so instead of using this:
+    </para>
+
+    <programlisting language="java">
+
+    import org.multiverse.api.*;
+    import org.multiverse.api.refs.*;
+    import static org.multiverse.api.StmUtils.*;
+
+    public class Account{
+        private final IntRef amount = newIntRef(0);
+
+        public void transfer(final int a){
+            execute(new AtomicVoidClosure()){
+                public void execute(Transaction tx){
+                    amount.increment(a);
+                }
+            });
+        }
+
+        ...
+    }
+    </programlisting>
+    <para>
+        Use the following:
+    </para>
+
+    <programlisting language="java">
+    import org.multiverse.api.*;
+    import org.multiverse.api.refs.*;
+    import static org.multiverse.api.StmUtils.*;
+    import static org.multiverse.api.GlobalStmInstance.*
+
+    public class Account{
+        private final static AtomicBlock transferBlock = getGlobalStmInstance()
+            .newTransactionFactoryBuilder()
+            .newAtomicBLock();
+
+        private final IntRef amount = newIntRef(0);
+
+        public void transfer(final int a){
+            execute(new AtomicVoidClosure()){
+                public void execute(Transaction tx){
+                    amount.increment(a);
+                }
+            });
+        }
+
+        ...
+    }
+    </programlisting>
+    <para>
+        The transferBlock can be placed in a static field and can safely be shared between threads (it is completely threadsafe and designed
+        to be used in this way). The advantage of this approach, is that the Stm is able to learn based on previous transaction executions and
+        select the best performing settings. It relies on a speculative configuration mechanism where the system starts with the cheapest
+        settings, but upgrades to more expensive one if the bet failed. If the AtomicBlock is discarded after usage, the STM will never be able to
+        learn. Another problem is that it also causes a lot of GC overhead.
+    </para>
+</sect1>
+
+<sect1>
+<title>Short transactions</title>
+<para>
+    Transactions should be kept as short as possible. If the executes over a longer period, chances increase that it runs into a read/write
+    conflict. When this happens, a lot of work is lost and needs to be redone. It also could lead to livelock problems.
+</para>
+</sect1>
+
+<sect1>
+<title>Small transactions</title>
+    Transactions should be as small as possible, so the less it needs to track, the faster it will be. Also when small transactions are used,
+    Multiverse is able to use special optimized transactions that cause less overhead than longer transactions.
+<para>
+
+</para>
+</sect1>
+
+<sect1>
+    <title>Use atomic methods</title>
+    <para>
+    </para>
+</sect1>
+
+<sect1>
+    <title>Explicit transaction passing</title>
+    <para>
+        Normally a Transaction doesn't need to be passed explicitly, because it is placed in the org.multiverse.api.ThreadLocalTransaction. Every time
+        the transaction is needed, it needs to be read from this ThreadLocal. By passing the Transaction explicitly, this overhead is removed.
+    </para>
+
+    <programlisting language="java">
+
+    import org.multiverse.api.*;
+    import org.multiverse.api.refs.*;
+    import static org.multiverse.api.StmUtils.*;
+    import static org.multiverse.api.GlobalStmInstance.*
+
+    public class Account{
+        private final static AtomicBlock transferBlock = getGlobalStmInstance()
+            .newTransactionFactoryBuilder()
+            .newAtomicBLock();
+
+        private final IntRef amount = newIntRef(0);
+
+        public void transfer(final int a){
+            execute(new AtomicVoidClosure()){
+                public void execute(Transaction tx){
+                    amount.increment(tx, a);
+                }
+            });
+        }
+
+        ...
+    }
+    </programlisting>
+    <para>
+        As you can see, the increment method now has an explicit transaction. Almost all methods of the ref are overloaded with a version that also
+        accepts a Transaction. If your methods call other transactional methods, the transaction can be passed manually.
+    </para>
+</sect1>
+
+<sect1>
+    <title>Primitive AtomicClosure</title>
+    <para>
+        Multiverse provides various forms of AtomicClosures for void, reference and primitive types. The primitive AtomicClosures like the AtomicIntClosure,
+        AtomicBooleanClosure, AtomicLongClosure and AtomicDoubleClosure prevent any form of boxing. So if you need to return a int, boolean, long
+        or Double, make sure you are using a primitive AtomicClosure.
+    </para>
+</sect1>
+
+</chapter>

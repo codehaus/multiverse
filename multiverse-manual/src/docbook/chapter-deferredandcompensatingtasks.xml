@@ -1,0 +1,29 @@
+<chapter xml:id="chapter-deferred-and-compensating-tasks">
+
+<title>Deferred and compensating tasks</title>
+<para>
+    Normal compensating tasks + permanent compensating tasks.
+</para>
+
+<sect1>
+    <title>Compensating task</title>
+    <para>
+        In some cases you want logic to be executed after a Transaction fails. This can be done using a deferred task.
+    </para>
+    <programlisting language="java">
+
+    </programlisting>
+</sect1>
+
+<sect1>
+    <title>Deferred tasks</title>
+    <para>
+        In some cases you want logic to be executed after a Transaction commits. This can be done using a compensating task.
+    </para>
+    <programlisting language="java">
+
+    </programlisting>
+
+</sect1>
+
+</chapter>

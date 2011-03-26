@@ -1,0 +1,42 @@
+<chapter xml:id="chapter-blocking-transactions">
+
+<title>Blocking Transactions</title>
+
+<sect1>
+    <title>Introduction</title>
+<para>
+
+</para>
+</sect1>
+
+<sect1>
+    <title>Composition</title>
+    <para></para>
+</sect1>
+
+<sect1>
+    <title>Orelse</title>
+    <para></para>
+</sect1>
+
+<sect1>
+    <title>Blocking on multiple resources</title>
+</sect1>
+
+<sect1>
+    <title>RetryError</title>
+</sect1>
+
+<sect1>
+    <title>Prevent blocking</title>
+</sect1>
+
+<sect1>
+    <title>Timeout</title>
+</sect1>
+
+<sect1>
+    <title>Interruptibility</title>
+</sect1>
+
+</chapter>
