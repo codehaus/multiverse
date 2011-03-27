@@ -1,0 +1,59 @@
+<chapter xml:id="chapter-propagation">
+
+    <title>Propagation (not finished)</title>
+
+    <sect1>
+        <title>Introduction</title>
+        <para>
+            It can happen that AtomicBlocks are called within the execution of other AtomicBlock and this leads to
+            transaction nesting.
+            In a lot of cases you want to allow this, but in some cases you want to control it. This can be done by
+            configuration
+            the transaction propagation.
+        </para>
+    </sect1>
+
+    <sect1>
+        <title>PropagationLevel</title>
+        <para>
+            Multiverse supports propagation by setting the correct PropagationLevel on the TransactionFactoryBuilder
+            (defaults to
+            PropagationLevel.Requires). The following propagation levels are supported:
+            <itemizedlist>
+                <listitem>
+                    <para>PropagationLevel.RequiresNew: Indicates that a new transaction always is started, even when
+                        there is an active transaction.
+                        The active transaction is postponed and used again after the nested transaction commits. It
+                        could be that the outer transaction
+                        conflicts made on changes by the inner transaction.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>PropagationLevel.Requires: Indicates that a new transaction will be used if none exists. If
+                        one exists, the logic will lift on
+                        that transaction. This is the default propagation level
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>PropagationLevel.Supports: Indicates that it the logic can either be run with or without
+                        transaction.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>PropagationLevel.Never: Indicates that no active transaction should be available. If a
+                        transaction is found, a org.multiverse.api.exceptions.TransactionNotAllowedException is thrown.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>PropagationLevel.Mandatory: Indicates that a transaction should always be available. If not, a
+                        org.multiverse.api.exceptions.TransactionMandatoryException is thrown.
+                    </para>
+                </listitem>
+
+            </itemizedlist>
+        </para>
+
+
+    </sect1>
+
+</chapter>

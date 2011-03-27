@@ -16,6 +16,7 @@
         <title>Happens before rules</title>
         <para>
             The Java Memory Model is specified in happens before rules, e.g.:
+        </para>
             <itemizedlist>
                 <listitem>
                     <itemizedlist>
@@ -26,13 +27,13 @@
                         </listitem>
                         <listitem>
                             <para>volatile variable rule: all writes executed before some volatile variable is written,
-                                are visible when the same
-                                volatile variable is read.
+                                are visible when the same volatile variable is read.
                             </para>
                         </listitem>
                     </itemizedlist>
                 </listitem>
             </itemizedlist>
+        <para>
             The happens before rules clearly specify which visibility guarantees are provided on memory content and
             which reordering are allowed. Without these rules it would not be possible to write concurrent code in Java.
         </para>
@@ -49,6 +50,34 @@
             reads the same transactional object. On a lower level this is realized by lifting on the volatile variable
             or lock rule.
         </para>
+
+        <para>
+            Check out at the following code fragment for an example:
+        <programlisting language="java">
+     public class Foo{
+          private final IntRef value = newIntRef();
+
+          public void write(final int newValue){
+            execute(new AtomicVoidClosure()){
+                public void execute(Transaction tx){
+                    value.set(newValue);
+                }
+            });
+          }
+
+          public int read(){
+            return execute(new AtomicIntClosure()){
+                public void execute(Transaction tx){
+                    return value.get();
+                }
+            });
+          }
+     }
+        </programlisting>
+        In this example there is a happens before relation between the commit of the write transaction and the start of
+        the read transaction.
+        </para>
+
         <para>
             For developers this means that you don't need to worry about the JMM when transactions are used and
             you don't need to define variable as volatile or synchronized blocks to introduce the needed memory

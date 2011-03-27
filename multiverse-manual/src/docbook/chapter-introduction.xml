@@ -1,7 +1,7 @@
 <chapter xml:id="chapter-introduction">
 <title>Introduction</title>
 <sect1>
-<title>Traditional Concurrency Control</title>
+<title>Traditional Concurrency Control (not finished)</title>
 <para>
     Traditional concurrency control is complex because you need to worry about a lot of problems. First of all you need to make sure
     that the program does no bad things (so no race problems), and you also need to worry about that good things happen eventually (

@@ -7,11 +7,14 @@
         <!ENTITY chapter-pessimistic-locking SYSTEM "chapter-pessimistic-locking.xml">
         <!ENTITY chapter-isolationlevel SYSTEM "chapter-isolationlevel.xml">
         <!ENTITY chapter-gammastm SYSTEM "chapter-gammastm.xml">
+        <!ENTITY chapter-propagation SYSTEM "chapter-propagation.xml">
+        <!ENTITY chapter-2pc SYSTEM "chapter-2pc.xml">
+        <!ENTITY chapter-controlflow-errors SYSTEM "chapter-controlflow-errors.xml">
         <!ENTITY chapter-jmm SYSTEM "chapter-jmm.xml">
         ]>
 <book xmlns="http://docbook.org/ns/docbook" version="5.0">
     <bookinfo>
-        <title>Multiverse 0.7 Manual</title>
+        <title>Manual Multiverse 0.7</title>
 
         <author>
             <firstname>Peter</firstname>
@@ -38,19 +41,27 @@
 
         <para>After almost a year of hard and backbreaking work, Multiverse 0.7 was finally released. It is a complete
             rewrite from the previous releases where a lot of effort was made on removing some fundamental problems with
-            the 0.6 design (the need for a shared clock was reduced considerable), so it should be a lot better scalable.
+            the 0.6 design (the need for a shared clock was reduced considerably), so it should be a lot better scalable.
             Also the performance was increased considerably, and last but not least a whole new set of new features are added
             like commuting operations, pessimistic locking etc.
+        </para>
+
+        <para>
+            Also the instrumentation was removed and the focus for this release is completely on transactional references.
+            The instrumentation will be added in the future.
         </para>
     </preface>
 
     &chapter-introduction;
     &chapter-transactional-references;
+    &chapter-propagation;
     &chapter-blockingtransactions;
+    &chapter-controlflow-errors;
     &chapter-pessimistic-locking;
     &chapter-deferredandcompensatingtasks;
     &chapter-isolationlevel;
     &chapter-gammastm;
     &chapter-performance-tuning;
     &chapter-jmm;
+    &chapter-2pc;
 </book>

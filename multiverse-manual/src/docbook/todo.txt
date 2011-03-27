@@ -4,6 +4,10 @@ todo
 
 done
 
+- chapter content on 1 page
+
+- css
+
 - summaries
 
-- subchapter numbering
+- sub-chapter numbering
