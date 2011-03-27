@@ -1,6 +1,6 @@
 <chapter xml:id="chapter-performance-tuning">
 
-<title>Performance tuning (not finished)</title>
+<title>Performance tuning</title>
 
 <sect1>
     <title>Introduction</title>
@@ -85,7 +85,7 @@
         to be used in this way). The advantage of this approach, is that the Stm is able to learn based on previous transaction executions and
         select the best performing settings. It relies on a speculative configuration mechanism where the system starts with the cheapest
         settings, but upgrades to more expensive one if the bet failed. If the AtomicBlock is discarded after usage, the STM will never be able to
-        learn. Another problem is that it also causes a lot of GC overhead.
+        learn. Another problem is that it also causes a lot of GC overhead. So reuse your AtomicBlocks!
     </para>
 </sect1>
 
@@ -99,16 +99,20 @@
 
 <sect1>
 <title>Small transactions</title>
-    Transactions should be as small as possible, so the less it needs to track, the faster it will be. Also when small transactions are used,
-    Multiverse is able to use special optimized transactions that cause less overhead than longer transactions.
 <para>
-
+    Transactions should be as small as possible, so the less it needs to track, the faster it will be. Also when small transactions are used,
+    Multiverse is able to use special optimized transactions that cause less overhead than longer transactions. Another advantage of using
+    small transactions, is that the mechanism for providing a read consistent view gets a lot cheaper (if the GammaStm is used). This reduces
+    the pressure on the shared conflict counter.
 </para>
 </sect1>
 
 <sect1>
     <title>Use atomic methods</title>
     <para>
+        If only a single ref needs to be read or written, consider using one the atomic methods that the refs support. They all support atomicGet,
+        atomicWeakGet, atomicSet and atomicGetAndSet. Atomic method provide the same guarantees and functionality you normally have with transactions,
+        but the overhead of transactions is considerably lower.
     </para>
 </sect1>
 
@@ -117,8 +121,6 @@
     <para>
         Normally a Transaction doesn't need to be passed explicitly, because it is placed in the org.multiverse.api.ThreadLocalTransaction. Every time
         the transaction is needed, it needs to be read from this ThreadLocal. By passing the Transaction explicitly, this overhead is removed.
-    </para>
-
     <programlisting language="java">
 
     import org.multiverse.api.*;
@@ -144,10 +146,39 @@
         ...
     }
     </programlisting>
-    <para>
         As you can see, the increment method now has an explicit transaction. Almost all methods of the ref are overloaded with a version that also
-        accepts a Transaction. If your methods call other transactional methods, the transaction can be passed manually.
+        accepts a Transaction. If your methods call other transactional methods, the transaction can be passed manually, e.g.
+
+    <programlisting language="java">
+    import org.multiverse.api.*;
+    import org.multiverse.api.refs.*;
+    import static org.multiverse.api.StmUtils.*;
+    import static org.multiverse.api.GlobalStmInstance.*
+
+    public class Foo{
+        private final static AtomicBlock someBlock = getGlobalStmInstance()
+                   .newTransactionFactoryBuilder()
+                   .newAtomicBLock();
+
+        private final IntRef ref = newIntRef(0);
+
+        public void method1(Transaction tx){
+           ref.set(tx, 2);
+        }
+
+        public void method2(){
+            someBlock.execute(new AtomicVoidClosure()){
+                public void execute(Transaction tx){
+                    method1(tx);
+                }
+            });
+        }
+    }
+    </programlisting>
+        Unfortunately this boilerplate code is required as long as the instrumentation is not available in Multiverse. Instrumentation
+        can transform this code mechanically.
     </para>
+
 </sect1>
 
 <sect1>

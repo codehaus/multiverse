@@ -41,9 +41,9 @@
 
         <para>After almost a year of hard and backbreaking work, Multiverse 0.7 was finally released. It is a complete
             rewrite from the previous releases where a lot of effort was made on removing some fundamental problems with
-            the 0.6 design (the need for a shared clock was reduced considerably), so it should be a lot better scalable.
+            the 0.6 design (the need for a shared clock was reduced considerably), so it should scale a lot better.
             Also the performance was increased considerably, and last but not least a whole new set of new features are added
-            like commuting operations, pessimistic locking etc.
+            like commuting operations, pessimistic locking, isolation and propagation levels etc.
         </para>
 
         <para>
