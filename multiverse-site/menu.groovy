@@ -41,7 +41,6 @@ def menus = [
                 new MenuItem(title: 'Overview', pageid: 'overview'),
                 new MenuItem(title: 'Download', pageid: 'download'),
                 new MenuItem(title: 'Features', pageid: 'features', items: [
-                        new SubMenuItem(title: 'Release 0.8', pageid: 'release-0.8'),
                         new SubMenuItem(title: 'Release 0.7', pageid: 'release-0.7'),
                         new SubMenuItem(title: 'Release 0.6', pageid: 'release-0.6'),
                         new SubMenuItem(title: 'Release 0.5', pageid: 'release-0.5'),
@@ -67,11 +66,8 @@ def menus = [
 
         new Menu(name: 'Documentation', items: [
                 new MenuItem(title: 'Overview', pageid: 'documentationoverview'),
-                new MenuItem(title: 'Reference Manual', pageid: 'manual', items: [
-                        new SubMenuItem(title: 'Manual Blocking', pageid: 'manual-blocking'),
-                        new SubMenuItem(title: 'Manual JMM', pageid: 'manual-jmm')
-                ]),
-                new MenuItem(title: 'Javadoc', url: 'http://multiverse.codehaus.org/maven-site/apidocs/')
+                new MenuItem(title: 'Reference Manual', url: 'manual/index.html'),
+                new MenuItem(title: 'Javadoc', url: 'javadoc/index.html')
         ])
 ]
 
@@ -97,27 +93,12 @@ def pages = [
         new Page(pageid: 'release-0.5'),
         new Page(pageid: 'release-0.6'),
         new Page(pageid: 'release-0.7'),
-        new Page(pageid: 'release-0.8'),
         new Page(pageid: 'flyingstart'),
-        new Page(pageid: 'index'),
         new Page(pageid: 'license'),
-        new Page(pageid: 'manual'),
-        new Page(pageid: 'manual-blocking'),
-        new Page(pageid: 'manual-isolation'),
-        new Page(pageid: 'manual-api'),
-        new Page(pageid: 'manual-mapping'),
-        new Page(pageid: 'manual-lifecycleevents'),
-        new Page(pageid: 'manual-referencesandprimitives'),
-        new Page(pageid: 'manual-jmm'),
-        new Page(pageid: 'manual-2phasecommit'),
-        new Page(pageid: 'manual-templates'),
-        new Page(pageid: 'manual-javaagent'),
-        new Page(pageid: 'manual-compiler'),
         new Page(pageid: 'missionstatement'),
         new Page(pageid: 'nosql'),
         new Page(pageid: 'otherjvmlanguages'),
         new Page(pageid: 'overview'),
-        new Page(pageid: 'setup-javaagent'),
         new Page(pageid: 'sponsors'),
         new Page(pageid: 'support'),
         new Page(pageid: 'team'),
@@ -156,6 +137,9 @@ output.text = new File("$basedir/multiverse-site/site/style.css").text
 
 def settingsxml = new File("$outputdirectory/settings.xml")
 settingsxml.text = new File("$basedir/multiverse-site/site/settings.xml").text
+
+def index = new File("$outputdirectory/index.html")
+index.text = new File("$basedir/multiverse-site/site/index.html").text
 
 def pomxml = new File("$outputdirectory/pom.xml")
 pomxml.text = new File("$basedir/multiverse-site/site/pom.xml").text

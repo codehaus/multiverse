@@ -7,13 +7,13 @@ both share one very important concept: transactions.
     In Multiverse a normal POJO can be made transactional by adding the <tt>TransactionalObject</tt> annotation, e.g.:
 <pre>
 
-    import org.multiverse.annotations.TransactionalObject;
+    import org.multiverse.api.*;
+    import static org.multiverse.api.StmUtils.*;
 
-    @TransactionalObject
     public class Account{
 
-        private Date lastUpdate;
-        private int balance;
+        private Ref&lt;Date&gt; lastUpdate = newRef();
+        private IntRef balance = newIntRef();
 
         public Account(int balance){
             setBalance(balance);
@@ -79,7 +79,3 @@ These examples only scratch the surface of Multiverse, but just having transacti
 a very big step forward in a lot of cases. For more advanced features and in-depth documention, the
 <a href="manual.html">manual</a> or <a href="documentationoverview.html">documentation overview</a>
 are the best places to get started.
-
-<h3>Footnote</h3>
-To make this transactional behavior possible, you need to set up the Multiverse Java agent, or use the Multiverse compiler
-for static instrumentation. For more information check <a href="http://multiverse.codehaus.org/manual.html">manual</a>.

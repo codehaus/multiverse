@@ -10,5 +10,5 @@ rely on a shared clock (atomic lock) which needs to be updated by updating threa
 share any other state. There are some optimizations that can be applied to reduce contention, but in the long
 run I think it is better to remove the clock altogether. As you can see in the graph, the STM's scale linearly
 as long as there is no contention.
-<a href="uncontended_mono_update_line_wide.png"><img src="uncontended_mono_update_line_narrow.png"/></a>
-<a href="contended_counter_line_wide.png"><img src="contended_counter_line_narrow.png"/></a>
+<a href="charts/uncontended_mono_update_line_wide.png"><img src="charts/uncontended_mono_update_line_narrow.png"/></a>
+<a href="charts/contended_counter_line_wide.png"><img src="charts/contended_counter_line_narrow.png"/></a>

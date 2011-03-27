@@ -228,6 +228,9 @@ project(':multiverse-site') {
         ant.copy(todir: "${projectDir}/build/site") {
             fileset(dir: "../charts")
         }
+
+
+
         println "Finished copying charts"
     }
 }
