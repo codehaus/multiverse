@@ -58,7 +58,7 @@
          private final static AtomicBlock transferBlock = getGlobalStmInstance()
               .newTransactionFactoryBuilder()
               .setPropagationLevel(PropagationLevel.Requires)
-              .newAtomicBLock();
+              .newAtomicBlock();
 
          private final IntRef amount = newIntRef(0);
 
