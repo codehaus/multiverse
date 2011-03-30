@@ -5,7 +5,7 @@
 <sect1>
     <title>Introduction</title>
     <para>
-        Check out the following set of guidelines to improve performance/scalability of STM datastructures.
+        This chapter contains various tips for improving performance of transactional datastructures.
     </para>
 </sect1>
 

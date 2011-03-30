@@ -124,6 +124,7 @@
 
     <sect1>
         <title>Other features</title>
+
         <itemizedlist>
             <listitem>
                 <para>Pessimistic transactions</para>
