@@ -51,7 +51,7 @@
             It is best, if there are more than 1 method that needs to have its own transaction, that each of these
             methods gets it own AtomicBlock. It is useful for debugging purposes because you can see which transaction
             is causing problems. It also is more useful for the speculative mechanism, so that the system is able to
-            learn from each AtomicBlock independently; so is able to select the optimal configuration for each
+            learn from each AtomicBlock independently, and is able to select the optimal configuration for each
             individual method.
         </para>
     </sect1>
