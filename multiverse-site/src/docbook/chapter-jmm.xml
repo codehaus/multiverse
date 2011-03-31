@@ -19,19 +19,14 @@
         </para>
             <itemizedlist>
                 <listitem>
-                    <itemizedlist>
-                        <listitem>
-                            <para>monitor lock rule: all writes executed before some lock is released, are visible when
-                                the same lock is acquired.
-                            </para>
-                        </listitem>
-                        <listitem>
-                            <para>volatile variable rule: all writes executed before some volatile variable is written,
-                                are visible when the same volatile variable is read.
-                            </para>
-                        </listitem>
-                    </itemizedlist>
+                    <para>monitor lock rule: all writes executed before some lock is released, are visible when
+                        the same lock is acquired.
+                    </para>
                 </listitem>
+                <listitem>
+                    <para>volatile variable rule: all writes executed before some volatile variable is written,
+                            are visible when the same volatile variable is read.</para>
+                 </listitem>
             </itemizedlist>
         <para>
             The happens before rules clearly specify which visibility guarantees are provided on memory content and
