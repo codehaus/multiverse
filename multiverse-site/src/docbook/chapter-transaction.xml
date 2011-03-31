@@ -28,7 +28,7 @@
         private final IntRef amount = newIntRef(0);
 
         public void transfer(final int a){
-            execute(new AtomicVoidClosure()){
+            transferBlock.execute(new AtomicVoidClosure()){
                 public void execute(Transaction tx){
                     amount.increment(tx, a);
                 }
@@ -71,7 +71,7 @@
                     private final IntRef amount = newIntRef(0);
 
                     public void transfer(final int a){
-                        execute(new AtomicVoidClosure()){
+                        transferBlock.execute(new AtomicVoidClosure()){
                             public void execute(Transaction tx){
                                 amount.increment(tx, a);
                             }
@@ -106,7 +106,7 @@
         private final IntRef amount = newIntRef(0);
 
         public void transfer(final int a){
-            execute(new AtomicVoidClosure()){
+            transferBlock.execute(new AtomicVoidClosure()){
                 public void execute(Transaction tx){
                     amount.increment(tx, a);
                 }
@@ -158,7 +158,7 @@
         private final IntRef amount = newIntRef(0);
 
         public void transfer(final int a){
-            execute(new AtomicVoidClosure()){
+            transferBlock.execute(new AtomicVoidClosure()){
                 public void execute(Transaction tx){
                     amount.increment(tx, a);
                 }

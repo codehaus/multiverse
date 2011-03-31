@@ -1,6 +1,6 @@
 <chapter xml:id="chapter-controlflow-errors">
 
-    <title>org.multiverse.api.exceptions.ControlFlowError (in progress)</title>
+    <title>org.multiverse.api.exceptions.ControlFlowError</title>
     <sect1>
         <title>Introduction</title>
         <para>
@@ -50,7 +50,15 @@
     <sect1>
         <title>org.multiverse.api.exceptions.SpeculativeConfigurationError</title>
         <para>
-
+            Multiverse uses a speculative mechanism to figure out the best configuration for a transaction. E.g.
+            there a different transaction implementations optimized for a different number of refs. The speculative
+            configuration mechanism starts with a settings, but as soon as it figures out that the settings are too
+            cheap,
+            it throws a org.multiverse.api.exceptions.SpeculativeConfigurationError. This error is caught by the
+            org.multiverse.api.AtomicBlock and upgrades the transaction/settings. Once the AtomicBlock has learned, it
+            will not make the same mistakes again. So in the beginning there can be some unexpected failure, but
+            after a few tries, they won't appear again. This mechanism can be disabled by setting the 'setSpeculative'
+            to true on the org.multiverse.api.TransactionFactoryBuilder.
         </para>
     </sect1>
 
@@ -59,10 +67,14 @@
         <para>
             Normally caching an Exception would be considered an very big no-no. The problem with using new exceptions
             for control flow, is that is can seriously limit scalability since exceptions are very expensive to create
-            (especially the stacktrace). That is why the default is that instances of the org.multiverse.api.exceptions.ControlFlowError
-            are created in the beginning and reused. If you need to have a closer look in the exception to see what is happening
-            (or where it is happening), the 'setControlFlowErrorsReused' on the org.multiverse.api.TransactionFactoryBuilder
-            can be called (else you will see an empty stacktrace). You need to make sure that you don't gobble up this Error, but
+            (especially the stacktrace). That is why the default is that instances of the
+            org.multiverse.api.exceptions.ControlFlowError
+            are created in the beginning and reused. If you need to have a closer look in the exception to see what is
+            happening
+            (or where it is happening), the 'setControlFlowErrorsReused' on the
+            org.multiverse.api.TransactionFactoryBuilder
+            can be called (else you will see an empty stacktrace). You need to make sure that you don't gobble up this
+            Error, but
             propagate it since the AtomicBlock is the one that is going to deal with it.
         </para>
     </sect1>
