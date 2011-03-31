@@ -176,4 +176,13 @@
             any progress.
         </para>
     </sect1>
+
+    <sect1>
+        <title>Don't rely on Transaction instance</title>
+        <para>
+            To prevent causing a lot of unwanted gc overhead, transaction instances are reused. This means that the same transaction instance
+            could be used for different executions of the same AtomicBlock, but it also could be reused to execute a completely different
+            AtomicBlock. That is why it is important to realize that Transaction instances should not be stored.
+        </para>
+    </sect1>
 </chapter>
