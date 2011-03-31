@@ -116,88 +116,6 @@
     </para>
 </sect1>
 
-<sect1>
-    <title>Nested transactional methods</title>
-    It can happen that nested transactional methods are required, e.g.:
-    <para>
-        <programlisting language="java">
-    import org.multiverse.api.*;
-    import org.multiverse.api.refs.*;
-    import static org.multiverse.api.StmUtils.*;
-    import static org.multiverse.api.GlobalStmInstance.*
-
-    public class Foo{
-        private final static AtomicBlock method1Block = getGlobalStmInstance()
-                   .newTransactionFactoryBuilder()
-                   .newAtomicBlock();
-        private final static AtomicBlock method2Block = getGlobalStmInstance()
-                   .newTransactionFactoryBuilder()
-                   .newAtomicBlock();
-
-        private final IntRef ref = newIntRef(0);
-
-        public void method1(){
-            method1Block.execute(new AtomicVoidClosure()){
-                public void execute(Transaction tx){
-                    ref.set(2);
-                }
-            });
-        }
-
-        public void method2(){
-            method2Block.execute(new AtomicVoidClosure()){
-                public void execute(Transaction tx){
-                    method1();
-                }
-            });
-        }
-    }
-        </programlisting>
-        The problem with this approach is that 2 AtomicClosures are created when method2 is called. This problem can
-        be prevented by creating 2 version of the method; 1 with a transaction and one without. E.g.:
-        <programlisting language="java">
-    import org.multiverse.api.*;
-    import org.multiverse.api.refs.*;
-    import static org.multiverse.api.StmUtils.*;
-    import static org.multiverse.api.GlobalStmInstance.*
-
-    public class Foo{
-        private final static AtomicBlock method1Block = getGlobalStmInstance()
-                   .newTransactionFactoryBuilder()
-                   .newAtomicBlock();
-        private final static AtomicBlock method2Block = getGlobalStmInstance()
-                   .newTransactionFactoryBuilder()
-                   .newAtomicBlock();
-
-        private final IntRef ref = newIntRef(0);
-
-        public void method1(){
-            method1Block.execute(new AtomicVoidClosure()){
-                public void execute(Transaction tx){
-                    method1(tx);
-                }
-            });
-        }
-
-        public void method1(Transaction tx){
-           ref.set(tx, 2);
-        }
-
-        public void method2(){
-            method2Block.execute(new AtomicVoidClosure()){
-                public void execute(Transaction tx){
-                    internalMethod(tx);
-                }
-            });
-        }
-
-        public void method2(Transaction tx){
-            method1(tx);
-        }
-    }
-        </programlisting>
-    </para>
-</sect1>
 
 <sect1>
     <title>Explicit transaction passing</title>
@@ -263,6 +181,89 @@
         tucked away behind some syntactic sugar.
     </para>
 
+</sect1>
+
+    <sect1>
+        <title>Nested transactional methods</title>
+        It can happen that nested transactional methods are required, e.g.:
+        <para>
+            <programlisting language="java">
+     import org.multiverse.api.*;
+     import org.multiverse.api.refs.*;
+     import static org.multiverse.api.StmUtils.*;
+     import static org.multiverse.api.GlobalStmInstance.*
+
+     public class Foo{
+         private final static AtomicBlock method1Block = getGlobalStmInstance()
+                    .newTransactionFactoryBuilder()
+                    .newAtomicBlock();
+         private final static AtomicBlock method2Block = getGlobalStmInstance()
+                    .newTransactionFactoryBuilder()
+                    .newAtomicBlock();
+
+         private final IntRef ref = newIntRef(0);
+
+         public void method1(){
+             method1Block.execute(new AtomicVoidClosure()){
+                 public void execute(Transaction tx){
+                     ref.set(2);
+                 }
+             });
+         }
+
+         public void method2(){
+             method2Block.execute(new AtomicVoidClosure()){
+                 public void execute(Transaction tx){
+                     method1();
+                 }
+             });
+         }
+     }
+         </programlisting>
+         The problem with this approach is that 2 AtomicClosures are created when method2 is called. This problem can
+         be prevented by creating 2 version of the method; 1 with a transaction and one without. E.g.:
+         <programlisting language="java">
+     import org.multiverse.api.*;
+     import org.multiverse.api.refs.*;
+     import static org.multiverse.api.StmUtils.*;
+     import static org.multiverse.api.GlobalStmInstance.*
+
+     public class Foo{
+         private final static AtomicBlock method1Block = getGlobalStmInstance()
+                    .newTransactionFactoryBuilder()
+                    .newAtomicBlock();
+         private final static AtomicBlock method2Block = getGlobalStmInstance()
+                    .newTransactionFactoryBuilder()
+                    .newAtomicBlock();
+
+         private final IntRef ref = newIntRef(0);
+
+         public void method1(){
+             method1Block.execute(new AtomicVoidClosure()){
+                 public void execute(Transaction tx){
+                     method1(tx);
+                 }
+             });
+         }
+
+         public void method1(Transaction tx){
+            ref.set(tx, 2);
+         }
+
+         public void method2(){
+             method2Block.execute(new AtomicVoidClosure()){
+                 public void execute(Transaction tx){
+                     internalMethod(tx);
+                 }
+             });
+         }
+
+         public void method2(Transaction tx){
+             method1(tx);
+         }
+     }
+         </programlisting>
+     </para>
 </sect1>
 
 <sect1>
