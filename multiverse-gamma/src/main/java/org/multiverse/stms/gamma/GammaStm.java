@@ -281,9 +281,9 @@ public final class GammaStm implements Stm {
             config.init();
 
             if (config.isSpeculative()) {
-                return new SpeculativeGammaTransactionFactory(config);
+                return new SpeculativeGammaTransactionFactory(config, this);
             } else {
-                return new NonSpeculativeGammaTransactionFactory(config);
+                return new NonSpeculativeGammaTransactionFactory(config,this);
             }
         }
     }
@@ -346,9 +346,16 @@ public final class GammaStm implements Stm {
     private static final class NonSpeculativeGammaTransactionFactory implements GammaTransactionFactory {
 
         private final GammaTransactionConfiguration config;
+        private final GammaTransactionFactoryBuilder builder;
 
-        NonSpeculativeGammaTransactionFactory(final GammaTransactionConfiguration config) {
+        NonSpeculativeGammaTransactionFactory(final GammaTransactionConfiguration config, GammaTransactionFactoryBuilder builder) {
             this.config = config.init();
+            this.builder = builder;
+        }
+
+        @Override
+        public TransactionFactoryBuilder getTransactionFactoryBuilder() {
+            return builder;
         }
 
         @Override
@@ -383,9 +390,16 @@ public final class GammaStm implements Stm {
     private static final class SpeculativeGammaTransactionFactory implements GammaTransactionFactory {
 
         private final GammaTransactionConfiguration config;
+        private final GammaTransactionFactoryBuilder builder;
 
-        SpeculativeGammaTransactionFactory(final GammaTransactionConfiguration config) {
+        SpeculativeGammaTransactionFactory(final GammaTransactionConfiguration config, GammaTransactionFactoryBuilder builder) {
             this.config = config.init();
+            this.builder = builder;
+        }
+
+        @Override
+        public GammaTransactionFactoryBuilder getTransactionFactoryBuilder() {
+            return builder;
         }
 
         @Override

@@ -1,5 +1,6 @@
 package org.multiverse.stms.gamma.transactions.lean;
 
+import org.multiverse.api.TransactionFactoryBuilder;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
@@ -22,6 +23,11 @@ public class LeanFixedLengthGammaTransactionFactory implements GammaTransactionF
 
     public LeanFixedLengthGammaTransactionFactory(GammaTransactionConfiguration config) {
         this.config = config.init();
+    }
+
+    @Override
+    public TransactionFactoryBuilder getTransactionFactoryBuilder() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

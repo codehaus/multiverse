@@ -1,5 +1,6 @@
 package org.multiverse.stms.gamma.transactions.fat;
 
+import org.multiverse.api.TransactionFactoryBuilder;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
@@ -17,6 +18,11 @@ public final class FatVariableLengthGammaTransactionFactory implements GammaTran
 
     public FatVariableLengthGammaTransactionFactory(GammaTransactionConfiguration config) {
         this.config = config.init();
+    }
+
+    @Override
+    public TransactionFactoryBuilder getTransactionFactoryBuilder() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

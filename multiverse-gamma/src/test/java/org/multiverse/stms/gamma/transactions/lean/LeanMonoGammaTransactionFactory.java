@@ -1,5 +1,6 @@
 package org.multiverse.stms.gamma.transactions.lean;
 
+import org.multiverse.api.TransactionFactoryBuilder;
 import org.multiverse.stms.gamma.GammaStm;
 import org.multiverse.stms.gamma.transactions.GammaTransaction;
 import org.multiverse.stms.gamma.transactions.GammaTransactionConfiguration;
@@ -27,6 +28,11 @@ public class LeanMonoGammaTransactionFactory implements GammaTransactionFactory 
 
     @Override
     public GammaTransaction upgradeAfterSpeculativeFailure(GammaTransaction failingTransaction, GammaTransactionPool pool) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public TransactionFactoryBuilder getTransactionFactoryBuilder() {
         throw new UnsupportedOperationException();
     }
 

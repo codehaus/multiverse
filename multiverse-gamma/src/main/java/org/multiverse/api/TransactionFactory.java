@@ -22,6 +22,8 @@ public interface TransactionFactory {
      */
     TransactionConfiguration getConfiguration();
 
+    TransactionFactoryBuilder getTransactionFactoryBuilder();
+
     /**
      * Creates a new {@link Transaction}.
      *
